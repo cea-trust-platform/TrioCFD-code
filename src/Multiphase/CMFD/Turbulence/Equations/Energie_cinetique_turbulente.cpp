@@ -12,56 +12,38 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Energie_cinetique_turbulente.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Equations
-// Version:     /main/52
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Energie_cinetique_turbulente.h>
+#include <EcritureLectureSpecial.h>
+#include <Scalaire_impose_paroi.h>
+#include <Champ_Face_PolyMAC_P0.h>
+#include <Echange_global_impose.h>
+#include <Schema_Implicite_base.h>
+#include <Neumann_sortie_libre.h>
+#include <Op_Conv_negligeable.h>
+#include <Frontiere_dis_base.h>
+#include <Navier_Stokes_std.h>
+#include <Champ_Uniforme.h>
+#include <Matrice_Morse.h>
+#include <Neumann_paroi.h>
 #include <Pb_Multiphase.h>
 #include <Discret_Thyd.h>
 #include <Domaine_VF.h>
+#include <TRUSTTrav.h>
+#include <EChaine.h>
 #include <Domaine.h>
 #include <Avanc.h>
-#include <Debog.h>
-#include <Frontiere_dis_base.h>
-#include <EcritureLectureSpecial.h>
-#include <Champ_Uniforme.h>
-#include <Matrice_Morse.h>
-#include <Navier_Stokes_std.h>
-#include <TRUSTTrav.h>
-#include <Neumann_sortie_libre.h>
-#include <Op_Conv_negligeable.h>
 #include <Param.h>
-#include <Schema_Implicite_base.h>
+#include <Debog.h>
 #include <SETS.h>
-#include <EChaine.h>
-#include <Neumann_paroi.h>
-#include <Scalaire_impose_paroi.h>
-#include <Echange_global_impose.h>
-
-#define old_forme
 
 Implemente_instanciable(Energie_cinetique_turbulente,"Energie_cinetique_turbulente",Convection_diffusion_turbulence_multiphase);
 
-/*! @brief Simple appel a: Convection_diffusion_turbulence_multiphase::printOn(Sortie&)
- *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Energie_cinetique_turbulente::printOn(Sortie& is) const
 {
   return Convection_diffusion_turbulence_multiphase::printOn(is);
 }
 
-/*! @brief Appelle Convection_diffusion_turbulence_multiphase::readOn(Entree&).
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
- */
 Entree& Energie_cinetique_turbulente::readOn(Entree& is)
 {
   Convection_diffusion_turbulence_multiphase::readOn(is);
@@ -71,10 +53,16 @@ Entree& Energie_cinetique_turbulente::readOn(Entree& is)
   terme_diffusif.set_description((Nom)"Turbulent kinetic energy transfer rate=Integral(mu*grad(k)*ndS) [W] if SI units used");
   return is;
 }
+void Energie_cinetique_turbulente::set_param(Param& param)
+{
+  Convection_diffusion_turbulence_multiphase::set_param(param);
+  param.ajouter("limit_coef",&coef_limit_); // XD attr limit_coef flottant limit_coef 1 Coefficient of the limiter (min (K, coef * v^2)). Default value of coef is set to 0.1
+  param.ajouter_flag("limit_K",&limit_k_); // XD attr limit_K entier limit_K 1 Flag to activate the limiter on K. Default value is 0 (deactivated)
+}
 
 const Champ_Don& Energie_cinetique_turbulente::diffusivite_pour_transport() const
 {
-  return ref_cast(Fluide_base,milieu()).viscosite_dynamique();
+  return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }
 
 const Champ_base& Energie_cinetique_turbulente::diffusivite_pour_pas_de_temps() const
@@ -82,9 +70,6 @@ const Champ_base& Energie_cinetique_turbulente::diffusivite_pour_pas_de_temps() 
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }
 
-/*! @brief Discretise l'equation.
- *
- */
 void Energie_cinetique_turbulente::discretiser()
 {
   int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
@@ -100,47 +85,58 @@ void Energie_cinetique_turbulente::discretiser()
   Cerr << "Energie_cinetique_turbulente::discretiser() ok" << finl;
 }
 
+void Energie_cinetique_turbulente::mettre_a_jour(double temps)
+{
+  // XXX : appel a la classe mere
+  Convection_diffusion_turbulence_multiphase::mettre_a_jour(temps);
+
+  const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, probleme());
+  if (pbm.discretisation().is_polymac_p0() && limit_k_ == 1)
+    if ( temps > schema_temps().temps_courant() && coef_limit_ > 0 )
+      {
+        Cerr << "Limiting the value of K : coeff used = " << coef_limit_ << finl;
+        const Champ_Face_PolyMAC_P0& ch_vit = ref_cast(Champ_Face_PolyMAC_P0, ref_cast(Navier_Stokes_std,pbm.equation_qdm()).vitesse().valeur());
+        const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, domaine_dis().valeur());
+        DoubleTab& k_val = inconnue()->valeurs();
+        const int N = k_val.line_size(), D = dimension;
+
+        for (int e = 0; e < domaine.nb_elem(); e++)
+          for (int n = 0; n < N; n++)
+            {
+              double norm_v2 = 0;
+              for (int d = 0 ; d<D ; d++) norm_v2 += ch_vit.passe()(e, N*d+n);
+              k_val(e, n) = std::min(k_val(e, n), coef_limit_ * norm_v2 );
+            }
+        k_val.echange_espace_virtuel();
+        inconnue()->passe() = k_val;
+      }
+}
+
 void Energie_cinetique_turbulente::calculer_alpha_rho_k(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
   const Equation_base& eqn = ref_cast(Equation_base, obj);
-  const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
-  const Champ_base& ch_rho = fl.masse_volumique();
-  const Champ_Inc_base *ch_alpha = sub_type(Pb_Multiphase, eqn.probleme()) ? &ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue().valeur() : NULL,
-                        *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : NULL; //pas toujours un Champ_Inc
-  const DoubleTab* alpha = ch_alpha ? &ch_alpha->valeurs() : NULL, &rho = ch_rho.valeurs(), &k = eqn.inconnue().valeurs();
+
+  /*  const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
+    const Champ_base& ch_rho = fl.masse_volumique();
+    const Champ_Inc_base *ch_alpha = sub_type(Pb_Multiphase, eqn.probleme()) ? &ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue().valeur() : nullptr,
+                          *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
+    const DoubleTab* alpha = ch_alpha ? &ch_alpha->valeurs() : nullptr, &rho = ch_rho.valeurs(), &k = eqn.inconnue().valeurs();
+  */
+  const DoubleTab& k = eqn.inconnue().valeurs();
 
   /* valeurs du champ */
-  int i, n, N = val.line_size(), Nl = val.dimension_tot(0), cR = sub_type(Champ_Uniforme, ch_rho);
+  int i, n, N = val.line_size(), Nl = val.dimension_tot(0);
   for (i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * k(i, n);
+    for (n = 0; n < N; n++) val(i, n) = k(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab();
-  DoubleTab b_rho, b_k = eqn.inconnue()->valeur_aux_bords();
+  const DoubleTab& b_k = eqn.inconnue()->valeur_aux_bords();
   int Nb = b_k.dimension_tot(0);
-  if (ch_rho.a_un_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
-  else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis().valeur()).xv_bord(), b_rho);
   for (i = 0; i < Nb; i++)
-    for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_k(i, n);
+    for (n = 0; n < N; n++) bval(i, n) = b_k(i, n);
 
-  if (alpha)//derivee en alpha : rho * k
-    {
-      DoubleTab& d_a = deriv["alpha"];
-      for (d_a.resize(Nl, N), i = 0; i < Nl; i++)
-        for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * k(i, n);
-    }
-  //derivee en k : alpha * rho
+  //derivee en k : 1.
   DoubleTab& d_k = deriv["k"];
   for (d_k.resize(Nl, N), i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) d_k(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n);
-
-  /* derivees a travers rho */
-  if (pch_rho)
-    for (auto && n_d :pch_rho->derivees())
-      {
-        DoubleTab& d_v = deriv[n_d.first];
-        for (d_v.resize(Nl, N), i = 0; i < Nl; i++)
-          for (n = 0; n < N; n++)
-            d_v(i, n) = (alpha ? (*alpha)(i, n) : 1) * k(i, n) * n_d.second(i, n);
-      }
+    for (n = 0; n < N; n++) d_k(i, n) = 1.;
 }

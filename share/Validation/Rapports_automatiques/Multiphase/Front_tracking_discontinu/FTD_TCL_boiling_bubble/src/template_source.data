@@ -141,7 +141,7 @@ Lire pb
    
    hydraulique
    {
-      modele_turbulence nul {  }
+      modele_turbulence null {  }
       solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
       convection { quick }
       diffusion { }

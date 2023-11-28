@@ -42,6 +42,7 @@ Champ_Post_Operateur_Eqn::Champ_Post_Operateur_Eqn()
 {
   numero_op_=-1;
   numero_source_=-1;
+  numero_masse_ = -1;
   sans_solveur_masse_=0;
   compo_=-1;
 }
@@ -51,6 +52,7 @@ void Champ_Post_Operateur_Eqn::set_param(Param& param)
   Champ_Generique_Operateur_base::set_param(param);
   param.ajouter("numero_source",&numero_source_);
   param.ajouter("numero_op",&numero_op_);
+  param.ajouter("numero_masse",&numero_masse_);
   param.ajouter_flag("sans_solveur_masse",&sans_solveur_masse_);
   param.ajouter("compo",&compo_);
 }
@@ -258,8 +260,10 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
         es=0;
         Operateur().ajouter(ref_eq_->operateur(numero_op_).mon_inconnue().valeurs(),es);
       }
-    else
+    else if (numero_source_!=-1)
       ref_eq_->sources()(numero_source_).calculer(es);
+    else if ((numero_masse_!=-1) && ref_eq_->has_interface_blocs())
+      es=0, ref_eq_->schema_temps().ajouter_blocs({},es,ref_eq_.valeur());
     if (!sans_solveur_masse_)
       ref_eq_->solv_masse().valeur().appliquer_impl(es); //On divise par le volume
     // Hack: car Masse_PolyMAC_Face::appliquer_impl ne divise pas par le volume (matrice de masse)....
@@ -369,6 +373,8 @@ void Champ_Post_Operateur_Eqn::nommer_source()
       nom_post_source += Nom(numero_source_);
       nom_post_source += "_o" ;
       nom_post_source += Nom(numero_op_);
+      nom_post_source += "_m" ;
+      nom_post_source += Nom(numero_masse_);
       if (compo_!=-1)
         {
           Nom nume(compo_);

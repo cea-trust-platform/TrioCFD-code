@@ -14,7 +14,6 @@
 *****************************************************************************/
 
 #include <Navier_Stokes_Turbulent.h>
-#include <Modele_turbulence_hyd_nul.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>

@@ -34,7 +34,7 @@
 #include <Nom.h>
 #include <Champ_Face_base.h>
 
-Implemente_instanciable(Loi_paroi_adaptative, "Loi_paroi_adaptative", Loi_paroi_base);
+Implemente_instanciable(Loi_paroi_adaptative, "Loi_paroi_adaptative", Loi_paroi_log);
 
 Sortie& Loi_paroi_adaptative::printOn(Sortie& os) const
 {
@@ -43,7 +43,7 @@ Sortie& Loi_paroi_adaptative::printOn(Sortie& os) const
 
 Entree& Loi_paroi_adaptative::readOn(Entree& is)
 {
-  return Loi_paroi_base::readOn(is);
+  return Loi_paroi_log::readOn(is);
 }
 
 void Loi_paroi_adaptative::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
@@ -97,27 +97,6 @@ void Loi_paroi_adaptative::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu
       }
 }
 
-double Loi_paroi_adaptative::calc_y_plus_loc(double u_par, double nu, double y, double y_p_0)
-{
-  double eps = eps_y_p_;
-  int step = 1, iter_max = 30;
-
-  double y_p = y_p_0 ;
-  double u_tau = nu*y_p/y;
-
-  do
-    {
-      y_p = y_p - (u_plus_de_y_plus(y_p) - u_par/u_tau)/(deriv_u_plus_de_y_plus(y*u_tau/nu) + u_par/(u_tau*y_p) );
-      step = step+1;
-      u_tau = nu*y_p/y;
-    }
-  while( (std::fabs(u_plus_de_y_plus(y_p) - u_par/u_tau) > eps) and (step < iter_max));
-
-  assert ( (std::fabs(u_par/u_tau - u_plus_de_y_plus(y_p)) < eps_y_p_*10) and (step < iter_max));
-
-  return y_p;
-}
-
 double Loi_paroi_adaptative::u_plus_de_y_plus(double y_p)  // Blended Reichardt model
 {
   double reichardt = std::log(1+0.4*y_p)/von_karman_;
@@ -141,7 +120,7 @@ double Loi_paroi_adaptative::deriv_u_plus_de_y_plus(double y_p)
   double d_reichardt = 0.4/(1+0.4*y_p)*1/von_karman_;
   d_reichardt += 7.8/11*std::exp(-y_p/11);
   d_reichardt += -7.8/11*std::exp(-y_p/3) + 7.8*y_p/33*std::exp(-y_p/3) ;
-  double d_log_law = 1/(y_p+limiteur_y_p);
+  double d_log_law = 1/(y_p+limiteur_y_p)*1./von_karman_;
   double d_blending = 4/27*(y_p/27*y_p/27*y_p/27)*(1-blending*blending);
 
   return (1-blending)*d_reichardt - reichardt*d_blending + blending*d_log_law + d_blending*log_law ;
