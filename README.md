@@ -5,7 +5,7 @@
 based on the TRUST platform.
 There are different physical modules such as:
 - Turbulence LES & RANS models,
-- Front_Tracking,
+- Front-Tracking,
 - Radiation,
 - ALE for fluid/structure interactions.
 
