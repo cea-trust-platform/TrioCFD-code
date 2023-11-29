@@ -1,0 +1,462 @@
+Parameters {
+	newvalidTrio
+        Title "Free vibration of a cantilever cylinder in a narrow coaxial cylindrical channel"
+        Author " M. A. Puscas"
+	ParametersTRUST Problem : Pb_hydraulique_ALE
+	ParametersTRUST Dimension : 3D
+	ParametersTRUST Domain : Domaine_ALE
+	ParametersTRUST Fluid Discretization : VEFPre1B
+	ParametersTRUST Fluid Time scheme : Scheme_euler_implicit with solver implicite_ALE
+	ParametersTRUST Medium : Fluide_Incompressible: air and water
+	ParametersTRUST Hydraulic problem : Navier_Stokes_standard_ALE
+        ParametersTRUST Convection scheme: ALE muscl
+        ParametersTRUST Beam time integration scheme: Hilber, Hughes and Taylor (HHT). Modal resolution, 20 modes (10 in xy plane, 10 in xz plane)
+        ParametersTRUST Beam boundary conditions : clamped-free and pinned-pinned
+        ParametersTRUST Beam mechanical properties, the Young modulus 2.1e11  Pa and the density equal to 7850 kg/m3
+        ParametersTRUST Explicit coupling with the fluid         
+	TestCase  CF_Air Beam_Free_Vibration.data 2
+	TestCase  CF_Water Beam_Free_Vibration.data 2
+	TestCase  PP_Air Beam_Free_Vibration.data 2
+	TestCase  PP_Water Beam_Free_Vibration.data 2 /*jdd en annexe*/ 
+	IncludeData 2
+
+        Reference "1. Assessment of an Euler-Bernoulli Beam Model Coupled to CFD in Order to Perform Fluid-Structure Simulations, D. Vivaldi and G. Ricciardi, Pressure Vessels and Piping Conference, 2022."
+       Reference  "2. Viscous theory for the vibrations of coaxial cylinders. Analytical formulas for the fluid forces and the modal added coefficients, R. Lagrange and M. A. Puscas, Journal of Applied Mechanics, 90(6), 2023."
+	 
+	 
+}
+
+Purpose {
+        Description "This test case was created to validate the fluid-structure partitioned coupling between an Euler-Bernoulli beam model for the structure and the incompressible viscous flow model of TrioCFD. "
+        Description "It allows two-way explicit fluid-structure coupling where the Arbitrary Lagrangian-Eulerian (ALE) module is used to consider the structure displacement/deformations in the fluid domain."
+        Description "The coupling is similar to that presented in reference [1]. The points of difference are in the resolution of the beam model, which in our case uses a model-based solution, and in the construction of the displacement/deformation of the fluid-structure interface (3d surface)."
+        Description "The geometry is taken from [2]. The validation investigates the free vibrations for a cantilever cylinder in static air and water. The cylinder frequency vibrations are compared to the reference data [2]."
+}
+
+Pb_description {
+	Description "The domain used for the numerical simulations is the one in Figure 1. It is composed of a cantilever cylinder, with a length of 0.7 m and a diameter of 0.02 m, in a narrow coaxial cylindrical fluid channel with a length of 0.8 m a diameter of 0.022 m."
+
+	geometry {
+		Figure {
+			Title "Domain: cantilever cylinder in a narrow coaxial cylindrical channel"
+			Width 10cm
+			picture domaine.png
+			}
+		}
+	icbc {
+
+		Description "The external cylinder is fixed. The internal cylinder is flexible. "
+		Description "Initially, the fluid is at rest."
+		Description "The simulations were performed in air and in water"
+		Description "In this test case we consider two configurations for the beam: 1) with boundary conditions at x=0 clamped type and at x=L free type (CF); 2) with boundary conditions at x=0 and x=L pinned type (PP)."
+		Description "Initial conditions for the beam: at the beginning of the simulation an initial displacement of 0.0001 m is imposed to the beam (at x=L for the CF case and at x=L/2 for the PP case)." 
+	} 
+}
+
+Results {
+	Description "Clamped-free beam natural frequency validation in static air and water."
+	Figure {
+		Title "Amplitude of the cylinder free end displacement as a function of time."		
+		LabelX "t [s]"
+		LabelY "D [m]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {
+			legend "CF Air"
+			file ./CF_Air/Poutre_Displacement1D.out
+			columns $1 $3
+			Style lines
+		}
+		Courbe {
+			legend "CF Water"
+			file ./CF_Water/Poutre_Displacement1D.out
+			columns $1 $3
+			Style lines
+		}
+	}
+
+
+
+
+	Description "Table 1 illustrates the corresponding results in terms of natural frequency in air and water for the clamped-free beam case." 
+
+
+	Table {
+		Title "Comparison of the clamped-free beam numerical natural frequency with the analytical solution."
+		nb_columns 2
+		label Air | Water
+		include_description_lines 0
+
+		Line {
+			legend "Theoretical solution [2]"
+			values 59.07 39.39
+		}
+		
+		Line {
+			Nb_colonnes_fichier 2
+			legend "Coupled TrioCFD-Beam"
+			file Freq_CF.txt 
+			Colonnes $1 $2
+
+		}
+
+	}
+
+			
+	Description "We report velocity and pressure fields along the line A(-0.05, 0.0205, 0.)--B(0.75, 0.0205, 0) in order to investigate such distributions."
+	
+	Figure {
+		Title "CF case: y-velocity fields along the line AB"
+		
+		LabelX "t [s]"
+		LabelY "Vy [m/s]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {
+			legend "CF air"
+			Fichier ./CF_Air/Beam_Free_Vibration_VITESSE_SONDE_H.son
+			columns $1 $3
+			Style lines
+		}
+
+		Courbe {
+			legend "CF water"
+			file ./CF_Water/Beam_Free_Vibration_VITESSE_SONDE_H.son
+			columns $1 $3
+			Style lines
+		}
+
+	}
+	
+	Figure {
+		Title "CF case: z-velocity fields along the line AB"
+		
+		LabelX "t [s]"
+		LabelY "Vz [m/s]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {
+			legend "CF air"
+			Fichier ./CF_Air/Beam_Free_Vibration_VITESSE_SONDE_H.son
+			columns $1 $4
+			Style lines
+		}
+
+		Courbe {
+			legend "CF water"
+			file ./CF_Water/Beam_Free_Vibration_VITESSE_SONDE_H.son
+			columns $1 $4
+			Style lines
+		}
+
+	}
+	
+		Figure {
+		Title "CF case: pressure fields along the line AB"
+		
+		LabelX "t [s]"
+		LabelY "P [Pa]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {
+			legend "CF air"
+			Fichier ./CF_Air/Beam_Free_Vibration_PRESSURE_SONDE_H.son
+			columns $1 $2
+			Style lines
+		}
+
+		Courbe {
+			legend "CF water"
+			file ./CF_Water/Beam_Free_Vibration_PRESSURE_SONDE_H.son
+			columns $1 $2
+			Style lines
+		}
+
+	}
+	
+	
+	
+	
+	Description "We report the fluid force acting on the beam in order to investigate such distributions."
+	
+	Figure {
+		Title "CF case: force per unit length of cylinder, x-component"
+		
+		LabelX "t [s]"
+		LabelY "F [Pa/m]"
+		legend outside
+		include_description_curves 0
+		RangeX 0.01 0.16
+		Courbe {
+			legend "CF air"
+			Fichier ./CF_Air/Numerical_force.txt
+			columns $1 $2
+			Style lines
+		}
+
+		Courbe {
+			legend "CF water"
+			file ./CF_Water/Numerical_force.txt
+			columns $1 $2
+			Style lines
+		}
+
+	}
+	Figure {
+		Title "CF case: force per unit length of cylinder, y-component"
+		
+		LabelX "t [s]"
+		LabelY "F [Pa/m]"
+		legend outside
+		include_description_curves 0
+
+		RangeX 0.01 0.16
+		Courbe {
+			legend "CF air"
+			Fichier ./CF_Air/Numerical_force.txt
+			columns $1 $3
+			Style lines
+		}
+
+		Courbe {
+			legend "CF water"
+			file ./CF_Water/Numerical_force.txt
+			columns $1 $3
+			Style lines
+		}
+
+	}
+	Figure {
+		Title "CF case: force per unit length of cylinder, z-component"
+		
+		LabelX "t [s]"
+		LabelY "F [Pa/m]"
+		legend outside
+		include_description_curves 0
+		RangeX 0.01 0.16
+		Courbe {
+			legend "CF air"
+			Fichier ./CF_Air/Numerical_force.txt
+			columns $1 $4
+			Style lines
+		}
+
+		Courbe {
+			legend "CF water"
+			file ./CF_Water/Numerical_force.txt
+			columns $1 $4
+			Style lines
+		}
+
+	}
+	
+	
+	
+      Description "Pinned-pinned beam natural frequency validation in static air and water."	
+      Figure {
+		Title "Amplitude of the cylinder midpoint displacement as a function of time."		
+		LabelX "t [s]"
+		LabelY "D [m]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {
+			legend "PP Air"
+			file ./PP_Air/Poutre_Displacement1D.out
+			columns $1 $3
+			Style lines
+		}
+		Courbe {
+			legend "PP Water"
+			file ./PP_Water/Poutre_Displacement1D.out
+			columns $1 $3
+			Style lines
+		}
+	}
+	
+
+
+	Description "Table 1 illustrates the corresponding results in terms of natural frequency in air and water for the pinned-pinned beam case." 
+	
+	Table {
+		Title "Comparison of the pinned-pinned beam numerical natural frequency with the analytical solution. "
+		nb_columns 2
+		label Air | Water
+		include_description_lines 0
+
+		Line {
+			legend "Theoretical solution [2]"
+			values 165.81 107.72
+		}
+		Line {
+			Nb_colonnes_fichier 2
+			legend "Coupled TrioCFD-Beam"
+			file Freq_PP.txt 
+			Colonnes $1 $2
+		}
+
+	}
+
+		Description "We report velocity fields along the line A(-0.05, 0.0205, 0.)--B(0.75, 0.0205, 0) in order to investigate such distributions."
+	
+	Figure {
+		Title "PP case: y-velocity fields along the line AB"
+		
+		LabelX "t [s]"
+		LabelY "Vy [m/s]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {
+			legend "CF air"
+			Fichier ./CF_Air/Beam_Free_Vibration_VITESSE_SONDE_H.son
+			columns $1 $3
+			Style lines
+		}
+
+		Courbe {
+			legend "CF water"
+			file ./CF_Water/Beam_Free_Vibration_VITESSE_SONDE_H.son
+			columns $1 $3
+			Style lines
+		}
+
+	}
+	
+	Figure {
+		Title "PP case: z-velocity fields along the line AB"
+		
+		LabelX "t [s]"
+		LabelY "Vz [m/s]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {
+			legend "PP air"
+			Fichier ./PP_Air/Beam_Free_Vibration_VITESSE_SONDE_H.son
+			columns $1 $4
+			Style lines
+		}
+
+		Courbe {
+			legend "PP water"
+			file ./PP_Water/Beam_Free_Vibration_VITESSE_SONDE_H.son
+			columns $1 $4
+			Style lines
+		}
+
+	}
+	
+		
+		Figure {
+		Title "CF case: pressure fields along the line AB"
+		
+		LabelX "t [s]"
+		LabelY "P [Pa]"
+		legend outside
+		include_description_curves 0
+		RangeX 0.005 0.061
+		Courbe {
+			legend "PP air"
+			Fichier ./PP_Air/Beam_Free_Vibration_PRESSURE_SONDE_H.son
+			columns $1 $2
+			Style lines
+		}
+
+		Courbe {
+			legend "PP water"
+			file ./PP_Water/Beam_Free_Vibration_PRESSURE_SONDE_H.son
+			columns $1 $2
+			Style lines
+		}
+
+	}
+	
+	
+		
+	
+	Description "We report the fluid force acting on the beam in order to investigate such distributions."
+	
+	Figure {
+		Title "PP case: force per unit length of cylinder, x-component"
+		
+		LabelX "t [s]"
+		LabelY "F [Pa/m]"
+		legend outside
+		include_description_curves 0
+		RangeX 0.005 0.061
+		Courbe {
+			legend "PP air"
+			Fichier ./PP_Air/Numerical_force.txt
+			columns $1 $2
+			Style lines
+		}
+
+		Courbe {
+			legend "PP water"
+			file ./PP_Water/Numerical_force.txt
+			columns $1 $2
+			Style lines
+		}
+
+	}
+	Figure {
+		Title "CF case: force per unit length of cylinder, y-component"
+		
+		LabelX "t [s]"
+		LabelY "F [Pa/m]"
+		legend outside
+		include_description_curves 0
+		RangeX 0.005 0.061
+		Courbe {
+			legend "PP air"
+			Fichier ./PP_Air/Numerical_force.txt
+			columns $1 $3
+			Style lines
+		}
+
+		Courbe {
+			legend "PP water"
+			file ./PP_Water/Numerical_force.txt
+			columns $1 $3
+			Style lines
+		}
+
+	}
+	Figure {
+		Title "PP case: force per unit length of cylinder, z-component"
+		
+		LabelX "t [s]"
+		LabelY "F [Pa/m]"
+		legend outside
+		include_description_curves 0
+		RangeX 0.005 0.061
+		Courbe {
+			legend "PP air"
+			Fichier ./PP_Air/Numerical_force.txt
+			columns $1 $4
+			Style lines
+		}
+
+		Courbe {
+			legend "PP water"
+			file ./PP_Water/Numerical_force.txt
+			columns $1 $4
+			Style lines
+		}
+
+	}
+	
+}
+
+
+
+
+Conclusion {
+
+	Description The fluid-structure partitioned coupling between an Euler-Bernoulli beam model for the structure and the incompressible viscous flow model of TrioCFD was investigated through the simulations of the free vibrations for a cantilever cylinder in static air and water. The simulating natural frequencies in air and water well agree with the analytical solution [2]. Remark: in order to reduce the numerical error a much more refined mesh must be used!
+}
