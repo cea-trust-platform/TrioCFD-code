@@ -2627,7 +2627,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
       Process::exit();
     }
 
-  if ((variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT))
+  if (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT)
     tmp *=-1;
 
   // Question: il y a un assert_espace_virtuel_vect dans divergence.calculer,
