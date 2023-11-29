@@ -3,6 +3,7 @@
 # Beam time integration scheme: HHT. Modal resolution, 20 modes (10 in xy plane, 10 in xz plane).  #
 # Hydraulique 3D laminar #
 # Explicit coupling with the fluid #
+# PARALLEL ONLY 2 #
 
 dimension 3
 
@@ -17,7 +18,7 @@ Read_MED {
 END MESH #
 
 # BEGIN SCATTER #
-Scatter ../DOM.Zones dom 
+Scatter DOM.Zones dom 
 # END SCATTER #
 
 # For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile
@@ -37,10 +38,10 @@ Beam_model dom
 	    Young_Module 210.e+9 # Pa #
 	    Rho_beam 7850. # kg/m^3 #
 	    NewmarkTimeScheme HHT -0.1
-	    Mass_and_stiffness_file_name ../BaseModale_CF/vibr_pout2tube.txt
-	    Absc_file_name ../BaseModale_CF/vibr_pout2tube_absc.txt
-	    CI_file_name ../BaseModale_CF/vibr_pout2tube_CI.txt
-	     Modal_deformation_file_name  20 ../BaseModale_CF/vibr_pout2tube_phi_1.txt ../BaseModale_CF/vibr_pout2tube_phi_2.txt ../BaseModale_CF/vibr_pout2tube_phi_3.txt ../BaseModale_CF/vibr_pout2tube_phi_4.txt ../BaseModale_CF/vibr_pout2tube_phi_5.txt ../BaseModale_CF/vibr_pout2tube_phi_6.txt ../BaseModale_CF/vibr_pout2tube_phi_7.txt ../BaseModale_CF/vibr_pout2tube_phi_8.txt ../BaseModale_CF/vibr_pout2tube_phi_9.txt ../BaseModale_CF/vibr_pout2tube_phi_10.txt ../BaseModale_CF/vibr_pout2tube_phi_11.txt ../BaseModale_CF/vibr_pout2tube_phi_12.txt ../BaseModale_CF/vibr_pout2tube_phi_13.txt ../BaseModale_CF/vibr_pout2tube_phi_14.txt ../BaseModale_CF/vibr_pout2tube_phi_15.txt ../BaseModale_CF/vibr_pout2tube_phi_16.txt ../BaseModale_CF/vibr_pout2tube_phi_17.txt ../BaseModale_CF/vibr_pout2tube_phi_18.txt ../BaseModale_CF/vibr_pout2tube_phi_19.txt ../BaseModale_CF/vibr_pout2tube_phi_20.txt
+	    Mass_and_stiffness_file_name BaseModale_CF/vibr_pout2tube.txt
+	    Absc_file_name BaseModale_CF/vibr_pout2tube_absc.txt
+	    CI_file_name BaseModale_CF/vibr_pout2tube_CI.txt
+	     Modal_deformation_file_name  20 BaseModale_CF/vibr_pout2tube_phi_1.txt BaseModale_CF/vibr_pout2tube_phi_2.txt BaseModale_CF/vibr_pout2tube_phi_3.txt BaseModale_CF/vibr_pout2tube_phi_4.txt BaseModale_CF/vibr_pout2tube_phi_5.txt BaseModale_CF/vibr_pout2tube_phi_6.txt BaseModale_CF/vibr_pout2tube_phi_7.txt BaseModale_CF/vibr_pout2tube_phi_8.txt BaseModale_CF/vibr_pout2tube_phi_9.txt BaseModale_CF/vibr_pout2tube_phi_10.txt BaseModale_CF/vibr_pout2tube_phi_11.txt BaseModale_CF/vibr_pout2tube_phi_12.txt BaseModale_CF/vibr_pout2tube_phi_13.txt BaseModale_CF/vibr_pout2tube_phi_14.txt BaseModale_CF/vibr_pout2tube_phi_15.txt BaseModale_CF/vibr_pout2tube_phi_16.txt BaseModale_CF/vibr_pout2tube_phi_17.txt BaseModale_CF/vibr_pout2tube_phi_18.txt BaseModale_CF/vibr_pout2tube_phi_19.txt BaseModale_CF/vibr_pout2tube_phi_20.txt
 	    Output_position_1D 1  50
 	    Output_position_3D 1  0.7 0.02 0.02
 	    # Restart_file_name PoutreSaveBeamForRestart.txt #
