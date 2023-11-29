@@ -29,7 +29,7 @@ Parameters {
 Purpose {
         Description "This test case was created to validate the fluid-structure partitioned coupling between an Euler-Bernoulli beam model for the structure and the incompressible viscous flow model of TrioCFD. "
         Description "It allows two-way explicit fluid-structure coupling where the Arbitrary Lagrangian-Eulerian (ALE) module is used to consider the structure displacement/deformations in the fluid domain."
-        Description "The coupling is similar to that presented in reference [1]. The points of difference are in the resolution of the beam model, which in our case uses a model-based solution, and in the construction of the displacement/deformation of the fluid-structure interface (3d surface)."
+        Description "The coupling is similar to that presented in reference [1]. The points of difference are in the resolution of the beam model, which in our case uses a model-based solution, and in the construction of the displacement/deformation of the fluid-structure interface."
         Description "The geometry is taken from [2]. The validation investigates the free vibrations for a cantilever cylinder in static air and water. The cylinder frequency vibrations are compared to the reference data [2]."
 }
 
