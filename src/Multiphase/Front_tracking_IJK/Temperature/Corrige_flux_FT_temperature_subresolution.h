@@ -98,6 +98,12 @@ public :
     use_reachable_fluxes_ = use_reachable_fluxes;
     keep_first_reachable_fluxes_ = keep_first_reachable_fluxes;
   }
+
+  void set_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs) override
+  {
+    copy_fluxes_on_every_procs_ = copy_fluxes_on_every_procs;
+  }
+
   void set_debug(const int& debug) override { debug_ = debug; };
   /*
    * On va calculer sur la grille IJ du layer k_layer tous les flux a proximite de
@@ -279,6 +285,37 @@ public :
                                                                      std::vector<ArrOfDouble>& flux_z,
                                                                      const DoubleVect& fluxes_subgrid,
                                                                      const int ini_index);
+
+  void initialise_any_cell_neighbours_indices_to_correct_on_processors(std::vector<std::vector<ArrOfInt>>& index_face_i_flux_x,
+                                                                       std::vector<std::vector<ArrOfInt>>& index_face_j_flux_x,
+                                                                       std::vector<std::vector<ArrOfInt>>& index_face_i_flux_y,
+                                                                       std::vector<std::vector<ArrOfInt>>& index_face_j_flux_y,
+                                                                       std::vector<std::vector<ArrOfInt>>& index_face_i_flux_z,
+                                                                       std::vector<std::vector<ArrOfInt>>& index_face_j_flux_z,
+                                                                       std::vector<std::vector<ArrOfDouble>>& flux_x,
+                                                                       std::vector<std::vector<ArrOfDouble>>& flux_y,
+                                                                       std::vector<std::vector<ArrOfDouble>>& flux_z,
+                                                                       const int ini_index);
+  void redistribute_indices_fluxes_by_k_layers(std::vector<ArrOfInt>& index_face_i_flux_x,
+                                               std::vector<ArrOfInt>& index_face_j_flux_x,
+                                               std::vector<ArrOfInt>& index_face_i_flux_y,
+                                               std::vector<ArrOfInt>& index_face_j_flux_y,
+                                               std::vector<ArrOfInt>& index_face_i_flux_z,
+                                               std::vector<ArrOfInt>& index_face_j_flux_z,
+                                               std::vector<ArrOfInt> index_face_i_flux_x_remaining_global,
+                                               std::vector<ArrOfInt> index_face_j_flux_x_remaining_global,
+                                               std::vector<ArrOfInt> index_face_i_flux_y_remaining_global,
+                                               std::vector<ArrOfInt> index_face_j_flux_y_remaining_global,
+                                               std::vector<ArrOfInt> index_face_i_flux_z_remaining_global,
+                                               std::vector<ArrOfInt> index_face_j_flux_z_remaining_global,
+                                               std::vector<ArrOfDouble>& flux_x,
+                                               std::vector<ArrOfDouble>& flux_y,
+                                               std::vector<ArrOfDouble>& flux_z,
+                                               std::vector<ArrOfDouble>& flux_x_remaining_global,
+                                               std::vector<ArrOfDouble>& flux_y_remaining_global,
+                                               std::vector<ArrOfDouble>& flux_z_remaining_global,
+                                               const int ini_index);
+
   void store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
                                   FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,
                                   FixedVector<IJK_Field_double,3>& cell_faces_corrected_diffusive) override;
@@ -350,7 +387,25 @@ protected :
   std::vector<ArrOfDouble> diffusive_flux_x_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_y_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_z_sorted_;
+
+  std::vector<std::vector<ArrOfInt>> index_face_i_flux_x_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfInt>> index_face_j_flux_x_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfInt>> index_face_i_flux_y_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfInt>> index_face_j_flux_y_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfInt>> index_face_i_flux_z_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfInt>> index_face_j_flux_z_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfDouble>> convective_flux_x_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfDouble>> convective_flux_y_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfDouble>> convective_flux_z_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfDouble>> diffusive_flux_x_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfDouble>> diffusive_flux_y_remaining_global_sorted_;
+  std::vector<std::vector<ArrOfDouble>> diffusive_flux_z_remaining_global_sorted_;
+
   FixedVector<IntVect,4> ijk_faces_to_correct_;
+
+  /*
+   *
+   */
 
   std::vector<ArrOfInt> index_face_i_flux_x_neighbours_diag_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_x_neighbours_diag_faces_sorted_;
@@ -365,6 +420,10 @@ protected :
   std::vector<ArrOfInt> index_face_j_flux_y_neighbours_all_faces_sorted_;
   std::vector<ArrOfInt> index_face_i_flux_z_neighbours_all_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_z_neighbours_all_faces_sorted_;
+
+  /*
+   *
+   */
 
   std::vector<ArrOfInt> index_face_i_flux_x_neighbours_min_max_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_x_neighbours_min_max_faces_sorted_;
@@ -401,6 +460,11 @@ protected :
 
   int convective_flux_correction_;
   int diffusive_flux_correction_;
+
+  /*
+   * Very large memory footprint ?
+   */
+  int copy_fluxes_on_every_procs_;
 
 };
 

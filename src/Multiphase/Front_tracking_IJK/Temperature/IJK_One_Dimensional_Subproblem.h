@@ -64,6 +64,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 class IJK_FT_double;
+class IJK_Thermal_base;
+class IJK_Thermal_Subresolution;
 
 class IJK_One_Dimensional_Subproblem : public Objet_U
 {
@@ -73,10 +75,10 @@ class IJK_One_Dimensional_Subproblem : public Objet_U
 public :
   IJK_One_Dimensional_Subproblem(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
-  void associate_sub_problem_to_inputs(int init,
-                                       int debug,
-                                       int sub_problem_index,
+  void associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
                                        int i, int j, int k,
+                                       int init,
+                                       int sub_problem_index,
                                        double global_time_step,
                                        double current_time,
                                        int compo_connex,
@@ -87,76 +89,115 @@ public :
                                        ArrOfDouble normal_vector,
                                        double bubble_rising_velocity,
                                        ArrOfDouble bubble_rising_vector,
-                                       ArrOfDouble bubbles_barycentre,
-                                       int advected_frame_of_reference,
-                                       int neglect_frame_of_reference_radial_advection,
-                                       const int& points_per_thermal_subproblem,
-                                       const double& alpha,
-                                       const double& lambda,
-                                       const double& coeff_distance_diagonal,
-                                       const double& cell_diagonal,
-                                       const double& dr_base,
-                                       const DoubleVect& radial_coordinates,
-                                       const Matrice& identity_matrix_explicit_implicit_raw,
-                                       const Matrice& radial_first_order_operator_raw,
-                                       const Matrice& radial_second_order_operator_raw,
-                                       const Matrice& radial_first_order_operator,
-                                       const Matrice& radial_second_order_operator,
-                                       Matrice& identity_matrix_subproblems,
-                                       Matrice& radial_diffusion_matrix,
-                                       Matrice& radial_convection_matrix,
-                                       const IJK_Interfaces& interfaces,
+                                       ArrOfDouble bubble_barycentre,
                                        const double& indicator,
-                                       const IJK_Field_double& eulerian_distance,
-                                       const IJK_Field_double& eulerian_curvature,
-                                       const IJK_Field_double& eulerian_interfacial_area,
-                                       const FixedVector<IJK_Field_double, 3>& eulerian_normal_vect,
-                                       const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
-                                       const IJK_Field_double& temperature,
-                                       const IJK_Field_double& temperature_ft,
-                                       const IJK_Field_double& temperature_before_extrapolation,
+                                       const IJK_Interfaces& interfaces,
                                        const FixedVector<IJK_Field_double, 3>& velocity,
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
-                                       const IJK_Field_double& pressure,
-                                       const FixedVector<IJK_Field_double, 3>& grad_T_elem,
-                                       const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
-                                       const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
-                                       IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
-                                       Matrice& thermal_subproblems_matrix_assembly,
-                                       DoubleVect& thermal_subproblems_rhs_assembly,
-                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
-                                       DoubleVect& thermal_subproblems_temperature_solution,
-                                       const int& source_terms_type,
-                                       const int& source_terms_correction,
-                                       const bool& is_first_time_step,
-                                       int& first_time_step_temporal,
-                                       const int& first_time_step_explicit,
-                                       const double& local_fourier,
-                                       const double& local_cfl,
-                                       const double& min_delta_xyz,
-                                       const double& delta_T_subcooled_overheated,
-                                       const int& first_time_step_varying_probes,
-                                       const int& probe_variations_priority,
-                                       const int& disable_interpolation_in_mixed_cells,
-                                       const int& max_u_radial,
-                                       const int& correct_fluxes,
-                                       const int& distance_cell_faces_from_lrs,
-                                       const int& pre_initialise_thermal_subproblems_list,
-                                       const int& correct_temperature_cell_neighbours,
-                                       const int& correct_neighbours_rank,
-                                       const int& neighbours_corrected_rank,
-                                       const int& neighbours_colinearity_weighting,
-                                       const int& compute_reachable_fluxes,
-                                       const int& find_cell_neighbours_for_fluxes_spherical_correction,
-                                       const int& n_iter_distance,
-                                       const int& interp_eulerian);
+                                       const IJK_Field_double& pressure);
+
+//  void associate_sub_problem_to_inputs(int init,
+//                                       int debug,
+//                                       int sub_problem_index,
+//                                       int i, int j, int k,
+//                                       double global_time_step,
+//                                       double current_time,
+//                                       int compo_connex,
+//                                       double distance,
+//                                       double curvature,
+//                                       double interfacial_area,
+//                                       ArrOfDouble facet_barycentre,
+//                                       ArrOfDouble normal_vector,
+//                                       double bubble_rising_velocity,
+//                                       ArrOfDouble bubble_rising_vector,
+//                                       ArrOfDouble bubbles_barycentre,
+//                                       int advected_frame_of_reference,
+//                                       int neglect_frame_of_reference_radial_advection,
+//                                       const int& points_per_thermal_subproblem,
+//                                       const double& alpha,
+//                                       const double& lambda,
+//                                       const double& coeff_distance_diagonal,
+//                                       const double& cell_diagonal,
+//                                       const double& dr_base,
+//                                       const DoubleVect& radial_coordinates,
+//                                       const Matrice& identity_matrix_explicit_implicit_raw,
+//                                       const Matrice& radial_first_order_operator_raw,
+//                                       const Matrice& radial_second_order_operator_raw,
+//                                       const Matrice& radial_first_order_operator,
+//                                       const Matrice& radial_second_order_operator,
+//                                       Matrice& identity_matrix_subproblems,
+//                                       Matrice& radial_diffusion_matrix,
+//                                       Matrice& radial_convection_matrix,
+//                                       const IJK_Interfaces& interfaces,
+//                                       const double& indicator,
+//                                       const IJK_Field_double& eulerian_distance,
+//                                       const IJK_Field_double& eulerian_curvature,
+//                                       const IJK_Field_double& eulerian_interfacial_area,
+//                                       const FixedVector<IJK_Field_double, 3>& eulerian_normal_vect,
+//                                       const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
+//                                       const IJK_Field_double& temperature,
+//                                       const IJK_Field_double& temperature_ft,
+//                                       const IJK_Field_double& temperature_before_extrapolation,
+//                                       const FixedVector<IJK_Field_double, 3>& velocity,
+//                                       const FixedVector<IJK_Field_double, 3>& velocity_ft,
+//                                       const IJK_Field_double& pressure,
+//                                       const FixedVector<IJK_Field_double, 3>& grad_T_elem,
+//                                       const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
+//                                       const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
+//                                       IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+//                                       Matrice& thermal_subproblems_matrix_assembly,
+//                                       DoubleVect& thermal_subproblems_rhs_assembly,
+//                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
+//                                       DoubleVect& thermal_subproblems_temperature_solution,
+//                                       const int& source_terms_type,
+//                                       const int& source_terms_correction,
+//                                       const bool& is_first_time_step,
+//                                       int& first_time_step_temporal,
+//                                       const int& first_time_step_explicit,
+//                                       const double& local_fourier,
+//                                       const double& local_cfl,
+//                                       const double& min_delta_xyz,
+//                                       const double& delta_T_subcooled_overheated,
+//                                       const int& first_time_step_varying_probes,
+//                                       const int& probe_variations_priority,
+//                                       const int& disable_interpolation_in_mixed_cells,
+//                                       const int& max_u_radial,
+//                                       const int& correct_fluxes,
+//                                       const int& distance_cell_faces_from_lrs,
+//                                       const int& pre_initialise_thermal_subproblems_list,
+//                                       const int& correct_temperature_cell_neighbours,
+//                                       const int& correct_neighbours_rank,
+//                                       const int& neighbours_corrected_rank,
+//                                       const int& neighbours_colinearity_weighting,
+//                                       const int& compute_reachable_fluxes,
+//                                       const int& find_cell_neighbours_for_fluxes_spherical_correction,
+//                                       const int& n_iter_distance,
+//                                       const int& interp_eulerian);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
   void compute_distance_cell_centre();
   void compute_distance_faces_centres();
   void compute_distance_cell_centres_neighbours();
+  double compute_cell_weighting(const double& dx_contrib,
+                                const double& dy_contrib,
+                                const double& dz_contrib);
   void compute_distance_last_cell_faces_neighbours();
+  Vecteur3 compute_relative_vector_cell_faces(const double& dx_contrib,
+                                              const double& dy_contrib,
+                                              const double& dz_contrib);
+  double compute_cell_faces_weighting(const double& dx_contrib,
+                                      const double& dy_contrib,
+                                      const double& dz_contrib,
+                                      const int& dir);
+  double compute_colinearity(const double& dx_contrib, const double& dy_contrib, const double& dz_contrib);
+  double compute_colinearity_cell_faces(const double& dx_contrib,
+                                        const double& dy_contrib,
+                                        const double& dz_contrib,
+                                        const int& dir);
+  double compute_distance_cell_faces(const double& dx_contrib,
+                                     const double& dy_contrib,
+                                     const double& dz_contrib);
   int get_dxyz_increment_max();
   int get_dxyz_over_two_increment_max();
   double compute_min_distance_pure_face_centre();
@@ -477,7 +518,14 @@ protected :
                                              const int& correct_neighbours_rank,
                                              const int& neighbours_corrected_rank,
                                              const int& neighbours_colinearity_weighting,
-                                             const int& compute_last_faces_to_correct,
+                                             const int& neighbours_distance_weighting,
+                                             const int& neighbours_colinearity_distance_weighting,
+                                             const int& neighbours_last_faces_colinearity_weighting,
+                                             const int& neighbours_last_faces_colinearity_face_weighting,
+                                             const int& neighbours_last_faces_distance_weighting,
+                                             const int& neighbours_last_faces_distance_colinearity_weighting,
+                                             const int& neighbours_last_faces_distance_colinearity_face_weighting,
+                                             const int& compute_reachable_fluxes,
                                              const int& find_cell_neighbours_for_fluxes_spherical_correction);
   void associate_probe_parameters(const int& points_per_thermal_subproblem,
                                   const double& alpha,
@@ -517,7 +565,7 @@ protected :
   void correct_velocities();
   void correct_velocity(const DoubleVect& velocity, DoubleVect& velocity_corrected);
   void correct_velocity_rise(const DoubleVect& velocity, const Vecteur3& basis, DoubleVect& velocity_corrected);
-  void correct_radial_velocity();
+  void correct_radial_velocity_probe();
   void project_cartesian_onto_basis_vector(const DoubleVect& compo_x, const DoubleVect& compo_y, const DoubleVect& compo_z, const Vecteur3& basis, DoubleVect& projection);
   void project_basis_vector_onto_cartesian_dir(const int& dir, const DoubleVect& compo_u, const DoubleVect& compo_v, const DoubleVect& compo_w,
                                                const Vecteur3& basis_u, const Vecteur3& basis_v, const Vecteur3& basis_w,
@@ -574,6 +622,7 @@ protected :
   double osculating_radius_ = 0.;
   Vecteur3 facet_barycentre_;
   Vecteur3 normal_vector_compo_;
+  Vecteur3 tangential_distance_vector_;
 
   double bubble_rising_velocity_ = 0.;
   Vecteur3 bubble_rising_vector_;
@@ -857,6 +906,7 @@ protected :
   int temperature_probe_condition_ = 0;
   int max_u_radial_=0;
   double cell_centre_distance_ = 0;
+  double cell_centre_tangential_distance_ = 0.;
   FixedVector<bool,6> pure_liquid_neighbours_;
   FixedVector<double,6> face_centres_distance_;
   FixedVector<FixedVector<double,4>,6> vertices_centres_distance_;
@@ -872,7 +922,10 @@ protected :
   int correct_temperature_cell_neighbours_ = 0;
   int correct_neighbours_rank_ = 1;
   int neighbours_corrected_rank_ = 1;
+  int neighbours_weighting_= 0;
   int neighbours_colinearity_weighting_ = 0;
+  int neighbours_distance_weighting_ = 0;
+  int neighbours_colinearity_distance_weighting_ = 0;
   FixedVector<int,3> pure_neighbours_corrected_sign_;
   std::vector<std::vector<std::vector<bool>>> pure_neighbours_to_correct_;
   std::vector<std::vector<std::vector<double>>> pure_neighbours_corrected_distance_;
@@ -886,7 +939,12 @@ protected :
    * Identify neighbours faces centres for flux correction
    */
   int compute_reachable_fluxes_ = 0;
+  int neighbours_last_faces_weighting_ = 0;
   int neighbours_last_faces_colinearity_weighting_ = 0;
+  int neighbours_last_faces_colinearity_face_weighting_ = 0.;
+  int neighbours_last_faces_distance_weighting_ = 0.;
+  int neighbours_last_faces_distance_colinearity_weighting_ = 0.;
+  int neighbours_last_faces_distance_colinearity_face_weighting_ = 0.;
   int neighbours_face_corrected_rank_ = 1;
   std::vector<std::vector<std::vector<std::vector<bool>>>> pure_neighbours_last_faces_to_correct_;
   std::vector<std::vector<std::vector<std::vector<double>>>> pure_neighbours_last_faces_corrected_distance_;

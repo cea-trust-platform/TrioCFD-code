@@ -55,6 +55,8 @@ class IJK_Thermal_Subresolution : public IJK_Thermal_base
 {
 
   Declare_instanciable( IJK_Thermal_Subresolution ) ;
+  friend class IJK_One_Dimensional_Subresolutions;
+  friend class IJK_One_Dimensional_Subproblem;
 
 public :
 
@@ -379,6 +381,7 @@ protected :
 
   int pre_initialise_thermal_subproblems_list_;
   double pre_factor_subproblems_number_;
+  int remove_append_subproblems_;
   int global_probes_characteristics_ = 1;
 
   int correct_temperature_cell_neighbours_first_iter_;
@@ -387,7 +390,10 @@ protected :
   int use_temperature_cell_neighbours_;
   int correct_neighbours_using_probe_length_;
   int neighbours_corrected_rank_;
+  int neighbours_weighting_;
   int neighbours_colinearity_weighting_;
+  int neighbours_distance_weighting_;
+  int neighbours_colinearity_distance_weighting_;
   IJK_Field_double temperature_cell_neighbours_;
   IJK_Field_double temperature_cell_neighbours_debug_;
   IJK_Field_int neighbours_temperature_to_correct_;
@@ -426,6 +432,11 @@ protected :
   FixedVector<IJK_Field_double, 3> neighbours_faces_weighting_colinearity_;
   FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_min_max_bool_;
   IJK_Field_int neighbours_temperature_to_correct_trimmed_;
+  int neighbours_last_faces_colinearity_weighting_;
+  int neighbours_last_faces_colinearity_face_weighting_;
+  int neighbours_last_faces_distance_weighting_;
+  int neighbours_last_faces_distance_colinearity_weighting_;
+  int neighbours_last_faces_distance_colinearity_face_weighting_;
 
   int post_process_all_probes_;
   int nb_theta_post_pro_;
@@ -434,6 +445,8 @@ protected :
 
   int interp_eulerian_;
   int first_step_thermals_post_;
+
+  int copy_fluxes_on_every_procs_;
 
 };
 

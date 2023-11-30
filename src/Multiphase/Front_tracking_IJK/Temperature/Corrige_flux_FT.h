@@ -135,6 +135,7 @@ public :
   inline void replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                                                                 const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
                                                                                 const int& fluxes_type);
+  inline void set_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs);
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
@@ -386,6 +387,11 @@ inline void Corrige_flux_FT::replace_cell_neighbours_thermal_convective_diffusiv
   valeur().replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(cell_faces_neighbours_corrected_min_max_bool,
                                                                              cell_faces_neighbours_fluxes_corrected,
                                                                              fluxes_type);
+}
+
+inline void Corrige_flux_FT::set_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs)
+{
+  valeur().set_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs);
 }
 
 #endif /* Corrige_flux_FT_included */

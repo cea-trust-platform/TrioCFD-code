@@ -173,6 +173,8 @@ public:
                                                                                  const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
                                                                                  const int& fluxes_type) { ; };
 
+  virtual void set_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs) { ; };
+
 protected:
   const IJK_Interfaces *interfaces_;
   const IJK_Field_double *field_;

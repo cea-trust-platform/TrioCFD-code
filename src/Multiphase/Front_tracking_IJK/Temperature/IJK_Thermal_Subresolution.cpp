@@ -102,14 +102,18 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 
   pre_initialise_thermal_subproblems_list_ = 0;
   pre_factor_subproblems_number_ = 3.;
+  remove_append_subproblems_ = 0;
 
   correct_temperature_cell_neighbours_first_iter_ = 0;
   correct_first_iter_deactivate_cell_neighbours_ = 0;
   find_temperature_cell_neighbours_ = 0;
   correct_neighbours_using_probe_length_ = 0;
   neighbours_corrected_rank_ = 1;
-  neighbours_colinearity_weighting_ = 0.;
   use_temperature_cell_neighbours_ = 0;
+  neighbours_weighting_ = 0.;
+  neighbours_colinearity_weighting_ = 0.;
+  neighbours_distance_weighting_ = 0;
+  neighbours_colinearity_distance_weighting_ = 0;
 
   clip_temperature_values_ = 0;
   disable_post_processing_probes_out_files_ = 0;
@@ -134,6 +138,14 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 
   interp_eulerian_ = 0;
   first_step_thermals_post_=1;
+
+  neighbours_last_faces_colinearity_weighting_ = 0;
+  neighbours_last_faces_colinearity_face_weighting_ = 0;
+  neighbours_last_faces_distance_weighting_ = 0;
+  neighbours_last_faces_distance_colinearity_weighting_ = 0;
+  neighbours_last_faces_distance_colinearity_face_weighting_ = 0;
+
+  copy_fluxes_on_every_procs_ = 0;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -232,6 +244,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
 
   param.ajouter_flag("pre_initialise_thermal_subproblems_list", &pre_initialise_thermal_subproblems_list_);
   param.ajouter("pre_factor_subproblems_number", &pre_factor_subproblems_number_);
+  param.ajouter_flag("remove_append_subproblems", &remove_append_subproblems_);
 
   param.ajouter_flag("correct_temperature_cell_neighbours_first_iter", &correct_temperature_cell_neighbours_first_iter_);
   param.ajouter_flag("find_temperature_cell_neighbours", &find_temperature_cell_neighbours_);
@@ -239,6 +252,8 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("neighbours_corrected_rank", &neighbours_corrected_rank_);
 
   param.ajouter_flag("neighbours_colinearity_weighting", &neighbours_colinearity_weighting_);
+  param.ajouter_flag("neighbours_distance_weighting", &neighbours_distance_weighting_);
+  param.ajouter_flag("neighbours_colinearity_distance_weighting", &neighbours_colinearity_distance_weighting_);
   param.ajouter_flag("use_temperature_cell_neighbours", &use_temperature_cell_neighbours_);
 
   param.ajouter_flag("clip_temperature_values", &clip_temperature_values_);
@@ -265,6 +280,14 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("interp_eulerian", &interp_eulerian_);
 
   param.ajouter_flag("disable_first_step_thermals_post", &first_step_thermals_post_);
+
+  param.ajouter_flag("neighbours_last_faces_colinearity_weighting", &neighbours_last_faces_colinearity_weighting_);
+  param.ajouter_flag("neighbours_last_faces_colinearity_face_weighting", &neighbours_last_faces_colinearity_face_weighting_);
+  param.ajouter_flag("neighbours_last_faces_distance_weighting", &neighbours_last_faces_distance_weighting_);
+  param.ajouter_flag("neighbours_last_faces_distance_colinearity_weighting", &neighbours_last_faces_distance_colinearity_weighting_);
+  param.ajouter_flag("neighbours_last_faces_distance_colinearity_face_weighting", &neighbours_last_faces_distance_colinearity_face_weighting_);
+
+  param.ajouter_flag("copy_fluxes_on_every_procs", &copy_fluxes_on_every_procs_);
 
   // param.ajouter_flag("enforce_periodic_boundary_value", &enforce_periodic_boundary_value_);
   // param.ajouter_non_std("enforce_periodic_boundary_value",(this));
@@ -344,6 +367,14 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   nalloc += 1;
   temperature_before_extrapolation_.data() = 0.;
 
+  neighbours_weighting_ = (neighbours_colinearity_weighting_ || neighbours_distance_weighting_ || neighbours_colinearity_distance_weighting_);
+
+  if (neighbours_weighting_)
+    if (!(neighbours_last_faces_colinearity_weighting_ || neighbours_last_faces_colinearity_face_weighting_
+          || neighbours_last_faces_distance_weighting_ || neighbours_last_faces_distance_colinearity_weighting_
+          || neighbours_last_faces_distance_colinearity_face_weighting_))
+      neighbours_last_faces_distance_colinearity_face_weighting_ = 1;
+
   correct_temperature_cell_neighbours_first_iter_ = (correct_temperature_cell_neighbours_first_iter_ && disable_spherical_diffusion_start_);
   if (correct_temperature_cell_neighbours_first_iter_)
     use_temperature_cell_neighbours_ = correct_temperature_cell_neighbours_first_iter_;
@@ -383,8 +414,9 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   corrige_flux_.set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
   corrige_flux_.set_debug(debug_);
   corrige_flux_.set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs_);
-  corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_colinearity_weighting_);
+  corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_weighting_);
   corrige_flux_.set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed_);
+  corrige_flux_.set_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs_);
 
 
   if (diffusive_flux_correction_ || use_cell_neighbours_for_fluxes_spherical_correction_)
@@ -482,7 +514,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       temperature_cell_neighbours_.data() = 0.;
       neighbours_temperature_to_correct_.echange_espace_virtuel(neighbours_temperature_to_correct_.ghost());
       temperature_cell_neighbours_.echange_espace_virtuel(temperature_cell_neighbours_.ghost());
-      if (neighbours_colinearity_weighting_)
+      if (neighbours_weighting_)
         {
           neighbours_temperature_colinearity_weighting_.allocate(splitting, IJK_Splitting::ELEM, ghost_cells_); // , 1);
           nalloc += 1;
@@ -546,7 +578,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
             cell_faces_neighbours_corrected_diffusive_[c].data() = 0.;
           cell_faces_neighbours_corrected_diffusive_.echange_espace_virtuel();
         }
-      if (neighbours_colinearity_weighting_)
+      if (neighbours_weighting_)
         {
           allocate_cell_vector(neighbours_faces_weighting_colinearity_, splitting, 1);
           nalloc += 3;
@@ -1180,7 +1212,8 @@ void IJK_Thermal_Subresolution::compute_second_order_operator(Matrice& radial_se
 void IJK_Thermal_Subresolution::initialise_thermal_subproblems_list()
 {
   thermal_local_subproblems_.initialise_thermal_subproblems_list_params(pre_initialise_thermal_subproblems_list_,
-                                                                        pre_factor_subproblems_number_);
+                                                                        pre_factor_subproblems_number_,
+                                                                        remove_append_subproblems_);
 }
 
 void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
@@ -1218,77 +1251,86 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                       }
                     debug_LRS_cells_(i,j,k) = indicator(i,j,k);
                   }
-                thermal_local_subproblems_.associate_sub_problem_to_inputs(debug_,
-                                                                           i, j, k,
+//                thermal_local_subproblems_.associate_sub_problem_to_inputs(debug_,
+//                                                                           i, j, k,
+//                                                                           ref_ijk_ft_->get_timestep(),
+//                                                                           ref_ijk_ft_->get_current_time(),
+//                                                                           *eulerian_compo_connex_from_interface_int_ns_,
+//                                                                           *eulerian_compo_connex_from_interface_ghost_int_ns_,
+//                                                                           eulerian_distance_ns_,
+//                                                                           eulerian_curvature_ns_,
+//                                                                           eulerian_interfacial_area_ns_,
+//                                                                           eulerian_facets_barycentre_ns_,
+//                                                                           eulerian_normal_vectors_ns_,
+//                                                                           rising_velocities_,
+//                                                                           rising_vectors_,
+//                                                                           bubbles_barycentre_,
+//                                                                           advected_frame_of_reference_,
+//                                                                           neglect_frame_of_reference_radial_advection_,
+//                                                                           points_per_thermal_subproblem_,
+//                                                                           uniform_alpha_,
+//                                                                           uniform_lambda_,
+//                                                                           coeff_distance_diagonal_,
+//                                                                           cell_diagonal_,
+//                                                                           dr_,
+//                                                                           radial_coordinates_,
+//                                                                           identity_matrix_explicit_implicit_,
+//                                                                           radial_first_order_operator_raw_,
+//                                                                           radial_second_order_operator_raw_,
+//                                                                           radial_first_order_operator_,
+//                                                                           radial_second_order_operator_,
+//                                                                           identity_matrix_subproblems_,
+//                                                                           radial_diffusion_matrix_,
+//                                                                           radial_convection_matrix_,
+//                                                                           ref_ijk_ft_->itfce(),
+//                                                                           indicator(i,j,k),
+//                                                                           temperature_,
+//                                                                           temperature_ft_,
+//                                                                           temperature_before_extrapolation_,
+//                                                                           ref_ijk_ft_->get_velocity(),
+//                                                                           ref_ijk_ft_->get_velocity_ft(),
+//                                                                           ref_ijk_ft_->get_pressure_ghost_cells(),
+//                                                                           grad_T_elem_,
+//                                                                           hess_diag_T_elem_,
+//                                                                           hess_cross_T_elem_,
+//                                                                           finite_difference_assembler_,
+//                                                                           thermal_subproblems_matrix_assembly_,
+//                                                                           thermal_subproblems_rhs_assembly_,
+//                                                                           thermal_subproblems_temperature_solution_ini_,
+//                                                                           thermal_subproblems_temperature_solution_,
+//                                                                           source_terms_type_,
+//                                                                           source_terms_correction_,
+//                                                                           is_first_time_step_,
+//                                                                           first_time_step_temporal_,
+//                                                                           first_time_step_explicit_,
+//                                                                           local_fourier_,
+//                                                                           local_cfl_,
+//                                                                           min_delta_xyz_,
+//                                                                           delta_T_subcooled_overheated_,
+//                                                                           first_time_step_varying_probes_,
+//                                                                           probe_variations_priority_,
+//                                                                           disable_interpolation_in_mixed_cells_,
+//                                                                           max_u_radial_,
+//                                                                           (convective_flux_correction_ || diffusive_flux_correction_),
+//                                                                           distance_cell_faces_from_lrs_,
+//                                                                           pre_initialise_thermal_subproblems_list_,
+//                                                                           find_temperature_cell_neighbours_,
+//                                                                           !correct_neighbours_using_probe_length_,
+//                                                                           neighbours_corrected_rank_,
+//                                                                           neighbours_colinearity_weighting_,
+//                                                                           find_reachable_fluxes_,
+//                                                                           find_cell_neighbours_for_fluxes_spherical_correction_,
+//                                                                           n_iter_distance_,
+//                                                                           interp_eulerian_);
+                thermal_local_subproblems_.associate_sub_problem_to_inputs((*this),
+                                                                           i,j,k,
+                                                                           indicator(i,j,k),
                                                                            ref_ijk_ft_->get_timestep(),
                                                                            ref_ijk_ft_->get_current_time(),
-                                                                           *eulerian_compo_connex_from_interface_int_ns_,
-                                                                           *eulerian_compo_connex_from_interface_ghost_int_ns_,
-                                                                           eulerian_distance_ns_,
-                                                                           eulerian_curvature_ns_,
-                                                                           eulerian_interfacial_area_ns_,
-                                                                           eulerian_facets_barycentre_ns_,
-                                                                           eulerian_normal_vectors_ns_,
-                                                                           rising_velocities_,
-                                                                           rising_vectors_,
-                                                                           bubbles_barycentre_,
-                                                                           advected_frame_of_reference_,
-                                                                           neglect_frame_of_reference_radial_advection_,
-                                                                           points_per_thermal_subproblem_,
-                                                                           uniform_alpha_,
-                                                                           uniform_lambda_,
-                                                                           coeff_distance_diagonal_,
-                                                                           cell_diagonal_,
-                                                                           dr_,
-                                                                           radial_coordinates_,
-                                                                           identity_matrix_explicit_implicit_,
-                                                                           radial_first_order_operator_raw_,
-                                                                           radial_second_order_operator_raw_,
-                                                                           radial_first_order_operator_,
-                                                                           radial_second_order_operator_,
-                                                                           identity_matrix_subproblems_,
-                                                                           radial_diffusion_matrix_,
-                                                                           radial_convection_matrix_,
                                                                            ref_ijk_ft_->itfce(),
-                                                                           indicator(i,j,k),
-                                                                           temperature_,
-                                                                           temperature_ft_,
-                                                                           temperature_before_extrapolation_,
                                                                            ref_ijk_ft_->get_velocity(),
                                                                            ref_ijk_ft_->get_velocity_ft(),
-                                                                           ref_ijk_ft_->get_pressure_ghost_cells(),
-                                                                           grad_T_elem_,
-                                                                           hess_diag_T_elem_,
-                                                                           hess_cross_T_elem_,
-                                                                           finite_difference_assembler_,
-                                                                           thermal_subproblems_matrix_assembly_,
-                                                                           thermal_subproblems_rhs_assembly_,
-                                                                           thermal_subproblems_temperature_solution_ini_,
-                                                                           thermal_subproblems_temperature_solution_,
-                                                                           source_terms_type_,
-                                                                           source_terms_correction_,
-                                                                           is_first_time_step_,
-                                                                           first_time_step_temporal_,
-                                                                           first_time_step_explicit_,
-                                                                           local_fourier_,
-                                                                           local_cfl_,
-                                                                           min_delta_xyz_,
-                                                                           delta_T_subcooled_overheated_,
-                                                                           first_time_step_varying_probes_,
-                                                                           probe_variations_priority_,
-                                                                           disable_interpolation_in_mixed_cells_,
-                                                                           max_u_radial_,
-                                                                           (convective_flux_correction_ || diffusive_flux_correction_),
-                                                                           distance_cell_faces_from_lrs_,
-                                                                           pre_initialise_thermal_subproblems_list_,
-                                                                           find_temperature_cell_neighbours_,
-                                                                           !correct_neighbours_using_probe_length_,
-                                                                           neighbours_corrected_rank_,
-                                                                           neighbours_colinearity_weighting_,
-                                                                           find_reachable_fluxes_,
-                                                                           find_cell_neighbours_for_fluxes_spherical_correction_,
-                                                                           n_iter_distance_,
-                                                                           interp_eulerian_);
+                                                                           ref_ijk_ft_->get_pressure_ghost_cells());
 
               }
       thermal_local_subproblems_.compute_global_indices();
@@ -1783,7 +1825,7 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
 
       find_temperature_cell_neighbours_ = 0;
       use_temperature_cell_neighbours_ = 0;
-      corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_colinearity_weighting_);
+      corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_weighting_);
     }
 
   corrige_flux_->compute_temperature_cell_centre(temperature_);
@@ -1860,45 +1902,51 @@ void IJK_Thermal_Subresolution::enforce_periodic_temperature_boundary_value()
       const int ni = temperature_.ni();
       const int nj = temperature_.nj();
       const int nk = temperature_.nk();
+      const int offset_i = temperature_.get_splitting().get_offset_local(0);
+      const int offset_j = temperature_.get_splitting().get_offset_local(1);
+      const int offset_k = temperature_.get_splitting().get_offset_local(2);
+      const int ni_tot = temperature_.get_splitting().get_grid_geometry().get_nb_elem_tot(0);
+      const int nj_tot = temperature_.get_splitting().get_grid_geometry().get_nb_elem_tot(1);
+      const int nk_tot = temperature_.get_splitting().get_grid_geometry().get_nb_elem_tot(2);
       std::vector<double> indices_i_to_correct;
       std::vector<double> indices_j_to_correct;
       std::vector<double> indices_k_to_correct;
       int stencil_to_correct = stencil_periodic_boundary_value_;
-      for (int i=0; i<=stencil_to_correct; i++)
+      for (int i=0; i<stencil_to_correct; i++)
         {
-          indices_i_to_correct.push_back(stencil_to_correct);
-          indices_j_to_correct.push_back(stencil_to_correct);
-          indices_k_to_correct.push_back(stencil_to_correct);
-          indices_i_to_correct.push_back(ni-1-stencil_to_correct);
-          indices_j_to_correct.push_back(nj-1-stencil_to_correct);
-          indices_k_to_correct.push_back(nk-1-stencil_to_correct);
+          indices_i_to_correct.push_back(i);
+          indices_j_to_correct.push_back(i);
+          indices_k_to_correct.push_back(i);
+          indices_i_to_correct.push_back(ni_tot-1-i);
+          indices_j_to_correct.push_back(nj_tot-1-i);
+          indices_k_to_correct.push_back(nk_tot-1-i);
         }
       int i,j,k;
       for (k = 0; k < nk; k++)
-        if (std::find(indices_k_to_correct.begin(), indices_k_to_correct.end(), k) != indices_k_to_correct.end())
+        if (std::find(indices_k_to_correct.begin(), indices_k_to_correct.end(), k+offset_k) != indices_k_to_correct.end())
           for (j = 0; j < nj; j++)
             for (i = 0; i < ni; i++)
               {
                 const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-                if (fabs(indic)<LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
+                if (fabs(indic)>LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
                   { temperature_(i,j,k) = delta_T_subcooled_overheated_; }
               }
       for (j = 0; j < nj; j++)
-        if (std::find(indices_j_to_correct.begin(), indices_j_to_correct.end(), j) != indices_j_to_correct.end())
+        if (std::find(indices_j_to_correct.begin(), indices_j_to_correct.end(), j+offset_j) != indices_j_to_correct.end())
           for (k = 0; k < nk; k++)
             for (i = 0; i < ni; i++)
               {
                 const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-                if (fabs(indic)<LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
+                if (fabs(indic)>LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
                   { temperature_(i,j,k) = delta_T_subcooled_overheated_; }
               }
       for (i = 0; i < ni; i++)
-        if (std::find(indices_i_to_correct.begin(), indices_i_to_correct.end(), i) != indices_i_to_correct.end())
+        if (std::find(indices_i_to_correct.begin(), indices_i_to_correct.end(), i+offset_i) != indices_i_to_correct.end())
           for (k = 0; k < nk; k++)
             for (j = 0; j < nj; j++)
               {
                 const double indic = ref_ijk_ft_->itfce().I(i,j,k);
-                if (fabs(indic)<LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
+                if (fabs(indic)>LIQUID_INDICATOR_TEST) // Mixed cells and pure vapour cells
                   { temperature_(i,j,k) = delta_T_subcooled_overheated_; }
               }
     }

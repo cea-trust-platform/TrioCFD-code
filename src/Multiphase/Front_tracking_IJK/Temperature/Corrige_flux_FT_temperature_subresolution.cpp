@@ -47,6 +47,8 @@ Corrige_flux_FT_temperature_subresolution::Corrige_flux_FT_temperature_subresolu
   flux_init_ = 0;
   convective_flux_correction_ = 0;
   diffusive_flux_correction_ = 0;
+
+  copy_fluxes_on_every_procs_ = 0;
 }
 
 void Corrige_flux_FT_temperature_subresolution::associate_thermal_problems(const IJK_One_Dimensional_Subproblems& thermal_subproblems)
@@ -2283,22 +2285,53 @@ void Corrige_flux_FT_temperature_subresolution::sort_ijk_intersections_subproble
                                                                                                               const int ini_index)
 
 {
-  const int nb_i_layer = ref_ijk_ft_->itfce().I().ni();
-  const int nb_j_layer = ref_ijk_ft_->itfce().I().nj();
-  const int nb_k_layer = ref_ijk_ft_->itfce().I().nk();
-  if (!ini_index)
-    {
-      index_face_i_flux_x.resize(nb_k_layer);
-      index_face_j_flux_x.resize(nb_k_layer);
-      index_face_i_flux_y.resize(nb_k_layer);
-      index_face_j_flux_y.resize(nb_k_layer);
-      index_face_i_flux_z.resize(nb_k_layer + 1);
-      index_face_j_flux_z.resize(nb_k_layer + 1);
-    }
+  const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I();
+  const int nb_i_layer = indicator.ni();
+  const int nb_j_layer = indicator.nj();
+  const int nb_k_layer = indicator.nk();
 
-  flux_x.resize(nb_k_layer);
-  flux_y.resize(nb_k_layer);
-  flux_z.resize(nb_k_layer + 1);
+  // Make it parallel
+  const IJK_Splitting& splitting_ns = ref_ijk_ft_->itfce().I().get_splitting();
+  const int offset_i = splitting_ns.get_offset_local(0);
+  const int offset_j = splitting_ns.get_offset_local(1);
+  const int offset_k = splitting_ns.get_offset_local(2);
+
+  const IJK_Grid_Geometry& geometry = splitting_ns.get_grid_geometry();
+  const int nb_i_layer_tot = geometry.get_nb_elem_tot(0);
+  const int nb_j_layer_tot = geometry.get_nb_elem_tot(1);
+  const int nb_k_layer_tot = geometry.get_nb_elem_tot(2);
+
+  const int seq = (Process::nproc() == 1);
+
+  initialise_any_cell_neighbours_indices_to_correct_with_flux(index_face_i_flux_x,
+                                                              index_face_j_flux_x,
+                                                              index_face_i_flux_y,
+                                                              index_face_j_flux_y,
+                                                              index_face_i_flux_z,
+                                                              index_face_j_flux_z,
+                                                              flux_x,
+                                                              flux_y,
+                                                              flux_z,
+                                                              ini_index);
+  if (!seq)
+    {
+      //  index_face_i_flux_x_remaining_global_sorted_;
+      //  index_face_j_flux_x_remaining_global_sorted_;
+      //  index_face_i_flux_y_remaining_global_sorted_;
+      //  index_face_j_flux_y_remaining_global_sorted_;
+      //  index_face_i_flux_z_remaining_global_sorted_;
+      //  index_face_j_flux_z_remaining_global_sorted_;
+//  	initialise_any_cell_neighbours_indices_to_correct_on_processors(index_face_i_flux_x_remaining_global,
+//  																															    index_face_j_flux_x_remaining_global,
+//  																																	index_face_i_flux_y_remaining_global,
+//  																																	index_face_i_flux_y_remaining_global,
+//  																																	index_face_i_flux_z_remaining_global,
+//  																																	index_face_j_flux_z_remaining_global,
+//  																																	flux_x_remaining_global,
+//  																																	flux_y_remaining_global,
+//  																																	flux_z_remaining_global
+//  																																	ini_index);
+    }
 
   FixedVector<std::vector<ArrOfInt>*,3> index_face_i_sorted;
   index_face_i_sorted[0] = &index_face_i_flux_x;
@@ -2315,22 +2348,38 @@ void Corrige_flux_FT_temperature_subresolution::sort_ijk_intersections_subproble
   fluxes[1] = &flux_y;
   fluxes[2] = &flux_z;
 
-  for (int dir=0; dir<3; dir++)
-    for (int k_layer=0; k_layer<nb_k_layer+1; k_layer++)
-      {
-        if ((dir==DIRECTION_I || dir==DIRECTION_J) && k_layer==nb_k_layer)
-          break;
-        if (!ini_index)
-          {
-            (*(index_face_i_sorted[dir]))[k_layer].reset();
-            (*(index_face_j_sorted[dir]))[k_layer].reset();
-            (*(index_face_i_sorted[dir]))[k_layer].set_smart_resize(1);
-            (*(index_face_j_sorted[dir]))[k_layer].set_smart_resize(1);
-          }
+//  if (!ini_index)
+//    {
+//      index_face_i_flux_x.resize(nb_k_layer);
+//      index_face_j_flux_x.resize(nb_k_layer);
+//      index_face_i_flux_y.resize(nb_k_layer);
+//      index_face_j_flux_y.resize(nb_k_layer);
+//      index_face_i_flux_z.resize(nb_k_layer + 1);
+//      index_face_j_flux_z.resize(nb_k_layer + 1);
+//    }
+//
+//  flux_x.resize(nb_k_layer);
+//  flux_y.resize(nb_k_layer);
+//  flux_z.resize(nb_k_layer + 1);
+//
 
-        (*(fluxes[dir]))[k_layer].reset();
-        (*(fluxes[dir]))[k_layer].set_smart_resize(1);
-      }
+//
+//  for (int dir=0; dir<3; dir++)
+//    for (int k_layer=0; k_layer<nb_k_layer+1; k_layer++)
+//      {
+//        if ((dir==DIRECTION_I || dir==DIRECTION_J) && k_layer==nb_k_layer)
+//          break;
+//        if (!ini_index)
+//          {
+//            (*(index_face_i_sorted[dir]))[k_layer].reset();
+//            (*(index_face_j_sorted[dir]))[k_layer].reset();
+//            (*(index_face_i_sorted[dir]))[k_layer].set_smart_resize(1);
+//            (*(index_face_j_sorted[dir]))[k_layer].set_smart_resize(1);
+//          }
+//
+//        (*(fluxes[dir]))[k_layer].reset();
+//        (*(fluxes[dir]))[k_layer].set_smart_resize(1);
+//      }
 
   IntVect& i_pure_face_to_correct = ijk_faces_to_correct_[0];
   IntVect& j_pure_face_to_correct = ijk_faces_to_correct_[1];
@@ -2344,54 +2393,161 @@ void Corrige_flux_FT_temperature_subresolution::sort_ijk_intersections_subproble
       (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
       (*(index_face_i_sorted[dir]))[k].append_array(i_pure_face_to_correct[i_flux]);
       (*(index_face_j_sorted[dir]))[k].append_array(j_pure_face_to_correct[i_flux]);
-
       switch(dir)
         {
         case DIRECTION_I:
+          if (i_pure_face_to_correct[i_flux] + offset_i == 0)
+            {
+              if (seq)
+                {
+                  (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
+                  (*(index_face_i_sorted[dir]))[k].append_array(nb_i_layer_tot);
+                  (*(index_face_j_sorted[dir]))[k].append_array(j_pure_face_to_correct[i_flux]);
+                }
+              else
+                {
+
+                }
+            }
+          if (i_pure_face_to_correct[i_flux] + offset_i == nb_i_layer_tot)
+            {
+              if (seq)
+                {
+                  (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
+                  (*(index_face_i_sorted[dir]))[k].append_array(0);
+                  (*(index_face_j_sorted[dir]))[k].append_array(j_pure_face_to_correct[i_flux]);
+                }
+            }
           if (i_pure_face_to_correct[i_flux] == 0)
             {
-              (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
-              (*(index_face_i_sorted[dir]))[k].append_array(nb_i_layer);
-              (*(index_face_j_sorted[dir]))[k].append_array(j_pure_face_to_correct[i_flux]);
+
             }
           if (i_pure_face_to_correct[i_flux] == nb_i_layer)
             {
-              (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
-              (*(index_face_i_sorted[dir]))[k].append_array(0);
-              (*(index_face_j_sorted[dir]))[k].append_array(j_pure_face_to_correct[i_flux]);
+
             }
           break;
         case DIRECTION_J:
-          if (j_pure_face_to_correct[i_flux] == 0)
+          if (j_pure_face_to_correct[i_flux] + offset_j == 0)
             {
-              (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
-              (*(index_face_i_sorted[dir]))[k].append_array(i_pure_face_to_correct[i_flux]);
-              (*(index_face_j_sorted[dir]))[k].append_array(nb_j_layer);
+              if (seq)
+                {
+                  (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
+                  (*(index_face_i_sorted[dir]))[k].append_array(i_pure_face_to_correct[i_flux]);
+                  (*(index_face_j_sorted[dir]))[k].append_array(nb_j_layer_tot);
+                }
             }
-          if (j_pure_face_to_correct[i_flux] == nb_j_layer)
+          if (j_pure_face_to_correct[i_flux] + offset_j  == nb_j_layer_tot)
             {
-              (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
-              (*(index_face_i_sorted[dir]))[k].append_array(i_pure_face_to_correct[i_flux]);
-              (*(index_face_j_sorted[dir]))[k].append_array(0);
+              if (seq)
+                {
+                  (*(fluxes[dir]))[k].append_array(fluxes_subgrid[i_flux]);
+                  (*(index_face_i_sorted[dir]))[k].append_array(i_pure_face_to_correct[i_flux]);
+                  (*(index_face_j_sorted[dir]))[k].append_array(0);
+                }
+            }
+          if (j_pure_face_to_correct[i_flux]  == 0)
+            {
+
+            }
+          if (j_pure_face_to_correct[i_flux] + offset_j  == nb_j_layer)
+            {
+
             }
           break;
         case DIRECTION_K:
-          if (k == nb_k_layer)
+          if (k + offset_k == 0)
             {
-              (*(fluxes[dir]))[0].append_array(fluxes_subgrid[i_flux]);
-              (*(index_face_i_sorted[dir]))[0].append_array(i_pure_face_to_correct[i_flux]);
-              (*(index_face_j_sorted[dir]))[0].append_array(j_pure_face_to_correct[i_flux]);
+              if (seq)
+                {
+                  (*(fluxes[dir]))[nb_k_layer_tot].append_array(fluxes_subgrid[i_flux]);
+                  (*(index_face_i_sorted[dir]))[nb_k_layer_tot].append_array(i_pure_face_to_correct[i_flux]);
+                  (*(index_face_j_sorted[dir]))[nb_k_layer_tot].append_array(j_pure_face_to_correct[i_flux]);
+                }
+            }
+          if (k + offset_k == nb_k_layer_tot)
+            {
+              if (seq)
+                {
+                  (*(fluxes[dir]))[0].append_array(fluxes_subgrid[i_flux]);
+                  (*(index_face_i_sorted[dir]))[0].append_array(i_pure_face_to_correct[i_flux]);
+                  (*(index_face_j_sorted[dir]))[0].append_array(j_pure_face_to_correct[i_flux]);
+                }
             }
           if (k == 0)
             {
-              (*(fluxes[dir]))[nb_k_layer].append_array(fluxes_subgrid[i_flux]);
-              (*(index_face_i_sorted[dir]))[nb_k_layer].append_array(i_pure_face_to_correct[i_flux]);
-              (*(index_face_j_sorted[dir]))[nb_k_layer].append_array(j_pure_face_to_correct[i_flux]);
+
+            }
+          if (k == nb_k_layer)
+            {
+
             }
           break;
         }
     }
 }
+
+void Corrige_flux_FT_temperature_subresolution::initialise_any_cell_neighbours_indices_to_correct_on_processors(std::vector<std::vector<ArrOfInt>>& index_face_i_flux_x,
+                                                                                                                std::vector<std::vector<ArrOfInt>>& index_face_j_flux_x,
+                                                                                                                std::vector<std::vector<ArrOfInt>>& index_face_i_flux_y,
+                                                                                                                std::vector<std::vector<ArrOfInt>>& index_face_j_flux_y,
+                                                                                                                std::vector<std::vector<ArrOfInt>>& index_face_i_flux_z,
+                                                                                                                std::vector<std::vector<ArrOfInt>>& index_face_j_flux_z,
+                                                                                                                std::vector<std::vector<ArrOfDouble>>& flux_x,
+                                                                                                                std::vector<std::vector<ArrOfDouble>>& flux_y,
+                                                                                                                std::vector<std::vector<ArrOfDouble>>& flux_z,
+                                                                                                                const int ini_index)
+{
+  const int nb_proc = Process::nproc();
+  if(!ini_index)
+    {
+      index_face_i_flux_x.resize(nb_proc);
+      index_face_j_flux_x.resize(nb_proc);
+      index_face_i_flux_y.resize(nb_proc);
+      index_face_j_flux_y.resize(nb_proc);
+      index_face_i_flux_z.resize(nb_proc);
+      index_face_j_flux_z.resize(nb_proc);
+    }
+  flux_x.resize(nb_proc);
+  flux_y.resize(nb_proc);
+  flux_z.resize(nb_proc);
+}
+
+void Corrige_flux_FT_temperature_subresolution::redistribute_indices_fluxes_by_k_layers(std::vector<ArrOfInt>& index_face_i_flux_x,
+                                                                                        std::vector<ArrOfInt>& index_face_j_flux_x,
+                                                                                        std::vector<ArrOfInt>& index_face_i_flux_y,
+                                                                                        std::vector<ArrOfInt>& index_face_j_flux_y,
+                                                                                        std::vector<ArrOfInt>& index_face_i_flux_z,
+                                                                                        std::vector<ArrOfInt>& index_face_j_flux_z,
+                                                                                        std::vector<ArrOfInt> index_face_i_flux_x_remaining_global,
+                                                                                        std::vector<ArrOfInt> index_face_j_flux_x_remaining_global,
+                                                                                        std::vector<ArrOfInt> index_face_i_flux_y_remaining_global,
+                                                                                        std::vector<ArrOfInt> index_face_j_flux_y_remaining_global,
+                                                                                        std::vector<ArrOfInt> index_face_i_flux_z_remaining_global,
+                                                                                        std::vector<ArrOfInt> index_face_j_flux_z_remaining_global,
+                                                                                        std::vector<ArrOfDouble>& flux_x,
+                                                                                        std::vector<ArrOfDouble>& flux_y,
+                                                                                        std::vector<ArrOfDouble>& flux_z,
+                                                                                        std::vector<ArrOfDouble>& flux_x_remaining_global,
+                                                                                        std::vector<ArrOfDouble>& flux_y_remaining_global,
+                                                                                        std::vector<ArrOfDouble>& flux_z_remaining_global,
+                                                                                        const int ini_index)
+{
+
+
+}
+
+//void Corrige_flux_FT_temperature_subresolution::redistribute_indices_any_fluxes_by_k_layers()
+//{
+//  int counter = 0;
+//  if (!convection_negligible_)
+//    {
+//  		redistribute_indices_fluxes_by_k_layers(, counter);
+//      counter ++;
+//    }
+//  if (!diffusion_negligible_)
+//    store_any_cell_faces_corrected(, counter);
+//}
 
 void Corrige_flux_FT_temperature_subresolution::store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
                                                                            FixedVector<IJK_Field_double,3>& cell_faces_corrected_convective,

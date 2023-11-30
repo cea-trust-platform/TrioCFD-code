@@ -38,6 +38,8 @@
 
 class IJK_FT_double;
 class Switch_FT_double;
+class IJK_Thermal_base;
+class IJK_Thermal_Subresolution;
 
 class IJK_One_Dimensional_Subproblems : public LIST(IJK_One_Dimensional_Subproblem)
 {
@@ -48,87 +50,99 @@ public :
   IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
   void initialise_thermal_subproblems_list_params(const int& pre_initialise_thermal_subproblems_list,
-                                                  const double& pre_factor_subproblems_number);
+                                                  const double& pre_factor_subproblems_number,
+                                                  const int& remove_append_subproblems);
   void set_max_subproblems(const int max_subproblems) { max_subproblems_ = max_subproblems; };
   void clean();
-  void clean(int add);
+  void clean(int add, int append);
   void clean_add();
   void clean_remove();
+  void clean_append();
   void complete_subproblems();
+  void shorten_subproblems();
   void add_subproblems(int n);
   void compute_global_indices();
   void set_global_index();
-  void associate_sub_problem_to_inputs(int debug,
+  void associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
                                        int i, int j, int k,
+                                       const double& indicator,
                                        double global_time_step,
                                        double current_time,
-                                       const IJK_Field_int& eulerian_compo_connex,
-                                       const IJK_Field_int& eulerian_compo_connex_ghost,
-                                       const IJK_Field_double& eulerian_distance,
-                                       const IJK_Field_double& eulerian_curvature,
-                                       const IJK_Field_double& eulerian_interfacial_area,
-                                       const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
-                                       const FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors,
-                                       const ArrOfDouble& rising_velocities,
-                                       const DoubleTab& rising_vectors,
-                                       const DoubleTab& bubbles_barycentre,
-                                       int advected_frame_of_reference,
-                                       int neglect_frame_of_reference_radial_advection,
-                                       const int& points_per_thermal_subproblem,
-                                       const double& alpha,
-                                       const double& lambda,
-                                       const double& coeff_distance_diagonal,
-                                       const double& cell_diagonal,
-                                       const double& dr_base,
-                                       const DoubleVect& radial_coordinates,
-                                       const Matrice& identity_matrix_explicit_implicit,
-                                       const Matrice& radial_first_order_operator_raw,
-                                       const Matrice& radial_second_order_operator_raw,
-                                       const Matrice& radial_first_order_operator,
-                                       const Matrice& radial_second_order_operator,
-                                       Matrice& identity_matrix_subproblems,
-                                       Matrice& radial_diffusion_matrix,
-                                       Matrice& radial_convection_matrix,
                                        const IJK_Interfaces& interfaces,
-                                       const double& indicator,
-                                       const IJK_Field_double& temperature,
-                                       const IJK_Field_double& temperature_ft,
-                                       const IJK_Field_double& temperature_before_extrapolation,
                                        const FixedVector<IJK_Field_double, 3>& velocity,
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
-                                       const IJK_Field_double& pressure,
-                                       const FixedVector<IJK_Field_double, 3>& grad_T_elem,
-                                       const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
-                                       const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
-                                       IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
-                                       Matrice& thermal_subproblems_matrix_assembly,
-                                       DoubleVect& thermal_subproblems_rhs_assembly,
-                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
-                                       DoubleVect& thermal_subproblems_temperature_solution,
-                                       const int& source_terms_type,
-                                       const int& source_terms_correction,
-                                       const bool& is_first_time_step,
-                                       int& first_time_step_temporal,
-                                       const int& first_time_step_explicit,
-                                       const double& local_fourier,
-                                       const double& local_cfl,
-                                       const double& min_delta_xyz,
-                                       const double& delta_T_subcooled_overheated,
-                                       const int& first_time_step_varying_probes,
-                                       const int& probe_variations_priority,
-                                       const int& disable_interpolation_in_mixed_cells,
-                                       const int& max_u_radial,
-                                       const int& correct_fluxes,
-                                       const int& distance_cell_faces_from_lrs,
-                                       const int& pre_initialise_thermal_subproblems_list,
-                                       const int& correct_temperature_cell_neighbours,
-                                       const int& correct_neighbours_rank,
-                                       const int& neighbours_corrected_rank,
-                                       const int& neighbours_colinearity_weighting,
-                                       const int& compute_reachable_fluxes,
-                                       const int& find_cell_neighbours_for_fluxes_spherical_correction,
-                                       const int& n_iter_distance,
-                                       const int& interp_eulerian);
+                                       const IJK_Field_double& pressure);
+//  void associate_sub_problem_to_inputs(int debug,
+//                                       int i, int j, int k,
+//                                       double global_time_step,
+//                                       double current_time,
+//                                       const IJK_Field_int& eulerian_compo_connex,
+//                                       const IJK_Field_int& eulerian_compo_connex_ghost,
+//                                       const IJK_Field_double& eulerian_distance,
+//                                       const IJK_Field_double& eulerian_curvature,
+//                                       const IJK_Field_double& eulerian_interfacial_area,
+//                                       const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
+//                                       const FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors,
+//                                       const ArrOfDouble& rising_velocities,
+//                                       const DoubleTab& rising_vectors,
+//                                       const DoubleTab& bubbles_barycentre,
+//                                       int advected_frame_of_reference,
+//                                       int neglect_frame_of_reference_radial_advection,
+//                                       const int& points_per_thermal_subproblem,
+//                                       const double& alpha,
+//                                       const double& lambda,
+//                                       const double& coeff_distance_diagonal,
+//                                       const double& cell_diagonal,
+//                                       const double& dr_base,
+//                                       const DoubleVect& radial_coordinates,
+//                                       const Matrice& identity_matrix_explicit_implicit,
+//                                       const Matrice& radial_first_order_operator_raw,
+//                                       const Matrice& radial_second_order_operator_raw,
+//                                       const Matrice& radial_first_order_operator,
+//                                       const Matrice& radial_second_order_operator,
+//                                       Matrice& identity_matrix_subproblems,
+//                                       Matrice& radial_diffusion_matrix,
+//                                       Matrice& radial_convection_matrix,
+//                                       const IJK_Interfaces& interfaces,
+//                                       const double& indicator,
+//                                       const IJK_Field_double& temperature,
+//                                       const IJK_Field_double& temperature_ft,
+//                                       const IJK_Field_double& temperature_before_extrapolation,
+//                                       const FixedVector<IJK_Field_double, 3>& velocity,
+//                                       const FixedVector<IJK_Field_double, 3>& velocity_ft,
+//                                       const IJK_Field_double& pressure,
+//                                       const FixedVector<IJK_Field_double, 3>& grad_T_elem,
+//                                       const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
+//                                       const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
+//                                       IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+//                                       Matrice& thermal_subproblems_matrix_assembly,
+//                                       DoubleVect& thermal_subproblems_rhs_assembly,
+//                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
+//                                       DoubleVect& thermal_subproblems_temperature_solution,
+//                                       const int& source_terms_type,
+//                                       const int& source_terms_correction,
+//                                       const bool& is_first_time_step,
+//                                       int& first_time_step_temporal,
+//                                       const int& first_time_step_explicit,
+//                                       const double& local_fourier,
+//                                       const double& local_cfl,
+//                                       const double& min_delta_xyz,
+//                                       const double& delta_T_subcooled_overheated,
+//                                       const int& first_time_step_varying_probes,
+//                                       const int& probe_variations_priority,
+//                                       const int& disable_interpolation_in_mixed_cells,
+//                                       const int& max_u_radial,
+//                                       const int& correct_fluxes,
+//                                       const int& distance_cell_faces_from_lrs,
+//                                       const int& pre_initialise_thermal_subproblems_list,
+//                                       const int& correct_temperature_cell_neighbours,
+//                                       const int& correct_neighbours_rank,
+//                                       const int& neighbours_corrected_rank,
+//                                       const int& neighbours_colinearity_weighting,
+//                                       const int& compute_reachable_fluxes,
+//                                       const int& find_cell_neighbours_for_fluxes_spherical_correction,
+//                                       const int& n_iter_distance,
+//                                       const int& interp_eulerian);
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_modified_probe_length(const int& probe_variations_enabled);
@@ -244,6 +258,7 @@ protected :
 
   int pre_initialise_thermal_subproblems_list_ = 0;
   double pre_factor_subproblems_number_ = 1.;
+  int remove_append_subproblems_ = 0;
 
   double spherical_nusselt_ = 2.;
   double overall_shear_stress_ = 0.;

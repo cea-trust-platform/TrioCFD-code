@@ -52,6 +52,8 @@ class IJK_Interfaces;
 class IJK_Thermal_base : public Objet_U
 {
   Declare_base( IJK_Thermal_base ) ;
+  friend class IJK_One_Dimensional_Subproblems;
+  friend class IJK_One_Dimensional_Subproblem;
 public:
   /*
    * Initialisation

@@ -23,6 +23,9 @@
 #include <IJK_Navier_Stokes_tools.h>
 #include <Ouvrir_fichier.h>
 #include <IJK_FT.h>
+#include <IJK_Thermal_base.h>
+#include <IJK_Thermal_Subresolution.h>
+
 
 Implemente_instanciable_sans_constructeur( IJK_One_Dimensional_Subproblem, "IJK_One_Dimensional_Subproblem", Objet_U ) ;
 
@@ -131,19 +134,15 @@ void IJK_One_Dimensional_Subproblem::reinit_variable(DoubleVect& vect)
   vect *= 0.;
 }
 
+
+
 /*
  * TODO: Remplacer cette methode pour eviter de fournir tous les attributs
  */
-//void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(const IJK_Thermal_Subresolution& thermal_problem)
-//{
-//	IJK_Thermal_Subresolution* thermal_problem_ = &thermal_problem
-// 	thermal_problem_->get_attributes();
-//}
-
-void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
-                                                                     int debug,
-                                                                     int sub_problem_index,
+void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
                                                                      int i, int j, int k,
+                                                                     int init,
+                                                                     int sub_problem_index,
                                                                      double global_time_step,
                                                                      double current_time,
                                                                      int compo_connex,
@@ -155,68 +154,11 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
                                                                      double bubble_rising_velocity,
                                                                      ArrOfDouble bubble_rising_vector,
                                                                      ArrOfDouble bubble_barycentre,
-                                                                     int advected_frame_of_reference,
-                                                                     int neglect_frame_of_reference_radial_advection,
-                                                                     const int& points_per_thermal_subproblem,
-                                                                     const double& alpha,
-                                                                     const double& lambda,
-                                                                     const double& coeff_distance_diagonal,
-                                                                     const double& cell_diagonal,
-                                                                     const double& dr_base,
-                                                                     const DoubleVect& radial_coordinates,
-                                                                     const Matrice& identity_matrix_explicit_implicit_raw,
-                                                                     const Matrice& radial_first_order_operator_raw,
-                                                                     const Matrice& radial_second_order_operator_raw,
-                                                                     const Matrice& radial_first_order_operator,
-                                                                     const Matrice& radial_second_order_operator,
-                                                                     Matrice& identity_matrix_subproblems,
-                                                                     Matrice& radial_diffusion_matrix,
-                                                                     Matrice& radial_convection_matrix,
-                                                                     const IJK_Interfaces& interfaces,
                                                                      const double& indicator,
-                                                                     const IJK_Field_double& eulerian_distance,
-                                                                     const IJK_Field_double& eulerian_curvature,
-                                                                     const IJK_Field_double& eulerian_interfacial_area,
-                                                                     const FixedVector<IJK_Field_double, 3>& eulerian_normal_vect,
-                                                                     const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
-                                                                     const IJK_Field_double& temperature,
-                                                                     const IJK_Field_double& temperature_ft,
-                                                                     const IJK_Field_double& temperature_before_extrapolation,
+                                                                     const IJK_Interfaces& interfaces,
                                                                      const FixedVector<IJK_Field_double, 3>& velocity,
                                                                      const FixedVector<IJK_Field_double, 3>& velocity_ft,
-                                                                     const IJK_Field_double& pressure,
-                                                                     const FixedVector<IJK_Field_double, 3>& grad_T_elem,
-                                                                     const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
-                                                                     const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
-                                                                     IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
-                                                                     Matrice& thermal_subproblems_matrix_assembly,
-                                                                     DoubleVect& thermal_subproblems_rhs_assembly,
-                                                                     DoubleVect& thermal_subproblems_temperature_solution_ini,
-                                                                     DoubleVect& thermal_subproblems_temperature_solution,
-                                                                     const int& source_terms_type,
-                                                                     const int& source_terms_correction,
-                                                                     const bool& is_first_time_step,
-                                                                     int& first_time_step_temporal,
-                                                                     const int& first_time_step_explicit,
-                                                                     const double& local_fourier,
-                                                                     const double& local_cfl,
-                                                                     const double& min_delta_xyz,
-                                                                     const double& delta_T_subcooled_overheated,
-                                                                     const int& first_time_step_varying_probes,
-                                                                     const int& probe_variations_priority,
-                                                                     const int& disable_interpolation_in_mixed_cells,
-                                                                     const int& max_u_radial,
-                                                                     const int& correct_fluxes,
-                                                                     const int& distance_cell_faces_from_lrs,
-                                                                     const int& pre_initialise_thermal_subproblems_list,
-                                                                     const int& correct_temperature_cell_neighbours,
-                                                                     const int& correct_neighbours_rank,
-                                                                     const int& neighbours_corrected_rank,
-                                                                     const int& neighbours_colinearity_weighting,
-                                                                     const int& compute_reachable_fluxes,
-                                                                     const int& find_cell_neighbours_for_fluxes_spherical_correction,
-                                                                     const int& n_iter_distance,
-                                                                     const int& interp_eulerian)
+                                                                     const IJK_Field_double& pressure)
 {
   /*
    * Should not change over iterations
@@ -226,70 +168,79 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
 
   if (init_)
     {
-      associate_thermal_subproblem_parameters(debug,
-                                              n_iter_distance,
-                                              delta_T_subcooled_overheated,
-                                              pre_initialise_thermal_subproblems_list);
+      associate_thermal_subproblem_parameters(ref_thermal_subresolution.debug_,
+                                              ref_thermal_subresolution.n_iter_distance_,
+                                              ref_thermal_subresolution.delta_T_subcooled_overheated_,
+                                              ref_thermal_subresolution.pre_initialise_thermal_subproblems_list_);
       associate_eulerian_fields_references(interfaces,
-                                           eulerian_distance,
-                                           eulerian_curvature,
-                                           eulerian_interfacial_area,
-                                           eulerian_normal_vect,
-                                           eulerian_facets_barycentre,
-                                           temperature,
-                                           temperature_ft,
-                                           temperature_before_extrapolation,
+                                           ref_thermal_subresolution.eulerian_distance_ns_,
+                                           ref_thermal_subresolution.eulerian_curvature_ns_,
+                                           ref_thermal_subresolution.eulerian_interfacial_area_ns_,
+                                           ref_thermal_subresolution.eulerian_normal_vectors_ns_,
+                                           ref_thermal_subresolution.eulerian_facets_barycentre_ns_,
+                                           ref_thermal_subresolution.temperature_,
+                                           ref_thermal_subresolution.temperature_ft_,
+                                           ref_thermal_subresolution.temperature_before_extrapolation_,
                                            velocity,
                                            velocity_ft,
                                            pressure,
-                                           grad_T_elem,
-                                           hess_diag_T_elem,
-                                           hess_cross_T_elem);
-      associate_probe_parameters(points_per_thermal_subproblem,
-                                 alpha,
-                                 lambda,
-                                 coeff_distance_diagonal,
-                                 cell_diagonal,
-                                 dr_base,
-                                 radial_coordinates);
-      associate_finite_difference_operators(radial_first_order_operator_raw,
-                                            radial_second_order_operator_raw,
-                                            radial_first_order_operator,
-                                            radial_second_order_operator,
-                                            identity_matrix_explicit_implicit_raw,
-                                            identity_matrix_subproblems,
-                                            radial_diffusion_matrix,
-                                            radial_convection_matrix);
-      associate_finite_difference_solver_solution(finite_difference_assembler,
-                                                  thermal_subproblems_matrix_assembly,
-                                                  thermal_subproblems_rhs_assembly,
-                                                  thermal_subproblems_temperature_solution,
-                                                  thermal_subproblems_temperature_solution_ini);
-      associate_source_terms_parameters(source_terms_type,
-                                        source_terms_correction,
-                                        source_terms_correction,
-                                        advected_frame_of_reference,
-                                        neglect_frame_of_reference_radial_advection);
-      associate_flux_correction_parameters(correct_fluxes,
-                                           distance_cell_faces_from_lrs,
-                                           interp_eulerian);
-      associate_varying_probes_params(first_time_step_varying_probes,
-                                      probe_variations_priority,
-                                      disable_interpolation_in_mixed_cells);
-      associate_flags_neighbours_correction(correct_temperature_cell_neighbours,
-                                            correct_neighbours_rank,
-                                            neighbours_corrected_rank,
-                                            neighbours_colinearity_weighting,
-                                            compute_reachable_fluxes,
-                                            find_cell_neighbours_for_fluxes_spherical_correction);
-      // TODO: If the calculation of the distance is changed in intersection_ijk, it will be useless...
-      associate_sub_problem_temporal_params(is_first_time_step,
-                                            first_time_step_temporal,
-                                            first_time_step_explicit,
-                                            local_fourier,
-                                            local_cfl,
-                                            min_delta_xyz,
-                                            max_u_radial);
+                                           ref_thermal_subresolution.grad_T_elem_,
+                                           ref_thermal_subresolution.hess_diag_T_elem_,
+                                           ref_thermal_subresolution.hess_cross_T_elem_);
+      associate_probe_parameters(ref_thermal_subresolution.points_per_thermal_subproblem_,
+                                 ref_thermal_subresolution.uniform_alpha_,
+                                 ref_thermal_subresolution.uniform_lambda_,
+                                 ref_thermal_subresolution.coeff_distance_diagonal_,
+                                 ref_thermal_subresolution.cell_diagonal_,
+                                 ref_thermal_subresolution.dr_,
+                                 ref_thermal_subresolution.radial_coordinates_);
+      associate_finite_difference_operators(ref_thermal_subresolution.radial_first_order_operator_raw_,
+                                            ref_thermal_subresolution.radial_second_order_operator_raw_,
+                                            ref_thermal_subresolution.radial_first_order_operator_,
+                                            ref_thermal_subresolution.radial_second_order_operator_,
+                                            ref_thermal_subresolution.identity_matrix_explicit_implicit_,
+                                            ref_thermal_subresolution.identity_matrix_subproblems_,
+                                            ref_thermal_subresolution.radial_diffusion_matrix_,
+                                            ref_thermal_subresolution.radial_convection_matrix_);
+      associate_finite_difference_solver_solution(ref_thermal_subresolution.finite_difference_assembler_,
+                                                  ref_thermal_subresolution.thermal_subproblems_matrix_assembly_,
+                                                  ref_thermal_subresolution.thermal_subproblems_rhs_assembly_,
+                                                  ref_thermal_subresolution.thermal_subproblems_temperature_solution_,
+                                                  ref_thermal_subresolution.thermal_subproblems_temperature_solution_ini_);
+      associate_source_terms_parameters(ref_thermal_subresolution.source_terms_type_,
+                                        ref_thermal_subresolution.source_terms_correction_,
+                                        ref_thermal_subresolution.source_terms_correction_,
+                                        ref_thermal_subresolution.advected_frame_of_reference_,
+                                        ref_thermal_subresolution.neglect_frame_of_reference_radial_advection_);
+      associate_flux_correction_parameters((ref_thermal_subresolution.convective_flux_correction_
+                                            || ref_thermal_subresolution.diffusive_flux_correction_),
+                                           ref_thermal_subresolution.distance_cell_faces_from_lrs_,
+                                           ref_thermal_subresolution.interp_eulerian_);
+      associate_varying_probes_params(ref_thermal_subresolution.first_time_step_varying_probes_,
+                                      ref_thermal_subresolution.probe_variations_priority_,
+                                      ref_thermal_subresolution.disable_interpolation_in_mixed_cells_);
+      associate_flags_neighbours_correction(ref_thermal_subresolution.find_temperature_cell_neighbours_,
+                                            !ref_thermal_subresolution.correct_neighbours_using_probe_length_,
+                                            ref_thermal_subresolution.neighbours_corrected_rank_,
+                                            ref_thermal_subresolution.neighbours_colinearity_weighting_,
+                                            ref_thermal_subresolution.neighbours_distance_weighting_,
+                                            ref_thermal_subresolution.neighbours_colinearity_distance_weighting_,
+                                            ref_thermal_subresolution.neighbours_last_faces_colinearity_weighting_,
+                                            ref_thermal_subresolution.neighbours_last_faces_colinearity_face_weighting_,
+                                            ref_thermal_subresolution.neighbours_last_faces_distance_weighting_,
+                                            ref_thermal_subresolution.neighbours_last_faces_distance_colinearity_weighting_,
+                                            ref_thermal_subresolution.neighbours_last_faces_distance_colinearity_face_weighting_,
+                                            ref_thermal_subresolution.find_reachable_fluxes_,
+                                            ref_thermal_subresolution.find_cell_neighbours_for_fluxes_spherical_correction_);
+
+//      // TODO: If the calculation of the distance is changed in intersection_ijk, it will be useless...
+      associate_sub_problem_temporal_params(ref_thermal_subresolution.is_first_time_step_,
+                                            ref_thermal_subresolution.first_time_step_temporal_,
+                                            ref_thermal_subresolution.first_time_step_explicit_,
+                                            ref_thermal_subresolution.local_fourier_,
+                                            ref_thermal_subresolution.local_cfl_,
+                                            ref_thermal_subresolution.min_delta_xyz_,
+                                            ref_thermal_subresolution.max_u_radial_);
     }
 
   /*
@@ -309,6 +260,176 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
     (*first_time_step_temporal_) = 0;
   recompute_finite_difference_matrices();
 }
+
+//void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(int init,
+//                                                                     int debug,
+//                                                                     int sub_problem_index,
+//                                                                     int i, int j, int k,
+//                                                                     double global_time_step,
+//                                                                     double current_time,
+//                                                                     int compo_connex,
+//                                                                     double distance,
+//                                                                     double curvature,
+//                                                                     double interfacial_area,
+//                                                                     ArrOfDouble facet_barycentre,
+//                                                                     ArrOfDouble normal_vector,
+//                                                                     double bubble_rising_velocity,
+//                                                                     ArrOfDouble bubble_rising_vector,
+//                                                                     ArrOfDouble bubble_barycentre,
+//                                                                     int advected_frame_of_reference,
+//                                                                     int neglect_frame_of_reference_radial_advection,
+//                                                                     const int& points_per_thermal_subproblem,
+//                                                                     const double& alpha,
+//                                                                     const double& lambda,
+//                                                                     const double& coeff_distance_diagonal,
+//                                                                     const double& cell_diagonal,
+//                                                                     const double& dr_base,
+//                                                                     const DoubleVect& radial_coordinates,
+//                                                                     const Matrice& identity_matrix_explicit_implicit_raw,
+//                                                                     const Matrice& radial_first_order_operator_raw,
+//                                                                     const Matrice& radial_second_order_operator_raw,
+//                                                                     const Matrice& radial_first_order_operator,
+//                                                                     const Matrice& radial_second_order_operator,
+//                                                                     Matrice& identity_matrix_subproblems,
+//                                                                     Matrice& radial_diffusion_matrix,
+//                                                                     Matrice& radial_convection_matrix,
+//                                                                     const IJK_Interfaces& interfaces,
+//                                                                     const double& indicator,
+//                                                                     const IJK_Field_double& eulerian_distance,
+//                                                                     const IJK_Field_double& eulerian_curvature,
+//                                                                     const IJK_Field_double& eulerian_interfacial_area,
+//                                                                     const FixedVector<IJK_Field_double, 3>& eulerian_normal_vect,
+//                                                                     const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
+//                                                                     const IJK_Field_double& temperature,
+//                                                                     const IJK_Field_double& temperature_ft,
+//                                                                     const IJK_Field_double& temperature_before_extrapolation,
+//                                                                     const FixedVector<IJK_Field_double, 3>& velocity,
+//                                                                     const FixedVector<IJK_Field_double, 3>& velocity_ft,
+//                                                                     const IJK_Field_double& pressure,
+//                                                                     const FixedVector<IJK_Field_double, 3>& grad_T_elem,
+//                                                                     const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
+//                                                                     const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
+//                                                                     IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
+//                                                                     Matrice& thermal_subproblems_matrix_assembly,
+//                                                                     DoubleVect& thermal_subproblems_rhs_assembly,
+//                                                                     DoubleVect& thermal_subproblems_temperature_solution_ini,
+//                                                                     DoubleVect& thermal_subproblems_temperature_solution,
+//                                                                     const int& source_terms_type,
+//                                                                     const int& source_terms_correction,
+//                                                                     const bool& is_first_time_step,
+//                                                                     int& first_time_step_temporal,
+//                                                                     const int& first_time_step_explicit,
+//                                                                     const double& local_fourier,
+//                                                                     const double& local_cfl,
+//                                                                     const double& min_delta_xyz,
+//                                                                     const double& delta_T_subcooled_overheated,
+//                                                                     const int& first_time_step_varying_probes,
+//                                                                     const int& probe_variations_priority,
+//                                                                     const int& disable_interpolation_in_mixed_cells,
+//                                                                     const int& max_u_radial,
+//                                                                     const int& correct_fluxes,
+//                                                                     const int& distance_cell_faces_from_lrs,
+//                                                                     const int& pre_initialise_thermal_subproblems_list,
+//                                                                     const int& correct_temperature_cell_neighbours,
+//                                                                     const int& correct_neighbours_rank,
+//                                                                     const int& neighbours_corrected_rank,
+//                                                                     const int& neighbours_colinearity_weighting,
+//                                                                     const int& compute_reachable_fluxes,
+//                                                                     const int& find_cell_neighbours_for_fluxes_spherical_correction,
+//                                                                     const int& n_iter_distance,
+//                                                                     const int& interp_eulerian)
+//{
+//  /*
+//   * Should not change over iterations
+//   */
+//  init_ = init;
+//  sub_problem_index_ = sub_problem_index;
+//
+//  if (init_)
+//    {
+//      associate_thermal_subproblem_parameters(debug,
+//                                              n_iter_distance,
+//                                              delta_T_subcooled_overheated,
+//                                              pre_initialise_thermal_subproblems_list);
+//      associate_eulerian_fields_references(interfaces,
+//                                           eulerian_distance,
+//                                           eulerian_curvature,
+//                                           eulerian_interfacial_area,
+//                                           eulerian_normal_vect,
+//                                           eulerian_facets_barycentre,
+//                                           temperature,
+//                                           temperature_ft,
+//                                           temperature_before_extrapolation,
+//                                           velocity,
+//                                           velocity_ft,
+//                                           pressure,
+//                                           grad_T_elem,
+//                                           hess_diag_T_elem,
+//                                           hess_cross_T_elem);
+//      associate_probe_parameters(points_per_thermal_subproblem,
+//                                 alpha,
+//                                 lambda,
+//                                 coeff_distance_diagonal,
+//                                 cell_diagonal,
+//                                 dr_base,
+//                                 radial_coordinates);
+//      associate_finite_difference_operators(radial_first_order_operator_raw,
+//                                            radial_second_order_operator_raw,
+//                                            radial_first_order_operator,
+//                                            radial_second_order_operator,
+//                                            identity_matrix_explicit_implicit_raw,
+//                                            identity_matrix_subproblems,
+//                                            radial_diffusion_matrix,
+//                                            radial_convection_matrix);
+//      associate_finite_difference_solver_solution(finite_difference_assembler,
+//                                                  thermal_subproblems_matrix_assembly,
+//                                                  thermal_subproblems_rhs_assembly,
+//                                                  thermal_subproblems_temperature_solution,
+//                                                  thermal_subproblems_temperature_solution_ini);
+//      associate_source_terms_parameters(source_terms_type,
+//                                        source_terms_correction,
+//                                        source_terms_correction,
+//                                        advected_frame_of_reference,
+//                                        neglect_frame_of_reference_radial_advection);
+//      associate_flux_correction_parameters(correct_fluxes,
+//                                           distance_cell_faces_from_lrs,
+//                                           interp_eulerian);
+//      associate_varying_probes_params(first_time_step_varying_probes,
+//                                      probe_variations_priority,
+//                                      disable_interpolation_in_mixed_cells);
+//      associate_flags_neighbours_correction(correct_temperature_cell_neighbours,
+//                                            correct_neighbours_rank,
+//                                            neighbours_corrected_rank,
+//                                            neighbours_colinearity_weighting,
+//                                            compute_reachable_fluxes,
+//                                            find_cell_neighbours_for_fluxes_spherical_correction);
+//      // TODO: If the calculation of the distance is changed in intersection_ijk, it will be useless...
+//      associate_sub_problem_temporal_params(is_first_time_step,
+//                                            first_time_step_temporal,
+//                                            first_time_step_explicit,
+//                                            local_fourier,
+//                                            local_cfl,
+//                                            min_delta_xyz,
+//                                            max_u_radial);
+//    }
+//
+//  /*
+//   * Should be reinitialised at each time step.
+//   */
+//  clear_vectors();
+//  reset_counters();
+//  set_global_index(0);
+//  reset_post_processing_theta_phi_scope();
+//  associate_temporal_parameters(global_time_step, current_time);
+//  associate_cell_ijk(i, j, k);
+//  associate_eulerian_field_values(compo_connex, indicator);
+//  associate_interface_related_parameters(distance, curvature, interfacial_area, facet_barycentre, normal_vector);
+//  associate_rising_velocity(bubble_rising_velocity, bubble_rising_vector, bubble_barycentre);
+//  initialise_thermal_probe();
+//  if (!global_probes_characteristics_)
+//    (*first_time_step_temporal_) = 0;
+//  recompute_finite_difference_matrices();
+//}
 
 void IJK_One_Dimensional_Subproblem::clear_vectors()
 {
@@ -441,6 +562,13 @@ void IJK_One_Dimensional_Subproblem::associate_flags_neighbours_correction(const
                                                                            const int& correct_neighbours_rank,
                                                                            const int& neighbours_corrected_rank,
                                                                            const int& neighbours_colinearity_weighting,
+                                                                           const int& neighbours_distance_weighting,
+                                                                           const int& neighbours_colinearity_distance_weighting,
+                                                                           const int& neighbours_last_faces_colinearity_weighting,
+                                                                           const int& neighbours_last_faces_colinearity_face_weighting,
+                                                                           const int& neighbours_last_faces_distance_weighting,
+                                                                           const int& neighbours_last_faces_distance_colinearity_weighting,
+                                                                           const int& neighbours_last_faces_distance_colinearity_face_weighting,
                                                                            const int& compute_reachable_fluxes,
                                                                            const int& find_cell_neighbours_for_fluxes_spherical_correction)
 {
@@ -451,7 +579,21 @@ void IJK_One_Dimensional_Subproblem::associate_flags_neighbours_correction(const
   correct_neighbours_rank_ = correct_neighbours_rank;
   neighbours_corrected_rank_ = neighbours_corrected_rank;
   neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
-  neighbours_last_faces_colinearity_weighting_ = neighbours_colinearity_weighting_;
+  neighbours_distance_weighting_ = neighbours_distance_weighting;
+  neighbours_colinearity_distance_weighting_ = neighbours_colinearity_distance_weighting;
+  neighbours_weighting_ = (neighbours_colinearity_weighting_
+                           || neighbours_distance_weighting_
+                           || neighbours_colinearity_distance_weighting_);
+  neighbours_last_faces_colinearity_weighting_ = neighbours_last_faces_colinearity_weighting;
+  neighbours_last_faces_colinearity_face_weighting_ = neighbours_last_faces_colinearity_face_weighting;
+  neighbours_last_faces_distance_weighting_ = neighbours_last_faces_distance_weighting;
+  neighbours_last_faces_distance_colinearity_weighting_ = neighbours_last_faces_distance_colinearity_weighting;
+  neighbours_last_faces_distance_colinearity_face_weighting_ = neighbours_last_faces_distance_colinearity_face_weighting;
+  neighbours_last_faces_weighting_ = (neighbours_last_faces_colinearity_weighting_
+                                      || neighbours_last_faces_colinearity_face_weighting_
+                                      || neighbours_last_faces_distance_weighting_
+                                      || neighbours_last_faces_distance_colinearity_weighting_
+                                      || neighbours_last_faces_distance_colinearity_face_weighting_);
   compute_reachable_fluxes_ = compute_reachable_fluxes;
   find_cell_neighbours_for_fluxes_spherical_correction_ = find_cell_neighbours_for_fluxes_spherical_correction;
   correct_temperature_cell_neighbours_ = (correct_temperature_cell_neighbours_ && distance_cell_faces_from_lrs_);
@@ -990,10 +1132,21 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
 void IJK_One_Dimensional_Subproblem::compute_distance_cell_centre()
 {
   Vecteur3 centre = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_, index_j_, index_k_, IJK_Splitting::ELEM);
+
   Vecteur3 facet_to_cell_centre = facet_barycentre_;
   facet_to_cell_centre *= -1;
   facet_to_cell_centre += centre;
   cell_centre_distance_ = Vecteur3::produit_scalaire(facet_to_cell_centre, normal_vector_compo_);
+
+  Vecteur3 normal_contrib = normal_vector_compo_;
+  normal_contrib *= cell_centre_distance_;
+  Vecteur3 tangential_displacement = normal_contrib;
+  tangential_displacement *= (-1);
+  tangential_displacement += facet_to_cell_centre;
+  cell_centre_tangential_distance_ = tangential_displacement.length();
+  tangential_distance_vector_ = tangential_displacement;
+  if (cell_centre_tangential_distance_ > 1e-16)
+    tangential_distance_vector_ *= (1 / cell_centre_tangential_distance_);
 }
 
 void IJK_One_Dimensional_Subproblem::compute_distance_faces_centres()
@@ -1206,23 +1359,32 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
             if (indic_neighbour > LIQUID_INDICATOR_TEST)
               {
                 pure_neighbours_to_correct_[l][m][n] = true;
-                const double dx_contrib = l_dir * normal_vector_compo_[0] * dx;
-                const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
-                const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
-                pure_neighbours_corrected_distance_[l][m][n] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+                const double dx_contrib = l_dir * dx;
+                const double dy_contrib = m_dir * dy;
+                const double dz_contrib = n_dir * dz;
+                Vecteur3 distance_contrib = {dx_contrib, dy_contrib, dz_contrib};
+                pure_neighbours_corrected_distance_[l][m][n] = cell_centre_distance_
+                                                               + Vecteur3::produit_scalaire(normal_vector_compo_, distance_contrib);
                 if (neighbours_colinearity_weighting_)
                   {
-                    Vecteur3 relative_vector = normal_vector_compo_;
-                    relative_vector *= cell_centre_distance_;
-                    relative_vector[0] += (l * normal_vector_compo_[0] * dx);
-                    relative_vector[1] += (m * normal_vector_compo_[1] * dy);
-                    relative_vector[2] += (n * normal_vector_compo_[2] * dz);
-                    const double relative_vector_norm = relative_vector.length();
-                    relative_vector *= (1 / relative_vector_norm);
-                    pure_neighbours_corrected_colinearity_[l][m][n] = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+                    const double colinearity = compute_cell_faces_weighting(dx_contrib, dy_contrib, dz_contrib, 0);
+                    pure_neighbours_corrected_colinearity_[l][m][n] = colinearity;
                   }
               }
           }
+}
+
+double IJK_One_Dimensional_Subproblem::compute_cell_weighting(const double& dx_contrib,
+                                                              const double& dy_contrib,
+                                                              const double& dz_contrib)
+{
+  if (neighbours_colinearity_weighting_)
+    return compute_colinearity(dx_contrib, dy_contrib, dz_contrib);
+  if (neighbours_distance_weighting_)
+    return compute_distance_cell_faces(dx_contrib, dy_contrib, dz_contrib);
+  if (neighbours_colinearity_distance_weighting_)
+    return compute_colinearity(dx_contrib, dy_contrib, dz_contrib) * compute_distance_cell_faces(dx_contrib, dy_contrib, dz_contrib);
+  return 1;
 }
 
 void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours()
@@ -1239,7 +1401,6 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
 
   int dxyz_increment_max = get_dxyz_increment_max();
   int dxyz_over_two_increment_max = get_dxyz_over_two_increment_max();
-  // const int first_increment[3] = {dxyz_over_two_increment_max, dxyz_increment_max, dxyz_increment_max};
   const int first_increment[3] = {dxyz_over_two_increment_max + 1, dxyz_increment_max, dxyz_increment_max};
   const int second_increment[3] = {dxyz_increment_max, dxyz_over_two_increment_max + 1, dxyz_increment_max};
   const int third_increment[3] = {dxyz_increment_max, dxyz_increment_max, dxyz_over_two_increment_max + 1};
@@ -1316,44 +1477,32 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
   /*
    * TODO: Should we look to cells faces that are not in the normal vector direction ?
    */
-  // for (l=dx_over_two_increment; l>=0; l--)
   for (l=dx_over_two_increment + 1; l>=0; l--)
     for (m_cell=dy_increment; m_cell>=0; m_cell--)
       for (n_cell=dz_increment; n_cell>=0; n_cell--)
         {
-          // const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l * (-1) : l + 1;
           const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l * (-1) + 1 : l;
           const int m_dir = (pure_neighbours_corrected_sign_[1]) ? m_cell * (-1) : m_cell;
           const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n_cell * (-1) : n_cell;
-          // const int l_dir_elem = (pure_neighbours_corrected_sign_[0]) ? (l + 1) * (-1) : l + 1;
           const int l_dir_elem = (pure_neighbours_corrected_sign_[0]) ? (l + 1) * (-1) + 1 : l;
           const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_ + l_dir_elem, index_j_ + m_dir, index_k_ + n_dir);
           if (indic_neighbour > LIQUID_INDICATOR_TEST)
             {
-              // pure_neighbours_last_faces_to_correct_[0][l_dir_elem][m_dir][n_dir] = true;
-
               pure_neighbours_last_faces_to_correct_[0][l][m_cell][n_cell] = true;
               const double lmn_zero = (l > 0) ? 1. : 0.;
-              // const double contrib_factor = (pure_neighbours_corrected_sign_[0]) ? (lmn_zero * pow(2, abs(l_dir)) + 1) * (-1) :
-              // 																																			(lmn_zero * pow(2, l_dir - 1)) + 1;
               const double contrib_factor = (pure_neighbours_corrected_sign_[0]) ? (lmn_zero * (2 * abs(l_dir) + 1) - (1. - lmn_zero)) * (-1):
                                             lmn_zero * (2 * (l_dir - 1) + 1) - (1. - lmn_zero);
-              const double dx_contrib = contrib_factor * normal_vector_compo_[0] * dx_over_two;
-              const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
-              const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
-              pure_neighbours_last_faces_corrected_distance_[0][l][m_cell][n_cell] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+              const double dx_contrib = contrib_factor * dx_over_two;
+              const double dy_contrib = m_dir * dy;
+              const double dz_contrib = n_dir * dz;
+              Vecteur3 distance_contrib = {dx_contrib, dy_contrib, dz_contrib};
+              pure_neighbours_last_faces_corrected_distance_[0][l][m_cell][n_cell] = cell_centre_distance_
+                                                                                     + Vecteur3::produit_scalaire(normal_vector_compo_, distance_contrib);
               if (pure_neighbours_last_faces_corrected_distance_[0][l][m_cell][n_cell] < 0)
                 pure_neighbours_last_faces_to_correct_[0][l][m_cell][n_cell] = false;
-              if (neighbours_last_faces_colinearity_weighting_)
+              if (neighbours_last_faces_weighting_)
                 {
-                  Vecteur3 relative_vector = normal_vector_compo_;
-                  relative_vector *= cell_centre_distance_;
-                  relative_vector[0] += (normal_vector_compo_[0] * abs(dx_contrib));
-                  relative_vector[1] += (normal_vector_compo_[1] * abs(dy_contrib));
-                  relative_vector[2] += (normal_vector_compo_[2] * abs(dz_contrib));
-                  const double relative_vector_norm = relative_vector.length();
-                  relative_vector *= (1 / relative_vector_norm);
-                  const double colinearity = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+                  const double colinearity = compute_cell_faces_weighting(dx_contrib, dy_contrib, dz_contrib, 0);
                   pure_neighbours_last_faces_corrected_colinearity_[0][l][m_cell][n_cell] = colinearity;
                 }
             }
@@ -1374,22 +1523,17 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
               const double lmn_zero = (m > 0) ? 1. : 0.;
               const double contrib_factor = (pure_neighbours_corrected_sign_[1]) ? (lmn_zero * (2 * abs(m_dir) + 1) - (1. - lmn_zero)) * (-1):
                                             lmn_zero * (2 * (m_dir - 1) + 1) - (1. - lmn_zero);
-              const double dx_contrib = l_dir * normal_vector_compo_[0] * dx;
-              const double dy_contrib = contrib_factor * normal_vector_compo_[1] * dy_over_two;
-              const double dz_contrib = n_dir * normal_vector_compo_[2] * dz;
-              pure_neighbours_last_faces_corrected_distance_[1][l_cell][m][n_cell] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+              const double dx_contrib = l_dir * dx;
+              const double dy_contrib = contrib_factor * dy_over_two;
+              const double dz_contrib = n_dir * dz;
+              Vecteur3 distance_contrib = {dx_contrib, dy_contrib, dz_contrib};
+              pure_neighbours_last_faces_corrected_distance_[1][l_cell][m][n_cell] = cell_centre_distance_
+                                                                                     + Vecteur3::produit_scalaire(normal_vector_compo_, distance_contrib);
               if (pure_neighbours_last_faces_corrected_distance_[1][l_cell][m][n_cell] < 0)
                 pure_neighbours_last_faces_to_correct_[1][l_cell][m][n_cell] = false;
-              if (neighbours_last_faces_colinearity_weighting_)
+              if (neighbours_last_faces_weighting_)
                 {
-                  Vecteur3 relative_vector = normal_vector_compo_;
-                  relative_vector *= cell_centre_distance_;
-                  relative_vector[0] += (normal_vector_compo_[0] * abs(dx_contrib));
-                  relative_vector[1] += (normal_vector_compo_[1] * abs(dy_contrib));
-                  relative_vector[2] += (normal_vector_compo_[2] * abs(dz_contrib));
-                  const double relative_vector_norm = relative_vector.length();
-                  relative_vector *= (1 / relative_vector_norm);
-                  const double colinearity = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+                  const double colinearity = compute_cell_faces_weighting(dx_contrib, dy_contrib, dz_contrib, 1);
                   pure_neighbours_last_faces_corrected_colinearity_[1][l_cell][m][n_cell] = colinearity;
                 }
             }
@@ -1401,7 +1545,6 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
         {
           const int l_dir = (pure_neighbours_corrected_sign_[0]) ? l_cell * (-1) : l_cell;
           const int m_dir = (pure_neighbours_corrected_sign_[1]) ? m_cell * (-1) : m_cell;
-          // const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n * (-1) : n + 1;
           const int n_dir = (pure_neighbours_corrected_sign_[2]) ? n * (-1) + 1: n;
           const int n_dir_elem = (pure_neighbours_corrected_sign_[2]) ? (n + 1) * (-1) + 1 : n;
           const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_ + l_dir, index_j_ + m_dir, index_k_ + n_dir_elem);
@@ -1411,22 +1554,17 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
               const double lmn_zero = (n > 0) ? 1. : 0.;
               const double contrib_factor = (pure_neighbours_corrected_sign_[2]) ? (lmn_zero * (2 * abs(n_dir) + 1) - (1. - lmn_zero)) * (-1):
                                             lmn_zero * (2 * (n_dir - 1) + 1) - (1. - lmn_zero);
-              const double dx_contrib = l_dir * normal_vector_compo_[0] * dx;
-              const double dy_contrib = m_dir * normal_vector_compo_[1] * dy;
-              const double dz_contrib = contrib_factor * normal_vector_compo_[2] * dz_over_two;
-              pure_neighbours_last_faces_corrected_distance_[2][l_cell][m_cell][n] = cell_centre_distance_ + dx_contrib + dy_contrib + dz_contrib;
+              const double dx_contrib = l_dir * dx;
+              const double dy_contrib = m_dir * dy;
+              const double dz_contrib = contrib_factor * dz_over_two;
+              Vecteur3 distance_contrib = {dx_contrib, dy_contrib, dz_contrib};
+              pure_neighbours_last_faces_corrected_distance_[2][l_cell][m_cell][n] = cell_centre_distance_ +
+                                                                                     Vecteur3::produit_scalaire(normal_vector_compo_, distance_contrib);
               if (pure_neighbours_last_faces_corrected_distance_[2][l_cell][m_cell][n] < 0)
                 pure_neighbours_last_faces_to_correct_[2][l_cell][m_cell][n] = false;
-              if (neighbours_last_faces_colinearity_weighting_)
+              if (neighbours_last_faces_weighting_)
                 {
-                  Vecteur3 relative_vector = normal_vector_compo_;
-                  relative_vector *= cell_centre_distance_;
-                  relative_vector[0] += (normal_vector_compo_[0] * abs(dx_contrib));
-                  relative_vector[1] += (normal_vector_compo_[1] * abs(dy_contrib));
-                  relative_vector[2] += (normal_vector_compo_[2] * abs(dz_contrib));
-                  const double relative_vector_norm = relative_vector.length();
-                  relative_vector *= (1 / relative_vector_norm);
-                  const double colinearity = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+                  const double colinearity = compute_cell_faces_weighting(dx_contrib, dy_contrib, dz_contrib, 2);
                   pure_neighbours_last_faces_corrected_colinearity_[2][l_cell][m_cell][n] = colinearity;
                 }
             }
@@ -1442,6 +1580,67 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
 //      relative_vector *= (1 / relative_vector_norm);
 //      // pure_neighbours_corrected_colinearity_[l][m][n] = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
 //    }
+}
+
+double IJK_One_Dimensional_Subproblem::compute_cell_faces_weighting(const double& dx_contrib,
+                                                                    const double& dy_contrib,
+                                                                    const double& dz_contrib,
+                                                                    const int& dir)
+{
+  if (neighbours_last_faces_colinearity_weighting_)
+    return compute_colinearity(dx_contrib, dy_contrib, dz_contrib);
+  if (neighbours_last_faces_colinearity_face_weighting_)
+    return compute_colinearity_cell_faces(dx_contrib, dy_contrib, dz_contrib, dir);
+  if (neighbours_last_faces_distance_weighting_)
+    return compute_distance_cell_faces(dx_contrib, dy_contrib, dz_contrib);
+  if (neighbours_last_faces_distance_colinearity_weighting_)
+    return compute_colinearity(dx_contrib, dy_contrib, dz_contrib) * compute_distance_cell_faces(dx_contrib, dy_contrib, dz_contrib);
+  if (neighbours_last_faces_distance_colinearity_face_weighting_)
+    return compute_colinearity_cell_faces(dx_contrib, dy_contrib, dz_contrib, dir) * compute_distance_cell_faces(dx_contrib, dy_contrib, dz_contrib);
+  return 1;
+}
+
+Vecteur3 IJK_One_Dimensional_Subproblem::compute_relative_vector_cell_faces(const double& dx_contrib,
+                                                                            const double& dy_contrib,
+                                                                            const double& dz_contrib)
+{
+  Vecteur3 relative_vector = normal_vector_compo_;
+  relative_vector *= cell_centre_distance_;
+  Vecteur3 tangential_relative_vector = tangential_distance_vector_;
+  tangential_relative_vector *= cell_centre_tangential_distance_;
+  relative_vector += tangential_relative_vector;
+  Vecteur3 dxyz_contrib = {dx_contrib, dy_contrib, dz_contrib};
+  relative_vector += dxyz_contrib;
+  return relative_vector;
+}
+
+double IJK_One_Dimensional_Subproblem::compute_colinearity(const double& dx_contrib, const double& dy_contrib, const double& dz_contrib)
+{
+  Vecteur3 relative_vector = compute_relative_vector_cell_faces(dx_contrib, dy_contrib, dz_contrib);
+  const double relative_vector_norm = relative_vector.length();
+  relative_vector *= (1 / relative_vector_norm);
+  const double colinearity = Vecteur3::produit_scalaire(normal_vector_compo_, relative_vector);
+  return abs(colinearity);
+}
+
+double IJK_One_Dimensional_Subproblem::compute_colinearity_cell_faces(const double& dx_contrib,
+                                                                      const double& dy_contrib,
+                                                                      const double& dz_contrib,
+                                                                      const int& dir)
+{
+  Vecteur3 relative_vector = compute_relative_vector_cell_faces(dx_contrib, dy_contrib, dz_contrib);
+  const double relative_vector_norm = relative_vector.length();
+  relative_vector *= (1 / relative_vector_norm);
+  return abs(relative_vector[dir]);
+}
+
+double IJK_One_Dimensional_Subproblem::compute_distance_cell_faces(const double& dx_contrib,
+                                                                   const double& dy_contrib,
+                                                                   const double& dz_contrib)
+{
+  Vecteur3 relative_vector = compute_relative_vector_cell_faces(dx_contrib, dy_contrib, dz_contrib);
+  const double distance = Vecteur3::produit_scalaire(tangential_distance_vector_, relative_vector);
+  return abs(1 / (distance + 1e-16));
 }
 
 int IJK_One_Dimensional_Subproblem::get_dxyz_increment_max()
@@ -1643,7 +1842,7 @@ void IJK_One_Dimensional_Subproblem::correct_velocity_rise(const DoubleVect& vel
     velocity_corrected[i] -= bubble_rising_velocity_projection[0];
 }
 
-void IJK_One_Dimensional_Subproblem::correct_radial_velocity()
+void IJK_One_Dimensional_Subproblem::correct_radial_velocity_probe()
 {
   correct_velocity(radial_velocity_, radial_velocity_corrected_);
 }
