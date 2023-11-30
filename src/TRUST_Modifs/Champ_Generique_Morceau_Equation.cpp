@@ -73,7 +73,8 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
 {
   const Probleme_base& Pb = get_ref_pb_base();
   int numero_eq_=-1;
-  bool iskeps = false, iskomega = false;
+  bool iskeps = false;
+  bool iskomega = false;
   if (sub_type(Champ_Generique_refChamp,get_source(0)))
     {
 
@@ -140,7 +141,7 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
       exit();
     }
 
-  if (!iskeps || !iskomega)
+  if (!iskeps && !iskomega)
     ref_eq_=Pb.equation(numero_eq_);
   else if (iskeps)
     {
@@ -153,6 +154,11 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
       const Mod_turb_hyd_RANS_komega& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_komega, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
       const Transport_K_Omega_base& eqn = ref_cast(Transport_K_Omega_base, le_mod_RANS.eqn_transp_K_Omega());
       ref_eq_ = ref_cast(Equation_base, eqn);
+    }
+  else
+    {
+      Cerr<<"Error: unknown case !"<<finl;
+      exit();
     }
 
   localisation_ = morceau().get_localisation_pour_post(option_);
