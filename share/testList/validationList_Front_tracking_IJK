@@ -1,5 +1,6 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/bulle_oscillante
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/channel_swarm_fixed
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/chmtvar
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/compaTrioCFD_and_CPU
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/conservation_volume
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/creeping_flow
