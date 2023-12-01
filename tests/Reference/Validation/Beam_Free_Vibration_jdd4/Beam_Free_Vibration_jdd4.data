@@ -1,5 +1,5 @@
 # Explicit coupling between the fluid (in ALE description) and the structure (beam model)  #
-# Free vibration of a Pinned-pinned beam in air #
+# Free vibration of a Pinned-pinned beam in water #
 # Beam time integration scheme: HHT. Modal resolution, 20 modes (10 in xy plane, 10 in xz plane).  #
 # Hydraulique 3D laminar #
 # Explicit coupling with the fluid #
@@ -13,13 +13,14 @@ Domaine_ALE dom
 # BEGIN MESH 
 Read_MED {
     domain dom
-    file ../Mesh.med
+    file Mesh.med
 } 
 END MESH #
 
 # BEGIN SCATTER #
 Scatter DOM.Zones dom 
 # END SCATTER #
+
 
 # For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile
 boundaries of the domain and specify the velocity to be imposed on them, or if coupled to a beam model. #
@@ -64,12 +65,14 @@ Read mon_schema
     # Time step #
     # Initial time [s] #
     tinit 0
+	nb_pas_dt_max 3
     # Min time step #
     dt_min 1.e-8
     dt_max 5.e-5
     # Output criteria #
     # .out files printing period #
     dt_impr 1.e-6
+    # tcpumax 0.5 #
     # .sauv files printing period #
     periode_sauvegarde_securite_en_heures 12
     # facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
@@ -94,8 +97,8 @@ Read pb
     # I define a medium #
     Fluide_Incompressible
     {
-    	mu  Champ_Uniforme 1 0.00001825
-   	rho Champ_Uniforme 1 1.204
+        mu Champ_Uniforme 1 1.e-3
+        rho Champ_Uniforme 1 1000
 
     }
     Navier_Stokes_standard_ALE
@@ -127,7 +130,7 @@ Read pb
             ALEMeshVelocity_sonde_h ALEMeshVelocity Periode 1e-6 Segment 50 0.0 0.0205 0. 0.7 0.0205 0.
         }
         # Fields #
-        format lata
+        format lml
         fields dt_post 1e-1
         {
             pression_pa som

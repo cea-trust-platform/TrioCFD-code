@@ -13,7 +13,7 @@ Domaine_ALE dom
 # BEGIN MESH 
 Read_MED {
     domain dom
-    file ../Mesh.med
+    file Mesh.med
 } 
 END MESH #
 
@@ -64,6 +64,7 @@ Read mon_schema
     # Time step #
     # Initial time [s] #
     tinit 0
+	nb_pas_dt_max 3
     # Min time step #
     dt_min 1.e-8
     dt_max 5.e-5
@@ -127,7 +128,7 @@ Read pb
             ALEMeshVelocity_sonde_h ALEMeshVelocity Periode 1e-6 Segment 50 0.0 0.0205 0. 0.7 0.0205 0.
         }
         # Fields #
-        format lata
+        format lml
         fields dt_post 1e-1
         {
             pression_pa som

@@ -15,6 +15,7 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_boiling_bubble
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_imposed_constant_growth
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_Qmicro
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_static_thermal_wedge
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/IBC_penalisation_poiseuille
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/ibc_refroidi
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/iodure-iodate-melange

@@ -80,7 +80,7 @@ Triple_Line_Model_FT_Disc TCL
 Read TCL 
 {
   Qtcl @Qi@ # W/m # 
-  ym 7.e-7
+  ym 3.e-7          # smaller ym to make sure Meso zone always exists even for refined cases #
   # ymeso 5.e-6 #
   n_extend_meso 4
   sm @sm@ # TestCase at theta_app = @degliq@ degree #
@@ -148,17 +148,17 @@ Lire pb
 	        conditions_initiales { fonction (tan(@degliq@*pi/180.)*(x-5.e-6-(@offset@e-6))-y) } 
 		iterations_correction_volume 2
 		methode_interpolation_v vdf_lineaire
-        	n_iterations_distance 8
+        	n_iterations_distance 10
 		remaillage {
 			pas -1e-6 
-			nb_iter_remaillage 0 # 1 #
-			critere_arete 0.35
+			nb_iter_remaillage 1 # 1 #
+			critere_arete 0.35 # augmente 0.35 #
 			critere_remaillage 0.2
 			pas_lissage 0.000001
 			lissage_courbure_iterations_systematique 10 # 1 #
 			lissage_courbure_iterations_si_remaillage 10 # 1 #
 			lissage_courbure_coeff -0.05
-			nb_iter_barycentrage 0 # 5 #
+			nb_iter_barycentrage 5 # 5 #
 			relax_barycentrage 1
 			facteur_longueur_ideale 1.5 # 1.45 en 2D; 2 en 3D #
 			nb_iter_correction_volume 0 # 3 #

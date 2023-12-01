@@ -1,12 +1,20 @@
 cp ForceNum.py CF_Air
 cp SPD.py CF_Air
 cp post_run CF_Air
+cp DOM_p2.Zones CF_Air
+cp -r BaseModale_CF CF_Air
 cp ForceNum.py CF_Water
 cp SPD.py CF_Water
 cp post_run CF_Water
+cp DOM_p2.Zones CF_Water
+cp -r BaseModale_CF CF_Water
 cp ForceNum.py PP_Air
 cp SPD.py PP_Air
 cp post_run PP_Air
+cp DOM_p2.Zones PP_Air
+cp -r BaseModale_PP PP_Air
 cp ForceNum.py PP_Water
 cp SPD.py PP_Water
 cp post_run PP_Water
+cp DOM_p2.Zones PP_Water
+cp -r BaseModale_PP PP_Water
