@@ -165,11 +165,7 @@ public :
                                            const double& delta_temperature,
                                            const double& lambda);
   void compute_shear_per_bubbles();
-  void compute_overall_bubbles_quantities(const IJK_Field_double& temperature_ghost,
-                                          const double& delta_temperature,
-                                          const double& lambda,
-                                          const double& radius,
-                                          const double& spherical_nusselt);
+  void compute_overall_bubbles_quantities(IJK_Thermal_Subresolution& ref_thermal_subresolution);
   void compute_overall_quantities();
   void post_process_overall_bubbles_quantities(const int rank, const Nom& overall_bubbles_quantities);
 
@@ -190,16 +186,30 @@ protected :
   int remove_append_subproblems_ = 0;
 
   double spherical_nusselt_ = 2.;
+  double spherical_nusselt_liquid_ = 2.;
+  double heat_flux_spherical_ = 0.;
   double overall_shear_stress_ = 0.;
   double overall_shear_force_ = 0.;
   double overall_nusselt_number_ = 0.;
   double overall_nusselt_number_gfm_ = 0.;
+  double overall_nusselt_number_spherical_ = 0.;
+  double overall_nusselt_number_liquid_ = 0.;
+  double overall_nusselt_number_gfm_liquid_ = 0.;
+  double overall_nusselt_number_spherical_liquid_ = 0.;
   double caracteristic_length_ = 0.;
-  double delta_temperature_ = 0.;
+  double caracteristic_length_from_surfaces_ = 0.;
+  double caracteristic_length_from_volumes_ = 0.;
+  double delta_temperature_ = -1;
+  double mean_liquid_temperature_= -1.;
   double interfacial_thermal_flux_ = 0.;
   double interfacial_thermal_flux_gfm_ = 0.;
   double total_surface_ = 0.;
+  double total_volume_ = 0.;
   double lambda_=0.;
+  double radius_from_surfaces_ = 0.;
+  double radius_from_volumes_ = 0.;
+
+  ArrOfDouble * bubbles_volume_;
 
   ArrOfDouble radius_outputs_;
   ArrOfDouble theta_outputs_;
@@ -208,11 +218,20 @@ protected :
 
   ArrOfDouble interfacial_thermal_flux_per_bubble_ ;
   ArrOfDouble interfacial_thermal_flux_per_bubble_gfm_;
+  ArrOfDouble interfacial_thermal_flux_per_bubble_spherical_;
   ArrOfDouble total_surface_per_bubble_;
   ArrOfDouble overall_nusselt_number_per_bubble_;
   ArrOfDouble overall_nusselt_number_per_bubble_gfm_;
+  ArrOfDouble overall_nusselt_number_per_bubble_spherical_;
+  ArrOfDouble overall_nusselt_number_per_bubble_liquid_;
+  ArrOfDouble overall_nusselt_number_per_bubble_gfm_liquid_;
+  ArrOfDouble overall_nusselt_number_per_bubble_spherical_liquid_;
   ArrOfDouble overall_shear_stress_per_bubble_;
   ArrOfDouble overall_shear_force_per_bubble_;
+  ArrOfDouble radius_from_surfaces_per_bubble_;
+  ArrOfDouble radius_from_volumes_per_bubble_;
+  ArrOfDouble caracteristic_length_from_surfaces_per_bubble_;
+  ArrOfDouble caracteristic_length_from_volumes_per_bubble_;
 
   int nb_bubbles_ = 0;
 

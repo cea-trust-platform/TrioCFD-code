@@ -131,8 +131,7 @@ void IJK_Composantes_Connex::compute_bounding_box_fill_compo_connex()
 
 void IJK_Composantes_Connex::compute_compo_connex_from_interface()
 {
-  ArrOfDouble bubbles_volume;
-  interfaces_->calculer_volume_bulles(bubbles_volume, bubbles_barycentre_);
+  interfaces_->calculer_volume_bulles(bubbles_volume_, bubbles_barycentre_);
 
   fill_mixed_cell_compo();
 

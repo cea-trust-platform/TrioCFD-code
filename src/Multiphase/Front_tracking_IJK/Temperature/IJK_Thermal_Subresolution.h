@@ -56,6 +56,7 @@ class IJK_Thermal_Subresolution : public IJK_Thermal_base
 
   Declare_instanciable( IJK_Thermal_Subresolution ) ;
   friend class IJK_One_Dimensional_Subresolutions;
+  friend class IJK_One_Dimensional_Subproblems;
   friend class IJK_One_Dimensional_Subproblem;
 
 public :
@@ -197,6 +198,7 @@ protected :
   void correct_any_temperature_field_for_visu(IJK_Field_double& temperature);
   void correct_temperature_for_visu() override;
   void clip_temperature_values() override;
+  void compute_mean_liquid_temperature();
   void compute_overall_probes_parameters();
   void pre_initialise_sparse_thermal_subproblems_matrices();
   void pre_initialise_thermal_subproblems_matrices();
@@ -260,7 +262,7 @@ protected :
   double compute_spherical_steady_dirichlet_left_right_derivative_value(const double& r);
   double compute_spherical_steady_dirichlet_left_right_integral();
   double find_time_dichotomy_integral(const double& temperature_integral);
-  double compute_Nusselt_spherical_diffusion();
+  void compute_Nusselt_spherical_diffusion();
   double find_time_dichotomy_derivative(const double& temperature_derivative);
 
   /* compute_rho_cp_u_mean() May be clearly overridden later */
@@ -275,7 +277,10 @@ protected :
   double modified_time_init_;
   int spherical_diffusion_;
   double nusselt_spherical_diffusion_;
+  double nusselt_spherical_diffusion_liquid_;
+  double heat_flux_spherical_;
   enum temperature_ini_dict { local_criteria, integral_criteria, derivative_criteria };
+  double mean_liquid_temperature_;
 
   int disable_mixed_cells_increment_;
   int enable_mixed_cells_increment_;

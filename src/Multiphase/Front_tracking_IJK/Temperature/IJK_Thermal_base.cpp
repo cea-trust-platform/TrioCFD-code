@@ -1214,6 +1214,7 @@ void IJK_Thermal_base::compute_eulerian_bounding_box_fill_compo()
   if (compute_eulerian_compo_)
     {
       bubbles_barycentre_ = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_barycentre();
+      bubbles_volume_ = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_volume();
       bounding_box_= ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bounding_box();
       min_max_larger_box_ = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_min_max_larger_box();
     }

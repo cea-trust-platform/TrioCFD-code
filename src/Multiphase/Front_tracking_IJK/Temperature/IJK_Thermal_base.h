@@ -644,6 +644,7 @@ protected:
   ArrOfDouble rising_velocities_;
   DoubleTab rising_vectors_;
   IJK_Field_double eulerian_rising_velocities_;
+  ArrOfDouble bubbles_volume_;
   DoubleTab bubbles_barycentre_;
 
   FixedVector<IJK_Field_int,3> dummy_int_vect_;

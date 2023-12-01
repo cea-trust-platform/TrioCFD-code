@@ -368,12 +368,12 @@ void Corrige_flux_FT_temperature_subresolution::initialise_any_cell_neighbours_i
                                                                                                             const bool& ini_index)
 {
   if (!ini_index)
-    initialise_any_cell_neighbours_indices_to_correct(index_face_i_flux_x_neighbours_min_max_faces_sorted_,
-                                                      index_face_j_flux_x_neighbours_min_max_faces_sorted_,
-                                                      index_face_i_flux_y_neighbours_min_max_faces_sorted_,
-                                                      index_face_j_flux_y_neighbours_min_max_faces_sorted_,
-                                                      index_face_i_flux_z_neighbours_min_max_faces_sorted_,
-                                                      index_face_j_flux_z_neighbours_min_max_faces_sorted_);
+    initialise_any_cell_neighbours_indices_to_correct(index_face_i_flux_x_faces_sorted,
+                                                      index_face_j_flux_x_faces_sorted,
+                                                      index_face_i_flux_y_faces_sorted,
+                                                      index_face_j_flux_y_faces_sorted,
+                                                      index_face_i_flux_z_faces_sorted,
+                                                      index_face_j_flux_z_faces_sorted);
 
   const int nb_k_layer = ref_ijk_ft_->itfce().I().nk();
 

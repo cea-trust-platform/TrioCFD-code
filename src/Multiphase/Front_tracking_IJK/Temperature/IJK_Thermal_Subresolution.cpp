@@ -41,6 +41,9 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   single_centred_bubble_radius_ini_ = 1.e-3;
   temperature_ini_type_ = 1;
   nusselt_spherical_diffusion_ = 2.;
+  nusselt_spherical_diffusion_liquid_ = 2.;
+  heat_flux_spherical_ = 0.;
+  mean_liquid_temperature_ = -1;
 
   disable_mixed_cells_increment_=1;
   enable_mixed_cells_increment_=0;
@@ -786,7 +789,7 @@ double IJK_Thermal_Subresolution::find_time_dichotomy_integral(const double& tem
   return time_tmp;
 }
 
-double IJK_Thermal_Subresolution::compute_Nusselt_spherical_diffusion()
+void IJK_Thermal_Subresolution::compute_Nusselt_spherical_diffusion()
 {
   const double T1 = delta_T_subcooled_overheated_;
   const double R0 = single_centred_bubble_radius_ini_;
@@ -798,8 +801,12 @@ double IJK_Thermal_Subresolution::compute_Nusselt_spherical_diffusion()
   { return Tinfty * R / r / (2 * sqrt(alpha * (t + 1e-16))) * (2 / sqrt(M_PI)) * (exp(-pow((r - R)/(2 * sqrt(alpha * (t + 1e-16))),2))) ; };
   const double temperature_derivative_interface = glambda(R0, R0, alpha_liq, ref_ijk_ft_->get_current_time(), T1)
                                                   + hlambda(R0, R0, alpha_liq, ref_ijk_ft_->get_current_time(), T1);
-  double Nusselt = abs(temperature_derivative_interface * (2 * single_centred_bubble_radius_ini_) / T1);
-  return Nusselt;
+  heat_flux_spherical_ = lambda_liquid_ * temperature_derivative_interface;
+  nusselt_spherical_diffusion_ = abs(temperature_derivative_interface * (2 * single_centred_bubble_radius_ini_) / T1);
+  const double temperature_derivative_interface_liquid = glambda(R0, R0, alpha_liq, ref_ijk_ft_->get_current_time(), mean_liquid_temperature_)
+                                                         + hlambda(R0, R0, alpha_liq, ref_ijk_ft_->get_current_time(), mean_liquid_temperature_);
+  nusselt_spherical_diffusion_liquid_ = abs(temperature_derivative_interface_liquid * (2 * single_centred_bubble_radius_ini_)
+                                            / mean_liquid_temperature_);
 }
 
 double IJK_Thermal_Subresolution::find_time_dichotomy_derivative(const double& temperature_derivative)
@@ -873,7 +880,8 @@ void IJK_Thermal_Subresolution::update_thermal_properties()
 void IJK_Thermal_Subresolution::post_process_after_temperature_increment()
 {
   IJK_Thermal_base::post_process_after_temperature_increment();
-  nusselt_spherical_diffusion_ = compute_Nusselt_spherical_diffusion();
+  compute_mean_liquid_temperature();
+  compute_Nusselt_spherical_diffusion();
 }
 
 void IJK_Thermal_Subresolution::compute_diffusion_increment()
@@ -1034,6 +1042,29 @@ void IJK_Thermal_Subresolution::clip_temperature_values()
             }
       temperature_.echange_espace_virtuel(temperature_.ghost());
     }
+}
+
+void IJK_Thermal_Subresolution::compute_mean_liquid_temperature()
+{
+  double vol_liq = 0.;
+  mean_liquid_temperature_ = 0.;
+  const int ni = temperature_.ni();
+  const int nj = temperature_.nj();
+  const int nk = temperature_.nk();
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+          if (indic > VAPOUR_INDICATOR_TEST)
+            {
+              vol_liq += (indic * vol_);
+              mean_liquid_temperature_ += (temperature_(i,j,k) * indic * vol_);
+            }
+        }
+  vol_liq = Process::mp_sum(vol_liq);
+  mean_liquid_temperature_ /= vol_liq;
+  mean_liquid_temperature_ = Process::mp_sum(mean_liquid_temperature_);
 }
 
 void IJK_Thermal_Subresolution::compute_thermal_subproblems()
@@ -1958,12 +1989,9 @@ void IJK_Thermal_Subresolution::set_thermal_subresolution_outputs(const Nom& int
 {
   if (!disable_subresolution_)
     {
+
       Cerr << "Compute bubbles quantities" << finl;
-      thermal_local_subproblems_.compute_overall_bubbles_quantities(eulerian_grad_T_interface_ns_,
-                                                                    delta_T_subcooled_overheated_,
-                                                                    uniform_lambda_,
-                                                                    single_centred_bubble_radius_ini_,
-                                                                    nusselt_spherical_diffusion_);
+      thermal_local_subproblems_.compute_overall_bubbles_quantities((*this));
       Cerr << "Sort spherical coords" << finl;
       thermal_local_subproblems_.sort_limited_probes_spherical_coords_post_processing(post_process_all_probes_,
                                                                                       nb_theta_post_pro_, nb_phi_post_pro_,

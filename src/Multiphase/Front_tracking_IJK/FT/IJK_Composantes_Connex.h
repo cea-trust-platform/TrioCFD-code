@@ -102,6 +102,10 @@ public :
   {
     return bubbles_barycentre_;
   }
+  const ArrOfDouble& get_bubbles_volume() const
+  {
+    return bubbles_volume_;
+  }
   const DoubleTab& get_min_max_larger_box() const
   {
     return min_max_larger_box_;
@@ -130,6 +134,7 @@ protected :
 
   DoubleTab bounding_box_;
   DoubleTab bubbles_barycentre_;
+  ArrOfDouble bubbles_volume_;
   DoubleTab min_max_larger_box_;
 
   bool is_updated_ = false;
