@@ -1,4 +1,5 @@
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/3dOscillatingBeamALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/Beam_Free_Vibration
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/DivaALE
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/RotationALE
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/SquareObstacleALE

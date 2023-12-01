@@ -16,13 +16,32 @@ for ibl, line in enumerate(lines):
 nx=ibl
 nt=int(nb_lines/ibl)
 
-x_start = 5.e-6
-if (len(sys.argv) != 2):
-   raise Exception("One argument is compulsory to set offset")
+if (len(sys.argv) != 4):
+   raise Exception("One argument is compulsory to set offset, Nx, and angle")
 
 print(f"Offset set to {sys.argv[1]} µm")
 x_shift = float(sys.argv[1])*1.e-6
 
+print(f"Number of node in x-dir set to {sys.argv[2]}")
+Nx = int(sys.argv[2])
+
+print(f"Contact angle set to {sys.argv[3]}")
+angle = int(sys.argv[3])
+
+
+# for offset 0 and -0.5, the Front will deplace into the left cell due to remaillage
+# The start position will be smaller
+if (x_shift == 0.0 or x_shift == -0.5e-6) and (Nx == 48) :
+   # for some contact angle, the remaillage will glisse the Front...
+   if (angle not in [5, 80, 90]) :
+      x_start = 5e-6 - 0.05 * 1e-6
+   else:
+      x_start = 5e-6
+else:
+    x_start = 5e-6
+
+
+print(x_start)
 mat = zeros((nt,nx,5))
 it = -1
 ix = 0
@@ -41,7 +60,8 @@ for line in lines:
        s= li[8]
        phi=li[10] # flux_par_surface(W/m2)
        pui=li[12] # flux(W)
-       mat[it,ix,0] = x
+       shif_ref = float(s) if (5.e-6-x_start) > 0 else 0.
+       mat[it,ix,0] = float(x)+shif_ref
        mat[it,ix,1] = y
        mat[it,ix,2] = s
        mat[it,ix,3] = phi if ( x_start+x_shift < float(x)+float(s)/2.) else 0.

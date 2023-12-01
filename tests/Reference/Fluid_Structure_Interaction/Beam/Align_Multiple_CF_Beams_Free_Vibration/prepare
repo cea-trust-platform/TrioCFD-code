@@ -1,0 +1,2 @@
+cp -r ${project_directory}/tests/Reference/Fluid_Structure_Interaction/Beam/Align_Multiple_CF_Beams_Free_Vibration/Cylindre1 .
+cp -r ${project_directory}/tests/Reference/Fluid_Structure_Interaction/Beam/Align_Multiple_CF_Beams_Free_Vibration/Cylindre2 .

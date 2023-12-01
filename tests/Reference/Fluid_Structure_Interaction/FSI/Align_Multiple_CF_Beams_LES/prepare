@@ -1,2 +1,0 @@
-cp -r ${project_directory}/tests/Reference/Fluid_Structure_Interaction/FSI/Align_Multiple_CF_Beams_LES/Cylindre1 .
-cp -r ${project_directory}/tests/Reference/Fluid_Structure_Interaction/FSI/Align_Multiple_CF_Beams_LES/Cylindre2 .

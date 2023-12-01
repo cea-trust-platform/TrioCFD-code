@@ -231,7 +231,7 @@ protected :
   int reinjection_tcl_;
   double tempC_tcl_;
   bool ready_inject_tcl_;
-  // To summeray:
+  // summaries:
   //        - when reinjection_tcl_ is 0;  i.e., by default, the pinching breakup with be used,
   //           Rc_tcl_GridN_ thetaC_tcl_ control the breakup, thetaC_tcl_ should be large
   //        - when reinjection_tcl_ is 1;  i.e., there is no the pinching breakup. The bubble goes away directly, we reinject seed

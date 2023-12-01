@@ -49,7 +49,7 @@ Triple_Line_Model_FT_Disc::Triple_Line_Model_FT_Disc() :
   deactivate_(0),
   capillary_effect_on_theta_activated_(0),
   TCL_energy_correction_(0),
-  n_ext_meso_(1),
+  n_ext_meso_(2),
   tag_tcl_(-1),
   //coeffa_(0),
   //coeffb_(0),
@@ -167,10 +167,10 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.ajouter("ym", &ym_); // XD_ADD_P floattant Wall distance of the point M delimiting micro/meso transition [m]
   p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
   p.ajouter("ymeso", &ymeso_); // XD_ADD_P floattant Meso region extension in wall-normal direction [m]
-  p.ajouter("n_extend_meso", &n_ext_meso_); // XD_ADD_P entier Meso region extension in number of cells [-]
-  p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // XD_ADD_P floattant Initial interface position
+  p.ajouter("n_extend_meso", &n_ext_meso_); // XD_ADD_P entire Meso region extension in number of cells [-]
+  p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // XD_ADD_P floattant Initial interface position (unused)
   p.ajouter("read_via_file", &read_via_file_);
-  p.ajouter("Rc_tcl_GridN", &Rc_tcl_GridN_); // XD_ADD_P floattant Radiate of nucleate site; [in number of grids]
+  p.ajouter("Rc_tcl_GridN", &Rc_tcl_GridN_); // XD_ADD_P floattant Radius of nucleate site; [in number of grids]
   // p.ajouter("Rc_inject", &Rc_inject_);
   p.ajouter("thetaC_tcl", &thetaC_tcl_); // XD_ADD_P floattant imposed contact angle [in degree] to force bubble pinching / necking once TCL entre nucleate site
   p.ajouter_flag("reinjection_tcl", &reinjection_tcl_); // XD_ADD_P flag This flag activates the automatic injection of a new nucleate seed with a specified shape when the temperature in the nucleation site becomes higher than a certain threshold (tempC_tcl). The shape of the seed is determined by the radius Rc_tcl_GridN and the contact angle thetaC_tcl. The nucleation site is considered free when there are no bubbles present. The site size is defined by Rc_tcl_GridN. This temperature threshold, termed tempC_tcl, is the activation temperature. Setting this temperature implies a wall temperature, therefore, activating reinjection_tcl is ONLY possible for a simulation coupled with solid conduction. NL2 When reinjection_tcl is activated, the values of tempC_tcl (default 10K), Rc_tcl_GridN (default 4 grid sizes), and thetaC_tcl (default 150 degrees) should be provided. Unless (STRONGLY not recommended), the default values (indicated in parentheses) will be used. NL2 If reinjection_tcl is not activated (by default), the mechanism of Numerically forcing bubble pinching/necking will be used for multi-cycle simulation. Once the Triple Contact Line (TCL) enters the nucleation site, a big contact angle thetaC_tcl is imposed to initiate bubble pinching/necking. After the bubble pinching ends, the large bubble above will depart, leaving the remaining part to serve as the nucleate seed. This process is equivalent to immediately inserting a new seed with a prescribed shape (determined by the nucleation site size and contact angle) once a bubble departs. Site size is defined by Rc_tcl_GridN (default 4 grid sizes). Contact angle thetaC_tcl (default 150 degrees). Useful for a standalone (not coupling with solid conduction) simulation.
@@ -330,6 +330,13 @@ void Triple_Line_Model_FT_Disc::completer()
       Cerr << "ymeso = " << ymeso_ <<finl;
       Process::exit();
     }
+  if (n_ext_meso_ <2 )
+    {
+      Cerr << "n_extend_meso = " << n_ext_meso_<< finl;
+      Cerr << "Check your datafile. n_extend_meso should be >= 2" << finl;
+      Process::exit();
+    }
+
   if (ymeso_==0.)
     {
       // ymeso has not been initialised. n_ext_meso is used instead:
@@ -367,7 +374,8 @@ void Triple_Line_Model_FT_Disc::completer()
       ymeso_ = Process::mp_max(ymeso_);
       Cerr << "[TCL] ymeso is set to " << ymeso_ << " according to provided n_ext_meso_ " << n_ext_meso_ << finl;
     }
-  ymeso_ -= Objet_U::precision_geom;
+
+  // ymeso_ -= Objet_U::precision_geom;
   ymeso_ = std::fmax(ymeso_,DMINFLOAT);
 
   if (reinjection_tcl())
@@ -823,7 +831,15 @@ double Triple_Line_Model_FT_Disc::compute_Qint(const DoubleTab& in_out, const do
   const double ytop = std::fmax(yr,yl);
   const double ybot = std::fmin(yr,yl);
   // Meso region is between ym_ and ymeso_:
-  double ln_y = log(std::fmin(ymeso_,std::fmax(ytop,ym_))/std::fmin(ymeso_,std::fmax(ybot,ym_)));
+
+  // for the last meso cell, if Front do not cut the right face of cell, only part of Meso contri is considered
+  // the corresponding flux will be underestimated
+  // we should ONLY consider cells before this last one
+  // To do this, here we put 0 for the this flux, it will then be eliminated in the subsequent part of the compute_tcl_flux.
+  double ln_y = 0.;
+  if (!est_egal(ytop, ymeso_))
+    ln_y = log(std::fmin(ymeso_,std::fmax(ytop,ym_))/std::fmin(ymeso_,std::fmax(ybot,ym_)));
+
   assert(kl_cond_>0.);
 //  Cerr << "ln_y = " << ln_y << " time_total = " << temps << " Theta_app_local = " << theta_app_loc
 //       <<" delT = "<< Twall << " kl = "<< kl_cond_ << finl;
