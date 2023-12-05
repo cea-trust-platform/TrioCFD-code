@@ -1,7 +1,7 @@
-./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/3dOscillatingBeamALE
-./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/Beam_Free_Vibration
-./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/DivaALE
-./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/RotationALE
-./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/SquareObstacleALE
-./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/TwoCylindersALE
-./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/TwoOscillatingCylindersALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/3dOscillatingBeamALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/DivaALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/RotationALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/SquareObstacleALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/TwoCylindersALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/TwoOscillatingCylindersALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/Beam/Beam_Free_Vibration
