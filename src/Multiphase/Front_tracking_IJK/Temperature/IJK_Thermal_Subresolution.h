@@ -254,7 +254,9 @@ protected :
   // void set_field_T_ana() override;
   double get_modified_time() override;
   void compute_temperature_init() override;
-  Nom compute_quasi_static_spherical_diffusion_expression(const double& time_scope);
+  void set_field_temperature_per_bubble(const int index_bubble);
+  Nom compute_quasi_static_spherical_diffusion_expression(const double& time_scope, const int index_bubble);
+  Nom generate_expression_temperature_ini(const double& time_scope, const double x, const double y, const double z);
   void approx_erf_inverse(const double& x, double& res);
   void set_field_T_ana() override;
   void calculer_ecart_T_ana() override { ; };
@@ -270,6 +272,7 @@ protected :
 
   int disable_spherical_diffusion_start_;
   int single_centred_bubble_;
+  int computed_centred_bubble_start_;
   double single_centred_bubble_radius_ini_;
   double probes_end_value_start_;
   double probes_end_value_coeff_;

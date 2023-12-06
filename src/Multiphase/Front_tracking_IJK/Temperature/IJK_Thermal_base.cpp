@@ -336,8 +336,9 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
    * Fields
    */
   temperature_.allocate(splitting, IJK_Splitting::ELEM, ghost_cells_);
+  temperature_for_ini_per_bubble_.allocate(splitting, IJK_Splitting::ELEM, 1);
   d_temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);
-  nalloc += 2;
+  nalloc += 3;
   compute_cell_volume();
   compute_min_cell_delta();
 

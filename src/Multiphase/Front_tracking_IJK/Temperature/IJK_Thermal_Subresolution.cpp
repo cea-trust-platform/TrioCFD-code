@@ -36,8 +36,9 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 
   disable_spherical_diffusion_start_ = 0;
   probes_end_value_start_ = -1;
-  probes_end_value_coeff_ = 0.01;
+  probes_end_value_coeff_ = 0.05;
   single_centred_bubble_ = 1;
+  computed_centred_bubble_start_ = 1.;
   single_centred_bubble_radius_ini_ = 1.e-3;
   temperature_ini_type_ = 1;
   nusselt_spherical_diffusion_ = 2.;
@@ -651,10 +652,15 @@ void IJK_Thermal_Subresolution::compute_temperature_init()
             default:
               break;
             }
-          Nom expression_T_ini = compute_quasi_static_spherical_diffusion_expression(time_ini);
           Cerr << "Time ini: " << time_ini << finl;
-          Cerr << "Test spherical diffusion ini: " << expression_T_ini << finl;
-          set_field_data(temperature_, expression_T_ini);
+          const int nb_bubble_tot = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_barycentre().dimension(0);
+          for (int index_bubble=0; index_bubble<nb_bubble_tot; index_bubble++)
+            {
+              Nom expression_T_ini = compute_quasi_static_spherical_diffusion_expression(time_ini, index_bubble);
+              set_field_data(temperature_for_ini_per_bubble_, expression_T_ini);
+              set_field_temperature_per_bubble(index_bubble);
+            }
+
 //          if (liste_post_instantanes_.contient_("TEMPERATURE_ANA") || liste_post_instantanes_.contient_("ECART_T_ANA"))
 //            {
 //              set_field_data(temperature_ana_, expression_T_ini);
@@ -668,28 +674,94 @@ void IJK_Thermal_Subresolution::compute_temperature_init()
     IJK_Thermal_base::compute_temperature_init();
 }
 
-Nom IJK_Thermal_Subresolution::compute_quasi_static_spherical_diffusion_expression(const double& time_scope)
+Nom IJK_Thermal_Subresolution::compute_quasi_static_spherical_diffusion_expression(const double& time_scope, const int index_bubble)
+{
+
+  if (computed_centred_bubble_start_)
+    {
+      const DoubleTab& bubbles_centres = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_barycentre();
+      return generate_expression_temperature_ini(time_scope, bubbles_centres(index_bubble,0), bubbles_centres(index_bubble,1), bubbles_centres(index_bubble,2));
+    }
+  return generate_expression_temperature_ini(time_scope, 0., 0., 0.);
+}
+
+void IJK_Thermal_Subresolution::set_field_temperature_per_bubble(const int index_bubble)
+{
+  if (!index_bubble)
+    temperature_.data() = delta_T_subcooled_overheated_;
+  const int sign_delta = signbit(delta_T_subcooled_overheated_);
+  const int ni = temperature_.ni();
+  const int nj = temperature_.nj();
+  const int nk = temperature_.nk();
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          const double indic = ref_ijk_ft_->itfce().I()(i,j,k);
+          if (indic > VAPOUR_INDICATOR_TEST)
+            {
+              const double temperature = temperature_(i,j,k);
+              if (sign_delta)
+                {
+                  if (temperature <= (1 - probes_end_value_coeff_) * delta_T_subcooled_overheated_)
+                    {
+                      const double temperature_per_bubble = temperature_for_ini_per_bubble_(i,j,k);
+                      temperature_(i,j,k) = temperature_per_bubble;
+                    }
+                }
+              else
+                {
+                  if (temperature >= (1 - probes_end_value_coeff_) * delta_T_subcooled_overheated_)
+                    {
+                      const double temperature_per_bubble = temperature_for_ini_per_bubble_(i,j,k);
+                      temperature_(i,j,k) = temperature_per_bubble;
+                    }
+                }
+            }
+        }
+}
+
+void reinit_streamObj(std::ostringstream& streamObj, const double& param)
+{
+  streamObj.str("");
+  streamObj.clear();
+  streamObj << (double) param;
+}
+
+Nom IJK_Thermal_Subresolution::generate_expression_temperature_ini(const double& time_scope, const double x, const double y, const double z)
 {
   const double rho_l = ref_ijk_ft_->get_rho_l();
   const double alpha_liq = lambda_liquid_ / (rho_l * cp_liquid_);
-  Nom expression_T = "0.";
   std::ostringstream streamObj;
-  expression_T = "(";
+  Nom expression_T = "(";
   streamObj << delta_T_subcooled_overheated_;
   expression_T += streamObj.str().c_str();
   expression_T += ")-(";
   expression_T += streamObj.str().c_str();
   expression_T += ")*(";
-  streamObj.str("");
-  streamObj.clear();
-  streamObj << single_centred_bubble_radius_ini_;
+  reinit_streamObj(streamObj, single_centred_bubble_radius_ini_);
   expression_T += streamObj.str().c_str();
-  expression_T += "/sqrt((x-1e-16)^2+(y-1e-16)^2+(z-1e-16)^2)*(1-erf((sqrt(x^2+y^2+z^2)-";
+  Nom expression_tmp = "sqrt((x-(";
+  reinit_streamObj(streamObj, (signbit(x) ? x-1e-16 : x+1e-16));
+  expression_tmp += streamObj.str().c_str();
+  expression_tmp += "))^2+(y-(";
+  reinit_streamObj(streamObj, (signbit(y) ? y-1e-16 : y+1e-16));
+  expression_tmp += streamObj.str().c_str();
+  expression_tmp += "))^2+(z-(";
+  reinit_streamObj(streamObj, (signbit(z) ? z-1e-16 : z+1e-16));
+  expression_tmp += streamObj.str().c_str();
+  expression_tmp += "))^2)";
+  expression_T += "/";
+  expression_T += expression_tmp;
+  expression_T += "*(1-erf((";
+  expression_T += expression_tmp;
+  expression_T += "-";
+  reinit_streamObj(streamObj, single_centred_bubble_radius_ini_);
   expression_T += streamObj.str().c_str();
   expression_T += ")/(2.*sqrt(";
   streamObj.str("");
   streamObj.clear();
-  streamObj << ((alpha_liq * time_scope) + 1e-16);
+  reinit_streamObj(streamObj, ((alpha_liq * time_scope) + 1e-16));
   expression_T += streamObj.str().c_str();
   expression_T += ")))))";
   return expression_T;
@@ -863,7 +935,7 @@ void IJK_Thermal_Subresolution::set_field_T_ana()
     {
       if (spherical_diffusion_)
         {
-          Nom expression_T_ana = compute_quasi_static_spherical_diffusion_expression(ref_ijk_ft_->get_current_time());
+          Nom expression_T_ana = compute_quasi_static_spherical_diffusion_expression(ref_ijk_ft_->get_current_time(), 0);
           set_field_data(temperature_ana_, expression_T_ana);
           correct_any_temperature_field_for_visu(temperature_ana_);
           if (liste_post_instantanes_.contient_("ECART_T_ANA"))

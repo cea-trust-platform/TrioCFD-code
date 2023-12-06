@@ -546,6 +546,7 @@ protected:
   IJK_Field_double rho_cp_;
   IJK_Field_double rho_cp_T_;
   IJK_Field_double temperature_;
+  IJK_Field_double temperature_for_ini_per_bubble_;
   IJK_Field_double temperature_before_extrapolation_;
   IJK_Field_double d_temperature_; // Temperature increment.
   IJK_Field_double RK3_F_temperature_; // Temporary storage for substeps in the RK3 algorithm.
