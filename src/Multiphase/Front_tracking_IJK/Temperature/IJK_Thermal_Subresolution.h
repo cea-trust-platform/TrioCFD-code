@@ -452,6 +452,7 @@ protected :
   int first_step_thermals_post_;
 
   int copy_fluxes_on_every_procs_;
+  int copy_temperature_on_every_procs_;
 
 };
 

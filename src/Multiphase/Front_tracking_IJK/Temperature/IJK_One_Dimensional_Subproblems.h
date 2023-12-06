@@ -52,6 +52,7 @@ public :
   void initialise_thermal_subproblems_list_params(const int& pre_initialise_thermal_subproblems_list,
                                                   const double& pre_factor_subproblems_number,
                                                   const int& remove_append_subproblems);
+  void associate_variables_for_post_processing(IJK_Thermal_Subresolution& ref_thermal_subresolution);
   void set_max_subproblems(const int max_subproblems) { max_subproblems_ = max_subproblems; };
   void clean();
   void clean(int add, int append);

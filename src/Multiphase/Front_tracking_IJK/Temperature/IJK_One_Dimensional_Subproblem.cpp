@@ -3048,7 +3048,12 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                          + Nom("_radial_quantities_time_index_") +
                          + Nom(std::string(max_digit - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
         Nom probe_header = Nom("tstep\tthermalrank\tpostproindex\tglobalsubproblem\tlocalsubproblem\ttime"
-                               "\tnx\tny\tnz\tt1x\tt1y\tt2z\tt2x\tt2y\tt2z\ts1x\ts1y\ts1z\ts2x\ts2y\ts2z"
+                               "\tnx\tny\tnz"
+                               "\tt1x\tt1y\tt1z"
+                               "\tt2x\tt2y\tt2z"
+                               "\ts1x\ts1y\ts1z"
+                               "\ts2x\ts2y\ts2z"
+                               "\trsph\tthetasph\tphisph"
                                "\tradial_coord\ttemperature_interp\ttemperature_solution"
                                "\ttemperature_gradient\ttemperature_gradient_sol"
                                "\ttemperature_double_deriv_sol"

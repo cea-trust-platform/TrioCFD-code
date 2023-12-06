@@ -148,7 +148,8 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   neighbours_last_faces_distance_colinearity_weighting_ = 0;
   neighbours_last_faces_distance_colinearity_face_weighting_ = 0;
 
-  copy_fluxes_on_every_procs_ = 0;
+  copy_fluxes_on_every_procs_ = 1;
+  copy_temperature_on_every_procs_ = 1;
 }
 
 Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
@@ -290,12 +291,13 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("neighbours_last_faces_distance_colinearity_weighting", &neighbours_last_faces_distance_colinearity_weighting_);
   param.ajouter_flag("neighbours_last_faces_distance_colinearity_face_weighting", &neighbours_last_faces_distance_colinearity_face_weighting_);
 
-  param.ajouter_flag("copy_fluxes_on_every_procs", &copy_fluxes_on_every_procs_);
+//  param.ajouter_flag("copy_fluxes_on_every_procs", &copy_fluxes_on_every_procs_);
+//  param.ajouter_flag("copy_temperature_on_every_procs", &copy_temperature_on_every_procs_);
 
-  // param.ajouter_flag("enforce_periodic_boundary_value", &enforce_periodic_boundary_value_);
-  // param.ajouter_non_std("enforce_periodic_boundary_value",(this));
-  //  for (int i=0; i<fd_solvers_jdd_.size(); i++)
-  //    param.ajouter_non_std(fd_solvers_jdd_[i], this);
+// param.ajouter_flag("enforce_periodic_boundary_value", &enforce_periodic_boundary_value_);
+// param.ajouter_non_std("enforce_periodic_boundary_value",(this));
+//  for (int i=0; i<fd_solvers_jdd_.size(); i++)
+//    param.ajouter_non_std(fd_solvers_jdd_[i], this);
 }
 
 int IJK_Thermal_Subresolution::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -419,7 +421,8 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   corrige_flux_.set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs_);
   corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_weighting_);
   corrige_flux_.set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed_);
-  corrige_flux_.set_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs_);
+  corrige_flux_.set_temperature_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs_,
+                                                                               copy_temperature_on_every_procs_);
 
 
   if (diffusive_flux_correction_ || use_cell_neighbours_for_fluxes_spherical_correction_)
@@ -1255,6 +1258,7 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
       const int ni = temperature_.ni();
       const int nj = temperature_.nj();
       const int nk = temperature_.nk();
+      int counter = 0;
       for (int k = 0; k < nk; k++)
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
@@ -1291,9 +1295,11 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
                                                                            ref_ijk_ft_->get_velocity(),
                                                                            ref_ijk_ft_->get_velocity_ft(),
                                                                            ref_ijk_ft_->get_pressure_ghost_cells());
-
+                counter++;
               }
       thermal_local_subproblems_.compute_global_indices();
+      if (!counter)
+        thermal_local_subproblems_.associate_variables_for_post_processing((*this));
     }
 }
 

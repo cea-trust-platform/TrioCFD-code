@@ -80,7 +80,7 @@ public :
   inline void compute_temperature_cell_centre(IJK_Field_double& temperature) const;
   inline void compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
                                                          IJK_Field_int& neighbours_weighting,
-                                                         IJK_Field_double& neighbours_weighting_colinearity) const;
+                                                         IJK_Field_double& neighbours_weighting_colinearity);
   inline void replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
                                                          IJK_Field_double& temperature_neighbours,
                                                          IJK_Field_int& neighbours_weighting,
@@ -135,7 +135,8 @@ public :
   inline void replace_cell_neighbours_thermal_convective_diffusive_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                                                                 const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
                                                                                 const int& fluxes_type);
-  inline void set_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs);
+  inline void set_temperature_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs,
+                                                                             const int& copy_temperature_on_every_procs);
 };
 
 inline void Corrige_flux_FT::initialize(const IJK_Splitting& splitting,
@@ -211,7 +212,7 @@ inline void Corrige_flux_FT::compute_temperature_cell_centre(IJK_Field_double& t
 
 inline void Corrige_flux_FT::compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
                                                                         IJK_Field_int& neighbours_weighting,
-                                                                        IJK_Field_double& neighbours_weighting_colinearity) const
+                                                                        IJK_Field_double& neighbours_weighting_colinearity)
 {
   valeur().compute_temperature_cell_centre_neighbours(temperature_neighbours, neighbours_weighting, neighbours_weighting_colinearity);
 }
@@ -389,9 +390,11 @@ inline void Corrige_flux_FT::replace_cell_neighbours_thermal_convective_diffusiv
                                                                              fluxes_type);
 }
 
-inline void Corrige_flux_FT::set_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs)
+inline void Corrige_flux_FT::set_temperature_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs,
+                                                                                            const int& copy_temperature_on_every_procs)
 {
-  valeur().set_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs);
+  valeur().set_temperature_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs,
+                                                                          copy_temperature_on_every_procs);
 }
 
 #endif /* Corrige_flux_FT_included */

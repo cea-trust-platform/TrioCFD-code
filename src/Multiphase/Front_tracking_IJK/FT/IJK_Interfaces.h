@@ -621,6 +621,11 @@ public :
     ijk_compo_connex_.compute_compo_connex_from_interface();
   }
 
+  void initialise_ijk_compo_connex_bubbles_params()
+  {
+    ijk_compo_connex_.initialise_bubbles_params();
+  }
+
 protected:
   // Met a jour les valeurs de surface_vapeur_par_face_ et barycentre_vapeur_par_face_
   SurfaceVapeurIJKComputation surface_vapeur_par_face_computation_;

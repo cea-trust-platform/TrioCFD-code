@@ -106,6 +106,11 @@ void IJK_Composantes_Connex::associer(const IJK_FT_double& ijk_ft)
   ref_ijk_ft_ = ijk_ft;
 }
 
+void IJK_Composantes_Connex::initialise_bubbles_params()
+{
+  interfaces_->calculer_volume_bulles(bubbles_volume_, bubbles_barycentre_);
+}
+
 void IJK_Composantes_Connex::compute_bounding_box_fill_compo_connex()
 {
   compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(),
@@ -187,8 +192,8 @@ void IJK_Composantes_Connex::compute_compo_connex_from_interface()
             }
         }
       elems_valid_size = elems_valid.size_array();
-      eulerian_compo_connex_from_interface_int_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_int_ns_.ghost());
     }
+  eulerian_compo_connex_from_interface_int_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_int_ns_.ghost());
   eulerian_compo_connex_from_interface_ghost_int_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_int_ns_.ghost());
 }
 

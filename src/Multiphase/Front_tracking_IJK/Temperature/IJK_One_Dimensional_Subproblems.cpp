@@ -183,6 +183,11 @@ void IJK_One_Dimensional_Subproblems::set_global_index()
     }
 }
 
+void IJK_One_Dimensional_Subproblems::associate_variables_for_post_processing(IJK_Thermal_Subresolution& ref_thermal_subresolution)
+{
+  bubbles_volume_ = &ref_thermal_subresolution.bubbles_volume_;
+}
+
 void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
                                                                       int i, int j, int k,
                                                                       const double& indicator,

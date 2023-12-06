@@ -1733,6 +1733,7 @@ int IJK_FT_double::initialise()
   /*
    * Thermal problems
    */
+  interfaces_.initialise_ijk_compo_connex_bubbles_params();
   thermals_.initialize(splitting_, nalloc);
 
   statistiques().end_count(calculer_thermique_prop_counter_);

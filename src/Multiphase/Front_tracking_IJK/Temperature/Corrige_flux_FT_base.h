@@ -145,7 +145,7 @@ public:
                                                                 FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity) { ; };
   virtual void compute_temperature_cell_centre_neighbours(IJK_Field_double& temperature_neighbours,
                                                           IJK_Field_int& neighbours_weighting,
-                                                          IJK_Field_double& neighbours_weighting_colinearity) const { ; };
+                                                          IJK_Field_double& neighbours_weighting_colinearity) { ; };
   virtual void replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
                                                           IJK_Field_double& temperature_neighbours,
                                                           IJK_Field_int& neighbours_weighting,
@@ -173,7 +173,8 @@ public:
                                                                                  const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
                                                                                  const int& fluxes_type) { ; };
 
-  virtual void set_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs) { ; };
+  virtual void set_temperature_fluxes_periodic_sharing_strategy_on_processors(const int& copy_fluxes_on_every_procs,
+                                                                              const int& copy_temperature_on_every_procs) { ; };
 
 protected:
   const IJK_Interfaces *interfaces_;
