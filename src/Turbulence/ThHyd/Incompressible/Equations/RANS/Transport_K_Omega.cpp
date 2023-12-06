@@ -36,6 +36,7 @@
 #include <Nom.h>
 
 Implemente_instanciable(Transport_K_Omega, "Transport_K_Omega", Transport_K_Omega_base);
+// XD transport_k_omega eqn_base transport_k_omega -1 The (k-omega) transport equation.
 
 /*! @brief Imprime le type de l'equation sur un flot de sortie.
  *
@@ -47,7 +48,7 @@ Sortie& Transport_K_Omega::printOn(Sortie& s) const { return s << que_suis_je() 
 void Transport_K_Omega::set_param(Param& param)
 {
   Transport_K_Omega_base::set_param(param);
-  param.ajouter("with_nu", &with_nu_);
+  param.ajouter("with_nu", &with_nu_); // XD_ADD_P chaine(into=["yes","no"]) yes/no (default no)
   param.dictionnaire("no", 0);
   param.dictionnaire("yes", 1);
 }

@@ -79,7 +79,7 @@ void Modele_turbulence_hyd_K_Omega::set_param(Param& param)
   param.ajouter_non_std("Transport_K_Omega", (this), Param::REQUIRED); // XD_ADD_P transport_k_omega Keyword to define the (k-omega) transportation equation.
   param.ajouter("PRANDTL_K", &Prandtl_K);
   param.ajouter("PRANDTL_Omega", &Prandtl_Omega);
-  param.ajouter("model_variant", &model_variant, Param::OPTIONAL); // XD_ADD_P Nom Model variant for k-omega (default value STD)
+  param.ajouter("model_variant", &model_variant, Param::OPTIONAL); // XD_ADD_P chaine Model variant for k-omega (default value STD)
 }
 
 int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)
