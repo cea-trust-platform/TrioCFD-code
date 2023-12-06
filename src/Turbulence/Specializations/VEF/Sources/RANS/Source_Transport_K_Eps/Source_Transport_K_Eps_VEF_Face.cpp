@@ -19,13 +19,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <TRUSTTabs_forward.h>
 #include <Source_Transport_K_Eps_VEF_Face.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Transport_K_Eps.h>
 #include <Milieu_base.h>
 #include <Domaine_VEF.h>
 
-Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_VEF_Face,"Source_Transport_K_Eps_VEF_P1NC",Source_Transport_VEF_Face_base);
+Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_VEF_Face,
+                                          "Source_Transport_K_Eps_VEF_P1NC",
+                                          Source_Transport_VEF_Face_base);
 
 Sortie& Source_Transport_K_Eps_VEF_Face::printOn(Sortie& s) const { return s << que_suis_je() ; }
 
@@ -117,7 +120,8 @@ void Source_Transport_K_Eps_VEF_Face::contribuer_a_avec(const DoubleTab& a, Matr
 {
   const DoubleTab& K_eps = equation().inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_LeK_MIN();
-  const DoubleVect& porosite_face = mon_eq_transport_K_Eps->milieu().porosite_face(), &volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
+  const DoubleVect& porosite_face = mon_eq_transport_K_Eps->milieu().porosite_face();
+  const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   // on implicite le -eps et le -eps^2/k
   for (int face = 0; face < K_eps.dimension(0); face++)
     if (K_eps(face, 0) >= LeK_MIN) // -eps*vol  donne +vol dans la bonne case

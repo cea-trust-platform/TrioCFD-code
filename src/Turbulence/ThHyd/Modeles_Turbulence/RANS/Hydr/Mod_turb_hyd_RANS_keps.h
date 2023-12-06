@@ -14,33 +14,33 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Mod_turb_hyd_RANS.h
+// File:        Mod_turb_hyd_RANS_keps.h
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Mod_turb_hyd_RANS_included
-#define Mod_turb_hyd_RANS_included
+#ifndef Mod_turb_hyd_RANS_keps_included
+#define Mod_turb_hyd_RANS_keps_included
 
-#include <Modele_turbulence_hyd_base.h>
+#include <Mod_turb_hyd_RANS_2eq.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
 class Equation_base;
 class Transport_K_Eps_base;
 
 
-/*! @brief Classe Mod_turb_hyd_RANS Classe de base des modeles de type RANS
+/*! @brief Classe Mod_turb_hyd_RANS_keps Classe de base des modeles de type RANS_keps
  *
  * @sa Modele_turbulence_hyd_base
  */
-class Mod_turb_hyd_RANS : public Modele_turbulence_hyd_base
+class Mod_turb_hyd_RANS_keps : public Mod_turb_hyd_RANS_2eq
 {
 
-  Declare_base_sans_constructeur(Mod_turb_hyd_RANS);
+  Declare_base_sans_constructeur(Mod_turb_hyd_RANS_keps);
 
 public:
 
-  Mod_turb_hyd_RANS();
+  Mod_turb_hyd_RANS_keps();
   void set_param(Param& param) override;
   virtual int nombre_d_equations() const=0;
   virtual Transport_K_Eps_base& eqn_transp_K_Eps()=0;
@@ -85,42 +85,42 @@ protected:
 
 };
 
-inline double Mod_turb_hyd_RANS::get_Prandtl_K() const
+inline double Mod_turb_hyd_RANS_keps::get_Prandtl_K() const
 {
   return Prandtl_K;
 }
 
-inline double Mod_turb_hyd_RANS::get_Prandtl_Eps() const
+inline double Mod_turb_hyd_RANS_keps::get_Prandtl_Eps() const
 {
   return Prandtl_Eps;
 }
 
-inline double Mod_turb_hyd_RANS::get_LeEPS_MIN() const
+inline double Mod_turb_hyd_RANS_keps::get_LeEPS_MIN() const
 {
   return LeEPS_MIN;
 }
 
-inline double Mod_turb_hyd_RANS::get_LeEPS_MAX() const
+inline double Mod_turb_hyd_RANS_keps::get_LeEPS_MAX() const
 {
   return LeEPS_MAX;
 }
 
-inline double Mod_turb_hyd_RANS::get_LeK_MIN() const
+inline double Mod_turb_hyd_RANS_keps::get_LeK_MIN() const
 {
   return LeK_MIN;
 }
 
-inline int Mod_turb_hyd_RANS::get_lquiet() const
+inline int Mod_turb_hyd_RANS_keps::get_lquiet() const
 {
   return lquiet;
 }
 
-inline Modele_Fonc_Bas_Reynolds& Mod_turb_hyd_RANS::associe_modele_fonction()
+inline Modele_Fonc_Bas_Reynolds& Mod_turb_hyd_RANS_keps::associe_modele_fonction()
 {
   return mon_modele_fonc;
 }
 
-inline const Modele_Fonc_Bas_Reynolds& Mod_turb_hyd_RANS::associe_modele_fonction() const
+inline const Modele_Fonc_Bas_Reynolds& Mod_turb_hyd_RANS_keps::associe_modele_fonction() const
 {
   return  mon_modele_fonc;
 }

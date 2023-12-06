@@ -31,51 +31,50 @@ Paroi_log_QDM::Paroi_log_QDM()
 
 void Paroi_log_QDM::set_param(Param& param)
 {
-  param.ajouter("Kappa",&Kappa);
-  param.ajouter("Erugu",&Erugu);
-  param.ajouter("A_plus",&A_plus);
+  param.ajouter("Kappa", &Kappa);
+  param.ajouter("Erugu", &Erugu);
+  param.ajouter("A_plus", &A_plus);
 }
 
 void Paroi_log_QDM::init_lois_paroi_hydraulique_()
 {
-  double (*pf)(double,double,double);
-  DoubleTab les_valeurs(40,1);
+  double (*pf)(double, double, double);
+  DoubleTab les_valeurs(40, 1);
   DoubleVect les_params(40);
-  double val=0;
-  int i;
   pf = &Fdypar;
 
-  for (i=0; i<40; i++)
-    les_params[i] = i+1;
+  for (int i = 0; i < 40; i++)
+    les_params[i] = i + 1;
 
-  for (i=0; i<40; i++)
+  double val = 0;
+  for (int i = 0; i < 40; i++)
     {
-      val += integrale(les_params[i]-1,les_params[i],Kappa,A_plus,pf);
-      les_valeurs(i,0) = val*les_params[i];
+      val += integrale(les_params[i] - 1, les_params[i], Kappa, A_plus, pf);
+      les_valeurs(i, 0) = val*les_params[i];
     }
 
-  table_hyd.remplir(les_params,les_valeurs);
+  table_hyd.remplir(les_params, les_valeurs);
 }
 
 double Paroi_log_QDM::calcul_lm_plus(double d_plus)
 {
-  return Kappa*d_plus*(1-exp(-d_plus/A_plus));
+  return Kappa*d_plus*(1 - exp(-d_plus/A_plus));
 }
 
 double Fdypar_direct(double lm_plus)
 {
-  return 2./(1+sqrt(1.0+4*lm_plus*lm_plus));
+  return 2./(1 + sqrt(1.0 + 4*lm_plus*lm_plus));
 }
 
-double Fdypar(double d_plus,double kappa,double a_plus)
+double Fdypar(double d_plus, double kappa, double a_plus)
 {
   double lm_plus = kappa*d_plus*(1-exp(-d_plus/a_plus));
   return 2./(1+sqrt(1.0+4*lm_plus*lm_plus));
 }
 
-double integrale(double a,double b,double param1,double param2,double (*pf) (double,double,double))
+double integrale(double a, double b, double param1, double param2,
+                 double (*pf) (double, double, double))
 {
-  double sum = 0.5 * ( pf(a,param1,param2) + pf(b,param1,param2) ) * (b-a);
+  double sum = 0.5*(pf(a, param1, param2) + pf(b, param1, param2))*(b - a);
   return sum;
 }
-

@@ -52,7 +52,7 @@ public :
   Operateur& operateur(int) override;
 
   void associer_milieu_base(const Milieu_base&) override;
-  void associer_modele_turbulence(const Mod_turb_hyd_RANS&) override;
+  void associer_modele_turbulence(const Mod_turb_hyd_RANS_keps&) override;
   inline const Modele_Fonc_Realisable& modele_fonc() const;
   inline  Modele_Fonc_Realisable& modele_fonc();
 //   inline const Champ_Inc& vitesse_transportante();

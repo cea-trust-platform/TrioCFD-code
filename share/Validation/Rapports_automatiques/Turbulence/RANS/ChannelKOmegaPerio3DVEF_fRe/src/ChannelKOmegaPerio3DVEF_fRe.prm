@@ -1,0 +1,404 @@
+Parameters {
+	Title "Pressure drop in a 3D periodic turbulent flow (K Omega model) in a plane channel"
+	Description "Poiseuille flow in a 3D periodic turbulent flow"
+	Description "Validated Model"
+	Description "Time scheme: Euler Implicite"
+	Description "Validation with:"
+	Description "Convection schemes: Muscl and EF_stab"
+	Description "Turbulent flow, turbulent K Omega turbulence model"
+	Description "Pressure solver Cholesky, VEF tetraedriser discretization"
+
+	VersionTrio_U "1.9.3"
+
+	ParametersTrio_U Type of problem : Hydraulique_Turbulent 3D
+	ParametersTrio_U Discretization : VEF
+	ParametersTrio_U Time scheme : Schema_Euler_Implicite
+	ParametersTrio_U Solving of equations : Navier Stokes_Turbulent
+	ParametersTrio_U Solving of equations : Solver_pression Cholesky Modele_turbulence K Omega
+	ParametersTrio_U Convection schemes : Muscl and EF_stab
+	ParametersTrio_U Type of boundary conditions : wall, x-periodicity and z-periodicity
+	ParametersTrio_U Type of fluid : Helium
+
+	TestCase muscl_0.05 canal_turbu_muscl /* jdd en annexe */
+	TestCase muscl_0.2 canal_turbu_muscl
+	TestCase EFstab_0.1 canal_turbu_EFstab
+
+	Author "Alan BURLOT"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Dimensions : L=2m h=2m z=1m"
+	Description "Mesh : 3 x 11 x 5 hexahedral unstructured element for VEF"
+	Description "type of cells (VEF only): Tetraedriser"
+	Description "Initial conditions : Hydraulic : uniform velocity profile"
+	Description "Boundary conditions : Hydraulic : x and z periodicity Wall paroi_fixe"
+	Figure {
+		Title "Geometry"
+		Width 12cm
+		picture ./Geometry.png
+	}
+	visu {
+		Title "480 Tetrahedral cells"
+		mesh muscl_0.05/canal_turbu_muscl.lata dom_pb1
+		normal3D -0.95 0.04 0.3
+		up3D 0.04 1 -0.01
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_triad
+	}
+	Figure {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"
+		Description "$\rho$ = 3.85 kg/m$^3$"
+		Description "$\mu$ = 3.56e-5 kg/m/s"
+		Width 0cm
+		picture ./schema.png
+	}
+}
+Chapter {
+	Title "Results : Muscl convection scheme"
+
+	Table {
+		Title "Y+ and U* calculation"
+		nb_columns 6
+		label U | Reynolds number Re | Y+ | U*theorical | U*trio_U | Error on U* in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./muscl_0.05/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+	}
+	Table {
+		Title "Pressure drop calculation"
+		nb_columns 5
+		label U | Reynolds number Re | $\Delta$Ptheorical/$\rho$ | $\Delta$Ptrio_U/$\rho$ | Error on $\Delta$P/$\rho$ in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./muscl_0.05/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+	}
+
+	Figure {
+		Title "U* evolution with Reynolds number"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 250000
+		LabelY "U*"
+		RangeY 0 0.025
+		Include_Description_Curves 0
+		Curve {
+			legend "U*_Theorical"
+			file CourbeUtautheo_muscl.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "U*_Trio_U"
+			file CourbeUtautrio_muscl.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+	Figure {
+		Title "Pressure drop evolution with Reynolds number"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 250000
+		LabelY "dP/rho"
+		RangeY 0 0.002
+		Include_Description_Curves 0
+		Curve {
+			legend "dPTheorical/rho"
+			file CourbedPtheo_muscl.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "dPTrio_U/rho"
+			file CourbedPtrio_muscl.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+
+}
+Chapter {
+	Title "Results : EF_stab convection scheme"
+	Table {
+		Title "Y+ and U* computation"
+		nb_columns 6
+		label U | Reynolds number Re | Y+ | U*theorical | U*trio_U | Error on U* in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EFstab_0.1/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+	}
+	Table {
+		Title "Pressure drop computation"
+		nb_columns 5
+		label U | Reynolds number Re | $\Delta$Ptheorical/$\rho$ | $\Delta$Ptrio_U/$\rho$ | Error on $\Delta$P/$\rho$ in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EFstab_0.1/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+	}
+
+	Figure {
+		Title "U* evolution with Reynolds number"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 250000
+		LabelY "U*"
+		RangeY 0 0.025
+		Include_Description_Curves 0
+		Curve {
+			legend "U*_Theorical"
+			file CourbeUtautheo_EFstab.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "U*_Trio_U"
+			file CourbeUtautrio_EFstab.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+
+	Figure {
+		Title "Pressure drop evolution with Reynolds number"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 250000
+		LabelY "dP/rho"
+		RangeY 0 0.002
+		Include_Description_Curves 0
+		Curve {
+			legend "dPTheorical/rho"
+			file CourbedPtheo_EFstab.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "dPTrio_U/rho"
+			file CourbedPtrio_EFstab.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+}
+
+Chapter {
+
+	Title "Forcing term evolution for U=0.5m/s"
+
+	Figure {
+		Title " Forcing term evolution for several convection scheme (Re=216292)"
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0. 1000.
+		LabelY "Forcing (m/s**2)"
+		RangeY 0. 0.001
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theory"
+			Fonction 0.00050437
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Muscl"
+			origin "Trio_U"
+			file muscl_0.05/canal_turbu_muscl_Pressure_Gradient_pb1_Entree
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_stab "
+			origin "Trio_U"
+			file EFstab_0.1/canal_turbu_EFstab_Pressure_Gradient_pb1_Entree
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+}
+Chapter {
+
+	Title "Velocity, turbulent viscosity and turbulence kinetic energy profiles"
+
+	Figure {
+		Title "Vx Velocity profile following Y for U=0.05m/s (Re=21629)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 2.0
+		LabelY "Vx Velocity"
+		RangeY 0 0.07
+		Include_Description_Curves 0
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./muscl_0.05/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./EFstab_0.05/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+
+	Figure {
+		Title "Velocity profile U+ following Y+ for U=0.05m/s (Re=21629)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10. 1000.0
+		LabelY "Vx Velocity:U+"
+		RangeY 0 50.0
+		LogX
+		Include_Description_Curves 0
+		Curve {
+			legend "Reichardt"
+			Fonction 1/0.41*log(1+0.4*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./muscl_0.05/Velocity_profile_dimensionLess.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./EFstab_0.05/Velocity_profile_dimensionLess.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+
+	Figure {
+		Title "Turbulent viscosity profile following Y for U=0.05m/s (Re=21629)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 2.0
+		LabelY "Turbulent viscosity Nut"
+		RangeY 0 0.00035
+		Include_Description_Curves 0
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./muscl_0.05/Turbulent_viscosity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./EFstab_0.05/Turbulent_viscosity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+
+	Figure {
+		Title "Dimensionless turbulent viscosity profile following Y+ for U=0.05m/s (Re=21629)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 0 800.0
+		LabelY "Dimensionless turbulent viscosity Nut"
+		RangeY 0 40.0
+		Include_Description_Curves 0
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./muscl_0.05/Turbulent_viscosity_profile_dimensionLess.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./EFstab_0.05/Turbulent_viscosity_profile_dimensionLess.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+
+	Figure {
+		Title "Turbulence kinetic energy profile following Y for U=0.05m/s (Re=21629)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 2.0
+		LabelY "k"
+		RangeY 0 1.0e-4
+		Include_Description_Curves 0
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			Segment muscl_0.05/canal_turbu_muscl.data SONDE_K
+			columns 1 2
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			Segment EFstab_0.05/canal_turbu_EFstab.data SONDE_K
+			columns 1 2
+			Style points
+		}
+	}
+
+	Figure {
+		Title "Conclusion"
+		Description " The EF_stab convection scheme gives much better quality results than Muscl for both the pressure drop and friction coefficient. The pressure drop errors with EF_stab are less than 5%  (expect for the lowest Reynolds number case) while they're greater than 10% with most Muscl cases"
+		Description "When it comes to velocity profiles, EF_stab gives much better results as well, since its profiles are closer to the theory"
+		Description "It is therefore recommended to use the EF_stab convection scheme for such a configuration with a K-Omega turbulence modelling"
+		Description "It is also noted that many velocity and turbulent viscosity profiles, especially with Musch scheme, are not symmetric. This is probably due to the VEF grid, that might not be fine enough".
+		Width 0cm
+		picture ./schema.png
+	}
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

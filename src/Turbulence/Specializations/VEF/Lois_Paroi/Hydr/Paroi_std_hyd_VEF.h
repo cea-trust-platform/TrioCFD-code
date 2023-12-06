@@ -31,6 +31,8 @@
 #include <Paroi_hyd_base_VEF.h>
 #include <distances_VEF.h>
 #include <Paroi_log_QDM.h>
+#include <Modele_turbulence_hyd_K_Eps.h>
+#include <Modele_turbulence_hyd_K_Omega.h>
 
 class Champ_Fonc_base;
 class Domaine_dis;
@@ -62,7 +64,18 @@ public:
   void imprimer_ustar(Sortie& ) const override;
   double calculer_u_plus(const int ,const double ,const  double erugu );
 
+  inline void check_turbulence_model();
+  void compute_turbulent_quantities(double&, double&, double d_plus, double u_star, double d_visco, double dist);
   virtual int calculer_k_eps(double& , double& , double , double , double , double);
+
+  //
+  void compute_k(double& k, double yp, double u_star);
+  void compute_epsilon(double& epsilon, double yp, double u_star, double d_visco);
+  void compute_omega(double& omega, double yp, double u_star, double d_visco, double dist);
+  void compute_k_epsilon(double& k, double& epsilon, double yplus, double u_star, double d_visco, double dist);
+  void compute_k_omega(double& k, double& omega, double yplus, double u_star, double d_visco, double dist);
+
+
 
 
 protected:
@@ -77,8 +90,23 @@ protected:
   double u_star_impose_;
   int is_u_star_impose_;
   virtual int init_lois_paroi_hydraulique();
+
+  int turbulence_model_type {0}; // To redirect the computation of the wall quantities
 };
 
+/*! @brief Returns an integer value depending on the turbulence model.
+ *
+ */
+inline void Paroi_std_hyd_VEF::check_turbulence_model()
+{
+  turbulence_model_type = 1;
+  // if (sub_type(Modele_turbulence_hyd_K_Eps, mon_modele_turb_hyd.valeur()))
+  // turbulence_model_type = 1;
+  if (sub_type(Modele_turbulence_hyd_K_Omega, mon_modele_turb_hyd.valeur()))
+    turbulence_model_type = 2;
+  // else
+  // Process::exit("The turbulence model should either be K_Eps or K_Omega");
+}
 
 /*! @brief cette classe permet de specifier des options a la loi de paroi standard.
  *

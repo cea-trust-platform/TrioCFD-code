@@ -30,7 +30,7 @@
  *
  * @sa Modele_turbulence_hyd_base Mod_turb_hyd_ss_maille
  */
-class Modele_turbulence_hyd_K_Eps : public Mod_turb_hyd_RANS
+class Modele_turbulence_hyd_K_Eps : public Mod_turb_hyd_RANS_keps
 {
 
   Declare_instanciable(Modele_turbulence_hyd_K_Eps);
