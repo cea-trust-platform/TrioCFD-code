@@ -254,16 +254,20 @@
 \counterwithin*{chapter}{part}
 %
 
+% Shortcuts
+% - left ans right parenthesis
+\def\lrp#1{\left( #1 \right)}
+% - Partial derivative used in many equations
+\def\pard#1#2{\frac{\partial #1}{\partial #2}}
+ 
 % Variables definition
 % - TrioCFD version
 \newcommand\codeVersion{1.9.2}
 
 \makeindex
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% debut du document
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{document}
-%
+
 % 1ere page
 \thispagestyle{empty}
 %\cfoot{}
@@ -316,42 +320,46 @@ v\codeVersion & \today & \includegraphics[scale=0.05]{../pictures/signTrioCFDMan
 %
 %\vspace{6cm}
 \listoftables
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \part{Introduction}
+\label{sec:Introduction}
 \normalsize \normalfont
-\vspace{3.5cm}
 \input{./part1-introduction.tex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\part{\label{sec:Equations-de-conservations}\'Equations de conservations : masse, quantit\'e de mouvement et \'energie}
+
+\part{\'Equations de conservations : masse, quantit\'e de mouvement et \'energie}
+\label{sec:Equations-de-conservations}
 \normalsize \normalfont
 \input{./part2-conservationEquations.tex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\part{\label{sec:Modeles-de-turbulence}Mod\`eles de turbulence}
+
+\part{Mod\`eles de turbulence}
+\label{sec:Modeles-de-turbulence}
 \normalsize \normalfont
 \input{./part3-turbulence.tex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\part{\label{sec:Diphasique}Mod\`eles des \'ecoulement diphasiques}
+
+\part{Mod\`eles des \'ecoulement diphasiques}
+\label{sec:Diphasique}
 \normalsize \normalfont
 %\input{./part41-FT.tex}
 \input{./part41-CMFD.tex}
 \input{./part42-FTD.tex}
 \input{./part43-Phase_field.tex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\part{\label{sec:ALE}The Arbitrary Lagrangian-Eulerian Method}
+
+\part{The Arbitrary Lagrangian-Eulerian Method}
+\label{sec:ALE}
 \normalsize \normalfont
 \input{./part5-ALE.tex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\part{\label{sec:Sensitivity}Sensitivity equation method for the Navier--Stokes equations applied to uncertainty propagation}
+
+\part{Sensitivity equation method for the Navier--Stokes equations applied to uncertainty propagation}
+\label{sec:Sensitivity}
 \normalsize \normalfont
 \input{./part6-sensitivity.tex}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \part{Perspectives}
 \normalsize \normalfont
 \vspace{4.5cm}
 \input{./part7-perspectives.tex}
 \newpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %\appendix
 %\Huge
 %\section*{\label{sec:Annexe_ListeValid}Annexe A : liste des fiches de validation dans \texttt{TrioCFD}}
@@ -360,9 +368,11 @@ v\codeVersion & \today & \includegraphics[scale=0.05]{../pictures/signTrioCFDMan
 %\normalfont
 %\input{./annexeA.tex}
 %\pagebreak
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \lhead{}
 \rhead{BIBLIOGRAPHIE}
 \bibliographystyle{plain}
-\bibliography{BibTeX_TrioCFD,18-Stokes_bib,bibALE,bibCMFD,bibFTD,bibSENSITIVITY.bib}
+\bibliography{BibTeX_TrioCFD, 18-Stokes_bib, bibALE, bibCMFD, bibFTD, bibSENSITIVITY}
+
 \end{document}
+
