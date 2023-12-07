@@ -28,12 +28,19 @@
 #include <communications.h>
 #include <Interprete.h>
 
-Implemente_instanciable( Navier_Stokes_std_sensibility, "Navier_Stokes_standard_sensibility", Navier_Stokes_std) ;
+Implemente_instanciable_sans_constructeur_ni_destructeur( Navier_Stokes_std_sensibility, "Navier_Stokes_standard_sensibility", Navier_Stokes_std) ;
 // XD Navier_Stokes_standard_sensibility navier_stokes_standard Navier_Stokes_standard_sensibility -1 Resolution of Navier-Stokes sensitivity problem
 // XD  attr state bloc_lecture state 0 Block to indicate the state problem. Between the braces, you must specify the key word 'pb_champ_evaluateur' then the name of the state problem and the velocity unknown  NL2 Example:  state { pb_champ_evaluateur pb_state  velocity }
 // XD  attr uncertain_variable bloc_lecture uncertain_variable 0 Block to indicate the name of the uncertain variable. Between the braces, you must specify the name of the unknown variable. Choice between velocity and mu.  NL2 Example: uncertain_variable { velocity }
 
+Navier_Stokes_std_sensibility::Navier_Stokes_std_sensibility() :  poly_chaos(0)
+{
 
+}
+Navier_Stokes_std_sensibility::~Navier_Stokes_std_sensibility()
+{
+
+}
 Sortie& Navier_Stokes_std_sensibility::printOn( Sortie& os ) const
 {
   return Navier_Stokes_std::printOn( os );
@@ -52,6 +59,7 @@ void Navier_Stokes_std_sensibility::set_param(Param& param)
   Navier_Stokes_std::set_param(param);
   param.ajouter_non_std("state",(this),Param::REQUIRED);
   param.ajouter_non_std("uncertain_variable",(this),Param::REQUIRED);
+  param.ajouter_non_std("polynomial_chaos",(this),Param::OPTIONAL);
 
   /* if (schema_temps().diffusion_implicite())
      {
@@ -144,6 +152,14 @@ int Navier_Stokes_std_sensibility::lire_motcle_non_standard(const Motcle& mot, E
         }
       return 1;
     }
+  else if (mot=="polynomial_chaos")
+    {
+      Cerr << "Reading and typing of the  option polynomial chaos: " << finl;
+      double value;
+      is >> value;
+      poly_chaos = value;
+      return 1;
+    }
   else
     return Navier_Stokes_std::lire_motcle_non_standard(mot, is);
 }
@@ -216,4 +232,10 @@ const Champ_Inc_base& Navier_Stokes_std_sensibility::get_state() const
 const Motcle& Navier_Stokes_std_sensibility::get_uncertain_variable_name() const
 {
   return uncertain_var;
+}
+
+const double& Navier_Stokes_std_sensibility::get_poly_chaos_value() const
+{
+
+  return poly_chaos;
 }

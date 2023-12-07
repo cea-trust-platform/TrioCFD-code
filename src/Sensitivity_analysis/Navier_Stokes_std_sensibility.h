@@ -34,9 +34,11 @@
 class Navier_Stokes_std_sensibility : public Navier_Stokes_std
 {
 
-  Declare_instanciable( Navier_Stokes_std_sensibility ) ;
+  Declare_instanciable_sans_constructeur_ni_destructeur( Navier_Stokes_std_sensibility ) ;
 
 public :
+  Navier_Stokes_std_sensibility();
+  ~Navier_Stokes_std_sensibility();
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
   void associate_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
@@ -45,13 +47,15 @@ public :
   const DoubleTab& get_state_field() const;
   const Champ_Inc_base& get_state() const;
   const Motcle& get_uncertain_variable_name() const;
+  const double& get_poly_chaos_value() const;
 
 protected :
   REF(Champ_Inc_base) state_field;  //Reference to the unknown field of the state problem
   Nom name_state_pb;                      //name of the problem state
   Motcle name_state_field;                 //name of the unknown field of the state problem
   Motcle uncertain_var;     				//name of the unknown field of the uncertain variable
-
+  double poly_chaos;               //It is the method that we will use to study the sensitivity of the Navier Stokes equation:
+  // if poly_chaos=0. thats mean that the sensitivity will be treated by the standard sentivity method and if not it will be treated by the polynomial chaos method
 };
 
 #endif /* Navier_Stokes_std_sensibility_included */
