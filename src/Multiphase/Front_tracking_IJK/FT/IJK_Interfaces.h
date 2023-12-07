@@ -62,6 +62,7 @@ public :
   int initialize(const IJK_Splitting& splitting_FT,
                  const IJK_Splitting& splitting_NS,
                  const Domaine_dis& domaine_dis,
+                 const int thermal_probes_ghost_cells,
                  const bool compute_vint=true);
   void associer(const IJK_FT_double& ijk_ft);
   void posttraiter_tous_champs(Motcles& liste) const;

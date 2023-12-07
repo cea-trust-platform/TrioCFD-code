@@ -464,6 +464,7 @@ void IJK_Interfaces::compute_vinterp()
 int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
                                const IJK_Splitting& splitting_NS,
                                const Domaine_dis& domaine_dis,
+                               const int thermal_probes_ghost_cells,
                                const bool compute_vint)
 {
   Cerr << "Entree dans IJK_Interfaces::initialize" << finl;
@@ -477,18 +478,20 @@ int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   surface_vapeur_par_face_computation_.initialize(splitting_FT);
   val_par_compo_in_cell_computation_.initialize(splitting_FT, maillage_ft_ijk_);
 
+  const int nb_ghost_cells = std::max(thermal_probes_ghost_cells, 2);
+
   indicatrice_ft_[old()].allocate(splitting_FT, IJK_Splitting::ELEM, 2);
   indicatrice_ft_[old()].data() = 1.;
   indicatrice_ft_[old()].echange_espace_virtuel(indicatrice_ft_[old()].ghost());
   indicatrice_ft_[next()].allocate(splitting_FT, IJK_Splitting::ELEM, 2);
   indicatrice_ft_[next()].data() = 1.;
   indicatrice_ft_[next()].echange_espace_virtuel(indicatrice_ft_[next()].ghost());
-  indicatrice_ns_[old()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
+  indicatrice_ns_[old()].allocate(splitting_NS, IJK_Splitting::ELEM, nb_ghost_cells);
   indicatrice_ns_[old()].data() = 1.;
   allocate_cell_vector(groups_indicatrice_ns_[old()], splitting_NS, 1);
   allocate_cell_vector(groups_indicatrice_ns_[next()], splitting_NS, 1);
   indicatrice_ns_[old()].echange_espace_virtuel(indicatrice_ns_[old()].ghost());
-  indicatrice_ns_[next()].allocate(splitting_NS, IJK_Splitting::ELEM, 2);
+  indicatrice_ns_[next()].allocate(splitting_NS, IJK_Splitting::ELEM, nb_ghost_cells);
   indicatrice_ns_[next()].data() = 1.;
   indicatrice_ns_[next()].echange_espace_virtuel(indicatrice_ns_[next()].ghost());
   nalloc += 4;

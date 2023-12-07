@@ -610,6 +610,12 @@ double IJK_Thermal_Subresolution::get_modified_time()
     return ref_ijk_ft_->get_current_time();
 }
 
+static int decoder_numero_bulle(const int code)
+{
+  const int num_bulle = code >> 6;
+  return num_bulle;
+}
+
 void IJK_Thermal_Subresolution::compute_temperature_init()
 {
   /*
@@ -654,9 +660,17 @@ void IJK_Thermal_Subresolution::compute_temperature_init()
             }
           Cerr << "Time ini: " << time_ini << finl;
           const int nb_bubble_tot = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_barycentre().dimension(0);
+          const int nb_bubbles_real = ref_ijk_ft_->itfce().get_nb_bulles_reelles();
+//					const int nb_bubbles_ghost = ref_ijk_ft_->itfce().get_nb_bulles_ghost();
           for (int index_bubble=0; index_bubble<nb_bubble_tot; index_bubble++)
             {
-              Nom expression_T_ini = compute_quasi_static_spherical_diffusion_expression(time_ini, index_bubble);
+              int index_bubble_real = index_bubble;
+              if (index_bubble>=nb_bubbles_real)
+                {
+                  const int ighost = ref_ijk_ft_->itfce().ghost_compo_converter(index_bubble-nb_bubbles_real);
+                  index_bubble_real = decoder_numero_bulle(-ighost);
+                }
+              Nom expression_T_ini = compute_quasi_static_spherical_diffusion_expression(time_ini, index_bubble, index_bubble_real);
               set_field_data(temperature_for_ini_per_bubble_, expression_T_ini);
               set_field_temperature_per_bubble(index_bubble);
             }
@@ -674,13 +688,31 @@ void IJK_Thermal_Subresolution::compute_temperature_init()
     IJK_Thermal_base::compute_temperature_init();
 }
 
-Nom IJK_Thermal_Subresolution::compute_quasi_static_spherical_diffusion_expression(const double& time_scope, const int index_bubble)
+Nom IJK_Thermal_Subresolution::compute_quasi_static_spherical_diffusion_expression(const double& time_scope,
+                                                                                   const int index_bubble,
+                                                                                   const int index_bubble_real)
 {
 
   if (computed_centred_bubble_start_)
     {
       const DoubleTab& bubbles_centres = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_barycentre();
-      return generate_expression_temperature_ini(time_scope, bubbles_centres(index_bubble,0), bubbles_centres(index_bubble,1), bubbles_centres(index_bubble,2));
+      double x,y,z;
+      x = bubbles_centres(index_bubble,0);
+      y = bubbles_centres(index_bubble,1);
+      z = bubbles_centres(index_bubble,2);
+      if (index_bubble != index_bubble_real)
+        {
+          const double x_real = bubbles_centres(index_bubble_real,0);
+          const double y_real = bubbles_centres(index_bubble_real,1);
+          const double z_real = bubbles_centres(index_bubble_real,2);
+          const double lx = temperature_.get_splitting().get_grid_geometry().get_domain_length(0);
+          const double ly = temperature_.get_splitting().get_grid_geometry().get_domain_length(0);
+          const double lz = temperature_.get_splitting().get_grid_geometry().get_domain_length(0);
+          x = (abs(x - x_real)< (lx / 2.)) ? x_real : ((x_real < (lx / 2.)) ? x_real + lx : x_real - lx);
+          y = (abs(y - y_real)< (ly / 2.)) ? y_real : ((y_real < (ly / 2.)) ? y_real + ly : y_real - ly);
+          z = (abs(z - z_real)< (lz / 2.)) ? z_real : ((z_real < (lz / 2.)) ? z_real + lz : z_real - lz);
+        }
+      return generate_expression_temperature_ini(time_scope, x, y, z);
     }
   return generate_expression_temperature_ini(time_scope, 0., 0., 0.);
 }
@@ -935,7 +967,7 @@ void IJK_Thermal_Subresolution::set_field_T_ana()
     {
       if (spherical_diffusion_)
         {
-          Nom expression_T_ana = compute_quasi_static_spherical_diffusion_expression(ref_ijk_ft_->get_current_time(), 0);
+          Nom expression_T_ana = compute_quasi_static_spherical_diffusion_expression(ref_ijk_ft_->get_current_time(), 0, 0);
           set_field_data(temperature_ana_, expression_T_ana);
           correct_any_temperature_field_for_visu(temperature_ana_);
           if (liste_post_instantanes_.contient_("ECART_T_ANA"))

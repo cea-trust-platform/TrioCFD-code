@@ -677,6 +677,7 @@ protected :
   LIST(IJK_Thermique) thermique_;
   LIST(IJK_Energie) energie_;
   IJK_Thermals thermals_;
+  int thermal_probes_ghost_cells_;
 
   double dt_cfl_ = 1.e20;
   double dt_fo_ = 1.e20;

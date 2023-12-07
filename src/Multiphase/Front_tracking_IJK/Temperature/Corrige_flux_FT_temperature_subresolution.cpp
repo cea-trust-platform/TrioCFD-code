@@ -149,6 +149,11 @@ void Corrige_flux_FT_temperature_subresolution::clear_vectors()
   diffusive_flux_z_min_max_faces_sorted_.clear();
 }
 
+int compute_periodic_index(const int index, const int n)
+{
+  return (n + index % n) % n;
+}
+
 void Corrige_flux_FT_temperature_subresolution::initialize_with_subproblems(const IJK_Splitting& splitting,
                                                                             const IJK_Field_double& field,
                                                                             const IJK_Interfaces& interfaces,
@@ -335,12 +340,15 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
                         index_i_neighbour = index_i_problem + ((pure_neighbours_corrected_sign[0]) ?  l * (-1) : l);
                         index_j_neighbour = index_j_problem + ((pure_neighbours_corrected_sign[1]) ?  m * (-1) : m);
                         index_k_neighbour = index_k_problem + ((pure_neighbours_corrected_sign[2]) ?  n * (-1) : n);
-                        index_i_neighbour_global = (index_i_neighbour + offset_i) % ni_tot;
-                        index_j_neighbour_global = (index_j_neighbour + offset_j) % nj_tot;
-                        index_k_neighbour_global = (index_k_neighbour + offset_k) % nk_tot;
-                        index_i_procs = index_i_neighbour % ni;
-                        index_j_procs = index_j_neighbour % nj;
-                        index_k_procs = index_k_neighbour % nk;
+                        /*
+                         * Handle both positive and negative periodicity !
+                         */
+                        index_i_neighbour_global = compute_periodic_index((index_i_neighbour + offset_i), ni_tot);
+                        index_j_neighbour_global = compute_periodic_index((index_j_neighbour + offset_j), nj_tot);
+                        index_k_neighbour_global = compute_periodic_index((index_k_neighbour + offset_k), nk_tot);
+                        index_i_procs = compute_periodic_index(index_i_neighbour, ni);
+                        index_j_procs = compute_periodic_index(index_j_neighbour, nj);
+                        index_k_procs = compute_periodic_index(index_k_neighbour, nk);
                         if (neighbours_colinearity_weighting_)
                           neighbours_colinearity = pure_neighbours_corrected_colinearity[l][m][n];
                         if (index_i_procs == index_i_neighbour

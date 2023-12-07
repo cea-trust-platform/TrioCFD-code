@@ -124,6 +124,7 @@ IJK_FT_double::IJK_FT_double():
   rk_step_=0;
   p_seuil_max_=0;
   compute_force_init_=0;
+  thermal_probes_ghost_cells_=2;
 }
 
 IJK_FT_double::IJK_FT_double(const IJK_FT_double& x):
@@ -1635,7 +1636,7 @@ int IJK_FT_double::initialise()
   const Domaine_dis& domaine_dis = refprobleme_ft_disc_.valeur().domaine_dis();
   // TODO: a valider
   // if (!disable_diphasique_)
-  nalloc += interfaces_.initialize(splitting_ft_, splitting_, domaine_dis);
+  nalloc += interfaces_.initialize(splitting_ft_, splitting_, domaine_dis, thermal_probes_ghost_cells_);
   /*
    * Compute mean rho_g using the indicator function
    */
@@ -2129,10 +2130,10 @@ void IJK_FT_double::run()
                                   delta_z_local_);
   Cerr << "IJK_FT_double::run()" << finl;
   int nalloc = 0;
-  int ft_ghost_cells = 2;
-  thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, ft_ghost_cells);
-  ft_ghost_cells = thermals_.get_probes_ghost_cells(ft_ghost_cells);
-  allocate_velocity(velocity_, splitting_, ft_ghost_cells);
+  thermal_probes_ghost_cells_ = 2;
+  thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, thermal_probes_ghost_cells_);
+  thermal_probes_ghost_cells_ = thermals_.get_probes_ghost_cells(thermal_probes_ghost_cells_);
+  allocate_velocity(velocity_, splitting_, thermal_probes_ghost_cells_);
   allocate_velocity(d_velocity_, splitting_, 1);
   nalloc += 6;
   // GAB, qdm
@@ -2153,7 +2154,7 @@ void IJK_FT_double::run()
       nalloc += 36;
     }
   //
-  pressure_ghost_cells_.allocate(splitting_, IJK_Splitting::ELEM, ft_ghost_cells);
+  pressure_ghost_cells_.allocate(splitting_, IJK_Splitting::ELEM, thermal_probes_ghost_cells_);
   pressure_ghost_cells_.data() = 0.;
   pressure_ghost_cells_.echange_espace_virtuel(pressure_ghost_cells_.ghost());
   nalloc += 2;
@@ -2190,7 +2191,7 @@ void IJK_FT_double::run()
 
   if (first_step_interface_smoothing_)
     {
-      allocate_velocity(zero_field_ft_, splitting_ft_, ft_ghost_cells);
+      allocate_velocity(zero_field_ft_, splitting_ft_, thermal_probes_ghost_cells_);
       for (int dir = 0; dir < 3; dir++)
         zero_field_ft_[dir].data() = 0.;
       zero_field_ft_.echange_espace_virtuel();
@@ -2255,7 +2256,7 @@ void IJK_FT_double::run()
    */
   // thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, ft_ghost_cells);
   // ft_ghost_cells = thermals_.get_probes_ghost_cells(ft_ghost_cells);
-  ft_ghost_cells = 4;
+  int ft_ghost_cells = 4;
   allocate_velocity(velocity_ft_, splitting_ft_, ft_ghost_cells);
   //  allocate_velocity(velocity_ft_, splitting_ft_, 4);
   nalloc += 3;
