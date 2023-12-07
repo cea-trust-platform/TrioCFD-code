@@ -92,7 +92,6 @@ int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, E
     }
   else
     return Mod_turb_hyd_RANS_komega::lire_motcle_non_standard(mot, is);
-  return 1;
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.
@@ -219,7 +218,6 @@ void imprimer_evolution_komega(const Champ_Inc& le_champ_K_Omega, const Schema_T
           size = le_champ_K_Omega.valeur().equation().domaine_dis().domaine().nb_elem();
         }
 
-      ConstDoubleTab_parts parts(le_champ_K_Omega.valeurs());
       for (int n = 0; n < size; n++)
         {
           const double k = K_Omega(n, 0);
@@ -448,6 +446,6 @@ void Modele_turbulence_hyd_K_Omega::get_noms_champs_postraitables(Noms& nom, Opt
 
 void Modele_turbulence_hyd_K_Omega::verifie_loi_paroi()
 {
-  Nom lp = loipar.valeur().que_suis_je();
+  //Nom lp = loipar.valeur().que_suis_je();
   Cerr << "We should probably do something here... Should be negligeable, isn't it?" << finl;
 }
