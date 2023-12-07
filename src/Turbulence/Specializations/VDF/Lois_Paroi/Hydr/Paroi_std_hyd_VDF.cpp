@@ -447,8 +447,9 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
       exit();
     }
   int ndeb, nfin, elem, ori;
-  double norm_v, dist, u_plus_d_plus {0}, d_visco;
-  u_plus_d_plus += 1;
+  //double norm_v, dist, u_plus_d_plus {0}, d_visco;
+  double norm_v, dist, d_visco;
+  //u_plus_d_plus += 1;
   //double val,val1,val2;
 
   //****************************************************************
