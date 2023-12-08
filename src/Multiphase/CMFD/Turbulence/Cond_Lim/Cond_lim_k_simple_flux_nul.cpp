@@ -76,7 +76,7 @@ void Cond_lim_k_simple_flux_nul::me_calculer()
       int f_domaine = f + f1; // number of the face in the domaine
       int e_domaine = (f_e(f_domaine,0)>=0) ? f_e(f_domaine,0) : f_e(f_domaine,1) ; // Make orientation vdf-proof
       double mu_tot_loc = (mu_poly) ? (*mu_poly)(e_domaine,n) : (mu_vdf) ? (*mu_vdf)(e_domaine,n) + mu_visc(!cmu * e_domaine,n) : -1;
-      double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ;
+      double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ; // ! En PolyVEF_P0, Ici c'est le y elem, et pas le y face !
 
       h_(f, 0) = mu_tot_loc / y_loc * (1-std::tanh( std::pow(y_loc*u_tau(f_domaine, 0)/visc_c(!cvisc * e_domaine, 0)/10.,2))); // Coeff d'echange de mu/y ; /20 avant modif
       h_grad_(f, 0) = 1. / y_loc * (1-std::tanh( std::pow(y_loc*u_tau(f_domaine, 0)/visc_c(!cvisc * e_domaine, 0)/10.,2)));

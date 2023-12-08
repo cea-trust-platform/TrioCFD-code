@@ -40,7 +40,6 @@ class Loi_paroi_adaptative : public Loi_paroi_log
 {
   Declare_instanciable(Loi_paroi_adaptative);
 public:
-  void   calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc) override;
   double u_plus_de_y_plus(double y_p) override ; // Blended Reichardt model
   double deriv_u_plus_de_y_plus(double y_p) override ;
 

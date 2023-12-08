@@ -46,8 +46,6 @@ Sortie& Paroi_frottante_loi::printOn(Sortie& s ) const
 
 Entree& Paroi_frottante_loi::readOn(Entree& s )
 {
-  if (app_domains.size() == 0) app_domains = { Motcle("turbulence") };
-
   Param param(que_suis_je());
   param.ajouter("y_p_prod_k", &y_p_prod_k_);
   param.ajouter("fac_prod_k", &fac_prod_k_);
@@ -55,7 +53,7 @@ Entree& Paroi_frottante_loi::readOn(Entree& s )
   param.ajouter("fac_prod_k_grand", &fac_prod_k_grand_);
   param.lire_avec_accolades_depuis(s);
 
-  le_champ_front.typer("Champ_front_vide");
+  Paroi_frottante_simple::readOn(s);
 
   return s;
 }
@@ -63,26 +61,37 @@ Entree& Paroi_frottante_loi::readOn(Entree& s )
 void Paroi_frottante_loi::completer()
 {
   if (!ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).is_turb()) Process::exit(que_suis_je() + " : diffusion operator must be turbulent !");
-  if sub_type(Viscosite_turbulente_k_tau, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()))
-    {
-      if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.2;
-      if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
-      if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .2;
-      if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 150.;
-    }
-  else if sub_type(Viscosite_turbulente_k_omega, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()))
-    {
-      if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.0;
-      if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
-      if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .6;
-      if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
-    }
-  else
+
+  if (is_externe_)
     {
       if (fac_prod_k_<-1.e7) fac_prod_k_ =  0.;
       if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
       if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ =  0.;
       if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
+    }
+  else
+    {
+      if sub_type(Viscosite_turbulente_k_tau, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur())
+        {
+          if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.2;
+          if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+          if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .2;
+          if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 150.;
+        }
+      else if sub_type(Viscosite_turbulente_k_omega, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur())
+        {
+          if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.0;
+          if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+          if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .6;
+          if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
+        }
+      else
+        {
+          if (fac_prod_k_<-1.e7) fac_prod_k_ =  0.;
+          if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
+          if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ =  0.;
+          if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 120.;
+        }
     }
 }
 

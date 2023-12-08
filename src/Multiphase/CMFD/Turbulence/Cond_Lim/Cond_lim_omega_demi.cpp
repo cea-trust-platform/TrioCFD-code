@@ -83,7 +83,7 @@ void Cond_lim_omega_demi::me_calculer()
     {
       int f_domaine = f + f1; // number of the face in the domaine
       int e_domaine = (f_e(f_domaine,0)>=0) ? f_e(f_domaine,0) : f_e(f_domaine,1) ; // Make orientation vdf-proof
-      double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ;
+      double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ; // ! En PolyVEF_P0, Ici c'est le y elem, et pas le y face !
 
       d_(f, n) = std::max(0., 2. * calc_omega(y_loc/2., u_tau(f_domaine, n), nu_visc(!cnu * e_domaine, n)) - calc_omega(y_loc, u_tau(f_domaine, n), nu_visc(!cnu * e_domaine, n)));
     }

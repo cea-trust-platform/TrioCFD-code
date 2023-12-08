@@ -68,7 +68,7 @@ void Cond_lim_k_complique_transition_flux_nul_demi::me_calculer()
     {
       int f_domaine = f + f1; // number of the face in the domaine
       int e_domaine = (f_e(f_domaine,0)>=0) ? f_e(f_domaine,0) : f_e(f_domaine,1) ; // Make orientation vdf-proof
-      double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ;
+      double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ; // ! En PolyVEF_P0, Ici c'est le y elem, et pas le y face !
       double mu_tot_loc = (mu_poly) ? (*mu_poly)(e_domaine,n) : (mu_vdf) ? (*mu_vdf)(e_domaine,n) + mu_visc(!cmu * e_domaine,n) : -1;
 
       h_(f, 0) = 2.*mu_tot_loc/y_loc * ( 1 - std::tanh(  std::pow( yp(f_domaine, 0)/50.,3)  ) );
