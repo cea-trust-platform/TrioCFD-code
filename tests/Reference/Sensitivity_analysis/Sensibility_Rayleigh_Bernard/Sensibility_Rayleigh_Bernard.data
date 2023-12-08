@@ -1,5 +1,5 @@
 # Thermohydraulique 2D VEF Boussinesq #
-# Sensitivity analysis  based on polynomial chaos #
+# Sensitivity analysis  based on Taylor expansion #
 # PARALLEL OK #
 dimension 2
 
@@ -135,7 +135,7 @@ Read pb_sensibilite
                 uncertain_variable { vitesse }
 		state { pb_champ_evaluateur pb_etat  vitesse } 
       		solveur_pression cholesky {  }  
-                convection { Sensibility { centre } }
+                convection { Sensibility { centre } } 
                 diffusion { }
 		sources { boussinesq_temperature { T0 338 verif_boussinesq 0 }  }
                 initial_conditions {
@@ -166,7 +166,7 @@ Read pb_sensibilite
 	}
 	Post_processing
 	{
-                fichier sensibilite
+                fichier Sensibility_Rayleigh_Bernard
                 format lml
 		fields dt_post 1
 		{

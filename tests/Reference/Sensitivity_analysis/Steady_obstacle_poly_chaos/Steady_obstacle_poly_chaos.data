@@ -133,8 +133,7 @@ Read pb_sensibilite
 		state { pb_champ_evaluateur pb_etat  vitesse } # here it is always the keyword 'vitesse' #
 		polynomial_chaos 7.5e-3
       		solveur_pression gcp  { precond ssor { omega 1.5 } seuil 1.e-10 }  
-		# solveur_pression PETSc Cholesky { } #
-                convection { Sensibility { amont } } # choice between amont and muscl #
+                convection { Sensibility { amont } } 
                 diffusion { }
                 initial_conditions {
                         vitesse Champ_Uniforme 2 0. 0.
@@ -150,7 +149,7 @@ Read pb_sensibilite
 	Post_processing
 	{
 			# Fields #
-			fichier sensibilite
+			fichier Steady_obstacle_poly_chaos
 		        format lml # lata for VisIt tool #
 			fields dt_post 1  # Note: Warning to memory space if dt_post too small #
 			{
