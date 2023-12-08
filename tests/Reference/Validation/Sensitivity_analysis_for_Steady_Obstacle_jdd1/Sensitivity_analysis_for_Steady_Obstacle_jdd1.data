@@ -1,6 +1,6 @@
-# Hydraulique 2D laminar with ALE : Sensitivity equation method for the Navier-Stokes #
-# Estimate of the variance of the velocity field when the
-inflow condition on boundary Inlet is uncertain #
+# Hydraulique 2D laminar: Sensitivity equation method for the Navier-Stokes #
+# Estimate of the variance of the velocity field when the inflow condition on boundary Inlet is uncertain #
+# Sensitivity analysis  based on  Taylor expansion #
 dimension 2    
 
 # Time scheme explicit or implicit #
