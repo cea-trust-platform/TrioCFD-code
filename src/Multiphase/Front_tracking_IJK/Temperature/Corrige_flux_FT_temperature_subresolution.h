@@ -158,8 +158,7 @@ public :
                                                            const double& neighbours_weighting_colinearity,
                                                            const int& index_i_neighbour_global,
                                                            const int& index_j_neighbour_global,
-                                                           const int& index_k_neighbour_global,
-                                                           int& init);
+                                                           const int& index_k_neighbour_global);
   void receive_temperature_cell_centre_neighbours_from_procs();
   void combine_temperature_cell_centre_neighbours_from_procs(IJK_Field_double& temperature_neighbours,
                                                              IJK_Field_int& neighbours_weighting,
@@ -192,8 +191,15 @@ public :
                                                                    std::vector<ArrOfDouble>& flux_x,
                                                                    std::vector<ArrOfDouble>& flux_y,
                                                                    std::vector<ArrOfDouble>& flux_z,
+                                                                   std::vector<ArrOfInt>& weighting_flux_x_faces_sorted,
+                                                                   std::vector<ArrOfInt>& weighting_flux_y_faces_sorted,
+                                                                   std::vector<ArrOfInt>& weighting_flux_z_faces_sorted,
+                                                                   std::vector<ArrOfDouble>& colinearity_flux_x_faces_sorted,
+                                                                   std::vector<ArrOfDouble>& colinearity_flux_y_faces_sorted,
+                                                                   std::vector<ArrOfDouble>& colinearity_flux_z_faces_sorted,
                                                                    const bool& ini_index,
-                                                                   const int global_indices = 0);
+                                                                   const int global_indices = 0,
+                                                                   const int weighting_colinearity=0);
   void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) override;
   void compute_cell_neighbours_mixed_cell_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool_mixed_cell,
                                                                    FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective_mixed_cell,
@@ -206,6 +212,22 @@ public :
                                                         FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
                                                         FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
                                                         FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity) override;
+  void compute_flux_neighbours_on_procs(const int& index_i_neighbour_global,
+                                        const int& index_j_neighbour_global,
+                                        const int& index_k_neighbour_global,
+                                        const int& subproblem_index,
+                                        const double& dist,
+                                        const int& dir,
+                                        const double& colinearity,
+                                        const int& compute_fluxes_values,
+                                        const int& computed_fluxes=0,
+                                        const double& convective_flux_computed=0,
+                                        const double& diffusive_flux_computed=0);
+  void receive_all_fluxes_from_outisde_frontier_on_procs();
+  void combine_all_fluxes_from_outisde_frontier_on_procs(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
+                                                         FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
+                                                         FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
+                                                         FixedVector<IJK_Field_double, 3>& neighbours_weighting_colinearity);
   void complete_neighbours_and_weighting_colinearity(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
                                                      FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_convective,
                                                      FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
@@ -215,60 +237,51 @@ public :
                                                  FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_corrected_diffusive,
                                                  const int& subproblem_index,
                                                  const int& index_i, const int& index_j, const int& index_k,
-                                                 const int& index_i_perio, const int& index_j_perio, const int& index_k_perio,
                                                  const double& dist,
                                                  const int& dir,
                                                  const double& colinearity,
-                                                 const int& compute_fluxes_values);
+                                                 const int& compute_fluxes_values,
+                                                 double& convective_flux,
+                                                 double& diffusive_flux);
   void compute_cell_neighbours_convective_fluxes_to_correct(double& convective_flux,
                                                             const int& subproblem_index,
-                                                            const int& index_i, const int& index_j, const int& index_k,
                                                             const double& dist,
                                                             const int& dir,
                                                             const double& colinearity);
   void compute_cell_neighbours_thermal_convective_fluxes_face_centre(double& convective_flux,
                                                                      const int& subproblem_index,
-                                                                     const int& index_i, const int& index_j, const int& index_k,
                                                                      const double& dist,
                                                                      const int& dir,
                                                                      const double& colinearity);
   void compute_cell_neighbours_thermal_convective_fluxes_face_centre_discrete_integral(double& convective_flux,
                                                                                        const int& subproblem_index,
-                                                                                       const int& index_i, const int& index_j, const int& index_k,
                                                                                        const double& dist,
                                                                                        const int& dir,
                                                                                        const double& colinearity);
   void compute_cell_neighbours_diffusive_fluxes_to_correct(double& diffusive_flux,
                                                            const int& subproblem_index,
-                                                           const int& index_i,
-                                                           const int& index_j,
-                                                           const int& index_k,
                                                            const double& dist,
                                                            const int& dir,
                                                            const double& colinearity);
   void compute_cell_neighbours_thermal_diffusive_fluxes_face_centre(double& diffusive_flux,
                                                                     const int& subproblem_index,
-                                                                    const int& index_i, const int& index_j, const int& index_k,
                                                                     const double& dist,
                                                                     const int& dir,
                                                                     const double& colinearity);
   void compute_cell_neighbours_thermal_diffusive_fluxes_face_centre_discrete_integral(double& diffusive_flux,
                                                                                       const int& subproblem_index,
-                                                                                      const int& index_i, const int& index_j, const int& index_k,
                                                                                       const double& dist,
                                                                                       const int& dir,
                                                                                       const double& colinearity);
   void compute_cell_neighbours_thermal_fluxes_face_centre(double& flux,
                                                           const int fluxes_type,
                                                           const int& subproblem_index,
-                                                          const int& index_i, const int& index_j, const int& index_k,
                                                           const double& dist,
                                                           const int& dir,
                                                           const double& colinearity);
   void compute_cell_neighbours_thermal_fluxes_face_centre_discrete_integral(double& flux,
                                                                             const int fluxes_type,
                                                                             const int& subproblem_index,
-                                                                            const int& index_i, const int& index_j, const int& index_k,
                                                                             const double& dist,
                                                                             const int& dir,
                                                                             const double& colinearity);
@@ -327,7 +340,8 @@ public :
                                              std::vector<ArrOfInt>& index_face_j_flux_z_remaining_global,
                                              std::vector<ArrOfDouble>& flux_x_remaining_global,
                                              std::vector<ArrOfDouble>& flux_y_remaining_global,
-                                             std::vector<ArrOfDouble>& flux_z_remaining_global);
+                                             std::vector<ArrOfDouble>& flux_z_remaining_global,
+                                             const int ini_index);
   void combine_fluxes_from_frontier_on_procs(std::vector<ArrOfInt>& index_face_i_flux_x,
                                              std::vector<ArrOfInt>& index_face_j_flux_x,
                                              std::vector<ArrOfInt>& index_face_i_flux_y,
@@ -446,12 +460,21 @@ protected :
    * Store (i, j, flux) at a given row (k)
    * convective_flux_x_sorted_.pushback(double_tab_ij_flux)
    */
+
+  /*
+   * Face fluxes in the immediate interface vicinity !
+   */
+  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_sorted_;
+
   std::vector<ArrOfInt> index_face_i_flux_x_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_x_sorted_;
   std::vector<ArrOfInt> index_face_i_flux_y_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_y_sorted_;
   std::vector<ArrOfInt> index_face_i_flux_z_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_z_sorted_;
+
+  FixedVector<FixedVector<std::vector<ArrOfDouble>,2>,3> convective_diffusive_flux_xyz_sorted_;
+
   std::vector<ArrOfDouble> convective_flux_x_sorted_;
   std::vector<ArrOfDouble> convective_flux_y_sorted_;
   std::vector<ArrOfDouble> convective_flux_z_sorted_;
@@ -459,29 +482,41 @@ protected :
   std::vector<ArrOfDouble> diffusive_flux_y_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_z_sorted_;
 
+  /*
+   * Face fluxes in the immediate interface vicinity (Parallel) !
+   */
+
+
+  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_remaining_global_sorted_;
+
   std::vector<ArrOfInt> index_face_i_flux_x_remaining_global_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_x_remaining_global_sorted_;
   std::vector<ArrOfInt> index_face_i_flux_y_remaining_global_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_y_remaining_global_sorted_;
   std::vector<ArrOfInt> index_face_i_flux_z_remaining_global_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_z_remaining_global_sorted_;
+
+  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> convective_diffusive_flux_xyz_remaining_global_sorted_;
+
   std::vector<ArrOfDouble> convective_flux_x_remaining_global_sorted_;
   std::vector<ArrOfDouble> convective_flux_y_remaining_global_sorted_;
   std::vector<ArrOfDouble> convective_flux_z_remaining_global_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_x_remaining_global_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_y_remaining_global_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_z_remaining_global_sorted_;
+
   /*
    * Map linear flux index to indices in Array to accelerate fusion of flux duplicates !
    */
   FixedVector<std::map<int, int>, 3> flux_frontier_map_;
   // FixedVector<std::map<int, int>, 3> flux_remaining_global_map_;
-
   FixedVector<IntVect,4> ijk_faces_to_correct_;
 
   /*
-   *
+   * M.G (07/12/23) All fluxes may be useless; Diagonal fluxes are not relevant for the moment
    */
+
+  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_neighbours_diag_faces_sorted_;
 
   std::vector<ArrOfInt> index_face_i_flux_x_neighbours_diag_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_x_neighbours_diag_faces_sorted_;
@@ -489,6 +524,8 @@ protected :
   std::vector<ArrOfInt> index_face_j_flux_y_neighbours_diag_faces_sorted_;
   std::vector<ArrOfInt> index_face_i_flux_z_neighbours_diag_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_z_neighbours_diag_faces_sorted_;
+
+  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_neighbours_all_faces_sorted_;
 
   std::vector<ArrOfInt> index_face_i_flux_x_neighbours_all_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_x_neighbours_all_faces_sorted_;
@@ -498,8 +535,10 @@ protected :
   std::vector<ArrOfInt> index_face_j_flux_z_neighbours_all_faces_sorted_;
 
   /*
-   *
+   * Face fluxes on a reconstructed convex shell around the bubble !
    */
+
+  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_;
 
   std::vector<ArrOfInt> index_face_i_flux_x_neighbours_min_max_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_x_neighbours_min_max_faces_sorted_;
@@ -508,12 +547,52 @@ protected :
   std::vector<ArrOfInt> index_face_i_flux_z_neighbours_min_max_faces_sorted_;
   std::vector<ArrOfInt> index_face_j_flux_z_neighbours_min_max_faces_sorted_;
 
+  FixedVector<FixedVector<std::vector<ArrOfDouble>,2>,3> convective_diffusive_flux_xyz_min_max_faces_sorted_;
+
   std::vector<ArrOfDouble> convective_flux_x_min_max_faces_sorted_;
   std::vector<ArrOfDouble> convective_flux_y_min_max_faces_sorted_;
   std::vector<ArrOfDouble> convective_flux_z_min_max_faces_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_x_min_max_faces_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_y_min_max_faces_sorted_;
   std::vector<ArrOfDouble> diffusive_flux_z_min_max_faces_sorted_;
+
+  /*
+   * Face fluxes on a reconstructed convex shell around the bubble (Parallel) !
+   */
+
+  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_neighbours_all_faces_remaining_global_sorted_;
+
+  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_all_faces_remaining_global_sorted_;
+
+  FixedVector<std::vector<ArrOfInt>,3> weighting_flux_xyz_neighbours_all_faces_remaining_global_sorted_;
+
+  std::vector<ArrOfInt> weighting_flux_x_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfInt> weighting_flux_y_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfInt> weighting_flux_z_all_faces_remaining_global_sorted_;
+
+  FixedVector<std::vector<ArrOfDouble>,3> colinearity_flux_xyz_neighbours_all_faces_remaining_global_sorted_;
+
+  std::vector<ArrOfDouble> colinearity_flux_x_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfDouble> colinearity_flux_y_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfDouble> colinearity_flux_z_all_faces_remaining_global_sorted_;
+
+  FixedVector<FixedVector<std::vector<ArrOfDouble>,2>,3> convective_diffusive_flux_all_faces_remaining_global_sorted_;
+
+  std::vector<ArrOfDouble> convective_flux_x_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfDouble> convective_flux_y_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfDouble> convective_flux_z_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_x_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_y_all_faces_remaining_global_sorted_;
+  std::vector<ArrOfDouble> diffusive_flux_z_all_faces_remaining_global_sorted_;
+
+  FixedVector<std::map<int, int>, 3> flux_frontier_all_map_;
+  FixedVector<std::map<int, int>, 3> flux_outside_frontier_all_map_;
+
 
   int convection_negligible_;
   int diffusion_negligible_;

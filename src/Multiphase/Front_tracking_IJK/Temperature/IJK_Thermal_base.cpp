@@ -517,7 +517,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
       eulerian_distance_ns_.echange_espace_virtuel(eulerian_distance_ns_.ghost());
       eulerian_normal_vectors_ns_.echange_espace_virtuel();
       eulerian_facets_barycentre_ns_.echange_espace_virtuel();
-      allocate_cell_vector(eulerian_normal_vectors_ns_normed_, splitting, 0);
+      allocate_cell_vector(eulerian_normal_vectors_ns_normed_, splitting, 1);
       nalloc += 3;
       eulerian_normal_vectors_ns_normed_.echange_espace_virtuel();
     }
@@ -1031,6 +1031,7 @@ void IJK_Thermal_base::compute_eulerian_distance()
                   eulerian_normal_vectors_ns_normed_[2](i,j,k) = eulerian_normal_vectors_ns_[2](i,j,k) / sqrt(norm);
                 }
             }
+      eulerian_normal_vectors_ns_normed_.echange_espace_virtuel();
     }
   else
     Cerr << "Don't compute the eulerian distance field" << finl;
