@@ -28,6 +28,7 @@
 #include <Viscosite_turbulente_base.h>
 #include <Domaine_PolyVEF_P0.h>
 #include <Navier_Stokes_std.h>
+#include <Loi_paroi_base.h>
 #include <Pb_Multiphase.h>
 
 Implemente_instanciable(Production_energie_cin_turb_PolyVEF_P0,"Production_energie_cin_turb_Elem_PolyVEF_P0", Source_Production_energie_cin_turb);
@@ -42,6 +43,7 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyVEF_P0_Face, eq_qdm.operateur(0).l_op_base()).correlation().valeur());
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
+  const IntTab& e_f = domaine.elem_faces();
 
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
@@ -56,11 +58,15 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
 
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),
                    &palp = equation().probleme().get_champ("alpha").passe(),
-                    &k = equation().probleme().get_champ("k").valeurs(),
-                     &pk = semi_impl.count("k")  ? semi_impl.at("k") : equation().probleme().get_champ("k").passe(),
-                      &tab_grad = pb.get_champ("gradient_vitesse").passe(),
-                       *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
-                        *pdiss = semi_impl.count(Type_diss) ? &semi_impl.at(Type_diss) : (equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr );
+                    &nu =  equation().probleme().get_champ("viscosite_cinematique").passe(),
+                     &k = equation().probleme().get_champ("k").valeurs(),
+                      &pk = semi_impl.count("k")  ? semi_impl.at("k") : equation().probleme().get_champ("k").passe(),
+                       &tab_grad = pb.get_champ("gradient_vitesse").passe(),
+                        *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
+                         *pdiss = semi_impl.count(Type_diss) ? &semi_impl.at(Type_diss) : (equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr );
+
+  const Loi_paroi_base& lp = ref_cast(Loi_paroi_base, ref_cast(Pb_Multiphase, pb).get_correlation("Loi_paroi").valeur());
+  double limiter_ = visc_turb.limiteur();
 
   if (Type_diss == "")
     {
@@ -94,8 +100,18 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
                 grad_grad += ( tab_grad( e, N * ( D*d_U+d_X ) + n) + tab_grad( e,  N * ( D*d_X+d_U ) + n) ) * tab_grad( e,  N * ( D*d_U+d_X ) + n) ;
-
             double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
+
+            double utau = 0., yloc = 0., nut_p=0;
+            int floc, cloc;
+            for (cloc = 0 ; cloc < e_f.dimension(1) && (floc = e_f(e, cloc)) >= 0 ; cloc++)
+              if (lp.get_utau(floc) > utau) utau = lp.get_utau(floc), yloc = domaine.dist_face_elem0(floc,e);
+            if      (Type_diss == "tau")   nut_p = pk(e, n) * (*pdiss)(e, n) + limiter_ * nu(e, n);
+            else if (Type_diss == "omega") nut_p = pk(e, n) / std::max((*pdiss)(e, n), omega_min_) + limiter_ * nu(e, n);
+            else Process::exit(que_suis_je() + " : ajouter_blocs : probleme !!!") ;
+
+            fac += 0.5 * std::pow(utau,4)/(nut_p*nut_p) * pe(e) * ve(e) * std::tanh( std::pow(1./80. * utau*yloc/nu(e,n), 3) ) ;
+
 
             if (Type_diss == "tau")
               {
