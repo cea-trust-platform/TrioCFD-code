@@ -219,8 +219,6 @@ public :
                                         const double& dist,
                                         const int& dir,
                                         const double& colinearity,
-                                        const int& compute_fluxes_values,
-                                        const int& computed_fluxes=0,
                                         const double& convective_flux_computed=0,
                                         const double& diffusive_flux_computed=0);
   void receive_all_fluxes_from_outisde_frontier_on_procs();
@@ -404,6 +402,8 @@ public :
                                       const int counter);
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
   void clear_vectors() override;
+  void clear_std_vectors_array_of_int(std::vector<ArrOfInt>& indices_to_clear);
+  void clear_std_vectors_array_of_double(std::vector<ArrOfDouble>& values_to_clear);
   void compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
                                             const IJK_Field_int& neighbours_temperature_to_correct,
                                             FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
