@@ -556,7 +556,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
         cell_faces_neighbours_corrected_all_bool_[c].data() = 0;
       cell_faces_neighbours_corrected_all_bool_.echange_espace_virtuel();
 
-      allocate_cell_vector(cell_faces_neighbours_corrected_min_max_bool_, splitting, 1);
+      allocate_cell_vector(cell_faces_neighbours_corrected_min_max_bool_, splitting, 2);
       nalloc += 3;
       for (int c=0; c<3; c++)
         cell_faces_neighbours_corrected_min_max_bool_[c].data() = 0;

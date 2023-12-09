@@ -1596,44 +1596,47 @@ void Corrige_flux_FT_temperature_subresolution::complete_neighbours_and_weightin
   cell_faces_neighbours_corrected_bool.echange_espace_virtuel();
   if (compute_fluxes_values)
     {
+//      if (convective_flux_correction_)
+//        cell_faces_neighbours_corrected_convective.echange_espace_virtuel();
+//      if (diffusive_flux_correction_)
+//        cell_faces_neighbours_corrected_diffusive.echange_espace_virtuel();
+//			if (neighbours_colinearity_weighting_)
+//				neighbours_weighting_colinearity.echange_espace_virtuel();
+      const int ni = cell_faces_neighbours_corrected_bool[0].ni();
+      const int nj = cell_faces_neighbours_corrected_bool[0].nj();
+      const int nk = cell_faces_neighbours_corrected_bool[0].nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            for (int c=0; c<3; c++)
+              if(cell_faces_neighbours_corrected_bool[c](i,j,k))
+                {
+                  if (neighbours_colinearity_weighting_)
+                    {
+                      const double colinearity = neighbours_weighting_colinearity[c](i,j,k);
+                      if (colinearity > 1e-12)
+                        {
+                          if (convective_flux_correction_)
+                            cell_faces_neighbours_corrected_convective[c](i,j,k) /= colinearity;
+                          if (diffusive_flux_correction_)
+                            cell_faces_neighbours_corrected_diffusive[c](i,j,k) /= colinearity;
+                        }
+                    }
+                  else
+                    {
+                      const double weighting = (double) (cell_faces_neighbours_corrected_bool[c](i,j,k));
+                      if (convective_flux_correction_)
+                        cell_faces_neighbours_corrected_convective[c](i,j,k) /= weighting;
+                      if (diffusive_flux_correction_)
+                        cell_faces_neighbours_corrected_diffusive[c](i,j,k) /= weighting;
+                    }
+                }
       if (convective_flux_correction_)
         cell_faces_neighbours_corrected_convective.echange_espace_virtuel();
       if (diffusive_flux_correction_)
         cell_faces_neighbours_corrected_diffusive.echange_espace_virtuel();
-      // if (neighbours_colinearity_weighting_)
-      {
-        if (neighbours_colinearity_weighting_)
-          neighbours_weighting_colinearity.echange_espace_virtuel();
-        const int ni = cell_faces_neighbours_corrected_bool[0].ni();
-        const int nj = cell_faces_neighbours_corrected_bool[0].nj();
-        const int nk = cell_faces_neighbours_corrected_bool[0].nk();
-        for (int k = 0; k < nk; k++)
-          for (int j = 0; j < nj; j++)
-            for (int i = 0; i < ni; i++)
-              for (int c=0; c<3; c++)
-                if(cell_faces_neighbours_corrected_bool[c](i,j,k))
-                  {
-                    if (neighbours_colinearity_weighting_)
-                      {
-                        const double colinearity = neighbours_weighting_colinearity[c](i,j,k);
-                        if (colinearity > 1e-12)
-                          {
-                            if (convective_flux_correction_)
-                              cell_faces_neighbours_corrected_convective[c](i,j,k) /= colinearity;
-                            if (diffusive_flux_correction_)
-                              cell_faces_neighbours_corrected_diffusive[c](i,j,k) /= colinearity;
-                          }
-                      }
-                    else
-                      {
-                        const double weighting = (double) (cell_faces_neighbours_corrected_bool[c](i,j,k));
-                        if (convective_flux_correction_)
-                          cell_faces_neighbours_corrected_convective[c](i,j,k) /= weighting;
-                        if (diffusive_flux_correction_)
-                          cell_faces_neighbours_corrected_diffusive[c](i,j,k) /= weighting;
-                      }
-                  }
-      }
+      if (neighbours_colinearity_weighting_)
+        neighbours_weighting_colinearity.echange_espace_virtuel();
     }
 }
 
@@ -2508,221 +2511,214 @@ void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_any_reachabl
           int c;
           for (c = 0; c < 3; c++)
             cell_faces_neighbours_corrected_min_max_bool[c].data() = 0.;
-//          const int ni = cell_faces_neighbours_corrected_all_bool[0].ni();
-//					const int nj = cell_faces_neighbours_corrected_all_bool[0].nj();
-//					const int nk = cell_faces_neighbours_corrected_all_bool[0].nk();
-//          int i,j,k;
-//          int c_ini = 0;
-//          int c_end = 3;
-//          if (remove_external_neighbour_values)
-//            {
-//              for (k = 0; k < nk; k++)
-//                for (j = 0; j < nj; j++)
-//                  for (i = 0; i < ni; i++)
-//                    neighbours_temperature_to_correct_trimmed(i,j,k) = neighbours_temperature_to_correct(i,j,k);
-//              neighbours_temperature_to_correct_trimmed.echange_espace_virtuel(neighbours_temperature_to_correct_trimmed.ghost());
-//              /*
-//              * i_min, i_max, j_min, j_max, k_min, k_max
-//              */
-//              ArrOfInt indices_found_ini, indices_found_end;
-//              ArrOfInt indices_flux_found_ini, indices_flux_found_end;
-//              ArrOfInt indices_to_remove;
-//              ArrOfInt indices_fluxes_to_remove;
-//              FixedVector<ArrOfInt,2> indices_sorted;
-//              FixedVector<ArrOfInt,2> indices_fluxes_sorted;
-//              indices_found_ini.set_smart_resize(1);
-//              indices_found_end.set_smart_resize(1);
-//              indices_flux_found_ini.set_smart_resize(1);
-//              indices_flux_found_end.set_smart_resize(1);
-//
-////              if (max_flux_per_dir)
-////                {
-////                  c_ini = 0;
-////                  c_end = 1;
-////                }
-//              int * i_ref = nullptr;
-//              int * j_ref = nullptr;
-//              int * k_ref = nullptr;
-//              int * i_ref_remove = nullptr;
-//              int * j_ref_remove = nullptr;
-//              int * k_ref_remove = nullptr;
-//              const int * n_first = nullptr;
-//              const int * n_bis = nullptr;
-//              const int * n_ter = nullptr;
-//              int index_first = 0, index_bis = 0, index_ter = 0;
-//              int val = 0;
-//              const int factor_pos[3][3] = {{1, 0, 0},{0, 1, 0},{0, 0, 1}};
-//              for (c = c_ini; c < c_end; c++)
+
+          const int ni = cell_faces_neighbours_corrected_all_bool[0].ni();
+          const int nj = cell_faces_neighbours_corrected_all_bool[0].nj();
+          const int nk = cell_faces_neighbours_corrected_all_bool[0].nk();
+          int i,j,k;
+          int c_ini = 0;
+          int c_end = 3;
+          if (remove_external_neighbour_values)
+            {
+              for (k = 0; k < nk; k++)
+                for (j = 0; j < nj; j++)
+                  for (i = 0; i < ni; i++)
+                    neighbours_temperature_to_correct_trimmed(i,j,k) = neighbours_temperature_to_correct(i,j,k);
+              neighbours_temperature_to_correct_trimmed.echange_espace_virtuel(neighbours_temperature_to_correct_trimmed.ghost());
+              /*
+              * i_min, i_max, j_min, j_max, k_min, k_max
+              */
+              ArrOfInt indices_found_ini, indices_found_end;
+              ArrOfInt indices_flux_found_ini, indices_flux_found_end;
+              ArrOfInt indices_to_remove;
+              ArrOfInt indices_fluxes_to_remove;
+              FixedVector<ArrOfInt,2> indices_sorted;
+              FixedVector<ArrOfInt,2> indices_fluxes_sorted;
+              indices_found_ini.set_smart_resize(1);
+              indices_found_end.set_smart_resize(1);
+              indices_flux_found_ini.set_smart_resize(1);
+              indices_flux_found_end.set_smart_resize(1);
+
+//              if (max_flux_per_dir)
 //                {
-//                  switch(c)
-//                    {
-//                    case 0:
-//                      n_first = &nk;
-//                      n_bis = &nj;
-//                      n_ter = &ni;
-//                      j_ref = &index_bis;
-//                      k_ref = &index_first;
-//                      i_ref = &index_ter;
-//                      i_ref_remove = &val;
-//                      j_ref_remove = &index_bis;
-//                      k_ref_remove = &index_first;
-//                      break;
-//                    case 1:
-//                      n_first = &nk;
-//                      n_bis = &ni;
-//                      n_ter = &nj;
-//                      k_ref = &index_first;
-//                      i_ref = &index_bis;
-//                      j_ref = &index_ter;
-//                      i_ref_remove = &index_bis;
-//                      j_ref_remove = &val;
-//                      k_ref_remove = &index_first;
-//                      break;
-//                    case 2:
-//                      n_first = &ni;
-//                      n_bis = &nj;
-//                      n_ter = &nk;
-//                      i_ref = &index_first;
-//                      j_ref = &index_bis;
-//                      k_ref = &index_ter;
-//                      i_ref_remove = &index_first;
-//                      j_ref_remove = &index_bis;
-//                      k_ref_remove = &val;
-//                      break;
-//                    default:
-//                      n_first = &nk;
-//                      n_bis = &nj;
-//                      n_ter = &ni;
-//                      j_ref = &index_bis;
-//                      k_ref = &index_first;
-//                      i_ref = &index_ter;
-//                      i_ref_remove = &val;
-//                      j_ref_remove = &index_bis;
-//                      k_ref_remove = &index_first;
-//                    }
-//                  for (index_first = 0; index_first < *n_first; index_first++)
-//                    for (index_bis = 0; index_bis < *n_bis; index_bis++)
-//                      {
-//                        Cerr << "num_proc" << nproc() << "c: " << c << finl;
-//                        Cerr << "num_proc" << nproc() << "index_first: " << index_first << finl;
-//                        Cerr << "num_proc" << nproc() << "index_bis: " << index_bis << finl;
-//                        indices_found_ini.reset();
-//                        indices_found_end.reset();
-//                        indices_flux_found_ini.reset();
-//                        indices_flux_found_end.reset();
-//                        indices_to_remove.reset();
-//                        indices_fluxes_to_remove.reset();
-//                        for (int l=0; l<2; l++)
-//                          {
-//                            indices_sorted[l].reset();
-//                            indices_fluxes_sorted[l].reset();
-//                          }
-//                        for (index_ter = 0; index_ter < *n_ter; index_ter++)
-//                          {
-//                            if (neighbours_temperature_to_correct(*i_ref,*j_ref,*k_ref))
-//                              {
-//                                if (!neighbours_temperature_to_correct(*i_ref + factor_pos[c][0],*j_ref + factor_pos[c][1],*k_ref + factor_pos[c][2]))
-//                                  indices_found_end.append_array(index_ter);
-//                                if (!neighbours_temperature_to_correct(*i_ref - factor_pos[c][0],*j_ref - factor_pos[c][1],*k_ref - factor_pos[c][2]))
-//                                  indices_found_ini.append_array(index_ter);
-//                              }
-//                            if(cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref,*j_ref,*k_ref))
-//                              {
-//                                if (!cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref + factor_pos[c][0],*j_ref + factor_pos[c][1],*k_ref + factor_pos[c][2]))
-//                                  indices_flux_found_end.append_array(index_ter);
-//                                if (!cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref - factor_pos[c][0],*j_ref - factor_pos[c][1],*k_ref - factor_pos[c][2]))
-//                                  indices_flux_found_ini.append_array(index_ter);
-//                              }
-//                            Cerr << "num_proc" << nproc() << "index_ter: " << index_ter << finl;
-//                          }
-//                        const int indices_test = indices_found_ini.size_array() || indices_found_end.size_array();
-//                        if (indices_test)
-//                          {
-//                            sort_ini_end_arrays(indices_found_ini,
-//                                                indices_found_end,
-//                                                indices_sorted,
-//                                                *n_ter);
-//                          }
-//                        Cerr << "num_proc" << nproc() << "Breakpoint A " << index_ter << finl;
-//                        const int indices_flux_test = indices_flux_found_ini.size_array() || indices_flux_found_end.size_array();
-//                        if (indices_flux_test)
-//                          {
+//                  c_ini = 0;
+//                  c_end = 1;
+//                }
+              const int * n_first = nullptr;
+              const int * n_bis = nullptr;
+              const int * n_ter = nullptr;
+              int * i_ref = nullptr;
+              int * j_ref = nullptr;
+              int * k_ref = nullptr;
+              int * i_ref_remove = nullptr;
+              int * j_ref_remove = nullptr;
+              int * k_ref_remove = nullptr;
+              int index_first = 0, index_bis = 0, index_ter = 0;
+              int val = 0;
+              const int factor_pos[3][3] = {{1, 0, 0},{0, 1, 0},{0, 0, 1}};
+              for (c = c_ini; c < c_end; c++)
+                {
+                  switch(c)
+                    {
+                    case 0:
+                      n_first = &nk;
+                      n_bis = &nj;
+                      n_ter = &ni;
+                      k_ref = &index_first;
+                      j_ref = &index_bis;
+                      i_ref = &index_ter;
+                      k_ref_remove = &index_first;
+                      j_ref_remove = &index_bis;
+                      i_ref_remove = &val;
+                      break;
+                    case 1:
+                      n_first = &nk;
+                      n_bis = &ni;
+                      n_ter = &nj;
+                      k_ref = &index_first;
+                      i_ref = &index_bis;
+                      j_ref = &index_ter;
+                      k_ref_remove = &index_first;
+                      i_ref_remove = &index_bis;
+                      j_ref_remove = &val;
+                      break;
+                    case 2:
+                      n_first = &ni;
+                      n_bis = &nj;
+                      n_ter = &nk;
+                      i_ref = &index_first;
+                      j_ref = &index_bis;
+                      k_ref = &index_ter;
+                      i_ref_remove = &index_first;
+                      j_ref_remove = &index_bis;
+                      k_ref_remove = &val;
+                      break;
+                    default:
+                      break;
+                    }
+                  for (index_first = 0; index_first < *n_first; index_first++)
+                    for (index_bis = 0; index_bis < *n_bis; index_bis++)
+                      {
+                        indices_found_ini.reset();
+                        indices_found_end.reset();
+                        indices_flux_found_ini.reset();
+                        indices_flux_found_end.reset();
+                        indices_to_remove.reset();
+                        indices_fluxes_to_remove.reset();
+                        for (int l=0; l<2; l++)
+                          {
+                            indices_sorted[l].reset();
+                            indices_fluxes_sorted[l].reset();
+                          }
+                        for (index_ter = 0; index_ter < *n_ter; index_ter++)
+                          {
+                            if (neighbours_temperature_to_correct(*i_ref,*j_ref,*k_ref))
+                              {
+                                if (!neighbours_temperature_to_correct(*i_ref + factor_pos[c][0],*j_ref + factor_pos[c][1],*k_ref + factor_pos[c][2]))
+                                  indices_found_end.append_array(index_ter);
+                                if (!neighbours_temperature_to_correct(*i_ref - factor_pos[c][0],*j_ref - factor_pos[c][1],*k_ref - factor_pos[c][2]))
+                                  indices_found_ini.append_array(index_ter);
+                              }
+                            if(cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref,*j_ref,*k_ref))
+                              {
+                                if (!cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref + factor_pos[c][0],*j_ref + factor_pos[c][1],*k_ref + factor_pos[c][2]))
+                                  indices_flux_found_end.append_array(index_ter);
+                                if (!cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref - factor_pos[c][0],*j_ref - factor_pos[c][1],*k_ref - factor_pos[c][2]))
+                                  indices_flux_found_ini.append_array(index_ter);
+                              }
+                          }
+
+                        const int indices_test = indices_found_ini.size_array() || indices_found_end.size_array();
+                        if (indices_test)
+                          {
+                            sort_ini_end_arrays(indices_found_ini,
+                                                indices_found_end,
+                                                indices_sorted,
+                                                *n_ter);
+                          }
+
+                        const int indices_flux_test = indices_flux_found_ini.size_array() || indices_flux_found_end.size_array();
+                        if (indices_flux_test)
+                          {
 //                            sort_ini_end_arrays(indices_flux_found_ini,
 //                                                indices_flux_found_end,
 //                                                indices_fluxes_sorted,
 //                                                *n_ter);
+                            sort_ini_end_arrays(indices_flux_found_ini,
+                                                indices_flux_found_end,
+                                                indices_fluxes_sorted,
+                                                (*n_ter) + 1);
+                          }
+                        if (indices_test || indices_flux_test)
+                          remove_non_overlapping_fluxes_values(indices_sorted,
+                                                               indices_fluxes_sorted,
+                                                               indices_to_remove,
+                                                               indices_fluxes_to_remove,
+                                                               index_first, index_bis, c);
+
+//                        for (index_ter = 0; index_ter < indices_fluxes_sorted[0].size_array(); index_ter++)
+//                          {
+//                            val = indices_fluxes_sorted[0](index_ter);
+//                            cell_faces_neighbours_corrected_min_max_bool[c](*i_ref_remove, *j_ref_remove, *k_ref_remove) =
+//                              cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref_remove, *j_ref_remove, *k_ref_remove);
+//                            val = indices_fluxes_sorted[1](index_ter);
+//                            cell_faces_neighbours_corrected_min_max_bool[c](*i_ref_remove, *j_ref_remove, *k_ref_remove) =
+//                              cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref_remove, *j_ref_remove, *k_ref_remove);
 //                          }
-//                        Cerr << "num_proc" << nproc() << "Breakpoint B " << index_ter << finl;
-//
-//                        if (indices_test || indices_flux_test)
-//                          remove_non_overlapping_fluxes_values(indices_sorted,
-//                                                               indices_fluxes_sorted,
-//                                                               indices_to_remove,
-//                                                               indices_fluxes_to_remove,
-//                                                               index_first, index_bis, c);
-//                        Cerr << "num_proc" << nproc() << "Breakpoint C " << index_ter << finl;
 //
 //                        /*
 //                         * Keep max min flux values to build a convex shape
 //                         */
-//
-//                        for (index_ter = 0; index_ter < indices_flux_found_ini.size_array(); index_ter++)
-//                          {
-//                            Cerr << "num_proc" << nproc() << "Breakpoint D " << index_ter << finl;
-//
-//                            val = indices_flux_found_ini(index_ter);
-//                            const double indic_ini = ref_ijk_ft_->itfce().I()(*i_ref_remove,
-//                                                                              *j_ref_remove,
-//                                                                              *k_ref_remove);
-//                            const double indic_ini_prev = ref_ijk_ft_->itfce().I()(*i_ref_remove - factor_pos[c][0],
-//                                                                                   *j_ref_remove - factor_pos[c][1],
-//                                                                                   *k_ref_remove - factor_pos[c][2]);
-//                            if(indic_ini > LIQUID_INDICATOR_TEST && indic_ini_prev > LIQUID_INDICATOR_TEST)
-//                              {
-//                                cell_faces_neighbours_corrected_min_max_bool[c](*i_ref_remove, *j_ref_remove, *k_ref_remove) =
-//                                  cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref_remove, *j_ref_remove, *k_ref_remove);
-//                                // break;
-//                              }
-//
-//                            Cerr << "num_proc" << nproc() << "Breakpoint E " << index_ter << finl;
-//
-//                            val = indices_flux_found_end(index_ter);
-//                            const double indic_end = ref_ijk_ft_->itfce().I()(*i_ref_remove,
-//                                                                              *j_ref_remove,
-//                                                                              *k_ref_remove);
-//                            const double indic_end_prev = ref_ijk_ft_->itfce().I()(*i_ref_remove - factor_pos[c][0],
-//                                                                                   *j_ref_remove - factor_pos[c][1],
-//                                                                                   *k_ref_remove - factor_pos[c][2]);
-//                            if(indic_end > LIQUID_INDICATOR_TEST && indic_end_prev > LIQUID_INDICATOR_TEST)
-//                              {
-//                                cell_faces_neighbours_corrected_min_max_bool[c](*i_ref_remove, *j_ref_remove, *k_ref_remove) =
-//                                  cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref_remove, *j_ref_remove, *k_ref_remove);
-//                                //break;
-//                              }
-//                            Cerr << "num_proc" << nproc() << "Breakpoint F " << index_ter << finl;
-//                          }
-//
-//                        /*
-//                         * Remove temperature and non-consistent fluxes values
-//                         */
-//                        Cerr << "num_proc" << nproc() << "Breakpoint G" << index_ter << finl;
-//
-//                        for (index_ter = 0; index_ter < indices_to_remove.size_array(); index_ter++)
-//                          {
-//                            val = indices_to_remove(index_ter);
-//                            neighbours_temperature_to_correct_trimmed(*i_ref_remove, *j_ref_remove, *k_ref_remove) = 0;
-//                          }
-//
-//                        Cerr << "num_proc" << nproc() << "Breakpoint H" << index_ter << finl;
-//
-//                        for (index_ter = 0; index_ter < indices_fluxes_to_remove.size_array(); index_ter++)
-//                          {
-//                            val = indices_fluxes_to_remove(index_ter);
-//                            cell_faces_neighbours_corrected_min_max_bool[c](*i_ref_remove, *j_ref_remove, *k_ref_remove) = 0;
-//                          }
-//                      }
-//                }
-//            }
+                        for (index_ter = 0; index_ter < indices_flux_found_ini.size_array(); index_ter++)
+                          {
+                            val = indices_flux_found_ini(index_ter);
+                            const double indic_ini = ref_ijk_ft_->itfce().I()(*i_ref_remove,
+                                                                              *j_ref_remove,
+                                                                              *k_ref_remove);
+                            const double indic_ini_prev = ref_ijk_ft_->itfce().I()(*i_ref_remove - factor_pos[c][0],
+                                                                                   *j_ref_remove - factor_pos[c][1],
+                                                                                   *k_ref_remove - factor_pos[c][2]);
+                            if(indic_ini > LIQUID_INDICATOR_TEST && indic_ini_prev > LIQUID_INDICATOR_TEST)
+                              {
+                                cell_faces_neighbours_corrected_min_max_bool[c](*i_ref_remove, *j_ref_remove, *k_ref_remove) =
+                                  cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref_remove, *j_ref_remove, *k_ref_remove);
+                                // break;
+                              }
+                          }
+                        for (index_ter = 0; index_ter < indices_flux_found_end.size_array(); index_ter++)
+                          {
+                            val = indices_flux_found_end(index_ter);
+                            const double indic_end = ref_ijk_ft_->itfce().I()(*i_ref_remove,
+                                                                              *j_ref_remove,
+                                                                              *k_ref_remove);
+                            const double indic_end_prev = ref_ijk_ft_->itfce().I()(*i_ref_remove - factor_pos[c][0],
+                                                                                   *j_ref_remove - factor_pos[c][1],
+                                                                                   *k_ref_remove - factor_pos[c][2]);
+                            if(indic_end > LIQUID_INDICATOR_TEST && indic_end_prev > LIQUID_INDICATOR_TEST)
+                              {
+                                cell_faces_neighbours_corrected_min_max_bool[c](*i_ref_remove, *j_ref_remove, *k_ref_remove) =
+                                  cell_faces_neighbours_corrected_min_max_bool_local[c](*i_ref_remove, *j_ref_remove, *k_ref_remove);
+                                //break;
+                              }
+                          }
+
+                        /*
+                         * Remove temperature and non-consistent fluxes values
+                         */
+                        for (index_ter = 0; index_ter < indices_to_remove.size_array(); index_ter++)
+                          {
+                            val = indices_to_remove(index_ter);
+                            neighbours_temperature_to_correct_trimmed(*i_ref_remove, *j_ref_remove, *k_ref_remove) = 0;
+                          }
+
+                        for (index_ter = 0; index_ter < indices_fluxes_to_remove.size_array(); index_ter++)
+                          {
+                            val = indices_fluxes_to_remove(index_ter);
+                            cell_faces_neighbours_corrected_min_max_bool[c](*i_ref_remove, *j_ref_remove, *k_ref_remove) = 0;
+                          }
+                      }
+                }
+            }
         }
       Cerr << "Echange espace virtuel" << finl;
       cell_faces_neighbours_corrected_min_max_bool.echange_espace_virtuel();
@@ -2751,10 +2747,9 @@ void Corrige_flux_FT_temperature_subresolution::sort_ini_end_arrays(ArrOfInt& in
   const int max_index = size_ini + size_end;
   for (int l=0; l<2; l++)
     indices_sorted[l].set_smart_resize(1);
+  std::vector<int> index_tmp;
   while(counter_ini < size_ini || counter_end < size_end)
     {
-      std::vector<int> index_tmp; // = {indices_found_ini[counter_ini],
-      //	indices_found_end[counter_end]};
       for (int l=0; l<2; l++)
         {
           const int index_int_tmp = (*counters[l] < *size_references[l]) ? (*indices_references[l])(*counters[l]) : (int) 1e20;
@@ -2788,9 +2783,9 @@ void Corrige_flux_FT_temperature_subresolution::remove_non_overlapping_fluxes_va
                                                                                      int& index_ter,
                                                                                      const int& dir)
 {
-  int * i;
-  int * j;
-  int * k;
+  int * i = nullptr;
+  int * j = nullptr;
+  int * k = nullptr;
   int val = 0;
   switch(dir)
     {
@@ -2810,9 +2805,6 @@ void Corrige_flux_FT_temperature_subresolution::remove_non_overlapping_fluxes_va
       k = &val;
       break;
     default:
-      j = &index_ter;
-      k = &index_bis;
-      i = &val;
       break;
     }
   const int factor_pos[3][3] = {{1, 0, 0},{0, 1, 0},{0, 0, 1}};
@@ -2820,42 +2812,44 @@ void Corrige_flux_FT_temperature_subresolution::remove_non_overlapping_fluxes_va
   indices_to_remove.set_smart_resize(1);
   indices_fluxes_to_remove.set_smart_resize(1);
   int ll;
+  int m = 0;
   for(int l=0; l<indices_sorted[0].size_array(); l++)
-    if (indices_fluxes_sorted[0].size_array())
-      for (int m=0; m<indices_fluxes_sorted[0].size_array(); m++)
-        {
-          for (int n=0; n<2; n++)
-            {
-              // use indicator
-              val = indices_fluxes_sorted[n][m];
-              const double indic = ref_ijk_ft_->itfce().I()(*i,*j,*k);
-              const double indic_prev = ref_ijk_ft_->itfce().I()(*i-factor_pos[dir][0],*j-factor_pos[dir][1],*k-factor_pos[dir][2]);
-              const int indic_test = (indic > LIQUID_INDICATOR_TEST && indic_prev > LIQUID_INDICATOR_TEST);
-              if (indic_test)
-                switch(n)
-                  {
-                  case 0:
-                    is_in_interval[n] = (indices_fluxes_sorted[n][m] > indices_sorted[n][l]) ? 1 : 0;
-                    break;
-                  case 1:
-                    is_in_interval[n] = (indices_fluxes_sorted[n][m] <= indices_sorted[n][l]) ? 1 : 0;
-                    break;
-                  default:
-                    break;
-                  }
-            }
-          if (is_in_interval[0] || is_in_interval[1])
-            {
-              if (is_in_interval[0])
-                for (ll=indices_sorted[0][l]; ll<indices_fluxes_sorted[0][m]; ll++)
-                  indices_to_remove.append_array(ll);
-              if (is_in_interval[1])
-                for (ll=indices_fluxes_sorted[1][m]; ll<=indices_sorted[1][l]; ll++)
-                  indices_to_remove.append_array(ll);
-            }
-          is_in_interval = {0, 0};
-        }
-  for (int m=0; m<indices_fluxes_sorted[0].size_array(); m++)
+    if (m < indices_fluxes_sorted[0].size_array())
+      // for (int m=0; m<indices_fluxes_sorted[0].size_array(); m++)
+      {
+        for (int n=0; n<2; n++)
+          {
+            // use indicator
+            val = indices_fluxes_sorted[n][m];
+            const double indic = ref_ijk_ft_->itfce().I()(*i, *j, *k);
+            const double indic_prev = ref_ijk_ft_->itfce().I()(*i - factor_pos[dir][0], *j - factor_pos[dir][1], *k - factor_pos[dir][2]);
+            const int indic_test = (indic > LIQUID_INDICATOR_TEST && indic_prev > LIQUID_INDICATOR_TEST);
+            if (indic_test)
+              switch(n)
+                {
+                case 0:
+                  is_in_interval[n] = (indices_fluxes_sorted[n][m] > indices_sorted[n][l]) ? 1 : 0;
+                  break;
+                case 1:
+                  is_in_interval[n] = (indices_fluxes_sorted[n][m] <= indices_sorted[n][l]) ? 1 : 0;
+                  break;
+                default:
+                  break;
+                }
+          }
+        if (is_in_interval[0] || is_in_interval[1])
+          {
+            if (is_in_interval[0])
+              for (ll=indices_sorted[0][l]; ll<indices_fluxes_sorted[0][m]; ll++)
+                indices_to_remove.append_array(ll);
+            if (is_in_interval[1])
+              for (ll=indices_fluxes_sorted[1][m]; ll<=indices_sorted[1][l]; ll++)
+                indices_to_remove.append_array(ll);
+            m++;
+          }
+        is_in_interval = {0, 0};
+      }
+  for (m=0; m<indices_fluxes_sorted[0].size_array(); m++)
     if (indices_fluxes_sorted[0][m] == indices_fluxes_sorted[1][m])
       indices_fluxes_to_remove.append_array(indices_fluxes_sorted[0][m]);
 }
