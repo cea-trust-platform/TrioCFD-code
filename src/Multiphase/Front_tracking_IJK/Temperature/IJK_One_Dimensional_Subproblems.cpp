@@ -114,7 +114,9 @@ void IJK_One_Dimensional_Subproblems::complete_subproblems()
 {
   if (init_)
     {
-      max_subproblems_ = (int) (pre_factor_subproblems_number_ * subproblems_counter_);
+      int total_subproblems = subproblems_counter_;
+      total_subproblems = Process::mp_sum(total_subproblems);
+      max_subproblems_ = (int) (pre_factor_subproblems_number_ * total_subproblems);
       if (subproblems_counter_ < max_subproblems_)//
         {
           const int sub_problem_end_index = subproblems_counter_ - 1;
