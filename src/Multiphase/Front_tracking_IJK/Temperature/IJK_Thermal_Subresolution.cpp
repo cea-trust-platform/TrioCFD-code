@@ -1435,7 +1435,8 @@ void IJK_Thermal_Subresolution::pre_initialise_thermal_subproblems_matrices()
       if (!disable_subresolution_)
         {
           int nb_subproblems_ini = thermal_local_subproblems_.get_subproblems_counter();
-          nb_subproblems_ini = Process::mp_sum(nb_subproblems_ini);
+          if (!(ref_ijk_ft_->get_disable_convection_qdm() && ref_ijk_ft_->get_disable_diffusion_qdm()))
+            nb_subproblems_ini = Process::mp_sum(nb_subproblems_ini);
           const int max_subproblems_predicted = (int) ((double) nb_subproblems_ini * pre_factor_subproblems_number_);
           finite_difference_assembler_.pre_initialise_matrix_subproblems(thermal_subproblems_matrix_assembly_,
                                                                          radial_second_order_operator_raw_,

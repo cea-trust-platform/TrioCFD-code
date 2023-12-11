@@ -115,7 +115,8 @@ void IJK_One_Dimensional_Subproblems::complete_subproblems()
   if (init_)
     {
       int total_subproblems = subproblems_counter_;
-      total_subproblems = Process::mp_sum(total_subproblems);
+      if (!(ref_ijk_ft_->get_disable_convection_qdm() && ref_ijk_ft_->get_disable_diffusion_qdm()))
+        total_subproblems = Process::mp_sum(total_subproblems);
       max_subproblems_ = (int) (pre_factor_subproblems_number_ * total_subproblems);
       if (subproblems_counter_ < max_subproblems_)//
         {

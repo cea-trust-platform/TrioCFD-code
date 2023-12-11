@@ -134,8 +134,6 @@ void IJK_One_Dimensional_Subproblem::reinit_variable(DoubleVect& vect)
   vect *= 0.;
 }
 
-
-
 /*
  * TODO: Remplacer cette methode pour eviter de fournir tous les attributs
  */

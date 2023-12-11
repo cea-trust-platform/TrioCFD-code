@@ -218,6 +218,14 @@ public :
   {
     return mu_vapeur_;
   }
+  const int& get_disable_diffusion_qdm() const
+  {
+    return disable_diffusion_qdm_;
+  }
+  const int& get_disable_convection_qdm() const
+  {
+    return disable_convection_qdm_;
+  }
 //  Intersection_Interface_ijk_cell& get_intersection_ijk_cell()
 //  {
 //    return intersection_ijk_cell_;

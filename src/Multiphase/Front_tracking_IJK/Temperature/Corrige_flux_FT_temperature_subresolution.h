@@ -112,15 +112,8 @@ public :
    * l'interface. On remplace les flux donnes en entree par ces flux la.
    */
   void corrige_flux_faceIJ_any_flux(IJK_Field_local_double *const flux,
-                                    std::vector<ArrOfInt>& index_face_i_flux_x_sorted,
-                                    std::vector<ArrOfInt>& index_face_j_flux_x_sorted,
-                                    std::vector<ArrOfInt>& index_face_i_flux_y_sorted,
-                                    std::vector<ArrOfInt>& index_face_j_flux_y_sorted,
-                                    std::vector<ArrOfInt>& index_face_i_flux_z_sorted,
-                                    std::vector<ArrOfInt>& index_face_j_flux_z_sorted,
-                                    std::vector<ArrOfDouble>& subgrid_fluxes_x,
-                                    std::vector<ArrOfDouble>& subgrid_fluxes_y,
-                                    std::vector<ArrOfDouble>& subgrid_fluxes_z,
+                                    FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz_sorted,
+                                    FixedVector<std::vector<ArrOfDouble>,3>& subgrid_fluxes_xyz,
                                     const int k_layer,
                                     const int dir);
 
@@ -175,30 +168,20 @@ public :
                                                   IJK_Field_double& neighbours_weighting_colinearity) const override;
 
   void initialise_cell_neighbours_indices_to_correct() override;
-  void initialise_any_cell_neighbours_indices_to_correct(std::vector<ArrOfInt>& index_face_i_flux_x_faces_sorted,
-                                                         std::vector<ArrOfInt>& index_face_j_flux_x_faces_sorted,
-                                                         std::vector<ArrOfInt>& index_face_i_flux_y_faces_sorted,
-                                                         std::vector<ArrOfInt>& index_face_j_flux_y_faces_sorted,
-                                                         std::vector<ArrOfInt>& index_face_i_flux_z_faces_sorted,
-                                                         std::vector<ArrOfInt>& index_face_j_flux_z_faces_sorted,
+  void initialise_fixed_vectors(FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& fixed_vectors,
+                                const int nb_k_layer);
+  void initialise_fixed_vector(FixedVector<std::vector<ArrOfInt>,3>& fixed_vector,
+                               const int nb_k_layer);
+  void initialise_fixed_vector_values(FixedVector<std::vector<ArrOfDouble>,3>& fixed_vector_values,
+                                      const int nb_k_layer);
+  void initialise_any_cell_neighbours_indices_to_correct(FixedVector<FixedVector<std::vector<ArrOfInt>,3>, 2>& index_face_ij_flux_xyz_faces_sorted,
                                                          const int global_indices = 0);
-  void initialise_any_cell_neighbours_indices_to_correct_with_flux(std::vector<ArrOfInt>& index_face_i_flux_x_faces_sorted,
-                                                                   std::vector<ArrOfInt>& index_face_j_flux_x_faces_sorted,
-                                                                   std::vector<ArrOfInt>& index_face_i_flux_y_faces_sorted,
-                                                                   std::vector<ArrOfInt>& index_face_j_flux_y_faces_sorted,
-                                                                   std::vector<ArrOfInt>& index_face_i_flux_z_faces_sorted,
-                                                                   std::vector<ArrOfInt>& index_face_j_flux_z_faces_sorted,
-                                                                   std::vector<ArrOfDouble>& flux_x,
-                                                                   std::vector<ArrOfDouble>& flux_y,
-                                                                   std::vector<ArrOfDouble>& flux_z,
-                                                                   std::vector<ArrOfInt>& weighting_flux_x_faces_sorted,
-                                                                   std::vector<ArrOfInt>& weighting_flux_y_faces_sorted,
-                                                                   std::vector<ArrOfInt>& weighting_flux_z_faces_sorted,
-                                                                   std::vector<ArrOfDouble>& colinearity_flux_x_faces_sorted,
-                                                                   std::vector<ArrOfDouble>& colinearity_flux_y_faces_sorted,
-                                                                   std::vector<ArrOfDouble>& colinearity_flux_z_faces_sorted,
+  void initialise_any_cell_neighbours_indices_to_correct_with_flux(FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz_faces_sorted,
+                                                                   FixedVector<std::vector<ArrOfDouble>,3>& fluxes,
+                                                                   FixedVector<std::vector<ArrOfInt>,3>& weighting_flux_xyz_faces_sorted,
+                                                                   FixedVector<std::vector<ArrOfDouble>,3>& colinearity_flux_xyz_faces_sorted,
                                                                    const bool& ini_index,
-                                                                   const int global_indices = 0,
+                                                                   const int global_indices=0,
                                                                    const int weighting_colinearity=0);
   void compute_cell_neighbours_faces_indices_for_spherical_correction(const int& n_iter_distance) override;
   void compute_cell_neighbours_mixed_cell_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool_mixed_cell,
@@ -288,9 +271,7 @@ public :
                                                                          const int& fluxes_type) override;
   void replace_cell_neighbours_thermal_fluxes_faces(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_min_max_bool,
                                                     const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
-                                                    std::vector<ArrOfDouble>& flux_x,
-                                                    std::vector<ArrOfDouble>& flux_y,
-                                                    std::vector<ArrOfDouble>& flux_z);
+                                                    FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz);
 
   void set_zero_temperature_increment(IJK_Field_double& d_temperature) const override;
   void compute_thermal_convective_fluxes() override;
@@ -307,87 +288,31 @@ public :
   void clean() override;
   void compute_ijk_pure_faces_indices() override;
   void sort_ijk_intersections_subproblems_indices_by_k_layers() override;
-  void sort_ijk_intersections_subproblems_indices_fluxes_by_k_layers(std::vector<ArrOfInt>& index_face_i_flux_x,
-                                                                     std::vector<ArrOfInt>& index_face_j_flux_x,
-                                                                     std::vector<ArrOfInt>& index_face_i_flux_y,
-                                                                     std::vector<ArrOfInt>& index_face_j_flux_y,
-                                                                     std::vector<ArrOfInt>& index_face_i_flux_z,
-                                                                     std::vector<ArrOfInt>& index_face_j_flux_z,
-                                                                     std::vector<ArrOfInt>& index_face_i_flux_x_remaining_global,
-                                                                     std::vector<ArrOfInt>& index_face_j_flux_x_remaining_global,
-                                                                     std::vector<ArrOfInt>& index_face_i_flux_y_remaining_global,
-                                                                     std::vector<ArrOfInt>& index_face_j_flux_y_remaining_global,
-                                                                     std::vector<ArrOfInt>& index_face_i_flux_z_remaining_global,
-                                                                     std::vector<ArrOfInt>& index_face_j_flux_z_remaining_global,
-                                                                     std::vector<ArrOfDouble>& flux_x,
-                                                                     std::vector<ArrOfDouble>& flux_y,
-                                                                     std::vector<ArrOfDouble>& flux_z,
-                                                                     std::vector<ArrOfDouble>& flux_x_remaining_global,
-                                                                     std::vector<ArrOfDouble>& flux_y_remaining_global,
-                                                                     std::vector<ArrOfDouble>& flux_z_remaining_global,
+  void sort_ijk_intersections_subproblems_indices_fluxes_by_k_layers(FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz,
+                                                                     FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz_remaining_global,
+                                                                     FixedVector<std::vector<ArrOfDouble>, 3>& flux_xyz,
+                                                                     FixedVector<std::vector<ArrOfDouble>, 3>& flux_xyz_remaining_global,
                                                                      FixedVector<std::map<int, int>, 3>& flux_frontier_map,
                                                                      const DoubleVect& fluxes_subgrid,
                                                                      const int ini_index);
   int  get_linear_index_local(const int& i, const int& j, const int& k, const int& dir);
   int  get_linear_index_global(const int& i, const int& j, const int& k, const int& dir);
-  void receive_fluxes_from_frontier_on_procs(std::vector<ArrOfInt>& index_face_i_flux_x_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_j_flux_x_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_i_flux_y_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_j_flux_y_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_i_flux_z_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_j_flux_z_remaining_global,
-                                             std::vector<ArrOfDouble>& flux_x_remaining_global,
-                                             std::vector<ArrOfDouble>& flux_y_remaining_global,
-                                             std::vector<ArrOfDouble>& flux_z_remaining_global,
+  void receive_fluxes_from_frontier_on_procs(FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz_remaining_global,
+                                             FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz_remaining_global,
                                              const int ini_index);
-  void combine_fluxes_from_frontier_on_procs(std::vector<ArrOfInt>& index_face_i_flux_x,
-                                             std::vector<ArrOfInt>& index_face_j_flux_x,
-                                             std::vector<ArrOfInt>& index_face_i_flux_y,
-                                             std::vector<ArrOfInt>& index_face_j_flux_y,
-                                             std::vector<ArrOfInt>& index_face_i_flux_z,
-                                             std::vector<ArrOfInt>& index_face_j_flux_z,
-                                             std::vector<ArrOfInt>& index_face_i_flux_x_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_j_flux_x_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_i_flux_y_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_j_flux_y_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_i_flux_z_remaining_global,
-                                             std::vector<ArrOfInt>& index_face_j_flux_z_remaining_global,
-                                             std::vector<ArrOfDouble>& flux_x,
-                                             std::vector<ArrOfDouble>& flux_y,
-                                             std::vector<ArrOfDouble>& flux_z,
-                                             std::vector<ArrOfDouble>& flux_x_remaining_global,
-                                             std::vector<ArrOfDouble>& flux_y_remaining_global,
-                                             std::vector<ArrOfDouble>& flux_z_remaining_global,
+  void combine_fluxes_from_frontier_on_procs(FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz,
+                                             FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz_remaining_global,
+                                             FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz,
+                                             FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz_remaining_global,
                                              FixedVector<std::map<int, int>, 3>& flux_frontier_map);
 
-  void initialise_any_cell_neighbours_indices_to_correct_on_processors(std::vector<std::vector<ArrOfInt>>& index_face_i_flux_x,
-                                                                       std::vector<std::vector<ArrOfInt>>& index_face_j_flux_x,
-                                                                       std::vector<std::vector<ArrOfInt>>& index_face_i_flux_y,
-                                                                       std::vector<std::vector<ArrOfInt>>& index_face_j_flux_y,
-                                                                       std::vector<std::vector<ArrOfInt>>& index_face_i_flux_z,
-                                                                       std::vector<std::vector<ArrOfInt>>& index_face_j_flux_z,
-                                                                       std::vector<std::vector<ArrOfDouble>>& flux_x,
-                                                                       std::vector<std::vector<ArrOfDouble>>& flux_y,
-                                                                       std::vector<std::vector<ArrOfDouble>>& flux_z,
+  void initialise_any_cell_neighbours_indices_to_correct_on_processors(FixedVector<FixedVector<std::vector<std::vector<ArrOfInt>>,3>,2>& index_face_ij_flux_xyz,
+                                                                       FixedVector<std::vector<std::vector<ArrOfDouble>>,3>& flux_xyz,
                                                                        const int ini_index);
-  void redistribute_indices_fluxes_by_k_layers(std::vector<ArrOfInt>& index_face_i_flux_x,
-                                               std::vector<ArrOfInt>& index_face_j_flux_x,
-                                               std::vector<ArrOfInt>& index_face_i_flux_y,
-                                               std::vector<ArrOfInt>& index_face_j_flux_y,
-                                               std::vector<ArrOfInt>& index_face_i_flux_z,
-                                               std::vector<ArrOfInt>& index_face_j_flux_z,
-                                               std::vector<ArrOfInt> index_face_i_flux_x_remaining_global,
-                                               std::vector<ArrOfInt> index_face_j_flux_x_remaining_global,
-                                               std::vector<ArrOfInt> index_face_i_flux_y_remaining_global,
-                                               std::vector<ArrOfInt> index_face_j_flux_y_remaining_global,
-                                               std::vector<ArrOfInt> index_face_i_flux_z_remaining_global,
-                                               std::vector<ArrOfInt> index_face_j_flux_z_remaining_global,
-                                               std::vector<ArrOfDouble>& flux_x,
-                                               std::vector<ArrOfDouble>& flux_y,
-                                               std::vector<ArrOfDouble>& flux_z,
-                                               std::vector<ArrOfDouble>& flux_x_remaining_global,
-                                               std::vector<ArrOfDouble>& flux_y_remaining_global,
-                                               std::vector<ArrOfDouble>& flux_z_remaining_global,
+  void redistribute_indices_fluxes_by_k_layers(FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_i_flux_x,
+                                               FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_i_flux_x_remaining_global,
+                                               FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz,
+                                               FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz_remaining_global,
                                                const int ini_index);
 
   void store_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
@@ -396,9 +321,7 @@ public :
   void store_any_cell_faces_corrected(FixedVector<IJK_Field_int,3>& cell_faces_corrected_bool,
                                       FixedVector<IJK_Field_double,3>& cell_faces_corrected,
                                       const DoubleVect& fluxes,
-                                      std::vector<ArrOfDouble>& flux_x,
-                                      std::vector<ArrOfDouble>& flux_y,
-                                      std::vector<ArrOfDouble>& flux_z,
+                                      FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz,
                                       const int counter);
   void check_pure_fluxes_duplicates(const DoubleVect& fluxes, DoubleVect& fluxes_unique, IntVect& pure_face_unique, const int known_unique);
   void clear_vectors() override;
@@ -464,50 +387,21 @@ protected :
   /*
    * Face fluxes in the immediate interface vicinity !
    */
-  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_sorted_;
 
-  std::vector<ArrOfInt> index_face_i_flux_x_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_x_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_y_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_y_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_z_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_z_sorted_;
-
-  FixedVector<FixedVector<std::vector<ArrOfDouble>,2>,3> convective_diffusive_flux_xyz_sorted_;
-
-  std::vector<ArrOfDouble> convective_flux_x_sorted_;
-  std::vector<ArrOfDouble> convective_flux_y_sorted_;
-  std::vector<ArrOfDouble> convective_flux_z_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_x_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_y_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_z_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2> index_face_ij_flux_xyz_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfDouble>,3>,2> convective_diffusive_flux_xyz_sorted_;
 
   /*
    * Face fluxes in the immediate interface vicinity (Parallel) !
    */
 
-
-  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_remaining_global_sorted_;
-
-  std::vector<ArrOfInt> index_face_i_flux_x_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_x_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_y_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_y_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_z_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_z_remaining_global_sorted_;
-
-  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> convective_diffusive_flux_xyz_remaining_global_sorted_;
-
-  std::vector<ArrOfDouble> convective_flux_x_remaining_global_sorted_;
-  std::vector<ArrOfDouble> convective_flux_y_remaining_global_sorted_;
-  std::vector<ArrOfDouble> convective_flux_z_remaining_global_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_x_remaining_global_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_y_remaining_global_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_z_remaining_global_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2> index_face_ij_flux_xyz_remaining_global_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfDouble>,3>,2> convective_diffusive_flux_xyz_remaining_global_sorted_;
 
   /*
    * Map linear flux index to indices in Array to accelerate fusion of flux duplicates !
    */
+
   FixedVector<std::map<int, int>, 3> flux_frontier_map_;
   // FixedVector<std::map<int, int>, 3> flux_remaining_global_map_;
   FixedVector<IntVect,4> ijk_faces_to_correct_;
@@ -516,79 +410,25 @@ protected :
    * M.G (07/12/23) All fluxes may be useless; Diagonal fluxes are not relevant for the moment
    */
 
-  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_neighbours_diag_faces_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2> index_face_ij_flux_xyz_neighbours_diag_faces_sorted_;
 
-  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_diag_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_diag_faces_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_diag_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_diag_faces_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_diag_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_diag_faces_sorted_;
-
-  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_neighbours_all_faces_sorted_;
-
-  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_all_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_all_faces_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_all_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_all_faces_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_all_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_all_faces_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2> index_face_ij_flux_xyz_neighbours_all_faces_sorted_;
 
   /*
    * Face fluxes on a reconstructed convex shell around the bubble !
    */
 
-  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_;
-
-  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_min_max_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_min_max_faces_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_min_max_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_min_max_faces_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_min_max_faces_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_min_max_faces_sorted_;
-
-  FixedVector<FixedVector<std::vector<ArrOfDouble>,2>,3> convective_diffusive_flux_xyz_min_max_faces_sorted_;
-
-  std::vector<ArrOfDouble> convective_flux_x_min_max_faces_sorted_;
-  std::vector<ArrOfDouble> convective_flux_y_min_max_faces_sorted_;
-  std::vector<ArrOfDouble> convective_flux_z_min_max_faces_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_x_min_max_faces_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_y_min_max_faces_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_z_min_max_faces_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2> index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfDouble>,3>,2> convective_diffusive_flux_xyz_min_max_faces_sorted_;
 
   /*
    * Face fluxes on a reconstructed convex shell around the bubble (Parallel) !
    */
 
-  FixedVector<FixedVector<std::vector<ArrOfInt>,2>,3> index_face_ij_flux_xyz_neighbours_all_faces_remaining_global_sorted_;
-
-  std::vector<ArrOfInt> index_face_i_flux_x_neighbours_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_x_neighbours_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_y_neighbours_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_y_neighbours_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_i_flux_z_neighbours_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfInt> index_face_j_flux_z_neighbours_all_faces_remaining_global_sorted_;
-
+  FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2> index_face_ij_flux_xyz_neighbours_all_faces_remaining_global_sorted_;
   FixedVector<std::vector<ArrOfInt>,3> weighting_flux_xyz_neighbours_all_faces_remaining_global_sorted_;
-
-  std::vector<ArrOfInt> weighting_flux_x_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfInt> weighting_flux_y_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfInt> weighting_flux_z_all_faces_remaining_global_sorted_;
-
   FixedVector<std::vector<ArrOfDouble>,3> colinearity_flux_xyz_neighbours_all_faces_remaining_global_sorted_;
-
-  std::vector<ArrOfDouble> colinearity_flux_x_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfDouble> colinearity_flux_y_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfDouble> colinearity_flux_z_all_faces_remaining_global_sorted_;
-
-  FixedVector<FixedVector<std::vector<ArrOfDouble>,2>,3> convective_diffusive_flux_all_faces_remaining_global_sorted_;
-
-  std::vector<ArrOfDouble> convective_flux_x_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfDouble> convective_flux_y_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfDouble> convective_flux_z_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_x_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_y_all_faces_remaining_global_sorted_;
-  std::vector<ArrOfDouble> diffusive_flux_z_all_faces_remaining_global_sorted_;
+  FixedVector<FixedVector<std::vector<ArrOfDouble>,3>,2> convective_diffusive_flux_all_faces_remaining_global_sorted_;
 
   FixedVector<std::map<int, int>, 3> flux_frontier_all_map_;
   FixedVector<std::map<int, int>, 3> flux_outside_frontier_all_map_;
