@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
 --------------------------------------------------------------------------------------------------
-30/11/23 (TrioCFD) New feature : k-omega turbulence model (Wilcox 1988 and SST variant)
-29/11/23 (TrioCFD) Tests       : FSI- New validation file for the fluid-structure partitioned internal coupling (Beam_Free_Vibration)
+30/11/23 (TrioCFD) New feature : Turbulence - k-omega turbulence model (Wilcox 1988 and SST variant) has been implemented in Turbulence section (validation still in progress)
+29/11/23 (TrioCFD) Tests       : FSI- New validation report for the fluid-structure partitioned internal coupling (Beam_Free_Vibration)
 24/11/23 (TrioCFD) Bug fix     : FSI- Extrait surface on mobile walls ( new keyword Extrait_surface_ALE)
 23/11/23 (TrioCFD) Bug fix     : FSI- Compute the y+ for mobile walls
 23/11/23 (TrioCFD) New feature : FTD - solid/fluid thermal coupling using TCL model
