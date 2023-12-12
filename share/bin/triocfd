@@ -5,6 +5,13 @@
 if [ "$1" = -index ]
 then
    $TRUST_WEBBROWSER $project_directory/index.html &
+elif [ "$1" = -doc ]
+then
+   doc=$project_directory/share/doc/TrioCFD_Reference_Manual.pdf
+   for app in evince xpdf kpdf okular
+   do
+     $app $doc 1>/dev/null 2>&1 && exit 0
+   done
 elif [ "$1" = -xcheck ]
 then
    #######################################
