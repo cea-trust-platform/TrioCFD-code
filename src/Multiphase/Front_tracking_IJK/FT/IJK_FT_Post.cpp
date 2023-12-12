@@ -57,6 +57,7 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
   fichier_reprise_integrated_timescale_ = "??"; // par defaut, invalide
   compteur_post_instantanes_ = 0;
   dt_post_ = 100;
+  dt_post_thermals_probes_ = 100;
   dt_post_stats_plans_ = 1;
   dt_post_stats_bulles_ = 1;
   //poisson_solver_post_ = xxxx;
@@ -64,6 +65,7 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
 
   param.ajouter_flag("check_stats", &check_stats_);
   param.ajouter("dt_post", &dt_post_);
+  param.ajouter("dt_post_thermals_probes", &dt_post_thermals_probes_);
   param.ajouter("dt_post_stats_plans", &dt_post_stats_plans_);
   param.ajouter("dt_post_stats_bulles", &dt_post_stats_bulles_);
   param.ajouter("champs_a_postraiter", &liste_post_instantanes_);
@@ -932,7 +934,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
      * TODO: Clean IJK_Thermique et IJK_Energie
      */
     thermals_.posttraiter_champs_instantanes_thermal(liste_post_instantanes_, lata_name, latastep, current_time, n);
-    thermals_.thermal_subresolution_outputs();
     Cerr << "les champs postraites sont: " << liste_post_instantanes_ << finl;
   }
 
@@ -1981,6 +1982,11 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
     {
       Cout << "tstep : " << tstep << finl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
+    }
+  if (tstep % dt_post_thermals_probes_ == dt_post_thermals_probes_ - 1 || stop || first_step_thermals_post_)
+    {
+      Cout << "tstep : " << tstep << finl;
+      thermals_.thermal_subresolution_outputs();
     }
   if (tstep % dt_post_stats_bulles_ == dt_post_stats_bulles_ - 1 || stop)
     {

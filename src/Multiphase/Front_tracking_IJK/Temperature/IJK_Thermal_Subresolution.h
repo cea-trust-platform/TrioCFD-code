@@ -195,6 +195,10 @@ protected :
                                   const IJK_Field_double& temperature_ana,
                                   IJK_Field_double& error_temperature_ana,
                                   IJK_Field_double& error_temperature_ana_rel);
+  void evaluate_total_liquid_absolute_parameter(const IJK_Field_double& field,
+                                                double& total_parameter);
+  void evaluate_total_liquid_parameter_squared(const IJK_Field_double& field,
+                                               double& total_parameter);
   void correct_any_temperature_field_for_visu(IJK_Field_double& temperature);
   void correct_temperature_for_visu() override;
   void clip_temperature_values() override;
@@ -373,6 +377,10 @@ protected :
   double local_dt_cfl_min_delta_xyz_ = 0.;
   double local_dt_cfl_counter_ = 0.;
   double local_dt_fourier_counter_ = 0.;
+
+  double error_temperature_ana_total_;
+  double error_temperature_ana_squared_total_;
+  double error_temperature_ana_rel_total_;
 
   /*
    * Some tries to make the probe length varies at the beginning of the simulation

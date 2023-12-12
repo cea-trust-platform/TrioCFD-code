@@ -1055,6 +1055,10 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities_per_bubbles(con
 
 void IJK_One_Dimensional_Subproblems::compute_overall_bubbles_quantities(IJK_Thermal_Subresolution& ref_thermal_subresolution)
 {
+  uniform_alpha_ = ref_thermal_subresolution.uniform_alpha_;
+  error_temperature_ana_total_ = ref_thermal_subresolution.error_temperature_ana_total_;
+  error_temperature_ana_squared_total_ = ref_thermal_subresolution.error_temperature_ana_squared_total_;
+  error_temperature_ana_rel_total_ = ref_thermal_subresolution.error_temperature_ana_rel_total_;
   caracteristic_length_ = (ref_thermal_subresolution.single_centred_bubble_radius_ini_) * 2;
   spherical_nusselt_ = ref_thermal_subresolution.nusselt_spherical_diffusion_;
   spherical_nusselt_liquid_ = ref_thermal_subresolution.nusselt_spherical_diffusion_liquid_;
@@ -1195,14 +1199,17 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
                        + Nom("_thermal_subproblems") + ("_overall_bubbles_quantities_")
                        + Nom(std::string(max_digit_time - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
       Nom probe_header = Nom("tstep\ttime\tthermalrank\tbubbleindex"
+                             "\ttimedimensionless"
                              "\tnusseltoverall\tnusseltoverallgfm\tnusseltspherical\tnusseltsphericalth"
                              "\tnusseltoverallliq\tnusseltoverallgfmliq\tnusseltsphericalliq\tnusseltsphericalthliq"
                              "\theatflux\theatfluxgfm\theatfluxspherical"
                              "\ttotalsurface\ttotalvolume"
-                             "\tradiussurface\tradiusvolume");
+                             "\tradiussurface\tradiusvolume"
+                             "\terrortemperatureana\terrortemperatureananorm\terrortemperatureanarel");
       SFichier fic = Open_file_folder(overall_bubbles_quantities, probe_name, probe_header, reset);
       int max_counter = nb_bubbles_;
       const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
+      const double dimensionless_time = caracteristic_length_ / (1e-16 + sqrt(M_PI * last_time * uniform_alpha_));
       /*
        * TODO: fill the Array in parallel
        */
@@ -1211,6 +1218,7 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << ref_ijk_ft_->get_tstep() << " " << last_time << " ";
           fic << rank << " ";
           fic << i << " ";
+          fic << dimensionless_time << " ";
           fic << overall_nusselt_number_per_bubble_(i) << " ";
           fic << overall_nusselt_number_per_bubble_gfm_(i) << " ";
           fic << overall_nusselt_number_per_bubble_spherical_(i) << " ";
@@ -1226,6 +1234,9 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << (*bubbles_volume_)(i) << " ";
           fic << radius_from_surfaces_per_bubble_(i) << " ";
           fic << radius_from_volumes_per_bubble_(i) << " ";
+          fic << error_temperature_ana_total_ << " ";
+          fic << error_temperature_ana_squared_total_ << " ";
+          fic << error_temperature_ana_rel_total_ << " ";
           fic << finl;
         }
       /*
@@ -1236,6 +1247,7 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << ref_ijk_ft_->get_tstep() << " " << last_time << " ";
           fic << rank << " ";
           fic << nb_bubbles_ << " ";
+          fic << dimensionless_time << " ";
           fic << overall_nusselt_number_ << " ";
           fic << overall_nusselt_number_gfm_ << " ";
           fic << overall_nusselt_number_spherical_ << " ";
@@ -1251,6 +1263,9 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << total_volume_ << " ";
           fic << radius_from_surfaces_ << " ";
           fic << radius_from_volumes_ << " ";
+          fic << error_temperature_ana_total_ << " ";
+          fic << error_temperature_ana_squared_total_ << " ";
+          fic << error_temperature_ana_rel_total_ << " ";
           fic << finl;
         }
       fic.close();

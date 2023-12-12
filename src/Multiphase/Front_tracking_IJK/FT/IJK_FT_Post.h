@@ -170,6 +170,7 @@ protected:
   void compute_phase_pressures_based_on_poisson(const int phase);
   Statistiques_dns_ijk_FT statistiques_FT_;
   int dt_post_;
+  int dt_post_thermals_probes_;
   int dt_post_stats_plans_; // intervalle de posttraitement des donnees par plan (pour les statistiques de canal)
   int dt_post_stats_bulles_; // intervalle de posttraitement des donnees par bulles
   Motcles liste_post_instantanes_; // liste des champs instantanes a postraiter

@@ -210,6 +210,11 @@ protected :
   double radius_from_surfaces_ = 0.;
   double radius_from_volumes_ = 0.;
 
+  double uniform_alpha_ = 0.;
+  double error_temperature_ana_total_=0.;
+  double error_temperature_ana_squared_total_=0.;
+  double error_temperature_ana_rel_total_=0.;
+
   ArrOfDouble * bubbles_volume_;
 
   ArrOfDouble radius_outputs_;

@@ -2511,6 +2511,7 @@ void IJK_FT_double::run()
       Cout << "BF posttraiter_champs_instantanes "
            << current_time_ << " " << tstep_ << finl;
       post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
+      thermals_.thermal_subresolution_outputs(); // for thermal counters
       Cout << "AF posttraiter_champs_instantanes" << finl;
     }
 

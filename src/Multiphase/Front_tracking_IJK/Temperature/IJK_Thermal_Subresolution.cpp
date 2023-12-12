@@ -57,6 +57,10 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   override_vapour_mixed_values_ = 0;
   compute_eulerian_compo_ = 1;
 
+  error_temperature_ana_total_ = 0.;
+  error_temperature_ana_squared_total_ = 0.;
+  error_temperature_ana_rel_total_ = 0.;
+
   points_per_thermal_subproblem_ = 32;
   dr_ = 0.;
   probe_length_=0.;
@@ -973,6 +977,13 @@ void IJK_Thermal_Subresolution::set_field_T_ana()
           if (liste_post_instantanes_.contient_("ECART_T_ANA"))
             compare_temperature_fields(temperature_, temperature_ana_, ecart_t_ana_, ecart_t_ana_rel_);
           correct_any_temperature_fields_for_eulerian_fluxes(ecart_t_ana_);
+          correct_any_temperature_fields_for_eulerian_fluxes(ecart_t_ana_rel_);
+          evaluate_total_liquid_absolute_parameter(ecart_t_ana_, error_temperature_ana_total_);
+          evaluate_total_liquid_absolute_parameter(ecart_t_ana_rel_, error_temperature_ana_rel_total_);
+          evaluate_total_liquid_parameter_squared(ecart_t_ana_, error_temperature_ana_squared_total_);
+          error_temperature_ana_total_ = abs(error_temperature_ana_total_ / delta_T_subcooled_overheated_);
+          error_temperature_ana_squared_total_ = sqrt(error_temperature_ana_squared_total_) / abs(delta_T_subcooled_overheated_);
+          error_temperature_ana_rel_total_ = abs(error_temperature_ana_rel_total_ / delta_T_subcooled_overheated_);
         }
     }
 }
@@ -1101,6 +1112,48 @@ void IJK_Thermal_Subresolution::compare_temperature_fields(const IJK_Field_doubl
           error_temperature_ana(i,j,k) = (temperature(i,j,k) - temperature_ana(i,j,k));
           error_temperature_ana_rel(i,j,k) = error_temperature_ana(i,j,k) / (temperature_ana(i,j,k) + 1.e-16) * 100.;
         }
+}
+
+void IJK_Thermal_Subresolution::evaluate_total_liquid_absolute_parameter(const IJK_Field_double& field,
+                                                                         double& total_parameter)
+{
+  const int ni = field.ni();
+  const int nj = field.nj();
+  const int nk = field.nk();
+  total_parameter = 0;
+  double liquid_volume = 0.;
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+          liquid_volume += (vol_ * indic);
+          total_parameter += abs(field(i,j,k)) * (vol_ * indic);
+        }
+  total_parameter = mp_sum(total_parameter);
+  liquid_volume = mp_sum(liquid_volume);
+  total_parameter = total_parameter / liquid_volume;
+}
+
+void IJK_Thermal_Subresolution::evaluate_total_liquid_parameter_squared(const IJK_Field_double& field,
+                                                                        double& total_parameter)
+{
+  const int ni = field.ni();
+  const int nj = field.nj();
+  const int nk = field.nk();
+  total_parameter = 0;
+  double liquid_volume = 0.;
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+          liquid_volume += (vol_ * indic);
+          total_parameter += pow(field(i,j,k) * (vol_ * indic), 2);
+        }
+  total_parameter = mp_sum(total_parameter);
+  liquid_volume = mp_sum(liquid_volume);
+  total_parameter = total_parameter / pow(liquid_volume, 2);
 }
 
 void IJK_Thermal_Subresolution::correct_any_temperature_field_for_visu(IJK_Field_double& temperature)
