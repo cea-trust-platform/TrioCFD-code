@@ -1632,7 +1632,7 @@ void Corrige_flux_FT_temperature_subresolution::replace_cell_neighbours_thermal_
             {
               flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
               index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(i);
-              index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(j);
+              index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(j);
               /*
                * Handle the periodicity
                */

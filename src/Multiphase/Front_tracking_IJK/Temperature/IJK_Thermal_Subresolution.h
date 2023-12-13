@@ -448,6 +448,7 @@ protected :
   FixedVector<IJK_Field_double, 3> neighbours_faces_weighting_colinearity_;
   FixedVector<IJK_Field_int,3> cell_faces_neighbours_corrected_min_max_bool_;
   IJK_Field_int neighbours_temperature_to_correct_trimmed_;
+  int neighbours_last_faces_weighting_;
   int neighbours_last_faces_colinearity_weighting_;
   int neighbours_last_faces_colinearity_face_weighting_;
   int neighbours_last_faces_distance_weighting_;

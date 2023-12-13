@@ -81,7 +81,7 @@ void Operateur_IJK_elem_diff_base_double::calculer(const IJK_Field_double& field
                                                    const IJK_Field_local_double& boundary_flux_kmin,
                                                    const IJK_Field_local_double& boundary_flux_kmax)
 {
-  Cerr << "Uniform lambda: " << get_uniform_lambda() << finl;
+  // Cerr << "Uniform lambda: " << get_uniform_lambda() << finl;
   input_field_ = &field;
   boundary_flux_kmin_ = &boundary_flux_kmin;
   boundary_flux_kmax_ = &boundary_flux_kmax;

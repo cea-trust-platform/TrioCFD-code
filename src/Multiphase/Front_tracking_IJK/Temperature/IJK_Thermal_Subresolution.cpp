@@ -378,12 +378,21 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   temperature_before_extrapolation_.data() = 0.;
 
   neighbours_weighting_ = (neighbours_colinearity_weighting_ || neighbours_distance_weighting_ || neighbours_colinearity_distance_weighting_);
-
+  neighbours_last_faces_weighting_ = (neighbours_last_faces_colinearity_weighting_ || neighbours_last_faces_colinearity_face_weighting_
+                                      || neighbours_last_faces_distance_weighting_ || neighbours_last_faces_distance_colinearity_weighting_
+                                      || neighbours_last_faces_distance_colinearity_face_weighting_);
   if (neighbours_weighting_)
-    if (!(neighbours_last_faces_colinearity_weighting_ || neighbours_last_faces_colinearity_face_weighting_
-          || neighbours_last_faces_distance_weighting_ || neighbours_last_faces_distance_colinearity_weighting_
-          || neighbours_last_faces_distance_colinearity_face_weighting_))
-      neighbours_last_faces_distance_colinearity_face_weighting_ = 1;
+    if (!neighbours_last_faces_weighting_)
+      {
+        neighbours_last_faces_weighting_ = 1;
+        neighbours_last_faces_colinearity_weighting_ = 1;
+      }
+  if(neighbours_last_faces_weighting_)
+    if (!neighbours_weighting_)
+      {
+        neighbours_weighting_ = 1;
+        neighbours_colinearity_weighting_ = 1;
+      }
 
   correct_temperature_cell_neighbours_first_iter_ = (correct_temperature_cell_neighbours_first_iter_ && disable_spherical_diffusion_start_);
   if (correct_temperature_cell_neighbours_first_iter_)
