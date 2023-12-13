@@ -979,11 +979,11 @@ void IJK_Thermal_Subresolution::set_field_T_ana()
           correct_any_temperature_fields_for_eulerian_fluxes(ecart_t_ana_);
           correct_any_temperature_fields_for_eulerian_fluxes(ecart_t_ana_rel_);
           evaluate_total_liquid_absolute_parameter(ecart_t_ana_, error_temperature_ana_total_);
-          evaluate_total_liquid_absolute_parameter(ecart_t_ana_rel_, error_temperature_ana_rel_total_);
           evaluate_total_liquid_parameter_squared(ecart_t_ana_, error_temperature_ana_squared_total_);
+          evaluate_total_liquid_absolute_parameter(ecart_t_ana_rel_, error_temperature_ana_rel_total_);
           error_temperature_ana_total_ = abs(error_temperature_ana_total_ / delta_T_subcooled_overheated_);
           error_temperature_ana_squared_total_ = sqrt(error_temperature_ana_squared_total_) / abs(delta_T_subcooled_overheated_);
-          error_temperature_ana_rel_total_ = abs(error_temperature_ana_rel_total_ / delta_T_subcooled_overheated_);
+          error_temperature_ana_rel_total_ = abs(error_temperature_ana_rel_total_);
         }
     }
 }

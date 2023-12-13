@@ -191,22 +191,38 @@ protected :
   double heat_flux_spherical_ = 0.;
   double overall_shear_stress_ = 0.;
   double overall_shear_force_ = 0.;
+
   double overall_nusselt_number_ = 0.;
   double overall_nusselt_number_gfm_ = 0.;
   double overall_nusselt_number_spherical_ = 0.;
   double overall_nusselt_number_liquid_ = 0.;
   double overall_nusselt_number_gfm_liquid_ = 0.;
   double overall_nusselt_number_spherical_liquid_ = 0.;
+
+  double overall_nusselt_number_error_ = 0.;
+  double overall_nusselt_number_gfm_error_ = 0.;
+  double overall_nusselt_number_liquid_error_ = 0.;
+  double overall_nusselt_number_gfm_liquid_error_ = 0.;
+
+  double overall_nusselt_number_error_rel_ = 0.;
+  double overall_nusselt_number_gfm_error_rel_ = 0.;
+  double overall_nusselt_number_liquid_error_rel_ = 0.;
+  double overall_nusselt_number_gfm_liquid_error_rel_ = 0.;
+
   double caracteristic_length_ = 0.;
   double caracteristic_length_from_surfaces_ = 0.;
   double caracteristic_length_from_volumes_ = 0.;
+
   double delta_temperature_ = -1;
   double mean_liquid_temperature_= -1.;
+
   double interfacial_thermal_flux_ = 0.;
   double interfacial_thermal_flux_gfm_ = 0.;
+
   double total_surface_ = 0.;
   double total_volume_ = 0.;
   double lambda_=0.;
+
   double radius_from_surfaces_ = 0.;
   double radius_from_volumes_ = 0.;
 
@@ -225,19 +241,34 @@ protected :
   ArrOfDouble interfacial_thermal_flux_per_bubble_ ;
   ArrOfDouble interfacial_thermal_flux_per_bubble_gfm_;
   ArrOfDouble interfacial_thermal_flux_per_bubble_spherical_;
+
   ArrOfDouble total_surface_per_bubble_;
+
   ArrOfDouble overall_nusselt_number_per_bubble_;
   ArrOfDouble overall_nusselt_number_per_bubble_gfm_;
   ArrOfDouble overall_nusselt_number_per_bubble_spherical_;
   ArrOfDouble overall_nusselt_number_per_bubble_liquid_;
   ArrOfDouble overall_nusselt_number_per_bubble_gfm_liquid_;
   ArrOfDouble overall_nusselt_number_per_bubble_spherical_liquid_;
+
   ArrOfDouble overall_shear_stress_per_bubble_;
   ArrOfDouble overall_shear_force_per_bubble_;
+
   ArrOfDouble radius_from_surfaces_per_bubble_;
   ArrOfDouble radius_from_volumes_per_bubble_;
+
   ArrOfDouble caracteristic_length_from_surfaces_per_bubble_;
   ArrOfDouble caracteristic_length_from_volumes_per_bubble_;
+
+  ArrOfDouble overall_nusselt_number_per_bubble_error_;
+  ArrOfDouble overall_nusselt_number_per_bubble_gfm_error_;
+  ArrOfDouble overall_nusselt_number_per_bubble_liquid_error_;
+  ArrOfDouble overall_nusselt_number_per_bubble_gfm_liquid_error_;
+
+  ArrOfDouble overall_nusselt_number_per_bubble_error_rel_;
+  ArrOfDouble overall_nusselt_number_per_bubble_gfm_error_rel_;
+  ArrOfDouble overall_nusselt_number_per_bubble_liquid_error_rel_;
+  ArrOfDouble overall_nusselt_number_per_bubble_gfm_liquid_error_rel_;
 
   int nb_bubbles_ = 0;
 

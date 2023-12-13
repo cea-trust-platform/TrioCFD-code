@@ -1136,25 +1136,25 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
    */
   pure_neighbours_to_correct_.resize(dxyz_increment_max + 1);
   pure_neighbours_corrected_distance_.resize(dxyz_increment_max + 1);
-  if (neighbours_colinearity_weighting_)
+  if (neighbours_weighting_)
     pure_neighbours_corrected_colinearity_.resize(dxyz_increment_max + 1);
   for (l=dxyz_increment_max; l>=0; l--)
     {
       pure_neighbours_to_correct_[l].resize(dxyz_increment_max + 1);
       pure_neighbours_corrected_distance_[l].resize(dxyz_increment_max + 1);
-      if (neighbours_colinearity_weighting_)
+      if (neighbours_weighting_)
         pure_neighbours_corrected_colinearity_[l].resize(dxyz_increment_max + 1);
       for (m=dxyz_increment_max; m>=0; m--)
         {
           pure_neighbours_to_correct_[l][m].resize(dxyz_increment_max + 1);
           pure_neighbours_corrected_distance_[l][m].resize(dxyz_increment_max + 1);
-          if (neighbours_colinearity_weighting_)
+          if (neighbours_weighting_)
             pure_neighbours_corrected_colinearity_[l][m].resize(dxyz_increment_max + 1);
           for (n=dxyz_increment_max; n>=0; n--)
             {
               pure_neighbours_to_correct_[l][m][n] = false;
               pure_neighbours_corrected_distance_[l][m][n] = 0.;
-              if (neighbours_colinearity_weighting_)
+              if (neighbours_weighting_)
                 pure_neighbours_corrected_colinearity_[l][m][n] = 0.;
             }
         }
@@ -1193,9 +1193,9 @@ void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
                 Vecteur3 distance_contrib = {dx_contrib, dy_contrib, dz_contrib};
                 pure_neighbours_corrected_distance_[l][m][n] = cell_centre_distance_
                                                                + Vecteur3::produit_scalaire(normal_vector_compo_, distance_contrib);
-                if (neighbours_colinearity_weighting_)
+                if (neighbours_weighting_)
                   {
-                    const double colinearity = compute_cell_faces_weighting(dx_contrib, dy_contrib, dz_contrib, 0);
+                    const double colinearity = compute_cell_weighting(dx_contrib, dy_contrib, dz_contrib);
                     pure_neighbours_corrected_colinearity_[l][m][n] = colinearity;
                   }
               }

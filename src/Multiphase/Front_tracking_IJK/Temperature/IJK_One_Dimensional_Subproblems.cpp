@@ -33,23 +33,41 @@ IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
   interfacial_thermal_flux_per_bubble_.set_smart_resize(1);
   interfacial_thermal_flux_per_bubble_gfm_.set_smart_resize(1);
   interfacial_thermal_flux_per_bubble_spherical_.set_smart_resize(1);
+
   total_surface_per_bubble_.set_smart_resize(1);
+
   overall_nusselt_number_per_bubble_.set_smart_resize(1);
   overall_nusselt_number_per_bubble_gfm_.set_smart_resize(1);
   overall_nusselt_number_per_bubble_spherical_.set_smart_resize(1);
   overall_nusselt_number_per_bubble_liquid_.set_smart_resize(1);
   overall_nusselt_number_per_bubble_gfm_liquid_.set_smart_resize(1);
   overall_nusselt_number_per_bubble_spherical_liquid_.set_smart_resize(1);
+
   overall_shear_stress_per_bubble_.set_smart_resize(1);
   overall_shear_force_per_bubble_.set_smart_resize(1);
+
   radius_outputs_.set_smart_resize(1);
   theta_outputs_.set_smart_resize(1);
   phi_outputs_.set_smart_resize(1);
+
   global_indices_post_processed_.set_smart_resize(1);
+
   radius_from_surfaces_per_bubble_.set_smart_resize(1);
   radius_from_volumes_per_bubble_.set_smart_resize(1);
+
   caracteristic_length_from_surfaces_per_bubble_.set_smart_resize(1);
   caracteristic_length_from_volumes_per_bubble_.set_smart_resize(1);
+
+  overall_nusselt_number_per_bubble_error_.set_smart_resize(1);
+  overall_nusselt_number_per_bubble_gfm_error_.set_smart_resize(1);
+  overall_nusselt_number_per_bubble_liquid_error_.set_smart_resize(1);
+  overall_nusselt_number_per_bubble_gfm_liquid_error_.set_smart_resize(1);
+
+  overall_nusselt_number_per_bubble_error_rel_.set_smart_resize(1);
+  overall_nusselt_number_per_bubble_gfm_error_rel_.set_smart_resize(1);
+  overall_nusselt_number_per_bubble_liquid_error_rel_.set_smart_resize(1);
+  overall_nusselt_number_per_bubble_gfm_liquid_error_rel_.set_smart_resize(1);
+
   bubbles_volume_ = nullptr;
 }
 
@@ -1034,19 +1052,33 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities_per_bubbles(con
   interfacial_thermal_flux_per_bubble_.resize(nb_bubbles_);
   interfacial_thermal_flux_per_bubble_gfm_.resize(nb_bubbles_);
   interfacial_thermal_flux_per_bubble_spherical_.resize(nb_bubbles_);
+
   total_surface_per_bubble_.resize(nb_bubbles_);
+
   overall_nusselt_number_per_bubble_.resize(nb_bubbles_);
   overall_nusselt_number_per_bubble_gfm_.resize(nb_bubbles_);
   overall_nusselt_number_per_bubble_spherical_.resize(nb_bubbles_);
   overall_nusselt_number_per_bubble_liquid_.resize(nb_bubbles_);
   overall_nusselt_number_per_bubble_gfm_liquid_.resize(nb_bubbles_);
   overall_nusselt_number_per_bubble_spherical_liquid_.resize(nb_bubbles_);
+
   overall_shear_stress_per_bubble_.resize(nb_bubbles_);
   overall_shear_force_per_bubble_.resize(nb_bubbles_);
   radius_from_surfaces_per_bubble_.resize(nb_bubbles_);
   radius_from_volumes_per_bubble_.resize(nb_bubbles_);
+
   caracteristic_length_from_surfaces_per_bubble_.resize(nb_bubbles_);
   caracteristic_length_from_volumes_per_bubble_.resize(nb_bubbles_);
+
+  overall_nusselt_number_per_bubble_error_.resize(nb_bubbles_);
+  overall_nusselt_number_per_bubble_gfm_error_.resize(nb_bubbles_);
+  overall_nusselt_number_per_bubble_liquid_error_.resize(nb_bubbles_);
+  overall_nusselt_number_per_bubble_gfm_liquid_error_.resize(nb_bubbles_);
+
+  overall_nusselt_number_per_bubble_error_rel_.resize(nb_bubbles_);
+  overall_nusselt_number_per_bubble_gfm_error_rel_.resize(nb_bubbles_);
+  overall_nusselt_number_per_bubble_liquid_error_rel_.resize(nb_bubbles_);
+  overall_nusselt_number_per_bubble_gfm_liquid_error_rel_.resize(nb_bubbles_);
 
   compute_nusselt_numbers_per_bubbles(temperature_gradient_ghost, delta_temperature, lambda);
   compute_shear_per_bubbles();
@@ -1139,33 +1171,63 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities()
   overall_nusselt_number_liquid_ = 0.;
   overall_nusselt_number_gfm_liquid_ = 0.;
   overall_nusselt_number_spherical_liquid_ = 0.;
+
   interfacial_thermal_flux_ = 0.;
   interfacial_thermal_flux_gfm_ = 0.;
+
   total_surface_ = 0.;
   total_volume_ = 0.;
+
   overall_shear_force_ = 0.;
   overall_shear_stress_ = 0.;
+
+  overall_nusselt_number_error_ = 0.;
+  overall_nusselt_number_gfm_error_ = 0.;
+  overall_nusselt_number_liquid_error_ = 0.;
+  overall_nusselt_number_gfm_liquid_error_ = 0.;
+
+  overall_nusselt_number_error_rel_ = 0.;
+  overall_nusselt_number_gfm_error_rel_ = 0.;
+  overall_nusselt_number_liquid_error_rel_ = 0.;
+  overall_nusselt_number_gfm_liquid_error_rel_ = 0.;
 
   for (int i=0; i < nb_bubbles_; i++)
     {
       interfacial_thermal_flux_ += interfacial_thermal_flux_per_bubble_(i);
       interfacial_thermal_flux_gfm_ += interfacial_thermal_flux_per_bubble_gfm_(i);
-      total_surface_ += total_surface_per_bubble_(i);
+      interfacial_thermal_flux_per_bubble_spherical_(i) = heat_flux_spherical_ * total_surface_per_bubble_(i);
+
+
       overall_nusselt_number_ += overall_nusselt_number_per_bubble_(i);
       overall_nusselt_number_gfm_ += overall_nusselt_number_per_bubble_gfm_(i);
       overall_nusselt_number_liquid_ += overall_nusselt_number_per_bubble_liquid_(i);
       overall_nusselt_number_gfm_liquid_ += overall_nusselt_number_per_bubble_gfm_liquid_(i);
-      interfacial_thermal_flux_per_bubble_spherical_(i) = heat_flux_spherical_ * total_surface_per_bubble_(i);
+
       overall_shear_force_ += overall_shear_force_per_bubble_(i);
+
+      total_surface_ += total_surface_per_bubble_(i);
       total_volume_ += (*bubbles_volume_)(i);
+
       radius_from_surfaces_per_bubble_(i) = sqrt(total_surface_per_bubble_(i) / (4. * M_PI));
       radius_from_volumes_per_bubble_(i) = pow((*bubbles_volume_)(i) * 3. / (4. * M_PI), (1. / 3.));
+
       caracteristic_length_from_surfaces_per_bubble_(i) = radius_from_surfaces_per_bubble_(i) * 2;
       caracteristic_length_from_volumes_per_bubble_(i) = radius_from_volumes_per_bubble_(i) * 2;
+
       overall_nusselt_number_per_bubble_spherical_(i) = (heat_flux_spherical_ * caracteristic_length_from_surfaces_per_bubble_(i))
                                                         / (delta_temperature_ * lambda_);
       overall_nusselt_number_per_bubble_spherical_liquid_(i) = (heat_flux_spherical_ * caracteristic_length_from_surfaces_per_bubble_(i))
                                                                / (mean_liquid_temperature_ * lambda_);
+
+      overall_nusselt_number_per_bubble_error_(i) = overall_nusselt_number_per_bubble_(i) - spherical_nusselt_;
+      overall_nusselt_number_per_bubble_gfm_error_(i) = overall_nusselt_number_per_bubble_gfm_(i) - spherical_nusselt_;
+      overall_nusselt_number_per_bubble_liquid_error_(i) = overall_nusselt_number_per_bubble_liquid_(i) - spherical_nusselt_;
+      overall_nusselt_number_per_bubble_gfm_liquid_error_(i) = overall_nusselt_number_per_bubble_gfm_liquid_(i) - spherical_nusselt_;
+
+      overall_nusselt_number_per_bubble_error_rel_(i) = overall_nusselt_number_per_bubble_error_(i) / (1e-16 + spherical_nusselt_);
+      overall_nusselt_number_per_bubble_gfm_error_rel_(i) = overall_nusselt_number_per_bubble_gfm_error_(i) / (1e-16 + spherical_nusselt_);
+      overall_nusselt_number_per_bubble_liquid_error_rel_(i) = overall_nusselt_number_per_bubble_liquid_error_(i) / (1e-16 + spherical_nusselt_);
+      overall_nusselt_number_per_bubble_gfm_liquid_error_rel_(i) = overall_nusselt_number_per_bubble_gfm_liquid_error_(i) / (1e-16 + spherical_nusselt_);
     }
   overall_shear_stress_ = overall_shear_force_ / total_surface_;
   radius_from_surfaces_ = sqrt((total_surface_ / nb_bubbles_) / (4. * M_PI));
@@ -1177,6 +1239,16 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities()
                                       / (delta_temperature_ * lambda_);
   overall_nusselt_number_spherical_liquid_ = (heat_flux_spherical_ * caracteristic_length_from_surfaces_)
                                              / (mean_liquid_temperature_ * lambda_);
+
+  overall_nusselt_number_error_ = (overall_nusselt_number_ - spherical_nusselt_);
+  overall_nusselt_number_gfm_error_ = (overall_nusselt_number_gfm_ - spherical_nusselt_);
+  overall_nusselt_number_liquid_error_ = (overall_nusselt_number_liquid_ - spherical_nusselt_);
+  overall_nusselt_number_gfm_liquid_error_ = (overall_nusselt_number_gfm_liquid_ - spherical_nusselt_);
+
+  overall_nusselt_number_error_rel_ = overall_nusselt_number_error_ / (1e-16 + spherical_nusselt_);
+  overall_nusselt_number_gfm_error_rel_ = overall_nusselt_number_gfm_error_ / (1e-16 + spherical_nusselt_);
+  overall_nusselt_number_liquid_error_rel_ = overall_nusselt_number_liquid_error_ / (1e-16 + spherical_nusselt_);
+  overall_nusselt_number_gfm_liquid_error_rel_ = overall_nusselt_number_gfm_liquid_error_ / (1e-16 + spherical_nusselt_);
 //  interfacial_thermal_flux_ = Process::mp_sum(interfacial_thermal_flux_);
 //  interfacial_thermal_flux_gfm_ = Process::mp_sum(interfacial_thermal_flux_gfm_);
 //  total_surface_ = Process::mp_sum(total_surface_);
@@ -1202,6 +1274,8 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
                              "\ttimedimensionless"
                              "\tnusseltoverall\tnusseltoverallgfm\tnusseltspherical\tnusseltsphericalth"
                              "\tnusseltoverallliq\tnusseltoverallgfmliq\tnusseltsphericalliq\tnusseltsphericalthliq"
+                             "\tnusseltoverallerror\tnusseltoverallgfmerror\tnusseltoverallliqerror\tnusseltoverallgfmliqerror"
+                             "\tnusseltoverallerrorrel\tnusseltoverallgfmerrorrel\tnusseltoverallliqerrorrel\tnusseltoverallgfmliqerrorrel"
                              "\theatflux\theatfluxgfm\theatfluxspherical"
                              "\ttotalsurface\ttotalvolume"
                              "\tradiussurface\tradiusvolume"
@@ -1227,6 +1301,14 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << overall_nusselt_number_per_bubble_gfm_liquid_(i) << " ";
           fic << overall_nusselt_number_per_bubble_spherical_liquid_(i) << " ";
           fic << spherical_nusselt_liquid_ << " ";
+          fic << overall_nusselt_number_per_bubble_error_(i) << " ";
+          fic << overall_nusselt_number_per_bubble_gfm_error_(i) << " ";
+          fic << overall_nusselt_number_per_bubble_liquid_error_(i)  << " ";
+          fic << overall_nusselt_number_per_bubble_gfm_liquid_error_(i) << " ";
+          fic << overall_nusselt_number_per_bubble_error_rel_(i)  << " ";
+          fic << overall_nusselt_number_per_bubble_gfm_error_rel_(i) << " ";
+          fic << overall_nusselt_number_per_bubble_liquid_error_rel_(i)  << " ";
+          fic << overall_nusselt_number_per_bubble_gfm_liquid_error_rel_(i)  << " ";
           fic << interfacial_thermal_flux_per_bubble_(i) << " ";
           fic << interfacial_thermal_flux_per_bubble_gfm_(i) << " ";
           fic << interfacial_thermal_flux_per_bubble_spherical_(i) << " ";
@@ -1256,6 +1338,14 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << overall_nusselt_number_gfm_liquid_ << " ";
           fic << overall_nusselt_number_spherical_liquid_ << " ";
           fic << spherical_nusselt_liquid_ << " ";
+          fic << overall_nusselt_number_error_ << " ";
+          fic << overall_nusselt_number_gfm_error_ << " ";
+          fic << overall_nusselt_number_liquid_error_  << " ";
+          fic << overall_nusselt_number_gfm_liquid_error_  << " ";
+          fic << overall_nusselt_number_error_rel_  << " ";
+          fic << overall_nusselt_number_gfm_error_rel_  << " ";
+          fic << overall_nusselt_number_liquid_error_rel_  << " ";
+          fic << overall_nusselt_number_gfm_liquid_error_rel_  << " ";
           fic << interfacial_thermal_flux_ << " ";
           fic << interfacial_thermal_flux_gfm_ << " ";
           fic << heat_flux_spherical_ << " ";

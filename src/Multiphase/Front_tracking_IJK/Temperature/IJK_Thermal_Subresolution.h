@@ -81,7 +81,7 @@ public :
   }
   const IJK_Field_double& get_temperature_cell_neighbours_debug() const override
   {
-    if (find_temperature_cell_neighbours_)
+    if (find_temperature_cell_neighbours_ && debug_)
       return temperature_cell_neighbours_debug_;
     else
       return dummy_double_field_;
