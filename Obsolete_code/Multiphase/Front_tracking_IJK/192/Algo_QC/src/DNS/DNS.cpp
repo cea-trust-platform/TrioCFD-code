@@ -7303,6 +7303,7 @@ Entree& DNS_QC_double::interpreter(Entree& is)
   convection_rho_centre4_ = 0;
 
   convection_velocity_amont_ = 0;
+  convection_velocity_centre2_ = 0;
   convection_velocity_quicksharp_ = 0;
 
   terme_source_acceleration_=0;
@@ -7409,6 +7410,7 @@ Entree& DNS_QC_double::interpreter(Entree& is)
 
   param.ajouter_flag("convection_velocity_amont", &convection_velocity_amont_);
   param.ajouter_flag("convection_velocity_quicksharp", &convection_velocity_quicksharp_);
+  param.ajouter_flag("convection_velocity_centre2", &convection_velocity_centre2_);
 
   param.ajouter_flag("variation_cste_modele_fonctionnel", &variation_cste_modele_fonctionnel_);
 
@@ -8609,7 +8611,9 @@ void DNS_QC_double::reprendre_qc(const char *fichier_reprise)
   param.ajouter("fichier_reprise_rho", &fichier_reprise_rho_);
   param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_);
   param.ajouter("timestep_reprise_rho", &timestep_reprise_rho_);
+  Cerr << "Avant ajout statistiques" << finl;
   param.ajouter("statistiques", &statistiques_);
+  Cerr << "Apres ajout statistiques" << finl;
   param.lire_avec_accolades(fichier);
   // Appeler ensuite initialize() pour lire les fichiers lata etc...
   Cerr << "Reprise des donnees a t=" << current_time_ << "\n P_thermo=" << P_thermodynamique_ << finl;
@@ -9623,6 +9627,10 @@ void DNS_QC_double::run()
     {
       velocity_convection_op_quicksharp_.initialize(splitting_);
     }
+  else if (convection_velocity_centre2_)
+    {
+      velocity_convection_op_centre_2_.initialize(splitting_, boundary_conditions_);
+    }
   else
     {
       // Schema centre4 (utilise par defaut)
@@ -10395,6 +10403,13 @@ void DNS_QC_double::calculer_convection_vitesse(FixedVector<IJK_Field_double, 3>
                                                           velocity[0], velocity[1], velocity[2],
                                                           d_velocity[0], d_velocity[1], d_velocity[2]);
             }
+          else if(convection_velocity_centre2_)
+            {
+              velocity_convection_op_centre_2_.ajouter_avec_u_div_rhou(rho_v[0], rho_v[1], rho_v[2],
+                                                         velocity[0], velocity[1], velocity[2],
+                                                         d_velocity[0], d_velocity[1], d_velocity[2],
+                                                         u_div_rho_u);
+            }
           else
             {
               // Schema centre4 (utilise par defaut)
@@ -10429,6 +10444,13 @@ void DNS_QC_double::calculer_convection_vitesse(FixedVector<IJK_Field_double, 3>
                                                           velocity[0], velocity[1], velocity[2],
                                                           d_velocity[0], d_velocity[1], d_velocity[2]);
             }
+          else if (convection_velocity_centre2_)
+          {
+              velocity_convection_op_centre_2_..ajouter_avec_u_div_rhou(rho_v[0], rho_v[1], rho_v[2],
+                                                                        velocity[0], velocity[1], velocity[2],
+                                                                        d_velocity[0], d_velocity[1], d_velocity[2],
+                                                                        u_div_rho_u);
+          }
           else
             {
               // Schema centre4 (utilise par defaut)

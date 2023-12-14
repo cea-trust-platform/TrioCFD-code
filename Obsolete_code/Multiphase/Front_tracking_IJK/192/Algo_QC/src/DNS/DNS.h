@@ -39,6 +39,7 @@
 #include <IJK_Splitting.h>
 #include <OpDiffTurbIJK.h>
 #include <OpCentre4IJK.h>
+#include <OpCentre2IJK.h>
 #include <Multigrille_Adrien.h>
 #include <Interprete.h>
 #include <IJK_Lata_writer.h>
@@ -49,7 +50,7 @@
 #include <OpDiffTurbIJKScalar.h>
 #include <Parser.h>
 #include <Boundary_Conditions.h>
-#include <Statistiques_dns_ijk.h>
+#include <Statistiques_dns_qc_ijk.h>
 #include <IJK_Thermique.h>
 #include <Filter_kernel.h>
 
@@ -179,7 +180,7 @@ protected:
 
   // -------------------------------------------------
   // Statistiques temporelles
-  Statistiques_dns_ijk statistiques_;
+  Statistiques_dns_qc_ijk statistiques_;
   double t_debut_statistiques_;
 
   // Statistiques spectrale de la turbulence
@@ -353,6 +354,8 @@ protected:
   FixedVector<IJK_Field_double, 3> d_velocity_tmp_;
 
   OpConvCentre4IJK_double velocity_convection_op_;
+  OpConvCentre2IJK_double velocity_convection_op_centre_2_;
+
   OpConvIJKQuickSharp_double velocity_convection_op_quicksharp_;
   OpConvAmontIJK_double velocity_convection_op_amont_;
 
