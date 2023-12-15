@@ -147,6 +147,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   interp_eulerian_ = 0;
   first_step_thermals_post_=1;
 
+  neighbours_last_faces_weighting_ = 0;
   neighbours_last_faces_colinearity_weighting_ = 0;
   neighbours_last_faces_colinearity_face_weighting_ = 0;
   neighbours_last_faces_distance_weighting_ = 0;
@@ -655,16 +656,42 @@ void IJK_Thermal_Subresolution::compute_temperature_init()
               break;
             case integral_criteria:
               {
-                const double temperature_integral = compute_spherical_steady_dirichlet_left_right_integral();
-                const double time_integral = find_time_dichotomy_integral(temperature_integral);
+                const int max_attempt = 50;
+                int attempt_counter = 0;
+                double temperature_end_prev = delta_T_subcooled_overheated_;
+                double time_integral = 0.;
+                double temperature_end_next = 2 * temperature_end_prev;
+                while (abs(temperature_end_next - temperature_end_prev) > 0.01 && (attempt_counter < max_attempt))
+                  {
+                    const double temperature_integral = compute_spherical_steady_dirichlet_left_right_integral(temperature_end_prev);
+                    time_integral = find_time_dichotomy_integral(temperature_integral, temperature_end_next);
+                    temperature_end_prev = 0.5 * (temperature_end_prev + temperature_end_next);
+                    attempt_counter++;
+                  }
                 time_ini = time_integral;
               }
               break;
             case derivative_criteria:
               {
+                double time_derivative=0.;
+                const int max_attempt = 100;
+                int attempt_counter = 0;
                 const double R = get_probes_length() +  single_centred_bubble_radius_ini_;
-                const double temperature_derivative = compute_spherical_steady_dirichlet_left_right_derivative_value(R);
-                const double time_derivative = find_time_dichotomy_derivative(temperature_derivative);
+                double error = 1.;
+                double temperature_end_min = 0.;
+                get_time_inflection_derivative(temperature_end_min);
+                double temperature_limit_left = temperature_end_min;
+                double temperature_limit_right = temperature_end_min + 0.25 * abs(temperature_end_min);
+                double temperature_middle = 0.5 * (temperature_limit_left + temperature_limit_right);
+                while (error > 1e-2 && (attempt_counter < max_attempt))
+                  {
+                    const double temperature_derivative = compute_spherical_steady_dirichlet_left_right_derivative_value(R, temperature_middle);
+                    time_derivative = find_time_dichotomy_derivative(temperature_derivative, temperature_limit_left, temperature_limit_right);
+                    error = abs(temperature_limit_right - temperature_limit_left);
+                    Cerr << "error: " << error << finl;
+                    temperature_middle = 0.5 * (temperature_limit_right + temperature_limit_right);
+                    attempt_counter++;
+                  }
                 time_ini = time_derivative;
               }
               break;
@@ -832,35 +859,35 @@ double IJK_Thermal_Subresolution::compute_spherical_steady_dirichlet_left_right_
   const double T1 = delta_T_subcooled_overheated_;
   const double R0 = single_centred_bubble_radius_ini_;
   const double R1 = get_probes_length() + R0;
-  temperature_value = T1  + T1 * (r * R0 - R1 * R0) / (r * (R1 - R0));
+  temperature_value = T1 + T1 * (r * R0 - R1 * R0) / (r * (R1 - R0));
   return temperature_value;
 }
 
-double IJK_Thermal_Subresolution::compute_spherical_steady_dirichlet_left_right_derivative_value(const double& r)
+double IJK_Thermal_Subresolution::compute_spherical_steady_dirichlet_left_right_derivative_value(const double& r, const double& temperature_end_prev)
 {
   double temperature_derivative;
-  const double T1 = delta_T_subcooled_overheated_;
+  const double T1 = temperature_end_prev;
   const double R0 = single_centred_bubble_radius_ini_;
   const double R1 = get_probes_length() + R0;
   temperature_derivative = T1 * (R1 * R0) / (pow(r, 2) * (R1 - R0));
   return temperature_derivative;
 }
 
-double IJK_Thermal_Subresolution::compute_spherical_steady_dirichlet_left_right_integral()
+double IJK_Thermal_Subresolution::compute_spherical_steady_dirichlet_left_right_integral(const double& temperature_end_prev)
 {
   double temperature_integral;
-  const double T1 = delta_T_subcooled_overheated_;
+  const double T1 = temperature_end_prev;
   const double R0 = single_centred_bubble_radius_ini_;
   const double R1 = get_probes_length() + R0;
   const double Delta_R = R1 - R0;
   temperature_integral = (T1 * R1) / (R1 - R0) * (Delta_R - R0 * (log(R1) - log(R0)));
   temperature_integral /= Delta_R;
-  temperature_integral += abs(T1);
+  //  temperature_integral += abs(T1);
   // temperature_integral positive
   return temperature_integral;
 }
 
-double IJK_Thermal_Subresolution::find_time_dichotomy_integral(const double& temperature_integral)
+double IJK_Thermal_Subresolution::find_time_dichotomy_integral(const double& temperature_integral, double& temperature_end_prev)
 {
   // Arbitrary large time
   const double time_integral = 100.;
@@ -874,8 +901,9 @@ double IJK_Thermal_Subresolution::find_time_dichotomy_integral(const double& tem
   double left_time = 0.;
   double right_time = time_integral;
   double temperature_integral_eval = 1.e20;
+  // const int sign_temperature_integral = signbit(temperature_integral);
   auto fflambda = [](const double& r, const double& R, const double& alpha, const double& t)
-  { return R / r * (1- erf( (r - R)/(2 * sqrt(alpha * t)))) ; };
+  { return R / r * (1 - erf( (r - R)/(2 * sqrt(alpha * t)))) ; };
   while(abs(temperature_integral_eval - temperature_integral) > 1e-6)
     {
       temperature_integral_eval = 0.;
@@ -887,7 +915,7 @@ double IJK_Thermal_Subresolution::find_time_dichotomy_integral(const double& tem
         temperature_integral_eval += (fflambda(R0 + radial_incr * i, R0, alpha_liq, time_tmp)
                                       + fflambda(R0 + radial_incr * (i+1), R0, alpha_liq, time_tmp))
                                      * (radial_incr / 2);
-      temperature_integral_eval = abs(T1) * temperature_integral_eval / Delta_R;
+      temperature_integral_eval = T1 - T1 * temperature_integral_eval / Delta_R;
       // temperature_integral_eval is positive
       if (temperature_integral_eval > temperature_integral)
         right_time = time_tmp;
@@ -902,6 +930,8 @@ double IJK_Thermal_Subresolution::find_time_dichotomy_integral(const double& tem
   { return Tinfty * R / r / (2 * sqrt(alpha * t)) * (2 / sqrt(M_PI)) * (exp(-pow((r - R)/(2 * sqrt(alpha * t)),2))) ; };
 
   const double temperature_end = flambda(R1, R0, alpha_liq, time_tmp, T1);
+  Cerr << "Temperature at the probes end: " << temperature_end_prev << finl;
+  temperature_end_prev = temperature_end;
   Cerr << "Temperature at the probes end: " << temperature_end << finl;
   const double temperature_derivative_end = glambda(R1, R0, alpha_liq, time_tmp, T1)
                                             + hlambda(R1, R0, alpha_liq, time_tmp, T1);
@@ -929,48 +959,90 @@ void IJK_Thermal_Subresolution::compute_Nusselt_spherical_diffusion()
                                             / mean_liquid_temperature_);
 }
 
-double IJK_Thermal_Subresolution::find_time_dichotomy_derivative(const double& temperature_derivative)
+
+double IJK_Thermal_Subresolution::get_time_inflection_derivative(double& temperature_end_min)
 {
   const double T1 = delta_T_subcooled_overheated_;
   const double R0 = single_centred_bubble_radius_ini_;
   const double R1 = get_probes_length() + R0;
   const double rho_l = ref_ijk_ft_->get_rho_l();
   const double alpha_liq = lambda_liquid_ / (rho_l * cp_liquid_);
-  const double inflection_time_temperature_derivative = (1. / 6.) * (pow(R0, 2) - 2*R1*R0 + pow(R1, 2)) / alpha_liq;
-  double time_tmp = inflection_time_temperature_derivative;
-  double left_time = 0.;
-  double right_time = inflection_time_temperature_derivative;
+  // Solve dphidt(dphidr(T)) == 0
+  const double inflection_time_temperature_derivative = 0.5 * (pow(R0,2) * R1 - 2 * R0 * pow(R1,2) + pow(R1,3)) / (R0*alpha_liq);
+  auto glambda = [](const double& r, const double& R, const double& alpha, const double& t, const double& Tinfty)
+  { return - (-Tinfty) * R / pow(r,2) * (1- erf( (r - R)/(2 * sqrt(alpha * t)))) ; };
+  auto hlambda = [](const double& r, const double& R, const double& alpha, const double& t, const double& Tinfty)
+  { return - (-Tinfty) * R / r / (2 * sqrt(alpha * t)) * (2 / sqrt(M_PI)) * (exp(-pow((r - R)/(2 * sqrt(alpha * t)),2))) ; };
+  const double inflection_temperature_derivative = glambda(R1, R0, alpha_liq, inflection_time_temperature_derivative, T1)
+                                                   + hlambda(R1, R0, alpha_liq, inflection_time_temperature_derivative, T1);
+  temperature_end_min = (inflection_temperature_derivative * R1 * (R1 - R0)) / (R0);
+  return inflection_time_temperature_derivative;
+}
+
+double IJK_Thermal_Subresolution::find_time_dichotomy_derivative(const double& temperature_derivative, double& temperature_limit_left, double& temperature_limit_right)
+{
+  // double temperature_incr = 0.001;
+  const double time_max = 1000.;
+  const double T1 = delta_T_subcooled_overheated_;
+  const double R0 = single_centred_bubble_radius_ini_;
+  const double R1 = get_probes_length() + R0;
+  const double rho_l = ref_ijk_ft_->get_rho_l();
+  const double alpha_liq = lambda_liquid_ / (rho_l * cp_liquid_);
+  double temperature_end_min = 0.;
+  // Solve dphidt(dphidr(T)) == 0
+  const double inflection_time_temperature_derivative = get_time_inflection_derivative(temperature_end_min);
+
+  double time_tmp = 0.;
+  double left_time = inflection_time_temperature_derivative;
+  double right_time = time_max;
   double temperature_derivative_eval = 1.e20;
   auto flambda = [](const double& r, const double& R, const double& alpha, const double& t, const double& Tinfty)
   { return Tinfty - Tinfty * R / r * (1- erf( (r - R)/(2 * sqrt(alpha * t)))) ; };
-  auto glambda = [](const double& r, const double& R, const double& alpha, const double& t)
-  { return - R / pow(r,2) * (1- erf( (r - R)/(2 * sqrt(alpha * t)))) ; };
-  auto hlambda = [](const double& r, const double& R, const double& alpha, const double& t)
-  { return - R / r / (2 * sqrt(alpha * t)) * (2 / sqrt(M_PI)) * (exp(-pow((r - R)/(2 * sqrt(alpha * t)),2))) ; };
-  const double inflection_temperature_derivative = glambda(R1, R0, alpha_liq, time_tmp)
-                                                   + hlambda(R1, R0, alpha_liq, time_tmp);
-  const double inflection_temperature = flambda(R1, R0, alpha_liq, time_tmp, T1);
+  auto glambda = [](const double& r, const double& R, const double& alpha, const double& t, const double& Tinfty)
+  { return - (-Tinfty) * R / pow(r,2) * (1- erf( (r - R)/(2 * sqrt(alpha * t)))) ; };
+  auto hlambda = [](const double& r, const double& R, const double& alpha, const double& t, const double& Tinfty)
+  { return - (-Tinfty) * R / r / (2 * sqrt(alpha * t)) * (2 / sqrt(M_PI)) * (exp(-pow((r - R)/(2 * sqrt(alpha * t)),2))) ; };
+  const double inflection_temperature_derivative = glambda(R1, R0, alpha_liq, inflection_time_temperature_derivative, T1)
+                                                   + hlambda(R1, R0, alpha_liq, inflection_time_temperature_derivative, T1);
+  const double inflection_temperature = flambda(R1, R0, alpha_liq, inflection_time_temperature_derivative, T1);
   Cerr << "Inflection temperature derivative init: " << inflection_temperature_derivative << finl;
   Cerr << "Temperature at the inflection point: " << inflection_temperature << finl;
-  if (abs(temperature_derivative) > abs(inflection_temperature_derivative))
-    return time_tmp;
+  Cerr << "Temperature derivative: " << temperature_derivative << finl;
   while(abs(temperature_derivative_eval - temperature_derivative) > 1e-6)
     {
       temperature_derivative_eval = 0.;
       time_tmp = (right_time + left_time) / 2;
-      temperature_derivative_eval = glambda(R1, R0, alpha_liq, time_tmp)
-                                    + hlambda(R1, R0, alpha_liq, time_tmp);
+      temperature_derivative_eval = glambda(R1, R0, alpha_liq, time_tmp, T1)
+                                    + hlambda(R1, R0, alpha_liq, time_tmp, T1);
       if (abs(temperature_derivative_eval) > abs(inflection_temperature_derivative))
         {
           time_tmp = inflection_time_temperature_derivative;
           break;
         }
+      if (abs(temperature_derivative_eval - temperature_derivative) > 1e-2 && abs(left_time-right_time) < 1e-2)
+        right_time = 2 * right_time;
       // temperature_integral_eval is positive
-      if (abs(temperature_derivative_eval) > abs(temperature_derivative))
+      if (abs(temperature_derivative_eval) < abs(temperature_derivative))
         right_time = time_tmp;
       else
         left_time = time_tmp;
     }
+  const double temperature_end = flambda(R1, R0, alpha_liq, time_tmp, T1);
+  Cerr << "Temperature at the probes end: " << temperature_end << finl;
+  double temperature_middle = 0.5 * (temperature_limit_right + temperature_limit_left);
+  Cerr << "Temperature left limit: " << temperature_limit_left << finl;
+  Cerr << "Temperature right limit: " << temperature_limit_right << finl;
+  Cerr << "Temperature middle: " << temperature_middle << finl;
+  if (abs(temperature_end) > abs(temperature_middle))
+    temperature_limit_left = temperature_middle;
+  else
+    temperature_limit_right = temperature_middle;
+  Cerr << "Temperature left limit: " << temperature_limit_left << finl;
+  Cerr << "Temperature right limit: " << temperature_limit_right << finl;
+
+  const double temperature_derivative_end = glambda(R1, R0, alpha_liq, time_tmp, T1)
+                                            + hlambda(R1, R0, alpha_liq, time_tmp, T1);
+  Cerr << "Temperature derivative at the probes end: " << temperature_derivative_end << finl;
   return time_tmp;
 }
 

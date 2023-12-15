@@ -265,11 +265,12 @@ protected :
   void set_field_T_ana() override;
   void calculer_ecart_T_ana() override { ; };
   double compute_spherical_steady_dirichlet_left_right_value(const double& r);
-  double compute_spherical_steady_dirichlet_left_right_derivative_value(const double& r);
-  double compute_spherical_steady_dirichlet_left_right_integral();
-  double find_time_dichotomy_integral(const double& temperature_integral);
+  double compute_spherical_steady_dirichlet_left_right_derivative_value(const double& r, const double& temperature_prev);
+  double compute_spherical_steady_dirichlet_left_right_integral(const double& temperature_end_prev);
+  double find_time_dichotomy_integral(const double& temperature_integral, double& temperature_end_prev);
   void compute_Nusselt_spherical_diffusion();
-  double find_time_dichotomy_derivative(const double& temperature_derivative);
+  double get_time_inflection_derivative(double& temperature_end_min);
+  double find_time_dichotomy_derivative(const double& temperature_derivative, double& temperature_limit_left, double& temperature_limit_right);
 
   /* compute_rho_cp_u_mean() May be clearly overridden later */
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };

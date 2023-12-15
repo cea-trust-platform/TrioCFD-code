@@ -1373,7 +1373,7 @@ void Corrige_flux_FT_temperature_subresolution::combine_all_fluxes_from_outisde_
                       if (convective_flux_correction_)
                         cell_faces_neighbours_corrected_convective[dir](i,j,k) += convective_flux;
                       if (diffusive_flux_correction_)
-                        cell_faces_neighbours_corrected_convective[dir](i,j,k) += diffusive_flux;
+                        cell_faces_neighbours_corrected_diffusive[dir](i,j,k) += diffusive_flux;
                       if (neighbours_colinearity_weighting_)
                         neighbours_weighting_colinearity[dir](i,j,k) += colinearity;
                     }
