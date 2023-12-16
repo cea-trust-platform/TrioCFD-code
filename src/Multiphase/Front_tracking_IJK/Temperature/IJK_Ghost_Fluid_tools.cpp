@@ -127,14 +127,18 @@ static void extrapolate_with_elem_faces_connectivity(const Domaine_VF& domaine_v
 }
 
 static void extrapolate_with_ijk_indices(const IJK_Field_double& distance,
+                                         const IJK_Field_double& indicator,
                                          IJK_Field_double& field,
-                                         const int stencil_width)
+                                         const int stencil_width,
+                                         const int recompute_field_ini,
+                                         const int zero_neighbour_value_mean,
+                                         const int vapour_mixed_only)
 {
   int neighbours_i[6] = NEIGHBOURS_I;
   int neighbours_j[6] = NEIGHBOURS_J;
   int neighbours_k[6] = NEIGHBOURS_K;
   const double invalid_test = INVALID_TEST;
-  const double n_iterations = 5 * stencil_width;
+  const double n_iterations = zero_neighbour_value_mean ? 20 * stencil_width : stencil_width;
   const int ni = field.ni();
   const int nj = field.nj();
   const int nk = field.nk();
@@ -147,30 +151,38 @@ static void extrapolate_with_ijk_indices(const IJK_Field_double& distance,
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
             {
-              const double d = distance(i,j,k);
-              const double field_ini_val = field_ini(i,j,k);
-              if ((d > invalid_test) && (field_ini_val == 0))
+              const double indic = indicator(i,j,k);
+              const int vapour_mixed = !vapour_mixed_only ? 1 : (indic < LIQUID_INDICATOR_TEST);
+              if (vapour_mixed)
                 {
-                  double sum_field = 0.;
-                  double coeff = 0.;
-                  for (int l=0; l<6; l++)
+                  const double d = distance(i,j,k);
+                  // const double field_ini_val = field_ini(i,j,k);
+                  const double field_ini_val = (!zero_neighbour_value_mean && !recompute_field_ini) ? field_old(i,j,k) : field_ini(i,j,k);
+                  if ((d > invalid_test) && (field_ini_val == 0))
                     {
-                      const int ii = neighbours_i[l];
-                      const int jj = neighbours_j[l];
-                      const int kk = neighbours_k[l];
-                      const double distance_neighbour = distance(i+ii,j+jj,k+kk);
-                      const double field_neighbour = field_old(i+ii,j+jj,k+kk);
-                      // Don't use zero values
-                      // if ((distance_neighbour > invalid_test) && field_neighbour != 0))
-                      // Use zero_values grad_T_ decreasing with distance
-                      if (distance_neighbour > invalid_test)
+                      double sum_field = 0.;
+                      double coeff = 0.;
+                      for (int l=0; l<6; l++)
                         {
-                          sum_field += field_neighbour;
-                          coeff++;
+                          const int ii = neighbours_i[l];
+                          const int jj = neighbours_j[l];
+                          const int kk = neighbours_k[l];
+                          const double distance_neighbour = distance(i+ii,j+jj,k+kk);
+                          const double field_neighbour = field_old(i+ii,j+jj,k+kk);
+                          const int neighbour_condition = zero_neighbour_value_mean ? 1 : (field_neighbour != 0);
+                          // if (distance_neighbour > invalid_test)
+                          // Don't use zero values
+                          // if ((distance_neighbour > invalid_test) && field_neighbour != 0))
+                          // Use zero_values grad_T_ decreasing with distance
+                          if (distance_neighbour > invalid_test && neighbour_condition)
+                            {
+                              sum_field += field_neighbour;
+                              coeff++;
+                            }
                         }
+                      if (coeff > 0.)
+                        field(i,j,k) = sum_field / coeff;
                     }
-                  if (coeff > 0.)
-                    field(i,j,k) = sum_field / coeff;
                 }
             }
       field.echange_espace_virtuel(field.ghost());
@@ -936,7 +948,10 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
 void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfaces& interfaces,
                                                               const IJK_Field_double& distance,
                                                               IJK_Field_double& grad_T_interface,
-                                                              const int stencil_width)
+                                                              const int stencil_width,
+                                                              const int recompute_field_ini,
+                                                              const int zero_neighbour_value_mean,
+                                                              const int vapour_mixed_only)
 {
   /*
    * Propagate value of grad_T_int stored in pure liquid phase towards the vapour phase and mixed cells
@@ -945,7 +960,7 @@ void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfac
   if (use_ijk)
     {
       // Using the ijk indices
-      extrapolate_with_ijk_indices(distance, grad_T_interface, stencil_width);
+      extrapolate_with_ijk_indices(distance, interfaces.I_ft(), grad_T_interface, stencil_width, recompute_field_ini, zero_neighbour_value_mean, vapour_mixed_only);
     }
   else
     {

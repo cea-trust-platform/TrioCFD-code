@@ -72,7 +72,10 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
 void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfaces& interfaces,
                                                               const IJK_Field_double& distance,
                                                               IJK_Field_double& grad_T_interface,
-                                                              const int stencil_width);
+                                                              const int stencil_width,
+                                                              const int recompute_field_ini=1,
+                                                              const int zero_neighbour_value_mean=0,
+                                                              const int vapour_mixed_only=1);
 
 void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
                                            const IJK_Field_double& distance,
