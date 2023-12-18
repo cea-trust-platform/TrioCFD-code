@@ -56,7 +56,20 @@ public :
   void scale_matrix_by_vector(Matrice& matrix,
                               const DoubleVect& vector,
                               const int& boundary_conditions);
-  void scale_matrix_subproblem_by_vector(Matrice * matrix, const DoubleVect& vector, const int& subproblem_index, const int& boundary_conditions);
+  void scale_matrix_subproblem_by_vector(Matrice * matrix,
+                                         const DoubleVect& vector,
+                                         const int& subproblem_index,
+                                         const int& boundary_conditions,
+                                         const int& use_sparse_matrix,
+                                         const FixedVector<ArrOfInt,6> * first_indices_sparse_matrix);
+  void make_operation_on_sub_matrix_sparse(Matrice& local_sub_matrix,
+                                           Matrice * matrix,
+                                           const int& subproblem_index,
+                                           const FixedVector<ArrOfInt,6> * first_indices_sparse_matrix);
+  void recombined_local_sub_matrix_with_matrix(Matrice& local_sub_matrix,
+                                               Matrice * matrix,
+                                               const int& subproblem_index,
+                                               const FixedVector<ArrOfInt,6> * first_indices_sparse_matrix);
   void impose_boundary_conditions(Matrice& modified_matrix,
                                   DoubleVect& mdified_rhs,
                                   const int& ini_boundary_conditions,
@@ -79,13 +92,35 @@ public :
                                              const int& first_time_step_temporal,
                                              const int& first_time_step_explicit,
                                              const DoubleVect& temperature_ini_temporal_schemes,
-                                             const int& start_index);
+                                             const int& start_index,
+                                             const FixedVector<ArrOfInt, 6> * first_indices_sparse_matrix,
+                                             const int& use_sparse_matrix);
+  void sum_any_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B, const int& use_sparse_matrix);
+  void sum_sparse_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B);
   void sum_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B);
   void sum_matrices(Matrice& matrix_A, Matrice& matrix_B);
+  void initialise_sparse_matrix_subproblems(Matrice& matrix_subproblems,
+                                            Matrice& fd_operator,
+                                            const int& nb_subproblems,
+                                            const int& first_time_step_varying_probes,
+                                            FixedVector<ArrOfInt, 6>& first_indices_sparse_matrix,
+                                            const int& first_initialisation,
+                                            int& initialise_sparse_indices);
   void initialise_matrix_subproblems(Matrice& matrix_subproblems,
                                      Matrice& fd_operator,
                                      const int& subproblems,
                                      const int& first_time_step_varying_probes);
+  void reinitialise_any_matrix_subproblem(Matrice * matrix_subproblems,
+                                          const Matrice * fd_operator,
+                                          const int& nb_subproblems,
+                                          const int& use_sparse_matrix,
+                                          FixedVector<ArrOfInt,6> * first_indices_sparse_matrix,
+                                          const int& first_initialisation);
+  void reinitialise_sparse_matrix_subproblem(Matrice * matrix_subproblems,
+                                             const Matrice * fd_operator,
+                                             const int& nb_subproblems,
+                                             FixedVector<ArrOfInt,6> * first_indices_sparse_matrix,
+                                             const int& first_initialisation);
   void reinitialise_matrix_subproblem(Matrice * matrix_subproblems,
                                       const Matrice * fd_operator,
                                       const int& nb_subproblems);

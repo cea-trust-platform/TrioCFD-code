@@ -89,11 +89,13 @@ Entree& IJK_One_Dimensional_Subproblems::readOn( Entree& is )
 
 void IJK_One_Dimensional_Subproblems::initialise_thermal_subproblems_list_params(const int& pre_initialise_thermal_subproblems_list,
                                                                                  const double& pre_factor_subproblems_number,
-                                                                                 const int& remove_append_subproblems)
+                                                                                 const int& remove_append_subproblems,
+                                                                                 const int& use_sparse_matrix)
 {
   pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
   pre_factor_subproblems_number_ = pre_factor_subproblems_number;
   remove_append_subproblems_ = remove_append_subproblems;
+  use_sparse_matrix_ = use_sparse_matrix;
 }
 
 void IJK_One_Dimensional_Subproblems::clean()
@@ -340,9 +342,7 @@ void IJK_One_Dimensional_Subproblems::compute_radial_convection_diffusion_operat
     (*this)[itr].compute_radial_convection_diffusion_operators();
 }
 
-void IJK_One_Dimensional_Subproblems::compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                                                                      DoubleVect& thermal_subproblems_temperature_solution_ini,
-                                                                                      const int& boundary_condition_interface,
+void IJK_One_Dimensional_Subproblems::compute_source_terms_impose_boundary_conditions(const int& boundary_condition_interface,
                                                                                       const double& interfacial_boundary_condition_value,
                                                                                       const int& impose_boundary_condition_interface_from_simulation,
                                                                                       const int& boundary_condition_end,
@@ -350,9 +350,7 @@ void IJK_One_Dimensional_Subproblems::compute_source_terms_impose_boundary_condi
                                                                                       const int& impose_user_boundary_condition_end_value)
 {
   for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].compute_source_terms_impose_boundary_conditions(thermal_subproblems_rhs_assembly,
-                                                                 thermal_subproblems_temperature_solution_ini,
-                                                                 boundary_condition_interface,
+    (*this)[itr].compute_source_terms_impose_boundary_conditions(boundary_condition_interface,
                                                                  interfacial_boundary_condition_value,
                                                                  impose_boundary_condition_interface_from_simulation,
                                                                  boundary_condition_end,

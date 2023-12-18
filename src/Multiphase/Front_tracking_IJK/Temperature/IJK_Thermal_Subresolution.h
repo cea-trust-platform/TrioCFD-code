@@ -204,8 +204,10 @@ protected :
   void clip_temperature_values() override;
   void compute_mean_liquid_temperature();
   void compute_overall_probes_parameters();
-  void pre_initialise_sparse_thermal_subproblems_matrices();
+
+  void pre_initialise_thermal_subproblems_any_matrices();
   void pre_initialise_thermal_subproblems_matrices();
+
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_radial_subresolution_convection_diffusion_operators();
@@ -225,12 +227,18 @@ protected :
   void compute_second_order_operator_raw(Matrice& radial_second_order_operator);
   void initialise_identity_matrices(Matrice& identity_matrix,
                                     Matrice& identity_matrix_subproblems);
+  void initialise_identity_matrices_sparse(Matrice& identity_matrix,
+                                           Matrice& identity_matrix_subproblems);
   void initialise_radial_convection_operator(Matrice& radial_first_order_operator,
                                              Matrice& radial_convection_matrix);
+  void initialise_radial_convection_operator_sparse(Matrice& radial_first_order_operator,
+                                                    Matrice& radial_convection_matrix);
   void initialise_radial_diffusion_operator(Matrice& radial_second_order_operator,
                                             Matrice& radial_diffusion_matrix);
-  int copy_local_unknwowns_rhs();
-  void convert_into_sparse_matrix(const int& nb_points);
+  void initialise_radial_diffusion_operator_sparse(Matrice& radial_second_order_operator,
+                                                   Matrice& radial_diffusion_matrix);
+  // int copy_local_unknwowns_rhs();
+  void convert_into_sparse_matrix();
   void compute_md_vector();
   void retrieve_temperature_solution();
   void check_wrong_values_rhs();
@@ -315,6 +323,12 @@ protected :
   Matrice identity_matrix_subproblems_;
   Matrice radial_diffusion_matrix_;
   Matrice radial_convection_matrix_;
+
+  Matrice radial_diffusion_matrix_test_;
+
+  FixedVector<ArrOfInt, 6> first_indices_sparse_matrix_;
+
+  int initialise_sparse_indices_;
   /*
    * Thermal subproblems are regrouped in a single linear system AX=b
    * on each processor !
@@ -328,12 +342,10 @@ protected :
   /*
    * TODO: Cast the matrice with Matrice Morse directly (not Matrice Bloc)
    */
+  Matrice * thermal_subproblems_matrix_assembly_for_solver_ref_;
   Matrice thermal_subproblems_matrix_assembly_for_solver_;
   Matrice thermal_subproblems_matrix_assembly_for_solver_reduced_;
 
-  DoubleVect thermal_subproblems_temperature_solution_ini_for_solver_;
-  DoubleVect thermal_subproblems_rhs_assembly_for_solver_;
-  DoubleVect thermal_subproblems_temperature_solution_for_solver_;
   // SolveurSys one_dimensional_advection_diffusion_thermal_solver_;
   IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_;
   IJK_SolveSys_FD_thermal one_dimensional_advection_diffusion_thermal_solver_implicit_;
@@ -399,6 +411,7 @@ protected :
   int pre_initialise_thermal_subproblems_list_;
   double pre_factor_subproblems_number_;
   int remove_append_subproblems_;
+  int use_sparse_matrix_;
   int global_probes_characteristics_ = 1;
 
   int correct_temperature_cell_neighbours_first_iter_;

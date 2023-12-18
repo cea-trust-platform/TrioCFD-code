@@ -565,6 +565,29 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_unknown_p
   return non_zero_elem;
 }
 
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_any_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B, const int& use_sparse_matrix)
+{
+  if (use_sparse_matrix)
+    sum_sparse_matrices_subproblems(matrix_A, matrix_B);
+  else
+    sum_matrices_subproblems(matrix_A, matrix_B);
+
+}
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_sparse_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B)
+{
+  Matrice_Morse& sparse_matrix_A  = ref_cast(Matrice_Morse, matrix_A.valeur());
+  Matrice_Morse& sparse_matrix_B  = ref_cast(Matrice_Morse, matrix_B.valeur());
+  sparse_matrix_A += sparse_matrix_B;
+
+  // Don't forget to call my own sort_stencil() if matrices have been compacted !
+  if (!known_pattern_)
+    {
+      sort_stencil(sparse_matrix_A);
+      sparse_matrix_A.sort_stencil();
+    }
+}
+
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::sum_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B)
 {
   Matrice_Bloc& block_matrix_A =ref_cast(Matrice_Bloc, matrix_A.valeur());
@@ -655,6 +678,84 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::complete_empty_matr
     }
 }
 
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_sparse_matrix_subproblems(Matrice& matrix_subproblems,
+                                                                                                  Matrice& fd_operator,
+                                                                                                  const int& nb_subproblems,
+                                                                                                  const int& first_time_step_varying_probes,
+                                                                                                  FixedVector<ArrOfInt, 6>& first_indices_sparse_matrix,
+                                                                                                  const int& first_initialisation,
+                                                                                                  int& initialise_sparse_indices)
+{
+
+  if (first_initialisation)
+    {
+      matrix_subproblems.typer("Matrice_Morse");
+      if (initialise_sparse_indices)
+        for (int l=0; l<6; l++)
+          first_indices_sparse_matrix[l].set_smart_resize(1);
+
+    }
+  if (initialise_sparse_indices)
+    {
+      for (int l=0; l<6; l++)
+        first_indices_sparse_matrix[l].reset();
+    }
+
+  Matrice_Morse& sparse_matrix_subproblems =ref_cast(Matrice_Morse, matrix_subproblems.valeur());
+  Matrice_Morse& fd_operator_sparse = ref_cast(Matrice_Morse, fd_operator.valeur());
+
+  const IntVect& tab1_operator = fd_operator_sparse.get_tab1();
+  const IntVect& tab2_operator = fd_operator_sparse.get_tab2();
+  const DoubleVect& coeff_operator = fd_operator_sparse.get_coeff();
+
+  const int nb_rows_operator = fd_operator_sparse.nb_lignes();
+  const int nb_columns_operator = fd_operator_sparse.nb_colonnes();
+
+  const int nb_rows = nb_rows_operator * nb_subproblems;
+  const int nb_columns = nb_columns_operator * nb_subproblems;
+
+  const int nb_val_non_zero_per_operator = fd_operator_sparse.nb_coeff();
+  const int nb_val_non_zero_sparse = nb_subproblems * nb_val_non_zero_per_operator;
+
+  IntVect& tab1 = sparse_matrix_subproblems.get_set_tab1();
+  IntVect& tab2 = sparse_matrix_subproblems.get_set_tab2();
+  DoubleVect& coeff = sparse_matrix_subproblems.get_set_coeff();
+
+  int j;
+  /*
+   * dimensionner resize each IntVect tab1 and tab2 and DoubleVect coeff
+   */
+  sparse_matrix_subproblems.dimensionner(nb_rows, nb_columns, nb_val_non_zero_sparse);
+  for (int i=0; i<nb_subproblems; i++)
+    {
+      const int first_index = i * nb_val_non_zero_per_operator;
+      const int column_index = i * nb_columns_operator;
+      const int row_index = i * nb_rows_operator;
+      if (initialise_sparse_indices)
+        {
+          first_indices_sparse_matrix[0].append_array(first_index);
+          first_indices_sparse_matrix[1].append_array(nb_val_non_zero_per_operator);
+          first_indices_sparse_matrix[2].append_array(column_index);
+          first_indices_sparse_matrix[3].append_array(nb_columns_operator);
+          first_indices_sparse_matrix[4].append_array(row_index);
+          first_indices_sparse_matrix[5].append_array(nb_rows_operator);
+        }
+      for (j=0; j<nb_val_non_zero_per_operator; j++)
+        {
+          tab2(j + first_index) = tab2_operator(j) + column_index;
+          coeff(j + first_index) = coeff_operator(j);
+        }
+      for (j=1; j<=nb_rows_operator; j++)
+        tab1(j + row_index) = tab1_operator(j) + first_index;
+    }
+  initialise_sparse_indices = 0;
+//if (!first_time_step_varying_probes)
+//	{
+//		Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,i).valeur());
+//		sparse_matrix = Matrice_Morse(fd_operator_sparse);
+//	}
+}
+
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_subproblems(Matrice& matrix_subproblems,
                                                                                            Matrice& fd_operator,
                                                                                            const int& nb_subproblems,
@@ -690,6 +791,86 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_s
     }
 }
 
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_any_matrix_subproblem(Matrice * matrix_subproblems,
+                                                                                                const Matrice * fd_operator,
+                                                                                                const int& nb_subproblems,
+                                                                                                const int& use_sparse_matrix,
+                                                                                                FixedVector<ArrOfInt,6> * first_indices_sparse_matrix,
+                                                                                                const int& first_initialisation)
+{
+  if (use_sparse_matrix)
+    reinitialise_sparse_matrix_subproblem(matrix_subproblems, fd_operator, nb_subproblems, first_indices_sparse_matrix, first_initialisation);
+  else
+    reinitialise_matrix_subproblem(matrix_subproblems, fd_operator, nb_subproblems);
+}
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_sparse_matrix_subproblem(Matrice * matrix_subproblems,
+                                                                                                   const Matrice * fd_operator,
+                                                                                                   const int& nb_subproblems,
+                                                                                                   FixedVector<ArrOfInt,6> * first_indices_sparse_matrix,
+                                                                                                   const int& first_initialisation)
+{
+  Matrice_Morse& sparse_matrix_subproblems =ref_cast(Matrice_Morse, (*matrix_subproblems).valeur());
+  IntVect& tab1 = sparse_matrix_subproblems.get_set_tab1();
+  IntVect& tab2 = sparse_matrix_subproblems.get_set_tab2();
+  DoubleVect& coeff = sparse_matrix_subproblems.get_set_coeff();
+
+  const Matrice_Morse& fd_operator_morse =ref_cast(Matrice_Morse, (*fd_operator).valeur());
+  const IntVect& tab1_operator = fd_operator_morse.get_tab1();
+  const IntVect& tab2_operator = fd_operator_morse.get_tab2();
+  const DoubleVect& coeff_operator = fd_operator_morse.get_coeff();
+
+  int nb_rows_operator = fd_operator_morse.nb_lignes();
+  int nb_columns_operator = fd_operator_morse.nb_colonnes();
+  int nb_coeff_operator = fd_operator_morse.nb_coeff();
+
+  int nb_rows = nb_rows_operator;
+  int nb_columns = nb_columns_operator;
+  int nb_coeff = nb_coeff_operator;
+
+  int nb_rows_ini = sparse_matrix_subproblems.nb_lignes();
+  int nb_columns_ini = sparse_matrix_subproblems.nb_colonnes();
+  int nb_coeff_ini = sparse_matrix_subproblems.nb_coeff();
+
+  if (!nb_subproblems)
+    {
+      nb_rows_ini = 0;
+      nb_columns_ini = 0;
+      nb_coeff_ini = 0;
+    }
+  else
+    {
+      nb_rows += nb_rows_ini;
+      nb_columns += nb_columns_ini;
+      nb_coeff += nb_coeff_ini;
+    }
+  sparse_matrix_subproblems.dimensionner(nb_rows, nb_columns, nb_coeff);
+  assert(nb_rows>=nb_rows_ini && nb_columns>=nb_columns_ini && nb_rows>=nb_rows_ini);
+
+  const int coeff_offset = nb_coeff_ini;
+  const int column_offset = nb_columns_ini;
+  const int row_offset = nb_coeff_ini;
+
+  if (first_initialisation)
+    {
+      first_indices_sparse_matrix[0][nb_subproblems] = nb_coeff_ini;
+      first_indices_sparse_matrix[1][nb_subproblems] = nb_coeff_operator;
+      first_indices_sparse_matrix[2][nb_subproblems] = nb_columns_ini;
+      first_indices_sparse_matrix[3][nb_subproblems] = nb_columns_operator;
+      first_indices_sparse_matrix[4][nb_subproblems] = nb_coeff_ini;
+      first_indices_sparse_matrix[5][nb_subproblems] = nb_rows_operator;
+    }
+
+  int i;
+  for (i=0; i<nb_coeff; i++)
+    {
+      tab2(i + coeff_offset) = tab2_operator(i) + column_offset;
+      coeff(i + coeff_offset) = coeff_operator(i);
+    }
+  for (i=1; i<=nb_rows; i++)
+    tab1(i + row_offset) = tab1_operator(i) + coeff_offset;
+}
+
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_matrix_subproblem(Matrice * matrix_subproblems,
                                                                                             const Matrice * fd_operator,
                                                                                             const int& nb_subproblems)
@@ -722,11 +903,97 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_by_vec
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_subproblem_by_vector(Matrice * matrix,
                                                                                                const DoubleVect& vector,
                                                                                                const int& subproblem_index,
-                                                                                               const int& boundary_conditions)
+                                                                                               const int& boundary_conditions,
+                                                                                               const int& use_sparse_matrix,
+                                                                                               const FixedVector<ArrOfInt,6> * first_indices_sparse_matrix)
 {
-  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, (*matrix).valeur());
-  Matrice& sub_matrix = block_matrix.get_bloc(subproblem_index, subproblem_index);
-  scale_matrix_by_vector(sub_matrix, vector, boundary_conditions);
+  if (use_sparse_matrix)
+    {
+      Matrice local_sub_matrix;
+      make_operation_on_sub_matrix_sparse(local_sub_matrix,
+                                          matrix,
+                                          subproblem_index,
+                                          first_indices_sparse_matrix);
+      scale_matrix_by_vector(local_sub_matrix, vector, boundary_conditions);
+      recombined_local_sub_matrix_with_matrix(local_sub_matrix,
+                                              matrix,
+                                              subproblem_index,
+                                              first_indices_sparse_matrix);
+    }
+  else
+    {
+      Matrice_Bloc& block_matrix = ref_cast(Matrice_Bloc, (*matrix).valeur());
+      Matrice& sub_matrix = block_matrix.get_bloc(subproblem_index, subproblem_index);
+      scale_matrix_by_vector(sub_matrix, vector, boundary_conditions);
+    }
+}
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::make_operation_on_sub_matrix_sparse(Matrice& local_sub_matrix,
+                                                                                                 Matrice * matrix,
+                                                                                                 const int& subproblem_index,
+                                                                                                 const FixedVector<ArrOfInt,6> * first_indices_sparse_matrix)
+{
+  local_sub_matrix.typer("Matrice_Morse");
+  Matrice_Morse& local_sparse_sub_matrix = ref_cast(Matrice_Morse, local_sub_matrix.valeur());
+
+  const int nb_coeff = (*first_indices_sparse_matrix)[1][subproblem_index];
+  const int nb_column = (*first_indices_sparse_matrix)[3][subproblem_index];
+  const int nb_rows = (*first_indices_sparse_matrix)[5][subproblem_index];
+  local_sparse_sub_matrix.dimensionner(nb_rows, nb_column, nb_coeff);
+
+  IntVect& tab1_local = local_sparse_sub_matrix.get_set_tab1();
+  IntVect& tab2_local = local_sparse_sub_matrix.get_set_tab2();
+  DoubleVect& coeff_local = local_sparse_sub_matrix.get_set_coeff();
+
+  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, (*matrix).valeur());
+  const IntVect& tab1 = sparse_matrix.get_tab1();
+  const IntVect& tab2 = sparse_matrix.get_tab2();
+  const DoubleVect& coeff = sparse_matrix.get_coeff();
+
+  const int coeff_offset = (*first_indices_sparse_matrix)[0][subproblem_index];
+  const int column_offset = (*first_indices_sparse_matrix)[2][subproblem_index];
+  const int row_offset = (*first_indices_sparse_matrix)[4][subproblem_index];
+  int i;
+  for (i=0; i<nb_coeff; i++)
+    {
+      tab2_local(i) = tab2(i + coeff_offset) - column_offset;
+      coeff_local(i) = coeff(i + coeff_offset);
+    }
+  tab1_local(0) = FORTRAN_INDEX_INI;
+  for (i=1; i<=nb_rows; i++)
+    tab1_local(i) = tab1(i + row_offset) - coeff_offset;
+}
+
+void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::recombined_local_sub_matrix_with_matrix(Matrice& local_sub_matrix,
+                                                                                                     Matrice * matrix,
+                                                                                                     const int& subproblem_index,
+                                                                                                     const FixedVector<ArrOfInt,6> * first_indices_sparse_matrix)
+{
+  Matrice_Morse& local_sparse_sub_matrix = ref_cast(Matrice_Morse, local_sub_matrix.valeur());
+  const IntVect& tab1_local = local_sparse_sub_matrix.get_tab1();
+  const IntVect& tab2_local = local_sparse_sub_matrix.get_tab2();
+  const DoubleVect& coeff_local = local_sparse_sub_matrix.get_coeff();
+
+  Matrice_Morse& sparse_matrix = ref_cast(Matrice_Morse, (*matrix).valeur());
+  IntVect& tab1 = sparse_matrix.get_set_tab1();
+  IntVect& tab2 = sparse_matrix.get_set_tab2();
+  DoubleVect& coeff = sparse_matrix.get_set_coeff();
+
+  const int nb_coeff = (*first_indices_sparse_matrix)[1][subproblem_index];
+  const int nb_rows = (*first_indices_sparse_matrix)[5][subproblem_index];
+
+  const int coeff_offset = (*first_indices_sparse_matrix)[0][subproblem_index];
+  const int column_offset = (*first_indices_sparse_matrix)[2][subproblem_index];
+  const int row_offset = (*first_indices_sparse_matrix)[4][subproblem_index];
+
+  int i;
+  for (i=0; i<nb_coeff; i++)
+    {
+      tab2(i + coeff_offset) = tab2_local(i) + column_offset;
+      coeff(i + coeff_offset) = coeff_local(i);
+    }
+  for (i=1; i<=nb_rows; i++)
+    tab1(i + row_offset) = tab1_local(i) + coeff_offset;
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_conditions_subproblem(Matrice * matrix,
@@ -741,20 +1008,47 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
                                                                                                    const int& first_time_step_temporal,
                                                                                                    const int& first_time_step_explicit,
                                                                                                    const DoubleVect& temperature_ini_temporal_schemes,
-                                                                                                   const int& start_index)
+                                                                                                   const int& start_index,
+                                                                                                   const FixedVector<ArrOfInt, 6> * first_indices_sparse_matrix,
+                                                                                                   const int& use_sparse_matrix)
 {
-  Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, (*matrix).valeur());
-  Matrice& sub_matrix = block_matrix.get_bloc(subproblem_index, subproblem_index);
-  impose_boundary_conditions(sub_matrix,
-                             local_rhs,
-                             ini_boundary_conditions,
-                             interfacial_value,
-                             end_boundary_conditions,
-                             end_value,
-                             dr_inv,
-                             first_time_step_temporal,
-                             first_time_step_explicit,
-                             temperature_ini_temporal_schemes);
+  if (use_sparse_matrix)
+    {
+      Matrice local_sub_matrix;
+      make_operation_on_sub_matrix_sparse(local_sub_matrix,
+                                          matrix,
+                                          subproblem_index,
+                                          first_indices_sparse_matrix);
+      impose_boundary_conditions(local_sub_matrix,
+                                 local_rhs,
+                                 ini_boundary_conditions,
+                                 interfacial_value,
+                                 end_boundary_conditions,
+                                 end_value,
+                                 dr_inv,
+                                 first_time_step_temporal,
+                                 first_time_step_explicit,
+                                 temperature_ini_temporal_schemes);
+      recombined_local_sub_matrix_with_matrix(local_sub_matrix,
+                                              matrix,
+                                              subproblem_index,
+                                              first_indices_sparse_matrix);
+    }
+  else
+    {
+      Matrice_Bloc& block_matrix =ref_cast(Matrice_Bloc, (*matrix).valeur());
+      Matrice& sub_matrix = block_matrix.get_bloc(subproblem_index, subproblem_index);
+      impose_boundary_conditions(sub_matrix,
+                                 local_rhs,
+                                 ini_boundary_conditions,
+                                 interfacial_value,
+                                 end_boundary_conditions,
+                                 end_value,
+                                 dr_inv,
+                                 first_time_step_temporal,
+                                 first_time_step_explicit,
+                                 temperature_ini_temporal_schemes);
+    }
   /*
    * Fill global RHS
    */

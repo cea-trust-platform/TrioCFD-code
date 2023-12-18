@@ -102,6 +102,8 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   identity_matrix_subproblems_ = nullptr;
 
   first_time_step_temporal_ = nullptr;
+
+  first_indices_sparse_matrix_ = nullptr;
 }
 
 IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblem()
@@ -169,7 +171,9 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
       associate_thermal_subproblem_parameters(ref_thermal_subresolution.debug_,
                                               ref_thermal_subresolution.n_iter_distance_,
                                               ref_thermal_subresolution.delta_T_subcooled_overheated_,
-                                              ref_thermal_subresolution.pre_initialise_thermal_subproblems_list_);
+                                              ref_thermal_subresolution.pre_initialise_thermal_subproblems_list_,
+                                              ref_thermal_subresolution.use_sparse_matrix_);
+      associate_thermal_subproblem_sparse_matrix(ref_thermal_subresolution.first_indices_sparse_matrix_);
       associate_eulerian_fields_references(interfaces,
                                            ref_thermal_subresolution.eulerian_distance_ns_,
                                            ref_thermal_subresolution.eulerian_curvature_ns_,
@@ -277,12 +281,19 @@ void IJK_One_Dimensional_Subproblem::reset_counters()
 void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(int debug,
                                                                              const int& n_iter_distance,
                                                                              const double& delta_T_subcooled_overheated,
-                                                                             const int& pre_initialise_thermal_subproblems_list)
+                                                                             const int& pre_initialise_thermal_subproblems_list,
+                                                                             const int& use_sparse_matrix)
 {
   debug_ = debug;
   n_iter_distance_ = n_iter_distance;
   delta_T_subcooled_overheated_ = delta_T_subcooled_overheated;
   pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
+  use_sparse_matrix_ = use_sparse_matrix;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_sparse_matrix(FixedVector<ArrOfInt,6>& first_indices_sparse_matrix)
+{
+  first_indices_sparse_matrix_ = &first_indices_sparse_matrix;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
@@ -513,10 +524,12 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
       if (correct_fluxes_ || correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_ || compute_reachable_fluxes_)
         {
           compute_distance_faces_centres();
-          Cerr << "Compute distance cell neighbours" << finl;
+          if (debug_)
+            Cerr << "Compute distance cell neighbours" << finl;
           if (correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_)
             compute_distance_cell_centres_neighbours();
-          Cerr << "Compute distance faces neighbours" << finl;
+          if (debug_)
+            Cerr << "Compute distance faces neighbours" << finl;
           if (compute_reachable_fluxes_)
             compute_distance_last_cell_faces_neighbours();
         }
@@ -561,7 +574,9 @@ void IJK_One_Dimensional_Subproblem::compute_interface_basis_vectors()
   Vecteur3 normal_contrib;
   const double normal_vector_compo_norm = normal_vector_compo_.length();
   normal_vector_compo_ *= (1 / normal_vector_compo_norm);
-  Cerr << "Normal vector norm:" << normal_vector_compo_norm << finl;
+
+  if (debug_)
+    Cerr << "Normal vector norm:" << normal_vector_compo_norm << finl;
   /*
    * First method with tangential direction of maximum velocity variations
    */
@@ -803,14 +818,16 @@ void IJK_One_Dimensional_Subproblem::compute_identity_matrix_local(Matrice& iden
 {
   int check_nb_elem;
   check_nb_elem = (*finite_difference_assembler_).build(identity_matrix_explicit_implicit, *points_per_thermal_subproblem_, -1);
-  Cerr << "Check_nb_elem" << check_nb_elem << finl;
+  if (debug_)
+    Cerr << "Check_nb_elem" << check_nb_elem << finl;
 }
 
 void IJK_One_Dimensional_Subproblem::compute_first_order_operator_local(Matrice& radial_first_order_operator)
 {
   int check_nb_elem;
   check_nb_elem = (*finite_difference_assembler_).build(radial_first_order_operator, *points_per_thermal_subproblem_, 0);
-  Cerr << "Check_nb_elem" << check_nb_elem << finl;
+  if (debug_)
+    Cerr << "Check_nb_elem" << check_nb_elem << finl;
   radial_first_order_operator_local_ *= dr_inv_;
 }
 
@@ -818,7 +835,8 @@ void IJK_One_Dimensional_Subproblem::compute_second_order_operator_local(Matrice
 {
   int check_nb_elem;
   check_nb_elem = (*finite_difference_assembler_).build(radial_second_order_operator, *points_per_thermal_subproblem_, 0);
-  Cerr << "Check_nb_elem" << check_nb_elem << finl;
+  if (debug_)
+    Cerr << "Check_nb_elem" << check_nb_elem << finl;
   const double dr_squared_inv = 1 / pow(dr_, 2);
   radial_second_order_operator_local_ *= dr_squared_inv;
 }
@@ -1841,25 +1859,37 @@ void IJK_One_Dimensional_Subproblem::project_matrix_on_basis(const Matrice33& pr
 void IJK_One_Dimensional_Subproblem::initialise_radial_convection_operator_local()
 {
   if (!global_probes_characteristics_ || first_time_step_varying_probes_ || pre_initialise_thermal_subproblems_list_)
-    (*finite_difference_assembler_).reinitialise_matrix_subproblem(radial_convection_matrix_base_,
-                                                                   radial_first_order_operator_,
-                                                                   sub_problem_index_);
+    (*finite_difference_assembler_).reinitialise_any_matrix_subproblem(radial_convection_matrix_base_,
+                                                                       radial_first_order_operator_,
+                                                                       sub_problem_index_,
+                                                                       use_sparse_matrix_,
+                                                                       first_indices_sparse_matrix_,
+                                                                       operators_reinitialisation_);
+  operators_reinitialisation_ = 0;
 }
 
 void IJK_One_Dimensional_Subproblem::initialise_radial_diffusion_operator_local()
 {
   if (!global_probes_characteristics_ || first_time_step_varying_probes_ || pre_initialise_thermal_subproblems_list_)
-    (*finite_difference_assembler_).reinitialise_matrix_subproblem(radial_diffusion_matrix_base_,
-                                                                   radial_second_order_operator_,
-                                                                   sub_problem_index_);
+    (*finite_difference_assembler_).reinitialise_any_matrix_subproblem(radial_diffusion_matrix_base_,
+                                                                       radial_second_order_operator_,
+                                                                       sub_problem_index_,
+                                                                       use_sparse_matrix_,
+                                                                       first_indices_sparse_matrix_,
+                                                                       operators_reinitialisation_);
+  operators_reinitialisation_ = 0;
 }
 
 void IJK_One_Dimensional_Subproblem::initialise_identity_operator_local()
 {
   if ((!global_probes_characteristics_ || pre_initialise_thermal_subproblems_list_) && (*first_time_step_temporal_))
-    (*finite_difference_assembler_).reinitialise_matrix_subproblem(identity_matrix_subproblems_,
-                                                                   identity_matrix_explicit_implicit_,
-                                                                   sub_problem_index_);
+    (*finite_difference_assembler_).reinitialise_any_matrix_subproblem(identity_matrix_subproblems_,
+                                                                       identity_matrix_explicit_implicit_,
+                                                                       sub_problem_index_,
+                                                                       use_sparse_matrix_,
+                                                                       first_indices_sparse_matrix_,
+                                                                       operators_reinitialisation_);
+  operators_reinitialisation_ = 0;
 }
 
 void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operators()
@@ -1890,13 +1920,16 @@ void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operato
         radial_convection_prefactor_ +=	osculating_radial_coefficient;
     }
   const int boundary_conditions = 0;
+  operators_reinitialisation_ = 1;
   initialise_radial_convection_operator_local();
   initialise_radial_diffusion_operator_local();
   initialise_identity_operator_local();
   (*finite_difference_assembler_).scale_matrix_subproblem_by_vector(radial_convection_matrix_base_,
                                                                     radial_convection_prefactor_,
                                                                     sub_problem_index_,
-                                                                    boundary_conditions);
+                                                                    boundary_conditions,
+                                                                    use_sparse_matrix_,
+                                                                    first_indices_sparse_matrix_);
 }
 
 void IJK_One_Dimensional_Subproblem::prepare_temporal_schemes()
@@ -1918,8 +1951,8 @@ void IJK_One_Dimensional_Subproblem::prepare_temporal_schemes()
     }
 }
 
-void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                                                 DoubleVect& thermal_subproblems_temperature_solution_ini,
+void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect * thermal_subproblems_rhs_assembly,
+                                                                 DoubleVect * thermal_subproblems_temperature_solution_ini,
                                                                  const int& boundary_condition_interface,
                                                                  const double& interfacial_boundary_condition_value,
                                                                  const int& impose_boundary_condition_interface_from_simulation,
@@ -1952,7 +1985,7 @@ void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect& the
   else
     {
       start_index_ = thermal_subproblems_rhs_size;
-      thermal_subproblems_rhs_assembly.resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
+      (*thermal_subproblems_rhs_assembly_).resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
     }
   end_index_ = start_index_ + (*points_per_thermal_subproblem_);
 
@@ -1960,7 +1993,7 @@ void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect& the
     {
       if (first_time_step_explicit_)
         if (!(pre_initialise_thermal_subproblems_list_ && global_probes_characteristics_))
-          thermal_subproblems_temperature_solution_ini.resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
+          (*thermal_subproblems_temperature_solution_ini_).resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
       temperature_ini_temporal_schemes_.resize(*points_per_thermal_subproblem_);
       if (boundary_condition_interface == dirichlet || boundary_condition_interface == default_bc)
         temperature_ini_temporal_schemes_[0] = interfacial_boundary_condition_value;
@@ -1980,9 +2013,7 @@ void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect& the
     }
 }
 
-void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                                                                     DoubleVect& thermal_subproblems_temperature_solution_ini,
-                                                                                     const int& boundary_condition_interface,
+void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_conditions(const int& boundary_condition_interface,
                                                                                      const double& interfacial_boundary_condition_value,
                                                                                      const int& impose_boundary_condition_interface_from_simulation,
                                                                                      const int& boundary_condition_end,
@@ -1990,8 +2021,8 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
                                                                                      const int& impose_user_boundary_condition_end_value)
 {
 
-  prepare_boundary_conditions(thermal_subproblems_rhs_assembly,
-                              thermal_subproblems_temperature_solution_ini,
+  prepare_boundary_conditions(thermal_subproblems_rhs_assembly_,
+                              thermal_subproblems_temperature_solution_ini_,
                               boundary_condition_interface,
                               interfacial_boundary_condition_value,
                               impose_boundary_condition_interface_from_simulation,
@@ -2013,7 +2044,9 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
                                                                         (*first_time_step_temporal_),
                                                                         first_time_step_explicit_,
                                                                         temperature_ini_temporal_schemes_,
-                                                                        start_index_);
+                                                                        start_index_,
+                                                                        first_indices_sparse_matrix_,
+                                                                        use_sparse_matrix_);
 
   if ((*first_time_step_temporal_) && first_time_step_explicit_)
     (*finite_difference_assembler_).add_source_terms(thermal_subproblems_temperature_solution_ini_, temperature_ini_temporal_schemes_);

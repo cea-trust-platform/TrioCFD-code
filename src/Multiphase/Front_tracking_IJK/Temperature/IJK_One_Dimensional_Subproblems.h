@@ -51,7 +51,8 @@ public :
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
   void initialise_thermal_subproblems_list_params(const int& pre_initialise_thermal_subproblems_list,
                                                   const double& pre_factor_subproblems_number,
-                                                  const int& remove_append_subproblems);
+                                                  const int& remove_append_subproblems,
+                                                  const int& use_sparse_matrix);
   void associate_variables_for_post_processing(IJK_Thermal_Subresolution& ref_thermal_subresolution);
   void set_max_subproblems(const int max_subproblems) { max_subproblems_ = max_subproblems; };
   void clean();
@@ -77,9 +78,7 @@ public :
   void reajust_probes_length();
   void compute_modified_probe_length(const int& probe_variations_enabled);
   void compute_radial_convection_diffusion_operators();
-  void compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
-                                                       const int& boundary_condition_interface,
+  void compute_source_terms_impose_boundary_conditions(const int& boundary_condition_interface,
                                                        const double& interfacial_boundary_condition_value,
                                                        const int& impose_boundary_condition_interface_from_simulation,
                                                        const int& boundary_condition_end,
@@ -185,6 +184,7 @@ protected :
   int pre_initialise_thermal_subproblems_list_ = 0;
   double pre_factor_subproblems_number_ = 1.;
   int remove_append_subproblems_ = 0;
+  int use_sparse_matrix_ = 0;
 
   double spherical_nusselt_ = 2.;
   double spherical_nusselt_liquid_ = 2.;

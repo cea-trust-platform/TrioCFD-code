@@ -135,17 +135,15 @@ public :
   void compute_modified_probe_length(const int& probe_variations_enabled);
   void compute_radial_convection_diffusion_operators();
   void prepare_temporal_schemes();
-  void prepare_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                   DoubleVect& thermal_subproblems_temperature_solution_ini,
+  void prepare_boundary_conditions(DoubleVect * thermal_subproblems_rhs_assembly,
+                                   DoubleVect * thermal_subproblems_temperature_solution_ini,
                                    const int& boundary_condition_interface,
                                    const double& interfacial_boundary_condition_value,
                                    const int& impose_boundary_condition_interface_from_simulation,
                                    const int& boundary_condition_end,
                                    const double& end_boundary_condition_value,
                                    const int& impose_user_boundary_condition_end_value);
-  void compute_source_terms_impose_boundary_conditions(DoubleVect& thermal_subproblems_rhs_assembly,
-                                                       DoubleVect& thermal_subproblems_temperature_solution_ini,
-                                                       const int& boundary_condition_interface,
+  void compute_source_terms_impose_boundary_conditions(const int& boundary_condition_interface,
                                                        const double& interfacial_boundary_condition_value,
                                                        const int& impose_boundary_condition_interface_from_simulation,
                                                        const int& boundary_condition_end,
@@ -376,7 +374,9 @@ protected :
   void associate_thermal_subproblem_parameters(int debug,
                                                const int& n_iter_distance,
                                                const double& delta_T_subcooled_overheated,
-                                               const int& pre_initialise_thermal_subproblems_list);
+                                               const int& pre_initialise_thermal_subproblems_list,
+                                               const int& use_sparse_matrix);
+  void associate_thermal_subproblem_sparse_matrix(FixedVector<ArrOfInt,6>& first_indices_sparse_matrix);
   void associate_flux_correction_parameters(const int& correct_fluxes,
                                             const int& distance_cell_faces_from_lrs,
                                             const int& interp_eulerian);
@@ -746,6 +746,9 @@ protected :
   int correct_tangential_temperature_gradient_;
   int correct_tangential_temperature_hessian_;
 
+  FixedVector<ArrOfInt,6> * first_indices_sparse_matrix_;
+  int operators_reinitialisation_=1;
+
   IJK_Finite_Difference_One_Dimensional_Matrix_Assembler * finite_difference_assembler_;
   Matrice * thermal_subproblems_matrix_assembly_;
   DoubleVect * thermal_subproblems_rhs_assembly_;
@@ -838,6 +841,7 @@ protected :
 
   int distance_cell_faces_from_lrs_ = 0;
   int pre_initialise_thermal_subproblems_list_ = 0;
+  int use_sparse_matrix_ = 0;
 
   /*
    * Identify neighbours cells centre for temperature correction
