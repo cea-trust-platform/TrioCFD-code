@@ -1375,11 +1375,11 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
 void Domaine_ALE::update_coord_dom_extrait_surface()
 {
   Interprete_bloc& interp = Interprete_bloc::interprete_courant();
-  Noms noms=interp.getListeNoms();
+  const Noms& noms = interp.les_noms();
   for(int i=0; i<noms.size(); i++)
     if(strcmp(interprete().objet(noms[i]).le_type(), "Domaine" ) == 0) //we only look for objet of type domaine
       {
-        Nom nom_domaine_ext= noms[i]; // give the name of domaine
+        const Nom& nom_domaine_ext = noms[i]; // give the name of domaine
         //if (interp.objet_global_existant(nom_domaine_ext))
         Domaine& dom_new = ref_cast(Domaine, interprete().objet(nom_domaine_ext));
         if(dom_new.getExtrait_surf_dom_deformable()) //test if domain was defined with extrait_surface_ALE
