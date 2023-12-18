@@ -96,6 +96,12 @@ public :
   inline void associer_equation(const Equation_base& une_eq);
   void update_coord_dom_extrait_surface();
 
+  inline const IntTab& les_elems_extrait_surf_reference() const;
+  inline void set_les_elems_extrait_surf_reference(const IntTab& );
+
+  inline bool extrait_surf_dom_deformable() const;
+  inline void set_extrait_surf_dom_deformable(bool def);
+
 protected:
 
   double dt_;
@@ -121,6 +127,11 @@ protected:
   Noms name_boundary_with_Neumann_BC; // Names of the boundary with Neumann CL for the grid problem (optional)
   mutable SFichier modalForceProjectionALE_; //post-processing file
   mutable SFichier modalForceBeam_; //post-processing file
+
+  //attributes necessary to perform surface extraction on a moving boundary (deformable domaine, like ALE)
+  IntTab les_elems_extrait_surf_reference_; // list of elements belonging to the extracted surface on a moving boundary defines at the initialization.
+
+  bool extrait_surf_dom_deformable_ = false;
 };
 
 
@@ -167,6 +178,26 @@ inline const DoubleTab& Domaine_ALE::getNewJacobian() const
 inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
 {
   eq = une_eq;
+}
+
+inline const IntTab& Domaine_ALE::les_elems_extrait_surf_reference() const
+{
+  return les_elems_extrait_surf_reference_;
+}
+
+inline void Domaine_ALE::set_les_elems_extrait_surf_reference(const IntTab& ref)
+{
+  les_elems_extrait_surf_reference_ = ref;
+}
+
+inline bool Domaine_ALE::extrait_surf_dom_deformable() const
+{
+  return extrait_surf_dom_deformable_;
+}
+
+inline void Domaine_ALE::set_extrait_surf_dom_deformable(bool def)
+{
+  extrait_surf_dom_deformable_ = def;
 }
 
 #endif
