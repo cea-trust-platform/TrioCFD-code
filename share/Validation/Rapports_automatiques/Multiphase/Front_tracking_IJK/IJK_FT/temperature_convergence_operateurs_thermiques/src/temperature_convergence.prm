@@ -2,17 +2,23 @@ Parametres {
 	Titre "Fiche de validation de la convergence des schemas en temperture
 
 	Description <<EOF
-		In order to validate the algorithm implemented for the resolution of the energy equation, we performed some particular test cases in which numerical solutions are compared to the corresponding analytical ones.
+	In order to validate the algorithm implemented for the resolution of the energy equation, we performed some
+        particular test cases in which numerical solutions are compared to the corresponding analytical ones.
 	\latex_($$\rho c_p \left( \partial_t T + \mathbf{u}.\nabla T \right) = \nabla (\lambda \nabla T)$$\latex_)
 	To this equation, we add spatial boundary conditions (BC) and an initial condition.
 	\latex_( \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|} \hline $L_x$ & $L_y$ & $L_z$ & $N_x$ & $N_y$ & $N_z$ & $\Delta t$ \\ \hline 0.006 &0.006 & 0.003 & 64 & 64 & 32 & 2.4e-4 \\  \hline \end{tabular} \end{center} \latex_)
-	Where L, N and $\Delta t$ stand respectively for the length, number of nodes and time step. The subscripts $x$, $y$ and $z$ indicate the different directions.
-		EOF
+	Where L, N and $\Delta t$ stand respectively for the length, number of nodes and time step.
+        The subscripts $x$, $y$ and $z$ indicate the different directions.
+	EOF
 
 	Auteur "A.S."
  	CasTest DIFFUSION DIFFUSION.data 1
 	CasTest CONVECTION CONVECTION.data 1
 	CasTest SCHEMA_TEMPS SCHEMA_TEMPS.data 1
+
+        ExtraUsedFile DIFFUSION/DIFFUSION.lata.40.TEMPERATURE_0
+        ExtraUsedFile CONVECTION/CONVERGENCE/DX_EUL_256/lata/CONVECTION.lata.40.TEMPERATURE_0
+        ExtraUsedFile SCHEMA_TEMPS/SCHEMA_TEMPS.lata.40.TEMPERATURE_0
 }
 
 Chapitre {

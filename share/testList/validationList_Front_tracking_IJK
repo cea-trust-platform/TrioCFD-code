@@ -1,3 +1,4 @@
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/barycentrage_lissage
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/bulle_oscillante
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/channel_swarm_fixed
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/chmtvar
@@ -7,6 +8,7 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/energie_bulle_seule
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/follow_color
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/interfacial_temperature_and_flux
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/monte
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/reprise_xyz_ijk
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/repulsion
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/schemas_temps
@@ -24,3 +26,4 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_test_pb_reprise
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/test_sigma
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/tests_schemas_monophasique
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/transport_perio
