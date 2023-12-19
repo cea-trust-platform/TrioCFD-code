@@ -49,11 +49,11 @@ class Beam_model;
 //////////////////////////////////////////////////////////////////////////////
 class Domaine_ALE : public Domaine
 {
-  Declare_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE);
+  Declare_instanciable_sans_constructeur(Domaine_ALE);
 
 public :
   Domaine_ALE();
-  ~Domaine_ALE();
+  void clear() override;
   inline const double& get_dt() const;
   void set_dt(double& dt) override;
   inline const DoubleTab& vitesse() const;

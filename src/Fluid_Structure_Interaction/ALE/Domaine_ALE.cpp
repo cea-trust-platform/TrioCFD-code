@@ -46,29 +46,48 @@
 #include <Entree_fluide_vitesse_imposee_ALE.h>
 #include <Navier_Stokes_std_ALE.h>
 
-
-
-
-
-
 #include <Interprete_bloc.h>
 #include <NettoieNoeuds.h>
 #include <trust_med_utils.h>
 
-
-Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
+Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() :
-  dt_(0.), nb_bords_ALE(0),
-  update_or_not_matrix_coeffs_(1), resumption(0),
-  nbBeam(0), associate_eq(false)
+
+Domaine_ALE::Domaine_ALE()
 {
+  clear();
+}
+
+void Domaine_ALE::clear()
+{
+  Domaine::clear();
+  // And most importantly:
   deformable_ = true;
+
+  dt_ = 0.;
+  ALE_mesh_velocity.reset();
+  vf.reset();
+  som_faces_bords.reset();
+  solv = SolveurSys();
+  mat = Matrice_Morse_Sym();
+  les_champs_front = Champs_front();
+  nb_bords_ALE = 0;
+  les_bords_ALE.vide();
+  update_or_not_matrix_coeffs_ = 1;
+  ALEjacobian_old.reset();
+  ALEjacobian_new.reset();
+  resumption = 0;
+  nbBeam = 0;
+  beam.clear();
+  eq = REF(Equation_base)();
+  field_ALE_projection_ = Champs_front_ALE_projection();
+  name_ALE_boundary_projection_ = Noms();
+  associate_eq = false;
+  name_boundary_with_Neumann_BC= Noms();
+  les_elems_extrait_surf_reference_.reset();
+  extrait_surf_dom_deformable_ = false;
 }
-Domaine_ALE::~Domaine_ALE()
-{
-//  delete[] beam;
-}
+
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
   Domaine::printOn(os);
