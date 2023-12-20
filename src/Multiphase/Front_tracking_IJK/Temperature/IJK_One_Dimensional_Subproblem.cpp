@@ -168,7 +168,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
 
   if (init_)
     {
-      associate_thermal_subproblem_parameters(ref_thermal_subresolution.debug_,
+      associate_thermal_subproblem_parameters(ref_thermal_subresolution.reference_gfm_on_probes_,
+                                              ref_thermal_subresolution.debug_,
                                               ref_thermal_subresolution.n_iter_distance_,
                                               ref_thermal_subresolution.delta_T_subcooled_overheated_,
                                               ref_thermal_subresolution.pre_initialise_thermal_subproblems_list_,
@@ -213,7 +214,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                         ref_thermal_subresolution.source_terms_correction_,
                                         ref_thermal_subresolution.source_terms_correction_,
                                         ref_thermal_subresolution.advected_frame_of_reference_,
-                                        ref_thermal_subresolution.neglect_frame_of_reference_radial_advection_);
+                                        ref_thermal_subresolution.neglect_frame_of_reference_radial_advection_,
+                                        ref_thermal_subresolution.compute_tangential_variables_);
       associate_flux_correction_parameters((ref_thermal_subresolution.convective_flux_correction_
                                             || ref_thermal_subresolution.diffusive_flux_correction_),
                                            ref_thermal_subresolution.distance_cell_faces_from_lrs_,
@@ -278,12 +280,14 @@ void IJK_One_Dimensional_Subproblem::reset_counters()
   velocities_calculation_counter_ = 0;
 }
 
-void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(int debug,
+void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(int reference_gfm_on_probes,
+                                                                             int debug,
                                                                              const int& n_iter_distance,
                                                                              const double& delta_T_subcooled_overheated,
                                                                              const int& pre_initialise_thermal_subproblems_list,
                                                                              const int& use_sparse_matrix)
 {
+  reference_gfm_on_probes_ = reference_gfm_on_probes;
   debug_ = debug;
   n_iter_distance_ = n_iter_distance;
   delta_T_subcooled_overheated_ = delta_T_subcooled_overheated;
@@ -368,14 +372,20 @@ void IJK_One_Dimensional_Subproblem::associate_flux_correction_parameters(const 
 void IJK_One_Dimensional_Subproblem::associate_source_terms_parameters(const int& source_terms_type,
                                                                        const int& correct_tangential_temperature_gradient,
                                                                        const int& correct_tangential_temperature_hessian,
-                                                                       int advected_frame_of_reference,
-                                                                       int neglect_frame_of_reference_radial_advection)
+                                                                       const int& advected_frame_of_reference,
+                                                                       const int& neglect_frame_of_reference_radial_advection,
+                                                                       const int& compute_tangential_variables)
 {
   source_terms_type_ = source_terms_type;
   correct_tangential_temperature_gradient_ = correct_tangential_temperature_gradient;
   correct_tangential_temperature_hessian_ = correct_tangential_temperature_hessian;
   advected_frame_of_reference_ = advected_frame_of_reference;
   neglect_frame_of_reference_radial_advection_ = neglect_frame_of_reference_radial_advection;
+  pure_thermal_diffusion_ = (source_terms_type_ == linear_diffusion
+                             || source_terms_type_ == spherical_diffusion
+                             || source_terms_type_ == spherical_diffusion_approx);
+  if (pure_thermal_diffusion_)
+    compute_tangential_variables_ = compute_tangential_variables;
 }
 
 void 	IJK_One_Dimensional_Subproblem::associate_finite_difference_solver_solution(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
@@ -516,24 +526,25 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
     Cerr << "Compute local discretisation" << finl;
   compute_local_discretisation();
 
-  if (distance_cell_faces_from_lrs_)
-    {
-      compute_distance_cell_centre();
-      if (debug_)
-        Cerr << "Compute cell and faces distance to the interface" << finl;
-      if (correct_fluxes_ || correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_ || compute_reachable_fluxes_)
-        {
-          compute_distance_faces_centres();
-          if (debug_)
-            Cerr << "Compute distance cell neighbours" << finl;
-          if (correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_)
-            compute_distance_cell_centres_neighbours();
-          if (debug_)
-            Cerr << "Compute distance faces neighbours" << finl;
-          if (compute_reachable_fluxes_)
-            compute_distance_last_cell_faces_neighbours();
-        }
-    }
+  if (!reference_gfm_on_probes_)
+    if (distance_cell_faces_from_lrs_)
+      {
+        compute_distance_cell_centre();
+        if (debug_)
+          Cerr << "Compute cell and faces distance to the interface" << finl;
+        if (correct_fluxes_ || correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_ || compute_reachable_fluxes_)
+          {
+            compute_distance_faces_centres();
+            if (debug_)
+              Cerr << "Compute distance cell neighbours" << finl;
+            if (correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_)
+              compute_distance_cell_centres_neighbours();
+            if (debug_)
+              Cerr << "Compute distance faces neighbours" << finl;
+            if (compute_reachable_fluxes_)
+              compute_distance_last_cell_faces_neighbours();
+          }
+      }
 
   surface_ = (*eulerian_interfacial_area_)(index_i_, index_j_, index_k_);
   // Resize won't change the values if size is not changing...
@@ -2054,9 +2065,7 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
 
 void IJK_One_Dimensional_Subproblem::compute_add_source_terms()
 {
-  if ((source_terms_type_ != linear_diffusion
-       && source_terms_type_ != spherical_diffusion
-       && source_terms_type_ != spherical_diffusion_approx) || !avoid_post_processing_all_terms_)
+  if (!pure_thermal_diffusion_ || !avoid_post_processing_all_terms_ || compute_tangential_variables_)
     {
       interpolate_temperature_gradient_on_probe();
       project_temperature_gradient_on_probes();
@@ -2070,9 +2079,7 @@ void IJK_One_Dimensional_Subproblem::compute_add_source_terms()
           retrieve_temperature_diffusion_spherical_on_probes();
         }
     }
-  if (source_terms_type_ != linear_diffusion
-      && source_terms_type_ != spherical_diffusion
-      && source_terms_type_ != spherical_diffusion_approx)
+  if (compute_tangential_variables_)
     {
       /*
        * Compute at least the tangential convection
@@ -2141,7 +2148,8 @@ void IJK_One_Dimensional_Subproblem::compute_add_source_terms()
       else
         rhs_assembly_ = source_terms_;
 
-      (*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_, rhs_assembly_);
+      if (!pure_thermal_diffusion_)
+        (*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_, rhs_assembly_);
     }
 }
 
@@ -2271,11 +2279,38 @@ void IJK_One_Dimensional_Subproblem::correct_tangential_temperature_hessian(Doub
 
 void IJK_One_Dimensional_Subproblem::retrieve_radial_quantities()
 {
-  retrieve_temperature_solution();
-  compute_local_temperature_gradient_solution();
-  compute_local_velocity_gradient();
-  compute_local_pressure_gradient();
+  retrieve_variables_solution_gfm_on_probes();
+  if (!reference_gfm_on_probes_)
+    {
+      retrieve_temperature_solution();
+      compute_local_temperature_gradient_solution();
+      compute_local_velocity_gradient();
+      compute_local_pressure_gradient();
+    }
   is_updated_ = true;
+}
+
+void IJK_One_Dimensional_Subproblem::retrieve_variables_solution_gfm_on_probes()
+{
+  /*
+   * Put zeros in DoubleVect or the temperature interpolated
+   * for easier post-processing with other simulations
+   */
+  interpolate_temperature_gradient_on_probe();
+  project_temperature_gradient_on_probes();
+  initialise_empty_variables_for_post_processing();
+  copy_interpolations_on_solution_variables_for_post_processing();
+}
+
+void IJK_One_Dimensional_Subproblem::copy_interpolations_on_solution_variables_for_post_processing()
+{
+  temperature_solution_ = temperature_interp_;
+  normal_temperature_gradient_solution_ = normal_temperature_gradient_;
+  temperature_x_gradient_solution_ = grad_T_elem_interp_[0];
+  temperature_y_gradient_solution_ = grad_T_elem_interp_[1];
+  temperature_z_gradient_solution_ = grad_T_elem_interp_[2];
+  thermal_flux_ = normal_temperature_gradient_solution_;
+  thermal_flux_*= ((*lambda_) * surface_);
 }
 
 void IJK_One_Dimensional_Subproblem::retrieve_temperature_solution()
@@ -2298,9 +2333,10 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
   reinit_variable(temperature_x_gradient_solution_);
   reinit_variable(temperature_y_gradient_solution_);
   reinit_variable(temperature_z_gradient_solution_);
-  if (source_terms_type_ == linear_diffusion
-      || source_terms_type_ == spherical_diffusion
-      || source_terms_type_ == spherical_diffusion_approx)
+  if ((source_terms_type_ == linear_diffusion
+       || source_terms_type_ == spherical_diffusion
+       || source_terms_type_ == spherical_diffusion_approx)
+      && !compute_tangential_variables_)
     {
       DoubleVect dummy_tangential_deriv;
       dummy_tangential_deriv.resize(*points_per_thermal_subproblem_);
@@ -2335,34 +2371,40 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
 
   if ((source_terms_type_ == linear_diffusion
        || source_terms_type_ == spherical_diffusion
-       || source_terms_type_ == spherical_diffusion_approx) && avoid_post_processing_all_terms_)
-    {
-      normal_temperature_gradient_.resize(*points_per_thermal_subproblem_);
-      tangential_temperature_gradient_first_.resize(*points_per_thermal_subproblem_);
-      tangential_temperature_gradient_second_.resize(*points_per_thermal_subproblem_);
-      tangential_temperature_gradient_first_from_rising_dir_.resize(*points_per_thermal_subproblem_);
-      azymuthal_temperature_gradient_.resize(*points_per_thermal_subproblem_);
-      for (int dir = 0; dir < 3; dir++)
-        {
-          hess_diag_T_elem_interp_[dir].resize(*points_per_thermal_subproblem_);
-          hess_cross_T_elem_interp_[dir].resize(*points_per_thermal_subproblem_);
-          hess_diag_T_elem_spherical_[dir].resize(*points_per_thermal_subproblem_);
-          hess_cross_T_elem_spherical_[dir].resize(*points_per_thermal_subproblem_);
-          hess_diag_T_elem_spherical_from_rising_[dir].resize(*points_per_thermal_subproblem_);
-          hess_cross_T_elem_spherical_from_rising_[dir].resize(*points_per_thermal_subproblem_);
-        }
-      temperature_diffusion_hessian_trace_.resize(*points_per_thermal_subproblem_);
-      temperature_diffusion_hessian_cartesian_trace_.resize(*points_per_thermal_subproblem_);
-      radial_temperature_diffusion_.resize(*points_per_thermal_subproblem_);
-      tangential_temperature_diffusion_.resize(*points_per_thermal_subproblem_);
-      tangential_convection_source_terms_first_.resize(*points_per_thermal_subproblem_);
-      tangential_convection_source_terms_second_.resize(*points_per_thermal_subproblem_);
-      tangential_diffusion_source_terms_.resize(*points_per_thermal_subproblem_);
-      source_terms_.resize(*points_per_thermal_subproblem_);
-    }
+       || source_terms_type_ == spherical_diffusion_approx)
+      && avoid_post_processing_all_terms_)
+    initialise_empty_variables_for_post_processing();
+
 
   thermal_flux_ = normal_temperature_gradient_solution_;
   thermal_flux_*= ((*lambda_) * surface_);
+
+}
+
+void IJK_One_Dimensional_Subproblem::initialise_empty_variables_for_post_processing()
+{
+  normal_temperature_gradient_.resize(*points_per_thermal_subproblem_);
+  tangential_temperature_gradient_first_.resize(*points_per_thermal_subproblem_);
+  tangential_temperature_gradient_second_.resize(*points_per_thermal_subproblem_);
+  tangential_temperature_gradient_first_from_rising_dir_.resize(*points_per_thermal_subproblem_);
+  azymuthal_temperature_gradient_.resize(*points_per_thermal_subproblem_);
+  for (int dir = 0; dir < 3; dir++)
+    {
+      hess_diag_T_elem_interp_[dir].resize(*points_per_thermal_subproblem_);
+      hess_cross_T_elem_interp_[dir].resize(*points_per_thermal_subproblem_);
+      hess_diag_T_elem_spherical_[dir].resize(*points_per_thermal_subproblem_);
+      hess_cross_T_elem_spherical_[dir].resize(*points_per_thermal_subproblem_);
+      hess_diag_T_elem_spherical_from_rising_[dir].resize(*points_per_thermal_subproblem_);
+      hess_cross_T_elem_spherical_from_rising_[dir].resize(*points_per_thermal_subproblem_);
+    }
+  temperature_diffusion_hessian_trace_.resize(*points_per_thermal_subproblem_);
+  temperature_diffusion_hessian_cartesian_trace_.resize(*points_per_thermal_subproblem_);
+  radial_temperature_diffusion_.resize(*points_per_thermal_subproblem_);
+  tangential_temperature_diffusion_.resize(*points_per_thermal_subproblem_);
+  tangential_convection_source_terms_first_.resize(*points_per_thermal_subproblem_);
+  tangential_convection_source_terms_second_.resize(*points_per_thermal_subproblem_);
+  tangential_diffusion_source_terms_.resize(*points_per_thermal_subproblem_);
+  source_terms_.resize(*points_per_thermal_subproblem_);
 }
 
 double IJK_One_Dimensional_Subproblem::get_interfacial_gradient_corrected() const

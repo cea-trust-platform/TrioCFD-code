@@ -181,6 +181,7 @@ protected :
   bool is_updated_ = 0;
   REF(IJK_FT_double) ref_ijk_ft_;
 
+  int reference_gfm_on_probes_ = 0;
   int pre_initialise_thermal_subproblems_list_ = 0;
   double pre_factor_subproblems_number_ = 1.;
   int remove_append_subproblems_ = 0;

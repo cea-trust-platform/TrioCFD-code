@@ -34,6 +34,8 @@ Implemente_instanciable_sans_constructeur( IJK_Thermal_Subresolution, "IJK_Therm
 IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 {
 
+  reference_gfm_on_probes_ = 0;
+
   disable_spherical_diffusion_start_ = 0;
   probes_end_value_start_ = -1;
   probes_end_value_coeff_ = 0.05;
@@ -93,6 +95,8 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   fd_solver_rank_ = 0;
   // one_dimensional_advection_diffusion_thermal_solver_.nommer("finite_difference_solver");
   // one_dimensional_advection_diffusion_thermal_solver_.typer("Solv_GCP");
+  compute_tangential_variables_ = 0;
+
   discrete_integral_ = 0;
   quadtree_levels_ = 1;
   advected_frame_of_reference_=0;
@@ -200,6 +204,7 @@ Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
 void IJK_Thermal_Subresolution::set_param( Param& param )
 {
   IJK_Thermal_base::set_param(param);
+  param.ajouter_flag("reference_gfm_on_probes", &reference_gfm_on_probes_);
   param.ajouter_flag("disable_spherical_diffusion_start", &disable_spherical_diffusion_start_);
   param.ajouter_flag("disable_subresolution", &disable_subresolution_);
   param.ajouter_flag("convective_flux_correction", &convective_flux_correction_);
@@ -1426,7 +1431,7 @@ double IJK_Thermal_Subresolution::get_probes_length()
 
 void IJK_Thermal_Subresolution::compute_overall_probes_parameters()
 {
-  if (!disable_subresolution_)
+  if (!disable_subresolution_ || reference_gfm_on_probes_)
     {
       probe_length_ = coeff_distance_diagonal_ * cell_diagonal_;
       dr_ = probe_length_ / (points_per_thermal_subproblem_ - 1);
@@ -1521,7 +1526,7 @@ void IJK_Thermal_Subresolution::initialise_thermal_subproblems_list()
 
 void IJK_Thermal_Subresolution::initialise_thermal_subproblems()
 {
-  if (!disable_subresolution_)
+  if (!disable_subresolution_ || reference_gfm_on_probes_)
     {
       const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I();
       const int ni = temperature_.ni();
@@ -2267,10 +2272,12 @@ void IJK_Thermal_Subresolution::set_zero_temperature_increment()
 
 void IJK_Thermal_Subresolution::clean_thermal_subproblems()
 {
-  if (!disable_subresolution_ && ref_ijk_ft_->get_tstep() > 0)
+  if (ref_ijk_ft_->get_tstep() > 0)
     {
-      thermal_local_subproblems_.clean();
-      corrige_flux_->clear_vectors();
+      if (!disable_subresolution_ || reference_gfm_on_probes_)
+        thermal_local_subproblems_.clean();
+      if (!disable_subresolution_)
+        corrige_flux_->clear_vectors();
     }
 }
 
@@ -2284,7 +2291,7 @@ void IJK_Thermal_Subresolution::set_thermal_subresolution_outputs(const Nom& int
                                                                   const Nom& overall_bubbles_quantities,
                                                                   const Nom& local_quantities_thermal_probes_time_index_folder)
 {
-  if (!disable_subresolution_)
+  if (!disable_subresolution_ || reference_gfm_on_probes_)
     {
       if (debug_)
         Cerr << "Compute bubbles quantities" << finl;

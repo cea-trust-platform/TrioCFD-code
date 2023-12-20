@@ -228,7 +228,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
     }
 
   debug_ = ref_thermal_subresolution.debug_;
-
+  reference_gfm_on_probes_ = ref_thermal_subresolution.reference_gfm_on_probes_;
   bubbles_volume_ = &ref_thermal_subresolution.bubbles_volume_;
 
   ArrOfDouble bubble_rising_vector(3);

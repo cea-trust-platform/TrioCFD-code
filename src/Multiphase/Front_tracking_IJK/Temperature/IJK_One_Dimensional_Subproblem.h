@@ -152,9 +152,12 @@ public :
   void compute_add_source_terms();
   void compute_temporal_explicit_implicit_matrices();
   void approximate_temperature_increment_material_derivative();
+  void retrieve_variables_solution_gfm_on_probes();
   void retrieve_temperature_solution();
   void retrieve_radial_quantities();
   void compute_local_temperature_gradient_solution();
+  void initialise_empty_variables_for_post_processing();
+  void copy_interpolations_on_solution_variables_for_post_processing();
   double get_interfacial_gradient_corrected() const;
   double get_interfacial_double_derivative_corrected() const;
 
@@ -371,7 +374,8 @@ protected :
   void clear_vectors();
   void reset_counters();
   void reinit_variable(DoubleVect& vect);
-  void associate_thermal_subproblem_parameters(int debug,
+  void associate_thermal_subproblem_parameters(int reference_gfm_on_probes,
+                                               int debug,
                                                const int& n_iter_distance,
                                                const double& delta_T_subcooled_overheated,
                                                const int& pre_initialise_thermal_subproblems_list,
@@ -383,8 +387,9 @@ protected :
   void associate_source_terms_parameters(const int& source_terms_type,
                                          const int& correct_tangential_temperature_gradient,
                                          const int& correct_tangential_temperature_hessian,
-                                         int advected_frame_of_reference,
-                                         int neglect_frame_of_reference_radial_advection);
+                                         const int& advected_frame_of_reference,
+                                         const int& neglect_frame_of_reference_radial_advection,
+                                         const int& compute_tangential_variables);
   void associate_finite_difference_solver_solution(IJK_Finite_Difference_One_Dimensional_Matrix_Assembler& finite_difference_assembler,
                                                    Matrice& thermal_subproblems_matrix_assembly,
                                                    DoubleVect& thermal_subproblems_rhs_assembly,
@@ -524,6 +529,9 @@ protected :
 
   enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump };
 
+  int reference_gfm_on_probes_ = 0;
+  int compute_tangential_variables_ = 1;
+  int pure_thermal_diffusion_ = 0;
   int debug_;
   int init_;
   int advected_frame_of_reference_=1;
