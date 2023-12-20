@@ -46,27 +46,48 @@
 #include <Entree_fluide_vitesse_imposee_ALE.h>
 #include <Navier_Stokes_std_ALE.h>
 
-
-
-
-
-
 #include <Interprete_bloc.h>
 #include <NettoieNoeuds.h>
 #include <trust_med_utils.h>
 
-
-Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
+Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), resumption(0), nbBeam(0), associate_eq(false)
-{
 
-//  beam = new Beam_model[nbBeam];
-}
-Domaine_ALE::~Domaine_ALE()
+Domaine_ALE::Domaine_ALE()
 {
-//  delete[] beam;
+  clear();
 }
+
+void Domaine_ALE::clear()
+{
+  Domaine::clear();
+  // And most importantly:
+  deformable_ = true;
+
+  dt_ = 0.;
+  ALE_mesh_velocity.reset();
+  vf.reset();
+  som_faces_bords.reset();
+  solv = SolveurSys();
+  mat = Matrice_Morse_Sym();
+  les_champs_front = Champs_front();
+  nb_bords_ALE = 0;
+  les_bords_ALE.vide();
+  update_or_not_matrix_coeffs_ = 1;
+  ALEjacobian_old.reset();
+  ALEjacobian_new.reset();
+  resumption = 0;
+  nbBeam = 0;
+  beam.clear();
+  eq = REF(Equation_base)();
+  field_ALE_projection_ = Champs_front_ALE_projection();
+  name_ALE_boundary_projection_ = Noms();
+  associate_eq = false;
+  name_boundary_with_Neumann_BC= Noms();
+  les_elems_extrait_surf_reference_.reset();
+  extrait_surf_dom_deformable_ = false;
+}
+
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
   Domaine::printOn(os);
@@ -383,7 +404,6 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
   Cerr << "Domaine_ALE::initialize " << finl;
-  deformable_=1;
   invalide_octree();
   bool  check_NoZero_ALE= true;
   ALE_mesh_velocity=calculer_vitesse(temps,le_domaine_dis,pb,  check_NoZero_ALE);
@@ -1375,23 +1395,27 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
 void Domaine_ALE::update_coord_dom_extrait_surface()
 {
   Interprete_bloc& interp = Interprete_bloc::interprete_courant();
-  Noms noms=interp.getListeNoms();
+  const Noms& noms = interp.les_noms();
   for(int i=0; i<noms.size(); i++)
     if(strcmp(interprete().objet(noms[i]).le_type(), "Domaine" ) == 0) //we only look for objet of type domaine
       {
-        Nom nom_domaine_ext= noms[i]; // give the name of domaine
+        const Nom& nom_domaine_ext = noms[i]; // give the name of domaine
         //if (interp.objet_global_existant(nom_domaine_ext))
+
         Domaine& dom_new = ref_cast(Domaine, interprete().objet(nom_domaine_ext));
-        if(dom_new.getExtrait_surf_dom_deformable()) //test if domain was defined with extrait_surface_ALE
+        if (sub_type(Domaine_ALE, dom_new))
           {
-            //Cout<<"Domaine_ALE:: update_coord_dom_extrait_surface, extrait_surface dom mobile. Nom domaine !"<<dom_new.le_nom()<<finl;
-            Scatter::uninit_sequential_domain(dom_new);
-            dom_new.les_sommets()=coord_sommets();             //coordinated updates
-            dom_new.les_elems()=dom_new.getLes_elems_extrait_surf_ref(); //only the coordinate are update, exactly the same elements will belong to the domain
-            NettoieNoeuds::nettoie(dom_new);
+            Domaine_ALE& dom_new_ale =  ref_cast(Domaine_ALE, dom_new);
+            if(dom_new_ale.extrait_surf_dom_deformable_) //test if domain was defined with extrait_surface_ALE
+              {
+                //Cout<<"Domaine_ALE:: update_coord_dom_extrait_surface, extrait_surface dom mobile. Nom domaine !"<<dom_new.le_nom()<<finl;
+                Scatter::uninit_sequential_domain(dom_new_ale);
+                dom_new_ale.les_sommets()=coord_sommets();             //coordinated updates
+                dom_new_ale.les_elems()=dom_new_ale.les_elems_extrait_surf_reference(); //only the coordinate are update, exactly the same elements will belong to the domain
+                NettoieNoeuds::nettoie(dom_new_ale);
+              }
           }
       }
-
 }
 
 
