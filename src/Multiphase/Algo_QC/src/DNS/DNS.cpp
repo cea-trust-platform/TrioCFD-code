@@ -10406,9 +10406,9 @@ void DNS_QC_double::calculer_convection_vitesse(FixedVector<IJK_Field_double, 3>
           else if(convection_velocity_centre2_)
             {
               velocity_convection_op_centre_2_.ajouter_avec_u_div_rhou(rho_v[0], rho_v[1], rho_v[2],
-                                                         velocity[0], velocity[1], velocity[2],
-                                                         d_velocity[0], d_velocity[1], d_velocity[2],
-                                                         u_div_rho_u);
+                                                                       velocity[0], velocity[1], velocity[2],
+                                                                       d_velocity[0], d_velocity[1], d_velocity[2],
+                                                                       u_div_rho_u);
             }
           else
             {
@@ -10445,12 +10445,12 @@ void DNS_QC_double::calculer_convection_vitesse(FixedVector<IJK_Field_double, 3>
                                                           d_velocity[0], d_velocity[1], d_velocity[2]);
             }
           else if (convection_velocity_centre2_)
-          {
-              velocity_convection_op_centre_2_..ajouter_avec_u_div_rhou(rho_v[0], rho_v[1], rho_v[2],
-                                                                        velocity[0], velocity[1], velocity[2],
-                                                                        d_velocity[0], d_velocity[1], d_velocity[2],
-                                                                        u_div_rho_u);
-          }
+            {
+              velocity_convection_op_centre_2_.ajouter_avec_u_div_rhou(rho_v[0], rho_v[1], rho_v[2],
+                                                                       velocity[0], velocity[1], velocity[2],
+                                                                       d_velocity[0], d_velocity[1], d_velocity[2],
+                                                                       u_div_rho_u);
+            }
           else
             {
               // Schema centre4 (utilise par defaut)
