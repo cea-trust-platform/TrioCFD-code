@@ -39,7 +39,7 @@ void OpConvIJKQuickScalar_double::compute_flux_(IJK_Field_local_double& resu, co
   IJK_double_ptr resu_ptr(resu, 0, 0, 0);
   const int nx = _DIR_==DIRECTION::X ? input_field_->ni() + 1 : input_field_->ni();
   const int ny = _DIR_==DIRECTION::Y ? input_field_->nj() + 1 : input_field_->nj();
-  const double delta_xyz = _DIR_==DIRECTION::Z ? (channel_data_.get_delta_z()[k_layer] + channel_data_.get_delta_z()[k_layer-1]) * 0.5 : channel_data_.get_delta((int)_DIR_);
+  const double delta_xyz = _DIR_==DIRECTION::Z ? (channel_data_.get_delta_z()[k_layer-1] + channel_data_.get_delta_z()[k_layer]) * 0.5 : channel_data_.get_delta((int)_DIR_);
   const  double surface = channel_data_.get_surface(k_layer, 1, (int)_DIR_);
   if(_DIR_==DIRECTION::Z)
     {
@@ -81,7 +81,7 @@ void OpConvIJKQuickScalar_double::compute_flux_(IJK_Field_local_double& resu, co
           Simd_double fram = max(fram0, fram1);
           Simd_double curv	   = select_double(velocity, 0., curv1, curv0);
           Simd_double T_amont = select_double(velocity, 0., T1 /* if velocity < 0 */, T0 /* if velocity > 0 */);
-          Simd_double flux	   = (T0 + T1) * 0.5 - dx_squared_over_8 * curv;
+          Simd_double flux	   = (T0 + T1) * 0.5 - delta_xyz_squared_over_8 * curv;
           flux		   = ((1. - fram) * flux + fram * T_amont) * velocity * surface;
 
           resu_ptr.put_val(i, flux);
@@ -94,6 +94,13 @@ void OpConvIJKQuickScalar_double::compute_flux_(IJK_Field_local_double& resu, co
       fram_values.next_j();
       curv_values.next_j();
       resu_ptr.next_j();
+    }
+
+  if(_DIR_==DIRECTION::Z)
+    {
+      // store curv and fram for next layer of fluxes in z direction
+      shift_curv_fram(tmp_curv_fram_);
+      stored_curv_fram_layer_z_ = k_layer;
     }
 }
 #endif
