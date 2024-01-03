@@ -562,13 +562,14 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
                                                  "t1x", "t1y", "t1z", "t2x", "t2y", "t2z",
                                                  "s1x", "s1y", "s1z", "s2x", "s2y", "s2z",
                                                  "rsph", "thetasph", "phisph",
-                                                 "temperature_interp","temperature_solution","temperature_gradient", "temperature_gradient_sol",
+                                                 "temperature_interp","temperature_sol","temperature_gradient", "temperature_gradient_sol",
                                                  "temperature_double_deriv_sol",
                                                  "temperature_gradient_tangential","temperature_gradient_tangential2",
                                                  "temperature_gradient_tangential_rise","temperature_gradient_azymuthal",
                                                  "temperature_diffusion_hessian_cartesian_trace",
                                                  "temperature_diffusion_hessian_trace",
                                                  "radial_temperature_diffusion",
+                                                 "radial_temperature_diffusion_sol",
                                                  "tangential_temperature_diffusion",
                                                  "surface","thermal_flux","lambda","alpha","prandtl_liq",
                                                  "shear","force",
@@ -666,7 +667,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
   Nom probe_header = Nom("tstep\tthermalrank\tpostproindex\tglobalsubproblem\tlocalsubproblem\ttime"
                          "\tnx\tny\tnz\tt1x\tt1y\tt2z\tt2x\tt2y\tt2z\ts1x\ts1y\ts1z\ts2x\ts2y\ts2z"
                          "\trsph\tthetasph\tphisph"
-                         "\ttemperature_interp\ttemperature_solution"
+                         "\ttemperature_interp\ttemperature_sol"
                          "\ttemperature_gradient\ttemperature_gradient_sol"
                          "\ttemperature_double_deriv_sol"
                          "\ttemperature_gradient_tangential\ttemperature_gradient_tangential2"
@@ -674,6 +675,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
                          "\ttemperature_diffusion_hessian_cartesian_trace"
                          "\ttemperature_diffusion_hessian_trace"
                          "\tradial_temperature_diffusion"
+                         "\tradial_temperature_diffusion_sol"
                          "\ttangential_temperature_diffusion"
                          "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
                          "\tshear\tforce"

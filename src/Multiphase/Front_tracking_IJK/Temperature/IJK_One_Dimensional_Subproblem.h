@@ -156,6 +156,7 @@ public :
   void retrieve_temperature_solution();
   void retrieve_radial_quantities();
   void compute_local_temperature_gradient_solution();
+  void compute_radial_temperature_diffusion_solution();
   void initialise_empty_variables_for_post_processing();
   void copy_interpolations_on_solution_variables_for_post_processing();
   double get_interfacial_gradient_corrected() const;
@@ -374,12 +375,13 @@ protected :
   void clear_vectors();
   void reset_counters();
   void reinit_variable(DoubleVect& vect);
-  void associate_thermal_subproblem_parameters(int reference_gfm_on_probes,
-                                               int debug,
+  void associate_thermal_subproblem_parameters(const int& reference_gfm_on_probes,
+                                               const int& debug,
                                                const int& n_iter_distance,
                                                const double& delta_T_subcooled_overheated,
                                                const int& pre_initialise_thermal_subproblems_list,
-                                               const int& use_sparse_matrix);
+                                               const int& use_sparse_matrix,
+                                               const int& compute_normal_derivative_on_reference_probes);
   void associate_thermal_subproblem_sparse_matrix(FixedVector<ArrOfInt,6>& first_indices_sparse_matrix);
   void associate_flux_correction_parameters(const int& correct_fluxes,
                                             const int& distance_cell_faces_from_lrs,
@@ -530,6 +532,7 @@ protected :
   enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump };
 
   int reference_gfm_on_probes_ = 0;
+  int compute_normal_derivative_on_reference_probes_ = 0;
   int compute_tangential_variables_ = 1;
   int pure_thermal_diffusion_ = 0;
   int debug_;
@@ -729,6 +732,7 @@ protected :
   DoubleVect temperature_diffusion_hessian_cartesian_trace_;
   DoubleVect temperature_diffusion_hessian_trace_;
   DoubleVect radial_temperature_diffusion_;
+  DoubleVect radial_temperature_diffusion_solution_;
   DoubleVect tangential_temperature_diffusion_;
 
   int source_terms_type_=0;
@@ -780,7 +784,7 @@ protected :
   DoubleVect first_tangential_velocity_normal_gradient_;
   DoubleVect second_tangential_velocity_normal_gradient_;
   DoubleVect azymuthal_velocity_normal_gradient_;
-  DoubleVect first_tangential_velocity_gradient_from_rising_dir_;
+  DoubleVect first_tangential_velocity_normal_gradient_from_rising_dir_;
   DoubleVect pressure_normal_gradient_;
 
   DoubleVect shear_stress_;

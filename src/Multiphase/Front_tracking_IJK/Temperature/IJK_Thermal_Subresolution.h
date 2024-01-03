@@ -284,6 +284,7 @@ protected :
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
   int reference_gfm_on_probes_;
+  int compute_normal_derivatives_on_reference_probes_;
 
   int disable_spherical_diffusion_start_;
   int single_centred_bubble_;

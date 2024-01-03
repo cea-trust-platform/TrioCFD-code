@@ -35,6 +35,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 {
 
   reference_gfm_on_probes_ = 0;
+  compute_normal_derivatives_on_reference_probes_ = 0;
 
   disable_spherical_diffusion_start_ = 0;
   probes_end_value_start_ = -1;
@@ -204,7 +205,10 @@ Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
 void IJK_Thermal_Subresolution::set_param( Param& param )
 {
   IJK_Thermal_base::set_param(param);
+
   param.ajouter_flag("reference_gfm_on_probes", &reference_gfm_on_probes_);
+  param.ajouter_flag("compute_normal_derivatives_on_reference_probes", &compute_normal_derivatives_on_reference_probes_);
+
   param.ajouter_flag("disable_spherical_diffusion_start", &disable_spherical_diffusion_start_);
   param.ajouter_flag("disable_subresolution", &disable_subresolution_);
   param.ajouter_flag("convective_flux_correction", &convective_flux_correction_);
@@ -380,6 +384,9 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   distance_cell_faces_from_lrs_ = !distance_cell_faces_from_lrs_;
   first_step_thermals_post_ = !first_step_thermals_post_;
+
+  if (compute_normal_derivatives_on_reference_probes_)
+    reference_gfm_on_probes_ = 1;
 
   if (use_sparse_matrix_)
     pre_initialise_thermal_subproblems_list_ = 0;
@@ -1630,7 +1637,7 @@ void IJK_Thermal_Subresolution::reset_subresolution_distributed_vectors()
 
 void IJK_Thermal_Subresolution::interpolate_project_velocities_on_probes()
 {
-  if (!disable_subresolution_)
+  if (!disable_subresolution_ || reference_gfm_on_probes_)
     thermal_local_subproblems_.interpolate_project_velocities_on_probes();
 }
 
@@ -1909,8 +1916,9 @@ void IJK_Thermal_Subresolution::solve_thermal_subproblems()
               Cerr << "Finite-difference thermal sub-resolution has finished !" << finl;
             }
         }
-      retrieve_temperature_solution();
     }
+  if (!disable_subresolution_ || reference_gfm_on_probes_)
+    retrieve_temperature_solution();
 }
 
 void IJK_Thermal_Subresolution::convert_into_sparse_matrix()
