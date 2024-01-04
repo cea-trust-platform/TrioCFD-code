@@ -133,7 +133,7 @@ void Modele_turbulence_scal_Prandtl::mettre_a_jour(double )
       for (int i = 0; i < lambda_t.size(); i++)  lambda_t(i) *= tab_Cp(Ccp ? 0 : i);
       if (equation().probleme().is_dilatable()) multiplier_par_rho_si_dilatable(lambda_t,mil);
     }
-  else lambda_t *= tab_rho(0, 0) * tab_Cp(0, 0);
+  else lambda_t *= mon_equation->domaine_dis()->nb_elem() > 0 ?  tab_rho(0, 0) * tab_Cp(0, 0) : 1.0;
   lambda_t.echange_espace_virtuel();
   diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
