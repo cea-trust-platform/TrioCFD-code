@@ -556,12 +556,12 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
   std::map<std::string, ArrOfDouble> results_probes_double;
   std::map<std::string, ArrOfInt> results_probes_int;
 
-  std::vector<std::string> key_results_int = {"tstep", "thermalrank", "postproindex", "globalsubproblem", "localsubproblem"};
+  std::vector<std::string> key_results_int = {"tstep", "thermal_rank", "post_pro_index", "global_subproblem", "local_subproblem"};
   std::vector<std::string> key_results_double = {"time",
                                                  "nx", "ny", "nz",
                                                  "t1x", "t1y", "t1z", "t2x", "t2y", "t2z",
                                                  "s1x", "s1y", "s1z", "s2x", "s2y", "s2z",
-                                                 "rsph", "thetasph", "phisph",
+                                                 "r_sph", "theta_sph", "phi_sph",
                                                  "temperature_interp","temperature_sol","temperature_gradient", "temperature_gradient_sol",
                                                  "temperature_double_deriv_sol",
                                                  "temperature_gradient_tangential","temperature_gradient_tangential2",
@@ -571,7 +571,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
                                                  "radial_temperature_diffusion",
                                                  "radial_temperature_diffusion_sol",
                                                  "tangential_temperature_diffusion",
-                                                 "surface","thermal_flux","lambda","alpha","prandtl_liq",
+                                                 "surface","thermal_flux","lambda_liq","alpha_liq","prandtl_liq",
                                                  "shear","force",
                                                  "pressure",
                                                  "u_x","u_y","u_z",
@@ -664,9 +664,9 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
   // {
   const int reset = 1;
   const int last_time_index = ref_ijk_ft_->get_tstep();
-  Nom probe_header = Nom("tstep\tthermalrank\tpostproindex\tglobalsubproblem\tlocalsubproblem\ttime"
+  Nom probe_header = Nom("tstep\tthermal_rank\tpost_pro_index\tglobal_subproblem\tlocal_subproblem\ttime"
                          "\tnx\tny\tnz\tt1x\tt1y\tt2z\tt2x\tt2y\tt2z\ts1x\ts1y\ts1z\ts2x\ts2y\ts2z"
-                         "\trsph\tthetasph\tphisph"
+                         "\tr_sph\ttheta_sph\tphi_sph"
                          "\ttemperature_interp\ttemperature_sol"
                          "\ttemperature_gradient\ttemperature_gradient_sol"
                          "\ttemperature_double_deriv_sol"
@@ -677,7 +677,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
                          "\tradial_temperature_diffusion"
                          "\tradial_temperature_diffusion_sol"
                          "\ttangential_temperature_diffusion"
-                         "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                         "\tsurface\tthermal_flux\tlambda_liq\talpha_liq\tprandtl_liq"
                          "\tshear\tforce"
                          "\tpressure"
                          "\tu_x\tu_y\tu_z"
@@ -1270,16 +1270,16 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
       Nom probe_name = Nom("_thermal_rank_") + Nom(std::string(max_digit - max_rank_digit,'0')) + Nom(rank)
                        + Nom("_thermal_subproblems") + ("_overall_bubbles_quantities_")
                        + Nom(std::string(max_digit_time - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
-      Nom probe_header = Nom("tstep\ttime\tthermalrank\tbubbleindex"
-                             "\ttimedimensionless"
-                             "\tnusseltoverall\tnusseltoverallgfm\tnusseltspherical\tnusseltsphericalth"
-                             "\tnusseltoverallliq\tnusseltoverallgfmliq\tnusseltsphericalliq\tnusseltsphericalthliq"
-                             "\tnusseltoverallerror\tnusseltoverallgfmerror\tnusseltoverallliqerror\tnusseltoverallgfmliqerror"
-                             "\tnusseltoverallerrorrel\tnusseltoverallgfmerrorrel\tnusseltoverallliqerrorrel\tnusseltoverallgfmliqerrorrel"
-                             "\theatflux\theatfluxgfm\theatfluxspherical"
-                             "\ttotalsurface\ttotalvolume"
-                             "\tradiussurface\tradiusvolume"
-                             "\terrortemperatureana\terrortemperatureananorm\terrortemperatureanarel");
+      Nom probe_header = Nom("tstep\ttime\tthermal_rank\tbubble_index"
+                             "\ttime_dimensionless"
+                             "\tnusselt_overall\tnusselt_overall_gfm\tnusselt_spherical\tnusselt_spherical_th"
+                             "\tnusselt_overall_liq\tnusselt_overall_gfm_liq\tnusselt_spherical_liq\tnusselt_spherical_th_liq"
+                             "\tnusselt_overall_error\tnusselt_overall_gfm_error\tnusselt_overall_liq_error\tnusselt_overall_gfm_liq_error"
+                             "\tnusselt_overall_error_rel\tnusselt_overall_gfm_error_rel\tnusselt_overall_liq_error_rel\tnusselt_overall_gfm_liq_error_rel"
+                             "\theat_flux\theat_flux_gfm\theat_flux_spherical"
+                             "\ttotal_surface\ttotal_volume"
+                             "\tradius_surface\tradius_volume"
+                             "\terror_temperature_ana\terror_temperature_ana_norm\terror_temperature_ana_rel");
       SFichier fic = Open_file_folder(overall_bubbles_quantities, probe_name, probe_header, reset);
       int max_counter = nb_bubbles_;
       const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();

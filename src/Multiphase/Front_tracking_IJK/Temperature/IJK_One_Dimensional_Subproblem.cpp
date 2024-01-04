@@ -3165,13 +3165,13 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                          + Nom("_global_") + Nom(std::string(max_digit - nb_digit_index_global, '0')) + Nom(global_subproblem_index_)
                          + Nom("_radial_quantities_time_index_") +
                          + Nom(std::string(max_digit - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
-        Nom probe_header = Nom("tstep\tthermalrank\tpostproindex\tglobalsubproblem\tlocalsubproblem\ttime"
+        Nom probe_header = Nom("tstep\tthermal_rank\tpost_pro_index\tglobal_subproblem\tlocal_subproblem\ttime"
                                "\tnx\tny\tnz"
                                "\tt1x\tt1y\tt1z"
                                "\tt2x\tt2y\tt2z"
                                "\ts1x\ts1y\ts1z"
                                "\ts2x\ts2y\ts2z"
-                               "\trsph\tthetasph\tphisph"
+                               "\tr_sph\ttheta_sph\tphi_sph"
                                "\tradial_coord\ttemperature_interp\ttemperature_sol"
                                "\ttemperature_gradient\ttemperature_gradient_sol"
                                "\ttemperature_double_deriv_sol"
@@ -3182,7 +3182,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                                "\tradial_temperature_diffusion"
                                "\tradial_temperature_diffusion_sol"
                                "\ttangential_temperature_diffusion"
-                               "\tsurface\tthermal_flux\tlambda\talpha\tprandtl_liq"
+                               "\tsurface\tthermal_flux\tlambda_liq\talpha_liq\tprandtl_liq"
                                "\tshear\tforce"
                                "\tpressure"
                                "\tu_x\tu_y\tu_z"
