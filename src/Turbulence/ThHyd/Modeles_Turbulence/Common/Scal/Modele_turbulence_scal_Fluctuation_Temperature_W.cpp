@@ -54,7 +54,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::set_param(Param& param)
 int Modele_turbulence_scal_Fluctuation_Temperature_W::lire_motcle_non_standard(const Motcle& mot, Entree& s)
 {
   Cerr << "Lecture des parametres du modele de fluctuation thermique. Il doit y avoir deux types d'equation." << finl;
-  Motcle accouverte = "{" , accfermee = "}" ;
+  //Motcle accouverte = "{" , accfermee = "}" ;
   Motcles les_mots(1);
   {
     les_mots[0] = "Transport_Fluctuation_Temperature_W";
@@ -160,7 +160,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::completer()
   eqn_transport_Fluctu_Temp->completer();
   const Probleme_base& mon_pb = mon_equation->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence.valeur());
+  const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
   const Champ_Fonc& visc_turb = mod_turb_hydr.viscosite_turbulente();
   associer_viscosite_turbulente(visc_turb);
   Cerr << "Fin de Modele_turbulence_scal_Fluctuation_Temperature_W::completer()" << finl;

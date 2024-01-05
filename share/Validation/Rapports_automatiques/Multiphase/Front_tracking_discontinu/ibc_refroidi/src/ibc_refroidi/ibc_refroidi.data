@@ -91,7 +91,7 @@ Read pb
 {
 eq_hydraulique
 {
-	modele_turbulence nul
+	modele_turbulence null {  }
         solveur_pression GCP { precond ssor { omega 1.5 } seuil 5.e-12 impr }
 	convection           { quick }
 	diffusion            { }

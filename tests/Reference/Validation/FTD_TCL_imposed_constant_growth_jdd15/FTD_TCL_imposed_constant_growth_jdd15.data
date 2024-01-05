@@ -85,6 +85,7 @@ Lire sch
 Triple_Line_Model_FT_Disc TCL 
 Read TCL 
 {
+  deactivate
   Qtcl 0.0 # W/m # 
   lv 10.e-9
   ym 5.e-6
@@ -219,7 +220,7 @@ Lire pb
       equation_interface interf
       equation_navier_stokes hydraulique
       phase 1
-                stencil_width  8
+                stencil_width  9
                 diffusion { }
                 convection { quick }
                 boundary_conditions

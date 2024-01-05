@@ -374,7 +374,7 @@ void Intersection_Interface_ijk_cell::calcul_projection_centre_sur_interface_moy
   Vecteur3 bary_interf {0., 0., .0};
   Vecteur3 normale_interf {0., 0., .0};
   Vecteur3 position {0., 0., .0};
-  Vecteur3 distance {0., 0., .0};
+  //Vecteur3 distance {0., 0., .0};
   int i_diph = 0;
   // TODO: attention il faut recuperer le nombre de cellule diphasique ici.
   n_diph_ = 0;

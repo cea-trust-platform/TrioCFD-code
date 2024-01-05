@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Mod_Turb_scal_diffturb_base.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Convection_Diffusion_std.h>
 
 Implemente_base(Mod_Turb_scal_diffturb_base,"Mod_Turb_scal_diffturb_base",Modele_turbulence_scal_base);
@@ -74,7 +74,7 @@ void Mod_Turb_scal_diffturb_base::completer()
   Modele_turbulence_scal_base::completer();
   const Probleme_base& mon_pb = equation().probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence.valeur());
+  const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
   const Champ_Fonc& visc_turb = mod_turb_hydr.viscosite_turbulente();
   associer_viscosite_turbulente(visc_turb);
 }

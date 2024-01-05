@@ -1,0 +1,4 @@
+python ForceNum.py
+python SPD.py
+cd ../ 
+python Freq.py

@@ -1628,7 +1628,9 @@ void IJK_Thermal_Subresolution::reset_subresolution_distributed_vectors()
   if (first_time_step_temporal_ && first_time_step_explicit_)
     thermal_subproblems_temperature_solution_ini_.detach_vect();
 
+  // For a constant number of points (we can just change the probe size)
   const int nb_points = points_per_thermal_subproblem_ * thermal_local_subproblems_.get_subproblems_counter();
+  thermal_subproblems_rhs_assembly_.resize(nb_points);
   thermal_subproblems_temperature_solution_.resize(nb_points);
   if (first_time_step_temporal_ && first_time_step_explicit_)
     thermal_subproblems_temperature_solution_ini_.resize(nb_points);
@@ -1932,15 +1934,18 @@ void IJK_Thermal_Subresolution::convert_into_sparse_matrix()
       Matrice_Morse& sparse_matrix_solver  = ref_cast(Matrice_Morse, thermal_subproblems_matrix_assembly_for_solver_.valeur());
       Matrice_Bloc& bloc_matrix_solver = ref_cast(Matrice_Bloc, thermal_subproblems_matrix_assembly_.valeur());
       bloc_matrix_solver.block_to_morse(sparse_matrix_solver);
-      Matrice_Morse& sparse_matrix_solver_reduced  = ref_cast(Matrice_Morse, thermal_subproblems_matrix_assembly_for_solver_reduced_.valeur());
-      finite_difference_assembler_.reduce_solver_matrix(sparse_matrix_solver,
-                                                        sparse_matrix_solver_reduced,
-                                                        nb_points,
-                                                        pre_initialise_thermal_subproblems_list_);
       if (pre_initialise_thermal_subproblems_list_)
-        thermal_subproblems_matrix_assembly_for_solver_ref_ = &thermal_subproblems_matrix_assembly_for_solver_reduced_;
+        {
+          Matrice_Morse& sparse_matrix_solver_reduced  = ref_cast(Matrice_Morse, thermal_subproblems_matrix_assembly_for_solver_reduced_.valeur());
+          finite_difference_assembler_.reduce_solver_matrix(sparse_matrix_solver,
+                                                            sparse_matrix_solver_reduced,
+                                                            nb_points,
+                                                            pre_initialise_thermal_subproblems_list_);
+          thermal_subproblems_matrix_assembly_for_solver_ref_ = &thermal_subproblems_matrix_assembly_for_solver_reduced_;
+        }
       else
         thermal_subproblems_matrix_assembly_for_solver_ref_ = &thermal_subproblems_matrix_assembly_for_solver_;
+
     }
   else
     {

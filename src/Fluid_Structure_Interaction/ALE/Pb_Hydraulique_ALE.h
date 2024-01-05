@@ -46,6 +46,7 @@ public :
   const Equation_base& equation(int) const override;
   Equation_base& equation(int) override;
   void associer_milieu_base(const Milieu_base& ) override;
+  void associer_sch_tps_base(const Schema_Temps_base&) override;
 
 protected :
 

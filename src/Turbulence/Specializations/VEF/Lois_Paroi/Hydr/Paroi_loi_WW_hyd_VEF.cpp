@@ -25,7 +25,7 @@
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Domaine.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Equation_base.h>
 #include <Param.h>
 
@@ -520,7 +520,7 @@ double distance_2D_som(int fac,int elem,const Domaine_VEF& domaine ) //distance 
   const DoubleTab& face_normale = domaine.face_normales();
 
   int i,num0,sommet;
-  IntVect num(2),som(2);
+  //IntVect num(2),som(2);
   // On cherche les faces autres que fac
   for (i=0; i<nfac; i++)
     {

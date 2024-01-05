@@ -21,13 +21,13 @@
 
 #include <Modele_turbulence_hyd_K_Eps_2_Couches.h>
 #include <Schema_Temps_base.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Probleme_base.h>
 #include <Schema_Temps.h>
 #include <stat_counters.h>
 #include <Param.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches,"Modele_turbulence_hyd_K_Epsilon_2_Couches",Mod_turb_hyd_RANS);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches,"Modele_turbulence_hyd_K_Epsilon_2_Couches",Mod_turb_hyd_RANS_keps);
 
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie.
@@ -41,19 +41,19 @@ Sortie& Modele_turbulence_hyd_K_Eps_2_Couches::printOn(Sortie& s ) const
 }
 
 
-/*! @brief Simple appel a Mod_turb_hyd_RANS::readOn(Entree&)
+/*! @brief Simple appel a Mod_turb_hyd_RANS_keps::readOn(Entree&)
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
 Entree& Modele_turbulence_hyd_K_Eps_2_Couches::readOn(Entree& s )
 {
-  return Mod_turb_hyd_RANS::readOn(s);
+  return Mod_turb_hyd_RANS_keps::readOn(s);
 }
 
 void Modele_turbulence_hyd_K_Eps_2_Couches::set_param(Param& param)
 {
-  Mod_turb_hyd_RANS::set_param(param);
+  Mod_turb_hyd_RANS_keps::set_param(param);
   param.ajouter_non_std("Transport_K_KEpsilon",(this),Param::REQUIRED);
 }
 
@@ -67,7 +67,7 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::lire_motcle_non_standard(const Motcle
       return 1;
     }
   else
-    return Mod_turb_hyd_RANS::lire_motcle_non_standard(mot,is);
+    return Mod_turb_hyd_RANS_keps::lire_motcle_non_standard(mot,is);
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.
@@ -135,7 +135,7 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::preparer_calcul()
 {
   eqn_transp_K_Eps().preparer_calcul();
   calculer_viscosite_turbulente(equation().schema_temps().temps_courant());
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   calculer_viscosite_turbulente(K_Eps().temps());
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   return 1;

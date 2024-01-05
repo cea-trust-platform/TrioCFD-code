@@ -9,6 +9,7 @@ Parametres {
 	CasTest . pre_run.data 1
 	CasTest . CHMTVAR.data 4
 	# DISABLE_PARALLEL_RUN #
+        ExtraUsedFile CHMTVAR.lata.*.TEMPERATURE_0
 }
 
 Chapitre {

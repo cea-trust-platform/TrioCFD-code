@@ -123,7 +123,7 @@ void Turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2()
   const IntTab& elem_faces = domaine_VDF.elem_faces();
 
   int i,j,k,elem;
-  IntVect element(4);
+  //IntVect element(4);
 
   DoubleTrav gij2(dimension,dimension);
   DoubleTrav sd(dimension,dimension);

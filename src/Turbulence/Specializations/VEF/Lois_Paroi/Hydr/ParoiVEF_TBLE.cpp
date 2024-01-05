@@ -36,7 +36,7 @@
 #include <Terme_Boussinesq_VEFPreP1B_Face.h>
 #include <Terme_Source_Qdm_lambdaup_VEF_Face.h>
 #include <SFichier.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Navier_Stokes_std.h>
 #include <Param.h>
 
@@ -1286,9 +1286,9 @@ int ParoiVEF_TBLE::calculer_k_eps(double& k, double& eps , double yp, double u_s
 int ParoiVEF_TBLE::calculer_stats()
 {
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
-  const Domaine& domaine = domaine_VEF.domaine();
+  //const Domaine& domaine = domaine_VEF.domaine();
   const DoubleTab& face_normale = domaine_VEF.face_normales();
-  const int nfac = domaine.nb_faces_elem();
+  //const int nfac = domaine.nb_faces_elem();
 
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const double tps = eqn_hydr.inconnue().temps();
@@ -1302,7 +1302,7 @@ int ParoiVEF_TBLE::calculer_stats()
   double Unp1_t1,Unp1_t2=0.;
   double Fx, Fy, Fz;
   double u,v,w=0.;
-  IntVect num(nfac);
+  //IntVect num(nfac);
 
 
   //////////////////////////////////////
@@ -1399,9 +1399,9 @@ void ParoiVEF_TBLE::imprimer_ustar(Sortie& os) const
   const double tps = eqn_hydr.inconnue().temps();
 
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
-  const Domaine& domaine = domaine_VEF.domaine();
+  //const Domaine& domaine = domaine_VEF.domaine();
   const DoubleTab& face_normale = domaine_VEF.face_normales();
-  const int nfac = domaine.nb_faces_elem();
+  //const int nfac = domaine.nb_faces_elem();
 
   int num_face, num_face_global;
   double surf;
@@ -1412,7 +1412,7 @@ void ParoiVEF_TBLE::imprimer_ustar(Sortie& os) const
   double u,v,w=0.;
   double norm_v=0.;
   double nut=0.;
-  IntVect num(nfac);
+  //IntVect num(nfac);
 
   for(int j=0; j<nb_post_pts; j++)
     {

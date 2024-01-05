@@ -31,7 +31,7 @@
 #include <Constituant.h>
 #include <Fluide_base.h>
 #include <EFichier.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Probleme_base.h>
 #include <Diffu_totale_scal_base.h>
 #include <time.h>
@@ -112,7 +112,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
   const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
   const Equation_base& eq_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_hydr.get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+  const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = le_modele.loi_paroi();
 
   if (!sub_type(ParoiVEF_TBLE,loi.valeur()))
@@ -500,7 +500,7 @@ int ParoiVEF_TBLE_scal::calculer_stats()
   const double dt = eqn_temp.schema_temps().pas_de_temps();
   const Equation_base& eq_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_hydr.get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+  const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = le_modele.loi_paroi();
   ParoiVEF_TBLE& loi_tble_hyd = ref_cast_non_const(ParoiVEF_TBLE,loi.valeur());
 
@@ -636,7 +636,7 @@ Paroi_TBLE_QDM& ParoiVEF_TBLE_scal::getLoiParoiHydraulique()
   const Probleme_base& pb_base  = mon_modele_turb_scal->equation().probleme();
   const Equation_base& eqn_hydr = pb_base.equation(0);
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+  const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi_base& loi = le_modele.loi_paroi().valeur();
 
   if (sub_type(ParoiVEF_TBLE,loi))

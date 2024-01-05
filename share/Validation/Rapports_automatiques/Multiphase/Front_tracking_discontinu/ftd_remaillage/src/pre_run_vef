@@ -1,3 +1,16 @@
-make_PAR.data FTD_remaillage_vef
-sed 's/lata\/post/lata\/par_post/g' PAR_FTD_remaillage_vef.data > tmp
-sed 's/PARALLEL RUNS/PARALLEL ONLY 4/g' tmp > PAR_FTD_remaillage_vef.data
+#!/bin/bash
+
+JDD="FTD_remaillage_vef"
+JDD_PAR="PAR_${JDD}"
+
+make_PAR.data ${JDD}
+
+if [[ ! -f "${JDD_PAR}.data" ]]
+then
+  echo -e "Error: the jdd '${JDD_PAR}' does not exist !"
+  exit 1
+fi
+
+sed -ri 's/lata\/post/lata\/par_post/g' ${JDD_PAR}.data
+
+sed -ri 's/PARALLEL RUNS/PARALLEL ONLY 4/g' ${JDD_PAR}.data 

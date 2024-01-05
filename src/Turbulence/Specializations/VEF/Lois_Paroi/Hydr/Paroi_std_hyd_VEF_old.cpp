@@ -31,7 +31,7 @@
 #include <TRUSTList.h>
 #include <EcrFicPartage.h>
 #include <Paroi_std_hyd_VEF.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Param.h>
 
 Implemente_instanciable(Paroi_std_hyd_VEF_old,"loi_standard_hydr_old_VEF",Paroi_hyd_base_VEF);

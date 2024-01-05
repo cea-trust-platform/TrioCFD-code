@@ -34,17 +34,18 @@ Operateur_IJK_faces_conv::Operateur_IJK_faces_conv()
     convection_op_words_[3] = "quick";
     convection_op_words_[4] = "quicksharp";
   }
+  convection_op_ = "";
   /* non_conservative_simple : rho div(u u)
    * non_conservative_rhou     : div(rho u u) - u div(rho u)
    * conservative              : div(rho u u)
    */
-  convection_op_ = "";
   convection_op_options_ = Motcles(3);
   {
     convection_op_options_[0] = "non_conservative_simple";
     convection_op_options_[1] = "non_conservative_rhou";
     convection_op_options_[2] = "conservative";
   }
+  convection_option_ = "";
 
   prefix_ = Nom("OpConv");
   suffix_ = Nom("IJK_double");
@@ -61,6 +62,24 @@ Sortie& Operateur_IJK_faces_conv::printOn( Sortie& os ) const
 Entree& Operateur_IJK_faces_conv::readOn( Entree& is )
 {
   typer_convection_op(is);
+  // By default, there is no testList using this...
+  convection_option_ = convection_op_options_[0];
+  /*
+   * Does not work
+   * Once read the next word is no longer used to read the
+   * datafile
+   * Should we use empty brackets ?
+   * Yes but we need to modify every testfiles...
+   */
+  // search_convection_option_type(is);
+
+  /*
+   * Do not work because param.lire_sans_accolade
+   * does not work for non required params
+   */
+  // Param param(que_suis_je());
+  // set_param(param);
+  // param.lire_sans_accolade(is);
   return is;
 }
 
@@ -83,7 +102,27 @@ int Operateur_IJK_faces_conv::lire_motcle_non_standard(const Motcle& mot, Entree
       else
         convection_option_ = convection_op_options_[0];
     }
+  else
+    convection_option_ = convection_op_options_[0];
   return 1;
+}
+
+void Operateur_IJK_faces_conv::search_convection_option_type(Entree& is)
+{
+  Cerr << "Read Operateur_IJK_faces_conv option:" << finl;
+  Motcle convection_option;
+  is >> convection_option;
+  Motcle word(convection_option);
+  set_convection_option_type(word);
+}
+
+void Operateur_IJK_faces_conv::set_convection_option_type( Motcle word ) // (const char * convection_op)
+{
+  int convection_option_index = convection_op_options_.search(word);
+  if (convection_option_index >= 0 && convection_option_index < convection_op_options_.size())
+    convection_option_ = convection_op_options_[convection_option_index];
+  else
+    convection_option_ = convection_op_options_[0];
 }
 
 Entree& Operateur_IJK_faces_conv::typer_convection_op(Entree& is) // (const char * convection_op)

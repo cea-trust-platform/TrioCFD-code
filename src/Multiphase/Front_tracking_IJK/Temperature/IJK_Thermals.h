@@ -104,6 +104,8 @@ protected :
   Nom local_quantities_thermal_probes_time_index_folder_;
   int ini_folder_out_files_ = 0;
 
+  bool is_diphasique_=false;
+
 };
 
 #endif /* IJK_Thermals_included */

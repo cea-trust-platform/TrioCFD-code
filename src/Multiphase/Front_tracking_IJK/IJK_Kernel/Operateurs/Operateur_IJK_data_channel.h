@@ -155,6 +155,31 @@ public:
   {
     return delta_y_;
   }
+  double get_delta(int dir, int k_layer=-1) const
+  {
+    switch (dir)
+      {
+      case 0:
+        return delta_x_;
+      case 1:
+        return delta_y_;
+      case 2:
+        {
+          if(k_layer==-1)
+            {
+              Cerr << "Operateur_IJK_data_channel:get_delta:: invalid k_layer" << finl;
+              Process::exit();
+            }
+          return delta_z_[k_layer];
+        }
+      default:
+        {
+          Cerr << "Operateur_IJK_data_channel:get_delta:: invalid direction" << finl;
+          Process::exit();
+          return 0.;
+        }
+      }
+  }
 
   double get_delta_xyz(int k_layer, int dir)
   {

@@ -44,6 +44,11 @@ protected:
   double Prt_ = .9 ; // Turbulent Prandtl number
   double minimum_ = -1.;
   double a_res_ = -1.;
+  double g_ = 9.81;
+  double C_lambda_ = 2.7;
+  double gamma_ = 1.; // rapport d'aspect moyen des bulles ; mis sous forme de daouble pour le moment ; possibilite d'ajouter une fermeture a l'avenir
+  double coefBIA_ = 0.;
+
 };
 
 #endif

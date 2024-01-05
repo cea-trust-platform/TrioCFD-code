@@ -1,1 +1,9 @@
+#!/bin/bash
+
+# During validation, the value shall be 50000.
+# However, this value implies a very long computation duration for non-regression tests cases
+# That's why the value is, by default, equal to 100 (used for NR).
+# For validation the value is changed to 50000
+sed -ri 's/nb_iteration_max_uzawa [0-9]+/nb_iteration_max_uzawa 50000/gmi' "ibc_ftd.data"
+
 mkdir -p lata

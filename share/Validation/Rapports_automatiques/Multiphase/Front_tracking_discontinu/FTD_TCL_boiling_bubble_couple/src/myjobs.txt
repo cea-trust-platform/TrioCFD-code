@@ -1,0 +1,17 @@
+  JOBID  ACCOUNT     USER                                               NAME PARTITION PRIORITY    STATE        TIME  TIME_LIMIT         START_TIME   CPUS  NODES NODELIST(REASON)
+ 716917 gen7712@ gb218285                                      T2/M5/TCL4/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     42      1 (Dependency)
+ 716916 gen7712@ gb218285                                      T2/M5/TCL1/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     42      1 (Dependency)
+ 716915 gen7712@ gb218285                                     T2/M5/NOTCL/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     42      1 (Dependency)
+ 716913 gen7712@ gb218285                                     T2/M10/TCL4/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     21      1 (Dependency)
+ 716912 gen7712@ gb218285                                     T2/M10/TCL1/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     21      1 (Dependency)
+ 716911 gen7712@ gb218285                                    T2/M10/NOTCL/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     21      1 (Dependency)
+ 716908 gen7712@ gb218285                                     T2/M20/TCL4/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     12      1 (Dependency)
+ 716894 gen7712@ gb218285                                     T2/M20/TCL1/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     12      1 (Dependency)
+ 716892 gen7712@ gb218285                                    T2/M20/NOTCL/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A     12      1 (Dependency)
+ 716890 gen7712@ gb218285                                     T2/M40/TCL4/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A      6      1 (Dependency)
+ 716889 gen7712@ gb218285                                     T2/M40/TCL1/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A      6      1 (Dependency)
+ 716888 gen7712@ gb218285                                    T2/M40/NOTCL/R0      rome   234107  PENDING        0:00  1-00:00:00                N/A      6      1 (Dependency)
+ 716891 gen7712@ gb218285                                      T2/M20/STEADY      rome   234107  RUNNING        2:18  1-00:00:00 2023-07-26T20:55:2     12      1 irene5258
+ 716909 gen7712@ gb218285                                      T2/M10/STEADY      rome   234107  RUNNING        2:18  1-00:00:00 2023-07-26T20:55:2     21      1 irene5258
+ 716914 gen7712@ gb218285                                       T2/M5/STEADY      rome   234107  RUNNING        2:18  1-00:00:00 2023-07-26T20:55:2     42      1 irene4895
+ 716886 gen7712@ gb218285                                      T2/M40/STEADY      rome   234107  RUNNING        3:18  1-00:00:00 2023-07-26T20:54:2      6      1 irene4178

@@ -52,7 +52,8 @@ public :
   void mettre_a_jour(double temps) override { };
 
 protected:
-  double C_d_star_ ;
+  double C_d_star_=-10 ;
+  double g_=9.81;
   double C_lambda_ = 2.7;
   int n_l = -1 ;
 };

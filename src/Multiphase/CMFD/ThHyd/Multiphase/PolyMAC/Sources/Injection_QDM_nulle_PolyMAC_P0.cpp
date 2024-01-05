@@ -37,6 +37,8 @@
 #include <math.h>
 
 Implemente_instanciable(Injection_QDM_nulle_PolyMAC_P0, "Injection_QDM_nulle_Face_PolyMAC_P0", Source_base);
+// XD Injection_QDM_nulle source_base Injection_QDM_nulle 1 not_set
+
 
 Sortie& Injection_QDM_nulle_PolyMAC_P0::printOn(Sortie& os) const
 {
@@ -45,6 +47,10 @@ Sortie& Injection_QDM_nulle_PolyMAC_P0::printOn(Sortie& os) const
 
 Entree& Injection_QDM_nulle_PolyMAC_P0::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.ajouter("beta", &beta_);
+  param.lire_avec_accolades_depuis(is);
+
   return is;
 }
 
@@ -72,7 +78,7 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
                     &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir();
 
-  const DoubleTab& vit = ch.valeurs(), pvit = ch.valeurs(),
+  const DoubleTab& vit = ch.valeurs(),
                    &rho   = equation().milieu().masse_volumique().passe(), // passe car qdm
                     &alpha = cha.passe();
 
@@ -104,9 +110,9 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
               for (int n = 0 ; n<N ; n++)
                 for (int m = 0 ; m<N ; m++)
                   {
-                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m);  // Force along -vit
+                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m) * beta_;  // Force along -vit
                     if (mat)
-                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) ;
+                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) * beta_ ;
                   }
 
             for (int i=0 ; i < e_f.line_size() ; i++)
@@ -118,9 +124,9 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
                     for (int n = 0 ; n<N ; n++)
                       for (int m = 0 ; m<N ; m++)
                         {
-                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m);
+                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m) * beta_;
                           if (mat)
-                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2);
+                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2) * beta_;
                         }
                   }
               }
@@ -130,8 +136,8 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
   // Cas bouillant : on passe par qpi
   if ( (pbm) && pbm->has_correlation("flux_parietal") )
     {
-      const DoubleTab& qpi = ref_cast(Source_Flux_interfacial_base, ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.sources().dernier().valeur()).qpi(),
-                       &press = pbm->eq_qdm.pression()->passe();
+      const DoubleTab& qpi = ref_cast(Source_Flux_interfacial_base, pbm->equation_energie().sources().dernier().valeur()).qpi(),
+                       &press = ref_cast(QDM_Multiphase, pbm->equation_qdm()).pression()->passe();
       int nb_max_sat = N*(N-1)/2;
 
       /* limiteur de changement de phase : pas mis dans la V0 de cette force */
@@ -181,9 +187,9 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
               for (int n = 0 ; n<N ; n++)
                 for (int m = 0 ; m<N ; m++)
                   {
-                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m);  // Force along -vit
+                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m) * beta_ ;  // Force along -vit
                     if (mat)
-                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) ;
+                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) * beta_ ;
                   }
 
             for (int i=0 ; i < e_f.line_size() ; i++)
@@ -195,9 +201,9 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
                     for (int n = 0 ; n<N ; n++)
                       for (int m = 0 ; m<N ; m++)
                         {
-                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m);
+                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m) * beta_ ;
                           if (mat)
-                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2);
+                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2) * beta_ ;
                         }
                   }
               }

@@ -138,7 +138,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_selectif_mod_VEF::calculer_viscosite_turb
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   const int nb_elem = domaine_VEF.nb_elem();
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
-  DoubleVect volume = domaine_VEF.volumes();
+  //DoubleVect volume = domaine_VEF.volumes();
   int num_elem;
 
   F2.resize(nb_elem_tot);

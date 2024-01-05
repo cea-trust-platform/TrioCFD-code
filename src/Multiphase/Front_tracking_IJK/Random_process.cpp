@@ -135,7 +135,7 @@ Entree& Random_process::readOn( Entree& is )
 //  gen_read >> gen;
 //  gen_read.close();
 
-  param.ajouter("semi_gen_et_modulo_reprise_",&semi_gen_et_modulo_reprise_,Param::REQUIRED);
+  param.ajouter("semi_gen_et_modulo_reprise",&semi_gen_et_modulo_reprise_,Param::REQUIRED);
   //Cout << "hello" << finl;
   //param.ajouter("distribution",&distribution);
   param.lire_avec_accolades(is);

@@ -57,7 +57,6 @@ void Cond_lim_k_simple_flux_nul::me_calculer()
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
-  const DoubleTab&       y = corr_loi_paroi.get_tab("y");
   const DoubleTab&  visc_c = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_pas_de_temps().passe(),
                     &mu_visc  = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_transport().passe();
 
@@ -76,9 +75,10 @@ void Cond_lim_k_simple_flux_nul::me_calculer()
       int f_domaine = f + f1; // number of the face in the domaine
       int e_domaine = (f_e(f_domaine,0)>=0) ? f_e(f_domaine,0) : f_e(f_domaine,1) ; // Make orientation vdf-proof
       double mu_tot_loc = (mu_poly) ? (*mu_poly)(e_domaine,n) : (mu_vdf) ? (*mu_vdf)(e_domaine,n) + mu_visc(e_domaine,n) : -1;
+      double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ;
 
-      h_(f, 0) = mu_tot_loc / y(f_domaine) * (1-std::tanh( std::pow(y(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2))); // Coeff d'echange de mu/y ; /20 avant modif
-      h_grad_(f, 0) = 1. / y(f_domaine) * (1-std::tanh( std::pow(y(f_domaine, 0)*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2)));
+      h_(f, 0) = mu_tot_loc / y_loc * (1-std::tanh( std::pow(y_loc*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2))); // Coeff d'echange de mu/y ; /20 avant modif
+      h_grad_(f, 0) = 1. / y_loc * (1-std::tanh( std::pow(y_loc*u_tau(f_domaine, 0)/visc_c(e_domaine, 0)/10.,2)));
     }
 
   h_.echange_espace_virtuel();

@@ -114,8 +114,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
   Nom type="Op_Diff_";
   Nom discr = discretisation().que_suis_je();
   // les operateurs C_D_Turb_T sont communs aux discretisations VEF et VEFP1B
-  if(discr=="VEFPreP1B")
-    discr = "VEF";
+  if(discr=="VEFPreP1B") discr = "VEF";
   type +=discr;
 
   Nom nb_inc;
@@ -124,15 +123,6 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
   else
     nb_inc = "_Mult_inco_";
   type+=nb_inc;
-
-  Nom type_diff;
-  if (discr == "VDF") type_diff = ""; /* pas de const/var en VDF */
-  else
-    {
-      if(sub_type(Champ_Uniforme,terme_diffusif.diffusivite())) type_diff="const_";
-      else type_diff="var_";
-    }
-  type+=type_diff;
 
   Nom type_inco=inconnue()->que_suis_je();
   type+=(type_inco.suffix("Champ_"));

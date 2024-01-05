@@ -77,10 +77,16 @@ public :
                             ArrOfDouble& dvol,
                             const int rk_step,
                             const double temps);
-  void calculer_bounding_box_bulles(DoubleTab& bounding_box) const;
+  void calculer_bounding_box_bulles(DoubleTab& bounding_box, int option_shear = 0) const;
   void preparer_duplicata_bulles(const DoubleTab& bounding_box_of_bubbles,
+                                 const DoubleTab& bounding_box_offsetp,
+                                 const DoubleTab& bounding_box_offsetm,
                                  const DoubleTab& authorized_bounding_box,
-                                 ArrOfInt& masque_duplicata_pour_compo);
+                                 ArrOfInt& masque_duplicata_pour_compo_reel);
+
+  void preparer_duplicata_bulles_masque_6bit(const DoubleTab& bounding_box,
+                                             const DoubleTab& authorized_bounding_box,
+                                             ArrOfInt& masque_duplicata_pour_compo);
   void dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo);
   void creer_duplicata_bulles();
   void supprimer_duplicata_bulles();
@@ -289,6 +295,8 @@ public :
   //   la phase
   //                  (+1 pour le voisin d'indice plus eleve, -1 pour l'autre )
   int compute_cell_phase_with_interface_normal(int num_elem, int direction, int face_plus);
+
+  void calculer_kappa_ft(IJK_Field_double& kappa_ft);
 
   void calculer_normales_et_aires_interfaciales(IJK_Field_double& ai,
                                                 IJK_Field_double& kappa_ai,
@@ -614,16 +622,22 @@ public :
 
   void compute_compo_connex_from_bounding_box()
   {
+    if (!is_diphasique_)
+      return;
     ijk_compo_connex_.compute_bounding_box_fill_compo_connex();
   }
 
   void compute_compo_connex_from_interface()
   {
+    if (!is_diphasique_)
+      return;
     ijk_compo_connex_.compute_compo_connex_from_interface();
   }
 
   void initialise_ijk_compo_connex_bubbles_params()
   {
+    if (!is_diphasique_)
+      return;
     ijk_compo_connex_.initialise_bubbles_params();
   }
 
@@ -691,13 +705,21 @@ protected:
                                              double distmax);
   void calculer_distance_autres_compo_connexe2(ArrOfDouble& distance,
                                                DoubleTab& v_closer);
-  void calculer_distance_autres_compo_connexe(const DoubleTab& sommets_a_tester,
-                                              const ArrOfInt& compo_connexe_sommets,
-                                              const DoubleTab& vinterp_tmp,
-                                              const Maillage_FT_IJK& mesh,
-                                              ArrOfDouble& distance,
-                                              DoubleTab& v_closer,
-                                              const double distmax);
+  void calculer_distance_autres_compo_connexe_octree(const DoubleTab& sommets_a_tester,
+                                                     const ArrOfInt& compo_connexe_sommets,
+                                                     const DoubleTab& vinterp_tmp,
+                                                     const Maillage_FT_IJK& mesh,
+                                                     ArrOfDouble& distance,
+                                                     DoubleTab& v_closer,
+                                                     const double distmax);
+
+  void calculer_distance_autres_compo_connexe_ijk(const DoubleTab& sommets_a_tester,
+                                                  const ArrOfInt& compo_connexe_sommets,
+                                                  const DoubleTab& vinterp_tmp,
+                                                  const Maillage_FT_IJK& mesh,
+                                                  ArrOfDouble& distance,
+                                                  DoubleTab& v_closer,
+                                                  const double distmax);
 
 // reference vers le splitting_ft_ pour les interfaces :
   REF(IJK_Splitting) ref_splitting_;
@@ -792,6 +814,7 @@ protected:
   // Si souhaite, une valeur differente pour les parois :
   double portee_wall_repulsion_;
   double delta_p_wall_max_repulsion_ = 0.; // desactive par defaut
+  int no_octree_method_ = 0;    // to use the IJK-discretization to search for closest faces of vertices instead of the octree method (disabled by default)
 
   ArrOfDoubleFT distance_autres_interfaces_;
 

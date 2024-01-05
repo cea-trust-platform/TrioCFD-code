@@ -79,11 +79,10 @@ Lire sch
 Triple_Line_Model_FT_Disc TCL 
 Read TCL 
 {
-  deactivate
   Qtcl @Qi@ # W/m # 
-  ym 5.e-7
+  ym 3.e-7          # smaller ym to make sure Meso zone always exists even for refined cases #
   # ymeso 5.e-6 #
-  n_extend_meso 1
+  n_extend_meso 4
   sm @sm@ # TestCase at theta_app = @degliq@ degree #
           # sm = ym / tan(theta) #
   inout_method both
@@ -133,7 +132,7 @@ Lire pb
 		boundary_conditions 
 		{
 		libre1   sortie_libre_rho_variable champ_front_uniforme 1 0.
-		haut1    paroi_fixe
+		haut1    sortie_libre_rho_variable champ_front_uniforme 1 0.
 		bas1     paroi_fixe 
 		sym1 	 symetrie 
         	}
@@ -152,8 +151,8 @@ Lire pb
         	n_iterations_distance 10
 		remaillage {
 			pas -1e-6 
-			nb_iter_remaillage 1
-			critere_arete 0.35
+			nb_iter_remaillage 1 # 1 #
+			critere_arete 0.35 # augmente 0.35 #
 			critere_remaillage 0.2
 			pas_lissage 0.000001
 			lissage_courbure_iterations_systematique 10 # 1 #
@@ -217,7 +216,7 @@ Lire pb
                 correction_courbure_ordre 0
                 phase 1
 		# maintien_temperature zone_tranche -6. #
-                stencil_width 2 # 10 #
+                stencil_width 11 # 10 #
                 diffusion { }
                 convection { quick }
                 boundary_conditions
@@ -304,7 +303,7 @@ Lire pb
    postraitement_ft_lata post1 { 
     format Lata 
     fichier lata/post 
-    champs dt_post 5.0e-5 { 
+    champs dt_post 4.0e-5 { 
         temperature_grad_thermique elem 
         temperature_thermique elem
         mpoint_thermique elem 
@@ -315,6 +314,8 @@ Lire pb
         vitesse elem
         pressure elem
         second_membre_projection elem
+	vitesse_delta_interface faces
+        second_membre_projection_jump elem
         vitesse faces
     } 
     interfaces interf { 

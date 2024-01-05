@@ -1,0 +1,146 @@
+# Two clamped-free beams lined up.  Beam time scheme: Hilber-Hughes-Taylor (HHT) #
+# Free vibration test case #
+# Laminar flow #
+# Warning: very coarse mesh #
+Dimension 3
+Pb_Hydraulique_ALE pb
+Domaine_ALE dom
+Lire_fichier dom Mesh.geom 
+
+
+
+
+# For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile boundaries of the domain and specify the speed that must be imposed on them #
+Imposer_vit_bords_ALE dom {
+					2 # number of mobile boundaries #
+					cylindre1 Champ_front_ALE_Beam 3  0.   0.  0.
+					cylindre2 Champ_front_ALE_Beam 3  0.   0.  0.
+			   }
+
+
+# Solver used to solve the system giving the moving mesh velocity #
+Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9  } } 
+
+
+Beam_model dom
+{
+        nb_beam 2
+	Name cylindre1 {
+		nb_modes 20 # number of modes #
+		direction 2 # x=0, y=1, z=2 #
+		Young_Module 6.9e10 # Pa #
+		Rho_beam 18450. # kg/m^3 #
+		BaseCenterCoordinates 0.0035 0. 0.
+		NewmarkTimeScheme HHT -0.1
+		Mass_and_stiffness_file_name Cylindre1/vibr_pout2tube.txt
+		Absc_file_name Cylindre1/vibr_pout2tube_absc.txt
+		CI_file_name Cylindre1/vibr_pout2tube_CI.txt 
+		Modal_deformation_file_name  20 Cylindre1/vibr_pout2tube_phi_1.txt Cylindre1/vibr_pout2tube_phi_2.txt Cylindre1/vibr_pout2tube_phi_3.txt Cylindre1/vibr_pout2tube_phi_4.txt Cylindre1/vibr_pout2tube_phi_5.txt Cylindre1/vibr_pout2tube_phi_6.txt Cylindre1/vibr_pout2tube_phi_7.txt Cylindre1/vibr_pout2tube_phi_8.txt Cylindre1/vibr_pout2tube_phi_9.txt Cylindre1/vibr_pout2tube_phi_10.txt Cylindre1/vibr_pout2tube_phi_11.txt Cylindre1/vibr_pout2tube_phi_12.txt Cylindre1/vibr_pout2tube_phi_13.txt Cylindre1/vibr_pout2tube_phi_14.txt Cylindre1/vibr_pout2tube_phi_15.txt Cylindre1/vibr_pout2tube_phi_16.txt Cylindre1/vibr_pout2tube_phi_17.txt Cylindre1/vibr_pout2tube_phi_18.txt Cylindre1/vibr_pout2tube_phi_19.txt Cylindre1/vibr_pout2tube_phi_20.txt
+		Output_position_1D 1 100
+		Output_position_3D 1  0.007 0.0035 0.198  
+		# Restart_file_name cylindre1SaveBeamForRestart.txt #
+	}
+		Name cylindre2 {
+		nb_modes 20 # number of modes #
+		direction 2 # x=0, y=1, z=2 #
+		Young_Module 6.9e10 # Pa #
+		Rho_beam 18450. # kg/m^3 #
+		BaseCenterCoordinates 0.0485 0. 0.
+		NewmarkTimeScheme HHT -0.1
+		Mass_and_stiffness_file_name Cylindre2/vibr_pout2tube.txt
+		Absc_file_name Cylindre2/vibr_pout2tube_absc.txt
+		CI_file_name Cylindre2/vibr_pout2tube_CI.txt
+		Modal_deformation_file_name  20 Cylindre2/vibr_pout2tube_phi_1.txt Cylindre2/vibr_pout2tube_phi_2.txt Cylindre2/vibr_pout2tube_phi_3.txt Cylindre2/vibr_pout2tube_phi_4.txt Cylindre2/vibr_pout2tube_phi_5.txt Cylindre2/vibr_pout2tube_phi_6.txt Cylindre2/vibr_pout2tube_phi_7.txt Cylindre2/vibr_pout2tube_phi_8.txt Cylindre2/vibr_pout2tube_phi_9.txt Cylindre2/vibr_pout2tube_phi_10.txt Cylindre2/vibr_pout2tube_phi_11.txt Cylindre2/vibr_pout2tube_phi_12.txt Cylindre2/vibr_pout2tube_phi_13.txt Cylindre2/vibr_pout2tube_phi_14.txt Cylindre2/vibr_pout2tube_phi_15.txt Cylindre2/vibr_pout2tube_phi_16.txt Cylindre2/vibr_pout2tube_phi_17.txt Cylindre2/vibr_pout2tube_phi_18.txt Cylindre2/vibr_pout2tube_phi_19.txt Cylindre2/vibr_pout2tube_phi_20.txt 
+		Output_position_1D 1 100
+		Output_position_3D 1  0.052 0.0035 0.198 
+		# Restart_file_name cylindre2SaveBeamForRestart.txt #
+	}
+}
+
+
+VEFPreP1b dis
+
+# Time scheme, choice between: Euler explicit or implicit, and Adams Bashforth order 2  or order 3 #
+Scheme_euler_implicit sch
+Read sch
+{
+    # Time step #
+    # Initial time [s] #
+    tinit 0
+    # Min time step #
+    dt_min 1.e-15
+    # Output criteria #
+    # .out files printing period #
+    dt_impr 5.e-7
+    tcpumax 9.5
+    # .sauv files printing period #
+    periode_sauvegarde_securite_en_heures 9
+    solveur implicite_ALE
+    {
+        solveur gmres { diag seuil 1.e-12 nb_it_max 3 }
+    }
+    # Stop if one of the following criteria is checked: #
+    # End time [s] #
+    tmax  0.1 
+    # Max number of time steps #
+    # nb_pas_dt_max 3 #
+    # Convergence threshold (see .dt_ev file) #
+    seuil_statio 1.e-15
+}
+
+
+
+Associer pb dom
+Associate pb sch
+Discretize pb dis
+
+
+
+
+Lire pb
+{
+	fluide_incompressible {
+	        mu Champ_Uniforme 1 1.307e-3
+		rho Champ_Uniforme 1 999.7
+		gravite Champ_Uniforme 3 0 -9.81 0
+	}
+
+	Navier_Stokes_standard_ALE
+	{
+		 # Pressure matrix solved with #
+                solveur_pression PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9  }
+		convection		{ ALE { MUSCL } }
+		diffusion		{ }
+		conditions_initiales	{ vitesse champ_uniforme 3 0. 0. 0. }
+		conditions_limites	{
+					entree			frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0 0 0 
+					sortie			frontiere_ouverte_pression_imposee champ_front_uniforme 1 0
+					cylindre1		frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE_Beam 3  0. 0.  0.
+					cylindre2		frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE_Beam 3  0. 0.  0.
+					parois_laterales	paroi_fixe
+					paroi_haut		paroi_fixe
+					paroi_bas		paroi_fixe
+					}
+
+
+	}
+
+	 Post_processing {
+
+			Format lml
+			Champs binaire dt_post 1e-2
+						{
+						vitesse elem
+                                              pression elem
+						ALEMeshVelocity som
+						ALEMeshTotalDisplacement som
+						}
+			
+	}
+	Sauvegarde single_hdf Cas.sauv
+}
+
+EcritureLectureSpecial 0
+
+Resoudre pb
+Fin

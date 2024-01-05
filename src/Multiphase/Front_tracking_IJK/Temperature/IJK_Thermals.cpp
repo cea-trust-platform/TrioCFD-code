@@ -135,10 +135,13 @@ void IJK_Thermals::initialize(const IJK_Splitting& splitting, int& nalloc)
                                + Nom(std::string(max_digit - max_rank_digit, '0')) + Nom(idth));
       idth++;
     }
-  overall_bubbles_quantities_folder_ = Nom("overall_bubbles_quantities");
-  interfacial_quantities_thermal_probes_folder_ = Nom("interfacial_quantities_thermal_probes");
-  local_quantities_thermal_probes_folder_ = Nom("local_quantities_thermal_probes");
-  local_quantities_thermal_probes_time_index_folder_ = Nom("local_quantities_thermal_probes_time_index_");
+  if (!ref_ijk_ft_->get_disable_diphasique())
+    {
+      overall_bubbles_quantities_folder_ = Nom("overall_bubbles_quantities");
+      interfacial_quantities_thermal_probes_folder_ = Nom("interfacial_quantities_thermal_probes");
+      local_quantities_thermal_probes_folder_ = Nom("local_quantities_thermal_probes");
+      local_quantities_thermal_probes_time_index_folder_ = Nom("local_quantities_thermal_probes_time_index_");
+    }
 }
 
 void IJK_Thermals::recompute_temperature_init()

@@ -1506,7 +1506,7 @@ void IJK_Thermique::calculer_Nusselt(const IJK_Field_double& vx)
   double Nu = 0.;
   if (std::fabs(theta_adim_moy)>1.e-10)
     Nu = 2./theta_adim_moy;
-  const double rho_cp_u_moy = calculer_rho_cp_u_moyen(vx, cp_,ref_ijk_ft_->rho_field_, 0., 0);
+  const double rho_cp_u_moy = calculer_rho_cp_u_moyen(vx, cp_, ref_ijk_ft_->rho_field_, 0., 0);
   // Impression dans le fichier source_temperature.out
   if (Process::je_suis_maitre())
     {

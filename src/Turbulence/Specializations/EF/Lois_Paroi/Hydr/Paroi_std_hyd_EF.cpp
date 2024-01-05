@@ -200,7 +200,7 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
 
           // Loop on real faces
-          ArrOfDouble vit_face_loc(dimension);
+          //ArrOfDouble vit_face_loc(dimension);
           int ndeb = 0;
           int nfin = le_bord.nb_faces_tot();
           for (int ind_face=ndeb; ind_face<nfin; ind_face++)
@@ -378,7 +378,7 @@ void Paroi_std_hyd_EF::imprimer_ustar(Sortie& os) const
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
            (sub_type(Paroi_decalee_Robin,la_cl.valeur()) ) ||
-           (la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE"))
+           (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           if(je_suis_maitre())

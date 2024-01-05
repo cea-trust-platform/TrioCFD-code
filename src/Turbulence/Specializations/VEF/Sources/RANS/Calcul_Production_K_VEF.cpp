@@ -36,10 +36,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DoubleTab& Calcul_Production_K_VEF::
-calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF& zcl_VEF,
-                            DoubleTab& P,const DoubleTab& K_eps,
-                            const DoubleTab& vit,const DoubleTab& visco_turb, const int& interpol_visco) const
+DoubleTab& Calcul_Production_K_VEF::calculer_terme_production_K(
+  const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& zcl_VEF, DoubleTab& prodK,
+  const DoubleTab& K_eps, const DoubleTab& vit, const DoubleTab& visco_turb,
+  const int& interpol_visco, const double& limiteur) const
 {
   // P est discretise comme K et Eps i.e au centre des faces
   //
@@ -54,7 +54,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
   // Rqs: On se place dans le cadre incompressible donc on neglige
   //      le terme (2/3)*k(i)*div_U(i)
 
-  P= 0;
+  prodK = 0;
 
   // Calcul de F(u,v,w):
   int nb_elem_tot = domaine_VEF.nb_elem_tot();
@@ -62,16 +62,16 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
   const DoubleVect& volumes = domaine_VEF.volumes();
   int premiere_face_int = domaine_VEF.premiere_face_int();
   //  const IntTab& les_Polys = domaine.les_elems();
-  int fac=0;
-  int poly1, poly2;
+  int fac {0};
+  int poly1 {0}, poly2 {0};
   int nb_faces_ = domaine_VEF.nb_faces();
-  int dimension=Objet_U::dimension;
+  int dimension = Objet_U::dimension;
   //  const DoubleTab& xp = domaine_VEF.xp();    // centre de gravite des elements
   //  const DoubleTab& xv = domaine_VEF.xv();    // centre de gravite des faces
 
-  DoubleTab gradient_elem(nb_elem_tot,dimension,dimension);
+  DoubleTab gradient_elem(nb_elem_tot, dimension,dimension);
   // (du/dx du/dy dv/dx dv/dy ...) pour un poly
-  gradient_elem=0.;
+  gradient_elem = 0.;
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
   //                        <
@@ -84,22 +84,22 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
   //On remplace le calcul precedent par un appel a calcul_duidxj
   ////////////////////////////////////////////////////////////////////////////////
 
-  int n_bord;
-  Champ_P1NC::calcul_gradient(vit,gradient_elem,zcl_VEF);
+  int n_bord {0};
+  Champ_P1NC::calcul_gradient(vit, gradient_elem,zcl_VEF);
 
   ///////////////////////////////////////////////
   // On a les gradient_elem par elements
   ///////////////////////////////////////////////
 
-  double du_dx;
-  double du_dy;
-  double du_dz;
-  double dv_dx;
-  double dv_dy;
-  double dv_dz;
-  double dw_dx;
-  double dw_dy;
-  double dw_dz;
+  double du_dx {0};
+  double du_dy {0};
+  double du_dz {0};
+  double dv_dx {0};
+  double dv_dy {0};
+  double dv_dz {0};
+  double dw_dx {0};
+  double dw_dy {0};
+  double dw_dz {0};
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Calcul des du/dx dv/dy et des derivees croisees sur les faces de chaque elements dans le cas 2D
@@ -124,7 +124,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
               double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
               double visco_face = 0.0;
 
-              if ( interpol_visco == 0 )
+              if ( interpol_visco == 0 ) // cas initial, toutes les interpolation arithmetiques ponderees sont fortement instables
                 {
                   visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
                 }
@@ -132,15 +132,19 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
                 {
                   //Moyenne harmonique (uniquement utilisee dans le cas du keps realisable) :
                   if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-                    visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
-                  // TODO : what happens if visco_turb < 1.0e-10 ??
+                    {
+                      visco_face=limiteur/(1./visco_turb(poly1)+1./visco_turb(poly2));
+                    }
+                  else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
                 }
               else if ( interpol_visco == 2 )
                 {
                   //Moyenne harmonique ponderee pour garantir la continuite du tenseur des contraintes a la face (uniquement utilisee dans le cas du keps realisable) :
                   if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-                    visco_face=( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) );
-                  // TODO : what happens if visco_turb < 1.0e-10 ??
+                    {
+                      visco_face=limiteur*( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) );
+                    }
+                  else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
                 }
               else
                 {
@@ -155,8 +159,8 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
 
               // Determination du terme de production
 
-              P(fac) = visco_face*( 2*(du_dx*du_dx + dv_dy*dv_dy)
-                                    + ((du_dy+dv_dx)*(du_dy+dv_dx) ) );
+              prodK(fac) = visco_face * (2 * (du_dx * du_dx + dv_dy * dv_dy) +
+                                         ((du_dy + dv_dx) * (du_dy + dv_dx)));
 
               if (dimension == 3)
                 {
@@ -168,10 +172,10 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
 
                   // Determination du terme de production
 
-                  P(fac) = visco_face*(2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
-                                       + (   (du_dy+dv_dx)*(du_dy+dv_dx)
-                                             + (du_dz+dw_dx)*(du_dz+dw_dx)
-                                             + (dw_dy+dv_dz)*(dw_dy+dv_dz) ));
+                  prodK(fac) = visco_face * (2 * (du_dx * du_dx + dv_dy * dv_dy + dw_dz * dw_dz) +
+                                             ((du_dy + dv_dx) * (du_dy + dv_dx) +
+                                              (du_dz + dw_dx) * (du_dz + dw_dx) +
+                                              (dw_dy + dv_dz) * (dw_dy + dv_dz)));
                 }
             }
         }
@@ -202,8 +206,8 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
               dv_dy=gradient_elem(poly1,1,1);
 
               // Determination du terme de production
-              P(fac) = visco_face*( 2*(du_dx*du_dx + dv_dy*dv_dy) + ((du_dy+dv_dx)*(du_dy+dv_dx)));
-
+              prodK(fac) = visco_face * (2 * (du_dx * du_dx + dv_dy * dv_dy) +
+                                         ((du_dy + dv_dx) * (du_dy + dv_dx)));
 
               if (dimension == 3)
                 {
@@ -215,11 +219,10 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
 
                   // Determination du terme de production
 
-                  P(fac) = visco_face*(2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
-                                       + ( (du_dy+dv_dx)*(du_dy+dv_dx)
-                                           + (du_dz+dw_dx)*(du_dz+dw_dx)
-                                           + (dw_dy+dv_dz)*(dw_dy+dv_dz)));
-
+                  prodK(fac) = visco_face * (2 * (du_dx * du_dx + dv_dy * dv_dy + dw_dz * dw_dz) +
+                                             ((du_dy + dv_dx) * (du_dy + dv_dx) +
+                                              (du_dz + dw_dx) * (du_dz + dw_dx) +
+                                              (dw_dy + dv_dz) * (dw_dy + dv_dz)));
                 }
             }
         }
@@ -235,7 +238,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
       double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
       double visco_face = 0.0;
 
-      if ( interpol_visco == 0 )
+      if ( interpol_visco == 0 )// cas initial, toutes les interpolation arithmetiques ponderees sont fortement instables
         {
           visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
         }
@@ -243,15 +246,15 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
         {
           //Moyenne harmonique (uniquement utilisee dans le cas du keps realisable) :
           if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-            visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
-          // TODO : what happens if visco_turb < 1.0e-10 ??
+            { visco_face=limiteur/(1./visco_turb(poly1)+1./visco_turb(poly2)); }
+          else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
         }
       else if ( interpol_visco == 2 )
         {
           //Moyenne harmonique ponderee pour garantir la continuite du tenseur des contraintes a la face (uniquement utilisee dans le cas du keps realisable) :
-          if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-            visco_face=( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) );
-          // TODO : what happens if visco_turb < 1.0e-10 ??
+          if  (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
+            {  visco_face=limiteur*( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) ); }
+          else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
         }
       else
         {
@@ -265,7 +268,8 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
       dv_dy=a*gradient_elem(poly1,1,1) + b*gradient_elem(poly2,1,1);
 
       // Determination du terme de production
-      P(fac) = visco_face*( 2*(du_dx*du_dx + dv_dy*dv_dy) + ((du_dy+dv_dx)*(du_dy+dv_dx)));
+      prodK(fac) =
+        visco_face * (2 * (du_dx * du_dx + dv_dy * dv_dy) + ((du_dy + dv_dx) * (du_dy + dv_dx)));
       if (dimension == 3)
         {
           du_dz=a*gradient_elem(poly1,0,2) + b*gradient_elem(poly2,0,2);
@@ -276,20 +280,22 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
 
           // Determination du terme de production
 
-          P(fac) = visco_face*(2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
-                               + (   (du_dy+dv_dx)*(du_dy+dv_dx)
-                                     + (du_dz+dw_dx)*(du_dz+dw_dx)
-                                     + (dw_dy+dv_dz)*(dw_dy+dv_dz) ));
+          prodK(fac) =
+            visco_face * (2 * (du_dx * du_dx + dv_dy * dv_dy + dw_dz * dw_dz) +
+                          ((du_dy + dv_dx) * (du_dy + dv_dx) + (du_dz + dw_dx) * (du_dz + dw_dx) +
+                           (dw_dy + dv_dz) * (dw_dy + dv_dz)));
         }
-    }
-  return P;
-}
 
+
+
+    }
+  return prodK;
+}
 
 DoubleTab& Calcul_Production_K_VEF::
 calculer_terme_production_K_BiK(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF& zcl_VEF,
                                 DoubleTab& P,const DoubleTab& K,const DoubleTab& eps,
-                                const DoubleTab& vit,const DoubleTab& visco_turb, const int& interpol_visco) const
+                                const DoubleTab& vit,const DoubleTab& visco_turb, const int& interpol_visco, const double& limiteur) const
 {
   // P est discretise comme K et Eps i.e au centre des faces
   //
@@ -372,9 +378,10 @@ calculer_terme_production_K_BiK(const Domaine_VEF& domaine_VEF,const Domaine_Cl_
               poly2 = face_voisins(fac,1);
               double a=volumes(poly1)/(volumes(poly1)+volumes(poly2));
               double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
+
               double visco_face = 0.0;
 
-              if ( interpol_visco == 0 )
+              if ( interpol_visco == 0 )// cas initial, toutes les interpolation arithmetiques ponderees sont fortement instables
                 {
                   visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
                 }
@@ -382,15 +389,15 @@ calculer_terme_production_K_BiK(const Domaine_VEF& domaine_VEF,const Domaine_Cl_
                 {
                   //Moyenne harmonique (uniquement utilisee dans le cas du keps realisable) :
                   if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-                    visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
-                  // TODO : what happens if visco_turb < 1.0e-10 ??
+                    { visco_face=limiteur/(1./visco_turb(poly1)+1./visco_turb(poly2)); }
+                  else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
                 }
               else if ( interpol_visco == 2 )
                 {
                   //Moyenne harmonique ponderee pour garantir la continuite du tenseur des contraintes a la face (uniquement utilisee dans le cas du keps realisable) :
                   if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-                    visco_face=( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) );
-                  // TODO : what happens if visco_turb < 1.0e-10 ??
+                    { visco_face=limiteur*( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) ); }
+                  else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
                 }
               else
                 {
@@ -483,9 +490,10 @@ calculer_terme_production_K_BiK(const Domaine_VEF& domaine_VEF,const Domaine_Cl_
       poly2 = face_voisins(fac,1);
       double a=volumes(poly1)/(volumes(poly1)+volumes(poly2));
       double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
+
       double visco_face = 0.0;
 
-      if ( interpol_visco == 0 )
+      if ( interpol_visco == 0 )// cas initial, toutes les interpolation arithmetiques ponderees sont fortement instables
         {
           visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
         }
@@ -493,15 +501,15 @@ calculer_terme_production_K_BiK(const Domaine_VEF& domaine_VEF,const Domaine_Cl_
         {
           //Moyenne harmonique (uniquement utilisee dans le cas du keps realisable) :
           if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-            visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
-          // TODO : what happens if visco_turb < 1.0e-10 ??
+            { visco_face=limiteur/(1./visco_turb(poly1)+1./visco_turb(poly2));}
+          else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
         }
       else if ( interpol_visco == 2 )
         {
           //Moyenne harmonique ponderee pour garantir la continuite du tenseur des contraintes a la face (uniquement utilisee dans le cas du keps realisable) :
           if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-            visco_face=( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) );
-          // TODO : what happens if visco_turb < 1.0e-10 ??
+            {  visco_face=limiteur*( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) ); }
+          else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
         }
       else
         {
@@ -538,7 +546,7 @@ calculer_terme_production_K_BiK(const Domaine_VEF& domaine_VEF,const Domaine_Cl_
 DoubleTab& Calcul_Production_K_VEF::
 calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF& zcl_VEF,
                                  DoubleTab& P,const DoubleTab& K_eps,
-                                 const DoubleTab& gradient_elem,const DoubleTab& visco_turb,const DoubleTab& Re, const int& interpol_visco) const
+                                 const DoubleTab& gradient_elem,const DoubleTab& visco_turb,const DoubleTab& Re, const int& interpol_visco, const double& limiteur) const
 {
   //Cerr << "Calcul_Production_K_VEF::calculer_terme_production_K_EASM" << finl;
 
@@ -595,9 +603,10 @@ calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl
               poly2 = face_voisins(fac,1);
               double a=volumes(poly1)/(volumes(poly1)+volumes(poly2));
               double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
+
               double visco_face = 0.0;
 
-              if ( interpol_visco == 0 )
+              if ( interpol_visco == 0 )// cas initial, toutes les interpolation arithmetiques ponderees sont fortement instables
                 {
                   visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
                 }
@@ -605,15 +614,15 @@ calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl
                 {
                   //Moyenne harmonique (uniquement utilisee dans le cas du keps realisable) :
                   if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-                    visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
-                  // TODO : what happens if visco_turb < 1.0e-10 ??
+                    { visco_face=limiteur/(1./visco_turb(poly1)+1./visco_turb(poly2)); }
+                  else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
                 }
               else if ( interpol_visco == 2 )
                 {
                   //Moyenne harmonique ponderee pour garantir la continuite du tenseur des contraintes a la face (uniquement utilisee dans le cas du keps realisable) :
                   if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-                    visco_face=( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) );
-                  // TODO : what happens if visco_turb < 1.0e-10 ??
+                    { visco_face=limiteur*( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) ); }
+                  else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
                 }
               else
                 {
@@ -654,9 +663,10 @@ calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl
       poly2 = face_voisins(fac,1);
       double a=volumes(poly1)/(volumes(poly1)+volumes(poly2));
       double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
+
       double visco_face = 0.0;
 
-      if ( interpol_visco == 0 )
+      if ( interpol_visco == 0 )// cas initial, toutes les interpolation arithmetiques ponderees sont fortement instables
         {
           visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
         }
@@ -664,15 +674,15 @@ calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl
         {
           //Moyenne harmonique (uniquement utilisee dans le cas du keps realisable) :
           if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-            visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
-          // TODO : what happens if visco_turb < 1.0e-10 ??
+            { visco_face=limiteur/(1./visco_turb(poly1)+1./visco_turb(poly2)); }
+          else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
         }
       else if ( interpol_visco == 2 )
         {
           //Moyenne harmonique ponderee pour garantir la continuite du tenseur des contraintes a la face (uniquement utilisee dans le cas du keps realisable) :
           if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
-            visco_face=( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) );
-          // TODO : what happens if visco_turb < 1.0e-10 ??
+            { visco_face=limiteur*( visco_turb(poly1)*visco_turb(poly2) )/( b*visco_turb(poly1)+a*visco_turb(poly2) ); }
+          else { visco_face=limiteur*0.5*(visco_turb(poly1)+visco_turb(poly2)); }
         }
       else
         {
@@ -723,11 +733,12 @@ calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl
   return P;
 }
 
+// Utilisée dans le bas Reynolds anisotherme
 DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
   const Domaine_VEF& domaine_VEF,
   const Domaine_Cl_VEF& zcl_VEF,
   DoubleTab& G,
-  const DoubleTab& inconnue,
+  const DoubleTab& inconnue, // scalar, concentration, temperature, etc.
   const DoubleTab& alpha_turb,
   const Champ_Don& ch_beta,
   const DoubleVect& gravite,
@@ -746,7 +757,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
   int nb_compo=0;
 
   int dimension=Objet_U::dimension;
-  DoubleVect coef(Objet_U::dimension);
+  //DoubleVect coef(Objet_U::dimension);
 
   const DoubleTab& tab_beta = ch_beta.valeurs();
   G = 0;

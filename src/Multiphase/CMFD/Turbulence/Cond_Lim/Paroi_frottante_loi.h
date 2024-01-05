@@ -17,7 +17,7 @@
 #define Paroi_frottante_loi_included
 
 #include <TRUSTTab.h>
-#include <Frottement_global_impose.h>
+#include <Paroi_frottante_simple.h>
 #include <Cond_lim_base.h>
 #include <TRUST_Ref.h>
 
@@ -30,35 +30,16 @@ class Correlation;
  *
  * @sa Neumann
  */
-class Paroi_frottante_loi : public Frottement_global_impose
+class Paroi_frottante_loi : public Paroi_frottante_simple
 {
 
   Declare_instanciable(Paroi_frottante_loi);
 
 public :
   void completer() override ;
-  virtual int initialiser(double temps) override;
-  virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
-  void mettre_a_jour(double tps) override;
-  void me_calculer();
-  double calc_flux(double y, double u_tau, double visc);
-  virtual double coefficient_frottement(int i) const override;
-  virtual double coefficient_frottement(int i,int j) const override;
-  virtual double coefficient_frottement_grad(int i) const override;
-  virtual double coefficient_frottement_grad(int i,int j) const override;
-  virtual void liste_faces_loi_paroi(IntTab&) override;
 
 protected :
-
-  REF(Correlation) correlation_loi_paroi_;
-  double deriv_u_plus_de_y_plus(double y_p);
-
-  DoubleTab valeurs_coeff_;
-  DoubleTab valeurs_coeff_grad_;
-
-  double von_karman_ = 0.41 ;
-  double beta_omega = 0.075;
-  double beta_k = 0.09;
+  double fac_coeff_grad(double y_p) const override ;
 
   // Initialized at 0. and adapted in the readOn depending on turbulence selected
   double y_p_prod_k_ = -1.e8 ;

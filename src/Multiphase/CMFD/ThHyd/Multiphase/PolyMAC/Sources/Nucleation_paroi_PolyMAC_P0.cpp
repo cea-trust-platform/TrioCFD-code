@@ -26,12 +26,12 @@
 #include <Op_Diff_PolyMAC_P0_Elem.h>
 #include <Milieu_composite.h>
 #include <Flux_parietal_base.h>
-#include <Flux_interfacial_PolyMAC.h>
+#include <Flux_interfacial_PolyMAC_P0P1NC.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
 #include <math.h>
 #include <Sources.h>
-#include <Flux_interfacial_PolyMAC.h>
+#include <Flux_interfacial_PolyMAC_P0P1NC.h>
 
 Implemente_instanciable(Nucleation_paroi_PolyMAC_P0, "Nucleation_paroi_Elem_PolyMAC_P0", Source_base);
 
@@ -58,7 +58,7 @@ Entree& Nucleation_paroi_PolyMAC_P0::readOn(Entree& is)
   const Sources& les_sources_loc = pbm->equation(2).sources();
   for (int j = 0 ; j<les_sources_loc.size(); j++)
     {
-      if sub_type(Flux_interfacial_PolyMAC, les_sources_loc(j).valeur()) src_flux_interfacial_ = les_sources_loc(j).valeur();
+      if sub_type(Flux_interfacial_PolyMAC_P0P1NC, les_sources_loc(j).valeur()) src_flux_interfacial_ = les_sources_loc(j).valeur();
     }
   if (!src_flux_interfacial_.non_nul()) Process::exit(que_suis_je() + " : there must be an interfacial flux source for nucleation to be possible !");
 
@@ -76,8 +76,8 @@ void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
   const IntTab& f_e = domaine.face_voisins();
 
   const DoubleTab& rho = pbm.milieu().masse_volumique().passe(),
-                   &press = pbm.eq_qdm.pression().passe(),
-                    &qpi = ref_cast(Flux_interfacial_PolyMAC, src_flux_interfacial_.valeur()).qpi(),
+                   &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
+                    &qpi = ref_cast(Flux_interfacial_PolyMAC_P0P1NC, src_flux_interfacial_.valeur()).qpi(),
                      &dnuc = ref_cast(Op_Diff_PolyMAC_P0_Elem, pbm.equation(2).operateur(0).l_op_base()).d_nucleation();
 
   int N = pbm.nb_phases(), Np = pbm.get_champ("pression").valeurs().line_size();

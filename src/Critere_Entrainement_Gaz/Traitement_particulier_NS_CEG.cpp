@@ -35,7 +35,7 @@
 #include <Statistiques.h>
 #include <stat_counters.h>
 #include <Fluide_Incompressible.h>
-#include <Mod_turb_hyd_RANS.h>
+#include <Mod_turb_hyd_RANS_keps.h>
 #include <Pb_Hydraulique_Turbulent.h>
 #include <Champ_P1NC.h>
 #include <Postraitement.h>
@@ -163,7 +163,7 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
     }
   // KEps si critere AREVA
   if (calculer_critere_areva_)
-    if (!sub_type(Pb_Hydraulique_Turbulent,mon_equation->probleme()) || !sub_type(Mod_turb_hyd_RANS,ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0)).modele_turbulence().valeur()))
+    if (!sub_type(Pb_Hydraulique_Turbulent,mon_equation->probleme()) || !sub_type(Mod_turb_hyd_RANS_keps,ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0)).modele_turbulence().valeur()))
       error("AREVA criterion can only be calculated with a RANS K-eps simulation.");
 
   // Vorticite dans le jeu de donnees si AREVA
@@ -182,11 +182,11 @@ void Traitement_particulier_NS_CEG::post_traitement_particulier()
   if (mon_equation->probleme().schema_temps().temps_courant()>=t_deb_ && mon_equation->probleme().schema_temps().temps_courant()<t_fin_)
     {
       Cerr << "Beginning calculation of the criteria..." << finl;
-      statistiques().begin_count(m1);
+      statistiques().begin_count(m1_counter_);
       // Calcul des 2 criteres
       if (calculer_critere_areva_) critere_areva();
-      statistiques().end_count(m1);
-      if (debug_) Cout << "CPU AREVA criterion " << statistiques().last_time(m1) << " s" << finl << finl;
+      statistiques().end_count(m1_counter_);
+      if (debug_) Cout << "CPU AREVA criterion " << statistiques().last_time(m1_counter_) << " s" << finl << finl;
       if (calculer_critere_cea_jaea_) critere_cea_jaea();
       dernier_temps_ = mon_equation->probleme().schema_temps().temps_courant();
       Cerr << "End of the calculation of the criteria." << finl;
@@ -199,7 +199,7 @@ void Traitement_particulier_NS_CEG::critere_areva()
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const DoubleTab& vorticite = mon_equation.valeur().get_champ("vorticite").valeurs();
   const Navier_Stokes_Turbulent& eqn = ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0));
-  const DoubleTab& KEps = ref_cast(Mod_turb_hyd_RANS,eqn.modele_turbulence().valeur()).equation_k_eps(0).inconnue().valeurs();
+  const DoubleTab& KEps = ref_cast(Mod_turb_hyd_RANS_keps,eqn.modele_turbulence().valeur()).equation_k_eps(0).inconnue().valeurs();
 
   double gz = mon_equation->milieu().gravite()(0,2);
   double K_max_local=0;
@@ -323,7 +323,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
   // Boucle tant que la liste d'elements n'est pas vide(tous les vortexes seront alors evalues)
   while (elements_surface_libre.mp_max_vect()>=0)
     {
-      statistiques().begin_count(m1);
+      statistiques().begin_count(m1_counter_);
       double critereQ_max=0;
       int ind_face_centre_vortex=-1;
       // On boucle sur les elements non evalues pour trouver le plus grand critere Q
@@ -392,13 +392,13 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
       // On va cherche le cercle le plus large pour lequel Q>0 et
       // ensuite on calcule les circulations
       // Processus de dichotomie sur R
-      statistiques().end_count(m1);
+      statistiques().end_count(m1_counter_);
       double R=R0;
       double dR=R;
       int niter=0;
       int limite_vortex_atteinte=0;
       int points_trouves=0;
-      statistiques().begin_count(m2);
+      statistiques().begin_count(m2_counter_);
       while (dR>0.01*R0)
         {
           double inside_vortex=1;
@@ -462,8 +462,8 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           niter++;
         }
       R-=dR;
-      statistiques().end_count(m2);
-      statistiques().begin_count(m3);
+      statistiques().end_count(m2_counter_);
+      statistiques().begin_count(m3_counter_);
       // On ne prend que des vortex superieres a N mailles dont toutes les
       // mailles sont dans le domaine fluide (points_trouves==nb_dtheta)
       points_trouves=mp_sum(points_trouves);
@@ -531,8 +531,8 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           if (elem>=0 && vortex_potentiel(elem)==0) elements_surface_libre(ind_face)=-1;
         }
     }
-  statistiques().end_count(m3);
-  if (debug_) Cout << "CPU AREVA criterion m1= " << statistiques().last_time(m1) << " s m2= " << statistiques().last_time(m2) << " s m3= " << statistiques().last_time(m3) << finl;
+  statistiques().end_count(m3_counter_);
+  if (debug_) Cout << "CPU AREVA criterion m1= " << statistiques().last_time(m1_counter_) << " s m2= " << statistiques().last_time(m2_counter_) << " s m3= " << statistiques().last_time(m3_counter_) << finl;
   const Schema_Temps_base& sch=mon_equation->probleme().schema_temps();
   if (nb_vortex==0)
     {

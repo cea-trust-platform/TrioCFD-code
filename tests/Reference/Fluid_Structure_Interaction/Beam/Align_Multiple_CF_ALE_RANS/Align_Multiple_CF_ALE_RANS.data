@@ -1,0 +1,139 @@
+# Two clamped-free beams lined up.  Beam time scheme: Newmark mean acceleration #
+# Turbulent flow: LES model with wall law #
+# Warning: very coarse mesh.  This is a numerical test case, we do not look at physical aspects in detail here #
+Dimension 3
+Pb_Hydraulique_turbulent_ALE pb
+Domaine_ALE dom
+Lire_fichier dom Domaine.geom 
+
+
+# For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile boundaries of the domain and specify the speed that must be imposed on them #
+# For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile boundaries of the domain and specify the speed that must be imposed on them #
+Imposer_vit_bords_ALE dom	{
+					2 # number of mobile boundaries #
+					cylindre1 champ_front_ALE 3 0.3670488531931233*(sinh(1.875*z/0.198)-sin(1.875*z/0.198)-1.3622205574777075*cosh(1.875*z/0.198)+1.3622205574777075*cos(1.875*z/0.198))*90*2*pi*cos(90*2*pi*t)*1e-4 0 -(x-0.0035)*(1.875/0.198)*0.3670488531931233*(cosh(1.875*z/0.198)-cos(1.875*z/0.198)-1.3622205574777075*sinh(1.875*z/0.198)-1.3622205574777075*sin(1.875*z/0.198))*90*2*pi*cos(90*2*pi*t)*1e-4
+					cylindre2 champ_front_ALE 3 0.3670488531931233*(sinh(1.875*z/0.198)-sin(1.875*z/0.198)-1.3622205574777075*cosh(1.875*z/0.198)+1.3622205574777075*cos(1.875*z/0.198))*90*2*pi*cos(90*2*pi*t)*1e-4 0 -(x-0.0485)*(1.875/0.198)*0.3670488531931233*(cosh(1.875*z/0.198)-cos(1.875*z/0.198)-1.3622205574777075*sinh(1.875*z/0.198)-1.3622205574777075*sin(1.875*z/0.198))*90*2*pi*cos(90*2*pi*t)*1e-4
+					}
+
+# Solver used to solve the system giving the moving mesh velocity #
+# Solver_moving_mesh_ALE dom { petsc Cholesky { } } #
+Solver_moving_mesh_ALE dom { petsc GCP { precond ssor { omega 1.55 } seuil 1e-12 } } 
+
+Projection_ALE_boundary dom	{ 
+				2 
+				cylindre1 3 0.3670488531931233*(sinh(1.875*z/0.198)-sin(1.875*z/0.198)-1.3622205574777075*cosh(1.875*z/0.198)+1.3622205574777075*cos(1.875*z/0.198)) 0. -1.*(x-0.0035)*(1.875/0.198)*0.3670488531931233*(cosh(1.875*z/0.198)-cos(1.875*z/0.198)-1.3622205574777075*sinh(1.875*z/0.198)-1.3622205574777075*sin(1.875*z/0.198))
+				
+				cylindre2 3 0.3670488531931233*(sinh(1.875*z/0.198)-sin(1.875*z/0.198)-1.3622205574777075*cosh(1.875*z/0.198)+1.3622205574777075*cos(1.875*z/0.198)) 0. -1.*(x-0.0485)*(1.875/0.198)*0.3670488531931233*(cosh(1.875*z/0.198)-cos(1.875*z/0.198)-1.3622205574777075*sinh(1.875*z/0.198)-1.3622205574777075*sin(1.875*z/0.198))
+
+}
+
+VEFPreP1b dis
+
+Scheme_euler_implicit sch
+Read sch
+{
+ 	# Time step #
+        # Initial time [s] #
+        tinit 0
+	# Min time step #
+        dt_min 1.e-8
+	# Output criteria #
+        # .out files printing period #
+        dt_impr 5.e-7
+	tcpumax 23
+	# .sauv files printing period #
+        periode_sauvegarde_securite_en_heures 9
+ 	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+	facsec 10
+        facsec_max 100
+	solveur implicite_ALE
+	{
+          solveur gmres { diag seuil 1.e-12 nb_it_max 20 } 
+	}
+	# Stop if one of the following criteria is checked: #
+        # End time [s] #
+	tmax  0.05555
+	# Max number of time steps #
+        nb_pas_dt_max 10
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-15
+}
+
+
+Associer pb dom
+Associate pb sch
+Discretize pb dis
+
+
+Lire pb
+{
+	fluide_incompressible {
+	        mu Champ_Uniforme 1 1.307e-3
+		rho Champ_Uniforme 1 999.7
+		gravite Champ_Uniforme 3 0 -9.81 0
+	}
+	Navier_Stokes_turbulent_ALE
+	{
+		solveur_pression	petsc Cholesky { impr }
+		convection		{ ALE { MUSCL } }
+		diffusion		{ }
+		conditions_initiales	{ vitesse champ_uniforme 3 0.46 0. 0. }
+		conditions_limites	{
+					entree			frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0.46 0 0 
+					sortie			frontiere_ouverte_pression_imposee champ_front_uniforme 1 0
+					cylindre1		frontiere_ouverte_vitesse_imposee_ALE champ_front_ALE 3 0.3670488531931233*(sinh(1.875*z/0.198)-sin(1.875*z/0.198)-1.3622205574777075*cosh(1.875*z/0.198)+1.3622205574777075*cos(1.875*z/0.198))*90*2*pi*cos(90*2*pi*t)*1e-4 0 -(x-0.0035)*(1.875/0.198)*0.3670488531931233*(cosh(1.875*z/0.198)-cos(1.875*z/0.198)-1.3622205574777075*sinh(1.875*z/0.198)-1.3622205574777075*sin(1.875*z/0.198))*90*2*pi*cos(90*2*pi*t)*1e-4
+					cylindre2		frontiere_ouverte_vitesse_imposee_ALE champ_front_ALE 3 0.3670488531931233*(sinh(1.875*z/0.198)-sin(1.875*z/0.198)-1.3622205574777075*cosh(1.875*z/0.198)+1.3622205574777075*cos(1.875*z/0.198))*90*2*pi*cos(90*2*pi*t)*1e-4 0 -(x-0.0485)*(1.875/0.198)*0.3670488531931233*(cosh(1.875*z/0.198)-cos(1.875*z/0.198)-1.3622205574777075*sinh(1.875*z/0.198)-1.3622205574777075*sin(1.875*z/0.198))*90*2*pi*cos(90*2*pi*t)*1e-4
+					parois_laterales	paroi_fixe
+					paroi_haut		paroi_fixe
+					paroi_bas		paroi_fixe
+					}
+		        modele_turbulence K_Epsilon 
+                 {
+                        Transport_K_Epsilon
+                        {
+                                convection { muscl }
+                                diffusion {  }
+                                conditions_initiales
+                                {
+					k_eps field_uniform_keps_from_ud { U 0.46 D 0.004 } 
+                                }
+                                conditions_limites
+                                {
+                                cylindre1           frontiere_ouverte_k_eps_impose champ_front_uniforme 2 0. 0.
+                                cylindre2           frontiere_ouverte_k_eps_impose champ_front_uniforme 2 0. 0.
+                                parois_laterales             paroi
+                                paroi_haut paroi
+                                paroi_bas paroi
+                                entree              frontiere_ouverte_k_eps_impose boundary_field_uniform_keps_from_ud { U 0.46 D 0.007 }
+                                sortie              frontiere_ouverte k_eps_ext boundary_field_uniform_keps_from_ud { U 0.46 D 0.007 }
+                                }
+
+                        }
+			turbulence_paroi loi_standard_hydr nut_max 0.02
+                 }
+
+	}
+
+	 Post_processing {
+
+			Format lml
+			Champs binaire dt_post 1e-6
+						{
+						vitesse elem
+						pression elem
+						y_plus elem
+						Viscosite_turbulente elem
+		   				k elem
+		   				eps elem 
+						ALEMeshVelocity som
+						ALEMeshTotalDisplacement som
+						}
+			
+	}
+	Sauvegarde single_hdf Cas.sauv
+}
+
+EcritureLectureSpecial 0
+
+Resoudre pb
+Fin

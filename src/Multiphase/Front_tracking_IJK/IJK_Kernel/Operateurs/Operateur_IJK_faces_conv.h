@@ -57,6 +57,8 @@ public:
    * ReadOn
    */
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
+  void search_convection_option_type(Entree& is);
+  void set_convection_option_type(Motcle word);
   void set_param(Param& param);
   void typer_convection_op(const char * convection_op);
   Entree& typer_convection_op(Entree& is);
@@ -98,7 +100,10 @@ inline void Operateur_IJK_faces_conv::compute_add(IJK_Field_double& dvx, IJK_Fie
 inline void Operateur_IJK_faces_conv::initialize(const IJK_Splitting& splitting)
 {
   if (!is_cast_)
-    typer_convection_op("quick");
+    {
+      typer_convection_op("quick");
+      convection_option_ = convection_op_options_[0];
+    }
   valeur().initialize(splitting);
 }
 

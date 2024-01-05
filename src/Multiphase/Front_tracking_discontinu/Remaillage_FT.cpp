@@ -1659,7 +1659,7 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
   const Parcours_interface& parcours = maillage.refparcours_interface_.valeur();
 #endif
 
-  DoubleTab xsom(3,3); // coords des sommets de la face: xs(isom_eul, direction)
+  //DoubleTab xsom(3,3); // coords des sommets de la face: xs(isom_eul, direction)
   int fa7, isom, som =0, nb_bord;
   for (fa7=0 ; fa7<nb_facettes ; fa7++)
     {
@@ -3708,5 +3708,50 @@ void Remaillage_FT::regulariser_courbure(Maillage_FT_Disc& maillage,
   dvolume *= coeff_dt;
 
   maillage.desc_sommets().collecter_espace_virtuel(dvolume, MD_Vector_tools::EV_SOMME);
+
+  const DoubleVect& volume = refdomaine_VF_->volumes();
+  int clip=0;
+  double lost_volume = 0.;
+  int nb_som_reels = 0;
+  for (int s = 0; s < maillage.nb_sommets(); s++)
+    {
+      if (!maillage.sommet_virtuel(s))
+        nb_som_reels++;
+      const int elem = maillage.sommet_elem()[s];
+      if (elem>=0)
+        {
+          // On est dans un element reel
+          if (dvolume[s]>volume[elem] )
+            {
+              lost_volume += dvolume[s]-volume[elem];
+              dvolume[s] = volume[elem];
+              clip++;
+            }
+          if (-dvolume[s]>volume[elem] )
+            {
+              lost_volume += dvolume[s]+volume[elem];
+              dvolume[s] = -volume[elem];
+              clip++;
+            }
+        }
+    }
+  clip = Process::mp_sum(clip);
+  nb_som_reels = Process::mp_sum(nb_som_reels);
+  lost_volume = Process::mp_sum(lost_volume);
+  if (je_suis_maitre() && clip)
+    {
+      Cerr << "[Remaillage_FT::regulariser_courbure] Clipping of var volume in "
+           << clip << " elems. time = " << maillage.temps()
+           << " Volume redistributed over the whole interface = "
+           << lost_volume << finl;
+    }
+  if (clip)
+    {
+      // On repartit le volume perdu sur toute l'interface:
+      lost_volume /=nb_som_reels;
+      for (int s = 0; s < maillage.nb_sommets(); s++)
+        if (!maillage.sommet_virtuel(s))
+          dvolume[s] += lost_volume;
+    }
   maillage.desc_sommets().echange_espace_virtuel(dvolume);
 }

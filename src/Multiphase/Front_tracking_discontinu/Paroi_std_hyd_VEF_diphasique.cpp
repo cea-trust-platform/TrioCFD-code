@@ -110,7 +110,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
   if ((!l_unif) && ((tab_visco_ph1.local_min_vect()<DMINFLOAT) || (tab_visco_ph0.local_min_vect()<DMINFLOAT) ))
     {
       Cerr << "Negative viscosity !!!" << finl;
-      Process::exit(-1);
+      Process::exit();
     }
 
   double dist=-1,d_visco=-1;
@@ -343,7 +343,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_k_eps)
   Cerr << " Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_k_eps) " << finl;
   Cerr <<  "on ne doit pas entrer dans cette methode" << finl;
   Cerr << " car elle est definie uniquement pour la LES " << finl ;
-  Process::exit(-1);
+  Process::exit();
   return 1 ;
 } // fin de calcul_hyd (K-eps)
 

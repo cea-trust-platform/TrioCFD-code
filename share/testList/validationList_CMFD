@@ -1,5 +1,8 @@
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/decroissance_ktau
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/expansion_NO_MASS
+./share/Validation/Rapports_automatiques/Multiphase/CMFD/Gabillet
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/shock_dodecane
+./share/Validation/Rapports_automatiques/Multiphase/CMFD/Tube_solution_analytique_turbulent
+./share/Validation/Rapports_automatiques/Multiphase/CMFD/Verification1D_drift-flux_models
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/Verification_k_tau_omega_transport_equation
 ./share/Validation/Rapports_automatiques/Multiphase/CMFD/Verification_wall_laws

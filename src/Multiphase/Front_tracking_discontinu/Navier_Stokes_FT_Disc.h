@@ -24,6 +24,7 @@
 #define Navier_Stokes_FT_Disc_included
 
 #include <Navier_Stokes_Turbulent.h>
+#include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Champ_Don.h>
 #include <TRUST_Ref.h>
 
@@ -54,11 +55,22 @@ public:
   DoubleTab&          derivee_en_temps_inco(DoubleTab& vpoint) override;
   void                projeter() override;
   virtual const Champ_base& calculer_div_normale_interface();
+  void correct_at_exit_bad_gradient(DoubleTab& u0) const;
   void calculer_delta_u_interface(Champ_base& u0, int phase_pilote, int ordre);
   const Champ_Don& diffusivite_pour_transport() const override;
 
   virtual const Champ_base * get_delta_vitesse_interface() const;
   virtual const Fluide_Diphasique&     fluide_diphasique() const;
+
+  void compute_boussinesq_additional_gravity(
+    const Convection_Diffusion_Temperature_FT_Disc& eq,
+    const Fluide_Diphasique& fluide_diphasique,
+    const IntTab& face_voisins,
+    const DoubleVect& volumes_entrelaces,
+    const IntVect& orientation,
+    const DoubleTab& indicatrice,
+    const ArrOfDouble& g,
+    DoubleTab& gravite_face) const;
 
   int is_terme_gravite_rhog() const;
   const Champ_Fonc& champ_rho_faces() const;
