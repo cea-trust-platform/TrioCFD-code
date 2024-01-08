@@ -1,5 +1,6 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/barycentrage_lissage
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/bulle_oscillante
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/canal_perio_monoph
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/channel_swarm_fixed
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/chmtvar
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/compaTrioCFD_and_CPU
