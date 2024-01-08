@@ -1,4 +1,4 @@
-# PARALLEL NOT #
+# PARALLEL OK #
 # Hydraulique 2D turbulent Comte-Bellot
   Re = (rho*U_moy*L)/mu
   rho = 1.208 kg/m^3
