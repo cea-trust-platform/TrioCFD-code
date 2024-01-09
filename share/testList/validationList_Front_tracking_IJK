@@ -22,6 +22,7 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_canal_bulles_symetrique
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_canal_poiseuille_source
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_channel_swarm_fixed
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_convergence_operateurs_thermiques
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_monop
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_stat
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/temperature_test_pb_reprise
