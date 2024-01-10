@@ -166,6 +166,7 @@ public :
                                            const double& lambda);
   void compute_shear_per_bubbles();
   void compute_overall_bubbles_quantities(IJK_Thermal_Subresolution& ref_thermal_subresolution);
+  void compute_dynamics_per_bubbles();
   void compute_overall_quantities();
   void post_process_overall_bubbles_quantities(const int rank, const Nom& overall_bubbles_quantities);
 
@@ -228,11 +229,28 @@ protected :
   double radius_from_volumes_ = 0.;
 
   double uniform_alpha_ = 0.;
-  double error_temperature_ana_total_=0.;
-  double error_temperature_ana_squared_total_=0.;
-  double error_temperature_ana_rel_total_=0.;
+  double error_temperature_ana_total_ = 0.;
+  double error_temperature_ana_squared_total_ = 0.;
+  double error_temperature_ana_rel_total_ = 0.;
 
   ArrOfDouble * bubbles_volume_;
+  ArrOfDouble * bubbles_rising_velocities_;
+  DoubleTab * bubbles_rising_vectors_per_bubble_;
+  ArrOfDouble bubbles_rising_relative_velocities_;
+  ArrOfDouble bubbles_reynolds_numbers_per_bubble_;
+  ArrOfDouble bubbles_reynolds_numbers_from_surface_per_bubble_;
+  ArrOfDouble bubbles_reynolds_numbers_from_volume_per_bubble_;
+  FixedVector<ArrOfDouble, 3> relative_rising_dir_compo_;
+
+  double velocity_upstream_ = 0.;
+  int gravity_dir_ = 0;
+  Vecteur3 total_relative_rising_dir_compo_;
+  Vecteur3 total_rising_dir_compo_;
+  double bubbles_total_rising_velocities_ = 0.;
+  double bubbles_total_rising_relative_velocities_ = 0.;
+  double bubbles_total_reynolds_numbers_ = 0.;
+  double bubbles_total_reynolds_numbers_from_surface_per_bubble_ = 0.;
+  double bubbles_total_reynolds_numbers_from_volume_per_bubble_ = 0.;
 
   ArrOfDouble radius_outputs_;
   ArrOfDouble theta_outputs_;
@@ -270,6 +288,13 @@ protected :
   ArrOfDouble overall_nusselt_number_per_bubble_gfm_error_rel_;
   ArrOfDouble overall_nusselt_number_per_bubble_liquid_error_rel_;
   ArrOfDouble overall_nusselt_number_per_bubble_gfm_liquid_error_rel_;
+
+  ArrOfDouble bubbles_peclet_numbers_per_bubble_;
+  ArrOfDouble bubbles_peclet_numbers_from_surface_per_bubble_;
+  ArrOfDouble bubbles_peclet_numbers_from_volume_per_bubble_;
+  double bubbles_total_peclet_numbers_ = 0.;
+  double bubbles_total_peclet_numbers_from_surface_per_bubble_ = 0.;
+  double bubbles_total_peclet_numbers_from_volume_per_bubble_ = 0.;
 
   int nb_bubbles_ = 0;
 

@@ -607,6 +607,7 @@ protected :
 
   double vitesse_entree_;
   double vitesse_upstream_;
+  Nom expression_vitesse_upstream_;
   int upstream_dir_; // static
   int upstream_stencil_;
   double nb_diam_upstream_;
@@ -664,6 +665,7 @@ protected :
   int time_scheme_;
   double store_RK3_source_acc_;
   double store_RK3_fac_sv_;
+  double modified_time_ini_;
   double current_time_;
   double current_time_at_rk3_step_;
   int tstep_; // The iteration number

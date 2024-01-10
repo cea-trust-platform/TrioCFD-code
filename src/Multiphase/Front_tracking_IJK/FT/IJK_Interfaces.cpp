@@ -483,7 +483,7 @@ int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
   surface_vapeur_par_face_computation_.initialize(splitting_FT);
   val_par_compo_in_cell_computation_.initialize(splitting_FT, maillage_ft_ijk_);
 
-  const int nb_ghost_cells = std::max(thermal_probes_ghost_cells, 2);
+  const int nb_ghost_cells = std::max(thermal_probes_ghost_cells, (int) 2);
 
   indicatrice_ft_[old()].allocate(splitting_FT, IJK_Splitting::ELEM, 2);
   indicatrice_ft_[old()].data() = 1.;

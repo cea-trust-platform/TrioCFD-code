@@ -67,6 +67,7 @@ IJK_FT_double::IJK_FT_double():
   oh_ = 0.;
   vitesse_entree_ = 0.;
   vitesse_upstream_ = 0.;
+  expression_vitesse_upstream_ = "??";
   upstream_dir_ = 0;
   upstream_stencil_ = 0;
   nb_diam_upstream_ = 0.;
@@ -99,6 +100,7 @@ IJK_FT_double::IJK_FT_double():
   time_scheme_ = 0;
   store_RK3_source_acc_ = 0.;
   store_RK3_fac_sv_ = 0.;
+  modified_time_ini_ = 0.;
   current_time_ = 0.;
   current_time_at_rk3_step_ = 0.;
   tstep_ = 0;
@@ -397,6 +399,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   //
   vitesse_entree_ = -1.1e20;
   vitesse_upstream_ = -1.1e20;
+  expression_vitesse_upstream_ = "??";
   nb_diam_upstream_ = 0.;
   upstream_dir_=-1;
   upstream_stencil_=3;
@@ -498,6 +501,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("vitesse_entree", &vitesse_entree_); // XD_ADD_P floattant Velocity to prescribe at inlet
   param.ajouter("vitesse_upstream", &vitesse_upstream_); // XD_ADD_P floattant Velocity to prescribe at 'nb_diam_upstream_' before bubble 0.
   param.ajouter("upstream_dir", &upstream_dir_); // XD_ADD_P entier Direction to prescribe the velocity
+  param.ajouter("expression_vitesse_upstream", &expression_vitesse_upstream_); // XD_ADD_P chaine Analytical expression to set the upstream velocity
   param.ajouter("upstream_stencil", &upstream_stencil_); // XD_ADD_P int Width on which the velocity is set
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_); // XD_ADD_P floattant Number of bubble diameters upstream of bubble 0 to prescribe the velocity.
   param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid density
@@ -2559,7 +2563,8 @@ void IJK_FT_double::run()
   post_.compute_extended_pressures(interfaces_.maillage_ft_ijk());
 //post_.compute_phase_pressures_based_on_poisson(0);
 //post_.compute_phase_pressures_based_on_poisson(1);
-  current_time_ = thermals_.get_modified_time();
+  modified_time_ini_ = thermals_.get_modified_time();
+  current_time_ = modified_time_ini_;
   if (!first_step_interface_smoothing_)
     {
       Cout << "BF posttraiter_champs_instantanes "
@@ -4090,9 +4095,22 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
 // Forcage de la vitesse en amont de la bulle :
       if (vitesse_upstream_ > -1e20)
-        force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
-                                vitesse_upstream_, interfaces_, nb_diam_upstream_,
-                                upstream_dir_, get_direction_gravite(), upstream_stencil_);
+        {
+          if (expression_vitesse_upstream_ != "??")
+            {
+              std::string expr(expression_vitesse_upstream_);
+              Parser parser;
+              parser.setString(expr);
+              parser.setNbVar(1);
+              parser.addVar("t");
+              parser.parseString();
+              parser.setVar(0, (*this).current_time_ - modified_time_ini_);
+              vitesse_upstream_ = parser.eval();
+            }
+          force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
+                                  vitesse_upstream_, interfaces_, nb_diam_upstream_,
+                                  upstream_dir_, get_direction_gravite(), upstream_stencil_);
+        }
     } // end of if ! frozen_velocity
 //static Stat_Counter_Id projection_counter_ = statistiques().new_counter(0, "projection");
 #ifdef PROJECTION_DE_LINCREMENT_DV
