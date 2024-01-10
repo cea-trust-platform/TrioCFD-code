@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,11 +13,11 @@
 *
 *****************************************************************************/
 
-#include <Y_plus_Champ_Face.h>
 #include <Modele_turbulence_hyd_base.h>
+#include <Y_plus_Champ_Face.h>
 #include <Champ_Face_VDF.h>
-#include <Equation_base.h>
 #include <Domaine_Cl_VDF.h>
+#include <Equation_base.h>
 #include <Milieu_base.h>
 
 Implemente_instanciable(Y_plus_Champ_Face, "Y_plus_Champ_Face", Champ_Fonc_P0_VDF);
@@ -35,9 +35,8 @@ void Y_plus_Champ_Face::me_calculer(double tps)
 {
   const Nom& nom_eq = mon_champ().equation().que_suis_je();
   const Milieu_base& mil = mon_champ().equation().milieu(); // returns Fluide_Diphasique or Fluide_Incompressible
-  const Nom& nom_mil = mil.que_suis_je();
 
-  if (nom_eq == "Navier_Stokes_FT_Disc" && nom_mil == "Fluide_Diphasique")
+  if (nom_eq == "Navier_Stokes_FT_Disc" &&  mil.que_suis_je() == "Fluide_Diphasique")
     {
       const RefObjU& modele_turbulence = mon_champ().equation().get_modele(TURBULENCE);
       const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
