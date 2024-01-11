@@ -16,6 +16,16 @@
 #include <MAIN.h>
 #include <mon_main.h>
 #include <Schema_Comm_Vecteurs.h>
+
+/*! \mainpage TRUST html documentation
+*
+* Welcome to the doxygen documentation of TRUST C++ sources.
+*
+* To visit CEA TRUST Platform's organization on Github, see:
+*
+* https://github.com/cea-trust-platform
+*/
+
 True_int main(True_int argc, char** argv)
 {
   mon_main* p=NULL;

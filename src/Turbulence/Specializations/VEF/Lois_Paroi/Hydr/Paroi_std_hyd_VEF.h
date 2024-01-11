@@ -92,6 +92,9 @@ protected:
   virtual int init_lois_paroi_hydraulique();
 
   int turbulence_model_type {0}; // To redirect the computation of the wall quantities
+
+  static constexpr double BETA_OMEGA {0.075};
+  static constexpr double BETA_K {0.09};  // equals to Cmu
 };
 
 /*! @brief Returns an integer value depending on the turbulence model.
