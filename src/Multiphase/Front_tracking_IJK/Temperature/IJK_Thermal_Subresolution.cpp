@@ -391,7 +391,10 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
     reference_gfm_on_probes_ = 1;
 
   if (use_sparse_matrix_)
-    pre_initialise_thermal_subproblems_list_ = 0;
+    {
+      pre_initialise_thermal_subproblems_list_ = 0;
+      remove_append_subproblems_ = 1;
+    }
 
   int nalloc = 0;
   nalloc = IJK_Thermal_base::initialize(splitting, idx);

@@ -136,6 +136,6 @@ void OpHessCentre2IJKScalar_double::fill_grad_field_z_(IJK_Field_local_double& f
     for (int j=0; j < nj; j++)
       {
         double dz_inv = 1 / (channel_data_.get_delta_z()[k] * channel_data_.get_delta_z()[k]);
-        resu(i,j,k) = (flux_max(i,j,0) - flux_min(i,j,0)) * dz_inv;
+        resu(i,j,k) = (flux_min(i,j,0) - flux_max(i,j,0)) * dz_inv;
       }
 }

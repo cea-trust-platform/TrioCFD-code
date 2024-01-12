@@ -515,15 +515,26 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
 
   if (debug_)
     Cerr << "Compute probe parameters" << finl;
+
+  probe_length_ = (*coeff_distance_diagonal_) * (*cell_diagonal_);
+
   /*
    *  Curvature is negative for a convex bubble
    *  but R should be positive in that case
    *  FIXME: What happen with highly deformable bubbles (concave interface portions) ?
    */
   if (fabs(curvature_) > DMINFLOAT)
-    osculating_radius_ = fabs(2 / curvature_);
-
-  probe_length_ = (*coeff_distance_diagonal_) * (*cell_diagonal_);
+    {
+      osculating_radius_  = 2 / curvature_;
+      if (curvature_ >= DMINFLOAT)
+        {
+          const double max_length = osculating_radius_ - probe_length_;
+          if (curvature_ >= DMINFLOAT && max_length < 0)
+            osculating_radius_ = 1.e30;
+        }
+      else
+        osculating_radius_ = fabs(osculating_radius_);
+    }
 
   if (debug_)
     Cerr << "Compute local discretisation" << finl;
@@ -1995,7 +2006,7 @@ void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect * th
     end_boundary_condition_value_ = temperature_interp_[temperature_interp_.size() -1];
 
   const int thermal_subproblems_rhs_size = (*thermal_subproblems_rhs_assembly_).size();
-  if (pre_initialise_thermal_subproblems_list_ && global_probes_characteristics_)
+  if ((use_sparse_matrix_ || pre_initialise_thermal_subproblems_list_) && global_probes_characteristics_)
     start_index_ = (int) (sub_problem_index_ * (*points_per_thermal_subproblem_));
   else
     {
