@@ -2668,6 +2668,7 @@ void IJK_FT_double::run()
                       post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
                       Cout << "AF posttraiter_champs_instantanes" << finl;
                       compute_var_volume_par_bulle(var_volume_par_bulle);
+                      thermals_.set_post_pro_first_call();
                     }
                 }
               while (first_step_interface_smoothing_);
@@ -4084,10 +4085,10 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
               std::string expr(expression_vitesse_upstream_);
               Parser parser;
               parser.setString(expr);
-              parser.setNbVar(1);
+              parser.setNbVar((int) 1);
               parser.addVar("t");
               parser.parseString();
-              parser.setVar(0, (*this).current_time_ - modified_time_ini_);
+              parser.setVar((int) 0, (*this).current_time_ - modified_time_ini_);
               vitesse_upstream_ = parser.eval();
             }
           force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],

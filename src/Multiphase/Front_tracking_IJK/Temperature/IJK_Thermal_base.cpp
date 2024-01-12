@@ -126,6 +126,8 @@ IJK_Thermal_base::IJK_Thermal_base()
   eulerian_compo_connex_from_interface_ghost_ns_ = nullptr;
   eulerian_compo_connex_from_interface_int_ns_ = nullptr;
   eulerian_compo_connex_from_interface_ghost_int_ns_= nullptr;
+
+  liquid_velocity_ = 0.;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
@@ -1233,7 +1235,8 @@ void IJK_Thermal_base::compute_rising_velocities()
       rising_vectors_ = DoubleTab(nb_bubbles, 3);
       compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
                               eulerian_compo_connex_from_interface_int_ns_, ref_ijk_ft_->get_direction_gravite(),
-                              rising_velocities_, rising_vectors_);
+                              rising_velocities_, rising_vectors_,
+                              liquid_velocity_);
 //      compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
 //                              ref_ijk_ft_->itfce().get_ijk_compo_connex().get_eulerian_compo_connex(),
 //															ref_ijk_ft_->get_direction_gravite(),

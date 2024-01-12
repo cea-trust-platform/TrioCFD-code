@@ -237,20 +237,30 @@ protected :
   ArrOfDouble * bubbles_rising_velocities_;
   DoubleTab * bubbles_rising_vectors_per_bubble_;
   ArrOfDouble bubbles_rising_relative_velocities_;
+  ArrOfDouble bubbles_rising_relative_velocities_upstream_;
   ArrOfDouble bubbles_reynolds_numbers_per_bubble_;
   ArrOfDouble bubbles_reynolds_numbers_from_surface_per_bubble_;
   ArrOfDouble bubbles_reynolds_numbers_from_volume_per_bubble_;
+  ArrOfDouble bubbles_reynolds_numbers_per_bubble_upstream_;
+  ArrOfDouble bubbles_reynolds_numbers_from_surface_per_bubble_upstream_;
+  ArrOfDouble bubbles_reynolds_numbers_from_volume_per_bubble_upstream_;
   FixedVector<ArrOfDouble, 3> relative_rising_dir_compo_;
+  FixedVector<ArrOfDouble, 3> relative_rising_dir_compo_upstream_;
 
   double velocity_upstream_ = 0.;
   int gravity_dir_ = 0;
   Vecteur3 total_relative_rising_dir_compo_;
+  Vecteur3 total_relative_rising_dir_compo_upstream_;
   Vecteur3 total_rising_dir_compo_;
   double bubbles_total_rising_velocities_ = 0.;
   double bubbles_total_rising_relative_velocities_ = 0.;
+  double bubbles_total_rising_relative_velocities_upstream_ = 0.;
   double bubbles_total_reynolds_numbers_ = 0.;
   double bubbles_total_reynolds_numbers_from_surface_per_bubble_ = 0.;
   double bubbles_total_reynolds_numbers_from_volume_per_bubble_ = 0.;
+  double bubbles_total_reynolds_numbers_upstream_ = 0.;
+  double bubbles_total_reynolds_numbers_from_surface_per_bubble_upstream_ = 0.;
+  double bubbles_total_reynolds_numbers_from_volume_per_bubble_upstream_ = 0.;
 
   ArrOfDouble radius_outputs_;
   ArrOfDouble theta_outputs_;
@@ -292,9 +302,17 @@ protected :
   ArrOfDouble bubbles_peclet_numbers_per_bubble_;
   ArrOfDouble bubbles_peclet_numbers_from_surface_per_bubble_;
   ArrOfDouble bubbles_peclet_numbers_from_volume_per_bubble_;
+  ArrOfDouble bubbles_peclet_numbers_per_bubble_upstream_;
+  ArrOfDouble bubbles_peclet_numbers_from_surface_per_bubble_upstream_;
+  ArrOfDouble bubbles_peclet_numbers_from_volume_per_bubble_upstream_;
   double bubbles_total_peclet_numbers_ = 0.;
   double bubbles_total_peclet_numbers_from_surface_per_bubble_ = 0.;
   double bubbles_total_peclet_numbers_from_volume_per_bubble_ = 0.;
+  double bubbles_total_peclet_numbers_upstream_  = 0.;
+  double bubbles_total_peclet_numbers_from_surface_per_bubble_upstream_ = 0.;
+  double bubbles_total_peclet_numbers_from_volume_per_bubble_upstream_  = 0.;
+
+  Vecteur3 * liquid_velocity_;
 
   int nb_bubbles_ = 0;
 

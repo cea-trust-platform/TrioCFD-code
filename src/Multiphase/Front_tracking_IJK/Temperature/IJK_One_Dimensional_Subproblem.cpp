@@ -2171,13 +2171,13 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms()
 
 void IJK_One_Dimensional_Subproblem::add_source_terms(const int& boundary_condition_interface, const int& boundary_condition_end)
 {
-	if (!(*first_time_step_temporal_))
-		if (!pure_thermal_diffusion_)
-			(*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_,
-                                                     	 source_terms_,
-																											 start_index_,
-																											 boundary_condition_interface,
-																											 boundary_condition_end);
+  if (!(*first_time_step_temporal_))
+    if (!pure_thermal_diffusion_)
+      (*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_,
+                                                       source_terms_,
+                                                       start_index_,
+                                                       boundary_condition_interface,
+                                                       boundary_condition_end);
 }
 
 void IJK_One_Dimensional_Subproblem::approximate_temperature_increment_material_derivative()

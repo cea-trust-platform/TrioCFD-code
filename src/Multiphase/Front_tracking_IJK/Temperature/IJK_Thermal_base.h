@@ -642,6 +642,7 @@ protected:
 
   int compute_rising_velocities_;
   int fill_rising_velocities_;
+  Vecteur3 liquid_velocity_;
   ArrOfDouble rising_velocities_;
   DoubleTab rising_vectors_;
   IJK_Field_double eulerian_rising_velocities_;

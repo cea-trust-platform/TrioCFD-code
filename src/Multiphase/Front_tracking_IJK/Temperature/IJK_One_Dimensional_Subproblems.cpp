@@ -38,13 +38,21 @@ IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
   bubbles_rising_velocities_ = nullptr;
   bubbles_rising_vectors_per_bubble_ = nullptr;
   bubbles_rising_relative_velocities_.set_smart_resize(1);
+  bubbles_rising_relative_velocities_upstream_.set_smart_resize(1);
   bubbles_reynolds_numbers_per_bubble_.set_smart_resize(1);
   bubbles_reynolds_numbers_from_surface_per_bubble_.set_smart_resize(1);
   bubbles_reynolds_numbers_from_surface_per_bubble_.set_smart_resize(1);
+  bubbles_reynolds_numbers_per_bubble_upstream_.set_smart_resize(1);
+  bubbles_reynolds_numbers_from_surface_per_bubble_upstream_.set_smart_resize(1);
+  bubbles_reynolds_numbers_from_surface_per_bubble_upstream_.set_smart_resize(1);
   total_rising_dir_compo_ = 0.;
   total_relative_rising_dir_compo_ = 0.;
+  total_relative_rising_dir_compo_upstream_ =0.;
   for (int dir=0; dir<3; dir++)
-    relative_rising_dir_compo_[dir].set_smart_resize(1);
+    {
+      relative_rising_dir_compo_[dir].set_smart_resize(1);
+      relative_rising_dir_compo_upstream_[dir].set_smart_resize(1);
+    }
 
   overall_nusselt_number_per_bubble_.set_smart_resize(1);
   overall_nusselt_number_per_bubble_gfm_.set_smart_resize(1);
@@ -82,6 +90,11 @@ IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
   bubbles_peclet_numbers_from_surface_per_bubble_.set_smart_resize(1);
   bubbles_peclet_numbers_from_volume_per_bubble_.set_smart_resize(1);
 
+  bubbles_peclet_numbers_per_bubble_upstream_.set_smart_resize(1);
+  bubbles_peclet_numbers_from_surface_per_bubble_upstream_.set_smart_resize(1);
+  bubbles_peclet_numbers_from_volume_per_bubble_upstream_.set_smart_resize(1);
+
+  liquid_velocity_ = nullptr;
   bubbles_volume_ = nullptr;
 }
 
@@ -246,6 +259,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
   bubbles_volume_ = &ref_thermal_subresolution.bubbles_volume_;
   bubbles_rising_velocities_ = &ref_thermal_subresolution.rising_velocities_;
   bubbles_rising_vectors_per_bubble_ = &ref_thermal_subresolution.rising_vectors_;
+  liquid_velocity_ = &ref_thermal_subresolution.liquid_velocity_;
 
   ArrOfDouble bubble_rising_vector(3);
   ArrOfDouble normal_vector(3);
@@ -1097,16 +1111,29 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities_per_bubbles(con
   overall_nusselt_number_per_bubble_gfm_liquid_error_rel_.resize(nb_bubbles_);
 
   bubbles_rising_relative_velocities_.resize(nb_bubbles_);
+  bubbles_rising_relative_velocities_upstream_.resize(nb_bubbles_);
+
   bubbles_reynolds_numbers_per_bubble_.resize(nb_bubbles_);
   bubbles_reynolds_numbers_from_surface_per_bubble_.resize(nb_bubbles_);
   bubbles_reynolds_numbers_from_volume_per_bubble_.resize(nb_bubbles_);
+
+  bubbles_reynolds_numbers_per_bubble_upstream_.resize(nb_bubbles_);
+  bubbles_reynolds_numbers_from_surface_per_bubble_upstream_.resize(nb_bubbles_);
+  bubbles_reynolds_numbers_from_volume_per_bubble_upstream_.resize(nb_bubbles_);
 
   bubbles_peclet_numbers_per_bubble_.resize(nb_bubbles_);
   bubbles_peclet_numbers_from_surface_per_bubble_.resize(nb_bubbles_);
   bubbles_peclet_numbers_from_volume_per_bubble_.resize(nb_bubbles_);
 
+  bubbles_peclet_numbers_per_bubble_upstream_.resize(nb_bubbles_);
+  bubbles_peclet_numbers_from_surface_per_bubble_upstream_.resize(nb_bubbles_);
+  bubbles_peclet_numbers_from_volume_per_bubble_upstream_.resize(nb_bubbles_);
+
   for (int dir=0; dir<3; dir++)
-    relative_rising_dir_compo_[dir].resize(nb_bubbles_);
+    {
+      relative_rising_dir_compo_[dir].resize(nb_bubbles_);
+      relative_rising_dir_compo_upstream_[dir].resize(nb_bubbles_);
+    }
 
   assert((*bubbles_rising_velocities_).size_array() == nb_bubbles_);
   compute_dynamics_per_bubbles();
@@ -1145,6 +1172,8 @@ void IJK_One_Dimensional_Subproblems::compute_overall_bubbles_quantities(IJK_The
 void IJK_One_Dimensional_Subproblems::compute_dynamics_per_bubbles()
 {
   bubbles_rising_relative_velocities_ = (*bubbles_rising_velocities_);
+  bubbles_rising_relative_velocities_upstream_ = (*bubbles_rising_velocities_);
+
   Vecteur3 upstream_velocity_vector;
   upstream_velocity_vector = 0.;
   upstream_velocity_vector[gravity_dir_] = 1.;
@@ -1159,15 +1188,29 @@ void IJK_One_Dimensional_Subproblems::compute_dynamics_per_bubbles()
       rising_velocity_vector *= (*bubbles_rising_velocities_)(i);
 //		for (int dir=0; dir<3; dir++)
 //			bubbles_rising_velocities_vectors(i, dir) = rising_velocity_vector[dir];
-      Vecteur3 rising_relative_velocity_vector = upstream_velocity_vector;
+
+      Vecteur3 rising_relative_velocity_vector = (*liquid_velocity_);
       rising_relative_velocity_vector *= (-1);
       rising_relative_velocity_vector += rising_velocity_vector;
       double rising_relative_velocity = rising_relative_velocity_vector.length();
       rising_relative_velocity_vector *= (1 / (rising_relative_velocity + 1e-30));
       for (int dir=0; dir<3; dir++)
         relative_rising_dir_compo_[dir](i) = rising_relative_velocity_vector[dir];
+
+      Vecteur3 rising_relative_velocity_vector_upstream = upstream_velocity_vector;
+      rising_relative_velocity_vector_upstream *= (-1);
+      rising_relative_velocity_vector_upstream += rising_velocity_vector;
+      double rising_relative_velocity_upstream = rising_relative_velocity_vector_upstream.length();
+      rising_relative_velocity_vector_upstream *= (1 / (rising_relative_velocity_upstream + 1e-30));
+      for (int dir=0; dir<3; dir++)
+        relative_rising_dir_compo_upstream_[dir](i) = rising_relative_velocity_vector_upstream[dir];
+
       bubbles_rising_relative_velocities_(i) = rising_relative_velocity;
       bubbles_reynolds_numbers_per_bubble_(i) = (rising_relative_velocity * caracteristic_length_ * ref_ijk_ft_->get_rho_l()) / ref_ijk_ft_->get_mu_liquid();
+
+      bubbles_rising_relative_velocities_upstream_(i) = rising_relative_velocity_upstream;
+      bubbles_reynolds_numbers_per_bubble_upstream_(i) = (rising_relative_velocity_upstream * caracteristic_length_ * ref_ijk_ft_->get_rho_l()) / ref_ijk_ft_->get_mu_liquid();
+
     }
 }
 
@@ -1262,16 +1305,23 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities()
 
   bubbles_total_rising_velocities_ = 0.;
   bubbles_total_rising_relative_velocities_ = 0.;
+  bubbles_total_rising_relative_velocities_upstream_ = 0.;
   bubbles_total_reynolds_numbers_ = 0.;
   bubbles_total_reynolds_numbers_from_surface_per_bubble_ = 0.;
   bubbles_total_reynolds_numbers_from_volume_per_bubble_ = 0.;
+  bubbles_total_reynolds_numbers_upstream_ = 0.;
+  bubbles_total_reynolds_numbers_from_surface_per_bubble_upstream_ = 0.;
+  bubbles_total_reynolds_numbers_from_volume_per_bubble_upstream_ = 0.;
 
   bubbles_total_peclet_numbers_ = 0.;
   bubbles_total_peclet_numbers_from_surface_per_bubble_ = 0.;
   bubbles_total_peclet_numbers_from_volume_per_bubble_ = 0.;
+  bubbles_total_peclet_numbers_upstream_  = 0.;
+  bubbles_total_peclet_numbers_from_surface_per_bubble_upstream_ = 0.;
+  bubbles_total_peclet_numbers_from_volume_per_bubble_upstream_  = 0.;
 
   total_relative_rising_dir_compo_ = 0.;
-
+  total_relative_rising_dir_compo_upstream_ = 0.;
   for (int i=0; i < nb_bubbles_; i++)
     {
       interfacial_thermal_flux_ += interfacial_thermal_flux_per_bubble_(i);
@@ -1311,6 +1361,8 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities()
       overall_nusselt_number_per_bubble_gfm_liquid_error_rel_(i) = overall_nusselt_number_per_bubble_gfm_liquid_error_(i) / (1e-16 + spherical_nusselt_);
 
       bubbles_total_reynolds_numbers_ += bubbles_reynolds_numbers_per_bubble_(i) * (*bubbles_volume_)(i);
+      bubbles_total_reynolds_numbers_upstream_ += bubbles_reynolds_numbers_per_bubble_upstream_(i) * (*bubbles_volume_)(i);
+
       bubbles_reynolds_numbers_from_surface_per_bubble_(i) = (bubbles_rising_relative_velocities_(i)
                                                               * caracteristic_length_from_surfaces_per_bubble_(i) * ref_ijk_ft_->get_rho_l()) / ref_ijk_ft_->get_mu_liquid();
       bubbles_reynolds_numbers_from_volume_per_bubble_(i) = (bubbles_rising_relative_velocities_(i)
@@ -1318,12 +1370,21 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities()
       bubbles_reynolds_numbers_from_surface_per_bubble_ += bubbles_reynolds_numbers_from_surface_per_bubble_(i) * (*bubbles_volume_)(i);
       bubbles_reynolds_numbers_from_volume_per_bubble_ += bubbles_reynolds_numbers_from_volume_per_bubble_(i) * (*bubbles_volume_)(i);
 
+      bubbles_reynolds_numbers_from_surface_per_bubble_upstream_(i) = (bubbles_rising_relative_velocities_upstream_(i)
+                                                                       * caracteristic_length_from_surfaces_per_bubble_(i) * ref_ijk_ft_->get_rho_l()) / ref_ijk_ft_->get_mu_liquid();
+      bubbles_reynolds_numbers_from_volume_per_bubble_upstream_(i) = (bubbles_rising_relative_velocities_upstream_(i)
+                                                                      * caracteristic_length_from_volumes_per_bubble_(i) * ref_ijk_ft_->get_rho_l()) / ref_ijk_ft_->get_mu_liquid();
+      bubbles_reynolds_numbers_from_surface_per_bubble_upstream_ += bubbles_reynolds_numbers_from_surface_per_bubble_upstream_(i) * (*bubbles_volume_)(i);
+      bubbles_reynolds_numbers_from_volume_per_bubble_upstream_ += bubbles_reynolds_numbers_from_volume_per_bubble_upstream_(i) * (*bubbles_volume_)(i);
+
       bubbles_total_rising_velocities_ += (*bubbles_rising_velocities_)(i) * (*bubbles_volume_)(i);
       bubbles_total_rising_relative_velocities_ += bubbles_rising_relative_velocities_(i) * (*bubbles_volume_)(i);
+      bubbles_total_rising_relative_velocities_upstream_ += bubbles_rising_relative_velocities_upstream_(i) * (*bubbles_volume_)(i);
       for (int dir=0; dir<3; dir++)
         {
           total_rising_dir_compo_[dir] = (*bubbles_rising_vectors_per_bubble_)(i, dir) * (*bubbles_volume_)(i);
           total_relative_rising_dir_compo_[dir] = relative_rising_dir_compo_[dir](i) * (*bubbles_volume_)(i);
+          total_relative_rising_dir_compo_upstream_[dir] = relative_rising_dir_compo_upstream_[dir](i) * (*bubbles_volume_)(i);
         }
       bubbles_peclet_numbers_per_bubble_(i) = bubbles_reynolds_numbers_per_bubble_(i) * overall_nusselt_number_per_bubble_(i);
       bubbles_peclet_numbers_from_surface_per_bubble_(i) = bubbles_reynolds_numbers_from_surface_per_bubble_(i) * overall_nusselt_number_per_bubble_spherical_(i);
@@ -1332,16 +1393,34 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities()
       bubbles_total_peclet_numbers_ += bubbles_peclet_numbers_per_bubble_(i) * total_surface_per_bubble_(i);
       bubbles_total_peclet_numbers_from_surface_per_bubble_ += bubbles_peclet_numbers_from_surface_per_bubble_(i) * total_surface_per_bubble_(i);
       bubbles_total_peclet_numbers_from_volume_per_bubble_ += bubbles_peclet_numbers_from_volume_per_bubble_(i) * total_surface_per_bubble_(i);
+
+      bubbles_peclet_numbers_per_bubble_upstream_(i) = bubbles_reynolds_numbers_per_bubble_upstream_(i) * overall_nusselt_number_per_bubble_(i);
+      bubbles_peclet_numbers_from_surface_per_bubble_upstream_(i) = bubbles_reynolds_numbers_from_surface_per_bubble_upstream_(i) * overall_nusselt_number_per_bubble_spherical_(i);
+      bubbles_peclet_numbers_from_volume_per_bubble_upstream_(i) = bubbles_reynolds_numbers_from_volume_per_bubble_upstream_(i) * overall_nusselt_number_per_bubble_spherical_(i);
+
+      bubbles_total_peclet_numbers_upstream_ += bubbles_peclet_numbers_per_bubble_upstream_(i) * total_surface_per_bubble_(i);
+      bubbles_total_peclet_numbers_from_surface_per_bubble_upstream_ += bubbles_peclet_numbers_from_surface_per_bubble_upstream_(i) * total_surface_per_bubble_(i);
+      bubbles_total_peclet_numbers_from_volume_per_bubble_upstream_ += bubbles_peclet_numbers_from_volume_per_bubble_upstream_(i) * total_surface_per_bubble_(i);
+
     }
   bubbles_total_rising_velocities_ /= total_volume_;
   bubbles_total_rising_relative_velocities_ /= total_volume_;
-  bubbles_total_reynolds_numbers_/= total_volume_;
+  bubbles_total_rising_relative_velocities_upstream_ /= total_volume_;
+
+  bubbles_total_reynolds_numbers_ /= total_volume_;
   bubbles_total_reynolds_numbers_from_surface_per_bubble_ /= total_volume_;
   bubbles_total_reynolds_numbers_from_volume_per_bubble_ /= total_volume_;
+
+  bubbles_total_reynolds_numbers_upstream_ /= total_volume_;
+  bubbles_total_reynolds_numbers_from_surface_per_bubble_upstream_ /= total_volume_;
+  bubbles_total_reynolds_numbers_from_volume_per_bubble_upstream_ /= total_volume_;
+
   const double total_rising_dir_norm = total_rising_dir_compo_.length();
   total_rising_dir_compo_ *= (1. / (total_rising_dir_norm + 1e-30));
   const double total_relative_rising_dir_norm = total_relative_rising_dir_compo_.length();
   total_relative_rising_dir_compo_ *= (1. / (total_relative_rising_dir_norm + 1e-30));
+  const double total_relative_rising_dir_norm_upstream = total_relative_rising_dir_compo_upstream_.length();
+  total_relative_rising_dir_compo_upstream_ *= (1. / (total_relative_rising_dir_norm_upstream + 1e-30));
 
   overall_shear_stress_ = overall_shear_force_ / total_surface_;
   radius_from_surfaces_ = sqrt((total_surface_ / nb_bubbles_) / (4. * M_PI));
@@ -1367,11 +1446,10 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities()
   bubbles_total_peclet_numbers_ /= total_surface_;
   bubbles_total_peclet_numbers_from_surface_per_bubble_ /= total_surface_;
   bubbles_total_peclet_numbers_from_volume_per_bubble_ /= total_surface_;
-//  interfacial_thermal_flux_ = Process::mp_sum(interfacial_thermal_flux_);
-//  interfacial_thermal_flux_gfm_ = Process::mp_sum(interfacial_thermal_flux_gfm_);
-//  total_surface_ = Process::mp_sum(total_surface_);
-//  overall_nusselt_number_ = Process::mp_sum(overall_nusselt_number_);
-//  overall_nusselt_number_gfm_ = Process::mp_sum(overall_nusselt_number_gfm_);
+
+  bubbles_total_peclet_numbers_upstream_ /= total_surface_;
+  bubbles_total_peclet_numbers_from_surface_per_bubble_upstream_ /= total_surface_;
+  bubbles_total_peclet_numbers_from_volume_per_bubble_upstream_ /= total_surface_;
 }
 
 void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(const int rank, const Nom& overall_bubbles_quantities)
@@ -1398,12 +1476,17 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
                              "\ttotal_surface\ttotal_volume"
                              "\tradius_surface\tradius_volume"
                              "\terror_temperature_ana\terror_temperature_ana_norm\terror_temperature_ana_rel"
+                             "\tliquid_velocity"
+                             "\tliquid_velocity_x\tliquid_velocity_y\tliquid_velocity_z"
                              "\tgravity_dir\tupstream_velocity"
                              "\trising_dir_x\trising_dir_y\trising_dir_z"
                              "\trelative_rising_dir_x\trelative_rising_dir_y\trelative_rising_dir_z"
-                             "\trising_velocity\trising_relative_velocity"
+                             "\trelative_rising_dir_upstream_x\trelative_rising_dir_upstream_y\trelative_rising_dir_upstream_z"
+                             "\trising_velocity\trising_relative_velocity\trising_relative_velocity_upstream"
                              "\treynolds_number\treynolds_number_surface\treynolds_number_volume"
-                             "\tpeclet_number\tpeclet_number_surface\tpeclet_number_volume");
+                             "\treynolds_number_upstream\treynolds_number_surface_upstream\treynolds_number_volume_upstream"
+                             "\tpeclet_number\tpeclet_number_surface\tpeclet_number_volume"
+                             "\tpeclet_number_upstream\tpeclet_number_surface_upstream\tpeclet_number_volume_upstream");
       SFichier fic = Open_file_folder(overall_bubbles_quantities, probe_name, probe_header, reset);
       int max_counter = nb_bubbles_;
       const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
@@ -1443,6 +1526,10 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << error_temperature_ana_total_ << " ";
           fic << error_temperature_ana_squared_total_ << " ";
           fic << error_temperature_ana_rel_total_ << " ";
+          fic << (*liquid_velocity_).length() << " ";
+          fic << (*liquid_velocity_)[0] << " ";
+          fic << (*liquid_velocity_)[1] << " ";
+          fic << (*liquid_velocity_)[2] << " ";
           fic << gravity_dir_ << " ";
           fic << velocity_upstream_ << " ";
           fic << (*bubbles_rising_vectors_per_bubble_)(i, 0) << " ";
@@ -1451,14 +1538,24 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << relative_rising_dir_compo_[0](i) << " ";
           fic << relative_rising_dir_compo_[1](i) << " ";
           fic << relative_rising_dir_compo_[2](i) << " ";
+          fic << relative_rising_dir_compo_upstream_[0](i) << " ";
+          fic << relative_rising_dir_compo_upstream_[1](i) << " ";
+          fic << relative_rising_dir_compo_upstream_[2](i) << " ";
           fic << (*bubbles_rising_velocities_)(i) << " ";
           fic << bubbles_rising_relative_velocities_(i) << " ";
+          fic << bubbles_rising_relative_velocities_upstream_(i) << " ";
           fic << bubbles_reynolds_numbers_per_bubble_(i) << " ";
           fic << bubbles_reynolds_numbers_from_surface_per_bubble_(i) << " ";
           fic << bubbles_reynolds_numbers_from_volume_per_bubble_(i) << " ";
+          fic << bubbles_reynolds_numbers_per_bubble_upstream_(i) << " ";
+          fic << bubbles_reynolds_numbers_from_surface_per_bubble_upstream_(i) << " ";
+          fic << bubbles_reynolds_numbers_from_volume_per_bubble_upstream_(i) << " ";
           fic << bubbles_peclet_numbers_per_bubble_(i) << " ";
           fic << bubbles_peclet_numbers_from_surface_per_bubble_(i) << " ";
           fic << bubbles_peclet_numbers_from_volume_per_bubble_(i) << " ";
+          fic << bubbles_peclet_numbers_per_bubble_upstream_(i) << " ";
+          fic << bubbles_peclet_numbers_from_surface_per_bubble_upstream_(i) << " ";
+          fic << bubbles_peclet_numbers_from_volume_per_bubble_upstream_(i) << " ";
           fic << finl;
         }
       /*
@@ -1496,6 +1593,10 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << error_temperature_ana_total_ << " ";
           fic << error_temperature_ana_squared_total_ << " ";
           fic << error_temperature_ana_rel_total_ << " ";
+          fic << (*liquid_velocity_).length() << " ";
+          fic << (*liquid_velocity_)[0] << " ";
+          fic << (*liquid_velocity_)[1] << " ";
+          fic << (*liquid_velocity_)[2] << " ";
           fic << gravity_dir_ << " ";
           fic << velocity_upstream_ << " ";
           fic << total_rising_dir_compo_[0] << " ";
@@ -1504,14 +1605,24 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
           fic << total_relative_rising_dir_compo_[0] << " ";
           fic << total_relative_rising_dir_compo_[1] << " ";
           fic << total_relative_rising_dir_compo_[2] << " ";
+          fic << total_relative_rising_dir_compo_upstream_[0] << " ";
+          fic << total_relative_rising_dir_compo_upstream_[1] << " ";
+          fic << total_relative_rising_dir_compo_upstream_[2] << " ";
           fic << bubbles_total_rising_velocities_ << " ";
           fic << bubbles_total_rising_relative_velocities_ << " ";
+          fic << bubbles_total_rising_relative_velocities_upstream_ << " ";
           fic << bubbles_total_reynolds_numbers_ << " ";
           fic << bubbles_reynolds_numbers_from_surface_per_bubble_ << " ";
           fic << bubbles_reynolds_numbers_from_volume_per_bubble_ << " ";
+          fic << bubbles_total_reynolds_numbers_upstream_ << " ";
+          fic << bubbles_reynolds_numbers_from_surface_per_bubble_upstream_ << " ";
+          fic << bubbles_reynolds_numbers_from_volume_per_bubble_upstream_ << " ";
           fic << bubbles_total_peclet_numbers_ << " ";
           fic << bubbles_peclet_numbers_from_surface_per_bubble_ << " ";
           fic << bubbles_peclet_numbers_from_volume_per_bubble_ << " ";
+          fic << bubbles_total_peclet_numbers_upstream_ << " ";
+          fic << bubbles_peclet_numbers_from_surface_per_bubble_upstream_ << " ";
+          fic << bubbles_peclet_numbers_from_volume_per_bubble_upstream_ << " ";
           fic << finl;
         }
       fic.close();
