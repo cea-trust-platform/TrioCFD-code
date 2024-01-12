@@ -76,7 +76,8 @@ public :
   void transporter_maillage(const double dt_tot,
                             ArrOfDouble& dvol,
                             const int rk_step,
-                            const double temps);
+                            const double temps,
+                            const int first_step_interface_smoothing = 0);
   void calculer_bounding_box_bulles(DoubleTab& bounding_box, int option_shear = 0) const;
   void preparer_duplicata_bulles(const DoubleTab& bounding_box_of_bubbles,
                                  const DoubleTab& bounding_box_offsetp,

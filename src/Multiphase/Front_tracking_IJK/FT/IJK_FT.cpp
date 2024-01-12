@@ -2643,27 +2643,7 @@ void IJK_FT_double::run()
       var_volume_par_bulle = 0.; // Je ne suis pas sur que ce soit un bon choix. Si on ne le remet pas a zero
       //                          a chaque dt, on corrigera la petite erreur qui pouvait rester d'avant...
 #if 1
-      if (vol_bulles_.size_array() > 0.)
-        {
-          ArrOfDouble volume_reel;
-          DoubleTab position;
-          interfaces_.calculer_volume_bulles(volume_reel, position);
-          const int nb_reelles = interfaces_.get_nb_bulles_reelles();
-          for (int ib = 0; ib < nb_reelles; ib++)
-            var_volume_par_bulle[ib] = volume_reel[ib] - vol_bulles_[ib];
-          // Pour les ghost : on retrouve leur vrai numero pour savoir quel est leur volume...
-          for (int i = 0;
-               i < interfaces_.get_nb_bulles_ghost(0 /* no print*/); i++)
-            {
-              const int ighost = interfaces_.ghost_compo_converter(i);
-              const int ibulle_reelle = decoder_numero_bulle(-ighost);
-              //Cerr << " aaaa " << i << " " << ighost << " " << ibulle_reelle << finl;
-              var_volume_par_bulle[nb_reelles + i] = volume_reel[nb_reelles
-                                                                 + i] - vol_bulles_[ibulle_reelle];
-            }
-
-        }
-
+      compute_var_volume_par_bulle(var_volume_par_bulle);
 #endif
       // Choix de l'avancement en temps :
       // euler_explicite ou RK3.
@@ -2676,18 +2656,21 @@ void IJK_FT_double::run()
               // inserer une methode ici style "mettre_a_jour_valeur_interface_temps_n()"
               do
                 {
+                  first_step_interface_smoothing_ = first_step_interface_smoothing_ && (counter_first_iter_ == 2);
                   deplacer_interfaces(timestep_,
                                       -1 /* le numero du sous pas de temps est -1 si on n'est pas en rk3 */,
-                                      var_volume_par_bulle);
+                                      var_volume_par_bulle,
+                                      first_step_interface_smoothing_);
                   counter_first_iter_--;
-                  if(counter_first_iter_ && first_step_interface_smoothing_)
+                  if(first_step_interface_smoothing_)
                     {
                       Cout << "BF posttraiter_champs_instantanes " << current_time_ << " " << tstep_ << finl;
                       post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
                       Cout << "AF posttraiter_champs_instantanes" << finl;
+                      compute_var_volume_par_bulle(var_volume_par_bulle);
                     }
                 }
-              while (counter_first_iter_ && first_step_interface_smoothing_);
+              while (first_step_interface_smoothing_);
               first_step_interface_smoothing_ = 0;
               parcourir_maillage();
             }
@@ -4411,7 +4394,8 @@ void IJK_FT_double::euler_explicit_update(const IJK_Field_double& dv, IJK_Field_
 //
 // Mettre rk_step = -1 si schema temps different de rk3.
 void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step,
-                                        ArrOfDouble& var_volume_par_bulle)
+                                        ArrOfDouble& var_volume_par_bulle,
+                                        const int first_step_interface_smoothing)
 {
   static Stat_Counter_Id deplacement_interf_counter_ = statistiques().new_counter(1, "Deplacement de l'interface");
   statistiques().begin_count(deplacement_interf_counter_);
@@ -4462,7 +4446,8 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   // if (counter_first_iter_ && first_step_interface_smoothing_)
   interfaces_.transporter_maillage(timestep/* total meme si RK3*/,
                                    var_volume_par_bulle,
-                                   rk_step, current_time_);
+                                   rk_step, current_time_,
+                                   first_step_interface_smoothing);
 
   // Apres le transport, est-ce que certaines bulles reeles sont trop proche du bord
   // du domaine etendu? Si on en trouve, on les transferts :
@@ -5110,6 +5095,29 @@ void IJK_FT_double::compute_and_add_qdm_corrections()
             }
     }
   Cout << "AF : compute_and_add_qdm_corrections" << finl;
+}
+
+void IJK_FT_double::compute_var_volume_par_bulle(ArrOfDouble& var_volume_par_bulle)
+{
+  if (vol_bulles_.size_array() > 0.)
+    {
+      ArrOfDouble volume_reel;
+      DoubleTab position;
+      interfaces_.calculer_volume_bulles(volume_reel, position);
+      const int nb_reelles = interfaces_.get_nb_bulles_reelles();
+      for (int ib = 0; ib < nb_reelles; ib++)
+        var_volume_par_bulle[ib] = volume_reel[ib] - vol_bulles_[ib];
+      // Pour les ghost : on retrouve leur vrai numero pour savoir quel est leur volume...
+      for (int i = 0;
+           i < interfaces_.get_nb_bulles_ghost(0 /* no print*/); i++)
+        {
+          const int ighost = interfaces_.ghost_compo_converter(i);
+          const int ibulle_reelle = decoder_numero_bulle(-ighost);
+          //Cerr << " aaaa " << i << " " << ighost << " " << ibulle_reelle << finl;
+          var_volume_par_bulle[nb_reelles + i] = volume_reel[nb_reelles
+                                                             + i] - vol_bulles_[ibulle_reelle];
+        }
+    }
 }
 
 void IJK_FT_double::redistribute_to_splitting_ft_elem(const IJK_Field_double& input_field,

@@ -1716,14 +1716,18 @@ static void calculer_normale_sommets_interface(const Maillage_FT_IJK& maillage,
 // Pre-requis : il faut que le tableau dvol soit bien dimensionne a nbulles_tot
 void IJK_Interfaces::transporter_maillage(const double dt_tot, ArrOfDouble& dvol,
                                           const int rk_step = -1,
-                                          const double temps = -1 /*pas de remaillage*/)
+                                          const double temps = -1, /*pas de remaillage*/
+                                          const int first_step_interface_smoothing)
 {
   // nouvelle version:
   Maillage_FT_IJK& mesh = maillage_ft_ijk_;
   const DoubleTab& sommets = mesh.sommets(); // Tableau des coordonnees des marqueurs.
   int nbsom = sommets.dimension(0);
   DoubleTab deplacement(nbsom, 3);
-  compute_vinterp(); // to resize and fill vinterp_
+  // compute_vinterp(); // to resize and fill vinterp_
+  compute_vinterp();
+  if (first_step_interface_smoothing)
+    vinterp_ = 0.;
 
   // Les sommets virtuels sont peut-etre trop loin pour pouvoir interpoler leur
   // vitesse, il faut faire un echange espace virtuel pour avoir leur vitesse.
@@ -1763,6 +1767,8 @@ void IJK_Interfaces::transporter_maillage(const double dt_tot, ArrOfDouble& dvol
                                      nbulles_ghost,
                                      vinterp_,
                                      vitesses_bulles);
+  if (first_step_interface_smoothing)
+    vitesses_bulles = 0.;
 
 #ifdef GB_VERBOSE
   if (Process::je_suis_maitre())

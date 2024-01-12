@@ -254,6 +254,7 @@ public :
   //void compute_and_add_source_qdm_gr(const double threshold_0, const double threshold_1, const double threshold_2, const double threshold_3);
   void set_time_for_corrections();
   void compute_and_add_qdm_corrections();
+  void compute_var_volume_par_bulle(ArrOfDouble& var_volume_par_bulle);
 
   // SURCHARGE DES OPERATEURS : dans FixedVector, on ajoute le produit_scalaire
   //  mais il faut que les operateur * et += soient definis pour IJK_FT_double
@@ -344,7 +345,10 @@ protected :
   void calculer_rho_mu_indicatrice(const bool parcourir = true);
   void maj_indicatrice_rho_mu(const bool parcourir = true);
   void ajout_dTrustine();
-  void deplacer_interfaces(const double timestep, const int rk_step, ArrOfDouble& var_volume_par_bulle);
+  void deplacer_interfaces(const double timestep,
+                           const int rk_step,
+                           ArrOfDouble& var_volume_par_bulle,
+                           const int first_step_interface_smoothing);
   void deplacer_interfaces_rk3(const double timestep, const int rk_step, ArrOfDouble& var_volume_par_bulle);
   void calculer_gradient_indicatrice_et_repul_ns(const IJK_Field_double& indic);
 
