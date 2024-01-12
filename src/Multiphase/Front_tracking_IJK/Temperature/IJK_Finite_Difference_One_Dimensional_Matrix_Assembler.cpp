@@ -1271,16 +1271,41 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(M
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
-                                                                              const DoubleVect& rhs_assembly)
+                                                                              const DoubleVect& source_terms,
+                                                                              const int& index_start,
+                                                                              const int& boundary_condition_interface,
+                                                                              const int& boundary_condition_end)
 {
   /*
    * Fill global RHS
    */
-  const int global_rhs_size = (*thermal_subproblems_rhs_assembly).size();
-  const int local_rhs_size = rhs_assembly.size();
-  const int index_start = global_rhs_size - local_rhs_size;
-  for (int i=0; i<rhs_assembly.size(); i++)
-    (*thermal_subproblems_rhs_assembly)[i + index_start] = rhs_assembly[i];
+  const int local_rhs_size = source_terms.size();
+  int index_ini = 0;
+  int index_end = local_rhs_size;
+  switch(boundary_condition_interface)
+    {
+    case dirichlet:
+      index_ini++;
+      break;
+    case neumann:
+      break;
+    default:
+      index_ini++;
+      break;
+    }
+  switch(boundary_condition_end)
+    {
+    case dirichlet:
+      index_end--;
+      break;
+    case neumann:
+      break;
+    default:
+      index_end--;
+      break;
+    }
+  for (int i=index_ini; i<index_end; i++)
+    (*thermal_subproblems_rhs_assembly)[i + index_start] += source_terms[i];
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res)

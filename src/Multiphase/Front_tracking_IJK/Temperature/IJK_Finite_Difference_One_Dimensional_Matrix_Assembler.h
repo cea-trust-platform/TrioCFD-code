@@ -125,7 +125,10 @@ public :
                                       const Matrice * fd_operator,
                                       const int& nb_subproblems);
   void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
-                        const DoubleVect& rhs_assembly);
+                        const DoubleVect& source_terms,
+                        const int& index_start,
+                        const int& boundary_condition_interface,
+                        const int& boundary_condition_end);
   void compute_operator(const Matrice * fd_operator, const DoubleVect& solution, DoubleVect& res);
   void apply_euler_time_step(Matrice * convection_matrix,
                              Matrice * diffusion_matrix,

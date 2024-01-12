@@ -2056,7 +2056,7 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
                               end_boundary_condition_value,
                               impose_user_boundary_condition_end_value);
 
-  compute_add_source_terms();
+  compute_source_terms();
 
   (*finite_difference_assembler_).impose_boundary_conditions_subproblem(thermal_subproblems_matrix_assembly_,
                                                                         thermal_subproblems_rhs_assembly_,
@@ -2074,11 +2074,17 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
                                                                         first_indices_sparse_matrix_,
                                                                         use_sparse_matrix_);
 
+  add_source_terms(boundary_condition_interface, boundary_condition_end);
+
   if ((*first_time_step_temporal_) && first_time_step_explicit_)
-    (*finite_difference_assembler_).add_source_terms(thermal_subproblems_temperature_solution_ini_, temperature_ini_temporal_schemes_);
+    (*finite_difference_assembler_).add_source_terms(thermal_subproblems_temperature_solution_ini_,
+                                                     temperature_ini_temporal_schemes_,
+                                                     start_index_,
+                                                     boundary_condition_interface,
+                                                     boundary_condition_end);
 }
 
-void IJK_One_Dimensional_Subproblem::compute_add_source_terms()
+void IJK_One_Dimensional_Subproblem::compute_source_terms()
 {
   if (!pure_thermal_diffusion_ || !avoid_post_processing_all_terms_ || compute_tangential_variables_)
     {
@@ -2160,12 +2166,18 @@ void IJK_One_Dimensional_Subproblem::compute_add_source_terms()
           else
             rhs_assembly_ += temperature_ini_temporal_schemes_;
         }
-      else
-        rhs_assembly_ = source_terms_;
-
-      if (!pure_thermal_diffusion_)
-        (*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_, rhs_assembly_);
     }
+}
+
+void IJK_One_Dimensional_Subproblem::add_source_terms(const int& boundary_condition_interface, const int& boundary_condition_end)
+{
+	if (!(*first_time_step_temporal_))
+		if (!pure_thermal_diffusion_)
+			(*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_,
+                                                     	 source_terms_,
+																											 start_index_,
+																											 boundary_condition_interface,
+																											 boundary_condition_end);
 }
 
 void IJK_One_Dimensional_Subproblem::approximate_temperature_increment_material_derivative()
