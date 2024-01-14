@@ -48,7 +48,7 @@
 
 #include <Interprete_bloc.h>
 #include <NettoieNoeuds.h>
-#include <trust_med_utils.h>
+#include <TRUST_2_MED.h>
 
 Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
