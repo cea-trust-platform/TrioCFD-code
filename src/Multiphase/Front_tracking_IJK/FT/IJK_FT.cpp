@@ -2664,6 +2664,7 @@ void IJK_FT_double::run()
                   counter_first_iter_--;
                   if(first_step_interface_smoothing_)
                     {
+                      thermals_.set_temperature_ini();
                       Cout << "BF posttraiter_champs_instantanes " << current_time_ << " " << tstep_ << finl;
                       post_.posttraiter_champs_instantanes(lata_name, current_time_, tstep_);
                       Cout << "AF posttraiter_champs_instantanes" << finl;

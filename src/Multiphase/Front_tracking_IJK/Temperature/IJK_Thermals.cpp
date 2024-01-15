@@ -452,3 +452,15 @@ void IJK_Thermals::set_first_step_thermals_post(int& first_step_thermals_post)
   for (int idth = 0; idth < (*this).size(); idth++)
     first_step_thermals_post = (first_step_thermals_post || (*this)[idth].get_first_step_thermals_post());
 }
+
+void IJK_Thermals::set_temperature_ini()
+{
+  for (auto& itr : (*this))
+    itr.compute_temperature_init();
+}
+
+void IJK_Thermals::recompute_interface_smoothing()
+{
+  set_temperature_ini();
+  set_post_pro_first_call();
+}

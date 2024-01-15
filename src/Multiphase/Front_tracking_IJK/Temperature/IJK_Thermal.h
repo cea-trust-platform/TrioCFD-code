@@ -167,6 +167,7 @@ public :
                                      const Nom& overall_bubbles_quantities,
                                      const Nom& local_quantities_thermal_probes_time_index_folder);
   int get_first_step_thermals_post() { return valeur().get_first_step_thermals_post(); };
+  inline void compute_temperature_init();
 
 protected:
   int thermal_rank_;
@@ -280,6 +281,11 @@ inline void IJK_Thermal::compute_eulerian_distance()
 inline void IJK_Thermal::compute_eulerian_curvature_from_interface()
 {
   valeur().compute_eulerian_curvature_from_interface();
+}
+
+inline void IJK_Thermal::compute_temperature_init()
+{
+  valeur().compute_temperature_init();
 }
 
 #endif /* IJK_Thermal_included */
