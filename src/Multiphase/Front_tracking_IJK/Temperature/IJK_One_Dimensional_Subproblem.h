@@ -444,7 +444,8 @@ protected :
                                             const IJK_Field_double& pressure,
                                             const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                             const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
-                                            const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem);
+                                            const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
+                                            const IJK_Field_double& eulerian_grad_T_interface_ns);
   void associate_flags_neighbours_correction(const int& correct_temperature_cell_neighbours,
                                              const int& correct_neighbours_rank,
                                              const int& neighbours_corrected_rank,
@@ -636,6 +637,7 @@ protected :
   const FixedVector<IJK_Field_double, 3> * velocity_;
   const FixedVector<IJK_Field_double, 3> * velocity_ft_;
   const IJK_Field_double * pressure_;
+  const IJK_Field_double * eulerian_grad_T_interface_ns_;
 
   const FixedVector<IJK_Field_double, 3> * grad_T_elem_;
   const FixedVector<IJK_Field_double, 3> * hess_diag_T_elem_;

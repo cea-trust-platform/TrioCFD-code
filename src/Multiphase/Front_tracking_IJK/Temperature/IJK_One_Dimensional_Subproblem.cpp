@@ -54,6 +54,7 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   velocity_ = nullptr;
   velocity_ft_ = nullptr;
   pressure_ = nullptr;
+  eulerian_grad_T_interface_ns_=nullptr;
 
   grad_T_elem_ = nullptr;
   hess_diag_T_elem_ = nullptr;
@@ -190,7 +191,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                            pressure,
                                            ref_thermal_subresolution.grad_T_elem_,
                                            ref_thermal_subresolution.hess_diag_T_elem_,
-                                           ref_thermal_subresolution.hess_cross_T_elem_);
+                                           ref_thermal_subresolution.hess_cross_T_elem_,
+                                           ref_thermal_subresolution.eulerian_grad_T_interface_ns_);
       associate_probe_parameters(ref_thermal_subresolution.points_per_thermal_subproblem_,
                                  ref_thermal_subresolution.uniform_alpha_,
                                  ref_thermal_subresolution.uniform_lambda_,
@@ -317,7 +319,8 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
                                                                           const IJK_Field_double& pressure,
                                                                           const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                                                           const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
-                                                                          const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem)
+                                                                          const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
+                                                                          const IJK_Field_double& eulerian_grad_T_interface_ns)
 {
   interfaces_ = &interfaces;
   eulerian_distance_ = &eulerian_distance;
@@ -331,9 +334,10 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
   velocity_ = &velocity ;
   velocity_ft_ = &velocity_ft;
   pressure_ = &pressure;
-  grad_T_elem_ = &grad_T_elem ;
-  hess_diag_T_elem_ = &hess_diag_T_elem ;
-  hess_cross_T_elem_ = &hess_cross_T_elem ;
+  grad_T_elem_ = &grad_T_elem;
+  hess_diag_T_elem_ = &hess_diag_T_elem;
+  hess_cross_T_elem_ = &hess_cross_T_elem;
+  eulerian_grad_T_interface_ns_ = &eulerian_grad_T_interface_ns;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_sub_problem_temporal_params(const bool& is_first_time_step,
@@ -2350,6 +2354,7 @@ void IJK_One_Dimensional_Subproblem::copy_interpolations_on_solution_variables_f
   temperature_y_gradient_solution_ = grad_T_elem_interp_[1];
   temperature_z_gradient_solution_ = grad_T_elem_interp_[2];
   thermal_flux_ = normal_temperature_gradient_solution_;
+  thermal_flux_[0] = (*eulerian_grad_T_interface_ns_)(index_i_, index_j_, index_k_);
   thermal_flux_*= ((*lambda_) * surface_);
   radial_temperature_diffusion_solution_ = radial_temperature_diffusion_;
 }
@@ -2419,6 +2424,8 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
   compute_radial_temperature_diffusion_solution();
 
   thermal_flux_ = normal_temperature_gradient_solution_;
+  if (reference_gfm_on_probes_)
+    thermal_flux_[0] = (*eulerian_grad_T_interface_ns_)(index_i_, index_j_, index_k_);
   thermal_flux_*= ((*lambda_) * surface_);
 
 }
