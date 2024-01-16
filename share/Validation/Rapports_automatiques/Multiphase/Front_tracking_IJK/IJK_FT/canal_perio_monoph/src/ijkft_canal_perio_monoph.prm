@@ -1,3 +1,4 @@
+# DISABLE_PARALLEL_RUN #
 Parametres {
 	Titre "Poiseuille monophasique en IJK : Cas laminaire (Ret=1) et turbulent (Ret180)"
 	Description ""
@@ -10,7 +11,6 @@ Parametres {
 	CasTest Ret180     ijkft_canal_perio_monoph_Ret180_repr 8
 	CasTest Ret180_RK3 ijkft_canal_perio_monoph_Ret180_RK3 8
 	CasTest Ret180_RK3 ijkft_canal_perio_monoph_Ret180_RK3_repr 8
-	# DISABLE_PARALLEL_RUN #
 }
 
 Chapitre {
