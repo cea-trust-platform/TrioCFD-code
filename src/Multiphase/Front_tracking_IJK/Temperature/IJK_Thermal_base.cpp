@@ -864,7 +864,7 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
 
   // Correct the vapour and mixed cells values
   store_temperature_before_extrapolation();
-  // correct_temperature_for_eulerian_fluxes();
+  correct_temperature_for_eulerian_fluxes();
 
   /*
    * Correct the temperature field using either the ghost-fluid

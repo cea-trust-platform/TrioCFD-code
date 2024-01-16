@@ -979,7 +979,7 @@ void compute_eulerian_extended_temperature(const IJK_Field_double& indicator,
                                            const int& spherical_approx)
 {
   /*
-   * Compute the extended temperature field using prppagated values of the temperature gradient
+   * Compute the extended temperature field using propagated values of the temperature gradient
    */
   const double invalid_test = INVALID_TEST;
   const int ni = temperature.ni();
