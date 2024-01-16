@@ -100,6 +100,11 @@ IJK_Thermal_base::IJK_Thermal_base()
   stencil_side_ = 2;
 
   n_iter_distance_ = 6;
+
+  gfm_recompute_field_ini_ = 1;
+  gfm_zero_neighbour_value_mean_ = 0;
+  gfm_vapour_mixed_only_ = 1;
+
   compute_grad_T_interface_ = 0;
   compute_curvature_ = 0;
   compute_distance_= 0;
@@ -286,6 +291,9 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter_flag("ghost_fluid", &ghost_fluid_);
   param.ajouter_flag("spherical_exact", &spherical_approx_);
   param.ajouter_flag("debug", &debug_);
+//  param.ajouter_flag("gfm_recompute_field_ini", &gfm_recompute_field_ini_);
+//  param.ajouter_flag("gfm_zero_neighbour_value_mean", &gfm_zero_neighbour_value_mean_);
+//  param.ajouter_flag("gfm_vapour_mixed_only", &gfm_vapour_mixed_only_);
 }
 
 /********************************************
@@ -1162,7 +1170,10 @@ void IJK_Thermal_base::propagate_eulerian_grad_T_interface()
       propagate_eulerian_normal_temperature_gradient_interface(ref_ijk_ft_->itfce(),
                                                                eulerian_distance_ft_,
                                                                eulerian_grad_T_interface_ft_,
-                                                               n_iter_distance_);
+                                                               n_iter_distance_,
+                                                               gfm_recompute_field_ini_,
+                                                               gfm_zero_neighbour_value_mean_,
+                                                               gfm_vapour_mixed_only_);
       eulerian_grad_T_interface_ft_.echange_espace_virtuel(eulerian_grad_T_interface_ft_.ghost());
 
       eulerian_grad_T_interface_ns_.echange_espace_virtuel(eulerian_grad_T_interface_ns_.ghost());

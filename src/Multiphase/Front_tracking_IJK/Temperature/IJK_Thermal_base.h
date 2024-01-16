@@ -576,6 +576,9 @@ protected:
    */
   int ghost_fluid_;
   int n_iter_distance_;
+  int gfm_recompute_field_ini_;
+  int gfm_zero_neighbour_value_mean_;
+  int gfm_vapour_mixed_only_;
   int compute_distance_;
   int compute_curvature_;
   int compute_grad_T_interface_;
