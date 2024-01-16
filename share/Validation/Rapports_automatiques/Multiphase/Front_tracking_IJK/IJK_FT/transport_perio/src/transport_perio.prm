@@ -1,3 +1,4 @@
+# DISABLE_PARALLEL_RUN #
 Parametres {
 	Titre "Transport periodique front-tracking en IJK"
 	Description ""
