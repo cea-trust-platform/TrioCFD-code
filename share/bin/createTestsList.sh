@@ -9,6 +9,7 @@
 
 REPLIST="./share/testList"
 
+MODULES+="Algo_QC "
 MODULES+="Turbulence "
 MODULES+="Rayonnement/Rayonnement_milieu_transparent "
 MODULES+="Rayonnement/Rayonnement_semi_transp "
