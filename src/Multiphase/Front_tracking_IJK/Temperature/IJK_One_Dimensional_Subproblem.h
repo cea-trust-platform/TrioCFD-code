@@ -66,16 +66,17 @@
 class IJK_FT_double;
 class IJK_Thermal_base;
 class IJK_Thermal_Subresolution;
+class IJK_One_Dimensional_Subproblems;
 
 class IJK_One_Dimensional_Subproblem : public Objet_U
 {
-
   Declare_instanciable( IJK_One_Dimensional_Subproblem ) ;
 
 public :
   IJK_One_Dimensional_Subproblem(const IJK_FT_double& ijk_ft);
   void associer(const IJK_FT_double& ijk_ft) { ref_ijk_ft_ = ijk_ft; };
   void associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
+                                       IJK_One_Dimensional_Subproblems& ref_one_dimensional_subproblems,
                                        int i, int j, int k,
                                        int init,
                                        int sub_problem_index,
@@ -220,6 +221,7 @@ public :
                                             const double& first_dir, const double& second_dir,
                                             double& dl1, double& dl2, Vecteur3& point_coords) const;
   double get_discrete_surface_at_level(const int& dir, const int& level) const;
+  void compute_bubble_related_quantities();
   void thermal_subresolution_outputs(SFichier& fic, const int rank, const Nom& local_quantities_thermal_probes_time_index_folder);
   void thermal_subresolution_outputs_parallel(const int rank, const Nom& local_quantities_thermal_probes_time_index_folder);
   void retrieve_interfacial_quantities(const int rank,
@@ -462,10 +464,18 @@ protected :
   void associate_probe_parameters(const int& points_per_thermal_subproblem,
                                   const double& alpha,
                                   const double& lambda,
+                                  const double& prandtl_number,
                                   const double& coeff_distance_diagonal,
                                   const double& cell_diagonal,
                                   const double& dr_base,
                                   const DoubleVect& radial_coordinates);
+  void associate_bubble_parameters(ArrOfDouble& bubbles_volume,
+                                   ArrOfDouble& bubbles_surface,
+                                   ArrOfDouble& radius_from_surfaces_per_bubble,
+                                   ArrOfDouble& radius_from_volumes_per_bubble,
+                                   double& delta_temperature,
+                                   double& mean_liquid_temperature,
+                                   DoubleTab& rising_vectors);
   void associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,
                                              const Matrice& radial_second_order_operator_raw,
                                              const Matrice& radial_first_order_operator,
@@ -605,8 +615,8 @@ protected :
   int increased_point_numbers_ = 32;
   // FIXME: Should alpha_liq be constant, or a reference ?
   const double * alpha_;
+  const double * prandtl_number_;
   const double * lambda_;
-  double Pr_l_ = 0.;
   const double * coeff_distance_diagonal_;
   const double * cell_diagonal_;
   double probe_length_ = 0.;
@@ -782,6 +792,18 @@ protected :
   DoubleVect temperature_y_gradient_solution_;
   DoubleVect temperature_z_gradient_solution_;
   DoubleVect thermal_flux_;
+  DoubleVect nusselt_number_;
+  DoubleVect nusselt_number_liquid_temperature_;
+  DoubleVect nusselt_number_integrand_;
+  DoubleVect nusselt_number_liquid_temperature_integrand_;
+
+  double * delta_temperature_;
+  double * mean_liquid_temperature_;
+  ArrOfDouble * bubbles_volume_;
+  ArrOfDouble * bubbles_surface_;
+  ArrOfDouble * radius_from_surfaces_per_bubble_;
+  ArrOfDouble * radius_from_volumes_per_bubble_;
+  DoubleTab * bubbles_rising_vectors_per_bubble_;
 
   DoubleVect normal_velocity_normal_gradient_;
   DoubleVect first_tangential_velocity_normal_gradient_;

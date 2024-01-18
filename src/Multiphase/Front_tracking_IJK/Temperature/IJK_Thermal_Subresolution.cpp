@@ -369,6 +369,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   uniform_lambda_ = lambda_liquid_;
   uniform_alpha_ =	lambda_liquid_ / (ref_ijk_ft_->get_rho_l() * cp_liquid_);
+  prandtl_number_ = (ref_ijk_ft_->get_mu_liquid() / ref_ijk_ft_->get_rho_l()) / uniform_alpha_;
   //  calulate_grad_T_ = 1;
   calulate_grad_T_=0;
   /*

@@ -87,6 +87,7 @@ IJK_Thermal_base::IJK_Thermal_base()
   E0_ = 0;
   uniform_lambda_ = 0;
   uniform_alpha_ = 0;
+  prandtl_number_=0;
   global_energy_ = 0;
   conserv_energy_global_ = 0;
   vol_ = 0.;

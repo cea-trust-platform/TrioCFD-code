@@ -467,6 +467,7 @@ protected:
   int single_phase_;
   double uniform_lambda_;
   double uniform_alpha_;
+  double prandtl_number_;
   /*
    * Initialisation (B.Cs, expression)
    */

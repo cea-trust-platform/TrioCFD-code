@@ -25,6 +25,7 @@
 #include <IJK_FT.h>
 #include <IJK_Thermal_base.h>
 #include <IJK_Thermal_Subresolution.h>
+#include <IJK_One_Dimensional_Subproblems.h>
 
 
 Implemente_instanciable_sans_constructeur( IJK_One_Dimensional_Subproblem, "IJK_One_Dimensional_Subproblem", Objet_U ) ;
@@ -38,6 +39,7 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   points_per_thermal_subproblem_base_ = nullptr;
   alpha_ = nullptr;
   lambda_ = nullptr;
+  prandtl_number_ = nullptr;
   coeff_distance_diagonal_ = nullptr;
   cell_diagonal_ = nullptr;
 
@@ -105,6 +107,14 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   first_time_step_temporal_ = nullptr;
 
   first_indices_sparse_matrix_ = nullptr;
+
+  bubbles_volume_ = nullptr;
+  bubbles_surface_ = nullptr;
+  radius_from_surfaces_per_bubble_ = nullptr;
+  radius_from_volumes_per_bubble_ = nullptr;
+  delta_temperature_ = nullptr;
+  mean_liquid_temperature_ = nullptr;
+  bubbles_rising_vectors_per_bubble_ = nullptr;
 }
 
 IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblem()
@@ -141,6 +151,7 @@ void IJK_One_Dimensional_Subproblem::reinit_variable(DoubleVect& vect)
  * TODO: Remplacer cette methode pour eviter de fournir tous les attributs
  */
 void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
+                                                                     IJK_One_Dimensional_Subproblems& ref_one_dimensional_subproblems,
                                                                      int i, int j, int k,
                                                                      int init,
                                                                      int sub_problem_index,
@@ -196,10 +207,18 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
       associate_probe_parameters(ref_thermal_subresolution.points_per_thermal_subproblem_,
                                  ref_thermal_subresolution.uniform_alpha_,
                                  ref_thermal_subresolution.uniform_lambda_,
+                                 ref_thermal_subresolution.prandtl_number_,
                                  ref_thermal_subresolution.coeff_distance_diagonal_,
                                  ref_thermal_subresolution.cell_diagonal_,
                                  ref_thermal_subresolution.dr_,
                                  ref_thermal_subresolution.radial_coordinates_);
+      associate_bubble_parameters(ref_thermal_subresolution.bubbles_volume_,
+                                  ref_one_dimensional_subproblems.total_surface_per_bubble_,
+                                  ref_one_dimensional_subproblems.radius_from_surfaces_per_bubble_,
+                                  ref_one_dimensional_subproblems.radius_from_volumes_per_bubble_,
+                                  ref_one_dimensional_subproblems.delta_temperature_,
+                                  ref_thermal_subresolution.mean_liquid_temperature_,
+                                  ref_thermal_subresolution.rising_vectors_);
       associate_finite_difference_operators(ref_thermal_subresolution.radial_first_order_operator_raw_,
                                             ref_thermal_subresolution.radial_second_order_operator_raw_,
                                             ref_thermal_subresolution.radial_first_order_operator_,
@@ -458,6 +477,7 @@ void IJK_One_Dimensional_Subproblem::associate_flags_neighbours_correction(const
 void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& points_per_thermal_subproblem,
                                                                 const double& alpha,
                                                                 const double& lambda,
+                                                                const double& prandtl_number,
                                                                 const double& coeff_distance_diagonal,
                                                                 const double& cell_diagonal,
                                                                 const double& dr_base,
@@ -470,6 +490,7 @@ void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& point
   coeff_distance_diagonal_ = &coeff_distance_diagonal;
   alpha_ = &alpha;
   lambda_ = &lambda;
+  prandtl_number_ = &prandtl_number;
   cell_diagonal_ = &cell_diagonal;
   dr_base_ = &dr_base;
   radial_coordinates_base_ = &radial_coordinates;
@@ -481,6 +502,23 @@ void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& point
     points_per_thermal_subproblem_ = points_per_thermal_subproblem_base_;
   else
     points_per_thermal_subproblem_ = increase_number_of_points(); //copy if modified later
+}
+
+void IJK_One_Dimensional_Subproblem::associate_bubble_parameters(ArrOfDouble& bubbles_volume,
+                                                                 ArrOfDouble& bubbles_surface,
+                                                                 ArrOfDouble& radius_from_surfaces_per_bubble,
+                                                                 ArrOfDouble& radius_from_volumes_per_bubble,
+                                                                 double& delta_temperature,
+                                                                 double& mean_liquid_temperature,
+                                                                 DoubleTab& rising_vectors)
+{
+  bubbles_volume_ = &bubbles_volume;
+  bubbles_surface_ = &bubbles_surface;
+  radius_from_surfaces_per_bubble_ = &radius_from_surfaces_per_bubble;
+  radius_from_volumes_per_bubble_ = &radius_from_volumes_per_bubble;
+  delta_temperature_ = &delta_temperature;
+  mean_liquid_temperature_ = &mean_liquid_temperature;
+  bubbles_rising_vectors_per_bubble_ = &rising_vectors;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,
@@ -3039,6 +3077,24 @@ double IJK_One_Dimensional_Subproblem::compute_temperature_integral_subproblem(c
   return integral_eval;
 }
 
+void IJK_One_Dimensional_Subproblem::compute_bubble_related_quantities()
+{
+  nusselt_number_ = normal_temperature_gradient_solution_;
+  nusselt_number_liquid_temperature_ = normal_temperature_gradient_solution_;
+  nusselt_number_ *=  ((2* (*radius_from_volumes_per_bubble_)(compo_connex_)) / (*delta_temperature_));
+  nusselt_number_liquid_temperature_ *=  ((2 * (*radius_from_volumes_per_bubble_)(compo_connex_)) / (*mean_liquid_temperature_));
+  const double atan_theta_incr_ini = M_PI / 2;
+  const double atan_incr_factor = -1;
+  const double theta = (theta_sph_ * atan_incr_factor) + atan_theta_incr_ini;
+  DoubleVect radius_squared = osculating_radial_coordinates_;
+  radius_squared *= radius_squared;
+  radius_squared *= (double) std::sin(theta);
+  nusselt_number_integrand_ = nusselt_number_;
+  nusselt_number_integrand_ *= radius_squared;
+  nusselt_number_liquid_temperature_integrand_ = nusselt_number_liquid_temperature_;
+  nusselt_number_liquid_temperature_integrand_ *= radius_squared;
+}
+
 
 void IJK_One_Dimensional_Subproblem::thermal_subresolution_outputs(SFichier& fic, const int rank, const Nom& local_quantities_thermal_probes_time_index_folder)
 {
@@ -3086,7 +3142,9 @@ void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int r
     radial_temperature_diffusion_[0],
     radial_temperature_diffusion_solution_[0],
     tangential_temperature_diffusion_[0],
-    surface_, thermal_flux_[0], (*lambda_), (*alpha_), Pr_l_,
+    surface_, thermal_flux_[0], (*lambda_), (*alpha_), (*prandtl_number_),
+    nusselt_number_[0], nusselt_number_liquid_temperature_[0],
+    nusselt_number_integrand_[0], nusselt_number_liquid_temperature_integrand_[0],
     velocity_shear_force_, velocity_shear_stress_,
     pressure_interp_[0],
     x_velocity_[0], y_velocity_[0], z_velocity_[0],
@@ -3104,7 +3162,13 @@ void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int r
     first_tangential_velocity_normal_gradient_[0],
     second_tangential_velocity_normal_gradient_[0],
     first_tangential_velocity_normal_gradient_from_rising_dir_[0],
-    azymuthal_velocity_normal_gradient_[0]
+    azymuthal_velocity_normal_gradient_[0],
+    (*bubbles_surface_)(compo_connex_), (*bubbles_volume_)(compo_connex_),
+    (*radius_from_surfaces_per_bubble_)(compo_connex_), (*radius_from_volumes_per_bubble_)(compo_connex_),
+    (*delta_temperature_), (*mean_liquid_temperature_),
+    (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 0),
+    (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 1),
+    (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 2)
   };
   int i;
   assert(key_results_int.size() == results_int.size());
@@ -3147,7 +3211,9 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
         fic << radial_temperature_diffusion_[0] << " ";
         fic << radial_temperature_diffusion_solution_[0] << " ";
         fic << tangential_temperature_diffusion_[0] << " ";
-        fic << surface_ << " " << thermal_flux_[0] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
+        fic << surface_ << " " << thermal_flux_[0] << " " << *lambda_ << " " << *alpha_ << " " << *prandtl_number_ << " ";
+        fic << nusselt_number_[0] << " " << nusselt_number_liquid_temperature_[0] << " ";
+        fic << nusselt_number_integrand_[0] << " " << nusselt_number_liquid_temperature_integrand_[0] << " ";
         fic << velocity_shear_force_ << " " << velocity_shear_stress_ << " ";
         fic << pressure_interp_[0] << " ";
         fic << x_velocity_[0] << " " << y_velocity_[0] << " " << z_velocity_[0] << " ";
@@ -3166,6 +3232,12 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
         fic << second_tangential_velocity_normal_gradient_[0] << " ";
         fic << first_tangential_velocity_normal_gradient_from_rising_dir_[0] << " ";
         fic << azymuthal_velocity_normal_gradient_[0] << " ";
+        fic << (*bubbles_surface_)(compo_connex_) << " " << (*bubbles_volume_)(compo_connex_) << " ";
+        fic << (*radius_from_surfaces_per_bubble_)(compo_connex_) << " " << (*radius_from_volumes_per_bubble_)(compo_connex_) << " ";
+        fic << (*delta_temperature_) << " " << (*mean_liquid_temperature_) << " ";
+        fic << (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 0) << " ";
+        fic << (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 1) << " ";
+        fic << (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 2) << " ";
         fic << finl;
       }
   }
@@ -3213,6 +3285,8 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                                "\tradial_temperature_diffusion_sol"
                                "\ttangential_temperature_diffusion"
                                "\tsurface\tthermal_flux\tlambda_liq\talpha_liq\tprandtl_liq"
+                               "\tnusselt_number\tnusselt_number_liquid_temperature"
+                               "\tnusselt_number_integrand\tnusselt_number_liquid_temperature_integrand"
                                "\tshear\tforce"
                                "\tpressure"
                                "\tu_x\tu_y\tu_z"
@@ -3221,7 +3295,10 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
                                "\tu_theta2\tu_theta2_corr\tu_theta2_static\tu_theta2_advected"
                                "\tu_theta_rise\tu_theta_rise_corr\tu_theta_rise_static\tu_theta_rise_advected"
                                "\tu_phi\tu_phi_corr\tu_phi_static\tu_phi_advected"
-                               "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr");
+                               "\tdu_r_dr\tdu_theta_dr\tdu_theta2_dr\tdu_theta_rise_dr\tdu_phi_dr"
+                               "\ttotal_surface\ttotal_volume\tradius_from_surface\tradius_from_volume"
+                               "\tdelta_temperature\tmean_liquid_temperature"
+                               "\trising_dir_x\trising_dir_y\trising_dir_z");
         SFichier fic = Open_file_folder(local_quantities_thermal_probes_time_index_folder, probe_name, probe_header, reset);
         const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
         for (int i=0; i<(*points_per_thermal_subproblem_); i++)
@@ -3247,7 +3324,9 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
             fic << radial_temperature_diffusion_[i] << " ";
             fic << radial_temperature_diffusion_solution_[i] << " ";
             fic << tangential_temperature_diffusion_[i] << " ";
-            fic << surface_ << " " << thermal_flux_[i] << " " << *lambda_ << " " << *alpha_ << " " << Pr_l_ << " ";
+            fic << surface_ << " " << thermal_flux_[i] << " " << *lambda_ << " " << *alpha_ << " " << *prandtl_number_ << " ";
+            fic << nusselt_number_[i] << " " << nusselt_number_liquid_temperature_[i] << " ";
+            fic << nusselt_number_integrand_[i] << " " << nusselt_number_liquid_temperature_integrand_[i] << " ";
             fic << shear_stress_[i] << " " << (shear_stress_[i] * surface_) << " ";
             fic << pressure_interp_[i] << " ";
             fic << x_velocity_[i] << " " << y_velocity_[i] << " " << z_velocity_[i] << " ";
@@ -3266,6 +3345,12 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
             fic << second_tangential_velocity_normal_gradient_[i] << " ";
             fic << first_tangential_velocity_normal_gradient_from_rising_dir_[i] << " ";
             fic << azymuthal_velocity_normal_gradient_[i] << " ";
+            fic << (*bubbles_surface_)(compo_connex_) << " " << (*bubbles_volume_)(compo_connex_) << " ";
+            fic << (*radius_from_surfaces_per_bubble_)(compo_connex_) << " " << (*radius_from_volumes_per_bubble_)(compo_connex_) << " ";
+            fic << (*delta_temperature_) << " " << (*mean_liquid_temperature_) << " ";
+            fic << (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 0) << " ";
+            fic << (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 1) << " ";
+            fic << (*bubbles_rising_vectors_per_bubble_)(compo_connex_, 2) << " ";
             fic << finl;
           }
         fic.close();

@@ -55,7 +55,6 @@ class IJK_Thermal_Subresolution : public IJK_Thermal_base
 {
 
   Declare_instanciable( IJK_Thermal_Subresolution ) ;
-  friend class IJK_One_Dimensional_Subresolutions;
   friend class IJK_One_Dimensional_Subproblems;
   friend class IJK_One_Dimensional_Subproblem;
 
