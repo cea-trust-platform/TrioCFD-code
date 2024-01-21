@@ -304,7 +304,8 @@ public :
                                              FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz_remaining_global,
                                              FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz,
                                              FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz_remaining_global,
-                                             FixedVector<std::map<int, int>, 3>& flux_frontier_map);
+                                             FixedVector<std::map<int, int>, 3>& flux_frontier_map,
+                                             const int ini_index);
 
   void initialise_any_cell_neighbours_indices_to_correct_on_processors(FixedVector<FixedVector<std::vector<std::vector<ArrOfInt>>,3>,2>& index_face_ij_flux_xyz,
                                                                        FixedVector<std::vector<std::vector<ArrOfDouble>>,3>& flux_xyz,

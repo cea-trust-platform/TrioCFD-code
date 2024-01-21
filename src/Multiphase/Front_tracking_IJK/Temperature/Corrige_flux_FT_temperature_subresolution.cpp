@@ -2860,7 +2860,8 @@ void Corrige_flux_FT_temperature_subresolution::sort_ijk_intersections_subproble
                                         index_face_ij_flux_xyz_remaining_global,
                                         flux_xyz,
                                         flux_xyz_remaining_global,
-                                        flux_frontier_map);
+                                        flux_frontier_map,
+                                        ini_index);
   if (debug_)
     Cerr << "Fluxes have been combined on procs" << finl;
 }
@@ -2984,7 +2985,8 @@ void Corrige_flux_FT_temperature_subresolution::combine_fluxes_from_frontier_on_
                                                                                       FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& index_face_ij_flux_xyz_remaining_global,
                                                                                       FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz,
                                                                                       FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz_remaining_global,
-                                                                                      FixedVector<std::map<int, int>, 3>& flux_frontier_map)
+                                                                                      FixedVector<std::map<int, int>, 3>& flux_frontier_map,
+                                                                                      const int ini_index)
 {
 
   const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I();
@@ -3000,6 +3002,8 @@ void Corrige_flux_FT_temperature_subresolution::combine_fluxes_from_frontier_on_
   FixedVector<std::map<int, int>, 3> multiple_flux_values_k;
   FixedVector<std::map<int, int>, 3> multiple_flux_values_count;
   FixedVector<std::map<int, double>, 3> multiple_flux_values_sum;
+
+  FixedVector<std::map<int, int>, 3> flux_frontier_map_tmp = flux_frontier_map;
 
   for (int dir=0; dir<3; dir++)
     {
@@ -3021,15 +3025,18 @@ void Corrige_flux_FT_temperature_subresolution::combine_fluxes_from_frontier_on_
               if ((0 <= i && i < ni_max) && (0 <= j && j < nj_max) && (0 <= k && k < nk_max))
                 {
                   const int linear_local_index = get_linear_index_local(i, j, k, dir);
-                  const int non_zero_value_local = (int) flux_frontier_map[dir].count(linear_local_index);
+                  const int non_zero_value_local = (int) flux_frontier_map_tmp[dir].count(linear_local_index);
                   if (!non_zero_value_local)
                     {
                       // Add flux at the end of the list if new
                       flux_xyz[dir][k].append_array(flux);
-                      index_face_ij_flux_xyz[0][dir][k].append_array(i);
-                      index_face_ij_flux_xyz[1][dir][k].append_array(j);
+                      if (!ini_index)
+                        {
+                          index_face_ij_flux_xyz[0][dir][k].append_array(i);
+                          index_face_ij_flux_xyz[1][dir][k].append_array(j);
+                        }
                       const int local_size_array = flux_xyz[dir][k].size_array() - 1;
-                      flux_frontier_map[dir][linear_local_index] = local_size_array;
+                      flux_frontier_map_tmp[dir][linear_local_index] = local_size_array;
                       multiple_flux_values_count[dir][linear_local_index] = 1;
                       multiple_flux_values_sum[dir][linear_local_index] = flux;
                       multiple_flux_values_k[dir][linear_local_index] = k;
@@ -3060,11 +3067,13 @@ void Corrige_flux_FT_temperature_subresolution::combine_fluxes_from_frontier_on_
           const int key = it->first;
           const double val_flux_sum = it->second;
           const double count_val = (double) multiple_flux_values_count[dir][key];
-          const int array_index = (int) flux_frontier_map[dir][key];
+          const int array_index = (int) flux_frontier_map_tmp[dir][key];
           const int k_local = (int) multiple_flux_values_k[dir][key];
           flux_xyz[dir][k_local](array_index) =  val_flux_sum / count_val;
         }
     }
+  if (ini_index)
+    flux_frontier_map = flux_frontier_map_tmp;
 }
 
 void Corrige_flux_FT_temperature_subresolution::initialise_any_cell_neighbours_indices_to_correct_on_processors(FixedVector<FixedVector<std::vector<std::vector<ArrOfInt>>,3>,2>& index_face_ij_flux_xyz,
