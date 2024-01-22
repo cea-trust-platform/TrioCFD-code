@@ -927,6 +927,8 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
     Cerr << "Compute thermal convective and diffusive fluxes from subproblems" << finl;
   compute_convective_diffusive_fluxes_face_centre();
 
+  if (debug_)
+    Cerr << "Prepare ij fluxes" << finl;
   if (!conv_temperature_negligible_ || !diff_temperature_negligible_)
     prepare_ij_fluxes_k_layers();
 
@@ -1260,7 +1262,8 @@ void IJK_Thermal_base::compute_rising_velocities()
         {
           eulerian_rising_velocities_.data() = 0.;
           eulerian_rising_velocities_.echange_espace_virtuel(eulerian_rising_velocities_.ghost());
-          fill_rising_velocity(eulerian_compo_connex_ns_, rising_velocities_, eulerian_rising_velocities_);
+          // fill_rising_velocity_double(eulerian_compo_connex_ns_, rising_velocities_, eulerian_rising_velocities_);
+          fill_rising_velocity_int(eulerian_compo_connex_from_interface_int_ns_, rising_velocities_, eulerian_rising_velocities_);
         }
     }
   else

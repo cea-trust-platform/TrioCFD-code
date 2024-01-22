@@ -159,10 +159,14 @@ public:
   }
   const IJK_Field_double& get_eulerian_compo_connex_ft() const
   {
+    if (Process::nproc() != 1)
+      return dummy_double_field_;
     return *eulerian_compo_connex_ft_;
   }
   const IJK_Field_double& get_eulerian_compo_connex_ghost_ft() const
   {
+    if (Process::nproc() != 1)
+      return dummy_double_field_;
     return *eulerian_compo_connex_ghost_ft_;
   }
   const IJK_Field_double& get_eulerian_compo_connex_from_interface_ft() const
@@ -175,10 +179,14 @@ public:
   }
   const IJK_Field_double& get_eulerian_compo_connex_ns() const
   {
+    if (Process::nproc() != 1)
+      return dummy_double_field_;
     return *eulerian_compo_connex_ns_;
   }
   const IJK_Field_double& get_eulerian_compo_connex_ghost_ns() const
   {
+    if (Process::nproc() != 1)
+      return dummy_double_field_;
     return *eulerian_compo_connex_ghost_ns_;
   }
   const IJK_Field_double& get_eulerian_compo_connex_from_interface_ns() const

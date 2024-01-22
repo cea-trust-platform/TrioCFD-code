@@ -62,8 +62,11 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
 //                             const IJK_Field_double& eulerian_compo_connex_ns, const int& gravity_dir,
 //                             ArrOfDouble& rising_velocities, DoubleTab& rising_vectors);
 
-void fill_rising_velocity(const IJK_Field_double * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
-                          IJK_Field_double& eulerian_rising_velocity);
+void fill_rising_velocity_double(const IJK_Field_double * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
+                                 IJK_Field_double& eulerian_rising_velocity);
+void fill_rising_velocity_int(const IJK_Field_int * eulerian_compo_connex_ns,
+                              const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity);
+
 
 // void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
 //                          IJK_Field_double& eulerian_rising_velocity);

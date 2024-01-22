@@ -287,7 +287,7 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
 }
 
 // void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
-void fill_rising_velocity(const IJK_Field_double * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
+void fill_rising_velocity_double(const IJK_Field_double * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
 {
   const int nk = (*eulerian_compo_connex_ns).nk();
   const int nj = (*eulerian_compo_connex_ns).nj();
@@ -298,6 +298,23 @@ void fill_rising_velocity(const IJK_Field_double * eulerian_compo_connex_ns, con
         {
           double compo_connex = (*eulerian_compo_connex_ns)(i,j,k);
           int int_compo_connex = (int) compo_connex;
+          if (int_compo_connex >= 0)
+            {
+              eulerian_rising_velocity(i,j,k) = rising_velocities(int_compo_connex);
+            }
+        }
+}
+
+void fill_rising_velocity_int(const IJK_Field_int * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
+{
+  const int nk = (*eulerian_compo_connex_ns).nk();
+  const int nj = (*eulerian_compo_connex_ns).nj();
+  const int ni = (*eulerian_compo_connex_ns).ni();
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          int int_compo_connex = (*eulerian_compo_connex_ns)(i,j,k);
           if (int_compo_connex >= 0)
             {
               eulerian_rising_velocity(i,j,k) = rising_velocities(int_compo_connex);

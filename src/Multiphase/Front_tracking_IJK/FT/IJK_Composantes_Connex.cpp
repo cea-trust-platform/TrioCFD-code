@@ -49,24 +49,26 @@ int IJK_Composantes_Connex::initialize(const IJK_Splitting& splitting, const IJK
   int nalloc = 0;
   interfaces_ = &interfaces;
 
-  eulerian_compo_connex_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
-  nalloc += 1;
-  eulerian_compo_connex_ft_.data() = -1.;
-  eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
+  if (Process::nproc() == 1)
+    {
+      eulerian_compo_connex_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
+      nalloc += 1;
+      eulerian_compo_connex_ft_.data() = -1.;
+      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
 
-  eulerian_compo_connex_ghost_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
-  nalloc += 1;
-  eulerian_compo_connex_ghost_ft_.data() = -1.;
-  eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
+      eulerian_compo_connex_ghost_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 2);
+      nalloc += 1;
+      eulerian_compo_connex_ghost_ft_.data() = -1.;
+      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
 
-  eulerian_compo_connex_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
-  nalloc += 1;
-  eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+      eulerian_compo_connex_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      nalloc += 1;
+      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
 
-  eulerian_compo_connex_ghost_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
-  nalloc += 1;
-  eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
-
+      eulerian_compo_connex_ghost_ns_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      nalloc += 1;
+      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+    }
   eulerian_compo_connex_from_interface_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 0);
   nalloc += 1;
   eulerian_compo_connex_from_interface_ft_.echange_espace_virtuel(eulerian_compo_connex_from_interface_ft_.ghost());
@@ -113,24 +115,29 @@ void IJK_Composantes_Connex::initialise_bubbles_params()
 
 void IJK_Composantes_Connex::compute_bounding_box_fill_compo_connex()
 {
-  compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(),
-                                  bounding_box_,
-                                  min_max_larger_box_,
-                                  eulerian_compo_connex_ft_,
-                                  eulerian_compo_connex_ghost_ft_,
-                                  bubbles_barycentre_);
-  eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
-  eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
+  if (Process::nproc() != 1)
+    interfaces_->calculer_bounding_box_bulles(bounding_box_);
+  else
+    {
+      compute_bounding_box_fill_compo(ref_ijk_ft_->itfce(),
+                                      bounding_box_,
+                                      min_max_larger_box_,
+                                      eulerian_compo_connex_ft_,
+                                      eulerian_compo_connex_ghost_ft_,
+                                      bubbles_barycentre_);
+      eulerian_compo_connex_ft_.echange_espace_virtuel(eulerian_compo_connex_ft_.ghost());
+      eulerian_compo_connex_ghost_ft_.echange_espace_virtuel(eulerian_compo_connex_ghost_ft_.ghost());
 
-  eulerian_compo_connex_ns_.data() = -1;
-  eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
-  ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ft_, eulerian_compo_connex_ns_);
-  eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+      eulerian_compo_connex_ns_.data() = -1;
+      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ft_, eulerian_compo_connex_ns_);
+      eulerian_compo_connex_ns_.echange_espace_virtuel(eulerian_compo_connex_ns_.ghost());
 
-  eulerian_compo_connex_ghost_ns_.data() = -1;
-  eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
-  ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ghost_ft_, eulerian_compo_connex_ghost_ns_);
-  eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+      eulerian_compo_connex_ghost_ns_.data() = -1;
+      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+      ref_ijk_ft_->redistribute_from_splitting_ft_elem(eulerian_compo_connex_ghost_ft_, eulerian_compo_connex_ghost_ns_);
+      eulerian_compo_connex_ghost_ns_.echange_espace_virtuel(eulerian_compo_connex_ghost_ns_.ghost());
+    }
 
 }
 
