@@ -1673,6 +1673,8 @@ void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_
                                                                                            IJK_Field_int& neighbours_weighting,
                                                                                            IJK_Field_double& neighbours_weighting_colinearity) const
 {
+  if (debug_)
+    Cerr << "Replace temperature cell neighbours" << finl;
   if (distance_cell_faces_from_lrs_ && find_temperature_cell_neighbours_)
     {
       temperature_neighbours.echange_espace_virtuel(temperature_neighbours.ghost());
@@ -2924,9 +2926,12 @@ void Corrige_flux_FT_temperature_subresolution::receive_fluxes_from_frontier_on_
                   for (l=1; l<overall_numerotation_array[c][k].size_array(); l++)
                     start_indices_array[c][k](l) = start_indices_array[c][k](l-1) + start_indices_array[c][k](l-1);
 
-                  Cerr << "Size array" << size_array << finl;
-                  Cerr << "Size array global" << size_array_global << finl;
-                  Cerr << "Overall_numerotation" << overall_numerotation_array[c][k](0) << "-" << overall_numerotation_array[c][k](1) << finl;
+                  if (debug_)
+                    {
+                      Cerr << "Size array" << size_array << finl;
+                      Cerr << "Size array global" << size_array_global << finl;
+                      Cerr << "Overall_numerotation" << overall_numerotation_array[c][k](0) << "-" << overall_numerotation_array[c][k](1) << finl;
+                    }
 
                   ArrOfDouble local_flux_values_tmp;
                   ArrOfDouble& global_flux_values_tmp = flux_xyz_remaining_global[c][k];

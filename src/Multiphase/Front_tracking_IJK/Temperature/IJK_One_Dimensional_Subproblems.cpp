@@ -237,6 +237,11 @@ void IJK_One_Dimensional_Subproblems::set_global_index()
 void IJK_One_Dimensional_Subproblems::associate_variables_for_post_processing(IJK_Thermal_Subresolution& ref_thermal_subresolution)
 {
   bubbles_volume_ = &ref_thermal_subresolution.bubbles_volume_;
+  reference_gfm_on_probes_ = ref_thermal_subresolution.reference_gfm_on_probes_;
+  bubbles_rising_velocities_ = &ref_thermal_subresolution.rising_velocities_;
+  bubbles_rising_vectors_per_bubble_ = &ref_thermal_subresolution.rising_vectors_;
+  liquid_velocity_ = &ref_thermal_subresolution.liquid_velocity_;
+  prandtl_number_ = &ref_thermal_subresolution.prandtl_number_;
 }
 
 void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
@@ -669,6 +674,8 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
   const int max_rank_digit = rank < 1 ? 1 : (int) (log10(rank) + 1);
   const int nb_digit_tstep = last_time_index < 1 ? 1 : (int) (log10(last_time_index) + 1);
 
+  if (debug_)
+    Cerr << "Post-process interfacial quantities" << finl;
   Nom probe_name = Nom("_thermal_rank_") +  Nom(std::string(max_digit - max_rank_digit, '0'))  + Nom(rank)
                    + Nom("_thermal_subproblems_interfacial_quantities_time_index_")
                    + Nom(std::string(max_digit_time - nb_digit_tstep, '0')) + Nom(last_time_index) + Nom(".out");
@@ -684,9 +691,13 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
       fic.close();
     }
 
+  if (debug_)
+    Cerr << "Post-process local radial quantities" << finl;
   for (int itr=0; itr < subproblems_counter_; itr++)
     (*this)[itr].thermal_subresolution_outputs_parallel(rank, local_quantities_thermal_probes_time_index_folder);
 
+  if (debug_)
+    Cerr << "Post-process overall bubble quantities" << finl;
   post_process_overall_bubbles_quantities(rank, overall_bubbles_quantities);
 }
 

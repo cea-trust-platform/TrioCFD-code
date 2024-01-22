@@ -2100,6 +2100,8 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
   int correct_first_iter = (correct_temperature_cell_neighbours_first_iter_
                             && ref_ijk_ft_->get_tstep() == 1
                             && !ref_ijk_ft_->get_reprise() != 0);
+  if (debug_)
+    Cerr << "Set correction cell neighbours" << finl;
   if (correct_first_iter_deactivate_cell_neighbours_ && correct_first_iter)
     {
 
@@ -2108,8 +2110,13 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
       corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_weighting_);
     }
 
+
+  if (debug_)
+    Cerr << "Compute temperature cell centre" << finl;
   corrige_flux_->compute_temperature_cell_centre(temperature_);
 
+  if (debug_)
+    Cerr << "Compute temperature cell centre neighbours" << finl;
   corrige_flux_->compute_temperature_cell_centre_neighbours(temperature_cell_neighbours_,
                                                             neighbours_temperature_to_correct_,
                                                             neighbours_temperature_colinearity_weighting_);
@@ -2122,6 +2129,8 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
                                                                 neighbours_temperature_colinearity_weighting_);
     }
 
+  if (debug_)
+    Cerr << "Replace temperature cell centres neighbours" << finl;
   replace_temperature_cell_centres_neighbours(0);
 }
 
