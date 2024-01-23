@@ -82,7 +82,7 @@ int Senseur_Interface::calculer_position(ArrOfDouble& pos) const
   IntVect num_element(nb_points_tests_);
   const Domaine& domaine = eq.domaine_dis().valeur().domaine();
   domaine.chercher_elements(positions, num_element);
-  DoubleVect dist(nb_points_tests_);
+  //DoubleVect dist(nb_points_tests_);
   // Invalide le numero d'element pour les elements virtuels
   const int nb_elem = domaine.nb_elem();
   for (i = 0; i < nb_points_tests_; i++)

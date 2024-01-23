@@ -1580,6 +1580,80 @@ const DoubleTab& Maillage_FT_Disc::get_update_normale_facettes() const
   return data_cache.normale_facettes_;
 }
 
+double Maillage_FT_Disc::compute_surface_and_normale_element(const int elem, const bool normalize, double surface, double normale[3]) const
+{
+  const ArrOfDouble& surface_facettes = get_update_surface_facettes();
+  const DoubleTab& normale_facettes = get_update_normale_facettes();
+  const Intersections_Elem_Facettes& intersections = intersections_elem_facettes();
+  const ArrOfInt& index_elem = intersections.index_elem();
+  normale[0]=0.;
+  normale[1]=0.;
+  normale[2]=0.;// = {0.,0.,0.}; // Normale sortante de I=0 vers I=1
+  surface = 0.;
+  {
+    int index = index_elem[elem];
+    if (index<0)
+      return surface;
+    // Boucle sur les faces qui traversent l'element:
+    while (index >= 0)
+      {
+        const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+        const double fraction_surf = data.fraction_surface_intersection_ * surface_facettes[data.numero_facette_];
+        for (int dir= 0; dir<Objet_U::dimension; dir++)
+          normale[dir] += fraction_surf * normale_facettes(data.numero_facette_, dir);
+        surface += fraction_surf;
+        index = data.index_facette_suivante_;
+      }
+  }
+
+  if (normalize)
+    {
+      const double norm = sqrt(normale[0]*normale[0]+normale[1]*normale[1]+normale[2]*normale[2]);
+      if (norm> Objet_U::precision_geom * Objet_U::precision_geom) // c'est a peu pres une surface pour le moment donc norm tres petit.
+        {
+          for (int dir= 0; dir<Objet_U::dimension; dir++)
+            normale[dir] /= norm;
+        }
+    }
+  return surface;
+}
+
+double Maillage_FT_Disc::compute_normale_element(const int elem, const bool normalize, ArrOfDouble& normale) const
+{
+  const ArrOfDouble& surface_facettes = get_update_surface_facettes();
+  const DoubleTab& normale_facettes = get_update_normale_facettes();
+  const Intersections_Elem_Facettes& intersections = intersections_elem_facettes();
+  const ArrOfInt& index_elem = intersections.index_elem();
+  normale=0.;// Normale sortante de I=0 vers I=1
+  {
+    int index = index_elem[elem];
+    if (index<0)
+      return 0.;
+    // Boucle sur les faces qui traversent l'element:
+    while (index >= 0)
+      {
+        const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+        const double fraction_surf = data.fraction_surface_intersection_ * surface_facettes[data.numero_facette_];
+        for (int dir= 0; dir<Objet_U::dimension; dir++)
+          normale[dir] += fraction_surf * normale_facettes(data.numero_facette_, dir);
+        //surface_totale += fraction_surf;
+        index = data.index_facette_suivante_;
+      }
+    //Cerr << "Surface dans l'elem : " <<  surface_totale << finl;
+  }
+
+  const double norm = norme_array(normale);
+  if (normalize)
+    {
+      if (norm> Objet_U::precision_geom * Objet_U::precision_geom) // c'est a peu pres une surface pour le moment donc norm tres petit.
+        {
+          for (int dir= 0; dir<Objet_U::dimension; dir++)
+            normale[dir] /= norm;
+        }
+    }
+  return norm;
+}
+
 const ArrOfDouble& Maillage_FT_Disc::get_surface_facettes() const
 {
   const Maillage_FT_Disc_Data_Cache& data_cache = mesh_data_cache();
@@ -4094,17 +4168,36 @@ int Maillage_FT_Disc::check_mesh(int error_is_fatal, int skip_facette_pe, int sk
                   double copie = coord_facettes(i, n++);
                   if (original != copie)
                     {
-                      Journal() << "Erreur facette " << i << " sommet " << j;
+                      Journal() << "Erreur facette " << i << " sommet " << j << " direction " << k;
                       Journal() << "   " << original << " != " << copie << finl;
                       printFa7(i,1,Journal());
                       Journal() <<" Fa7 orig ="<<finl;
-                      Journal() << " som0= " << coord_facettes(i, 0) << " " << coord_facettes(i, 1) << " " << coord_facettes(i, 2) << finl;
-                      Journal() << " som1= " << coord_facettes(i, 3) << " " << coord_facettes(i, 4) << " " << coord_facettes(i, 5) << finl;
-                      Journal() << " som2= " << coord_facettes(i, 6) << " " << coord_facettes(i, 7) << " " << coord_facettes(i, 8) << finl;
+                      if (Objet_U::dimension ==3)
+                        {
+                          Journal() << " som0= " << sommets_(i, 0) << " " << sommets_(i, 1) << " " << sommets_(i, 2) << finl;
+                          Journal() << " som1= " << sommets_(i, 3) << " " << sommets_(i, 4) << " " << sommets_(i, 5) << finl;
+                          Journal() << " som2= " << sommets_(i, 6) << " " << sommets_(i, 7) << " " << sommets_(i, 8) << finl;
+                        }
+                      else
+                        {
+                          Journal() << " som0= " << sommets_(i, 0) << " " << sommets_(i, 1) <<finl;
+                          Journal() << " som1= " << sommets_(i, 2) << " " << sommets_(i, 3) << finl;
+                        }
+                      Journal() <<" Fa7 copie ="<<finl;
+                      if (Objet_U::dimension ==3)
+                        {
+                          Journal() << " som0= " << coord_facettes(i, 0) << " " << coord_facettes(i, 1) << " " << coord_facettes(i, 2) << finl;
+                          Journal() << " som1= " << coord_facettes(i, 3) << " " << coord_facettes(i, 4) << " " << coord_facettes(i, 5) << finl;
+                          Journal() << " som2= " << coord_facettes(i, 6) << " " << coord_facettes(i, 7) << " " << coord_facettes(i, 8) << finl;
+                        }
+                      else
+                        {
+                          Journal() << " som0= " << coord_facettes(i, 0) << " " << coord_facettes(i, 1) <<finl;
+                          Journal() << " som1= " << coord_facettes(i, 2) << " " << coord_facettes(i, 3) << finl;
+                        }
                       if (error_is_fatal)
                         {
-                          assert(0);
-                          exit();
+                          Process::exit();
                         }
                       return_code = 0;
                     }
@@ -6006,6 +6099,30 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       //tcl.set_theta_app(theta_app);
                       Cerr << "[TCL-model] Contact_angle_micro= " << M_PI-theta << " apparent= " << theta_app
                            << " (velocity= " << norm_vit_som1 << " m/s)" << " time= " << t << " theta_app_degree= " << (theta_app/M_PI)*180 << finl;
+                    }
+
+                  if (refequation_transport_.non_nul() && (sommet_elem_[som[i2]]>0))
+                    {
+                      const Transport_Interfaces_FT_Disc& eq_interfaces = refequation_transport_.valeur();
+                      const Probleme_base& pb = eq_interfaces.get_probleme_base();
+                      Probleme_FT_Disc_gen& pb_ft = ref_cast_non_const(Probleme_FT_Disc_gen, pb);
+                      Triple_Line_Model_FT_Disc& tcl = pb_ft.tcl();
+
+                      int face_loc;
+                      const Domaine_Cl_dis_base& zcl =
+                        equation_transport ().get_probleme_base ().equation (
+                          0).domaine_Cl_dis ().valeur ();
+                      const Cond_lim_base& type_cl =
+                        zcl.condition_limite_de_la_face_reelle (face,
+                                                                face_loc);
+                      bool is_wall = (sub_type(Dirichlet_paroi_fixe, type_cl) || sub_type(Dirichlet_paroi_defilante,type_cl));
+
+                      if (tcl.is_read_via_file() && is_wall )
+                        {
+                          double theta_app = tcl.get_theta_app(face)/180.*M_PI;
+                          costheta = cos(theta_app);
+                          Cerr << "[TCL-model] Contact_angle apparent= " << (theta_app/M_PI)*180 << finl;
+                        }
                     }
 #endif
                   // Normale unitaire au bord

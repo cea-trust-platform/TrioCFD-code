@@ -205,7 +205,7 @@ Lire pb2
 		Sources			{ puissance_thermique Champ_Fonc_MED { domain dom 
                                                         file Vorticite1_0000.med 
                                                         field vorticite 
-                                                        use_existing_domain 
+                                                        # use_existing_domain #
                                                         last_time 
                                                         }
 }

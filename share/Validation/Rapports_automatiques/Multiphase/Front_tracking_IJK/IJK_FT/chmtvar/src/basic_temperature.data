@@ -40,7 +40,7 @@ IJK_FT_double
                 bctype_kmax Perio
   }
   # champs_a_postraiter 1 tous #
-  champs_a_postraiter 6 TEMPERATURE INTERFACES COMPO_CONNEXE VELOCITY_FT INDICATRICE TEMPERATURE_ADIM_BULLES
+  champs_a_postraiter 5 TEMPERATURE INTERFACES COMPO_CONNEXE VELOCITY_FT INDICATRICE 
   tinit 0
   nb_pas_dt_max 50
   

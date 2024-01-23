@@ -27,11 +27,10 @@
 #include <Periodique.h>
 #include <Domaine_VEF.h>
 #include <Domaine_Cl_VEF.h>
-#include <Domaine_VEF_PreP1b.h>
+#include <Domaine_VEF.h>
 #include <Synonyme_info.h>
 
-extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Domaine_Cl_VEF& zcl, const Domaine_VEF& domaine_VEF);
-
+extern double calculer_coef_som(True_int rang_elem, True_int dimension, True_int& nb_face_diri, True_int *indice_diri);
 
 Implemente_instanciable(Terme_Boussinesq_Sensibility_VEFPreP1B_Face, "Terme_Boussinesq_Sensibility_VEFPreP1B_Face", Terme_Boussinesq_VEFPreP1B_Face) ;
 Add_synonym(Terme_Boussinesq_Sensibility_VEFPreP1B_Face,"Boussinesq_temperature_sensibility_VEFPreP1B_P1NC");
@@ -55,7 +54,7 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
   Cerr<<"Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter, equation_scalaire() = "<<equation_scalaire().que_suis_je()<<finl;
   assert(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility");
 
-  const Domaine_VEF_PreP1b& domaine_VEF = ref_cast(Domaine_VEF_PreP1b, le_dom_VEF.valeur());
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VEF.valeur());
   if (domaine_VEF.get_alphaE() && !domaine_VEF.get_alphaS() && !domaine_VEF.get_alphaA())
     return Terme_Boussinesq_VEF_Face::ajouter(resu);
 
@@ -168,18 +167,21 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
   ArrOfDouble a0(dimension),a0a1(dimension),a0a2(dimension),a0a3(dimension);
 
   // Extension possible des volumes de controle:
-  int modif_traitement_diri=( sub_type(Domaine_VEF_PreP1b,domaine_VEF) ? ref_cast(Domaine_VEF_PreP1b,domaine_VEF).get_modif_div_face_dirichlet() : 0);
+  int modif_traitement_diri=( sub_type(Domaine_VEF,domaine_VEF) ? ref_cast(Domaine_VEF,domaine_VEF).get_modif_div_face_dirichlet() : 0);
   modif_traitement_diri = 0; // Forcee a 0 car ne marche pas d'apres essais Ulrich&Thomas
-  int nb_face_diri=0;
-  ArrOfInt indice_diri(dimension+1);
+  True_int nb_face_diri=0;
+  True_int indice_diri[4];
 
   // Boucle sur les elements:
   int nb_elem_tot=domaine_VEF.nb_elem_tot();
   for (int elem=0; elem<nb_elem_tot; elem++)
     {
       if (modif_traitement_diri)
-        calculer_coef_som(elem,nb_face_diri,indice_diri,domaine_Cl_VEF,domaine_VEF);
-
+        {
+          True_int rang_elem = domaine_VEF.rang_elem_non_std()(elem);
+          True_int type_elem = (True_int)rang_elem < 0 ? 0 : domaine_Cl_VEF.type_elem_Cl(rang_elem);
+          calculer_coef_som(type_elem, dimension, nb_face_diri, indice_diri);
+        }
       double volume=volumes(elem);
       for (int i=0; i<nbpts; i++)
         les_polygones(i)=elem;

@@ -82,13 +82,20 @@ La v\'erification quotidienne porte sur les aspects suivants :\newline
 
 \subsection{La base de cas-tests de \texttt{TrioCFD}}
 
-Revenons maintenant un peu plus en d\'etails sur la base de cas-tests de \texttt{TrioCFD}. Celle-ci comprend 1533 tests s\'equentiels et 444 tests parall\`eles (voir tableau r\'ecapitulatif en Annexe). Ces cas-tests couvrent l'ensemble des baltiks de \texttt{TrioCFD} et assurent un taux de couverture de 80.05\% des mot-cl\'es (1349 mots-cl\'es sont test\'es sur les 1685 mots-cl\'es de \texttt{TrioCFD}). Les cas-tests sont rang\'es dans le repertoire \texttt{tests} de chacun des baltiks. Un cas-test a pour extension \texttt{.data} et peut \^etre soit un test simple (test de R\'ef\'erence), soit un test extrait d'une fiche de validation. Dans ce dernier cas, comme une fiche de validation peut comporter plusieurs cas-tests, il aura un suffixe de la forme \texttt{\_jddX.data} o\`u X variera de 1 au nombre de jeux de donn\'ees de la fiche de validation.\newline
-Chaque cas-test \texttt{.data} est rang\'e dans un r\'epertoire du m\^eme nom qui contient \'egalement le r\'esultat de r\'ef\'erence de ce cas-test (fichier au format \texttt{.lml.gz}). Comme mentionn\'e pr\'ec\'edemment, ces cas-tests sont lanc\'es sur les 3 premiers pas de temps dans le cadre du processus de v\'erification afin de s'assurer que :
+La base de cas-tests de \texttt{TrioCFD} comprend plus de 1600 tests s\'equentiels et plus de 400 tests parall\`eles.
+Ces cas-tests couvrent l'ensemble des modules de \texttt{TrioCFD} et assurent un taux de couverture de 80.05\% des mot-cl\'es (1349 mots-cl\'es sont test\'es sur les 1685 mots-cl\'es de \texttt{TrioCFD}).
+Les cas-tests sont rang\'es dans le r\'epertoire \texttt{tests/Reference}. Il y a ensuite un r\'epertoire par module.
+Un cas-test a pour extension \texttt{.data} et peut \^etre soit un test simple (test de R\'ef\'erence), soit un test extrait d'une fiche de validation.
+Dans ce dernier cas, comme une fiche de validation peut comporter plusieurs cas-tests,
+il aura un suffixe de la forme \texttt{\_jddX.data} o\`u X variera de 1 au nombre de jeux de donn\'ees de la fiche de validation.\newline
+Chaque cas-test \texttt{.data} est rang\'e dans un r\'epertoire du m\^eme nom qui contient \'egalement le r\'esultat de r\'ef\'erence de ce cas-test (fichier au format \texttt{.lml.gz}).
+Comme mentionn\'e pr\'ec\'edemment, ces cas-tests sont lanc\'es sur les 3 premiers pas de temps dans le cadre du processus de v\'erification afin de s'assurer que :
 \begin{itemize}[label=$\Rightarrow$, font=\LARGE]
   \item le calcul se d\'eroule correctement sur ces 3 pas de temps ;
   \item les r\'esultats obtenus sur ces 3 pas de temps ne pr\'esentent pas d'\'ecarts avec les r\'esultats de   r\'ef\'erence.
 \end{itemize}
-Afin que la base de v\'erification puisse \^etre lanc\'ee aussi souvent que n\'ecessaire, son temps de r\'ealisation doit rester abordable. Sur un poste de travail standard (\textit{e.g.} is241762 - voir tableau \ref{tab:Computer-characteristics}), les 1977 cas-tests s'exécutent en 2047.2s (2s/test), soit un peu moins d'une heure, le plus long test durant 89 secondes.
+Afin que la base de v\'erification puisse \^etre lanc\'ee aussi souvent que n\'ecessaire, son temps de r\'ealisation doit rester raisonnable.
+Sur un poste de travail standard (\textit{e.g.} is241762 - voir tableau \ref{tab:Computer-characteristics}), les cas-tests s'executent en moins d'une heure.
 
 
 \subsection{Fréquence de lancement de la base de cas-tests de \texttt{TrioCFD}}
@@ -102,7 +109,9 @@ Pour le lancement de la base de vérification de façon manuelle, l'utilisateur 
 \footnotesize
 \begin{lstlisting}
 > source env_TrioCFD.sh    % source de l'environnement de TrioCFD
-> make check_all_optim     % lancement de la base de verification
+> make check_optim         % lancement de la base de verification
+% Autre possibilite
+> make ctest_optim         % lancement de la base de verification avec CTest
 \end{lstlisting}
 \normalsize
 
@@ -116,8 +125,17 @@ Une fois la base de vérification terminée, la procédure renvoie le bilan de c
 \end{figure}
 
 
-Pour le lancement automatique quotidien, l'atelier de TrioCFD, contenant un ensemble de procédures en Bash et en Python, est exécuté chaque soir par l'atelier de TRUST par un crontab (procédure de lancement automatique et périodique) sur le script \texttt{lance\_test\_nuit} contenu dans le répertoire \texttt{bin/admin} de TRUST. Ce script met à jour TrioCFD par rapport à ce qui a été intégré la veille dans la branche \texttt{triou/TMA}, installe TRUST, puis envoi TriocCFD (et les autres baltiks sur base TRUST) sur les machines du parc (voir tableau \ref{tab:Computer-characteristics}).
-Les machines sur lesquelles TRUST et ses Baltiks sont testés chaque nuit sont spécifiées dans le fichier \texttt{bin/admin/liste.machines} de TRUST. Les machines concernant TrioCFD sont celles qui contiennent le paramètre -TrioCFD dans ce fichier au niveau de la colonne \texttt{baltiks}. Ce fichier contient également les options de compilation et de lancement des tests. Quelques-unes de ces options sont données dans le tableau \ref{tab:options-verif}.
+Pour le lancement automatique quotidien, l'atelier de TrioCFD,
+contenant un ensemble de procédures en Bash et en Python,
+est exécuté chaque soir par l'atelier de TRUST par une crontab (procédure de lancement automatique et périodique)
+sur le script \texttt{lance\_test\_nuit} contenu dans le répertoire \texttt{bin/admin} de TRUST.
+Ce script met à jour TrioCFD par rapport à ce qui a été intégré la veille dans la branche \texttt{triou/TMA},
+installe TRUST, puis envoi TriocCFD (et les autres baltiks sur base TRUST) sur les machines du parc (voir tableau \ref{tab:Computer-characteristics}).
+Les machines sur lesquelles TRUST et ses Baltiks sont testés chaque nuit sont spécifiées dans le fichier \texttt{bin/admin/liste.machines} de TRUST.
+Les machines concernant TrioCFD sont celles qui contiennent le paramètre -TrioCFD
+dans ce fichier au niveau de la colonne \texttt{baltiks}.
+Ce fichier contient également les options de compilation
+et de lancement des tests. Quelques-unes de ces options sont données dans le tableau \ref{tab:options-verif}.
 
 \begin{table}[H]
 \begin{centering}
@@ -194,11 +212,30 @@ Si la v\'erification logicielle garantit que le r\'esultat de chaque phase du pr
 
 \subsection{La base de validation de \texttt{TrioCFD}}
 
-La  validation du code est effectuée via les fiches de validation (PRM). Ces PRM peuvent être composées d'un ou plusieurs cas tests de la base de vérification. Lorsqu'une fiche de validation est composée de plusieurs cas tests, c'est parce que ceux-ci comportent des variantes (différents maillages, différents modèles,...) La base de validation est actuellement composée de 162 fiches. Ce nombre est en perpétuelle augmentation puisqu'à chaque nouveau développement, le développeur se doit de fournir une fiche de validation associée.\\
-Ces fiches de validation sont disponibles dans le répertoire \texttt{/share/Validation/Rapports\_automatiques} de chacun des Baltiks et peuvent être ensuite ordonnées dans différents sous-répertoires pour mieux identifier les sujets d'intérêt de chacune. A l'heure actuelle, cette sous-structuration n'est pas optimale et sera améliorée dans les futures versions de TrioCFD.\\
-Le tableau récapitulatif des différentes fiches de validation est donné en Annexe A du document intitulé models\_report\_TrioCFD.pdf présent dans le répertoire \texttt{share/doc} de TrioCFD. Il sera amené à être prochainement migré vers le document validation\_report\_TrioCFD.pdf situé dans ce même répertoire.\\
-La validation est actuellement exécutée sur une seule machine (cluster2 du tableau \ref{tab:Computer-characteristics}). Actuellement, seule cette machine est en mesure de faire tourner la base de validation : les autres clusters sont des machines partagées avec d'autres codes, le processus de validation nécessite trop de temps de calcul et les stations ne sont pas suffisamment puissantes pour que le processus de validation soit achevé dans des temps raisonnables. Prochainement, un nouveau cluster sera disponible pour la validation avec des caractéristiques de configuration différentes afin d'analyser la portabilité sur ce processus. Le processus de validation présente également une contrainte forte en terme de temps de résolution et doit être en mesure de fournir les résultats dans un délai acceptable. Avant la mise en service du cluster2, mi 2020, celui-ci était lancé sur une station de travail et prenait entre 12 et 13. Cette durée ne permettait pas de garantir une validation suffisamment performante du code.\\
-La base de validation est exécutée sur le cluster via le code Open Source Jenkins, développé en Java, qui permet de bien gérer tous les processus d'un code en intégration continue comme TrioCFD. Jenkins est relativement ergonomique avec une interface graphique simple pour la création de files de tâches mais dispose également d'un mode un peu plus évolué avec la possibilité pour l'utilisateur d'implémenter ses propres scripts en langage Groovy. TrioCFD utilise ces deux fonctionnalités de Jenkins pour le lancement de la base de validation de TrioCFD.\\
+La validation du code est effectuée via les fiches/rapports de validation.
+Ces rapports peuvent être composées d'un ou plusieurs cas tests de la base de vérification.
+Lorsqu'une fiche de validation est composée de plusieurs cas tests, c'est parce que ceux-ci comportent des variantes (différents maillages, différents modèles,...).
+Le nombre de rapports de la base de validation augmente r\'eguli\`erement.
+En effet, \`a chaque nouveau d\'eveloppement, un nouveau rapport de validation doit \^etre ajout\'e pour de le tester.\\
+Les rapports de validation sont disponibles dans le répertoire \texttt{/share/Validation/Rapports\_automatiques}.
+Ils peuvent être ensuite ordonnées dans différents sous-répertoires pour mieux identifier les sujets d'intérêt de chacun.\\
+
+Le tableau récapitulatif des différentes fiches de validation est donné en Annexe A du document intitulé "TrioCFD\_models\_report.pdf" présent dans le répertoire \texttt{share/doc} de TrioCFD.
+Il sera amené à être prochainement migré vers le document validation\_report\_TrioCFD.pdf situé dans ce même répertoire.\\
+
+La validation de r\'ef\'erence est actuellement exécutée sur la machine \emph{uruk} (Ubuntu20, gcc 9.4.0).\\
+Les autres clusters (voir \ref{tab:Computer-characteristics}) sont des machines partagées avec d'autres codes,
+le processus de validation nécessite trop de temps de calcul et les stations ne sont pas suffisamment puissantes
+pour que le processus de validation soit achevé dans des temps raisonnables.\\
+
+Le processus de validation présente également une contrainte forte en terme de temps de résolution
+et doit être en mesure de fournir les résultats dans un délai acceptable (quelques jours au plus).\\
+
+La base de validation est exécutée via le logiciel Open Source \emph{Jenkins},
+qui permet de bien gérer tous les processus d'un code en intégration continue comme TrioCFD.
+Jenkins fournit une interface graphique simple pour la création de files de tâches ainsi qu'un mode un peu plus évolué
+avec la possibilité pour l'utilisateur d'implémenter ses propres scripts en langage Groovy.\\
+TrioCFD utilise ces deux fonctionnalités de Jenkins pour le lancement de la base de validation de TrioCFD.\\
 La validation hebdomadaire du logiciel porte actuellement sur les aspects suivants :
 \begin{itemize}[label=$\Rightarrow$, font=\LARGE]
    \item \textbf{la bonne compilation du code}
@@ -209,12 +246,18 @@ La validation hebdomadaire du logiciel porte actuellement sur les aspects suivan
 Ce processus de validation sera prochainement enrichi afin d'être également en mesure de contrôler la portabilité du code de façon plus poussée que la base de vérification mais s'assure également de la bonne génération de la documentation utilisateur de TrioCFD.\\
 
 \subsection{Fréquence de lancement de la base de validation de \texttt{TrioCFD}}
-Avec l'arrivée du cluster2, la fréquence de lancement de la base de validation a pu être considérablement augmentée. En effet, elle tournait auparavant seulement avant chaque sortie de version à cause de sa durée trop conséquente. La réduction de cette durée permet maintenant de l'exécuter de façon hebdomadaire. Son lancement est actuellement réalisé manuellement par le Responsable de Code le vendredi, après que les dernières intégrations prévues dans la branche \texttt{triou/TMA} aient été réalisées. Ce lancement hebdomadaire est réalisé sur la branche en développement de TrioCFD en s'appuyant sur la version de même niveau de TRUST. Il sera prochainement automatisé.\\
-Lorsque des développements pour lesquels des impacts sont prévus doivent être intégrés dans la version, la base de validation peut être amenée à être lancée à tout moment par le Responsable de Code.
+La base de validation est ex\'ecut\'ee de façon hebdomadaire.
+Son lancement est actuellement réalisé manuellement par le Responsable de Code le vendredi,
+après que les dernières intégrations prévues dans la branche \texttt{triou/TMA} aient été réalisées.
+Ce lancement hebdomadaire est réalisé sur la branche en développement de TrioCFD en s'appuyant sur la version de même niveau de TRUST.\\
+Lorsque des développements pour lesquels des impacts sont prévus doivent être intégrés dans la version,
+la base de validation peut être amenée à être lancée àtout moment par le Responsable de Code.
 
 \subsection{Méthodologie de lancement de la base de validation de \texttt{TrioCFD}}
 
-La machine maître de lancement des tâches de Jenkins (Pipelines) est actuellement la station 9 du tableau \ref{tab:Computer-characteristics}. Un Pipeline spécifique a été créé pour le lancement de la validation, nommé TrioCFD\_Validation et rattaché au cluster 2. Ce Pipeline est lancé manuellement en remplissant la fiche de paramètres de la figure \ref{figure:lancement_jenkins}.
+La machine maître de lancement des tâches de Jenkins (Pipelines) est actuellement la station 9 du tableau \ref{tab:Computer-characteristics}.
+Un Pipeline spécifique a été créé pour le lancement de la validation, nommé TrioCFD\_Validation et rattaché au cluster 2.
+Ce Pipeline est lancé manuellement en remplissant la fiche de paramètres de la figure \ref{figure:lancement_jenkins}.
 
 \begin{figure}[H]
    \centering
@@ -231,9 +274,13 @@ Six principaux paramètres sont à renseigner manuellement pour le lancement de 
    \item \textbf{trio\_git\_ref} : branche, SHA1 ID ou tag du dépôt git de TrioCFD à partir duquel la validation sera lancée
    \item \textbf{nb\_proc\_test} : nombre de processeurs de la machine sur laquelle le processus de validation sera lancé (par défaut 40)
 \end{itemize}
-Deux cases à cocher sont utilisées pour la réitération du lancement en cas de problème lors du précédent. La première, nommée \texttt{resume} permet de relancer le processus de validation à partir de l'endroit exact où celle-ci a été interrompu. La seconde, nommée \texttt{run\_test}, permet de s'affranchir de toute la première partie qui concerne le clonage des différentes bases git de la compilation de TRUST et TrioCFD.
+Deux cases à cocher sont utilisées pour la réitération du lancement en cas de problème lors du précédent.
+La première, nommée \texttt{resume} permet de relancer le processus de validation à partir de l'endroit exact où celle-ci a été interrompu.
+La seconde, nommée \texttt{run\_test}, permet de s'affranchir de toute la première partie qui concerne le clonage des différentes bases git de la compilation de TRUST et TrioCFD.
 
-Ce Pipeline lance le script \texttt{TrioCFD\_validation.gy} présent dans le répertoire \texttt{/home/trust\_trio/jenkins/scripts/} avec en arguments, les paramètres précédemment renseignés. Ce script Groovy est composé de plusieurs étapes :
+Ce Pipeline lance le script \texttt{TrioCFD\_validation.gy} présent dans le répertoire \texttt{/home/service/s-sac-dm2s-trust-tri/jenkins/scripts/} avec en arguments,
+les paramètres précédemment renseignés.
+Ce script Groovy est composé de plusieurs étapes :
 \begin{enumerate}
 \item \textbf{check-ref-dir} : vérification de l'existence du répertoire de la version de référence (2ème paramètre de la figure ci-dessus)
 \item \textbf{git-ext-pkg} : clonage du dépôt GIT externalpackages et positionnement par rapport au paramètre renseigné dans \texttt{ext\_pkg\_git\_ref}
@@ -251,7 +298,9 @@ Ce Pipeline lance le script \texttt{TrioCFD\_validation.gy} présent dans le ré
 \item \textbf{ctest\_valid\_agg} : finalisation du processus de validation
 \end{enumerate}
 
-Le suivi de l'avancée du processus de validation se fait en direct dans Jenkins et permet de savoir, à tout moment, où en est le processus mais également connaître le bon déroulé ou non de chaque étape et le temps pris par chacun (voir figure \ref{figure:etapes_validation}).
+Le suivi de l'avancée du processus de validation se fait en direct dans Jenkins et permet de savoir,
+à tout moment, où en est le processus mais également connaître le bon déroulé ou non
+de chaque étape et le temps pris par chacun (voir figure \ref{figure:etapes_validation}).
 
 \begin{figure}[H]
    \centering
@@ -260,17 +309,32 @@ Le suivi de l'avancée du processus de validation se fait en direct dans Jenkins
    \captionof{figure}{\label{figure:etapes_validation}Les différentes étapes du processus de Validation de TrioCFD sous Jenkins}
 \end{figure}
 
-Une fois le processus arrivé dans l'étape \texttt{ctest\_valid}, l'état de chaque fiche peut être consulté en temps réel dans la page html de suivi qui sera décrite dans la section suivante.
+Une fois le processus arrivé dans l'étape \texttt{ctest\_valid},
+l'état de chaque fiche peut être consulté en temps réel dans la page html de suivi qui sera décrite dans la section suivante.\\
 
-Les résultats de la validation sont stockés dans le répertoire nommé suivant le premier paramètre donné au lancement du Pipeline situé dans \texttt{/volatile/projet/trust\_trio/jenkins/workspace/TrioCFD\_Validation\_pegasi2/validation}. Une fois le processus de validation terminée, le Responsable de code l'archivera dans \texttt{/volatile/projet/trust\_trio/validation/main\_Validation18X/}, répertoire qui comprendra l'ensemble des résultats de validation obtenus entre la version X et X-1 de TrioCFD.
+Durant la validation, les résultats sont stockés
+dans le répertoire \texttt{/volatile/projet/trust\_trio/jenkins/workspace/TrioCFD\_Validation\_\{nomDeLaMachine\}/validation}.\\
+
+A la fin du processus de validation, ce r\'epertoire de calcul est copi\'e
+dans le r\'epertoire \texttt{/volatile/projets/trust\_trio/validation/TrioCFD} de la machine de validation.\\
+Ce r\'epertoire comprendra donc l'ensemble des r\'esultats de validation obtenus
+entre les versions officielles \emph{n} et \emph{n+1} de TrioCFD.\\
+
+Enfin, lors de la mise en service d'une version majeure,
+le r\'epertoire de calcul est archiv\'e dans le r\'epertoire  \texttt{/home/trust\_trio/validation}.
 
 
 \subsection{Dépouillement des résultats de la base de validation de \texttt{TrioCFD}}
 
-Pour le dépouillement des résultats, le script Groovy \texttt{TrioCFD\_validation.gy} génère une page HTML consultable  depuis l'interface Jenkins, ou pouvant être ouverte par le biais d'un navigateur web lancé depuis la machine où la validation a tourné, à l'adresse : \texttt{/volatile/projet/trust\_trio/jenkins/workspace/TrioCFD\_Validation\_pegasi2/validation/valida\-tion\_label/prm\_report.html}. Cette page est composée de cinq rubriques.\smallskip\\
+Pour le dépouillement des résultats, le script Groovy \texttt{TrioCFD\_validation.gy}
+génère une page HTML consultable depuis l'interface Jenkins, ou pouvant être ouverte
+par le biais d'un navigateur web.
+Il s'agit du fichier \texttt{prm\_report.html} qui se trouve dans le r\'peroire de calcul.
+Cette page est composée de cinq rubriques.\smallskip\\
 
 \begin{minipage}[c]{0.65\linewidth}
-La première nommée \textbf{Summary} est un résumé du nombre de fiches ayant tourné avec succès et des fiches en échec. Par échec, on entend à la fois les fiches n'ayant pas abouti et les fiches présentant des écarts avec la version de référence.
+La première nommée \textbf{Summary} est un résumé du nombre de fiches ayant tourné avec succès et des fiches en échec.
+Par échec, on entend à la fois les fiches n'ayant pas abouti et les fiches présentant des écarts avec la version de référence.
 \end{minipage} \hfill
 \begin{minipage}[c]{0.3\linewidth}
    \includegraphics[width=5cm]{pictures/validation-summary.png}\vspace*{0.2cm}
@@ -304,7 +368,8 @@ La quatrième nommée \textbf{Failed PRMS (comparison)} correspond aux fiches ay
 \vspace{0.5cm}
 
 \begin{minipage}[c]{0.5\linewidth}
-La dernière partie (\textbf{Successful PRMS} récapitule l'ensemble des fiches de validation qui ont été générées correctement et qui ne présentent aucun écart par rapport à la version de référence.
+La dernière partie (\textbf{Successful PRMS} récapitule l'ensemble des fiches de validation
+qui ont été générées correctement et qui ne présentent aucun écart par rapport à la version de référence.
 \end{minipage} \hfill
 \begin{minipage}[c]{0.45\linewidth}
    \includegraphics[width=8cm]{pictures/validation-success.png}\vspace*{0.2cm}

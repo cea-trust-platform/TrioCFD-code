@@ -138,7 +138,6 @@ void Eq_couch_lim::mailler_fin()
 void Eq_couch_lim::aller_au_temps(double t_final)
 {
   it=0;
-  int cpt=0;
 
   utau=0.;
   utau_old = 0;
@@ -158,7 +157,6 @@ void Eq_couch_lim::aller_au_temps(double t_final)
 
   do
     {
-      cpt++;
 
       for(int i= 0; i<N ; i++)
         visco_tot[i] = le_a.calculer_a_local(i);

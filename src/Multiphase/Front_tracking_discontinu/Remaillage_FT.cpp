@@ -66,7 +66,8 @@ Remaillage_FT::Remaillage_FT() :
   lissage_courbure_coeff_(-0.05), // valeur typique pour stabilite
   lissage_courbure_iterations_systematique_(0),
   lissage_courbure_iterations_si_remaillage_(0),
-  lissage_courbure_iterations_old_(-1)
+  lissage_courbure_iterations_old_(-1),
+  lissage_critere_(0) // Default value to 0, when lissage is applied, it is for the whole mesh
 {
 }
 
@@ -193,6 +194,7 @@ void Remaillage_FT::set_param(Param& p)
   p.ajouter("lissage_courbure_iterations", &lissage_courbure_iterations_old_);
   p.ajouter("lissage_courbure_iterations_systematique", &lissage_courbure_iterations_systematique_);
   p.ajouter("lissage_courbure_iterations_si_remaillage", &lissage_courbure_iterations_si_remaillage_);
+  p.ajouter("lissage_critere", &lissage_critere_);
 }
 
 /*! @brief Cette fonction stocke le domaine_dis dans refdomaine_dis_
@@ -1657,7 +1659,7 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
   const Parcours_interface& parcours = maillage.refparcours_interface_.valeur();
 #endif
 
-  DoubleTab xsom(3,3); // coords des sommets de la face: xs(isom_eul, direction)
+  //DoubleTab xsom(3,3); // coords des sommets de la face: xs(isom_eul, direction)
   int fa7, isom, som =0, nb_bord;
   for (fa7=0 ; fa7<nb_facettes ; fa7++)
     {
@@ -3595,7 +3597,8 @@ void Remaillage_FT::regulariser_courbure(Maillage_FT_Disc& maillage,
 
   // Calcul de la longueur de la plus petite arete
   double l_min = 1e10;
-
+  int count = 0;
+  int total_count = 0;
   const double one_third = 1. / 3.;
 
   dvolume = 0.;
@@ -3616,18 +3619,30 @@ void Remaillage_FT::regulariser_courbure(Maillage_FT_Disc& maillage,
           const double l2 = dx * dx + dy * dy;
           if (l2 > 0.)
             {
+              const double inv_l = 1. / sqrt(l2);
+              const double inv_l2 = 1. / (l2);
               if (l2 < l_min)
                 l_min = l2;
 
               const double c1 = courbure[s1];
               const double c2 = courbure[s2];
               const double gradient_c = (c2 - c1) / sqrt(l2);
-              double h = 1.;
-              if (bidim_axi)
-                h = (x1+x2) * 0.5 * angle_bidim_axi;
-              const double flux = gradient_c * h;
-              dvolume[s1] += flux;
-              dvolume[s2] -= flux;
+              // We assume that the highest curvature achievable is 1/l (corresponds to an hexagon)
+              // and that the maximal gradient is a 50%
+              const double criterion1 = lissage_critere_*0.5*inv_l2;
+              // Or we assume the variation around mean curvature is at maximum 50% of c_moy
+              const double criterion2 = lissage_critere_*0.25*std::fabs(c1+c2)*inv_l;
+              if ((std::fabs(gradient_c)>= criterion1)||(std::fabs(gradient_c)>= criterion2))
+                {
+                  double h = 1.;
+                  if (bidim_axi)
+                    h = (x1+x2) * 0.5 * angle_bidim_axi;
+                  const double flux = gradient_c * h;
+                  dvolume[s1] += flux;
+                  dvolume[s2] -= flux;
+                  count++;
+                }
+              total_count++;
             }
         }
       else
@@ -3656,31 +3671,87 @@ void Remaillage_FT::regulariser_courbure(Maillage_FT_Disc& maillage,
               if (l2 < l_min)
                 l_min = l2;
               const double inv_l = (l2 == 0.) ? 1. : 1. / sqrt(l2);
+              const double inv_l2 = (l2 == 0.) ? 1. : 1. / (l2);
               const double c1 = c[i];
               const double c2 = c[i_suiv];
               const double gradient_c = (c2 - c1) * inv_l;
-              // Hauteur d'un tiers du triangle (facette, la base du triangle etant [i,i_suiv])
-              const double h = (surface * inv_l) * one_third;
-              // Integrale du flux de masse sur le morceau de volume de controle autour des
-              // sommets (au coefficient de diffusion pres) :
-              const double flux = gradient_c * h;
+              // We assume that the highest curvature achievable is 1/l (corresponds to an hexagon)
+              // and that the maximal gradient is a 50%
+              const double criterion1 = lissage_critere_*0.5*inv_l2;
+              // Or we assume the variation around mean curvature is at maximum 50% of c_moy
+              const double criterion2 = lissage_critere_*0.25*std::fabs(c1+c2)*inv_l;
+              if ((std::fabs(gradient_c)>= criterion1)||(std::fabs(gradient_c)>= criterion2))
+                {
+                  // Hauteur d'un tiers du triangle (facette, la base du triangle etant [i,i_suiv])
+                  const double h = (surface * inv_l) * one_third;
+                  // Integrale du flux de masse sur le morceau de volume de controle autour des
+                  // sommets (au coefficient de diffusion pres) :
+                  const double flux = gradient_c * h;
 
-              const int s1 = som[i]; // Numero du premier sommet
-              const int s2 = som[i_suiv]; // Numero du deuxieme sommet
-              dvolume[s1] += flux;
-              dvolume[s2] -= flux;
-
+                  const int s1 = som[i]; // Numero du premier sommet
+                  const int s2 = som[i_suiv]; // Numero du deuxieme sommet
+                  dvolume[s1] += flux;
+                  dvolume[s2] -= flux;
+                  count++;
+                }
+              total_count++;
               i_suiv = i;
             }
         }
     }
   l_min = Process::mp_min(l_min);
-
+  if ((total_count)&&(lissage_critere_>DMINFLOAT))
+    Journal() << "Proportion of smoothed aretes (similar to sommets) " << 100.*count/total_count << " %" << finl;
   // Calcul du coefficient de diffusion * pas de temps pour stabilite:
   // proportionnel a longueur^4 :
   const double coeff_dt = l_min * l_min * coeff;
   dvolume *= coeff_dt;
 
   maillage.desc_sommets().collecter_espace_virtuel(dvolume, MD_Vector_tools::EV_SOMME);
+
+  const DoubleVect& volume = refdomaine_VF_->volumes();
+  int clip=0;
+  double lost_volume = 0.;
+  int nb_som_reels = 0;
+  for (int s = 0; s < maillage.nb_sommets(); s++)
+    {
+      if (!maillage.sommet_virtuel(s))
+        nb_som_reels++;
+      const int elem = maillage.sommet_elem()[s];
+      if (elem>=0)
+        {
+          // On est dans un element reel
+          if (dvolume[s]>volume[elem] )
+            {
+              lost_volume += dvolume[s]-volume[elem];
+              dvolume[s] = volume[elem];
+              clip++;
+            }
+          if (-dvolume[s]>volume[elem] )
+            {
+              lost_volume += dvolume[s]+volume[elem];
+              dvolume[s] = -volume[elem];
+              clip++;
+            }
+        }
+    }
+  clip = Process::mp_sum(clip);
+  nb_som_reels = Process::mp_sum(nb_som_reels);
+  lost_volume = Process::mp_sum(lost_volume);
+  if (je_suis_maitre() && clip)
+    {
+      Cerr << "[Remaillage_FT::regulariser_courbure] Clipping of var volume in "
+           << clip << " elems. time = " << maillage.temps()
+           << " Volume redistributed over the whole interface = "
+           << lost_volume << finl;
+    }
+  if (clip)
+    {
+      // On repartit le volume perdu sur toute l'interface:
+      lost_volume /=nb_som_reels;
+      for (int s = 0; s < maillage.nb_sommets(); s++)
+        if (!maillage.sommet_virtuel(s))
+          dvolume[s] += lost_volume;
+    }
   maillage.desc_sommets().echange_espace_virtuel(dvolume);
 }

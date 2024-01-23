@@ -2,65 +2,69 @@ IJK_Grid_Geometry DOM
 
 Lire DOM
 {
-  nbelem_i 32
-  nbelem_j 32
-  nbelem_k 32
+  nbelem_i 24
+  nbelem_j 24
+  nbelem_k 24
   uniform_domain_size_i 0.001
   uniform_domain_size_j 0.001
   uniform_domain_size_k 0.001
   perio_i
   perio_j
-  perio_k
+  # Shear periodicity is a periodicity #
+  perio_k 
 }
 
 IJK_Splitting grid_splitting
 Lire grid_splitting
 {
   ijk_grid_geometry DOM
+  # pas de decoupage possible en i #
   nproc_i 1
-  nproc_j 2
-  nproc_k 2
+  # decoupage en n proc sur y et z avec n>=3 #
+  nproc_j 1
+  nproc_k 1
 }
 
 IJK_FT_double
 {
-  vol_bulle_monodisperse 3.681553890925539e-11
-  
-  # ajout des mots clefs suivants pour fixer les bulles #
-  coef_mean_force 0.0
-  coef_force_time_n 0.0
-  coef_immobilisation 18810000 # doit etre de l ordre de grandeur rho*g/Dx. Dx est la taille d une maille #
-  coef_ammortissement -3000 # -cv = -kDx >> c = k Dx / v. v est la vitesse max qu'on autorise a la bulle #
-  coef_rayon_force_rappel 1.5 # a garder a l esprit pour les bulles deformables #
-
   ijk_splitting grid_splitting
-  ijk_splitting_ft_extension 10 # To be checked.. #
+  ijk_splitting_ft_extension 15 # To be checked.. #
   timestep 0.9e-4
-  time_scheme RK3_FT # si euler_explicite diminuer le facsec #
+  # Shear-BC valide uniquement pour le RK3 #
+  time_scheme RK3_FT # si euler_explicit RK3_FT diminuer le facsec #
   type_velocity_convection_op Centre
   Boundary_Conditions {
+    # BC de type Mixte_shear #
     bctype_kmin Mixte_shear
     bctype_kmax Mixte_shear
-    dU_perio 0.1
-    t0_shear 0.0
+    # saut de vitesse sur le bord z en m/s #
+    dU_perio 0.3
+    # permet de debuter la simulation avec un desynchronisation des parois z-, z+ #
+    t0_shear 0.00839
+    # si defilement = 0 On obtient seulement une condition de saut de la vitesse en z #
+    # sans desynchronisation des parois #
     defilement 1
-    resolution_u_prime 0
+    # active le traitement particulier pour l interpolation des grandeurs monofluides #
+    # Toujours a activer dans le cas shear-perio #
+    interp_monofluide 1
   }
   timestep_facsec 1.0
   cfl 1.0
   fo  1.0
   oh  1.0
-  dt_post 10
-  dt_post_stats_bulles 1
-  dt_post_stats_plans 1
+  dt_post 100
+  dt_post_stats_bulles 100
+  dt_post_stats_plans 100
   t_debut_statistiques 0.0
   
-  # les champs INTERFACES EXTERNAL_FORCE INTEGRATED_VELOCITY INTEGRATED_PRESSURE INTEGRATED_TIMESCALE INDICATRICE_PERTURBE doivent etre post-traiter sans quoi les calculs à bulles fixes ne tournent pas #
-  champs_a_postraiter 11 COMPO_CONNEXE INDICATRICE VELOCITY PRESSURE COURBURE INTERFACES EXTERNAL_FORCE INTEGRATED_VELOCITY INTEGRATED_PRESSURE INTEGRATED_TIMESCALE INDICATRICE_PERTURBE
+  # rend le solveur de pression plus souple dans le cas shear-perio #
+  use_inv_rho_in_poisson_solver
+
+  champs_a_postraiter 6 COMPO_CONNEXE INDICATRICE VELOCITY PRESSURE COURBURE INTERFACES      
   check_stop_file stop.txt
   dt_sauvegarde 5000
   tinit 0
-  nb_pas_dt_max 10
+  nb_pas_dt_max 200
   
   multigrid_solver {
     solver_precision mixed
@@ -75,7 +79,7 @@ IJK_FT_double
   }
   # LECTURE DES INTERFACES DANS UN FICHIER LATA #
   check_divergence
-  gravite 3 -9.81 0.0 0.0
+  gravite 3 -20. 0.0 0.0
   interfaces {
    fichier_reprise_interface init.lata
    timestep_reprise_interface       1
@@ -95,22 +99,19 @@ IJK_FT_double
    }
   # follow_colors #
   }
-  terme_force_init 0. # 10855.866965787514 = (0.059688461999999984*87.545+(1.0-0.059688461999999984)*1171.3)*9.81 #
-  expression_derivee_force 20000*rappel_moyen
-  # check_divergence #
-  # refuse_patch_conservation_QdM_RK3_source_interf #
-  rho_liquide 1171.3	
-  rho_vapeur 87.545	
+  rho_liquide 1171.3
+  rho_vapeur 100.
   mu_liquide 0.001578
   mu_vapeur 1.3493e-05
-  sigma 0.01 # 0.05 0.018055 #
+  sigma 0.01 
   # Pour Creer le fichier de Reprise #
   nom_sauvegarde diph_fixe.sauv
   sauvegarder_xyz
   # REPRISE #
   # nom_reprise diph_init.sauv 
  timestep_reprise_vitesse 1 #
-  expression_vx_init 0.1*z/0.001
+  # expression doit etre compatible avec dU_perio #
+  expression_vx_init 0.3+0.3*z/0.001
   expression_vy_init 0.0
   expression_vz_init 0.0 
 }

@@ -1,10 +1,32 @@
 #!/bin/bash
+
+local_root=$project_directory/share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_static_thermal_wedge/src/
+lata_to_med ()
+{
+  [ ! -d lata ] && echo "Lata is missing" && return -2
+  echo "Dimension 2" > lata/convert.data
+  echo "lata_to_med post.lata post" >> lata/convert.data
+  echo "Fin" >> lata/convert.data
+  cd lata
+  trust convert.data 1> convert.out 2> convert.err
+  cd ..
+  source $TRUST_MEDCOUPLING_ROOT/env.sh
+  python $local_root/conv_med.py
+  return 0
+}
+
 if [ ${1} != "fake" ] ; then 
-  echo "[post_run] Running data_extract" && ../data_extract.sh || (echo "data_extract failed" && exit -1)
-  echo "[post_run] Running postpro" && visit -nowin -cli -s ../postpro.py&> postpro.log || [ $? == 250 ] || (echo "postpro failed" && exit -1)
-  echo "[post_run] Running postpro_flux" && python ../postpro_flux.py &> postpro_flux.log || (echo "postpro_flux failed" && exit -1)
+    offset=$(grep offset info.txt | sed "s/offset=//")
+    Nx=$(grep Nx info.txt | sed "s/Nx=//")
+    angle=$(grep theta info.txt | sed "s/theta=//")
+    sm=$(grep sm info.txt | sed "s/sm=//")
+  echo "[post_run] Running data_extract" && $local_root/data_extract.sh || (echo "data_extract failed" && exit -1)
+  [ $(basename $PWD) == "CAS_REFINE8" ] && echo "[post_run] CAS_REFINE8 -> modify lata to remove Champs FACES (due to bug?)" && sed -i.bkp "/Champ FACES/d" lata/post.lata
+  echo "[post_run] Running postpro" && visit -nowin -cli -s $local_root/postpro.py $sm &> postpro.log || [ $? == 250 ] || (echo "postpro failed" && exit -1)
+  echo "[post_run] Running postpro_flux" && python postpro_flux.py $offset $Nx $angle &> postpro_flux.log || (echo "postpro_flux failed" && exit -1)
   if [ $(basename $PWD) == "CAS_OFFSET-0.5" ] ; then
-    echo "[post_run] Running visit_Re_Nu2" &&  visit -nowin -cli -s ../visit_Re_Nu2.py&> visit_Re_Nu2.log || [ $? == 250 ] || (echo "visit_Re_Nu2 failed" && exit -1)
+    echo "[post_run] Running visit_Re_Nu2" &&  visit -nowin -cli -s $local_root/visit_Re_Nu2.py&> visit_Re_Nu2.log || [ $? == 250 ] || (echo "visit_Re_Nu2 failed" && exit -1)
   fi
+  echo "[post_run] Running med extraction of interface. " && lata_to_med || (echo "post pro of lata_to_med failed" && exit -1)
 fi
 echo "End of post_run in `basename $PWD`"

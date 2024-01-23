@@ -73,7 +73,7 @@ Entree& Sonde_IJK::readOn( Entree& is )
 {
 
   Motcle motlu;
-  Motcle accolade_ouverte("{");
+  //Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
   int nbre_points;
   // initialisation de periode par defaut
@@ -667,7 +667,8 @@ void Sonde_IJK::initialiser()
   {
     IJK_Field_double& ijk_field = ref_ijk_field_.valeur();
     const IJK_Splitting::Localisation loc = ijk_field.get_localisation();
-
+    const IJK_Splitting& field_splitting = ijk_field.get_splitting();
+    //const IJK_Grid_Geometry& field_geom = field_splitting.get_grid_geometry();
     const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
     Vecteur3 origin(0., 0., 0.), delta(0., 0., 0.);
     delta[0] = geom.get_constant_delta(DIRECTION_I);
@@ -695,6 +696,7 @@ void Sonde_IJK::initialiser()
             // L'element appartient a ce proc. On peut donc trouver son ijk...
             // Les autres positions seront mises a jour par les autres procs...
             const Int3 ijk = splitting.convert_packed_to_ijk_cell(num_elem);
+            Int3 new_ijk(ijk);
             /*
               Cerr << "Avant : Sonde ?? Point " << idx
               << " x= " << les_positions_(idx, 0)
@@ -719,6 +721,23 @@ void Sonde_IJK::initialiser()
                  << " x= " << les_positions_(idx, 0)
                  << " y= " << les_positions_(idx, 1)
                  << " z= " << les_positions_(idx, 2) << finl;
+
+            if ((field_splitting != splitting) &&
+                (ref_ijk_ft_.valeur().get_splitting_extension() != 0))
+              {
+                // Les 2 splittings ne sont pas identiques il faut changer l'elem :
+                for (int i = 0; i < 3; i++)
+                  {
+                    //Cerr << " " << (field_geom.get_origin(i)-geom.get_origin(i))/delta[i] << finl;
+                    if (geom.get_periodic_flag(i))
+                      {
+                        //assert(int((field_geom.get_origin(i)-geom.get_origin(i))/delta[i]) == ref_ijk_ft_.valeur().get_splitting_extension());
+                        new_ijk[i] -= ref_ijk_ft_.valeur().get_splitting_extension();
+                      }
+                  }
+                const int new_num_elem =  field_splitting.convert_ijk_cell_to_packed(new_ijk[0], new_ijk[1], new_ijk[2]);
+                elem_[idx] = new_num_elem;
+              }
           }
       }
   }
@@ -843,16 +862,6 @@ void Sonde_IJK::postraiter()
         const int nb_pts = elem_.size();
         IJK_Field_double& ijk_field = ref_ijk_field_.valeur();
         const IJK_Splitting& splitting = ijk_field.get_splitting();
-        // GUILLAUME, sondes. Question GAB : on inhibe juste cette condition en ajoutant le && 0
-        if ((ref_ijk_ft_.valeur().get_splitting_ft() != splitting) &&
-            (ref_ijk_ft_.valeur().get_splitting_extension() != 0) && 0)
-          {
-            Cerr << " Error in Sonde_IJK::postraiter() "
-                 << " L'extension est non-nulle donc splitting_ et splitting_ft_ different."
-                 << " Le champ demande n'est pas discretise sur le domaine etendu "
-                 << "alors que le Domaine_VF est construit sur ce domaine..."  << finl;
-            Process::exit();
-          }
         for (int idx =0; idx < nb_pts; idx++)
           {
             const int num_elem = elem_[idx];

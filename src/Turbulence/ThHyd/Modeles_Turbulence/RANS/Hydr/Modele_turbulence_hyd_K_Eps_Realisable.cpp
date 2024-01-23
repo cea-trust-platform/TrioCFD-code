@@ -30,13 +30,13 @@
 #include <Param.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Modele_Shih_Zhu_Lumley_VEF.h>
-#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Modele_turbulence_scal_base.h>
 #include <TRUSTTrav.h>
 #include <communications.h>
 #include <Champ_Inc_P0_base.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable,"Modele_turbulence_hyd_K_Epsilon_Realisable",Mod_turb_hyd_RANS);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable,"Modele_turbulence_hyd_K_Epsilon_Realisable",Mod_turb_hyd_RANS_keps);
 
 // XD K_Eps_Realisable mod_turb_hyd_rans K_Epsilon_Realisable -1 Realizable K-Epsilon Turbulence Model.
 
@@ -48,17 +48,17 @@ Sortie& Modele_turbulence_hyd_K_Eps_Realisable::printOn(Sortie& s ) const
   return s << que_suis_je() << " " << le_nom();
 }
 
-/*! @brief Simple appel a Mod_turb_hyd_RANS::readOn(Entree&)
+/*! @brief Simple appel a Mod_turb_hyd_RANS_keps::readOn(Entree&)
  *
  */
 Entree& Modele_turbulence_hyd_K_Eps_Realisable::readOn(Entree& is)
 {
-  return Mod_turb_hyd_RANS::readOn(is);
+  return Mod_turb_hyd_RANS_keps::readOn(is);
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable::set_param(Param& param)
 {
-  Mod_turb_hyd_RANS::set_param(param);
+  Mod_turb_hyd_RANS_keps::set_param(param);
   param.ajouter_non_std("Transport_K_Epsilon_Realisable",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (k-eps) transportation equation.
   param.ajouter_non_std("Modele_Fonc_Realisable",(this),Param::REQUIRED); // XD_ADD_P Modele_Fonc_Realisable_base This keyword is used to set the model used
   param.ajouter("PRANDTL_K",&Prandtl_K,Param::REQUIRED); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
@@ -83,7 +83,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcl
       return 1;
     }
   else
-    return Mod_turb_hyd_RANS::lire_motcle_non_standard(mot,is);
+    return Mod_turb_hyd_RANS_keps::lire_motcle_non_standard(mot,is);
 }
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente(double temps)
@@ -128,7 +128,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
 
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= DMINFLOAT)
+          if (tab_K_Eps(i,1) <= LeEPS_MIN)
             visco_turb_K_eps_Rea[i] = 0;
           else
             visco_turb_K_eps_Rea[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
@@ -142,7 +142,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
     {
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= DMINFLOAT)
+          if (tab_K_Eps(i,1) <= LeEPS_MIN)
             visco_turb[i] = 0;
           else
             visco_turb[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
@@ -183,7 +183,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(
               Process::exit(-1);
             }
         }
-      ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
+      //ConstDoubleTab_parts parts(le_champ_K_Eps.valeurs());
       for (int n=0; n<size; n++)
         {
           const double k = tabKEps(n,0);
@@ -266,7 +266,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(
 int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
 {
   eqn_transp_K_Eps().preparer_calcul();
-  Mod_turb_hyd_base::preparer_calcul();
+  Modele_turbulence_hyd_base::preparer_calcul();
   // GF pour initialiser la loi de paroi thermique en TBLE
 //   if (equation().probleme().nombre_d_equations()>1)
 //     {
@@ -346,7 +346,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle
 {
   try
     {
-      return Mod_turb_hyd_RANS::get_champ(nom);
+      return Mod_turb_hyd_RANS_keps::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {
@@ -368,7 +368,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle
 
 void Modele_turbulence_hyd_K_Eps_Realisable::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
-  Mod_turb_hyd_RANS::get_noms_champs_postraitables(nom,opt);
+  Mod_turb_hyd_RANS_keps::get_noms_champs_postraitables(nom,opt);
   if (mon_modele_fonc.non_nul())
     mon_modele_fonc->get_noms_champs_postraitables(nom,opt);
 }

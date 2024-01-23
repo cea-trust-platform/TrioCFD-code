@@ -129,18 +129,16 @@ void OpConvCentre4IJK_double::calculer(const IJK_Field_double& inputx, const IJK
                                        const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
-  OpConvIJKFacesCommon_double::calculer(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
   div_rho_u_ = 0;
-
-
+  OpConvIJKFacesCommon_double::calculer(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
 }
 
 void OpConvCentre4IJK_double::ajouter(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
                                       const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
-  OpConvIJKFacesCommon_double::ajouter(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
   div_rho_u_ = 0;
+  OpConvIJKFacesCommon_double::ajouter(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
 }
 
 // Calcule, sur la couche k_layer de mailles, l'integrale sur la maille de div(rho_v)

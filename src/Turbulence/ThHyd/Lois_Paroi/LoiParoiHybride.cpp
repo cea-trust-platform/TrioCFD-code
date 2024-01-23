@@ -31,7 +31,7 @@
 
 
 
-Entree& LoiParoiHybride::lire(Entree& is, const Noms& noms_bord, const Mod_turb_hyd_base& mod)
+Entree& LoiParoiHybride::lire(Entree& is, const Noms& noms_bord, const Modele_turbulence_hyd_base& mod)
 {
   const int nbord = noms_bord.size();
   int lp_lue=0;

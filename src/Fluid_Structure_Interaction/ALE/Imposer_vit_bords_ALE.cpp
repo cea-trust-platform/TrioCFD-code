@@ -71,6 +71,12 @@ Entree& Imposer_vit_bords_ALE::readOn(Entree& is)
 Entree& Imposer_vit_bords_ALE::interpreter_(Entree& is)
 {
   associer_domaine(is);
+  Nom dom_name = domaine().que_suis_je();
+  if (!dom_name.contient("ALE"))
+    {
+      Cerr <<"Mobile domain:  replace  " <<domaine().que_suis_je()<<" with "<< domaine().que_suis_je() <<"_ALE and restart!"<< finl;
+      exit();
+    }
   Domaine_ALE& dom=ref_cast(Domaine_ALE, domaine());
   dom.reading_vit_bords_ALE(is);
   return is;

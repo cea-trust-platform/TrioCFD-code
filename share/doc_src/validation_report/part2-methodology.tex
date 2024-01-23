@@ -4,51 +4,72 @@
 
 \lettrine[lines=2,slope=0pt,nindent=4pt]{\textbf{I}}{n} this chapter,
 the three-stage methodology to build this report is developed as following:
-1) inventory and sort of the \textsf{TrioCFD} database ; 2) development of a
-new \texttt{PRM} template ; 3) running the \textsf{v1.8.3} of \textsf{TrioCFD} and description of \LaTeX~files.
+1) inventory and sort of the \textsf{TrioCFD} database ;
+2) development of a new \texttt{PRM} template ;
+3) running the \textsf{v\codeVersion} of \textsf{TrioCFD} and description of \LaTeX~files.
 In this first section we present a summary of those three stages before
 giving accurate instructions and commands in next sections.
 
 \section{Inventory and sort}
 \lhead{\textit{Inventory and sort}}
 \rhead{\textit{METHODOLOGY}}
-Currently, the \texttt{TrioCFD} database contains 170 test
-cases archived in different folders (see Table \ref{tab:List-of-folders}).
+Currently, the \texttt{TrioCFD} database contains \nbValidationReports validation
+reports archived in different folders (see Table \ref{tab:List-of-folders}).
 First, an important inventory work was carried out to sort the test
 cases for targeting quickly the use of \texttt{TrioCFD} in different
 CFD configurations. The inventory resulted in a single table with
 plenty information (\texttt{LibreOffice} format), where the test cases
-are classified into several subdomains of fluid flows. In this document,
-some of them have been selected and detailed because 1) they are well-known
-in the literature, 2) they present comparisons with other academic
-or commercial CFD codes and 3) they present comparisons with experimental
-data.
+are classified into several subdomains of fluid flows.
+In this document, some of them have been selected and detailed because
+1) they are well-known in the literature,
+2) they present comparisons with other academic or commercial CFD codes and
+3) they present comparisons with experimental data.\\
+
+Validation reports for a given \texttt{TrioCFD} module are located in\\
+\texttt{./share/Validation/Rapports\_automatiques/\{nameOfTheModule\}}
+as shown in the table below.
 
 \begin{table}[H]
 \begin{centering}
 \begin{tabular}{ll}
 \hline 
-\textbf{Folders} & \textbf{Comments}\tabularnewline
+\textbf{Module folder in \texttt{./share/Validation/Rapports\_automatiques}} & \textbf{Comments}
+\tabularnewline
 \hline 
-\texttt{\footnotesize{}/ALE/share/Validation/Rapports\_automatiques/} & {\small{}ALE method}\tabularnewline
-\texttt{\footnotesize{}/Critere\_Entrainement\_Gaz/share/Validation/Rapports\_automatiques/} & {\small{}Gaz Entrainement}\tabularnewline
-\texttt{\footnotesize{}/Multiphase/CMFD/share/Validation/Rapports\_automatiques/} & {\small{}sheets for Two phase mixing}\tabularnewline
-\texttt{\footnotesize{}/Multiphase/Front\_tracking\_discontinu/share/Validation/Rapports\_automatiques/} & {\small{}sheets for }\texttt{\small{}baltik}{\small{} Front-tracking}\tabularnewline
-\texttt{\footnotesize{}/Multiphase/Front\_tracking\_IJK/share/Validation/Rapports\_automatiques/} & {\small{}sheets for }\texttt{\small{}baltik}{\small{} Front-tracking IJK}\tabularnewline
-\texttt{\footnotesize{}/P1NCP0RT/share/Validation/Rapports\_automatiques/} & \texttt{\small{}baltik}{\small{} P1NCP0RT}\tabularnewline
-\texttt{\footnotesize{}/Rayonnement/share/Validation/Rapports\_automatiques/} & {\small{}Radiation}\tabularnewline
-\texttt{\footnotesize{}/Schema\_Euler\_Implicite\_Stationnaire/share/Validation/Rapports\_automatiques/} & {\small{}Steady state implicit Euler scheme}\tabularnewline
-\texttt{\footnotesize{}/Sensitivity\_analysis/share/Validation/Rapports\_automatiques/} & {\small{}Sensitivity analysis for NS}\tabularnewline
-\texttt{\footnotesize{}/Turbulence/share/Validation/Rapports\_automatiques/} & {\small{}Turbulence models (LES and RANS)}\tabularnewline
-\texttt{\footnotesize{}/validation/share/Validation/Rapports\_automatiques/} & {\small{}Files validating several }\texttt{\small{}baltik}\tabularnewline
+\texttt{\footnotesize{}Critere\_Entrainement\_Gaz} & {\small{}Gaz Entrainement}
+\tabularnewline
+\texttt{\footnotesize{}Fluid\_Structure\_Interaction} & {\small{}ALE method}
+\tabularnewline
+\texttt{\footnotesize{}Multiphase/CMFD} & {\small{}reports for Two phase mixing}
+\tabularnewline
+\texttt{\footnotesize{}Multiphase/Front\_tracking\_discontinu} & {\small{}reports for }\texttt{\small{}Front-tracking}{\small{} module}
+\tabularnewline
+\texttt{\footnotesize{}Multiphase/Front\_tracking\_IJK} & {\small{}reports for }\texttt{\small{}Front-tracking IJK}{\small{} module}
+\tabularnewline
+\texttt{\footnotesize{}P1NCP0RT} & \texttt{\small{}P1NCP0RT}{\small{} module}
+\tabularnewline
+\texttt{\footnotesize{}Rayonnement} & {\small{}Radiation}
+\tabularnewline
+\texttt{\footnotesize{}Schema\_Euler\_Implicite\_Stationnaire} & {\small{}Steady state implicit Euler scheme}
+\tabularnewline
+\texttt{\footnotesize{}Sensitivity\_analysis} & {\small{}Sensitivity analysis for NS}
+\tabularnewline
+\texttt{\footnotesize{}Turbulence} & {\small{}Turbulence models (LES and RANS)}
+\tabularnewline
+\texttt{\footnotesize{}validation} & {\small{}Files validating several modules}
+\tabularnewline
 \hline 
 \end{tabular}
 \par\end{centering}
 \caption{\label{tab:List-of-folders}List of folders of \texttt{TrioCFD} test cases.}
 \end{table}
 
-Since version 1.9.0, the validation sheets are present in the Baltik necessary to execute them. Some of them can run only with TRUST (laminar and thermal laminar problems) but the choice was made to keep them in \texttt{TrioCFD}. All the validation sheets are accessible in the Baltik validation in the \texttt{/validation/share/Validation/Rapports\_automatiques/} directory.They are grouped here in accordance with the themes structuring this present validation report (Laminar Flow, Thermal Laminar Flow,...)
-In addition, since version v1.9.0, the summary table of all these validation sheets is present in the appendix \textbf{Annexe A: List of TrioCFD \texttt{PRM} files} of this report.
+Some of them can run only with TRUST (laminar and thermal laminar problems)
+but the choice was made to keep them in \texttt{TrioCFD}.
+They are grouped here in accordance with the themes structuring
+this present validation report (Laminar Flow, Thermal Laminar Flow,...)
+In addition the summary table of all these validation sheets
+is present in the appendix \textbf{Annexe A: List of TrioCFD \texttt{PRM} files} of this report.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Development of a new \textsf{PRM} template}
@@ -70,24 +91,24 @@ report have been revised and enhanced by taking into account the new
 \texttt{PRM} template.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Running with \textsf{v1.8.3} and \LaTeX~files}
-\lhead{\textit{Running with \textsf{v1.8.3} and \LaTeX~files}}
+\section{Running with \textsf{v\codeVersion} and \LaTeX~files}
+\lhead{\textit{Running with \textsf{v\codeVersion} and \LaTeX~files}}
 \rhead{\textit{METHODOLOGY}}
-For all test cases, the datafiles were run with the version \texttt{1.8.3}
-of \texttt{TrioCFD} for checking the achievement of computations. The validation
-database is launched on a new computer (PEGASI2). This is more efficient than
-the previous one (is223288) since the validation database now runs in about 
-3 days against more than 11 days with the previous one. 
-The CPU time required to 1) compile \texttt{TRUST} and \texttt{TrioCFD}
-and 2) run the 162 validation sheets.
-The characteristics of the previous and new computer are given in Table \ref{tab:Computer-characteristics}.
+All validation test case datafiles have been run with the version \texttt{\codeVersion}
+of \texttt{TrioCFD} for checking the achievement of computations.
+The validation database has been launched on \emph{URUK} and \emph{PEGASI2}.
+The characteristics of these computers are given in Table \ref{tab:Computer-characteristics}.\\
+
 For each validation sheet, the full documentation is automatically
-generated via the \texttt{Run\_fiche} procedure. The validation
-sheets associated with the daily elementary tests that run daily (not discussed
-in more detail in this report) allow to obtain a coverage rate of
-78.7\% of the keywords of \texttt{TrioCFD}. Finally, all selected sheets are
-gathered in one single document. Precisions will be given on the \LaTeX~files
-in Section \ref{chap:Validation-report-generation}.
+generated via the \texttt{Run\_fiche} procedure.
+
+% bfa : to be updated automatically
+%The validation sheets associated with the daily elementary tests that run daily
+%(not discussed in more detail in this report) allow to obtain a coverage rate of
+%78.7\% of the keywords of \texttt{TrioCFD}.
+
+Finally, all selected sheets are gathered in one single document.
+Precisions will be given on the \LaTeX~files in Section \ref{chap:Validation-report-generation}.
 
 \begin{table}[H]
 \begin{centering}
@@ -95,13 +116,20 @@ in Section \ref{chap:Validation-report-generation}.
 \hline 
 \textbf{COMPUTER} & \textbf{OPERATING SYSTEM} & \textbf{COMPILER} \tabularnewline
 \hline 
-\rowcolor{lightgray}\multicolumn{3}{Sc}{is223288@intra.cea.fr} \tabularnewline \hline
-PC Linux Intel(R) Xeon(R) CPU E5-2620 0@2.00GHz & LINUX Fedora 26 & \textsf{GCC7.1.1}\tabularnewline
-2 CPU - 6 physical cores per CPU & Kernel \textsf{gcc 7.1.1} & \textsf{MPICH3.2}\tabularnewline
+\rowcolor{lightgray}\multicolumn{3}{Sc}{uruk@intra.cea.fr} \tabularnewline
+\hline
+PC Linux Intel(R) Xeon(R) Gold 5218R CPU @ 2.10GHz & LINUX Ubuntu 20           & \textsf{GCC9.4.0}
+\tabularnewline
+2 CPU - 20 physical cores per CPU                  & Kernel \textsf{5.4.0-147}   & \textsf{MPICH 3.3.2}
+\tabularnewline
 \hline 
-\rowcolor{lightgray}\multicolumn{3}{Sc}{pegasi2@intra.cea.fr} \tabularnewline \hline
-PC Linux Intel(R) Xeon(R) Gold 5120 CPU @2.20GHz & CentOS 7.9.2009 & \textsf{GCC4.8.5}\tabularnewline
-2 CPU - 14 physical cores per CPU & Kernel \textsf{gcc 4.8.5} & \textsf{MPICH3.2}\tabularnewline
+\rowcolor{lightgray}\multicolumn{3}{Sc}{pegasi2@intra.cea.fr}
+\tabularnewline
+\hline
+PC Linux Intel(R) Xeon(R) Gold 5120 CPU @2.20GHz & CentOS 7.9.2009            & \textsf{GCC8.3.0}
+\tabularnewline
+2 CPU - 14 physical cores per CPU                & Kernel \textsf{3.10.0-1160.90.1.el7}  & \textsf{MPICH3.2}
+\tabularnewline
 \hline
 \end{tabular}
 \par\end{centering}
@@ -431,6 +459,21 @@ Four instructions can be used inside all blocks and sub-blocks: \texttt{Descript
 \texttt{Figure}, \texttt{Visu} and \texttt{Table} that can be repeated
 as many times as necessary and in the desired writing order.
 
+
+\section{Jupyter notebook}
+\label{sec:Jupyter_notebook}
+\lhead{\textit{Jupyter notebook}}
+\rhead{\textit{METHODOLOGY}}
+
+The Jupyter Notebook is the original web application for creating and sharing computational documents.
+It offers a simple, streamlined, document-centric experience.\\
+
+Jupyter notebook has been chosen to be the reference format for TrioCFD validation report
+and will progressively replace the PRM format.
+It is already the case in TRUST where all reports are using Jupyter format.
+A tutorial for Jupyter notebook writing can be found in TRUST code in the report "SampleFormJupyter".
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{\label{chap:Validation-report-generation}\LaTeX~files and report generation}
@@ -492,13 +535,14 @@ the \texttt{PRM} template.
 \section{\label{sec:Generating-the-report}New shell script for gathering all \texttt{.tex} files}
 \lhead{\textit{New shell script for gathering all \texttt{.tex} files}}
 \rhead{\textit{METHODOLOGY}}
-The folder \texttt{fiches} and all subfolders of test cases are created
-by \texttt{generer\_rapport\_valid.unix}. For all test cases, the
+The folder \texttt{archives} and all subfolders of test cases are created
+by \texttt{generer\_rapport\_valid.sh}. For all test cases, the
 first task of this shell script is to copy the \texttt{build} directory
 of \texttt{TrioCFD} results in corresponding subfolders. The second
 task is to clean each \texttt{fic.tex} file in order to be included
-in the main \LaTeX~file. Finally the instruction \texttt{pdflatex
-validation\_report\_TrioCFD.tex} compiles and generates the PDF file.
+in the main \LaTeX~file.
+Finally the instruction \texttt{pdflatex validation\_report\_TrioCFD.tex}
+compiles and generates the PDF file.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Enhancement}

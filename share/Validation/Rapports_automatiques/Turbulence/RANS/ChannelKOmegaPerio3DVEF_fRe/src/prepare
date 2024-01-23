@@ -1,0 +1,128 @@
+#!/bin/bash
+mkdir -p {muscl,EFstab}_{0.05,0.1,0.2,0.3,0.4,0.5}
+
+for dir in muscl_* EFstab_*
+do
+    cp canal_turbu_muscl.data post_run "$dir"
+done
+
+# = MUSCL
+# muscl_0.05
+(
+    cd muscl_0.05 || exit
+    sed -i "s|#OPTION|rm ..\/*.dat 2>/dev/null|" post_run
+)
+
+# muscl_0.1
+(
+    if [ -d muscl_0.1 ]; then
+        cd muscl_0.1 || exit
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.1 0. 0./" canal_turbu_muscl.data
+        sed -i "s/muscl 0.05/muscl 0.1/" post_run
+    fi
+)
+
+# muscl_0.2
+(
+    if [ -d muscl_0.2 ]; then
+        cd muscl_0.2 || exit
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.2 0. 0./" canal_turbu_muscl.data
+        sed -i "s/muscl 0.05/muscl 0.2/" post_run
+    fi
+)
+
+# muscl_0.3
+(
+    if [ -d muscl_0.3 ]; then
+        cd muscl_0.3 || exit
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.3 0. 0./" canal_turbu_muscl.data
+        sed -i "s/muscl 0.05/muscl 0.3/" post_run
+    fi
+)
+
+# muscl_0.4
+(
+    if [ -d muscl_0.4 ]; then
+        cd muscl_0.4 || exit
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.4 0. 0./" canal_turbu_muscl.data
+        sed -i "s/muscl 0.05/muscl 0.4/" post_run
+    fi
+)
+
+# muscl_0.5
+(
+    if [ -d muscl_0.5 ]; then
+        cd muscl_0.5 || exit
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.5 0. 0./" canal_turbu_muscl.data
+        sed -i "s/muscl 0.05/muscl 0.5/" post_run
+    fi
+)
+
+# = EFstab
+# EFstab_0.05
+(
+    if [ -d EFstab_0.05 ]; then
+        cd EFstab_0.05 || exit
+        mv canal_turbu_muscl.data canal_turbu_EFstab.data
+        sed -i "s/muscl/EF_stab { alpha 1 }/" canal_turbu_EFstab.data
+        sed -i "s/muscl 0.05/EFstab 0.05/" post_run
+    fi
+)
+
+# EFstab_0.1
+(
+    if [ -d EFstab_0.1 ]; then
+        cd EFstab_0.1 || exit
+        mv canal_turbu_muscl.data canal_turbu_EFstab.data
+        sed -i "s/muscl/EF_stab { alpha 1 }/" canal_turbu_EFstab.data
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.1 0. 0./" canal_turbu_EFstab.data
+        sed -i "s/muscl 0.05/EFstab 0.1/" post_run
+    fi
+)
+
+# EFstab_0.2
+(
+    if [ -d EFstab_0.2 ]; then
+        cd EFstab_0.2 || exit
+        mv canal_turbu_muscl.data canal_turbu_EFstab.data
+        sed -i "s/muscl/EF_stab { alpha 1 }/" canal_turbu_EFstab.data
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.2 0. 0./" canal_turbu_EFstab.data
+        sed -i "s/muscl 0.05/EFstab 0.2/" post_run
+    fi
+)
+
+# EFstab_0.3
+(
+    if [ -d EFstab_0.3 ]; then
+        cd EFstab_0.3 || exit
+        mv canal_turbu_muscl.data canal_turbu_EFstab.data
+        sed -i "s/muscl/EF_stab { alpha 1 }/" canal_turbu_EFstab.data
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.3 0. 0./" canal_turbu_EFstab.data
+        sed -i "s/muscl 0.05/EFstab 0.3/" post_run
+    fi
+)
+
+# EFstab_0.4
+(
+    if [ -d EFstab_0.4 ]; then
+        cd EFstab_0.4 || exit
+        mv canal_turbu_muscl.data canal_turbu_EFstab.data
+        sed -i "s/muscl/EF_stab { alpha 1 }/" canal_turbu_EFstab.data
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.4 0. 0./" canal_turbu_EFstab.data
+        sed -i "s/muscl 0.05/EFstab 0.4/" post_run
+    fi
+)
+
+# EFstab_0.5
+(
+    if [ -d EFstab_0.5 ]; then
+        cd EFstab_0.5 || exit
+        mv canal_turbu_muscl.data canal_turbu_EFstab.data
+        sed -i "s/muscl/EF_stab { alpha 1 }/" canal_turbu_EFstab.data
+        sed -i "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.5 0. 0./" canal_turbu_EFstab.data
+        sed -i "s/muscl 0.05/EFstab 0.5/" post_run
+    fi
+)
+echo
+pwd
+echo

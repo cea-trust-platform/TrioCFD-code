@@ -1,6 +1,7 @@
 Parameters {
 	Title "TCL heat flux"
 	Author "G.B."
+	VersionTrio_U "1.9.2"
 	TestCase THETA20/VoF1113 Qmicro_only.data
 	TestCase THETA40/VoF1113 Qmicro_only.data
 	TestCase THETA80/VoF1113 Qmicro_only.data
@@ -10,7 +11,6 @@ Parameters {
 	TestCase THETA40/VoF1000 Qmicro_only.data
 	TestCase THETA40/VoF1003 Qmicro_only.data
 	TestCase THETA40/VoF1110 Qmicro_only.data
-	TestCase THETA40/VoF1113 Qmicro_only.data
 	TestCase THETA40/VoF1330 Qmicro_only.data
 	TestCase THETA40/VoF1333 Qmicro_only.data
 	
@@ -18,7 +18,7 @@ Parameters {
 \latex_(There is neither gravity nor surface tension.
 The interface is initialized as a sphere portion matching the contact line BC at an angle $40^\circ$ with a 
 curvature radius of 0.1mm. 
-Initial CL radius is then: $r_{cl}=64.0835$µm for $40^\circ$.
+Initial CL radius is then: $r_{CL}=64.0835$µm for $40^\circ$.
 The temperature is set to saturation everywhere ($T=0$ including on BCs). The test-case is not related to temperature resolution. Phase change is created through a source term at the TCL with $Q_{CL} = 50W/m$. 
 
 Mesh size in $\Delta=10\mu m$. Micro-region extension is set to : $y_m=3.7\mu m$ and $s_m = 5\mu m$.
@@ -75,7 +75,7 @@ EOF
 
 	Figure {
         Title "Bubble Growth - Effect of contact angle"
-        Description "Prefect, there is no effect of contact angle."
+        Description "For any contact angle, we are capable of recovering the correct time evolution of bubble growth (dV/dt)."
         Dimension 2
         LabelX "time [ms]"
         LabelY "vapour volume V/V0 [-]"
@@ -84,7 +84,7 @@ EOF
                 Version ""
                 file ./THETA20/VoF1113/v_ana.txt 
                 columns $1*1000 $2
-                Style point
+                Style points
                 PointSize 2
         }
         Curve {
@@ -92,7 +92,7 @@ EOF
                 Version ""
                 file ./THETA40/VoF1113/v_ana.txt 
                 columns $1*1000 $2
-                Style point
+                Style points
                 PointSize 2
         }
         Curve {
@@ -100,7 +100,7 @@ EOF
                 Version ""
                 file ./THETA80/VoF1113/v_ana.txt 
                 columns $1*1000 $2
-                Style point
+                Style points
                 PointSize 2
         }
         Curve {
@@ -163,7 +163,7 @@ EOF
                 Version ""
                 file ./THETA40/VoF1113/v_ana.txt 
                 columns $1*1000 $2
-                Style point
+                Style points
                 PointSize 2
         }
         Curve {
@@ -276,7 +276,8 @@ visu {
 	instruction_visit SetActivePlots((1))
 	instruction_visit m2=MeshAttributes()
 	instruction_visit m2.opaqueMode=m2.Off
-	instruction_visit m2.foregroundFlag=0
+	instruction_visit try: m2.meshColorSource=m2.MeshCustom
+	instruction_visit except: m2.foregroundFlag=0
 	instruction_visit m2.meshColor=(255,0,0,255)
 	instruction_visit m2.lineWidth = 4
 	instruction_visit m2.legendFlag = 0
@@ -285,7 +286,8 @@ visu {
 	instruction_visit SetActivePlots((2))
 	instruction_visit m3=MeshAttributes()
 	instruction_visit m3.opaqueMode=m3.Off
-	instruction_visit m3.foregroundFlag=0
+	instruction_visit try: m3.meshColorSource=m3.MeshCustom
+	instruction_visit except: m3.foregroundFlag=0
 	instruction_visit m3.legendFlag = 0
 	instruction_visit m3.lineWidth = 3
 	instruction_visit m3.meshColor=(0,255,0,255)

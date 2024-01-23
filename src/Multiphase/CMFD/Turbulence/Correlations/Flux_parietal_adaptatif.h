@@ -44,6 +44,7 @@ public:
   virtual void qp(const input_t& input, output_t& output) const override;
 
   virtual void completer() override;
+  virtual int T_at_wall() const override {return 1;};
 
 protected :
   double calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp, double Diam_hyd_) const;

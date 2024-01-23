@@ -1,10 +1,42 @@
 --------------------------------------------------------------------------------------------------
-Release notes version 1.9.2_beta : Enhancements, modifications and corrected bugs since version 1.9.1 :
+Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
 --------------------------------------------------------------------------------------------------
-25/04/23 (TrioCFD) Change     : New project organization (all modues are gathered)
-02/02/23 (TRUST) Major Change : Domain and Zone are now merged into a single concept: Domaine. All former keywords remain supported (Sous_Zone, Create_domain_from_sous_zone, etc...), but internally the code now only work with Domaine.
-27/01/23 (TRUST) Portability  : C++14 compilers are now mandatory so old GNU compilers (<5.0) are not supported anymore
-04/01/23 (TRUST) Major Change : For Pb_Multiphase, simple calls are now applied to compute fluid/saturations properties (improve significantly the performance especially with libraries like EOS, RefProp, ...)
+30/11/23 (TrioCFD) New feature : Turbulence - k-omega turbulence model (Wilcox 1988 and SST variant) has been implemented in Turbulence section (validation still in progress)
+29/11/23 (TrioCFD) Tests       : FSI- New validation report for the fluid-structure partitioned internal coupling (Beam_Free_Vibration)
+24/11/23 (TrioCFD) Bug fix     : FSI- Extrait surface on mobile walls ( new keyword Extrait_surface_ALE)
+23/11/23 (TrioCFD) Bug fix     : FSI- Compute the y+ for mobile walls
+23/11/23 (TrioCFD) New feature : FTD - solid/fluid thermal coupling using TCL model
+15/11/23 (TrioCFD) New feature : CMFD - Latest multiphase Euler-Euler developments : simplifying single-phase turbulence, adding bubble induced agitation models and adding test cases.
+09/11/23 (TrioCFD) New feature : FSI - Add Neumann boundary conditions for the grid problems in ALE module
+09/11/23 (TrioCFD) Keyword     : Syntax change for modele_turbulence nul. New syntax is "modele_turbulence null {  }"
+25/10/23 (TrioCFD) New feature : FT IJK - New algorithm available, based on IJK discretization, to find the nearest neighbouring face of each node of the front mesh. To activate it , add "no_octree_method 1 " in the interfaces bloc
+11/10/23 (TrioCFD) Bug fix     : FT IJK - Fix area calculation in convection scalar operator
+31/08/23 (TrioCFD) New feature : CMFD - Two-phase adiabatic flow with VDF numerical scheme
+07/07/23 (TrioCFD) New feature : FSI - Hilber-Hughes-Taylor (HHT) time discretisation for the mechanical model (Beam)
+07/07/23 (TrioCFD) New feature : FSI - possibility to have multiple beams in the partitioned explicit serial coupling between the ALE module and the Beam model
+06/07/23 (TrioCFD) Bug fix     : FSI - Periodic boundary conditions in ALE module
+30/06/23 (TrioCFD) Bug fix     : FT IJK - Fixing valgrind leak (uninitialized pointer)
+30/06/23 (TrioCFD) Portability : Fix some validation reports to use Visit v3.3.3
+15/06/23 (TrioCFD) Bug fix     : FSI - Fix periodic boundary conditions in ALE module
+
+--------------------------------------------------------------------------------------------------
+Release notes version 1.9.2 : Enhancements, modifications and corrected bugs since version 1.9.1 :
+--------------------------------------------------------------------------------------------------
+02/06/23 (TrioCFD) Doc         : CMFD - Documentation for drift velocities
+01/06/23 (TrioCFD) Change      : FTD - Adding an optional criterion to smooth the interface conditionally (based on local curvature variation)
+25/05/23 (TrioCFD) Tests       : FTD - Adding TCL (contact line model) validation reports
+16/05/23 (TrioCFD) Tests       : FT IJK - Fix some validation reports
+03/05/23 (TrioCFD) Change      : FSI & SA - No more mask
+25/04/23 (TrioCFD) Major Change: New project organization (all modues are gathered)
+13/04/23 (TrioCFD) Doc         : Update documentation generation scripts
+20/03/23 (TrioCFD) Change      : CMFD - 'Probleme_multiphase' development in progress
+21/02/23 (TrioCFD) New Feature : CMFD - Development in progress
+13/02/23 (TrioCFD) New Feature : FT IJK - New shear boundary condition
+08/02/23 (TrioCFD) New Feature : Turbulence - adding the possibility (still experimental) to compute turbulent viscosity using harmonic mean
+06/02/23 (TRUST)   Change      : C++ template are used (no more macros)
+02/02/23 (TRUST)   Major Change: Domain and Zone are now merged into a single concept: Domaine. All former keywords remain supported (Sous_Zone, Create_domain_from_sous_zone, etc...), but internally the code now only work with Domaine.
+27/01/23 (TrioCFD) New feature : Phase_field - Extension to N components
+04/01/23 (TRUST)   Major Change: For Pb_Multiphase, simple calls are now applied to compute fluid/saturations properties (improve significantly the performance especially with libraries like EOS, RefProp, ...)
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.1 : Enhancements, modifications and corrected bugs since version 1.9.0 :
 --------------------------------------------------------------------------------------------------
@@ -26,7 +58,7 @@ Release notes version 1.9.1 : Enhancements, modifications and corrected bugs sin
 04/10/22 (TrioCFD) Major Change: Previous Phases interpret is no more available in Pb_multiphase and Pb_HEM. Milieu_composite class should now be used and should be placed as well in the problem.
 04/10/22 (TrioCFD) Major Change: Medium (Fluid, solid, constituent, ...) is no more read and associated to a problem for non Front-Tracking problems. It should be read at the begining of each problem bloc.
 04/10/22 (TrioCFD) Major Change: Gravity is no more read and associated to a medium for non Front-Tracking datafiles. It is read directly in the medium.
-04/10/22 (TrioCFD) Syntax      : For Rayonnement datafiles, the problem name should now contain _Rayo (ex: Pb_Thermohydraulique -> Pb_Rayo_Thermohydraulique) 
+04/10/22 (TrioCFD) Syntax      : For Rayonnement datafiles, the problem name should now contain _Rayo (ex: Pb_Thermohydraulique -> Pb_Rayo_Thermohydraulique)
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.0 : Enhancements, modifications and corrected bugs since version 1.8.4 :
 --------------------------------------------------------------------------------------------------
@@ -56,7 +88,7 @@ Release notes version 1.8.3 : Enhancements, modifications and corrected bugs sin
 22/06/21 (TrioCFD) New feature : PHASE_FIELD: generalization of the thermodynamic landscape, the density law and so on of this binary Cahn-Hilliard model coupled with the Navier-Stokes equations (isothermal)
 18/06/21 (TrioCFD) Validation  : Add a validation sheets for a new BC which create synthetic fluctuations as inlet boundary
 09/06/21 (TrioCFD) Bug fixed   : Trust fix to globally conserve the mass of constituents by accepting small local erros in QC (ex baltik GRAINS)
-02/06/21 (TrioCFD) New feature : New problem added which allows simulating binary mixture flows at iso-bar and iso-thermal conditions using a low Mach number approximation 
+02/06/21 (TrioCFD) New feature : New problem added which allows simulating binary mixture flows at iso-bar and iso-thermal conditions using a low Mach number approximation
 17/05/21 (TrioCFD) New feature : k-epsilon Bicephale model : New decoupled management of the evolution equations of k and epsilon for the Bas-Reynolds models - WARNING model under validation
 31/03/21 (TrioCFD) New feature : triocfd -baltik BALTIK_NAME creates an empty baltik that depends on TrioCFD.
 31/03/21 (TrioCFD) New feature : triocfd -xcheck allows now to check the syntaxe of triocfd datafiles using XDATA.
@@ -79,7 +111,7 @@ Release notes version 1.8.2 : Enhancements, modifications and corrected bugs sin
 05/11/20 (TrioCFD) New feature : Adding postprocessing the residues of all the unknown factors of the problem
 03/11/20 (TrioCFD) Bug fixed   : Disabling a loop vectorization in Shih_Zhu_Lumley_VDF model to avoid crash on intel compilers
 30/10/20 (TrioCFD) Change      : Add a missing term in the deformation tensor for non-uniform viscosity in VDF (laminar or turbulent flow)
-30/10/20 (TrioCFD) Change      : Remove -2/3*k remaining terms in the previous operators to be conform for all diffusive operators (VDF, VEF, uniform or not, axi or not) 
+30/10/20 (TrioCFD) Change      : Remove -2/3*k remaining terms in the previous operators to be conform for all diffusive operators (VDF, VEF, uniform or not, axi or not)
 30/10/20 (TrioCFD) Conception  : Diffusive operators coding turbulent shear stress come back from TrioCFD to TRUST
 16/10/20 (TrioCFD) New feature : Add possibility to post-process ustar with negligeable wall law in VDF discretization
 25/09/20 (TrioCFD) New feature : Add tenseur_Reynolds_externe option into Navier Stokes source and diffusion (viscosity) terms to enable a turbulence model built by a machine learning method
@@ -137,6 +169,6 @@ Release notes version 1.7.3 : Enhancements, modifications and corrected bugs sin
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.2 : Enhancements, modifications and corrected bugs since version 1.7.1 :
 --------------------------------------------------------------------------------------------------
-12/11/15 (TrioCFD) Major change: Disable low Reynolds number turbulence model 
+12/11/15 (TrioCFD) Major change: Disable low Reynolds number turbulence model
 14/10/15 (TrioCFD) Minor change: UtilitairesAssemblages dependency deleted because not used by this baltik
 18/06/15 (TrioCFD) Major change: Trio_U code becomes TRUST platform + TrioCFD baltilk

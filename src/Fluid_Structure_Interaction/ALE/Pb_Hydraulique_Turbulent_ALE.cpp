@@ -24,8 +24,12 @@
 #include <Verif_Cl.h>
 #include <Verif_Cl_Turb.h>
 #include <Les_mod_turb.h>
-#include <Mod_turb_hyd_RANS.h>
-
+#include <Mod_turb_hyd_RANS_keps.h>
+#include <Schema_Implicite_base.h>
+#include <Implicite_ALE.h>
+#include <Schema_Euler_explicite.h>
+#include <Schema_Euler_explicite_ALE.h>
+#include <Schema_Euler_Implicite.h>
 
 Implemente_instanciable(Pb_Hydraulique_Turbulent_ALE,"Pb_Hydraulique_Turbulent_ALE",Pb_Fluide_base);
 // XD Pb_Hydraulique_Turbulent_ALE Pb_base Pb_Hydraulique_Turbulent_ALE -1 Resolution of hydraulic turbulent problems for ALE
@@ -132,9 +136,9 @@ int Pb_Hydraulique_Turbulent_ALE::verifier()
 {
   const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
 
-  if ( sub_type(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
+  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
-      const Mod_turb_hyd_RANS& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
@@ -143,3 +147,28 @@ int Pb_Hydraulique_Turbulent_ALE::verifier()
   return 1;
 }
 
+void Pb_Hydraulique_Turbulent_ALE::associer_sch_tps_base(const Schema_Temps_base& sch)
+{
+  Probleme_base::associer_sch_tps_base(sch);
+
+  // Verify that user choosed adapted time scheme/solver
+  if (sub_type(Schema_Euler_explicite,le_schema_en_temps.valeur()))
+    {
+      if(!sub_type(Schema_Euler_explicite_ALE,le_schema_en_temps.valeur()))
+        {
+          Cerr <<"Error: for Mobile domain (Domaine_ALE):  replace  " <<sch.que_suis_je()<<" with "<< sch.que_suis_je() <<"_ALE and restart!"<< finl;
+          Process::exit();
+        }
+    }
+  else if (sub_type(Schema_Euler_Implicite,le_schema_en_temps.valeur()))
+    {
+      Schema_Euler_Implicite& sch_imp = ref_cast(Schema_Euler_Implicite,le_schema_en_temps.valeur());
+      if (!sub_type(Implicite_ALE,sch_imp.solveur().valeur()))
+        {
+          Cerr <<"Error: for Mobile domain (Domaine_ALE), you can only use Scheme_euler_implicit time scheme with solveur implicite_ALE "<<finl;
+          Cerr <<"Replace  solveur implicite with solveur implicite_ALE and restart!"<< finl;
+          Process::exit();
+        }
+
+    }
+}

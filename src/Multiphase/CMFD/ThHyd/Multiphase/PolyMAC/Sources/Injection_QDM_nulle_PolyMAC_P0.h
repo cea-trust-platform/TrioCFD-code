@@ -49,6 +49,7 @@ public :
   void mettre_a_jour(double temps) override { };
 
 protected:
+  double beta_=1.;
 };
 
 #endif

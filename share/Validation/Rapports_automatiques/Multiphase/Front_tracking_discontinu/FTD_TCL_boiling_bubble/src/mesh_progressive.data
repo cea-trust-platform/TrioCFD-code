@@ -1,0 +1,73 @@
+# Boiling bubble simulation #
+# lance_test 4 ecarts #
+# PARALLEL RUNS #
+dimension 2 
+PrecisionGeom 1e-18
+bidim_axi 
+
+domaine dom
+Probleme_FT_Disc_gen pb
+
+# BEGIN MESH #
+Mailler dom
+{
+
+   Pave pave1
+   { 
+   origine 0. 0.
+   longueurs 0.333 0.333 
+   nombre_de_noeuds 76 101
+   Facteurs 1. 1.0
+   }
+   {
+   bord left1     X = 0.          0. <= Y <= 0.333
+   bord bot1      Y = 0.          0. <= X <= 0.333
+   } ,
+   
+   Pave pave2
+   { 
+   origine 0.333 0.
+   longueurs 0.667 0.333 
+   nombre_de_noeuds 44 101
+   Facteurs 1.05 1.0
+   }
+   {
+   bord bot2      Y = 0.          0.333 <= X <= 1.
+   bord right1    X = 1.          0. <= Y <= 0.333
+   } ,
+   
+   Pave pave3
+   { 
+   origine 0. 0.333
+   longueurs 0.333 0.667 
+   nombre_de_noeuds 76 50
+   Facteurs 1.0 1.05
+   }
+   {
+   bord top1     Y = 1.          0. <= X <= 0.333
+   bord left2    X = 0.          0.333 <= Y <= 1.
+   } ,
+   
+   Pave pave4
+   { 
+   origine 0.333 0.333
+   longueurs 0.667 0.667 
+   nombre_de_noeuds 44 50
+   Facteurs 1.05 1.05
+   }
+   {
+   bord top2      Y = 1.          0.333 <= X <= 1.
+   bord right2    X = 1.          0.333 <= Y <= 1.
+   }
+}
+RegroupeBord dom bot { bot1 bot2 } 
+RegroupeBord dom up { top1 top2 } 
+RegroupeBord dom left { left1 left2 } 
+RegroupeBord dom right { right1 right2 } 
+transformer dom x*0.009 y*0.012
+# END MESH #
+
+discretiser_domaine dom
+postraiter_domaine { domaine dom fichier file format lata }
+End        
+

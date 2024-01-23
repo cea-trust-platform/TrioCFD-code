@@ -67,13 +67,15 @@ Entree& Source_Transport_proto::readOn_real(Entree& is, const Nom& nom)
   Param param(nom);
   param.ajouter("C2_eps", &C2);
   param.ajouter("interpolation_viscosite_turbulente", &_interpolation_viscosite_turbulente);
+  param.ajouter("coefficient_limiteur", &_coefficient_limiteur);
   param.lire_avec_accolades(is);
   Cerr << "C2_eps = " << C2 << finl;
 
   // Checking of the value given in the data deck for "interpolation_viscosite_turbulente"
   if ( _interpolation_viscosite_turbulente == 0 ) { Cerr << "Interpolation arithmetique de la viscosite turbulente aux faces (si VEF) = " << finl; }
-  else if ( _interpolation_viscosite_turbulente == 1 ) { Cerr << "Interpolation harmonique de la viscosite (si VEF) = " << finl; }
-  else if ( _interpolation_viscosite_turbulente == 2 ) { Cerr << "Interpolation harmonique ponderee de la viscosite (si VEF) = " << finl; }
+  else if ( _interpolation_viscosite_turbulente == 1 ) { Cerr << "Interpolation harmonique de la viscosite turbulente aux faces (si VEF) = " << finl; }
+  else if ( _interpolation_viscosite_turbulente == 2 ) { Cerr << "Interpolation harmonique ponderee par les volumes de maille de la viscosite turbulente aux faces (si VEF) = " << finl; }
+  else if ( _interpolation_viscosite_turbulente == 3 ) { Cerr << "Interpolation harmonique ponderee par les tailles de maille de la viscosite turbulente aux faces (si VEF) = " << finl; }
   else
     {
       Cerr << "Error in 'interpolation_viscosite_turbulente' input value :" << _interpolation_viscosite_turbulente << finl;
@@ -115,6 +117,17 @@ void Source_Transport_proto::verifier_pb_keps_concen(const Probleme_base& pb, co
 void Source_Transport_proto::verifier_pb_keps_anisotherme_concen(const Probleme_base& pb, const Nom& nom)
 {
   if (!sub_type(Pb_Thermohydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
+}
+
+void Source_Transport_proto::verifier_pb_komega(const Probleme_base& pb, const Nom& nom)
+{
+  if (!sub_type(Pb_Hydraulique_Turbulent, pb) &&
+      !sub_type(Pb_Thermohydraulique_Turbulent_QC, pb))
+    {
+      Cerr << "You should not do this with the K_Omega model, be patient."
+           << finl;
+      Process::exit();
+    }
 }
 
 void Source_Transport_proto::verifier_milieu_anisotherme(const Probleme_base& pb, const Nom& nom)

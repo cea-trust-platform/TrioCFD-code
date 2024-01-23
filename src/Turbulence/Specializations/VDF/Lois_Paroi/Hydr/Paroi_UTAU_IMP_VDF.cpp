@@ -27,7 +27,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Fluide_Dilatable_base.h>
 #include <Equation_base.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 
 Implemente_instanciable(Paroi_UTAU_IMP_VDF,"UTAU_IMP_VDF",Paroi_hyd_base_VDF);
 

@@ -85,10 +85,11 @@ Lire sch
 Triple_Line_Model_FT_Disc TCL 
 Read TCL 
 {
+  distri_first_facette
   Qtcl 50.0 # W/m # 
   lv 10.e-9
-  coeffa -1.9291
-  coeffb  4.03634
+  # coeffa -1.9291 #
+  # coeffb  4.03634 #
   ym 3.7e-6
   sm   5.e-6 # if TestCase at theta_app = 90° => sm=ylim #
   initial_CL_xcoord 0.000035 # Incorrect. Useless for the moment #
@@ -163,8 +164,8 @@ Lire pb
       # In remaillage, nb_iter_correction_volume -> additional VoF conserving iterations after lissage and bary are finished #
       # facteur_longueur_ideale 1.0 is not recommanded usually #
       VOFlike_correction_volume 1
-      nb_iterations_correction_volume 1 
-      nb_lissage_correction_volume 1 
+      nb_iterations_correction_volume 3 
+      nb_lissage_correction_volume 3 
       # Bloc Remesh Best # 
       remaillage {
                     pas 1e-12
@@ -175,7 +176,7 @@ Lire pb
                     relax_barycentrage 0.1
                     facteur_longueur_ideale 1.0
                     nb_iter_barycentrage 1
-                    nb_iter_correction_volume 3
+                    nb_iter_correction_volume 0
                     seuil_dvolume_residuel 1e-15
                     lissage_courbure_coeff -0.02
                     lissage_courbure_iterations_systematique 1
@@ -204,7 +205,7 @@ Lire pb
       equation_interface interf
       equation_navier_stokes hydraulique
       phase 1
-                stencil_width  8
+                stencil_width  9
                 diffusion { }
                 convection { quick }
                 boundary_conditions

@@ -20,6 +20,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Dirichlet_entree_fluide_leaves.h>
 #include <Entree_fluide_K_Eps_impose.h>
+#include <Entree_fluide_K_Omega_impose.h>
 #include <Neumann_paroi.h>
 #include <Neumann_paroi_flux_nul.h>
 #include <Symetrie.h>
@@ -102,7 +103,9 @@ int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& domaine_Cl_hydr, const 
       // hyd (sortie_libre) et turb (sortie_libre ou k_eps_impose)
       if ( sub_type(Neumann_sortie_libre,la_cl_hydr.valeur()) &&
            ! ( sub_type(Neumann_sortie_libre,la_cl_turb.valeur()) ||
-               sub_type(Entree_fluide_K_Eps_impose,la_cl_turb.valeur()) ) )
+               sub_type(Entree_fluide_K_Eps_impose,la_cl_turb.valeur()) ||
+               sub_type(Entree_fluide_K_Omega_impose,la_cl_turb.valeur())
+             ) )
         {
           message_erreur_turb( la_cl_hydr, la_cl_turb, num_Cl);
         }
@@ -113,6 +116,7 @@ int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& domaine_Cl_hydr, const 
       if ( sub_type(Entree_fluide_vitesse_imposee,la_cl_hydr.valeur()) &&
            ! ( sub_type(Neumann_sortie_libre,la_cl_turb.valeur()) ||
                sub_type(Entree_fluide_K_Eps_impose,la_cl_turb.valeur()) ||
+               sub_type(Entree_fluide_K_Omega_impose,la_cl_turb.valeur()) ||
                sub_type(Symetrie,la_cl_turb.valeur()) ) &&
            +	       !pbb.contient("ALE"))
         {
@@ -140,4 +144,3 @@ int message_erreur_turb(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_turb, 
   Process::exit();
   return 1;
 }
-

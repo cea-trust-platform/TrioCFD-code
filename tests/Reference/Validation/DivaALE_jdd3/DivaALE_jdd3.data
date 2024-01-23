@@ -108,7 +108,7 @@ Read pb
 			}
 		# Boundary conditions #
 		boundary_conditions {
-			Cylindre_Centre frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.003*125.66*cos(125.66*t) 0.0 # mobile bord in ALE framework #
+			Cylindre_Centre frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 2 0.003*125.66*cos(125.66*t) 0.0 # mobile bord in ALE framework #
 			Cylindre_Nord paroi_fixe
 			Cylindre_Sud paroi_fixe
 			Cylindre_Est paroi_fixe

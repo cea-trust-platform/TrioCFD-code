@@ -1,0 +1,137 @@
+# 3D forced oscillating cylindrical beam (imposed movement) into a confined space #
+# Modele_turbulence (K, Epsilon) with wall law  #
+# Warning: very coarse mesh.  This is a numerical test case, we do not look at physical aspects in detail here #
+# PARALLEL ONLY 6 # 
+
+
+dimension 3
+Pb_Hydraulique_Turbulent_ALE pb 
+Domaine_ALE dom
+
+# BEGIN SCATTER #
+Scatter DOM.Zones dom
+# END SCATTER #
+
+# For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile 
+boundaries of the domain and specify the speed that must be imposed on them #
+Imposer_vit_bords_ALE dom
+{
+	1 # number of mobile boundaries  #
+	Poutre      Champ_front_ALE 3  -159.3*2*pi*cos(159.3*2*pi*t)*(pi/0.7)*cos(pi*x/0.7)*0.5*1.e-4*y  159.3*2*pi*cos(159.3*2*pi*t)*sin(pi*x/0.7)*0.5*1.e-4 0.0
+}
+
+# Solver used to solve the system giving the moving mesh velocity #
+# Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9  } } #
+Solver_moving_mesh_ALE dom { PETSc Cholesky { } }
+VEFPreP1B dis
+
+
+Scheme_euler_implicit sch
+Read sch
+{
+ 	# Time step #
+        # Initial time [s] #
+        tinit 0
+	# Min time step #
+        dt_min 1.e-9
+	dt_max 1.e-5 
+	# Output criteria #
+        # .out files printing period #
+        dt_impr 1.e-6
+	tcpumax 23.5
+	# .sauv files printing period #
+        periode_sauvegarde_securite_en_heures 12
+ 	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+	facsec 100
+        facsec_max 1000
+	solveur implicite_ALE
+	{
+          solveur gmres  { diag seuil 1.e-8 nb_it_max 5 }    
+	}
+	# Stop if one of the following criteria is checked: #
+        # End time [s] #
+	tmax  0.0062777
+	# Max number of time steps #
+        nb_pas_dt_max 10
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-6
+}
+
+
+# Association between the different objects #
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+Read pb
+{
+   Fluide_Incompressible 
+	{
+	mu Champ_Uniforme 1 0.0009128
+	rho Champ_Uniforme 1 997.6
+	}
+    Navier_Stokes_Turbulent_ALE
+    {
+        # solveur_pression petsc GCP { precond SSOR { omega 1.5 } seuil 1.e-8 } #
+        solveur_pression PETSc Cholesky { }
+        convection {  ALE { muscl } }
+        diffusion   { }
+        initial_conditions 
+        {
+
+           # vitesse Champ_Fonc_Reprise RJH_pb.xyz pb vitesse last_time #
+            vitesse champ_uniforme 3 0.4 0 0 
+        }
+        boundary_conditions
+        {
+           In   frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0.4 0 0 # Re approx  10000 and  V_ann approx 3 m/s #
+           Out  frontiere_ouverte_pression_imposee champ_front_uniforme 1 0
+           Wall    paroi_fixe
+	   Poutre  frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 3 -159.3*2*pi*cos(159.3*2*pi*t)*(pi/0.7)*cos(pi*x/0.7)*0.5*1.e-4*y  159.3*2*pi*cos(159.3*2*pi*t)*sin(pi*x/0.7)*0.5*1.e-4 0.0
+	   In_Poutre  paroi_fixe
+	   Out_Poutre paroi_fixe
+       }
+        modele_turbulence K_Epsilon 
+                 {
+                        Transport_K_Epsilon
+                        {
+                                convection { muscl }
+                                diffusion {  }
+                                conditions_initiales
+                                {
+                                      # k_eps Champ_Fonc_Reprise RJH_pb.xyz pb k_eps last_time #
+                                      k_eps field_uniform_keps_from_ud { U 0.4 D 0.04 } 
+                                }
+                                conditions_limites
+                                {
+                                Poutre           frontiere_ouverte_k_eps_impose champ_front_uniforme 2 0. 0.
+				 In_Poutre        paroi
+           			 Out_Poutre       paroi
+                                Wall             paroi
+                                In               frontiere_ouverte_k_eps_impose boundary_field_uniform_keps_from_ud { U 0.4 D 0.04 }
+                                Out              frontiere_ouverte k_eps_ext boundary_field_uniform_keps_from_ud { U 0.4 D 0.04 }
+                                }
+
+                        }
+			turbulence_paroi loi_standard_hydr nut_max 0.01
+                 }
+    }
+    Post_processing
+    {
+        format lml
+        fields dt_post 0.00015
+        {
+           pression_pa elem
+           vitesse elem
+           Viscosite_turbulente elem
+           y_plus elem
+           k elem
+           eps elem 
+           ALEMeshVelocity som
+        }
+    }
+	Sauvegarde single_hdf Cas.sauv
+}
+EcritureLectureSpecial 0
+Resoudre pb
+Fin
+

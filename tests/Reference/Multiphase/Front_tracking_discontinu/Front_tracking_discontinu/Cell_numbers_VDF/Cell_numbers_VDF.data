@@ -101,7 +101,7 @@ Lire pb
 {
     eq_hydraulique
     {
-	    modele_turbulence nul
+	    modele_turbulence null { }
 	    solveur_pression petsc cholesky { }
 	    convection           { quick }
 	    diffusion            { }

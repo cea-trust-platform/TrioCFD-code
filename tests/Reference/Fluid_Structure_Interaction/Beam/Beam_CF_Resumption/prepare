@@ -1,0 +1,3 @@
+sed "s/Restart_file_name PoutreSaveBeamForRestart.txt/# Restart_file_name PoutreSaveBeamForRestart.txt #/" Beam_CF_Resumption.data > Beam_CF_debut.data
+sed -i "s/resume_last_time single_hdf Beam_CF.sauv/# resume_last_time single_hdf Beam_CF.sauv #/" Beam_CF_debut.data
+trust Beam_CF_debut.data

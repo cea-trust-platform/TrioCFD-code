@@ -59,7 +59,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_1elt_VEF::calculer_viscosite_turbulente()
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   const int nb_elem = domaine_VEF.nb_elem();
-  DoubleVect volume = domaine_VEF.volumes();
+  //DoubleVect volume = domaine_VEF.volumes();
   int num_elem;
 
   F2.resize(nb_elem);
@@ -91,7 +91,7 @@ void Turbulence_hyd_sous_maille_1elt_VEF::calculer_fonction_structure()
   const IntTab& elem_faces = domaine_VEF.elem_faces();
   const DoubleTab& xv = domaine_VEF.xv();
   const DoubleTab& xp= domaine_VEF.xp();
-  DoubleVect volume = domaine_VEF.volumes();
+  //DoubleVect volume = domaine_VEF.volumes();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
 

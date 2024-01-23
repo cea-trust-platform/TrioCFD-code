@@ -437,8 +437,8 @@ void Remaillage_FT_IJK::remaillage_local_interface(double temps, Maillage_FT_IJK
 
 Vecteur3 Remaillage_FT_IJK::get_delta_euler(const Maillage_FT_IJK& maillage) const
 {
-  //  const IJK_Splitting & s = maillage.ref_splitting().valeur();
-  const IJK_Grid_Geometry& geom = maillage.ref_splitting().valeur().get_grid_geometry();
+  REF(IJK_Splitting) s = maillage.ref_splitting();
+  const IJK_Grid_Geometry& geom = s.valeur().get_grid_geometry();
   //  const IJK_Grid_Geometry & geom = s.get_grid_geometry();
   Vecteur3 delta(0., 0., 0.);
   const int dim = Objet_U::dimension;

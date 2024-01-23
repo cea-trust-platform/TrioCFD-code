@@ -37,7 +37,7 @@
  * Take as main parameter reference to FT to be able to use its members.
  */
 IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft) :
-  statistiques_FT_(ijk_ft), ref_ijk_ft_(ijk_ft), disable_diphasique_(ijk_ft.disable_diphasique_), interfaces_(ijk_ft.interfaces_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
+  statistiques_FT_(ijk_ft), ref_ijk_ft_(ijk_ft), disable_diphasique_(ijk_ft.disable_diphasique_), interfaces_(ijk_ft.interfaces_), kappa_ft_(ijk_ft.kappa_ft_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
   d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_), thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_)
 {
   groups_statistiques_FT_.dimensionner(0);
@@ -820,6 +820,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
   if (liste_post_instantanes_.contient_("PRESSURE"))
     n--, dumplata_scalar(lata_name, "PRESSURE", pressure_, latastep);
+  if (liste_post_instantanes_.contient_("KAPPA_FT"))
+    n--, dumplata_scalar(lata_name, "KAPPA_FT", kappa_ft_, latastep);
+  if (liste_post_instantanes_.contient_("KAPPA_FT_NS"))
+    n--, dumplata_scalar(lata_name, "KAPPA_FT_NS", ref_ijk_ft_.kappa_ft_ns_, latastep);
   if (liste_post_instantanes_.contient_("D_PRESSURE"))
     n--, dumplata_scalar(lata_name, "D_PRESSURE", ref_ijk_ft_.d_pressure_, latastep);
   if (liste_post_instantanes_.contient_("INDICATRICE"))
@@ -832,6 +836,8 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     n--, dumplata_scalar(lata_name, "RHO", ref_ijk_ft_.rho_field_, latastep);
   if (liste_post_instantanes_.contient_("PRESSURE_RHS"))
     n--, dumplata_scalar(lata_name, "PRESSURE_RHS", ref_ijk_ft_.pressure_rhs_, latastep);
+//  if (liste_post_instantanes_.contient_("INV_RHO"))
+//    n--, dumplata_scalar(lata_name, "INV_RHO", ref_ijk_ft_.inv_rho_field_, latastep);
   if (liste_post_instantanes_.contient_("VELOCITY_FT"))
     n--, dumplata_vector(lata_name, "VELOCITY_FT", ref_ijk_ft_.velocity_ft_[0], ref_ijk_ft_.velocity_ft_[1], ref_ijk_ft_.velocity_ft_[2], latastep);
   if (liste_post_instantanes_.contient_("SOURCE_QDM_INTERF"))

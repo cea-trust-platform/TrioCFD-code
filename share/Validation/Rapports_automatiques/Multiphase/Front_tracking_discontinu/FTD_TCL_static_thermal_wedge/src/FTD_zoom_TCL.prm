@@ -8,7 +8,7 @@ Parameters {
 	Description "....No effect of phase-change on the interface (no motion)"
 	Description "....Prescribed wall temperature"
 
-	VersionTrio_U "1.7.6"
+	VersionTrio_U "1.9.2"
 
 	ParametersTrio_U Type of problem : Probleme_FT_Disc_gen
 	ParametersTrio_U Discretization : VDF
@@ -21,13 +21,14 @@ Parameters {
 	ParametersTrio_U Type of boundary conditions : Heated wall with constant temperature and prescribed contact angle (bottom), free openings or walls otherwise.
 	ParametersTrio_U Type of fluid : Atm. water\&steam.
 
-	TestCase . fake 
         CasTest CAS_OFFSET-0.5 calc 1 /* jdd inclus en annexe */
         CasTest CAS_OFFSET-0.4 calc 1
         CasTest CAS_OFFSET-0.3 calc 1
 #         CasTest CAS_OFFSET-0.2 calc 1  /* Weirdly, but its the only one unstable, spurrious currents */
         CasTest CAS_OFFSET-0.1 calc 1
-        CasTest CAS_OFFSET0.0 calc 1
+        CasTest CAS_OFFSET0.0 calc 1 /* REF case */
+        CasTest CAS_OFFSET0.0_TIMESTEP1e-07 calc 1 /* max||u|| = 1e-12 -> very reasonnable */
+        CasTest CAS_OFFSET0.0_TIMESTEP1e-08 calc 1 /* max||u|| = 1e-3 -> very reasonnable */
         CasTest CAS_OFFSET0.1 calc 1
 #        CasTest CAS_OFFSET0.2 calc 1  /* Weirdly, very unstable too. We have to set dt=3.0e-8 to remove spurrious */
         CasTest CAS_OFFSET0.2_TIMESTEP1e-07 calc 1
@@ -40,31 +41,40 @@ Parameters {
         CasTest CAS_REFINE0.5 calc 1
         CasTest CAS_REFINE2 calc 1
         CasTest CAS_REFINE4 calc 1
-        CasTest CAS_REFINE8 calc 1
+#        CasTest CAS_REFINE8 calc 1
         CasTest CAS_ANGLE5 calc 1
         CasTest CAS_ANGLE10 calc 1
         CasTest CAS_ANGLE15 calc 1
         CasTest CAS_ANGLE20 calc 1
         CasTest CAS_ANGLE30 calc 1
+#	CasTest CAS_ANGLE50 calc 1
         CasTest CAS_ANGLE80 calc 1
         CasTest CAS_ANGLE90 calc 1
         CasTest CAS_DT3 calc 1
         CasTest CAS_DT5 calc 1
-        CasTest CAS_DT9 calc 1
+        CasTest CAS_DT10 calc 1
         CasTest CAS_DT15 calc 1
+        CasTest CAS_REFINE1/TCL2 calc 1
+        CasTest CAS_REFINE1/TCL4 calc 1
+        CasTest CAS_REFINE1/TCL6 calc 1
+	CasTest CAS_REFINE1/TCL8 calc 1
+        ExtraUsedFile REF/lata/post.lata.INDICATRICE_*
+	ExtraUsedFile REF/lata/post.lata.TEMPERATURE_THERMIQUE*
+	ExtraUsedFile REF/lata/post.lata.TEMPERATURE_GRAD_THERMIQUE*
+	ExtraUsedFile REF/lata/post.lata.MPOINT_THERMIQUE*
 
 	Author "G. Bois"
 }
 
 Chapter {
 	Title "Tests Description"
-	Description "Geometry : 2D (axi?)"
+	Description "Geometry : 2D"
 	Description "Dimensions : R=25e-6 m, L=12.e-6 m"
 	Description "Mesh : Hexa, "
 	Description "Initial conditions : "
 	Description "...Hydraulic : Zero velocity"
-	Description "...Interface : plane at a prescribed angle"
-	Description "...Temperature : T=7$°$ Cover-saturation at the wall, and linear decrease on 5$\mu m$"
+	Description "...Interface : plane at a prescribed angle 5, 10, 15, 20, 30, 50, 80 or 90$°$"
+	Description "...Temperature : T=3,5,7,9 or 15$°$C over-saturation at the wall, and linear decrease on 5$\mu m$"
 	Description "Boundary conditions :"
 	Description "..."
 	Description "..."
@@ -128,7 +138,8 @@ Chapter {
 		instruction_visit VectorAtts.stride = 1
 		instruction_visit VectorAtts.scale = 0.09
 		instruction_visit VectorAtts.scaleByMagnitude = 0
-		instruction_visit VectorAtts.colorByMag = 0
+		instruction_visit try: VectorAtts.colorByMagnitude = 0
+		instruction_visit except: VectorAtts.colorByMag = 0
 		instruction_visit SetPlotOptions(VectorAtts)
 		cycles 0 -1
 		normal3D 0. 0. 1. 
@@ -155,13 +166,160 @@ Chapter {
 		instruction_visit VectorAtts.stride = 1
 		instruction_visit VectorAtts.scale = 0.4
 		instruction_visit VectorAtts.scaleByMagnitude = 1
-		instruction_visit VectorAtts.colorByMag = 1
+		instruction_visit try: VectorAtts.colorByMagnitude = 1
+		instruction_visit except: VectorAtts.colorByMag = 1
 		instruction_visit SetPlotOptions(VectorAtts)
 		cycles -1
 		normal3D 0. 0. 1. 
 		up3D 0. 1 0.
 	}
 	
+	visu {
+		Title "final comparison of mp to analytical using VisIt projection by pos_cmfe"
+		nb_img_without_newline 1
+		Origin Visit
+		Width 7.5cm
+		instruction_visit DefineScalarExpression("ri","1.e-20+sqrt((coord(INTERFACES)[0]-5e-6)^2+(coord(INTERFACES)[1])^2)")
+		instruction_visit DefineScalarExpression("mpana", "0.67897/(-2.2574e6)*7.0/(ri*(50*3.14159)/180)")
+		instruction_visit DefineScalarExpression("mp", "pos_cmfe(<[0]id:MPOINT_THERMIQUE_ELEM_dom>,INTERFACES,-100.)")
+		instruction_visit  OpenDatabase("REF/lata/post.lata")
+		instruction_visit ScatterAtts = ScatterAttributes()
+		instruction_visit ScatterAtts.var1 = "ri"
+		instruction_visit ScatterAtts.var2 = "mpana"
+		instruction_visit ScatterAtts.colorType = ScatterAtts.ColorBySingleColor
+		instruction_visit ScatterAtts.pointSizePixels = 10
+		instruction_visit ScatterAtts.singleColor = (0, 0, 0, 255)
+		instruction_visit ScatterAtts.scaleCube = 0
+		instruction_visit SetDefaultPlotOptions(ScatterAtts)
+		instruction_visit AddPlot("Scatter", "mpana", 0, 1)
+		instruction_visit SetPlotOptions(ScatterAtts)
+		instruction_visit AddPlot("Scatter", "mp", 0, 1)
+		instruction_visit ScatterAtts.var2 = "mp"
+		instruction_visit ScatterAtts.singleColor = (255, 0, 0, 255)
+		instruction_visit SetPlotOptions(ScatterAtts)
+		instruction_visit DrawPlots()
+		instruction_visit View2DAtts = View2DAttributes()
+		instruction_visit View2DAtts.windowCoords = (5.20315e-08, 1.56526e-05, -9.20733, -0.154104)
+		instruction_visit View2DAtts.viewportCoords = (0.2, 0.95, 0.15, 0.95)
+		instruction_visit SetView2D(View2DAtts)
+		cycles -1
+	}
+	
+	Figure {
+		Title "final comparison of mp to analytical using MED and Python"
+		Width 7.5cm
+		Dimension 2
+		LabelX "s [$\\mu m$]"
+		LabelY "mp"
+		legend below title " at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference solution (without interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($2)
+			Style lines
+			TypeLigne 1
+			LineWidth 2
+		}
+		Curve {
+			legend "Reference solution (with interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($3)
+			Style lines
+			TypeLigne 2
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M2"
+			file ./CAS_REFINE2/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 3
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1"
+			file ./CAS_REFINE1/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 4
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M0.5"
+			file ./CAS_REFINE0.5/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 5
+			LineWidth 2
+		}
+	}
+	Figure {
+		Title "TCL model effect. final comparison of mp to analytical using MED and Python"
+		Description "Remark: The results for mpoint converge when the meso cells >= 4"
+		Width 7.5cm
+		Dimension 2
+		LabelX "s [$\\mu m$]"
+		LabelY "mp"
+		legend below title " at the interface"
+		Include_Description_Curves 0
+		Curve {
+			legend "Reference solution (without interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($2)
+			Style lines
+			TypeLigne 1
+			LineWidth 2
+		}
+		Curve {
+			legend "Reference solution (with interf. resistance)"
+			file ./CAS_REFINE2/sm_ana.dat
+			columns ($1*1e6) ($3)
+			Style lines
+			TypeLigne 2
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1"
+			file ./CAS_REFINE1/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 3
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=2)"
+			file ./CAS_REFINE1/TCL2/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 4
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=4)"
+			file ./CAS_REFINE1/TCL4/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 5
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=6)"
+			file ./CAS_REFINE1/TCL6/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 6
+			LineWidth 2
+		}
+		Curve {
+			legend "Mesh M1 (TCL - meso=8)"
+			file ./CAS_REFINE1/TCL8/xysm.dat
+			columns ($3*1e6) ($4)
+			Style lines
+			TypeLigne 7
+			LineWidth 2
+		}
+	}
 }
 Chapter {
 	Title "Results"
@@ -199,7 +357,7 @@ Chapter {
 			legend "Reference case"
 			file CAS_OFFSET0.0/dTdni.xyz
 			columns (1e6*sqrt($2*$2+$3*$3)) ($5)
-			Style linepoints
+			Style linespoints
 			TypeLigne 1
 			LineWidth 2
 			PointSize 3
@@ -259,6 +417,8 @@ Chapter {
 	Title "Sensitivity to the offset"
 	Description "How does the flux evolves when the contact line crosses to a new Eulerian cell at the wall? "
 	Description "Strangely, all calculations are stables except OFFSET-0.2 which requires to set the TIMESTEP to 2e-07 and OFFSET0.2 which is even more demanding (dt=1e-7). "
+	Description "Remark: The integral flux  (shown in Chap 4.2) converges consistently regardless of the offset, demonstrating the model's conservation behavior, which is a important feature for the moving triple contact line."
+	Description "In the reference case, the leftward shift of the front (TCL) occurs due to remeshing, which we cannot eliminate because it would lead to the marker being situated at the grid face, causing issues with the employed algorithm (*.med) in post-processing. This shift slightly alters the simulated contact angle. Additionally, due to this leftward movement, only a smaller portion of the front enters the adjacent left cell. Consequently, a reduced part of Qmicro is assigned to this cell, which ideally should be entirely allocated to the second cell. Despite this effect, we believe its overall influence on the system's behavior remains limited. This assumption is supported by the convergence of the integral flux, indicating that despite the leftward shift and the altered distribution of Qmicro, the system's integral behavior remains consistent and converges as expected."
 	Figure {
 		nb_img_without_newline 2
 		Title "(final) flux at the bottom wall"
@@ -784,11 +944,10 @@ The definition of $T_l$ in mixed cells should be clarified.
 		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
 		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
 		Origin Visit
-#		mesh CAS_REFINE8/lata/post.lata dom
-		mesh CAS_REFINE8/lata/post.lata INTERFACES
+		mesh CAS_REFINE4/lata/post.lata INTERFACES
 #		Operator_to_all no_legend
 #		Operator no_databaseinfo
-		Pseudocolor_with_range CAS_REFINE8/lata/post.lata dom dT ELEM min max
+		Pseudocolor_with_range CAS_REFINE4/lata/post.lata dom dT ELEM min max
 		cycles -1
 		normal3D 0. 0. 1. 
 		up3D 0. 1 0.
@@ -804,17 +963,15 @@ The definition of $T_l$ in mixed cells should be clarified.
 		instruction_visit DefineScalarExpression("Tana50_ELEM_dom", "if(eq(INDICATRICE_INTERF_ELEM_dom,1),7.*(1-theta/50), 0.)")
 		instruction_visit DefineScalarExpression("dT_ELEM_dom", "Tl_ELEM_dom-Tana50_ELEM_dom")
 		Origin Visit
-#		InsertText 0. 13.e-6 0. "Refined_colorbar" 0.1
-#		mesh CAS_REFINE8/lata/post.lata dom
-		mesh CAS_REFINE8/lata/post.lata INTERFACES
-#		Operator_to_all no_legend
-#		Operator no_databaseinfo
-		Pseudocolor_with_range CAS_REFINE8/lata/post.lata dom dT ELEM -0.01 0.01
+		mesh CAS_REFINE4/lata/post.lata INTERFACES
+		Pseudocolor_with_range CAS_REFINE4/lata/post.lata dom dT ELEM -0.01 0.01
 		cycles -1
 		normal3D 0. 0. 1. 
 		up3D 0. 1 0.
 	}
 	Description "Some curves now."
+
+        Description "Remark: The integral flux (shown in Chap 5.3) consistently converges irrespective of mesh refinement. This demonstrates that the thermal singularity at the triple contact line (TCL) is effectively handled by the TCL model. Specifically, the total energy entering the domain remains unchanged with varying mesh sizes"
 	
 	Figure {
 		nb_img_without_newline 2
@@ -872,15 +1029,15 @@ The definition of $T_l$ in mixed cells should be clarified.
 			LineWidth 1
 			PointSize 0.25
 		}
-		Curve {
-			legend "refine: 8 (finest)"
-			file CAS_REFINE8/xphi_last.txt
-			columns (1e6*($1-5e-6-0.e-6)) ($2)
-			Style linespoints
-			TypeLigne 4
-			LineWidth 1
-			PointSize 0.25
-		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($2)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
 	}
 	Figure {
 #		nb_img_without_newline 1
@@ -938,15 +1095,15 @@ The definition of $T_l$ in mixed cells should be clarified.
 			LineWidth 1
 			PointSize 0.25
 		}
-		Curve {
-			legend "refine: 8 (finest)"
-			file CAS_REFINE8/xphi_last.txt
-			columns (1e6*($1-5e-6-0.e-6)) ($2)
-			Style linespoints
-			TypeLigne 4
-			LineWidth 1
-			PointSize 0.25
-		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($2)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
 	}
 	Figure {
 		nb_img_without_newline 2
@@ -1004,15 +1161,15 @@ The definition of $T_l$ in mixed cells should be clarified.
 			LineWidth 1
 			PointSize 0.25
 		}
-		Curve {
-			legend "refine: 8 (finest)"
-			file CAS_REFINE8/xphi_last.txt
-			columns (1e6*($1-5e-6-0.e-6)) ($3)
-			Style linespoints
-			TypeLigne 4
-			LineWidth 1
-			PointSize 0.25
-		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($3)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
 	}
 	Figure {
 #		nb_img_without_newline 1
@@ -1070,21 +1227,26 @@ The definition of $T_l$ in mixed cells should be clarified.
 			LineWidth 1
 			PointSize 0.25
 		}
-		Curve {
-			legend "refine: 8 (finest)"
-			file CAS_REFINE8/xphi_last.txt
-			columns (1e6*($1-5e-6-0.e-6)) ($3)
-			Style linespoints
-			TypeLigne 4
-			LineWidth 1
-			PointSize 0.25
-		}
+#		Curve {
+#			legend "refine: 8 (finest)"
+#			file CAS_REFINE8/xphi_last.txt
+#			columns (1e6*($1-5e-6-0.e-6)) ($3)
+#			Style linespoints
+#			TypeLigne 4
+#			LineWidth 1
+#			PointSize 0.25
+#		}
 	}
 }
 
 Chapter {
 	Title "Effect of the microscopic contact angle"
 	Description "The microscopic contact angle is varied from 5 to 90 degrees."
+
+        Description "Firstly, In the generated figure for angle 5, only the results for the micro and meso zones are depicted, considering the utilization of 4 meso cells. For the flux show in the figure, larger contact angles display a curve representing micro, meso, and macro zones, whereas smaller contact angles only exhibit micro and meso zones."
+	Description "The flux demonstrates a distinct pattern for smaller contact angles: it initially decreases in the micro-zone, then exhibits an increase during the transition from the micro to the meso zone, followed by a consistent decrease within the meso zone.  This peculiar transition behavior is a result of the interfacial heat resistance employed in the micro-zone. For a smooth and coherent flux transition (where the flux consistently decreases moving away from the triple contact line), it's crucial to ensure that the flux in the micro-zone ($q_{micro}$) is less than the flux in the meso zone ($q_{meso}$ at sm+$\Delta x$). This condition necessitates $\Delta x $ bigger than $R_i \lambda_{l} / \theta_{app}$ to maintain a proper transient flux."
+        Description "In most cases, excluding angles 5, 80, and 90, the front shifts leftward due to remeshing, slightly altering the simulated contact angle. When only a smaller section of the front enters the adjacent left cell, the flux distribution is affected (as seen in angle 50)."
+
 	Figure {
 		nb_img_without_newline 2
 		Title "(final) flux at the bottom wall"
@@ -1425,7 +1587,8 @@ Chapter {
 
 Chapter {
 	Title "Effect of the wall overheat"
-	Description "The wall overheat angle is varied from 3 to 15$\deg C$."
+	Description "The wall overheat is varied from 3 to 15$\deg C$."
+	Description "In all cases, the leftward shift of the front (TCL) occurs due to remeshing, which we cannot eliminate because it would lead to the marker being situated at the grid face, causing issues with the employed algorithm (*.med) in post-processing. This shift slightly alters the simulated contact angle. Additionally, due to this leftward movement, only a smaller portion of the front enters the adjacent left cell. Consequently, a reduced part of Qmicro is assigned to this cell, which ideally should be entirely allocated to the second cell. Despite this effect, we believe its overall influence on the system's behavior remains limited. This assumption is supported by the convergence of the integral flux, indicating that despite the leftward shift and the altered distribution of Qmicro, the system's integral behavior remains consistent and converges as expected. (see Chap. 4.2)"
 	Figure {
 		nb_img_without_newline 2
 		Title "(final) flux at the bottom wall"
@@ -1456,17 +1619,8 @@ Chapter {
 			PointSize 0
 		}
 		Curve {
-			legend "angle: 15"
-			file CAS_ANGLE15/xphi_last.txt
-			columns (1e6*($1-5e-6+0.e-6)) ($2)
-			Style linespoints
-			TypeLigne 2
-			LineWidth 2
-			PointSize 0
-		}
-		Curve {
-			legend "DT: 7 (ref)"
-			file CAS_DT7/xphi_last.txt
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
 			columns (1e6*($1-5e-6-0.0e-6)) ($2)
 			Style linespoints
 			TypeLigne 1
@@ -1474,8 +1628,8 @@ Chapter {
 			PointSize 0.25
 		}
 		Curve {
-			legend "DT: 9"
-			file CAS_DT9/xphi_last.txt
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
 			columns (1e6*($1-5e-6-0.e-6)) ($2)
 			Style linespoints
 			TypeLigne 2
@@ -1522,17 +1676,8 @@ Chapter {
 			PointSize 0
 		}
 		Curve {
-			legend "angle: 15"
-			file CAS_ANGLE15/xphi_last.txt
-			columns (1e6*($1-5e-6+0.e-6)) ($2)
-			Style linespoints
-			TypeLigne 2
-			LineWidth 2
-			PointSize 0
-		}
-		Curve {
-			legend "DT: 7 (ref)"
-			file CAS_DT7/xphi_last.txt
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
 			columns (1e6*($1-5e-6-0.0e-6)) ($2)
 			Style linespoints
 			TypeLigne 1
@@ -1540,8 +1685,8 @@ Chapter {
 			PointSize 0.25
 		}
 		Curve {
-			legend "DT: 9"
-			file CAS_DT9/xphi_last.txt
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
 			columns (1e6*($1-5e-6-0.e-6)) ($2)
 			Style linespoints
 			TypeLigne 2
@@ -1588,17 +1733,8 @@ Chapter {
 			PointSize 0
 		}
 		Curve {
-			legend "angle: 15"
-			file CAS_ANGLE15/xphi_last.txt
-			columns (1e6*($1-5e-6+0.e-6)) ($3)
-			Style linespoints
-			TypeLigne 2
-			LineWidth 2
-			PointSize 0
-		}
-		Curve {
-			legend "DT: 7 (ref)"
-			file CAS_DT7/xphi_last.txt
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
 			columns (1e6*($1-5e-6-0.0e-6)) ($3)
 			Style linespoints
 			TypeLigne 1
@@ -1606,8 +1742,8 @@ Chapter {
 			PointSize 0.25
 		}
 		Curve {
-			legend "DT: 9"
-			file CAS_DT9/xphi_last.txt
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
 			columns (1e6*($1-5e-6-0.e-6)) ($3)
 			Style linespoints
 			TypeLigne 2
@@ -1654,17 +1790,8 @@ Chapter {
 			PointSize 0
 		}
 		Curve {
-			legend "angle: 15"
-			file CAS_ANGLE15/xphi_last.txt
-			columns (1e6*($1-5e-6+0.e-6)) ($3)
-			Style linespoints
-			TypeLigne 2
-			LineWidth 2
-			PointSize 0
-		}
-		Curve {
-			legend "DT: 7 (ref)"
-			file CAS_DT7/xphi_last.txt
+			legend "DT: 8.5 (ref)"
+			file CAS_DT8.5/xphi_last.txt
 			columns (1e6*($1-5e-6-0.0e-6)) ($3)
 			Style linespoints
 			TypeLigne 1
@@ -1672,8 +1799,8 @@ Chapter {
 			PointSize 0.25
 		}
 		Curve {
-			legend "DT: 9"
-			file CAS_DT9/xphi_last.txt
+			legend "DT: 10"
+			file CAS_DT10/xphi_last.txt
 			columns (1e6*($1-5e-6-0.e-6)) ($3)
 			Style linespoints
 			TypeLigne 2

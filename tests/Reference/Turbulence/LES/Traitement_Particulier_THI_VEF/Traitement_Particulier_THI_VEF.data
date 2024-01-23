@@ -103,7 +103,7 @@ Lire pb
 
     Traitement_particulier { THI { init_ec 1 val_ec 1
 				   periode_calc_spectre 0.25
-                                   calc_spectre 1 3D 1 1D 1 
+                                   calc_spectre 1 spectre_3D 1 spectre_1D 1
 			conservation_Ec
 			longueur_boite 6.28
 				   } }		

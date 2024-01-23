@@ -16,6 +16,10 @@
 }
 \newcommand*\acocher{\quitvmode{\fboxsep0pt \fboxrule0.8pt \fbox{\vrule height1.8ex depth.1ex width0pt \vrule height0pt width1.9ex}}}
 
+% Variables definition
+% - TrioCFD version
+\newcommand\codeVersion{1.9.3}
+
 \begin{document}
 
 \begin{minipage}{.15\textwidth}
@@ -23,7 +27,7 @@
 \end{minipage}
 \begin{minipage}{0.6\textwidth}
    \begin{center}
-       {\LARGE TRIOCFD v1.9.1 : \\ INSTALLATION REPORT}
+       {\LARGE TRIOCFD v\codeVersion : \\ INSTALLATION REPORT}
    \end{center}
 \end{minipage}
 \begin{minipage}{.15\textwidth}
@@ -50,7 +54,7 @@
 \\
        \multicolumn{2}{l}{\Large TrioCFD Usage} \\ \hline \\
 %
-       \raisebox{0.25\baselineskip}{Baltik(s) used:} & \TextField[name=nomValue,width=0.5\textwidth,bordercolor={0.65 0.79 0.94}]{} \tabularnewline
+       \raisebox{0.25\baselineskip}{Module(s) used:} & \TextField[name=nomValue,width=0.5\textwidth,bordercolor={0.65 0.79 0.94}]{} \tabularnewline
        \raisebox{0.25\baselineskip}{How many TrioCFD users in your organism ?} & \TextField[name=nomValue,width=0.5\textwidth,bordercolor={0.65 0.79 0.94}]{} \tabularnewline
 %       Multi-user in your organism ?  &  \ChoiceMenu[radio,name=jddValue,bordercolor={0.65 0.79 0.94},radiosymbol=]{}{YES,~~~NO}\tabularnewline \\
        \raisebox{0.3\baselineskip}{For which application(s) do you use TrioCFD ? } & \tabularnewline

@@ -50,7 +50,7 @@ calculer_terme_production_K(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF
   const IntVect& orientation = domaine_VDF.orientation();
 
   int elem;
-  IntVect element(4);
+  //IntVect element(4);
 
   S = 0. ;
 
@@ -88,6 +88,47 @@ calculer_terme_production_K(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF
     }
 
   Debog::verifier("Source_Transport_K_Eps_VDF_P0_VDF:: calculer_terme_production_K ",S);
+  return S ;
+}
+
+DoubleVect& Calcul_Production_K_VDF::
+calculer_terme_production_K_for_komega(const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF& domaine_Cl_VDF,
+                                       DoubleVect& S, const DoubleTab& K_Omega,
+                                       const DoubleTab& vitesse, const Champ_Face_VDF& vit,
+                                       const DoubleTab& visco_turb) const
+{
+  const IntTab& elem_faces = domaine_VDF.elem_faces();
+  const IntVect& orientation = domaine_VDF.orientation();
+
+  // cAlan, 23/01/2023. Pour le modele k-omega, on prend un
+  // calcul_S_barre car on n a pas de loi de paroi. La fonction sera a
+  // factoriser avec la precedente.
+  S = 0.;
+  vit.calcul_S_barre(vitesse, S, domaine_Cl_VDF);
+
+  Debog::verifier("Source_Transport_K_Omega_VDF_P0_VDF::calculer_terme_production_K",
+                  S);
+
+  int nb_elem = domaine_VDF.nb_elem();
+  for (int elem = 0; elem < nb_elem; elem++)
+    {
+      // P = 2*nut*Sij*Sij
+      S(elem) *= visco_turb(elem);
+      double coef = 0.;
+      for (int i = 0; i < Objet_U::dimension; i++)
+        {
+          coef += (vitesse[elem_faces(elem, i)] - vitesse[elem_faces(elem, i+Objet_U::dimension)]);
+          coef /= domaine_VDF.dim_elem(elem, orientation(elem_faces(elem, i)));
+        }
+
+      //Corrections pour prendre en compte la divergence de u
+      //non nulle en Quasi-Compressible
+      S(elem) += -(2./3.)*visco_turb(elem)*coef*coef;
+      S(elem) += -(2./3.)*K_Omega(elem, 0)*coef;
+    }
+
+  Debog::verifier("Source_Transport_K_Omega_VDF_P0_VDF::calculer_terme_production_K_for_komega",
+                  S);
   return S ;
 }
 
@@ -594,7 +635,7 @@ calculer_terme_production_K_BiK(const Domaine_VDF& domaine_VDF, const Domaine_Cl
   const IntVect& orientation = domaine_VDF.orientation();
 
   int elem;
-  IntVect element(4);
+  //IntVect element(4);
 
   S = 0. ;
 
@@ -749,5 +790,3 @@ calculer_terme_production_K_BiK_Axi(const Domaine_VDF& domaine_VDF,
   P.echange_espace_virtuel();
   return P;
 }
-
-

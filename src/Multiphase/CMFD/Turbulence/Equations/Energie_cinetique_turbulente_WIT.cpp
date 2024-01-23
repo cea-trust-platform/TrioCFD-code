@@ -86,7 +86,7 @@ void Energie_cinetique_turbulente_WIT::associer_milieu_base(const Milieu_base& u
 
 const Champ_Don& Energie_cinetique_turbulente_WIT::diffusivite_pour_transport() const
 {
-  return ref_cast(Fluide_base,milieu()).viscosite_dynamique();
+  return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }
 
 const Champ_base& Energie_cinetique_turbulente_WIT::diffusivite_pour_pas_de_temps() const
@@ -173,44 +173,23 @@ void Energie_cinetique_turbulente_WIT::associer_fluide(const Fluide_base& un_flu
 void Energie_cinetique_turbulente_WIT::calculer_alpha_rho_k_WIT(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
   const Equation_base& eqn = ref_cast(Equation_base, obj);
-  const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
-  const Champ_base& ch_rho = fl.masse_volumique();
-  const Champ_Inc_base *ch_alpha = sub_type(Pb_Multiphase, eqn.probleme()) ? &ref_cast(Pb_Multiphase, eqn.probleme()).eq_masse.inconnue().valeur() : NULL,
-                        *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : NULL; //pas toujours un Champ_Inc
-  const DoubleTab* alpha = ch_alpha ? &ch_alpha->valeurs() : NULL, &rho = ch_rho.valeurs(), &k = eqn.inconnue().valeurs();
+  const DoubleTab& k = eqn.inconnue().valeurs();
 
   /* valeurs du champ */
-  int i, n, N = val.line_size(), Nl = val.dimension_tot(0), cR = sub_type(Champ_Uniforme, ch_rho);
+  int i, n, N = val.line_size(), Nl = val.dimension_tot(0);
   for (i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * k(i, n);
+    for (n = 0; n < N; n++) val(i, n) = k(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab();
-  DoubleTab b_rho, b_k = eqn.inconnue()->valeur_aux_bords();
+  DoubleTab b_k = eqn.inconnue()->valeur_aux_bords();
   int Nb = b_k.dimension_tot(0);
-  if (ch_rho.a_un_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
-  else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis().valeur()).xv_bord(), b_rho);
-  for (i = 0; i < Nb; i++)
-    for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_k(i, n);
 
-  if (alpha)//derivee en alpha : rho * k
-    {
-      DoubleTab& d_a = deriv["alpha"];
-      for (d_a.resize(Nl, N), i = 0; i < Nl; i++)
-        for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * k(i, n);
-    }
-  //derivee en k : alpha * rho
+  for (i = 0; i < Nb; i++)
+    for (n = 0; n < N; n++) bval(i, n) = b_k(i, n);
+
+  //derivee en k : 1
   DoubleTab& d_k = deriv["k_WIT"];
   for (d_k.resize(Nl, N), i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) d_k(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n);
+    for (n = 0; n < N; n++) d_k(i, n) = 1.;
 
-  /* derivees a travers rho */
-  if (pch_rho)
-    for (auto && n_d :pch_rho->derivees())
-      {
-        DoubleTab& d_v = deriv[n_d.first];
-        for (d_v.resize(Nl, N), i = 0; i < Nl; i++)
-          for (n = 0; n < N; n++)
-            d_v(i, n) = (alpha ? (*alpha)(i, n) : 1) * k(i, n) * n_d.second(i, n);
-      }
 }

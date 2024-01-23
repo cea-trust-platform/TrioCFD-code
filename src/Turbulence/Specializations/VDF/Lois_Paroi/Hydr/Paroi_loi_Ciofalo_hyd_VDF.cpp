@@ -27,7 +27,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Turbulence_paroi_base.h>
 #include <Equation_base.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 
 Implemente_instanciable_sans_constructeur(Paroi_loi_Ciofalo_hyd_VDF,"loi_Ciofalo_hydr_VDF",Paroi_std_hyd_VDF);
 

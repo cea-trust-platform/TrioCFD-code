@@ -214,7 +214,6 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
   chp.filtrer_L2(ub);
 
 
-  int cpt=0;
   int num_face;
   for (num_face=0; num_face <nb_faces; num_face++)
     {
@@ -230,7 +229,6 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
       Ec_ubp+=(vitesse(num_face,0)-ub(num_face,0))*ub(num_face,0);
       Ec_ubp+=(vitesse(num_face,1)-ub(num_face,1))*ub(num_face,1);
       Ec_ubp+=(vitesse(num_face,2)-ub(num_face,2))*ub(num_face,2);
-      cpt++;
     }
   Ectot/=(2*nb_faces);
   Ec_ub/=(2*nb_faces);
@@ -419,7 +417,7 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_s(DoubleTab& vit
 
   //int nb_faces=vitesse.dimension(0);
   Champ_P1NC& chp=ref_cast_non_const(Champ_P1NC, mon_equation->inconnue().valeur());
-  DoubleTab vit_fac(chp.valeurs());
+  //DoubleTab vit_fac(chp.valeurs());
   const int nb_comp = vitesse.line_size();
   DoubleTab vit_som(nb_som, nb_comp);
   vit_som=valeur_P1_L2(chp, chp.domaine());

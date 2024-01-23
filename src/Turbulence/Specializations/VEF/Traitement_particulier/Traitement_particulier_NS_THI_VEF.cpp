@@ -104,9 +104,11 @@ Entree& Traitement_particulier_NS_THI_VEF::lire(Entree& is)
         les_mots[2] = "calc_spectre";
         les_mots[3] = "conservation_Ec";
         les_mots[4] = "longueur_boite";
-        les_mots[6] = "3D";
-        les_mots[7] = "1D";
+        les_mots[6] = "Spectre_3D";
+        les_mots[7] = "Spectre_1D";
         les_mots[8] = "suppr_vit_moy";
+        les_mots[9] = "3D";
+        les_mots[10] = "1D";
         les_mots[12] = "correlations";
         les_mots[13] = "champs_scalaires";
       }
@@ -212,6 +214,18 @@ Entree& Traitement_particulier_NS_THI_VEF::lire(Entree& is)
               case 8 :
                 {
                   is >> cle_suppr_vit_moy;
+                  break;
+                }
+              case 9 :
+                {
+                  Cerr << "Keyword 3D renamed to Spectre_3D in Traitement_particulier_NS_THI" << finl;
+                  Process::exit();
+                  break;
+                }
+              case 10 :
+                {
+                  Cerr << "Keyword 1D renamed to Spectre_1D in Traitement_particulier_NS_THI" << finl;
+                  Process::exit();
                   break;
                 }
               case 12 :
@@ -1225,12 +1239,12 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre_1D(const DoubleTab& vites
   Ec_spectre = 0;
   double Df_spectre = 0;
 
-  int nb_points_1D_max = local_max_vect(nb_points_1D);
+  //int nb_points_1D_max = local_max_vect(nb_points_1D);
 
-  DoubleVect Ec_moy(nb_points_1D_max),
+  /* DoubleVect Ec_moy(nb_points_1D_max),
              Ec_moy_u(nb_points_1D_max),
              Ec_moy_v(nb_points_1D_max),
-             Ec_moy_w(nb_points_1D_max);
+             Ec_moy_w(nb_points_1D_max); */
 
   for (int dir=0; dir<dimension; dir++)
     {
@@ -1261,7 +1275,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre_1D(const DoubleTab& vites
       //      fic_data_direction << "# coordonnee selon la direction" << dim << " ; vit_u ; vit_v ; vit_w" << finl;
 
 
-      DoubleTab Ec_comp(nb_points_1D(dir), dimension); // energie par composante (u,v,w) par bande spectrale
+      //DoubleTab Ec_comp(nb_points_1D(dir), dimension); // energie par composante (u,v,w) par bande spectrale
       DoubleTab Ec_comp_min(nb_points_1D(dir), dimension);
       DoubleTab Ec_comp_max(nb_points_1D(dir), dimension);
       DoubleTab Ec_comp_moy(nb_points_1D(dir), dimension);

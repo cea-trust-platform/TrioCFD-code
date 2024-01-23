@@ -85,10 +85,11 @@ Lire sch
 Triple_Line_Model_FT_Disc TCL 
 Read TCL 
 {
+  distri_first_facette
   Qtcl 50.0 # W/m # 
   lv 10.e-9
-  coeffa -1.9291
-  coeffb  4.03634
+  # coeffa -1.9291 #
+  # coeffb  4.03634 #
   ym 3.7e-6
   sm   5.e-6 # if TestCase at theta_app = 90° => sm=ylim #
   initial_CL_xcoord 0.000035 # Incorrect. Useless for the moment #
@@ -204,7 +205,7 @@ Lire pb
       equation_interface interf
       equation_navier_stokes hydraulique
       phase 1
-                stencil_width  8
+                stencil_width  9
                 diffusion { }
                 convection { quick }
                 boundary_conditions

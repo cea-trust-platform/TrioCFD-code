@@ -57,14 +57,7 @@ public :
   void completer();
   int associer_(Objet_U& ob) override;
   void set_param(Param& p);
-  double get_Qtcl()
-  {
-//   return Qtcl_;
-    //  Qtcl_ = coeffb_ + coeffa_*(theta_app_*22/(7*180));
-//   Cerr << "coeffb " << coeffb_ << " coeffa " << coeffa_ << "theta " << (theta_app_) << finl;
-    //  return (coeffb_ + coeffa_*(theta_app_))*(6.2/(theta_app_));
-    return Qtcl_;
-  };
+  double get_Qtcl(const int num_face);
   const double& get_lv() const
   {
     return lv_;
@@ -94,21 +87,69 @@ public :
     return capillary_effect_on_theta_activated_;
   };
 
+  const int& is_read_via_file() const
+  {
+    return read_via_file_;
+  };
+  const int& Rc_tcl_GridN() const
+  {
+    return Rc_tcl_GridN_;
+  };
+  const double& Rc_inject() const
+  {
+    return Rc_inject_;
+  };
+  const double& thetaC_tcl() const
+  {
+    return thetaC_tcl_;
+  };
+  const int& reinjection_tcl() const
+  {
+    return reinjection_tcl_;
+  };
+  const int& distri_first_facette() const
+  {
+    return distri_first_facette_;
+  };
+  const bool& ready_inject_tcl() const
+  {
+    return ready_inject_tcl_;
+  };
+  bool& ready_inject_tcl()
+  {
+    return ready_inject_tcl_;
+  };
+  const double& tempC_tcl() const
+  {
+    return tempC_tcl_;
+  };
   const int& tag_tcl() const
   {
     return tag_tcl_;
   };
   double compute_capillary_number() const;
+  int get_any_tcl_face() const;
+
+  // Using the exact in/out intersections of the interface within the cell (works only in 2D, and may assume the wall in y-)
   void get_in_out_coords(const Domaine_VDF& zvdf, const int elem,
                          const double dt,
                          DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot);
 
+  // computes an approximate interface position (equivalent mean-plane)
+  // returns in_out table and the mean normal in elem, and the interface surface
+  void compute_approximate_interface_inout(const Domaine_VDF& zvdf, const int korient,
+                                           const int elem, const int num_face,
+                                           DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot) const;
+
   double compute_local_cos_theta(const Parcours_interface& parcours, const int num_face, const FTd_vecteur3& norm_elem) const;
 
+  // Computes the integral flux in a cell in the meso zone.
+  // in and out are the interface position on both sides of the cell.
   double compute_Qint(const DoubleTab& in_out, const double theta_app_locs,
                       const int num_face, double& Qmeso) const;
 
   void compute_TCL_fluxes_in_all_boundary_cells(ArrOfInt& elems_with_CL_contrib,
+                                                ArrOfInt& faces_with_CL_contrib,
                                                 ArrOfDouble& mpoint_from_CL, ArrOfDouble& Q_from_CL);
 
   void corriger_mpoint(DoubleTab& mpoint) const;
@@ -116,17 +157,15 @@ public :
   void correct_wall_adjacent_temperature_according_to_TCL_fluxes(DoubleTab& temperature) const;
   void set_wall_adjacent_temperature_according_to_TCL_model(DoubleTab& temperature) const;
   void correct_TCL_energy_evolution(DoubleTab& temperature) const;
-  void set_theta_app(double val)
-  {
-    theta_app_= val;
-    Cerr << "theta_app inside set_theta_app " << theta_app_ << finl;
-  };
+  double get_theta_app(const int num_face);
+
 
   void associer_eq_temperature(const Convection_Diffusion_Temperature_FT_Disc& eq_temp);
   void associer_eq_ns(const Equation_base& eq);
   void associer_eq_interf(const Equation_base& eq);
 
-
+  enum InoutMethod { EXACT, APPROX, BOTH };
+  //InoutMethod inout_method() const { return inout_method_;} ;
   inline ArrOfInt& elems();
   inline const ArrOfInt& elems() const;
   inline ArrOfInt& boundary_faces();
@@ -139,11 +178,13 @@ public :
 protected :
 
   bool activated_;
+  int deactivate_;
   int capillary_effect_on_theta_activated_;
   int TCL_energy_correction_;
+  int n_ext_meso_; // number of layers in the extension of the meso-zone.
   int tag_tcl_;
-  double coeffa_; //
-  double coeffb_; //
+  //double coeffa_; //
+  //double coeffb_; //
   double Qtcl_; //
   double lv_; // The length...
   double theta_app_;
@@ -151,10 +192,53 @@ protected :
   // The end of micro-region:
   double ym_;
   double sm_;
+  // End of meso region
+  double ymeso_;
 // double old_xcl_ ; // Former position of the contact line. Not nice, but needed to copute the CL velocity
   double initial_CL_xcoord_; // Former position of the contact line. Not nice, but needed to copute the CL velocity
   double kl_cond_; // We store the liquid conductivity for easy access.
   double rhocpl_;
+  int inout_method_ = 0;
+  // Tabulation TCL model
+  int read_via_file_ ;
+  Nom Nom_ficher_tcl_;
+  DoubleTab tab_Mtcl_;
+  // total nb of colons
+  int nb_colon_tab_;
+  // num -colon for temperature
+  int num_colon_tem_;
+  // num -colon for velocity
+  // int num_colon_vel_;
+  // num -colon for theta app
+  int num_colon_app_;
+  // num -colon for Qtcl
+  int num_colon_qtcl_;
+
+
+  // parameters to force numerical breakup
+  // Radius of nucleate site; [in number of grids]
+  // Distance below which the theta_app will be replaced by a big contact angle thetaC_tcl_ [in degree]
+  // to force bubble pinching / necking
+  int Rc_tcl_GridN_;
+  double Rc_inject_;
+  double thetaC_tcl_;
+  // parameters injection seed nucleate
+  // Size: Using the same Radius defined above (Rc_tcl_gridN_), [in number of grids]
+  // Use the average temperature in the same zone to tell if nucleate site is activted and inject bubbles
+  // Temperature beyond which the site is activeted [in K] T-Tsat
+  // in this case,  we need the initial value for contact angle, thetaC_tcl_ will be used
+  // reinjection: if a re-injection of interface if nessaire
+  int reinjection_tcl_;
+  double tempC_tcl_;
+  bool ready_inject_tcl_;
+  // summaries:
+  //        - when reinjection_tcl_ is 0;  i.e., by default, the pinching breakup with be used,
+  //           Rc_tcl_GridN_ thetaC_tcl_ control the breakup, thetaC_tcl_ should be large
+  //        - when reinjection_tcl_ is 1;  i.e., there is no the pinching breakup. The bubble goes away directly, we reinject seed
+  //           Rc_tcl_GridN_ thetaC_tcl_ control the initial shape, thetaC_tcl_ should be small...
+
+  // if to distribute the Qtcl into the first facette
+  int distri_first_facette_;
 
   // Information on the TCL region :
   // Note that the same elem may appear twice in the list, once for the micro contribution, once for the meso.

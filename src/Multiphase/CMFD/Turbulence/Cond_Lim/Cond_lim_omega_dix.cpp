@@ -34,6 +34,7 @@
 #include <math.h>
 
 Implemente_instanciable(Cond_lim_omega_dix,"Cond_lim_omega_dix",Dirichlet_loi_paroi);
+// XD Cond_lim_omega_dix condlim_base Cond_lim_omega_dix 1 Adaptive wall law boundary condition for turbulent dissipation rate
 
 Sortie& Cond_lim_omega_dix::printOn(Sortie& s ) const
 {
@@ -70,7 +71,6 @@ void Cond_lim_omega_dix::me_calculer()
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
-  const DoubleTab&       y = corr_loi_paroi.get_tab("y");
   const DoubleTab&      nu_visc = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_pas_de_temps().passe();
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
@@ -82,8 +82,9 @@ void Cond_lim_omega_dix::me_calculer()
     {
       int f_domaine = f + f1; // number of the face in the domaine
       int e_domaine = (f_e(f_domaine,0)>=0) ? f_e(f_domaine,0) : f_e(f_domaine,1) ; // Make orientation vdf-proof
+      double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ;
 
-      d_(f, n) = facteur_paroi_*calc_omega(y(f_domaine, n), u_tau(f_domaine, n), nu_visc(e_domaine, n));
+      d_(f, n) = facteur_paroi_*calc_omega(y_loc, u_tau(f_domaine, n), nu_visc(e_domaine, n));
     }
   d_.echange_espace_virtuel();
 }

@@ -9,10 +9,10 @@
 <UL><BR>
 <B>TrioCFD documentation</B><BR><BR>
 <a HREF=share/RELEASE_NOTES>Release notes</a><BR>
-<a HREF=share/doc/TRUST_Generic_Guide.pdf>Generic guide</a><BR>
+Generic guide <a HREF=TRUSTR/doc/TRUST/TRUST_Generic_documentation.pdf#TRUST%20Generic%20Guide>[pdf]  </a><a HREF=https://cea-trust-platform.readthedocs.io/en/latest/srcs/generic/index.html#trust-generic-guide> [online]</a><BR>
 <a HREF=share/doc/TrioCFD_Reference_Manual.pdf>Reference manual</a><BR>
-<a HREF=share/doc/TrioCFD_validation_report.pdf>Validation document</a><BR>
-<a HREF=share/doc/TrioCFD_recap_fiches_validation.pdf>Panorama des fiches de validation</a><BR>
+<a HREF=share/doc/TrioCFD_validation_report.pdf>Validation report</a><BR>
+<a HREF=share/doc/TrioCFD_validation_report.pdf#page=200>Validation test cases overview (Appendix A from validation report)</a><BR>
 <a HREF=share/doc/TrioCFD_models_report.pdf>Models Description</a><BR>
 <a HREF=share/doc/TrioCFD_PGC.pdf>Configuration Management Plan</a><BR><BR>
 <a HREF=share/doc/plan-de-dev-TrioCFD_2020_2025.pdf>Development Plan for the period 2020 - 2025</a><BR><BR>
@@ -22,7 +22,8 @@
 <a HREF=TRUSTR/doc/TRUST/Baltik_tutorial.pdf>Developer tutorial</a><BR>
 <a HREF=TRUSTR/doc/TRUST/ICoCo_tutorial.pdf>ICoCo tutorial</a><BR>
 <a HREF=TRUSTR/doc/TRUST/exercices/equation_convection_diffusion/rapport.pdf>Other baltik tutorial</a><BR>
-<a HREF=build/html/index.html>C++ classes</a><BR><BR>
+<a HREF=build/html/index.html>C++ classes</a><BR>
+<a href=TRUSTR/Validation/Outils/Genere_courbe/doc/manuel.xhtml>.prm syntax</a><BR><BR>
 <B>TRUST index</B><BR><BR>
 <a href=TRUSTR/index.html>Link to TRUST index</a><BR><BR>
 <B>TrioCFD download & support</B><BR><BR>

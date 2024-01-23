@@ -30,6 +30,9 @@
 #if __GNUC__ > 5
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
+#ifdef __APPLE__
+#pragma GCC diagnostic ignored "-Wsuggest-override"
+#endif
 #include <fftw3-mpi.h>
 #pragma GCC diagnostic pop
 #include <vector>

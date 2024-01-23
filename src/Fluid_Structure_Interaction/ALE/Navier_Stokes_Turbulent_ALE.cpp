@@ -26,7 +26,7 @@
 #include <Champ_Uniforme.h>
 #include <Fluide_Incompressible.h>
 #include <Avanc.h>
-#include <Modele_turbulence_hyd_nul.h>
+#include <Modele_turbulence_hyd_null.h>
 #include <Discretisation_base.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
@@ -83,7 +83,7 @@ int Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard(const Motcle& mot, Ent
       // Si on a lu le modele de turbulence et qu'il est nul,
       // alors on utilise l'operateur de diffusion standard.
       if (le_modele_turbulence.non_nul() // L'operateur a ete type (donc lu)
-          && sub_type(Modele_turbulence_hyd_nul, le_modele_turbulence.valeur()))
+          && sub_type(Modele_turbulence_hyd_null, le_modele_turbulence.valeur()))
         is >> terme_diffusif;
       else
         lire_op_diff_turbulent(is);
@@ -98,7 +98,7 @@ int Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard(const Motcle& mot, Ent
       // Si on vient de lire un modele de turbulence nul et que l'operateur
       // de diffusion a deja ete lu, alors on s'est plante d'operateur,
       // stop.
-      if (sub_type(Modele_turbulence_hyd_nul, le_modele_turbulence.valeur())
+      if (sub_type(Modele_turbulence_hyd_null, le_modele_turbulence.valeur())
           && terme_diffusif.non_nul())
         {
           Cerr << "Erreur dans Navier_Stokes_Turbulent_ALE::lire:\n"
@@ -149,17 +149,6 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
   else
     nb_inc = "_Multi_inco_";
   type+= nb_inc ;
-
-  Nom type_diff;
-
-  if (discr == "VDF") type_diff=""; /* pas de const/var en VDF */
-  else
-    {
-      if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite())) type_diff = "";
-      else type_diff = "var_";
-    }
-
-  type+= type_diff;
 
   Nom type_inco=inconnue()->que_suis_je();
   type+=(type_inco.suffix("Champ_"));
@@ -234,7 +223,7 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
 
 /*! @brief Prepare le calcul.
  *
- * Simple appe a Mod_turb_hyd::preparer_caclul() sur
+ * Simple appe a Modele_turbulence_hyd::preparer_caclul() sur
  *     le membre reprresentant la turbulence.
  *
  * @return (int) renvoie toujours 1
@@ -369,7 +358,7 @@ const RefObjU& Navier_Stokes_Turbulent_ALE::get_modele(Type_modele type) const
     {
       const RefObjU&  mod = itr;
       if (mod.non_nul())
-        if ((sub_type(Mod_turb_hyd_base,mod.valeur())) && (type==TURBULENCE))
+        if ((sub_type(Modele_turbulence_hyd_base,mod.valeur())) && (type==TURBULENCE))
           return mod;
     }
   return Equation_base::get_modele(type);

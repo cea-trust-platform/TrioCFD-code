@@ -69,7 +69,9 @@ public :
   void reading_vit_bords_ALE(Entree& is);
   void reading_solver_moving_mesh_ALE(Entree& is);
   void reading_beam_model(Entree& is);
+  void read_beam(Entree& is, int&);
   void reading_projection_ALE_boundary(Entree& is);
+  void reading_ALE_Neumann_BC_for_grid_problem(Entree& is);
   void reading_structural_dynamic_mesh_model(Entree& is);
   void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
   void  update_ALE_projection(const double);
@@ -84,21 +86,23 @@ public :
   inline int getMeshMotionModel() const ;
 
 
-  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
-  void initializationBeam (double velocity) ;
-  double computeDtBeam(Domaine_dis&);
-  const DoubleTab& getBeamDisplacement(int i) const;
-  const DoubleTab& getBeamRotation(int i) const;
-  const int& getBeamDirection() const;
-  DoubleVect& getBeamVelocity(const double& tps, const double& dt);
-  const int& getBeamNbModes();
-  void computeFluidForceOnBeam();
-  const DoubleVect& getFluidForceOnBeam();
+  DoubleVect interpolationOnThe3DSurface(const int&, const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
+  //double computeDtBeam(Domaine_dis&);
+  const DoubleTab& getBeamDisplacement(const int&, const int&) const;
+  const DoubleTab& getBeamRotation(const int&, const int&) const;
+  inline const int& getBeamDirection(const int&) const;
+  DoubleVect& getBeamVelocity(const int&,const double& tps, const double& dt);
+  const int& getBeamNbModes(const int&) const;
+  const Nom& getBeamName(const int&) const;
+  const int& getBeamNbBeam() const;
+  void computeFluidForceOnBeam(const int&);
   Equation_base& getEquation() ;
   inline void associer_equation(const Equation_base& une_eq);
+  void update_coord_dom_extrait_surface();
   const DoubleVect& getMeshPbPressure() const ;
   const DoubleVect& getMeshPbVonMises() const ;
   const DoubleTab& getMeshPbForceFace() const ;
+
 protected:
 
   double dt_;
@@ -114,19 +118,21 @@ protected:
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
   int resumption; //1 if resumption of calculation else 0
-  Beam_model *beam; // Mechanical model: a beam model
+  int nbBeam;
+//  Beam_model *beam; // Mechanical model: a beam model
+  std::vector<Beam_model> beam;
   Structural_dynamic_mesh_model *str_mesh_model; // Fictitious structural model for mesh motion
   REF(Equation_base) eq;
-  DoubleVect fluidForceOnBeam; //Fluid force acting on the IFS boundary
   Champs_front_ALE_projection field_ALE_projection_; // Definition of the modes of vibration in view of projection of the IFS force
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
   bool associate_eq;
-  double tempsComputeForceOnBeam; // Time at which the fluid force acting on the Beam is computed.
+  Noms name_boundary_with_Neumann_BC; // Names of the boundary with Neumann CL for the grid problem (optional)
+  mutable SFichier modalForceProjectionALE_; //post-processing file
+  mutable SFichier modalForceBeam_; //post-processing file
   int meshMotionModel_ = 0 ; // Model for ALE mesh motion: 0 = Laplacien, 1 = Structural_dynamics
   void solveDynamicMeshProblem_(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
                                 DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
                                 const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets) ;
-
 };
 
 

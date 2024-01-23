@@ -1,0 +1,87 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 48 # 96 #
+  nbelem_j 12 # 24 #
+  nbelem_k 12 # 24 #
+  uniform_domain_size_i 0.006
+  uniform_domain_size_j 0.006
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+  perio_k # need perio_k for mixte shear condition, only DU at z=0(z=Lz) is imposed #
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0 # To be checked.. #
+  timestep 1.e-1
+  time_scheme euler_explicit  # RK3_FT #
+  type_velocity_convection_op Centre 
+  Boundary_Conditions {
+    bctype_kmin Mixte_shear
+    bctype_kmax Mixte_shear
+    dU_perio 0.625 
+    t0_shear 0.0
+    defilement 1
+    resolution_u_prime 0
+  }
+
+  timestep_facsec 0.1
+  cfl 1.0
+  fo  1.0
+  oh  1.0
+  dt_post 10
+  dt_post_stats_bulles 100
+  dt_post_stats_plans 100
+  t_debut_statistiques 0.0
+
+  disable_diphasique
+  # disable_diffusion_qdm #
+  # disable_convection_qdm #
+  # ajouter disable solver poisson #
+  # disable_solveur_poisson #
+
+
+  champs_a_postraiter 4 VELOCITY PRESSURE D_VELOCITY PRESSURE_RHS 
+  check_stop_file stop.txt
+  dt_sauvegarde 5000
+  tinit 0
+	nb_pas_dt_max 3
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 0
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-10  precond ssor { omega 1.5 }  }
+    seuil 1e-8
+    nb_full_mg_steps 2 20 1
+  }
+
+  check_divergence
+  rho_liquide 1000.
+  mu_liquide 1e-3
+
+  expression_vx_init -(0.625/2.)*(1.-2*z/0.003)
+  expression_vy_init 0.
+  expression_vz_init x*(1.-x/0.006)
+
+
+  
+}
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+Fin

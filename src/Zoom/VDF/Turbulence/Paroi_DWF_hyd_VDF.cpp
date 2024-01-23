@@ -23,7 +23,7 @@
 
 #include <Paroi_DWF_hyd_VDF.h>
 #include <Navier_Stokes_std.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modele_turbulence_hyd_base.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
 #include <Domaine_Cl_VDF.h>
@@ -98,12 +98,12 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
 
   Probleme_base& pb_thhyd = mon_modele_turb_hyd->equation().probleme();
 
-  Nom nom_pbmg("export Pb_MG pbMG");
-  EChaine ch_pbmg(nom_pbmg);
+  //Nom nom_pbmg("export Pb_MG pbMG");
+  //EChaine ch_pbmg(nom_pbmg);
   //interpreter(ch_pbmg);
 
-
-  const Objet_U& ob_pbmg=Interprete::objet("pbMG");
+  Nom pbMGName("pbMG");
+  const Objet_U& ob_pbmg=Interprete::objet(pbMGName);
   pbMG=ref_cast(Pb_MG, ob_pbmg);
 
   pbMG.associer_pbMG_pbGglobal_(pb_thhyd); // Probleme grossier  = le probleme a resoudre
@@ -144,7 +144,7 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
           if (sub_type(Navier_Stokes_std,pb_fin->equation(i)))
             {
               const RefObjU& modele_turbulence = pb_fin->equation(i).get_modele(TURBULENCE);
-              if (modele_turbulence.non_nul() && sub_type(Mod_turb_hyd_base,modele_turbulence.valeur()) && (cl.le_nom() == "Interface"))
+              if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base,modele_turbulence.valeur()) && (cl.le_nom() == "Interface"))
                 {
                   Nom champ("Champ_front_zoom pbMG ");
                   champ+=pb_fin->le_nom();

@@ -26,7 +26,7 @@
 #include <Pb_Multiphase.h>
 #include <Domaine_dis.h>
 #include <Domaine_VF.h>
-#include <Op_Diff_PolyMAC_base.h>
+#include <Op_Diff_PolyMAC_P0P1NC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
 
 #include <math.h>
@@ -44,14 +44,13 @@ void Flux_parietal_adaptatif::completer()
 void Flux_parietal_adaptatif::qp(const input_t& in, output_t& out) const
 {
   const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const double y = corr_loi_paroi.get_y(in.f);
   const double u_tau = corr_loi_paroi.get_utau(in.f);
   int e = ref_cast(Domaine_VF, pb_->domaine_dis().valeur()).face_voisins()(in.f,0);
-  const DoubleTab& diffu_th = sub_type(Op_Diff_PolyMAC_base, pb_->equation(2).operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, pb_->equation(2).operateur(0).l_op_base()).nu() :
+  const DoubleTab& diffu_th = sub_type(Op_Diff_PolyMAC_P0P1NC_base, pb_->equation(2).operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_P0P1NC_base, pb_->equation(2).operateur(0).l_op_base()).nu() :
                               ref_cast(Op_Diff_PolyMAC_P0_base, pb_->equation(2).operateur(0).l_op_base()).nu();
 
-  double theta_plus = calc_theta_plus(y, u_tau, in.mu[0], in.lambda[0], in.rho[0], in.Cp[0], in.D_h),
-         fac = in.rho[0] * in.Cp[0] * u_tau / theta_plus * 1. / (1 - in.rho[0] * in.Cp[0] * y / diffu_th(e, 0) * u_tau / theta_plus); // No alpha
+  double theta_plus = calc_theta_plus(in.y, u_tau, in.mu[0], in.lambda[0], in.rho[0], in.Cp[0], in.D_h),
+         fac = in.rho[0] * in.Cp[0] * u_tau / theta_plus * 1. / (1 - in.rho[0] * in.Cp[0] * in.y / diffu_th(e, 0) * u_tau / theta_plus); // No alpha ; truc chelou en bas de la fraction : diffusion entre le mur et le centre du premier element
   if (out.qpk) (*out.qpk)(0) = fac * (in.Tp - in.T[0]);
   if (out.dTf_qpk) (*out.dTf_qpk)(0,0) = -fac;
   if (out.dTp_qpk) (*out.dTp_qpk)(0)   = fac;

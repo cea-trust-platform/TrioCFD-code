@@ -62,7 +62,7 @@ Entree& Convection_Diffusion_Concentration_Turbulent_FT_Disc::readOn(Entree& is)
           if (nom_equation_nu_t_ == "??")
             {
               Cerr << "Missing EQUATION_NU_T" << finl;
-              Process::exit(-1);
+              Process::exit();
             }
         }
       Cerr << "The kinematic model used is : modele_cinetique " << modele_cinetique_ << finl;
@@ -284,7 +284,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
     {
       const Equation_base& eq =pb.get_equation_by_name(nom_equation_nu_t_);
       const RefObjU& modele_turbulence_hydr = eq.get_modele(TURBULENCE);
-      const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+      const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
       champ_nu_t = &(le_modele.viscosite_turbulente().valeurs());
     }
 
@@ -410,7 +410,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
         {
           Cerr << "MODELE_CINETIQUE not implemented ==> Please specify model 1 -- 4" << finl;
           barrier();
-          Process::exit(-1);
+          Process::exit();
         }
 
     }

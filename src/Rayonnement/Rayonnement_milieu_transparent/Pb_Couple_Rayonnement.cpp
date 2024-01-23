@@ -199,7 +199,6 @@ void Pb_Couple_Rayonnement::completer()
 {
   le_modele_de_rayo->discretiser(ref_cast(Probleme_base,probleme(0)).discretisation(), ref_cast(Probleme_base,probleme(0)).domaine());
   int nb_pb_fluide=0;
-  int clrayo=0;
   Modele_Rayonnement_Milieu_Transparent& mod_rayo  =
     ref_cast(Modele_Rayonnement_Milieu_Transparent,le_modele_de_rayo.valeur());
 
@@ -275,7 +274,6 @@ void Pb_Couple_Rayonnement::completer()
                               if (mod_rayo.face_rayonnante(i).emissivite()!=-1)
                                 ok=1;
                               //Cerr<< mod_rayo.face_rayonnante(i).nom_bord_rayo()<<" associe a "<<la_zcl.les_conditions_limites(num_cl).frontiere_dis().le_nom()<<finl;
-                              clrayo++;
                               mod_rayo.face_rayonnante(i).ensembles_faces_bord(0).associer_les_cl(la_cl);
                               compte_nb_bords_rayo += 1;
                             }

@@ -237,19 +237,19 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   //
 
   int nb_elem = domaine_VDF.nb_elem();
-  int nb_faces= domaine_VDF.nb_faces();
-  DoubleTrav u_teta(nb_faces);
+  //int nb_faces= domaine_VDF.nb_faces();
+  //DoubleTrav u_teta(nb_faces);
   //  const DoubleVect& porosite_face = domaine_VDF.porosite_face();
   gteta2 = 0;
 
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Domaine& le_dom=domaine_VDF.domaine();
-  int nb_faces_elem = le_dom.nb_faces_elem();
+  //const Domaine& le_dom=domaine_VDF.domaine();
+  //int nb_faces_elem = le_dom.nb_faces_elem();
 
-  IntTrav numfa(nb_faces_elem);
-  DoubleVect coef(dimension);
+  //IntTrav numfa(nb_faces_elem);
+  //DoubleVect coef(dimension);
   //  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
 
   for (int elem=0; elem<nb_elem; elem++)
@@ -265,19 +265,19 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
   //
 
   int nb_elem = domaine_VDF.nb_elem();
-  int nb_faces= domaine_VDF.nb_faces();
-  DoubleTrav u_teta(nb_faces);
+  //int nb_faces= domaine_VDF.nb_faces();
+  //DoubleTrav u_teta(nb_faces);
   //  const DoubleVect& porosite_face = domaine_VDF.porosite_face();
   gteta2 = 0;
 
   //                ------->  -------->
   // Calcul de beta.gravite . tetacarre
 
-  const Domaine& le_dom=domaine_VDF.domaine();
-  int nb_faces_elem = le_dom.nb_faces_elem();
+  //const Domaine& le_dom=domaine_VDF.domaine();
+  //int nb_faces_elem = le_dom.nb_faces_elem();
 
-  IntTrav numfa(nb_faces_elem);
-  DoubleVect coef(dimension);
+  //IntTrav numfa(nb_faces_elem);
+  //DoubleVect coef(dimension);
   //  const IntTab& les_elem_faces = domaine_VDF.elem_faces();
 
   for (int elem=0; elem<nb_elem; elem++)
@@ -577,7 +577,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl.valeur());
   const RefObjU& modele_turbulence_hydr = eq_hydraulique->get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
+  const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& modele_bas_Re =
     ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,le_modele);
   const Transport_K_Eps_base& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.eqn_transp_K_Eps();

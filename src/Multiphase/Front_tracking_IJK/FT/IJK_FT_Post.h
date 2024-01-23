@@ -302,6 +302,7 @@ protected:
 
   const int& disable_diphasique_;    // yes a ref, not a const value.
   const IJK_Interfaces& interfaces_;
+  IJK_Field_double& kappa_ft_;
   IJK_Field_double& pressure_;                   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3>& velocity_;   // non-const because some echange_espace_virtuel()
   FixedVector<IJK_Field_double, 3> source_spectrale_;   // non-const because some echange_espace_virtuel()

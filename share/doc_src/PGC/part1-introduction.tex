@@ -199,7 +199,7 @@ Pour TrioCFD, les \'evolutions majeures sont explicit\'ees sur la frise chronolo
 \ref{figure:Histo-triocfd}.\smallskip
 
 \begin{tikzpicture}
-	\draw[<-,>=stealth] (8,0) -- (8,14.12) ;
+	\draw[<-,>=stealth] (8,-1.63) -- (8,14.12) ;
 	\draw (0,0) -- (0,0.01) ; 
 	\draw (7.8,14.12) -- (8.2,14.12) ;
 	\draw (7.8,14.12) node[left]{$2015$} ;
@@ -297,13 +297,20 @@ Pour TrioCFD, les \'evolutions majeures sont explicit\'ees sur la frise chronolo
 	\draw (8.8,00.82) node[right]{\textcolor{blue}{v1.9.1} \textbf{Baltik} Fluid\_Structure\_Interaction};
 	\draw (7.8,00.68) -- (8.2,00.68) ;
 	\draw (7.8,00.68) node[left]{$2023$} ;
-%	\draw (7.8,01.84) -- (8.0,01.84) ;
-%	\draw (7.8,01.42) -- (8.0,01.42) ;
-%	\draw (7.8,01.00) -- (8.2,01.00) ;
-%	\draw (7.8,01.00) node[left]{$2022$} ;
+	\draw (7.8,00.26) -- (8.0,00.26);
+	\draw (7.8,-00.16) -- (8.0,-00.16);
+	\draw (7.8,-00.58) -- (8.0,-00.58);
+	\draw[blue,thick,dashed] (8.0,-00.16) -- (8.7,-00.16);
+	\draw (8.8,-00.16) node[right]{\textcolor{blue}{v1.9.2} R\'eorganisation des fichiers sources};
+	\draw (7.8,-1.00) -- (8.2, -1.00);
+	\draw (7.8,-1.00) node[left]{$2024$};
+	\draw[blue,thick,dashed] (8.0,-1.00) -- (8.7,-1.00);
+	\draw (8.8,-1.00) node[right]{\textcolor{blue}{v1.9.3} Am\'eliorations Turbulence, FSI, FT, CMFD};
 \end{tikzpicture}\smallskip
 \begin{center}\captionof{figure}{\label{figure:Histo-triocfd}Historique de TrioCFD}\end{center}\smallskip
-Il est \`a noter que m\^eme si TRUST supporte la partie "sch\'emas num\'eriques", lorsqu'un nouveau sch\'ema est amen\'e \`a \^etre d\'evelopp\'e pour des besoins TrioCFD, l'\'elaboration de ce nouveau sch\'ema est, dans un premier temps d\'evelopp\'e, v\'erif\'e et valid\'e dans TrioCFD avant d'\^etre revers\'e dans TRUST si d'autres Baltiks sous base TRUST (FLICA5, Genepi2,...) sont int\'eress\'es par ce sch\'ema.\newpage
+
+\newpage
+Il est \`a noter que m\^eme si TRUST supporte la partie "sch\'emas num\'eriques", lorsqu'un nouveau sch\'ema est amen\'e \`a \^etre d\'evelopp\'e pour des besoins TrioCFD, l'\'elaboration de ce nouveau sch\'ema est, dans un premier temps d\'evelopp\'e, v\'erif\'e et valid\'e dans TrioCFD avant d'\^etre revers\'e dans TRUST si d'autres Baltiks sous base TRUST (FLICA5, Genepi2,...) sont int\'eress\'es par ce sch\'ema.
 
 Depuis la cr\'eation du projet, de nombreuses améliorations sur la parallélisme du produit ont permis d'augmenter, de manière très importante, les capacités de calcul. La plateforme TRUST/TrioCFD est maintenant en mesure d'effectuer des calculs haute performance (en anglais : High Performance Computing ou HPC). Les progrès récents (2020-2021) sur cet aspect viennent de 3 améliorations majeures :
 \begin{itemize}
@@ -383,56 +390,68 @@ Gr\^ace \`a ces am\'eliorations sur la parall\'elisation et les performances, TR
   \end{itemize}
 \end{itemize}\smallskip
 
-Tous ces outils étant hérités de TRUST, leur gestion est du ressort de l'équipe TRUST. Par conséquent, leur processus ne sera pas décrit dans ce présent PGC. Toutefois, une description de certains de ces outils sera faite dans les sections suivantes.\\
-TrioCFD est en langage C++ pour la partie source du code tandis que les procédures sont en Python ou en bash. Le code source est constitué d'environ 1 500 classes et 513 636 lignes de code (fichiers .cpp et .h). La mod\'elisation d'un applicatif considéré est définie dans un Jeu De Données (.data) et toutes les ex\'ecutions (compilation du code, lancement du jeu de données,...) se font en ligne de commande. \smallskip\\
+Tous ces outils \'etant h\'erit\'es de TRUST, leur gestion est du ressort de l'\'equipe TRUST.
+Par cons\'equent, leur processus ne sera pas d\'ecrit dans ce pr\'esent PGC. Toutefois, une description de certains de ces outils sera faite dans les sections suivantes.\\
+TrioCFD est en langage C++ pour la partie source du code tandis que les proc\'edures sont en Python ou en bash.
+Le code source est constitu\'e d'environ 1 500 classes et de plus 510 00 lignes de code (fichiers .cpp et .h).
+La mod\'elisation d'un applicatif consid\'er\'e est d\'efinie dans un Jeu De Donn\'ees (.data)
+et toutes les ex\'ecutions (compilation du code, lancement du jeu de donn\'ees,...) se font en ligne de commande. \smallskip\\
 
-TrioCFD est lui-même composé de plusieurs Baltiks et sous-Baltiks ayant tous un domaine de compétence spécifique. Ils sont \`a l'heure actuelle au nombre de 10 et 2 d'entre eux contiennent eux-même 2 sous-Baltiks. Le tableau \ref{tab:carto-baltiks} dresse la liste de ces Baltiks et sous-Baltiks, leur domaine de compétence ainsi que leur dépendance interne.
+Depuis la r\'eorganisation du code intervenue dans la version v1.9.2, TrioCFD est un seul et unique Baltik
+compos\'e de plusieurs modules et sous-modules ayant tous un domaine de comp\'etence sp\'ecifique.
+Ils sont \`a l'heure actuelle au nombre de 9.
+Deux d'entre eux (Multiphase et Rayonnement) contiennent eux-m\^eme des sous-modules.
+Le tableau \ref{tab:carto-modules} dresse la liste de ces modules et sous-modules et leur domaine de comp\'etence.
 
 \begin{table}[H]
 \begin{centering}
 \footnotesize
-\begin{tabular}{Sc Sc Sc}
-\hline\hline
-\rowcolor{lightgray}\textbf{Baltik} & \textbf{Description}  & \textbf{D\'ependances} \tabularnewline
+\begin{tabular}{Sc Sc}
 \hline
-
-\textbf{Critere\_Entrainement\_Gaz} & Crit\`ere num\'erique bas\'e sur la voriticit\'e & Turbulence \tabularnewline
-& pour pr\'edire l'aparition d'un vortex & Turbulence \tabularnewline\hline
- & M\'ethode Arbitrary Langrangian-Eulerian  & Turbulence \tabularnewline
-\textbf{Fluid\_Structure\_Interaction} & pour les interactions fluide-structure & \tabularnewline
-  & mod\`ele vibratoire de poutre & \tabularnewline\hline
-\textbf{Multiphase} & & \tabularnewline
-$\hookrightarrow$ CMFD & Computational Multiphase Fluid Dynamics  & SO \tabularnewline
-$\hookrightarrow$ Front\_tracking\_IJK & Int\'egration de TrioIJK dans TrioCFD  & Turbulence \& FTD \tabularnewline
-$\hookrightarrow$ Front\_tracking\_discontinu & Suivi d'interface avec la méthode de Front-Tracking & Turbulence \tabularnewline
-$\hookrightarrow$ Phase\_field & Écoulements diphasiques incompressibles de & SO \tabularnewline
-& fluides non miscibles & \tabularnewline\hline
-\textbf{P1NCP0RT} & Approximation P1/P0 non conforme avec les &  \tabularnewline
-& éléments de Raviart-Thomas & SO \tabularnewline\hline
-\textbf{Rayonnement} & Rayonnement thermique & \tabularnewline
-$\hookrightarrow$ Rayonnement\_milieu\_transparent & dans différents & Turbulence \tabularnewline
-$\hookrightarrow$ Rayonnement\_semi\_transp & milieux & Turbulence \tabularnewline\hline
-\textbf{Schema\_Euler\_Implicite\_Stationnaire} &  & Turbulence \tabularnewline\hline
-& Quantification des changements dans la solution d'un & \tabularnewline
-\textbf{Sensitivity\_analysis} &  système d'EDP (ici Navier-Stokes) dus aux variations & SO \tabularnewline
-& des paramètres d'entrée & \tabularnewline\hline
-& Baltik principal de TrioCFD dont quasiment & \tabularnewline
-\textbf{Turbulence} & tous les autres Baltiks dépendent. Il contient l'ensemble & SO \tabularnewline
-& des modèles de turbulence (Bas-Reynolds, k-epsilon, & \tabularnewline
-& lois de parois,...) quelle que soit la discrétisation considérée & \tabularnewline\hline
-& Baltik contenant les fiches de validation pour & \tabularnewline
-\textbf{validation} & les tests à effets intégraux. Les fiches de validation & Turbulence \tabularnewline
-& des tests à effets séparés sont présents dans le répertoire & \tabularnewline
-& \texttt{/share} du Baltik concerné &  \tabularnewline\hline
-\textbf{Zoom} & & Turbulence \tabularnewline
+\hline
+\rowcolor{lightgray}\textbf{Module} & \textbf{Description} \tabularnewline
+\hline
+\textbf{Critere\_Entrainement\_Gaz} & Crit\`ere num\'erique bas\'e sur la voriticit\'e \tabularnewline
+                                    & pour pr\'edire l'aparition d'un vortex \tabularnewline
+\hline
+                                       & M\'ethode Arbitrary Langrangian-Eulerian \tabularnewline
+\textbf{Fluid\_Structure\_Interaction} & pour les interactions fluide-structure \tabularnewline
+                                       & mod\`ele vibratoire de poutre \tabularnewline
+\hline
+\textbf{Multiphase} & \tabularnewline
+$\hookrightarrow$ CMFD                        & Computational Multiphase Fluid Dynamics  \tabularnewline
+$\hookrightarrow$ Front\_tracking\_IJK        & Int\'egration de TrioIJK dans TrioCFD  \tabularnewline
+$\hookrightarrow$ Front\_tracking\_discontinu & Suivi d'interface avec la méthode de Front-Tracking \tabularnewline
+$\hookrightarrow$ Phase\_field                & Écoulements diphasiques incompressibles de \tabularnewline
+                                              & fluides non miscibles \tabularnewline
+\hline
+\textbf{P1NCP0RT} & Approximation P1/P0 non conforme avec les \tabularnewline
+                  & éléments de Raviart-Thomas \tabularnewline
+\hline
+\textbf{Rayonnement} & Rayonnement thermique \tabularnewline
+$\hookrightarrow$ Rayonnement\_milieu\_transparent & dans différents \tabularnewline
+$\hookrightarrow$ Rayonnement\_semi\_transp        & milieux \tabularnewline
+\hline
+\textbf{Schema\_Euler\_Implicite\_Stationnaire} & \tabularnewline
+\hline
+                               & Quantification des changements dans la solution d'un \tabularnewline
+\textbf{Sensitivity\_analysis} &  système d'EDP (ici Navier-Stokes) dus aux variations \tabularnewline
+                               & des paramètres d'entrée \tabularnewline
+\hline
+                    & Module principal de TrioCFD que quasiment \tabularnewline
+\textbf{Turbulence} & tous les autres modules utilisent. Il contient l'ensemble \tabularnewline
+                    & des modèles de turbulence (Bas-Reynolds, k-epsilon, \tabularnewline
+                    & lois de parois,...) quelle que soit la discrétisation considérée \tabularnewline
+\hline
+\textbf{Zoom} & \tabularnewline
 \hline\hline
 \end{tabular}
 \normalsize
 \par\end{centering}
-\caption{\label{tab:carto-baltiks}Cartographie des BALTIKS et sous-BALTIKS de TrioCFD}
+\caption{\label{tab:carto-modules}Cartographie des modules et sous-modules de TrioCFD}
 \end{table}
 
-Ces différents Baltiks permettent de couvrir les domaines de modélisation physique suivants :
+Ces différents modules permettent de couvrir les domaines de modélisation physique suivants :
 \begin{itemize}[label=$\Rightarrow$, font=\LARGE]
   \item Hydraulique avec ou sans turbulence
   \item Thermohydraulique avec ou sans turbulence
@@ -441,7 +460,7 @@ Ces différents Baltiks permettent de couvrir les domaines de modélisation phys
   \begin{itemize}
     \item Front-Tracking
     \item Interface diffuse incompressible
-    \item Modèle Homogène Équilibré (HEM) pr\'esent dans le Baltik CMFD
+    \item Modèle Homogène Équilibré (HEM) pr\'esent dans le module CMFD
   \end{itemize}
   \item Interactions fluide/structure par la méthode ALE
   \item Chimie

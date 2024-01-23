@@ -85,121 +85,145 @@ Chapter {
 			legend "Carre (K-Eps)"
 			Style lines
 			file Carre/keps_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Carre (K-Eps-R-A0=4)"
 			Style lines
 			file Carre/k3r_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Carre (K-Eps-R-A0=3.2)"
 			Style lines
 			file Carre/k3r_alt_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Carre (ML)"
 			Style lines
 			file Carre/lm_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Cercle (K-Eps)"
 			Style lines
 			file Cercle/keps_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Cercle (K-Eps-R-A0=4)"
 			Style lines
 			file Cercle/k3r_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Cercle (K-Eps-R-A0=3.2)"
 			Style lines
 			file Cercle/k3r_alt_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Cercle (ML)"
 			Style lines
 			file Cercle/lm_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Triangle1 (K-Eps)"
 			Style lines
 			file Triangle1/keps_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Triangle1 (K-Eps-R_A0=4)"
 			Style lines
 			file Triangle1/k3r_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Triangle1 (K-Eps-R_A0=3.2)"
 			Style lines
 			file Triangle1/k3r_alt_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Triangle1 (ML)"
 			Style lines
 			file Triangle1/lm_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Plaque (K-Eps)"
 			Style lines
 			file Plaque/keps_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Plaque (K-Eps-R-A0=4)"
 			Style lines
 			file Plaque/k3r_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Plaque (K-Eps-R-A0=3.2)"
 			Style lines
 			file Plaque/k3r_alt_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Plaque (ML)"
 			Style lines
 			file Plaque/lm_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Triangle2 (K-Eps)"
 			Style lines
 			file Triangle2/keps_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Triangle2 (K-Eps-R-A0=4)"
 			Style lines
 			file Triangle2/k3r_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Triangle2 (K-Eps-R-A0=3.2)"
 			Style lines
 			file Triangle2/k3r_alt_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "Triangle2 (ML)"
 			Style lines
 			file Triangle2/lm_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "DemiCercle (K-Eps)"
 			Style lines
 			file DemiCercle/keps_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "DemiCercle (K-Eps-R-A0=4)"
 			Style lines
 			file DemiCercle/k3r_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "DemiCercle (K-Eps-R-A0=3.2)"
 			Style lines
 			file DemiCercle/k3r_alt_pb_Force_pression.out
+			columns $1 $6
 		}
 		Curve { 
 			legend "DemiCercle (ML)"
 			Style lines
 			file DemiCercle/lm_pb_Force_pression.out
+			columns $1 $6
 		}
 	}
 	Figure {

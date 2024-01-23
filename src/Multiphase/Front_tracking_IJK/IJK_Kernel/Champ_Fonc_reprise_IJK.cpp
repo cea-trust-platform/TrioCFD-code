@@ -201,8 +201,6 @@ static int lire_special(Entree& fich, const DoubleTab& coords, DoubleTab& val, c
       int nb_items_proches = octree.search_elements(x, y, z, index);
       if (nb_items_proches == 0)
         {
-          int a = 0;
-          a++;
           Cerr << "pas ditems proches" << finl;
         }
 
@@ -236,8 +234,6 @@ static int lire_special(Entree& fich, const DoubleTab& coords, DoubleTab& val, c
               else if (flag == 0)
                 {
                   // Cet item n'est pas a moi, ne pas le lire
-                  int a =0;
-                  a++;
                 }
               else
                 {
@@ -248,8 +244,6 @@ static int lire_special(Entree& fich, const DoubleTab& coords, DoubleTab& val, c
           else if (nb_items_proches == 0)
             {
               // ok, le sommet est sur un autre processeur (ou epsilon trop petit ??)
-              int a =0;
-              a++;
               Cerr << "pas ditems proches 2" << finl;
             }
           else

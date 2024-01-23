@@ -1,3 +1,4 @@
+#!/bin/bash
 lata=$2
 export liste_bulles=$1
 export nbulles=`wc -l $liste_bulles`

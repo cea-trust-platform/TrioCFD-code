@@ -1,0 +1,38 @@
+#!/bin/bash
+ko=0
+tar xzf ref.tgz
+fic=plot.gplot
+echo "plot 1" > $fic
+c=0
+for i in "interp_standard" "interp_modifiee" "interp_ai_based" 
+do
+  ci=0
+  echo "plot 1" > $i.gplot
+  #for j in "CORRECTION_GHOST_INDIC"
+  #for j in "NO_CORRECTION" "ZERO_NET_FLUX_ON_MIXED_CELLS" "ZERO_OUT_FLUX_ON_MIXED_CELLS"
+  for j in "NO_CORRECTION" "CORRECTION_GHOST_INDIC" "ZERO_NET_FLUX_ON_MIXED_CELLS" "ZERO_OUT_FLUX_ON_MIXED_CELLS"
+  do
+    name=${i}_${j}
+    echo "Verifying $name case..."
+    data=vol_bulle_${name}
+    str=$(echo $name | sed "s/_/-/g")
+    grep "Volume_phase_0" ${name}.err | awk '{print $4, $2/(0.001*0.001*3.141592653589793/2)}' > ${data}.txt
+    #grep "\[GB\]" ${name}.err | awk '{print $5, $6, $7}' > conserv_${name}.dat
+    echo "replot  \"${data}.txt\" t \"${str}\" w l lc $c" >> $fic
+    echo "replot  \"ref/${data}.txt\" every 1000 t \"\" w p lc $c pt $c" >> $fic
+    let c++
+    echo "replot  \"${data}.txt\" t \"${str}\" w l lc $ci" >> $i.gplot
+    echo "replot  \"ref/${data}.txt\" every 1000 t \"ref/${str}\" w p lc $ci pt $ci" >> $i.gplot
+    let ci++
+    diff --brief ${data}.txt ref/${data}.txt
+    [ $? -ne 0 ] && ko=1 && echo "Il y a des difference sur l'evolution temporelle du volume de bulle" && echo "Comparison can be viewed by:" && echo "gnuplot $i.gplot"
+  done
+  echo "pause -1" >> $i.gplot
+
+done
+echo "pause -1" >> $fic
+[ $ko == 1 ] && echo "For all curves, you can check: ", gnuplot $fic
+
+echo "$0 finished in $PWD"
+exit $ko
+

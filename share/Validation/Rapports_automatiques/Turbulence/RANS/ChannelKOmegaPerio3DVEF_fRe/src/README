@@ -1,0 +1,6 @@
+# Alan BURLOT, le 2023-11-24 ven. 11:05
+Première version de la fiche pour intégration dans Trio. Inspirée de la fiche du même nom
+pour le k-epsilon. À améliorer :
+- modifier le maillage en paroi pour être cohérent avec le k-omega
+- remettre les schémas muscl et EFstab avec les coefficients comme dans la fiche k-epsilon
+- convertir en ipynb

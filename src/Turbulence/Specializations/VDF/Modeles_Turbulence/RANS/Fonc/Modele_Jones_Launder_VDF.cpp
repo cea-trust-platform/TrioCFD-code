@@ -102,10 +102,10 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Domaine_dis& do
   const DoubleVect& volume_entrelaces = le_dom.volumes_entrelaces();
   //  int nb_elem = le_dom.nb_elem();
   int nb_elem_tot = le_dom.nb_elem_tot();
-  const Domaine& domaine=le_dom.domaine();
+  //const Domaine& domaine=le_dom.domaine();
 
-  int nb_faces_elem = domaine.nb_faces_elem();
-  IntTrav numfa(nb_faces_elem);
+  //int nb_faces_elem = domaine.nb_faces_elem();
+  //IntTrav numfa(nb_faces_elem);
   double coef;
   //  const IntTab& elem_faces = le_dom.elem_faces();
   const IntTab& face_voisins = le_dom.face_voisins();
@@ -571,8 +571,6 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
       ndeb = le_dom.premiere_arete_coin();
       nfin = ndeb + le_dom.nb_aretes_coin();
 
-      int compt_coin=0;
-
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
           for (i=0; i<4; i++)
@@ -622,7 +620,6 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
           else
             {
               //Cerr << "Oh!!! Un coin!!!" << finl;
-              compt_coin++;
             }
 
         }
@@ -741,8 +738,6 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
       ndeb = le_dom.premiere_arete_coin();
       nfin = ndeb + le_dom.nb_aretes_coin();
 
-      int compt_coin=0;
-
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
           for (i=0; i<4; i++)
@@ -796,7 +791,6 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
           else
             {
               //Cerr << "Oh!!! Un coin!!!" << finl;
-              compt_coin++;
             }
         }
       // Cerr << "Il y a : " << compt_coin << " coins!!" << finl;
@@ -920,8 +914,6 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
       ndeb = le_dom.premiere_arete_coin();
       nfin = ndeb + le_dom.nb_aretes_coin();
 
-      int compt_coin=0;
-
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
           for (i=0; i<4; i++)
@@ -967,7 +959,6 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
           else
             {
               //Cerr << "Oh!!! Un coin!!!" << finl;
-              compt_coin++;
             }
 
         }
@@ -1077,7 +1068,6 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
       ndeb = le_dom.premiere_arete_coin();
       nfin = ndeb + le_dom.nb_aretes_coin();
 
-      int compt_coin=0;
 
       for (num_arete=ndeb; num_arete<nfin; num_arete++)
         {
@@ -1125,7 +1115,6 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
           else
             {
               //Cerr << "Oh!!! Un coin!!!" << finl;
-              compt_coin++;
             }
         }
       //  Cerr << "Il y a : " << compt_coin << " coins!!" << finl;
@@ -1356,10 +1345,10 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis
   const DoubleVect& volume_entrelaces = le_dom.volumes_entrelaces();
   //  int nb_elem = le_dom.nb_elem();
   int nb_elem_tot = le_dom.nb_elem_tot();
-  const Domaine& domaine=le_dom.domaine();
+  //const Domaine& domaine=le_dom.domaine();
 
-  int nb_faces_elem = domaine.nb_faces_elem();
-  IntTrav numfa(nb_faces_elem);
+  //int nb_faces_elem = domaine.nb_faces_elem();
+  //IntTrav numfa(nb_faces_elem);
   double coef;
   //  const IntTab& elem_faces = le_dom.elem_faces();
   const IntTab& face_voisins = le_dom.face_voisins();

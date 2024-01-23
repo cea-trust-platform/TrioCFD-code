@@ -22,15 +22,25 @@ ExportDatabase(ExportDBAtts)
 
 import math
 import numpy as np
+import sys
+
+if (len(sys.argv) != 2):
+   raise Exception("One argument is compulsory to set sm")
+
+# print(f"sm set to {sys.argv[1]}")
+sm = float(sys.argv[1])
+print(sm*1.e6)
+
 x, y, z, dTdn = np.loadtxt("dTdni.xyz", skiprows=2, usecols=(1,2,3,4)).T
+def readFileInfo():
+    data = {}
+    with open("info.txt") as f:
+        for line in f.readlines():
+            key, value = line.rstrip("\n").split("=")
+            data[key] = float(value)
+    return data
 
-data = {}
-with open("info.txt") as f:
-  for line in f.readlines():
-    key, value = line.rstrip("\n").split("=")
-    data[key] = float(value)
-
-
+data = readFileInfo()
 # Curvilinear absissa : 
 s = np.sqrt(x*x+y*y+z*z)
 s -= s[0]
@@ -40,7 +50,19 @@ dT = data["DT"]
 theta_app = data["theta"]*math.pi/180
 qi = lda*dTdn
 # Analytical solution from Vadim:
-qi_ana = lda*dT/(s[1:]*theta_app)
+# qi_ana = lda*dT/(s[1:]*theta_app)
+Ri = 6.38209e-08
+
+qi_ana = []
+for element in s[1:]:
+    if element <= sm:
+        qi_ana.append(lda * dT / (element * theta_app))
+    else:
+        qi_ana.append(lda * dT / (element * theta_app + Ri * lda))
+
+# If s[1:] is a NumPy array or a list, you can convert qi_ana back to the same type
+qi_ana = np.array(qi_ana)  # For NumPy array
+
 np.savetxt("s_qi_qiana.txt", np.c_[s[1:],qi[1:],qi_ana], header='s qi qi_ana')
 
 exit()
