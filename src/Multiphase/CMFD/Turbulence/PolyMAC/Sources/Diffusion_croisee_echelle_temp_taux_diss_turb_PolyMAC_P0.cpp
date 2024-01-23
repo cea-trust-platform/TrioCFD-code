@@ -28,7 +28,7 @@
 #include <Echange_impose_base.h>
 #include <Domaine_PolyMAC_P0.h>
 #include <Domaine_Cl_PolyMAC.h>
-#include <Pb_Multiphase.h>
+#include <Probleme_base.h>
 #include <Neumann_paroi.h>
 #include <Dirichlet.h>
 
@@ -40,7 +40,7 @@ Entree& Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::readOn(Entree&
 
 void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::completer()
 {
-  const Pb_Multiphase& pb = ref_cast(Pb_Multiphase,  equation().probleme());
+  const Probleme_base& pb = equation().probleme();
 
   for (int i = 0 ; i <pb.nombre_d_equations() ; i++)
     for (int j = 0 ; j<pb.equation(i).domaine_Cl_dis()->nb_cond_lim(); j++)

@@ -53,6 +53,7 @@ void Cond_lim_k_complique_transition_flux_nul_demi::me_calculer()
   const DoubleTab& nu_visc = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_pas_de_temps().passe(),
                    &mu_visc = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_transport().passe();
 
+  const int cnu = nu_visc.dimension(0) == 1, cmu = mu_visc.dimension(0) == 1;
   // On va chercher le mu turbulent de polymac et celui de vdf et on prend le bon dans la suite
   const DoubleTab* mu_poly = domaine.que_suis_je().debute_par("Domaine_PolyMAC") ? &ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr,
                    *mu_vdf = domaine.que_suis_je().debute_par("Domaine_VDF") ? &ref_cast(Op_Dift_Multiphase_VDF_Elem, domaine_Cl_dis().equation().operateur(0).l_op_base()).get_diffusivite_turbulente() : nullptr;
@@ -68,11 +69,11 @@ void Cond_lim_k_complique_transition_flux_nul_demi::me_calculer()
       int f_domaine = f + f1; // number of the face in the domaine
       int e_domaine = (f_e(f_domaine,0)>=0) ? f_e(f_domaine,0) : f_e(f_domaine,1) ; // Make orientation vdf-proof
       double y_loc = f_e(f_domaine,0)>=0 ? domaine.dist_face_elem0(f_domaine,e_domaine) : domaine.dist_face_elem1(f_domaine,e_domaine) ;
-      double mu_tot_loc = (mu_poly) ? (*mu_poly)(e_domaine,n) : (mu_vdf) ? (*mu_vdf)(e_domaine,n) + mu_visc(e_domaine,n) : -1;
+      double mu_tot_loc = (mu_poly) ? (*mu_poly)(e_domaine,n) : (mu_vdf) ? (*mu_vdf)(e_domaine,n) + mu_visc(!cmu * e_domaine,n) : -1;
 
       h_(f, 0) = 2.*mu_tot_loc/y_loc * ( 1 - std::tanh(  std::pow( yp(f_domaine, 0)/50.,3)  ) );
       h_grad_(f, 0) = 2./y_loc * ( 1 - std::tanh(  std::pow( yp(f_domaine, 0)/50.,3)  ) );
-      T_(f, 0) = calc_k(y_loc/2., u_tau(f_domaine, 0), nu_visc(e_domaine, 0));
+      T_(f, 0) = calc_k(y_loc/2., u_tau(f_domaine, 0), nu_visc(!cnu * e_domaine, 0));
     }
 
   h_.echange_espace_virtuel();
