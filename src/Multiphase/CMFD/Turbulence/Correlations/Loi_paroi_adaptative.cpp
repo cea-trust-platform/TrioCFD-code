@@ -48,6 +48,7 @@ Entree& Loi_paroi_adaptative::readOn(Entree& is)
 
 void Loi_paroi_adaptative::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
 {
+  const int cnu = nu_visc.dimension(0) == 1;
   Domaine_VF& domaine = ref_cast(Domaine_VF, pb_->domaine_dis());
   DoubleTab& u_t = valeurs_loi_paroi_["u_tau"], &y_p = valeurs_loi_paroi_["y_plus"];
   const DoubleTab& n_f = domaine.face_normales();
@@ -92,8 +93,8 @@ void Loi_paroi_adaptative::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu
         double norm_u_parallel = std::sqrt(domaine.dot(&u_parallel(0), &u_parallel(0)));
 
         double y_loc = (c==0) ? domaine.dist_face_elem0(f,e) : domaine.dist_face_elem1(f,e) ;
-        y_p(f, n) = std::max(y_p_min_, calc_y_plus_loc(norm_u_parallel, nu_visc(e, n), y_loc, y_p(f, n)));
-        u_t(f, n) = y_p(f, n)*nu_visc(e, n)/y_loc;
+        y_p(f, n) = std::max(y_p_min_, calc_y_plus_loc(norm_u_parallel, nu_visc(!cnu * e, n), y_loc, y_p(f, n)));
+        u_t(f, n) = y_p(f, n)*nu_visc(!cnu * e, n)/y_loc;
       }
 }
 

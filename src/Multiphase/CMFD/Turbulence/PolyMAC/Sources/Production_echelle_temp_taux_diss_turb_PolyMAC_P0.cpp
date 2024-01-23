@@ -41,7 +41,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
   const DoubleTab&                     tab_diss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue()).valeurs(); // tau ou omega selon l'equation
   const DoubleTab&                    tab_pdiss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue()).passe(); // tau ou omega selon l'equation
   const DoubleTab&                     tab_grad = equation().probleme().get_champ("gradient_vitesse").passe();
-  const DoubleTab&                          alp = equation().probleme().get_champ("alpha").valeurs();
+  const DoubleTab*                          alp = sub_type(Pb_Multiphase,equation().probleme()) ? &equation().probleme().get_champ("alpha").valeurs() : nullptr;
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   int nf_tot = domaine.nb_faces_tot(), ne = domaine.nb_elem(), D = dimension ;
@@ -67,16 +67,16 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
 
         if (Type_diss == "tau")
           {
-            secmem(e, n) -= fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) * alp(e,n) ; // tau has negative production
+            secmem(e, n) -= fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) * (alp ? (*alp)(e,n) : 1.0); // tau has negative production
             for (auto &&i_m : matrices)
               {
-                if (i_m.first == "tau")    (*i_m.second)(N*e+n, N*e+n) += fac *  2 * tab_pdiss(e, n) * alp(e,n) ;
+                if (i_m.first == "tau")    (*i_m.second)(N*e+n, N*e+n) += fac *  2 * tab_pdiss(e, n) * (alp ? (*alp)(e,n) : 1.0) ;
                 if (i_m.first == "alpha")  (*i_m.second)(N*e+n, Na*e+n) += fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) ;
               }
           }
         else if (Type_diss == "omega")
           {
-            secmem(e, n) +=   fac * alp(e,n);
+            secmem(e, n) +=   fac * (alp ? (*alp)(e,n) : 1.0);
             for (auto &&i_m : matrices)
               if (i_m.first == "alpha")  (*i_m.second)(N*e+n, Na*e+n) += fac ;
           }

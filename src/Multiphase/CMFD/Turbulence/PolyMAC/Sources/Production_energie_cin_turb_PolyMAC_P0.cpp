@@ -53,25 +53,23 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
   int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = domaine.nb_elem(), D = dimension, nf_tot = domaine.nb_faces_tot() ;
   int N = equation().inconnue().valeurs().line_size(),
       Np = equation().probleme().get_champ("pression").valeurs().line_size(),
-      Nt = equation().probleme().get_champ("temperature").valeurs().line_size(),
       Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
   int e, n, mp;
 
   double limiter_ = visc_turb.limiteur();
   double nut_l = -10000., fac;
-
+  const bool is_multi = sub_type(Pb_Multiphase,equation().probleme());
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),
-                   &palp = equation().probleme().get_champ("alpha").passe(),
-                    &alp = equation().probleme().get_champ("alpha").valeurs(),
+                   *palp = is_multi ? &equation().probleme().get_champ("alpha").passe() : nullptr,
+                    *alp = is_multi ? &equation().probleme().get_champ("alpha").valeurs() : nullptr,
                      &nu =  equation().probleme().get_champ("viscosite_cinematique").passe(),
                       &k = equation().probleme().get_champ("k").valeurs(),
                        &tab_grad = pb.get_champ("gradient_vitesse").passe(),
                         *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
                          *pdiss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr;
 
-  const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).equation_masse().champ_conserve() : equation().milieu().masse_volumique();
-  const DoubleTab&       alpha_rho = ch_alpha_rho.valeurs();
-  const tabs_t&      der_alpha_rho = ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
+  const int cnu = nu.dimension(0) == 1;
+  const Champ_base&   ch_alpha_rho = is_multi ? ref_cast(Pb_Multiphase,equation().probleme()).equation_masse().champ_conserve() : equation().milieu().masse_volumique();
 
   if (Type_diss == "")
     {
@@ -88,7 +86,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
                 secmem_en += ( tab_grad(nf_tot + d_U + e * D , D * n + d_X) + tab_grad(nf_tot + d_X + e * D , D * n + d_U) ) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-            secmem_en *= pe(e) * ve(e) * palp(e, n) * tab_rho(e, n) * nut(e, n) ;
+            secmem_en *= pe(e) * ve(e) * (palp ? (*palp)(e, n) : 1.0) * tab_rho(e, n) * nut(e, n) ;
 
             secmem(e, n) += std::max(secmem_en, 0.);//  secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
 
@@ -108,33 +106,41 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
 
             fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
 
-            if      (Type_diss == "tau")   nut_l = k(e, n) * (*diss)(e, n) + limiter_ * nu(e, n);
-            else if (Type_diss == "omega") nut_l = k(e, n) / std::max((*pdiss)(e, n), omega_min_) + 0.*(2-(*diss)(e, n)/std::max((*pdiss)(e, n), omega_min_)) + limiter_ * nu(e, n);
+            if      (Type_diss == "tau")   nut_l = k(e, n) * (*diss)(e, n) + limiter_ * nu(!cnu * e, n);
+            else if (Type_diss == "omega") nut_l = k(e, n) / std::max((*pdiss)(e, n), omega_min_) + 0.*(2-(*diss)(e, n)/std::max((*pdiss)(e, n), omega_min_)) + limiter_ * nu(!cnu * e, n);
             else Process::exit(que_suis_je() + " : ajouter_blocs : probleme !!!") ;
 
-            secmem(e, n) += fac * nut_l * (1.+ 0.*alpha_rho(e, n) * alp(e,n)) ;
-            for (auto &&i_m : matrices)
+            const double alp_en = (alp ? (*alp)(e, n) : 1.0);
+            secmem(e, n) += fac * nut_l;
+
+            if (is_multi)
               {
-                Matrice_Morse& mat = *i_m.second;
-                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, n) : 0 );			      // derivee par rapport au taux de vide
-                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= fac * nut_l ;			      // derivee par rapport au taux de vide
-                if (i_m.first == "temperature") mat(N * e + n, Nt * e + n) -= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, n) : 0 );// derivee par rapport a la temperature
-                if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		  // derivee par rapport a la pression
+                const int Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
+
+                const tabs_t&      der_alpha_rho = ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
+                for (auto &&i_m : matrices)
+                  {
+                    Matrice_Morse& mat = *i_m.second;
+                    if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= 0.*fac * nut_l * alp_en * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, n) : 0 );			      // derivee par rapport au taux de vide
+                    if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= fac * nut_l ;			      // derivee par rapport au taux de vide
+                    if (i_m.first == "temperature") mat(N * e + n, Nt * e + n) -= 0.*fac * nut_l * alp_en * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, n) : 0 );// derivee par rapport a la temperature
+                    if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= 0.*fac * nut_l * alp_en * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		  // derivee par rapport a la pression
+                  }
               }
 
             if (Type_diss == "tau")
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;
-                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alp(e,n) *(*diss)(e,n);
-                  if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * alp(e,n) * k(e,n);
+                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alp_en *(*diss)(e,n);
+                  if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * alp_en * k(e,n);
                 }
             else if (Type_diss == "omega")
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;
-                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alp(e,n) *      1./ std::max((*pdiss)(e, n), omega_min_) + 0. * std::max((*pdiss)(e, n), omega_min_)*(2-(*diss)(e, n)/std::max((*pdiss)(e, n), omega_min_)) ;
-                  if (i_m.first == "omega")     mat(N * e + n,  N * e + n) -= fac * alp(e,n) * -k(e,n)/(std::max((*pdiss)(e, n), omega_min_)*std::max((*pdiss)(e, n), omega_min_)) *0.;
+                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alp_en *      1./ std::max((*pdiss)(e, n), omega_min_) + 0. * std::max((*pdiss)(e, n), omega_min_)*(2-(*diss)(e, n)/std::max((*pdiss)(e, n), omega_min_)) ;
+                  if (i_m.first == "omega")     mat(N * e + n,  N * e + n) -= fac * alp_en * -k(e,n)/(std::max((*pdiss)(e, n), omega_min_)*std::max((*pdiss)(e, n), omega_min_)) *0.;
                 }
           }
     }

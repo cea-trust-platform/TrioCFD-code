@@ -37,7 +37,7 @@ Entree& Flux_parietal_adaptatif::readOn(Entree& is) { return Flux_parietal_base:
 
 void Flux_parietal_adaptatif::completer()
 {
-  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, pb_.valeur()).get_correlation("Loi_paroi");
+  correlation_loi_paroi_ = pb_->get_correlation("Loi_paroi");
 }
 
 void Flux_parietal_adaptatif::qp(const input_t& in, output_t& out) const

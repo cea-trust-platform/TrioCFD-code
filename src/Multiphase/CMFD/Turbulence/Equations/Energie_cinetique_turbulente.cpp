@@ -26,7 +26,7 @@
 #include <Champ_Uniforme.h>
 #include <Matrice_Morse.h>
 #include <Neumann_paroi.h>
-#include <Pb_Multiphase.h>
+#include <Probleme_base.h>
 #include <Discret_Thyd.h>
 #include <Domaine_VF.h>
 #include <TRUSTTrav.h>
@@ -90,12 +90,13 @@ void Energie_cinetique_turbulente::mettre_a_jour(double temps)
   // XXX : appel a la classe mere
   Convection_diffusion_turbulence_multiphase::mettre_a_jour(temps);
 
-  const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, probleme());
-  if (pbm.discretisation().is_polymac_p0() && limit_k_ == 1)
+  const Navier_Stokes_std& eqv = ref_cast(Navier_Stokes_std, probleme().equation(0));
+
+  if (probleme().discretisation().is_polymac_p0() && limit_k_ == 1)
     if ( temps > schema_temps().temps_courant() && coef_limit_ > 0 )
       {
         Cerr << "Limiting the value of K : coeff used = " << coef_limit_ << finl;
-        const Champ_Face_PolyMAC_P0& ch_vit = ref_cast(Champ_Face_PolyMAC_P0, ref_cast(Navier_Stokes_std,pbm.equation_qdm()).vitesse());
+        const Champ_Face_PolyMAC_P0& ch_vit = ref_cast(Champ_Face_PolyMAC_P0, eqv.vitesse());
         const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, domaine_dis());
         DoubleTab& k_val = inconnue().valeurs();
         const int N = k_val.line_size(), D = dimension;
