@@ -43,9 +43,18 @@ Operateur_IJK_elem_diff::Operateur_IJK_elem_diff()
   diffusion_rank_= 0 ;
 }
 
+void Operateur_IJK_elem_diff::reset_operator()
+{
+  diffusion_op_ = "";
+  diffusion_op_options_ = "";
+  is_cast_ = false;
+  diffusion_rank_= 0 ;
+}
+
 Sortie& Operateur_IJK_elem_diff::printOn( Sortie& os ) const
 {
-  DERIV(Operateur_IJK_elem_diff_base_double)::printOn( os );
+  // DERIV(Operateur_IJK_elem_diff_base_double)::printOn( os );
+  os << diffusion_op_words_[diffusion_rank_];
   return os;
 }
 
@@ -70,6 +79,8 @@ int Operateur_IJK_elem_diff::lire_motcle_non_standard(const Motcle& mot, Entree&
 
 Entree& Operateur_IJK_elem_diff::typer_diffusion_op(Entree& is)
 {
+  if (is_cast_)
+    reset_operator();
   Cerr << "Read and Cast Operateur_IJK_elem_diff :" << finl;
   Motcle word;
   is >> word;
@@ -83,6 +94,8 @@ Entree& Operateur_IJK_elem_diff::typer_diffusion_op(Entree& is)
 
 void Operateur_IJK_elem_diff::typer_diffusion_op(const char * diffusion_op) // (const char * convection_op)
 {
+  if (is_cast_)
+    reset_operator();
   Cerr << "Read and Cast Operateur_IJK_elem_diff :" << finl;
   Motcle word(diffusion_op);
   Nom type(get_diffusion_op_type(word));

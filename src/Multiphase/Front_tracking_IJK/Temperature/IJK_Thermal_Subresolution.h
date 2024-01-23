@@ -61,6 +61,7 @@ class IJK_Thermal_Subresolution : public IJK_Thermal_base
 public :
 
   int initialize(const IJK_Splitting& splitting, const int idx) override;
+  // void sauvegarder_temperature(Nom& lata_name, int idx) override;
   void update_thermal_properties() override;
   void post_process_after_temperature_increment() override;
   void set_param(Param& param) override;
@@ -108,21 +109,21 @@ public :
   }
   const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_diffusive() const override
   {
-    if (diffusive_flux_correction_)
+    if((convective_flux_correction_ || diffusive_flux_correction_) && store_cell_faces_corrected_)
       return cell_faces_corrected_diffusive_;
     else
       return dummy_double_vect_;
   }
   const FixedVector<IJK_Field_double,3>& get_cell_faces_corrected_convective() const override
   {
-    if (convective_flux_correction_)
+    if((convective_flux_correction_ || diffusive_flux_correction_) && store_cell_faces_corrected_)
       return cell_faces_corrected_convective_;
     else
       return dummy_double_vect_;
   }
   const FixedVector<IJK_Field_int,3>& get_cell_faces_corrected_bool() const override
   {
-    if (convective_flux_correction_ || diffusive_flux_correction_)
+    if ((convective_flux_correction_ || diffusive_flux_correction_) && store_cell_faces_corrected_)
       return cell_faces_corrected_bool_;
     else
       return dummy_int_vect_;
@@ -307,6 +308,7 @@ protected :
   int diffusive_flux_correction_;
   int convective_flux_correction_;
   int impose_fo_flux_correction_;
+  int disable_fo_flux_correction_;
   int subproblem_temperature_extension_; // ghost fluid extension based on the interfacial gradient computed with the subproblem
 
   int override_vapour_mixed_values_; // For debug purposes
@@ -363,12 +365,15 @@ protected :
   int compute_tangential_variables_;
 
   int boundary_condition_interface_;
+  Motcles boundary_condition_interface_dict_;
   double interfacial_boundary_condition_value_;
   int impose_boundary_condition_interface_from_simulation_;
   int boundary_condition_end_;
+  Motcles boundary_condition_end_dict_;
   double end_boundary_condition_value_;
   int impose_user_boundary_condition_end_value_;
   int source_terms_type_;
+  Motcles source_terms_type_dict_;
   int source_terms_correction_;
   int advected_frame_of_reference_;
   int neglect_frame_of_reference_radial_advection_;
@@ -410,6 +415,7 @@ protected :
 
   IJK_Field_double debug_LRS_cells_;
   int distance_cell_faces_from_lrs_;
+  int  disable_distance_cell_faces_from_lrs_;
 
   int pre_initialise_thermal_subproblems_list_;
   double pre_factor_subproblems_number_;
@@ -479,6 +485,7 @@ protected :
 
   int interp_eulerian_;
   int first_step_thermals_post_;
+  int disable_first_step_thermals_post_;
 
   int copy_fluxes_on_every_procs_;
   int copy_temperature_on_every_procs_;

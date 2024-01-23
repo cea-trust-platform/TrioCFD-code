@@ -593,6 +593,7 @@ protected :
    *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
    */
   Operateur_IJK_faces_diff velocity_diffusion_op_;
+  enum velocity_diffusion_options_ { simple_arithmetic, full_arithmetic, full_adaptative};
 
   /*
    * Velocity convection operator
@@ -601,6 +602,7 @@ protected :
    * conservative            : div(rho u u)
    */
   Operateur_IJK_faces_conv velocity_convection_op_;
+  enum velocity_convection_options_ { non_conservative_simple, non_conservative_rhou, conservative};
 
   Multigrille_Adrien poisson_solver_;
   // Simulation parameters

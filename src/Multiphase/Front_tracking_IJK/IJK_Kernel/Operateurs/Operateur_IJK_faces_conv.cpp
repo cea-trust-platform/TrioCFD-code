@@ -51,11 +51,13 @@ Operateur_IJK_faces_conv::Operateur_IJK_faces_conv()
   suffix_ = Nom("IJK_double");
   is_cast_=false;
   convection_rank_=0;
+  convection_option_rank_=0;
 }
 
 Sortie& Operateur_IJK_faces_conv::printOn( Sortie& os ) const
 {
-  DERIV(Operateur_IJK_faces_conv_base_double)::printOn( os );
+  // DERIV(Operateur_IJK_faces_conv_base_double)::printOn( os );
+  os << convection_op_words_[convection_rank_] << "_" << convection_option_ << "\n";
   return os;
 }
 
@@ -63,7 +65,7 @@ Entree& Operateur_IJK_faces_conv::readOn( Entree& is )
 {
   typer_convection_op(is);
   // By default, there is no testList using this...
-  convection_option_ = convection_op_options_[0];
+  // convection_option_ = convection_op_options_[0];
   /*
    * Does not work
    * Once read the next word is no longer used to read the
@@ -148,6 +150,12 @@ void Operateur_IJK_faces_conv::typer_convection_op(const char * convection_op) /
 
 Nom Operateur_IJK_faces_conv::get_convection_op_type( Motcle word ) // (const char * convection_op)
 {
+
+  convection_option_rank_ = convection_op_options_.search(word);
+  if (convection_option_rank_ == -1)
+    convection_option_rank_ = 0;
+  convection_option_ = convection_op_options_[convection_option_rank_];
+
   convection_rank_ = convection_op_words_.search(word);
   Nom type(prefix_);
   switch(convection_rank_)

@@ -42,9 +42,18 @@ Operateur_IJK_elem_conv::Operateur_IJK_elem_conv()
   is_cast_ = false;
 }
 
+void Operateur_IJK_elem_conv::reset_operator()
+{
+  convection_op_ = "";
+  convection_op_option_ = "";
+  convection_rank_ = 0;
+  is_cast_ = false;
+}
+
 Sortie& Operateur_IJK_elem_conv::printOn( Sortie& os ) const
 {
-  DERIV(Operateur_IJK_elem_conv_base_double)::printOn( os );
+  // DERIV(Operateur_IJK_elem_conv_base_double)::printOn( os );
+  os << convection_op_words_[convection_rank_];
   return os;
 }
 
@@ -70,6 +79,8 @@ int Operateur_IJK_elem_conv::lire_motcle_non_standard(const Motcle& mot, Entree&
 
 Entree& Operateur_IJK_elem_conv::typer_convection_op(Entree& is)
 {
+  if (is_cast_)
+    reset_operator();
   Cerr << "Read and Cast Operateur_IJK_elem_conv :" << finl;
   Motcle word;
   is >> word;
@@ -83,6 +94,8 @@ Entree& Operateur_IJK_elem_conv::typer_convection_op(Entree& is)
 
 void Operateur_IJK_elem_conv::typer_convection_op(const char * convection_op)
 {
+  if (is_cast_)
+    reset_operator();
   Cerr << "Read and Cast Operateur_IJK_elem_conv :" << finl;
   Motcle word(convection_op);
   Motcle type(get_convection_op_type(word));

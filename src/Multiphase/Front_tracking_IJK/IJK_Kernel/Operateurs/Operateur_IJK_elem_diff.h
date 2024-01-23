@@ -53,6 +53,7 @@ public :
   /*
    * ReadOn
    */
+  void reset_operator();
   void typer_diffusion_op(const char * diffusion_op);
   Entree& typer_diffusion_op(Entree& is);
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;

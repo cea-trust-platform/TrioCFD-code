@@ -54,6 +54,7 @@ public :
   /*
    * ReadOn
    */
+  void reset_operator();
   Entree& typer_convection_op(Entree& is);
   void typer_convection_op(const char * convection_op);
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;

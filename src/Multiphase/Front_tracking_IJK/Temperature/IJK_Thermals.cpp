@@ -37,8 +37,21 @@ Sortie& IJK_Thermals::printOn( Sortie& os ) const
 
 Entree& IJK_Thermals::readOn( Entree& is )
 {
+  if ((*this).size())
+    vide();
   LIST(IJK_Thermal)::readOn(is);
   return is;
+}
+
+void IJK_Thermals::set_fichier_reprise(const char *lataname)
+{
+  for (auto& itr : *this)
+    itr.set_fichier_reprise(lataname);
+}
+
+const Nom& IJK_Thermals::get_fichier_reprise()
+{
+  return (*this)[0].get_fichier_reprise();
 }
 
 void IJK_Thermals::associer(const IJK_FT_double& ijk_ft)
@@ -141,6 +154,11 @@ void IJK_Thermals::initialize(const IJK_Splitting& splitting, int& nalloc)
       interfacial_quantities_thermal_probes_folder_ = Nom("interfacial_quantities_thermal_probes");
       local_quantities_thermal_probes_folder_ = Nom("local_quantities_thermal_probes");
       local_quantities_thermal_probes_time_index_folder_ = Nom("local_quantities_thermal_probes_time_index_");
+    }
+  for (auto& itr : (*this))
+    {
+      lata_step_reprise_.push_back(itr.valeur().get_latastep_reprise());
+      lata_step_reprise_ini_.push_back(itr.valeur().get_latastep_reprise_ini());
     }
 }
 
@@ -380,6 +398,13 @@ int IJK_Thermals::get_disable_post_processing_probes_out_files() const
   return disable_post_processing_probes_out_files;
 }
 
+void IJK_Thermals::set_latastep_reprise(const bool stop)
+{
+  if (stop)
+    for (auto& itr : (*this))
+      itr.valeur().set_latastep_reprise(ref_ijk_ft_->get_tstep() + 1);
+}
+
 void IJK_Thermals::thermal_subresolution_outputs()
 {
   const int disable_post_processing_probes_out_files = get_disable_post_processing_probes_out_files();
@@ -393,7 +418,7 @@ void IJK_Thermals::thermal_subresolution_outputs()
       int rank = 0;
       for (auto& itr : (*this))
         {
-          const int last_time = ref_ijk_ft_->get_tstep();
+          const int last_time = ref_ijk_ft_->get_tstep() + lata_step_reprise_ini_[rank];
           const int max_digit_time = 8;
           const int nb_digit_tstep = last_time < 1 ? 1 : (int) (log10(last_time) + 1);
           Nom local_quantities_thermal_probes_time_index_folder = thermal_rank_folder_[rank] + "/"
@@ -409,9 +434,10 @@ void IJK_Thermals::thermal_subresolution_outputs()
           itr.thermal_subresolution_outputs(interfacial_quantities_thermal_probes,
                                             overall_bubbles_quantities,
                                             local_quantities_thermal_probes_time_index_folder);
+          // .sauv written before the post-processing on probes
+          itr.valeur().set_latastep_reprise(lata_step_reprise_ini_[rank] + ref_ijk_ft_->get_tstep() + 2);
           rank++;
         }
-
     }
   post_pro_first_call_++;
 }

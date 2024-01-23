@@ -115,6 +115,8 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   delta_temperature_ = nullptr;
   mean_liquid_temperature_ = nullptr;
   bubbles_rising_vectors_per_bubble_ = nullptr;
+
+  latastep_reprise_ = nullptr;
 }
 
 IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblem()
@@ -186,7 +188,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                               ref_thermal_subresolution.delta_T_subcooled_overheated_,
                                               ref_thermal_subresolution.pre_initialise_thermal_subproblems_list_,
                                               ref_thermal_subresolution.use_sparse_matrix_,
-                                              ref_thermal_subresolution.compute_normal_derivatives_on_reference_probes_);
+                                              ref_thermal_subresolution.compute_normal_derivatives_on_reference_probes_,
+                                              ref_thermal_subresolution.latastep_reprise_ini_);
       associate_thermal_subproblem_sparse_matrix(ref_thermal_subresolution.first_indices_sparse_matrix_);
       associate_eulerian_fields_references(interfaces,
                                            ref_thermal_subresolution.eulerian_distance_ns_,
@@ -308,7 +311,8 @@ void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(con
                                                                              const double& delta_T_subcooled_overheated,
                                                                              const int& pre_initialise_thermal_subproblems_list,
                                                                              const int& use_sparse_matrix,
-                                                                             const int& compute_normal_derivative_on_reference_probes)
+                                                                             const int& compute_normal_derivative_on_reference_probes,
+                                                                             const int& latastep_reprise)
 {
   reference_gfm_on_probes_ = reference_gfm_on_probes;
   debug_ = debug;
@@ -317,6 +321,7 @@ void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(con
   pre_initialise_thermal_subproblems_list_ = pre_initialise_thermal_subproblems_list;
   use_sparse_matrix_ = use_sparse_matrix;
   compute_normal_derivative_on_reference_probes_ = compute_normal_derivative_on_reference_probes;
+  latastep_reprise_ = &latastep_reprise;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_sparse_matrix(FixedVector<ArrOfInt,6>& first_indices_sparse_matrix)
@@ -504,13 +509,13 @@ void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& point
     points_per_thermal_subproblem_ = increase_number_of_points(); //copy if modified later
 }
 
-void IJK_One_Dimensional_Subproblem::associate_bubble_parameters(ArrOfDouble& bubbles_volume,
-                                                                 ArrOfDouble& bubbles_surface,
-                                                                 ArrOfDouble& radius_from_surfaces_per_bubble,
-                                                                 ArrOfDouble& radius_from_volumes_per_bubble,
-                                                                 double& delta_temperature,
-                                                                 double& mean_liquid_temperature,
-                                                                 DoubleTab& rising_vectors)
+void IJK_One_Dimensional_Subproblem::associate_bubble_parameters(const ArrOfDouble& bubbles_volume,
+                                                                 const ArrOfDouble& bubbles_surface,
+                                                                 const ArrOfDouble& radius_from_surfaces_per_bubble,
+                                                                 const ArrOfDouble& radius_from_volumes_per_bubble,
+                                                                 const double& delta_temperature,
+                                                                 const double& mean_liquid_temperature,
+                                                                 const DoubleTab& rising_vectors)
 {
   bubbles_volume_ = &bubbles_volume;
   bubbles_surface_ = &bubbles_surface;
@@ -3115,7 +3120,7 @@ void IJK_One_Dimensional_Subproblem::retrieve_interfacial_quantities(const int r
                                                                      std::map<std::string, ArrOfDouble>& results_probes_double)
 {
   const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
-  const int last_time_index = ref_ijk_ft_->get_tstep();
+  const int last_time_index = ref_ijk_ft_->get_tstep() + (*latastep_reprise_);
   std::vector<int> results_int =
   {
     last_time_index, rank, index_post_processing_, global_subproblem_index_, sub_problem_index_
@@ -3189,7 +3194,7 @@ void IJK_One_Dimensional_Subproblem::post_process_interfacial_quantities(SFichie
     if (is_updated_)
       {
         const double last_time = ref_ijk_ft_->get_current_time() - ref_ijk_ft_->get_timestep();
-        const int last_time_index = ref_ijk_ft_->get_tstep();
+        const int last_time_index = ref_ijk_ft_->get_tstep() + (*latastep_reprise_);
         fic << last_time_index << " ";
         fic << rank << " " << index_post_processing_ << " " << global_subproblem_index_ << " " << sub_problem_index_ << " ";
         fic << last_time << " ";

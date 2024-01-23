@@ -45,6 +45,11 @@ IJK_Thermal::IJK_Thermal()
   }
 }
 
+void IJK_Thermal::set_fichier_reprise(const char *lataname)
+{
+  valeur().set_fichier_reprise(lataname);
+}
+
 Sortie& IJK_Thermal::printOn( Sortie& os ) const
 {
   DERIV(IJK_Thermal_base)::printOn( os );
@@ -61,6 +66,8 @@ Entree& IJK_Thermal::typer_thermal( Entree& is )
   Cerr << "Read and Cast IJK_Thermal :" << finl;
   Motcle word;
   is >> word;
+  if (word.debute_par(prefix_))
+    word = Motcle((word.getString()).substr(prefix_.getString().length()));
   Nom type = "";
   thermal_rank_ = thermal_words_.search(word);
   type += prefix_;
@@ -152,6 +159,7 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
                                                         const double current_time,
                                                         const int idx)
 {
+
   Cerr << liste_post_instantanes << finl;
   int n = 0; // number of post-processed field
   std::ostringstream oss;

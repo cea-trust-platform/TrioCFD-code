@@ -120,7 +120,8 @@ IJK_Thermal_base::IJK_Thermal_base()
   fill_rising_velocities_ = 0;
 
   debug_ = 0;
-  spherical_approx_ = 0.;
+  spherical_approx_ = 1;
+  spherical_exact_ = 0;
 
   eulerian_compo_connex_ft_ = nullptr;
   eulerian_compo_connex_ns_ = nullptr;
@@ -134,13 +135,23 @@ IJK_Thermal_base::IJK_Thermal_base()
   eulerian_compo_connex_from_interface_ghost_int_ns_= nullptr;
 
   liquid_velocity_ = 0.;
+  latastep_reprise_=0;
+  latastep_reprise_ini_=0;
 }
 
 Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
 {
+  Nom front_space = "    ";
+  Nom end_space = " ";
+  Nom escape = "\n";
   Objet_U::printOn( os );
-  os<< "  {\n"
-    << "    boundary_conditions {"  << "\n";
+  os << "  {" << escape;
+
+  os << escape;
+  os << front_space << "# BASE PARAMS #" << escape;
+  os << escape;
+
+  os << "    boundary_conditions {"  << escape;
   /*
    * Boundary conditions (Periodicity or wall)
    */
@@ -187,7 +198,6 @@ Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
     }
   os<< "      bctype_kmin" << " " << bctype_kmin << " \n";
   os<< "      bctype_kmax" << " " << bctype_kmax << " \n";
-
   os<< "      " << bckmin << " " << valeur_kmin << " \n";
   os<< "      " << bckmax << " " << valeur_kmax << " \n";
   os<< "    } \n" ;
@@ -195,15 +205,16 @@ Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
   /*
    * Physical parameters
    */
-  os<< "    lambda_liquid " <<  lambda_liquid_ << "\n";
-  os<< "    lambda_vapour " <<  lambda_vapour_ << "\n";
-  os<< "    cp_liquid " <<  cp_liquid_ << "\n";
-  os<< "    cp_vapour " <<  cp_vapour_ << "\n";
+  os << front_space << "lambda_liquid" << end_space << lambda_liquid_ << escape;
+  os << front_space << "lambda_vapour" << end_space << lambda_vapour_ << escape;
+  os << front_space << "cp_liquid" << end_space << cp_liquid_ << escape;
+  os << front_space << "cp_vapour" << end_space << cp_vapour_ << escape;
 
   /*
    * Source term
    */
-  os<< "    type_T_source " << type_T_source_ << "\n";
+  if (type_T_source_!="??")
+    os<< "    type_T_source " << type_T_source_ << "\n";
   if (type_T_source_=="SWARM")
     {
       os<< "      kl_source " <<  kl_ << "\n";
@@ -213,36 +224,53 @@ Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
     }
 
   if( wall_flux_)
-    os << "    wall_flux \n";
+    os << front_space << "wall_flux" << escape;
 
   /*
    * Resume calculation
    */
-  os<< "    fichier_reprise_temperature" << " " << fichier_reprise_temperature_  << "\n";
-  os<< "    timestep_reprise_temperature" << " " << timestep_reprise_temperature_ << "\n";
+  os << front_space << "fichier_reprise_temperature" << end_space << basename(fichier_reprise_temperature_)  << escape;
+  os << front_space << "timestep_reprise_temperature" << end_space << timestep_reprise_temperature_ << escape;
+  os << front_space << "latastep_reprise" << end_space << latastep_reprise_ << escape;
 
   /*
    * Analytical expression of temperature at t_initial
    */
   if ( expression_T_ana_!="??")
-    os<< "    expression_T_ana" <<  " " << expression_T_ana_ << "\n";
+    os << front_space << "expression_T_ana" <<  end_space << expression_T_ana_ << escape;
+
+
+  os << front_space << "upstream_temperature" << end_space << upstream_temperature_ << escape;
+  os << front_space << "nb_diam_upstream" << end_space << nb_diam_upstream_ << escape;
+  os << front_space << "side_temperature" << end_space << side_temperature_ << escape;
+  os << front_space << "stencil_side" << end_space << stencil_side_ << escape;
+  os << front_space << "n_iter_distance" << end_space << n_iter_distance_ << escape;
+
+
+  os << front_space << "temperature_diffusion_op" << end_space << temperature_diffusion_op_ << escape;
+  os << front_space << "temperature_convection_op" << end_space << temperature_convection_op_ << escape;
 
   /*
    * Neglect an operator
    */
+
+  os << escape;
+  os << front_space << "# BASE FLAGS #" << escape;
+  os << escape;
+
   if ( conv_temperature_negligible_)
-    os<< "    conv_temperature_negligible \n ";
-
+    os << front_space << "conv_temperature_negligible" << escape;
   if ( diff_temperature_negligible_)
-    os<< "    diff_temp_negligible \n";
+    os << front_space << "diff_temp_negligible" << escape;
+  if (ghost_fluid_)
+    os << front_space << "ghost_fluid" <<  escape;
+  if (spherical_exact_)
+    os << front_space << "spherical_exact" <<  escape;
+  if (debug_)
+    os << front_space << "debug" <<  escape;
+  if (calculate_local_energy_)
+    os << front_space << "calculate_local_energy" <<  escape;
 
-  os << "upstream_temperature" << upstream_temperature_;
-  os << "nb_diam_upstream" << nb_diam_upstream_;
-  os << "side_temperature" << side_temperature_;
-  os << "stencil_side" << stencil_side_;
-  os << "    ghost_fluid" <<  " " << ghost_fluid_ << "\n";
-
-  os<< "  }\n";
   return os;
 }
 
@@ -259,6 +287,11 @@ Entree& IJK_Thermal_base::readOn( Entree& is )
   Cout << "IJK_Thermal_base::readOn : Parameters summary. " << finl;
   printOn(Cout);
   return is;
+}
+
+void IJK_Thermal_base::set_fichier_reprise(const char *lataname)
+{
+  fichier_reprise_temperature_ = lataname;
 }
 
 void IJK_Thermal_base::set_param(Param& param)
@@ -280,6 +313,7 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("T0v_source", &T0v_);
   param.ajouter("fichier_reprise_temperature", &fichier_reprise_temperature_);
   param.ajouter("timestep_reprise_temperature", &timestep_reprise_temperature_);
+  param.ajouter("latastep_reprise", &latastep_reprise_);
   param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // XD_ADD_P rien neglect temperature convection
   param.ajouter_flag("diff_temperature_negligible", &diff_temperature_negligible_); // XD_ADD_P rien neglect temperature diffusion
   param.ajouter("temperature_diffusion_op", &temperature_diffusion_op_);
@@ -288,9 +322,11 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("calculate_local_energy", &calculate_local_energy_);
   param.ajouter("upstream_temperature", &upstream_temperature_);
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
+  param.ajouter("side_temperature", &side_temperature_);
+  param.ajouter("stencil_side", &stencil_side_);
   param.ajouter("n_iter_distance", &n_iter_distance_);
   param.ajouter_flag("ghost_fluid", &ghost_fluid_);
-  param.ajouter_flag("spherical_exact", &spherical_approx_);
+  param.ajouter_flag("spherical_exact", &spherical_exact_);
   param.ajouter_flag("debug", &debug_);
 //  param.ajouter_flag("gfm_recompute_field_ini", &gfm_recompute_field_ini_);
 //  param.ajouter_flag("gfm_zero_neighbour_value_mean", &gfm_zero_neighbour_value_mean_);
@@ -307,6 +343,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   rang_ = idx;
   int nalloc = 0;
 
+  latastep_reprise_ = latastep_reprise_ini_;
   /*
    * Diffusion operator:
    * If temperature_diffusion_op_ is not written in the .data
@@ -314,13 +351,10 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
    * in Operateur_IJK_elem_diff
    */
   if (single_phase_)
-    {
-      temperature_diffusion_op_.typer_diffusion_op("uniform");
-    }
+    temperature_diffusion_op_.typer_diffusion_op("uniform");
   else
-    {
-      temperature_diffusion_op_.typer_diffusion_op("standard");
-    }
+    temperature_diffusion_op_.typer_diffusion_op("standard");
+
 
   /*
    * Convection operator
@@ -641,7 +675,7 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
        * to derive the cross derivatives...
        */
     }
-  spherical_approx_ = !spherical_approx_;
+  spherical_approx_ = !spherical_exact_;
 
   /*
    * FIXME: Temporary need to rewrite IJK_Thermal.cpp posttraitements

@@ -66,6 +66,7 @@ public:
   /*
    * Getters
    */
+  inline int get_convection_op_option_rank() { return convection_option_rank_; };
   inline Nom get_convection_op_option() { return convection_option_; };
   inline Nom get_convection_op() { return convection_op_; };
   /*
@@ -79,6 +80,7 @@ protected:
   Nom convection_op_;
   Nom convection_option_;
   int convection_rank_;
+  int convection_option_rank_;
   bool is_cast_;
 };
 
@@ -102,7 +104,7 @@ inline void Operateur_IJK_faces_conv::initialize(const IJK_Splitting& splitting)
   if (!is_cast_)
     {
       typer_convection_op("quick");
-      convection_option_ = convection_op_options_[0];
+      // convection_option_ = convection_op_options_[0];
     }
   valeur().initialize(splitting);
 }

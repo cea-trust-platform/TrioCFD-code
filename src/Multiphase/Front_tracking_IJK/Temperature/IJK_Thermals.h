@@ -45,6 +45,8 @@ class IJK_Thermals : public LIST(IJK_Thermal)
 
 public :
   IJK_Thermals(const IJK_FT_double& ijk_ft);
+  void set_fichier_reprise(const char *lataname);
+  const Nom& get_fichier_reprise();
   void associer(const IJK_FT_double& ijk_ft);
   void associer_post(const IJK_FT_Post& ijk_ft_post);
   void associer_switch(const Switch_FT_double& ijk_ft_switch);
@@ -79,6 +81,7 @@ public :
   void clean_ijk_intersections();
   void compute_eulerian_distance();
   void compute_eulerian_curvature_from_interface();
+  void set_latastep_reprise(const bool stop);
   void thermal_subresolution_outputs();
   int get_disable_post_processing_probes_out_files() const;
   double get_modified_time();
@@ -108,7 +111,8 @@ protected :
   int ini_folder_out_files_ = 0;
 
   bool is_diphasique_=false;
-
+  std::vector<int> lata_step_reprise_ini_;
+  std::vector<int> lata_step_reprise_;
 };
 
 #endif /* IJK_Thermals_included */

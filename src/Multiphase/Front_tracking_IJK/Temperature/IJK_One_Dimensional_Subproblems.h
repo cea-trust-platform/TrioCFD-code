@@ -326,6 +326,7 @@ protected :
   Vecteur3 * liquid_velocity_;
 
   int nb_bubbles_ = 0;
+  int * latastep_reprise_;
 
 };
 

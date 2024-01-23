@@ -44,6 +44,8 @@ public :
   /*
    * Getters
    */
+  void set_fichier_reprise(const char *lataname);
+  const Nom& get_fichier_reprise() const { return valeur().get_fichier_reprise(); };
   inline Nom& get_thermal_problem_type() { return thermal_problem_type_; };
   inline int& get_thermal_rank() { return thermal_rank_; };
   inline Motcles& get_thermal_words() { return thermal_words_; };

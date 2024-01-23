@@ -28,6 +28,7 @@ Implemente_instanciable( IJK_SolveSys_FD_thermal, "IJK_SolveSys_FD_thermal", Sol
 
 Sortie& IJK_SolveSys_FD_thermal::printOn( Sortie& os ) const
 {
+  os << "    ";
   SolveurSys::printOn( os );
   return os;
 }
@@ -46,7 +47,10 @@ Entree& IJK_SolveSys_FD_thermal::readOn( Entree& is )
     cast_iterative_solver_by_default();
   else
     {
-      Nom type_solv_sys("Solv_");
+      Nom prefix = "Solv_";
+      if (solver_name.debute_par(prefix))
+        solver_name = Motcle((solver_name.getString()).substr(prefix.getString().length()));
+      Nom type_solv_sys(prefix);
       type_solv_sys+=solver_name;
       typer(type_solv_sys);
       nommer(Nom("thermal_fd_solver_") + solver_name);

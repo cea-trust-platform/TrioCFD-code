@@ -63,7 +63,8 @@ public:
   virtual void update_thermal_properties();
   double compute_timestep(const double timestep,
                           const double dxmin);
-
+  void set_fichier_reprise(const char *lataname);
+  const Nom& get_fichier_reprise() const { return fichier_reprise_temperature_; }
   void associer(const IJK_FT_double& ijk_ft);
   void associer_post(const IJK_FT_Post& ijk_ft_post);
   void associer_switch(const Switch_FT_double& ijk_ft_switch);
@@ -91,6 +92,18 @@ public:
                                   IJK_Field_local_double& flux_bord,
                                   const bool bord_kmax);
   virtual int get_first_step_thermals_post() { return 0; };
+  void set_latastep_reprise(const int latastep)
+  {
+    latastep_reprise_ = latastep;
+  }
+  const int& get_latastep_reprise() const
+  {
+    return latastep_reprise_;
+  }
+  const int& get_latastep_reprise_ini() const
+  {
+    return latastep_reprise_;
+  }
   /*
    * Getters and setters
    */
@@ -448,6 +461,7 @@ protected:
   virtual void enforce_periodic_temperature_boundary_value() { ; } ;
 
   int debug_;
+  int latastep_reprise_, latastep_reprise_ini_;
   /*
    * Patch to conserve energy
    */
@@ -641,6 +655,7 @@ protected:
 //  IJK_Field_double eulerian_compo_connex_ghost_ft_;
 //  IJK_Field_double eulerian_compo_connex_ghost_ns_;
   int spherical_approx_;
+  int spherical_exact_;
   const IJK_Field_double * eulerian_compo_connex_ft_;
   const IJK_Field_double * eulerian_compo_connex_ns_;
   const IJK_Field_double * eulerian_compo_connex_ghost_ft_;

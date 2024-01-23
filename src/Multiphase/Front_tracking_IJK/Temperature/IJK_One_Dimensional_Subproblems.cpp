@@ -97,6 +97,7 @@ IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
   liquid_velocity_ = nullptr;
   bubbles_volume_ = nullptr;
   prandtl_number_ = nullptr;
+  latastep_reprise_ = nullptr;
 }
 
 IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblems()
@@ -236,12 +237,17 @@ void IJK_One_Dimensional_Subproblems::set_global_index()
 
 void IJK_One_Dimensional_Subproblems::associate_variables_for_post_processing(IJK_Thermal_Subresolution& ref_thermal_subresolution)
 {
-  bubbles_volume_ = &ref_thermal_subresolution.bubbles_volume_;
-  reference_gfm_on_probes_ = ref_thermal_subresolution.reference_gfm_on_probes_;
-  bubbles_rising_velocities_ = &ref_thermal_subresolution.rising_velocities_;
-  bubbles_rising_vectors_per_bubble_ = &ref_thermal_subresolution.rising_vectors_;
-  liquid_velocity_ = &ref_thermal_subresolution.liquid_velocity_;
-  prandtl_number_ = &ref_thermal_subresolution.prandtl_number_;
+  if (init_)
+    {
+      debug_ = ref_thermal_subresolution.debug_;
+      reference_gfm_on_probes_ = ref_thermal_subresolution.reference_gfm_on_probes_;
+      bubbles_volume_ = &ref_thermal_subresolution.bubbles_volume_;
+      bubbles_rising_velocities_ = &ref_thermal_subresolution.rising_velocities_;
+      bubbles_rising_vectors_per_bubble_ = &ref_thermal_subresolution.rising_vectors_;
+      liquid_velocity_ = &ref_thermal_subresolution.liquid_velocity_;
+      prandtl_number_ = &ref_thermal_subresolution.prandtl_number_;
+      latastep_reprise_= &ref_thermal_subresolution.latastep_reprise_ini_;
+    }
 }
 
 void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
@@ -260,13 +266,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
       Process::exit();
     }
 
-  debug_ = ref_thermal_subresolution.debug_;
-  reference_gfm_on_probes_ = ref_thermal_subresolution.reference_gfm_on_probes_;
-  bubbles_volume_ = &ref_thermal_subresolution.bubbles_volume_;
-  bubbles_rising_velocities_ = &ref_thermal_subresolution.rising_velocities_;
-  bubbles_rising_vectors_per_bubble_ = &ref_thermal_subresolution.rising_vectors_;
-  liquid_velocity_ = &ref_thermal_subresolution.liquid_velocity_;
-  prandtl_number_ = &ref_thermal_subresolution.prandtl_number_;
+  associate_variables_for_post_processing(ref_thermal_subresolution);
 
   ArrOfDouble bubble_rising_vector(3);
   ArrOfDouble normal_vector(3);
@@ -668,7 +668,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
    * Post-process all probes for interfacial quantities
    */
   const int reset = 1;
-  const int last_time_index = ref_ijk_ft_->get_tstep();
+  const int last_time_index = ref_ijk_ft_->get_tstep() + (*latastep_reprise_);
   const int max_digit = 3;
   const int max_digit_time = 8;
   const int max_rank_digit = rank < 1 ? 1 : (int) (log10(rank) + 1);
@@ -713,7 +713,7 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
   //if (Process::je_suis_maitre())
   // {
   const int reset = 1;
-  const int last_time_index = ref_ijk_ft_->get_tstep();
+  const int last_time_index = ref_ijk_ft_->get_tstep() + (*latastep_reprise_);
   Nom probe_header = Nom("tstep\tthermal_rank\tpost_pro_index\tglobal_subproblem\tlocal_subproblem\ttime"
                          "\tnx\tny\tnz\tt1x\tt1y\tt2z\tt2x\tt2y\tt2z\ts1x\ts1y\ts1z\ts2x\ts2y\ts2z"
                          "\tr_sph\ttheta_sph\tphi_sph"
@@ -1483,7 +1483,7 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
   if (Process::je_suis_maitre())
     {
       const int reset = 1;
-      const int last_time_index = ref_ijk_ft_->get_tstep();
+      const int last_time_index = (*latastep_reprise_) + ref_ijk_ft_->get_tstep();
       const int max_digit = 3;
       const int max_digit_time = 8;
       const int max_rank_digit = rank < 1 ? 1 : (int) (log10(rank) + 1);
@@ -1523,7 +1523,7 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
        */
       for (int i=0; i<max_counter; i++)
         {
-          fic << ref_ijk_ft_->get_tstep() << " " << last_time << " ";
+          fic << last_time_index << " " << last_time << " ";
           fic << rank << " ";
           fic << i << " ";
           fic << dimensionless_time << " ";
@@ -1591,7 +1591,7 @@ void IJK_One_Dimensional_Subproblems::post_process_overall_bubbles_quantities(co
        */
       if(max_counter > 1)
         {
-          fic << ref_ijk_ft_->get_tstep() << " " << last_time << " ";
+          fic << last_time_index << " " << last_time << " ";
           fic << rank << " ";
           fic << nb_bubbles_ << " ";
           fic << dimensionless_time << " ";

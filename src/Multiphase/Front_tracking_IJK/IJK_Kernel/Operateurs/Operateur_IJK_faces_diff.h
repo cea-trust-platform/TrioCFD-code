@@ -77,6 +77,7 @@ public:
   /*
    * Getters
    */
+  int get_diffusion_op_option_rank() { return diffusion_option_rank_; };
   Nom get_diffusion_op_option() { return diffusion_option_; };
   Nom get_diffusion_op() { return diffusion_op_; };
   /*
@@ -91,6 +92,7 @@ protected:
   int diffusion_rank_;
   Nom diffusion_op_;
   Nom diffusion_option_;
+  int diffusion_option_rank_;
   bool is_cast_;
 };
 
@@ -113,7 +115,7 @@ inline void Operateur_IJK_faces_diff::initialize(const IJK_Splitting& splitting)
 {
   if (!is_cast_)
     typer_diffusion_op("standard");
-  diffusion_option_ = diffusion_op_options_[0];
+  // diffusion_option_ = diffusion_op_options_[0];
   valeur().initialize(splitting);
 }
 

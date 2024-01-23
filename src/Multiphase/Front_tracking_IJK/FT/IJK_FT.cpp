@@ -1390,7 +1390,8 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   reprise_ = 1;
   interfaces_.set_reprise(1);
   Nom prefix = dirname(fichier_reprise);
-  interfaces_.set_fichier_reprise(prefix+interfaces_.get_fichier_reprise());
+  interfaces_.set_fichier_reprise(prefix + interfaces_.get_fichier_reprise());
+  thermals_.set_fichier_reprise(prefix + thermals_.get_fichier_reprise());
   fichier_reprise_vitesse_=prefix+fichier_reprise_vitesse_;
 }
 
@@ -1445,7 +1446,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
   //  const double nu_max = std::max(mu_liquide_/rho_liquide_, mu_vapeur_/rho_vapeur_);
   //  dt_fo_  = dxmin*dxmin/(nu_max + 1.e-20) * fo * 0.125;
   dt_fo_liq_ = dxmin*dxmin/((mu_liquide_/rho_liquide_) + 1.e-20) * fo * 0.125;
-  dt_fo_vap_ =dxmin*dxmin/((mu_vapeur_/rho_vapeur_) + 1.e-20) * fo * 0.125; ;
+  dt_fo_vap_ =dxmin*dxmin/((mu_vapeur_/rho_vapeur_) + 1.e-20) * fo * 0.125;
   dt_fo_ = std::min(dt_fo_liq_, dt_fo_vap_);
   if (disable_diffusion_qdm_)
     dt_fo_ = 1.e20;
@@ -2261,7 +2262,7 @@ void IJK_FT_double::run()
       nalloc += 4;
     }
 
-  if (velocity_convection_op_.get_convection_op_option() == Nom("non_conservative_rhou").majuscule())
+  if (velocity_convection_op_.get_convection_op_option_rank() == non_conservative_rhou)
     {
       div_rhou_.allocate(splitting_, IJK_Splitting::ELEM, 1);
       nalloc += 1;
@@ -3074,14 +3075,11 @@ void IJK_FT_double::run()
         {
           //demarrage des compteurs CPU
           if(tstep_ == 2)
-            {
-              statistiques().set_three_first_steps_elapsed(true);
-            }
+            statistiques().set_three_first_steps_elapsed(true);
         }
       else
-        {
-          statistiques().compute_avg_min_max_var_per_step(tstep_);
-        }
+        statistiques().compute_avg_min_max_var_per_step(tstep_);
+
 
     }
   if (Process::je_suis_maitre())
@@ -3097,13 +3095,11 @@ void IJK_FT_double::run()
 
   if (!disable_TU)
     {
-
       if(GET_COMM_DETAILS)
         statistiques().print_communciation_tracking_details("Statistiques de resolution du probleme", 1);
 
       statistiques().dump("Statistiques de resolution du probleme", 1);
       print_statistics_analyse("Statistiques de resolution du probleme", 1);
-
     }
 
   statistiques().reset_counters();
@@ -3344,7 +3340,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
   // Calcul d_velocity = convection
   if (!disable_convection_qdm_)
     {
-      if (velocity_convection_op_.get_convection_op_option() == Nom("non_conservative_simple").majuscule())
+      if (velocity_convection_op_.get_convection_op_option_rank() == non_conservative_simple)
         {
           velocity_convection_op_.calculer(velocity_[0], velocity_[1], velocity_[2],
                                            velocity_[0], velocity_[1], velocity_[2],
@@ -3364,7 +3360,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
             }
 
         }
-      else if (velocity_convection_op_.get_convection_op_option() == Nom("non_conservative_rhou").majuscule())
+      else if (velocity_convection_op_.get_convection_op_option_rank() == non_conservative_rhou)
         {
           update_rho_v();
           // Non optimise car la methode calculer_avec_u_div_rhou inexistante.
@@ -3380,7 +3376,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                                                               div_rhou_);
             }
         }
-      else if (velocity_convection_op_.get_convection_op_option() == Nom("conservative").majuscule())
+      else if (velocity_convection_op_.get_convection_op_option_rank() == conservative)
         {
           update_rho_v();
           velocity_convection_op_.calculer(rho_v_[0], rho_v_[1], rho_v_[2],
@@ -3748,7 +3744,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                           // GAB, qdm
                           if (test_etapes_et_bilan_)
                             {
-                              terme_diffusion_local_[dir2](i,j,k2) = molecular_mu_(i,j,k2)*laplacien_velocity_[dir2](i,j,k2);
+                              terme_diffusion_local_[dir2](i,j,k2) = molecular_mu_(i,j,k2) * laplacien_velocity_[dir2](i,j,k2);
                               // Cerr << "terme diffusion local" << terme_diffusion_local[dir2](i,j,k2) << finl;
                               d_velocity_[dir2](i,j,k2) += terme_diffusion_local_[dir2](i,j,k2);
                               // d_velocity_[dir2](i,j,k2) += nu * laplacien_u;

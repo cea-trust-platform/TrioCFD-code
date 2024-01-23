@@ -98,7 +98,16 @@ IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::IJK_Finite_Difference_On
 
 Sortie& IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::printOn( Sortie& os ) const
 {
-  Objet_U::printOn( os );
+  // Objet_U::printOn( os );
+  Nom front_space = "    ";
+  Nom end_space = " ";
+  Nom escape = "\n";
+  os << escape;
+  os << front_space << "{" << escape;
+  if (reduce_side_precision_)
+    os << front_space << " reduce_side_precision" << escape;
+  os << front_space << " precision_order" << end_space << precision_order_ << escape;
+  os << front_space << "}" << escape;
   return os;
 }
 

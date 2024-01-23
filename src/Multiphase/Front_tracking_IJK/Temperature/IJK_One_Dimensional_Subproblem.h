@@ -384,7 +384,8 @@ protected :
                                                const double& delta_T_subcooled_overheated,
                                                const int& pre_initialise_thermal_subproblems_list,
                                                const int& use_sparse_matrix,
-                                               const int& compute_normal_derivative_on_reference_probes);
+                                               const int& compute_normal_derivative_on_reference_probes,
+                                               const int& latastep_reprise);
   void associate_thermal_subproblem_sparse_matrix(FixedVector<ArrOfInt,6>& first_indices_sparse_matrix);
   void associate_flux_correction_parameters(const int& correct_fluxes,
                                             const int& distance_cell_faces_from_lrs,
@@ -469,13 +470,13 @@ protected :
                                   const double& cell_diagonal,
                                   const double& dr_base,
                                   const DoubleVect& radial_coordinates);
-  void associate_bubble_parameters(ArrOfDouble& bubbles_volume,
-                                   ArrOfDouble& bubbles_surface,
-                                   ArrOfDouble& radius_from_surfaces_per_bubble,
-                                   ArrOfDouble& radius_from_volumes_per_bubble,
-                                   double& delta_temperature,
-                                   double& mean_liquid_temperature,
-                                   DoubleTab& rising_vectors);
+  void associate_bubble_parameters(const ArrOfDouble& bubbles_volume,
+                                   const ArrOfDouble& bubbles_surface,
+                                   const ArrOfDouble& radius_from_surfaces_per_bubble,
+                                   const ArrOfDouble& radius_from_volumes_per_bubble,
+                                   const double& delta_temperature,
+                                   const double& mean_liquid_temperature,
+                                   const DoubleTab& rising_vectors);
   void associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,
                                              const Matrice& radial_second_order_operator_raw,
                                              const Matrice& radial_first_order_operator,
@@ -797,13 +798,13 @@ protected :
   DoubleVect nusselt_number_integrand_;
   DoubleVect nusselt_number_liquid_temperature_integrand_;
 
-  double * delta_temperature_;
-  double * mean_liquid_temperature_;
-  ArrOfDouble * bubbles_volume_;
-  ArrOfDouble * bubbles_surface_;
-  ArrOfDouble * radius_from_surfaces_per_bubble_;
-  ArrOfDouble * radius_from_volumes_per_bubble_;
-  DoubleTab * bubbles_rising_vectors_per_bubble_;
+  const double * delta_temperature_;
+  const double * mean_liquid_temperature_;
+  const ArrOfDouble * bubbles_volume_;
+  const ArrOfDouble * bubbles_surface_;
+  const ArrOfDouble * radius_from_surfaces_per_bubble_;
+  const ArrOfDouble * radius_from_volumes_per_bubble_;
+  const DoubleTab * bubbles_rising_vectors_per_bubble_;
 
   DoubleVect normal_velocity_normal_gradient_;
   DoubleVect first_tangential_velocity_normal_gradient_;
@@ -916,6 +917,8 @@ protected :
 
   int interp_eulerian_= 0;
   int n_iter_distance_ = 0;
+
+  const int * latastep_reprise_;
 };
 
 #endif /* IJK_One_Dimensional_Subproblem_included */

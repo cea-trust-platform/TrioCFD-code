@@ -59,15 +59,18 @@ Operateur_IJK_faces_diff::Operateur_IJK_faces_diff()
     diffusion_op_options_[1] = "full_arithmetic";
     diffusion_op_options_[2] = "full_adaptative";
   }
+  diffusion_option_="";
   prefix_ = Nom("OpDiff");
   suffix_ = Nom("IJK_double");
   is_cast_= false;
   diffusion_rank_ = 0;
+  diffusion_option_rank_=0;
 }
 
 Sortie& Operateur_IJK_faces_diff::printOn( Sortie& os ) const
 {
-  DERIV(Operateur_IJK_faces_diff_base_double)::printOn( os );
+  // DERIV(Operateur_IJK_faces_diff_base_double)::printOn( os );
+  os << diffusion_op_words_[diffusion_rank_] << "_" << diffusion_option_ << "\n";
   return os;
 }
 
@@ -123,6 +126,11 @@ void Operateur_IJK_faces_diff::typer_diffusion_op( const char * diffusion_op )
 
 Nom Operateur_IJK_faces_diff::get_diffusion_op_type( Motcle word )
 {
+  diffusion_option_rank_ = diffusion_op_options_.search(word);
+  if (diffusion_option_rank_ == -1)
+    diffusion_option_rank_ = 0;
+  diffusion_option_ = diffusion_op_options_[diffusion_option_rank_];
+
   diffusion_rank_ = diffusion_op_words_.search(word);
   Nom type(prefix_);
   // TODO: Use enum instead such as in IJK_FT:   enum TimeScheme { EULER_EXPLICITE, RK3_FT }; ??
