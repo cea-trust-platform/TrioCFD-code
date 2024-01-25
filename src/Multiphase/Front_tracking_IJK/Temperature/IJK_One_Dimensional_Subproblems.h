@@ -75,6 +75,8 @@ public :
                                        const FixedVector<IJK_Field_double, 3>& velocity,
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                        const IJK_Field_double& pressure);
+  void interpolate_indicator_on_probes();
+  void clear_problems_colliding_bubbles();
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_modified_probe_length(const int& probe_variations_enabled);

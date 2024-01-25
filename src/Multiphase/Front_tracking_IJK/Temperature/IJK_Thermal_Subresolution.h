@@ -208,6 +208,8 @@ protected :
   void pre_initialise_thermal_subproblems_any_matrices();
   void pre_initialise_thermal_subproblems_matrices();
 
+  void interpolate_indicator_on_probes();
+  void clear_problems_colliding_bubbles();
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
   void compute_radial_subresolution_convection_diffusion_operators();

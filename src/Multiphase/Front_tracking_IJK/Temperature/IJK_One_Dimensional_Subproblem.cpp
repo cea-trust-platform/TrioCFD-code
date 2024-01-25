@@ -35,6 +35,11 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   init_ = 1;
   debug_ = 0;
 
+  disable_probe_collision_ = 0;
+  disable_find_cell_centre_probe_tip_ = 0;
+  enable_resize_probe_collision_ = 0;
+  resize_probe_collision_index_ = 0;
+
   points_per_thermal_subproblem_ = nullptr;
   points_per_thermal_subproblem_base_ = nullptr;
   alpha_ = nullptr;
@@ -946,6 +951,87 @@ void IJK_One_Dimensional_Subproblem::recompute_finite_difference_matrices_varyin
   compute_second_order_operator_local_varying_probe_length(radial_second_order_operator_raw_base_);
   radial_first_order_operator_= &radial_first_order_operator_local_;
   radial_second_order_operator_= &radial_second_order_operator_local_;
+}
+
+void IJK_One_Dimensional_Subproblem::interpolate_indicator_on_probes()
+{
+  indicator_interp_.resize(*points_per_thermal_subproblem_);
+  const IJK_Field_double& indicator = interfaces_->I();
+  ijk_interpolate_skip_unknown_points(indicator, coordinates_cartesian_compo_, indicator_interp_, INVALID_INTERP);
+  if (enable_resize_probe_collision_)
+    {
+      for (int i=(*points_per_thermal_subproblem_)-1; i>=0; i--)
+        {
+          const double indic_last = find_cell_related_indicator_on_probes(i);
+          if (indic_last > LIQUID_INDICATOR_TEST)
+            {
+              resize_probe_collision_index_ = i;
+              return;
+            }
+          disable_probe_collision_ = (i == 0);
+        }
+    }
+  else
+    {
+      if (!disable_find_cell_centre_probe_tip_)
+        {
+
+          const int last_index = (*points_per_thermal_subproblem_) - 1;
+          const double indic_last = find_cell_related_indicator_on_probes(last_index);
+          if (indic_last < LIQUID_INDICATOR_TEST)
+            {
+              disable_probe_collision_ = 1;
+              return;
+            }
+        }
+      else
+        {
+          for (int i=(*points_per_thermal_subproblem_)-1; i>=0; i--)
+            {
+              const double indicator_val = indicator_interp_(i);
+              if (indicator_val < LIQUID_INDICATOR_TEST)
+                {
+                  disable_probe_collision_ = 1;
+                  return;
+                }
+            }
+        }
+    }
+}
+
+double IJK_One_Dimensional_Subproblem::find_cell_related_indicator_on_probes(const int& last_index)
+{
+  const IJK_Field_double& indicator = interfaces_->I();
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
+
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  const double dy = geom.get_constant_delta(DIRECTION_J);
+  const double dz = geom.get_constant_delta(DIRECTION_K);
+  Vecteur3 xyz_cart_end = {coordinates_cartesian_compo_(last_index, 0),
+                           coordinates_cartesian_compo_(last_index, 1),
+                           coordinates_cartesian_compo_(last_index, 2)
+                          };
+  Vecteur3 centre_elem = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_, index_j_, index_k_, IJK_Splitting::ELEM);
+  Vecteur3 displacement_centre_probe = centre_elem;
+  displacement_centre_probe *= (-1);
+  displacement_centre_probe += xyz_cart_end;
+  Vecteur3 displacement_factor = {displacement_centre_probe[0] / dx,
+                                  displacement_centre_probe[1] / dy,
+                                  displacement_centre_probe[2] / dz
+                                 };
+  const int offset_x = (int) displacement_factor[0];
+  const int offset_y = (int) displacement_factor[1];
+  const int offset_z = (int) displacement_factor[2];
+  const int offset_x_elem = ((abs(displacement_factor[0] - offset_x) >= 0.5) ? 1 : 0);
+  const int offset_y_elem = ((abs(displacement_factor[1] - offset_y) >= 0.5) ? 1 : 0);
+  const int offset_z_elem = ((abs(displacement_factor[2] - offset_z) >= 0.5) ? 1 : 0);
+  const int real_offset_x = offset_x + (signbit(offset_x) ? - offset_x_elem : offset_x_elem);
+  const int real_offset_y = offset_y + (signbit(offset_y) ? - offset_y_elem : offset_y_elem);
+  const int real_offset_z = offset_z + (signbit(offset_z) ? - offset_z_elem : offset_z_elem);
+  const double indic_last = indicator(index_i_ + real_offset_x,
+                                      index_j_ + real_offset_y,
+                                      index_k_ + real_offset_z);
+  return indic_last;
 }
 
 void IJK_One_Dimensional_Subproblem::interpolate_project_velocities_on_probes()

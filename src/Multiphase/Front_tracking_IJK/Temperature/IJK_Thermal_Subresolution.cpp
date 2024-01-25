@@ -1528,6 +1528,9 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
     Cerr << "Initialise thermal subproblems" << finl;
   initialise_thermal_subproblems();
 
+  interpolate_indicator_on_probes();
+  clear_problems_colliding_bubbles();
+
   pre_initialise_thermal_subproblems_any_matrices();
 
   reset_subresolution_distributed_vectors();
@@ -1802,6 +1805,17 @@ void IJK_Thermal_Subresolution::reset_subresolution_distributed_vectors()
     thermal_subproblems_temperature_solution_ini_.resize(nb_points);
 }
 
+void IJK_Thermal_Subresolution::interpolate_indicator_on_probes()
+{
+  if (!disable_subresolution_ || reference_gfm_on_probes_)
+    thermal_local_subproblems_.interpolate_indicator_on_probes();
+}
+
+void IJK_Thermal_Subresolution::clear_problems_colliding_bubbles()
+{
+  if (!disable_subresolution_ || reference_gfm_on_probes_)
+    thermal_local_subproblems_.clear_problems_colliding_bubbles();
+}
 
 void IJK_Thermal_Subresolution::interpolate_project_velocities_on_probes()
 {

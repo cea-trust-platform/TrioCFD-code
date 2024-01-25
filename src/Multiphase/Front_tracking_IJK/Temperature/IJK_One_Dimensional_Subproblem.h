@@ -96,6 +96,8 @@ public :
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                        const IJK_Field_double& pressure);
 
+  void interpolate_indicator_on_probes();
+  double find_cell_related_indicator_on_probes(const int& last_index);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
   void compute_modified_probe_length_condition();
@@ -543,6 +545,11 @@ protected :
 
   enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump };
 
+  int disable_probe_collision_;
+  int disable_find_cell_centre_probe_tip_;
+  int enable_resize_probe_collision_;
+  int resize_probe_collision_index_;
+
   int reference_gfm_on_probes_ = 0;
   int compute_normal_derivative_on_reference_probes_ = 0;
   int compute_tangential_variables_ = 1;
@@ -690,6 +697,7 @@ protected :
   DoubleTab osculating_radial_coordinates_cartesian_compo_;
   DoubleTab coordinates_cartesian_compo_;
 
+  DoubleVect indicator_interp_;
   DoubleVect pressure_interp_;
   DoubleVect x_velocity_;
   DoubleVect y_velocity_;

@@ -333,6 +333,17 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
   subproblems_counter_++;
 }
 
+void IJK_One_Dimensional_Subproblems::interpolate_indicator_on_probes()
+{
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    (*this)[itr].interpolate_indicator_on_probes();
+}
+
+void IJK_One_Dimensional_Subproblems::clear_problems_colliding_bubbles()
+{
+
+}
+
 void IJK_One_Dimensional_Subproblems::interpolate_project_velocities_on_probes()
 {
   for (int itr=0; itr < subproblems_counter_; itr++)
