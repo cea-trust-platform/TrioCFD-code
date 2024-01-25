@@ -22,6 +22,7 @@
 #include <IJK_Thermals.h>
 #include <IJK_FT.h>
 #include <IJK_switch_FT.h>
+#include <IJK_switch.h>
 
 Implemente_instanciable( IJK_Thermals, "IJK_Thermals", LIST(IJK_Thermal) ) ;
 
@@ -194,17 +195,15 @@ void IJK_Thermals::euler_time_step(const double timestep)
 void IJK_Thermals::euler_rustine_step(const double timestep)
 {
   for (auto& itr : (*this))
-    {
-      if (itr.get_thermal_problem_type() == Nom("onefluid"))
-        {
-          itr.update_thermal_properties();
-          if (itr.get_conserv_energy_global())
-            {
-              const double dE = itr.get_E0() - itr.compute_global_energy();
-              itr.euler_rustine_step(timestep, dE);
-            }
-        }
-    }
+    if (itr.get_thermal_problem_type() == Nom("onefluid"))
+      {
+        itr.update_thermal_properties();
+        if (itr.get_conserv_energy_global())
+          {
+            const double dE = itr.get_E0() - itr.compute_global_energy();
+            itr.euler_rustine_step(timestep, dE);
+          }
+      }
 }
 
 void IJK_Thermals::rk3_sub_step(const int rk_step, const double total_timestep, const double time)
@@ -237,18 +236,15 @@ void IJK_Thermals::rk3_rustine_sub_step(const int rk_step, const double total_ti
                                         const double fractionnal_timestep, const double time)
 {
   for (auto& itr : (*this))
-    {
-      if (itr.get_thermal_problem_type() == Nom("onefluid") )
-        {
-          itr.update_thermal_properties();
-          if (itr.get_conserv_energy_global())
-            {
-              const double dE = itr.get_E0() - itr.compute_global_energy();
-              itr.rk3_rustine_sub_step(rk_step, total_timestep, fractionnal_timestep, time, dE);
-            }
-        }
-
-    }
+    if (itr.get_thermal_problem_type() == Nom("onefluid") )
+      {
+        itr.update_thermal_properties();
+        if (itr.get_conserv_energy_global())
+          {
+            const double dE = itr.get_E0() - itr.compute_global_energy();
+            itr.rk3_rustine_sub_step(rk_step, total_timestep, fractionnal_timestep, time, dE);
+          }
+      }
 }
 
 void IJK_Thermals::posttraiter_tous_champs_thermal(Motcles& liste_post_instantanes_)
@@ -288,7 +284,7 @@ void IJK_Thermals::posttraiter_champs_instantanes_thermal(const Motcles& liste_p
     }
 }
 
-int IJK_Thermals::init_thermals(const IJK_Splitting& splitting)
+int IJK_Thermals::init_switch_thermals(const IJK_Splitting& splitting)
 {
   int nb_allocated_arrays=0;
   int idx =0;
@@ -296,7 +292,7 @@ int IJK_Thermals::init_thermals(const IJK_Splitting& splitting)
     {
       Cout << "Reading the old temperature field from " << Nom(itr.get_fichier_sauvegarde())
            << " to fill the (*this) field."<< finl;
-      nb_allocated_arrays += itr.initialize(splitting, idx);
+      nb_allocated_arrays += itr.initialize_switch(splitting, idx);
       idx++;
     }
   return nb_allocated_arrays;
@@ -334,7 +330,6 @@ void IJK_Thermals::ecrire_fichier_reprise(SFichier& fichier, const char *lata_na
     fichier << " } \n" ;
 }
 
-
 int IJK_Thermals::ghost_fluid_flag()
 {
   int ghost_fluid = 0;
@@ -346,7 +341,6 @@ int IJK_Thermals::ghost_fluid_flag()
     }
   return ghost_fluid;
 }
-
 
 void IJK_Thermals::compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init)
 {
@@ -468,7 +462,7 @@ void IJK_Thermals::create_folders(Nom folder_name_base)
       //  istringstream folder_name_istringstream(folder_name.c_str());
       //  istream& folder_name_istream = folder_name_istringstream;
       //  Entree folder_name_entry(folder_name_istream);
-      // make_dir_for_out_files_.interpreter(folder_name_entry);
+      //  make_dir_for_out_files_.interpreter(folder_name_entry);
     }
 }
 
@@ -489,4 +483,36 @@ void IJK_Thermals::recompute_interface_smoothing()
 {
   set_temperature_ini();
   set_post_pro_first_call();
+}
+
+void IJK_Thermals::compute_new_thermal_field(Switch_FT_double& switch_double_ft,
+                                             const IJK_Splitting& new_mesh,
+                                             const Nom& lata_name,
+                                             DoubleTab& coeff_i,
+                                             IntTab Indice_i,
+                                             DoubleTab& coeff_j,
+                                             IntTab Indice_j,
+                                             DoubleTab& coeff_k,
+                                             IntTab Indice_k)
+{
+  IJK_Field_double new_thermal_field;
+  if ((*this).size() > 0)
+    {
+      switch_double_ft.calculer_coords_elem();
+      switch_double_ft.calculer_coeff(coeff_i,Indice_i,coeff_j,Indice_j,coeff_k,Indice_k);
+      new_thermal_field.allocate(new_mesh /* it is in fact a splitting */, IJK_Splitting::ELEM, 0);
+    }
+  int idth = 0;
+  for (auto& itr : (*this))
+    {
+      switch_double_ft.switch_scalar_field(itr.get_temperature(),
+                                           new_thermal_field,
+                                           coeff_i, Indice_i,
+                                           coeff_j ,Indice_j,
+                                           coeff_k ,Indice_k);
+
+      Cout << "Writing " << Nom("TEMPERATURE_") + Nom(idth) << " into " << lata_name << finl;
+      dumplata_scalar(lata_name, Nom("TEMPERATURE_") + Nom(idth), new_thermal_field, 0 /*we store a 0 */);
+      ++idth;
+    }
 }

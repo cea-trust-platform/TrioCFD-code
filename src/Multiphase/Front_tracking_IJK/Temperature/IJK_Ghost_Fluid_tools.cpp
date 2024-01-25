@@ -64,9 +64,9 @@ static void extrapolate_with_elem_faces_connectivity(const Domaine_VF& domaine_v
           const double d = distance(num_elem_ijk[DIRECTION_I],
                                     num_elem_ijk[DIRECTION_J],
                                     num_elem_ijk[DIRECTION_K]);
-//          const double interfacial_area_elem = interfacial_area(num_elem_ijk[DIRECTION_I],
-//                                                                num_elem_ijk[DIRECTION_J],
-//                                                                num_elem_ijk[DIRECTION_K]);
+          //          const double interfacial_area_elem = interfacial_area(num_elem_ijk[DIRECTION_I],
+          //                                                                num_elem_ijk[DIRECTION_J],
+          //                                                                num_elem_ijk[DIRECTION_K]);
           // Need a value of distance but don't overwrite the first calculated value
           // if ((d > invalid_test) && (interfacial_area_elem < invalid_test))
           const double field_ini_val = field_ini(num_elem_ijk[DIRECTION_I],
@@ -902,9 +902,11 @@ void compute_eulerian_normal_temperature_gradient_interface(const IJK_Field_doub
   const int ni = temperature.ni();
   const int nj = temperature.nj();
   const int nk = temperature.nk();
+
   //  grad_T_interface.data() = 1.1 * invalid_value;
   grad_T_interface.data() = 0.;
   grad_T_interface.echange_espace_virtuel(grad_T_interface.ghost());
+
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)

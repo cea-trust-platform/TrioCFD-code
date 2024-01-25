@@ -291,7 +291,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
 
   IJK_Splitting splitting = (*(ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_)).get_splitting();
   const double bubble_rising_velocity = ref_thermal_subresolution.rising_velocities_(compo_connex);
-  //  const double bubble_rising_velocity = rising_velocities(compo_connex);
+
   for (int dir=0; dir < 3; dir++)
     {
       facet_barycentre(dir) = ref_thermal_subresolution.eulerian_facets_barycentre_ns_[dir](i, j, k);
@@ -710,8 +710,6 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
    * Replace routines for parallel calculation
    */
   Cerr << "Post-processing on the probes" << finl;
-  //if (Process::je_suis_maitre())
-  // {
   const int reset = 1;
   const int last_time_index = ref_ijk_ft_->get_tstep() + (*latastep_reprise_);
   Nom probe_header = Nom("tstep\tthermal_rank\tpost_pro_index\tglobal_subproblem\tlocal_subproblem\ttime"
@@ -919,17 +917,6 @@ const int& IJK_One_Dimensional_Subproblems::get_end_index_subproblem(const int i
   return (*this)[index].get_end_index_subproblem();
 }
 
-//static std::vector<int> arg_min(ArrOfDouble theta_phi_scope)
-//{
-//  const int n = theta_phi_scope.size();
-//  // IntVect indices(n);
-//  std::vector<int> indices(n);
-//  for (int j=0; j<n; j++)
-//    indices[j]=j;
-//  std::sort(indices.begin(), indices.end(), [&theta_phi_scope](int i, int j) {return theta_phi_scope[i] < theta_phi_scope[j];});
-//  return indices;
-//}
-
 void IJK_One_Dimensional_Subproblems::post_processed_all_probes()
 {
   for (int itr=0; itr < subproblems_counter_; itr++)
@@ -1024,8 +1011,6 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
                                                                   std::min_element(sum_errors_theta_phi_scope.begin(),
                                                                                    sum_errors_theta_phi_scope.end()));
 
-//            if (theta_phi_scope_index >= index_ini_ && theta_phi_scope_index < index_end_)
-//              (*this)[theta_phi_scope_index - index_ini_].set_post_processing_theta_phi_scope(phi_theta_counter);
             radius_outputs_(phi_theta_counter) = r_sph(theta_phi_scope_index);
             theta_outputs_(phi_theta_counter) = theta_sph(theta_phi_scope_index);
             phi_outputs_(phi_theta_counter) = phi_sph(theta_phi_scope_index);
@@ -1033,16 +1018,13 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
             phi_theta_counter ++;
           }
 
-      // Cerr << "test" << finl;
-      //      mp_sum_for_each_item(radius_outputs_);
-      //      mp_sum_for_each_item(theta_outputs_);
-      //      mp_sum_for_each_item(phi_outputs_);
-      //      mp_sum_for_each_item(global_indices_post_processed_);
-
-      Cerr << radius_outputs_ << finl;
-      Cerr << theta_outputs_ << finl;
-      Cerr << phi_outputs_ << finl;
-      Cerr << global_indices_post_processed_ << finl;
+      if (debug_)
+        {
+          Cerr << radius_outputs_ << finl;
+          Cerr << theta_outputs_ << finl;
+          Cerr << phi_outputs_ << finl;
+          Cerr << global_indices_post_processed_ << finl;
+        }
 
       ArrOfDouble radius_outputs_tmp = radius_outputs_;
       ArrOfDouble theta_outputs_tmp = theta_outputs_;
@@ -1099,7 +1081,6 @@ void IJK_One_Dimensional_Subproblems::compute_overall_quantities_per_bubbles(con
   nb_bubbles_ = (int) std::distance(compo_found.begin(), std::max_element(compo_found.begin(), compo_found.end()));
   nb_bubbles_ += 1;
   nb_bubbles_ = Process::mp_max(nb_bubbles_);
-  // nb_bubbles_ = (int) compo_found.size();
 
   /*
    * Should be the same size on each processor
@@ -1204,7 +1185,7 @@ void IJK_One_Dimensional_Subproblems::compute_dynamics_per_bubbles()
   upstream_velocity_vector = 0.;
   upstream_velocity_vector[gravity_dir_] = 1.;
   upstream_velocity_vector *= velocity_upstream_;
-//	DoubleTab bubbles_rising_velocities_vectors = (*bubbles_rising_vectors_);
+
   for (int i=0; i<(*bubbles_rising_vectors_per_bubble_).dimension(0); i++)
     {
       Vecteur3 rising_velocity_vector;
@@ -1212,8 +1193,6 @@ void IJK_One_Dimensional_Subproblems::compute_dynamics_per_bubbles()
       for (int dir=0; dir<3; dir++)
         rising_velocity_vector[dir] = (*bubbles_rising_vectors_per_bubble_)(i, dir);
       rising_velocity_vector *= (*bubbles_rising_velocities_)(i);
-//		for (int dir=0; dir<3; dir++)
-//			bubbles_rising_velocities_vectors(i, dir) = rising_velocity_vector[dir];
 
       Vecteur3 rising_relative_velocity_vector = (*liquid_velocity_);
       rising_relative_velocity_vector *= (-1);

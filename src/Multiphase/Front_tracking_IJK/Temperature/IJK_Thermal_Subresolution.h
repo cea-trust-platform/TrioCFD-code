@@ -263,7 +263,6 @@ protected :
   void enforce_periodic_temperature_boundary_value() override;
   void correct_operators_for_visu() override;
 
-  // void set_field_T_ana() override;
   double get_modified_time() override;
   void compute_temperature_init() override;
   void set_field_temperature_per_bubble(const int index_bubble);
@@ -360,8 +359,7 @@ protected :
   Nom fd_solver_type_;
   int discrete_integral_;
   int quadtree_levels_;
-  // DoubleVect radial_convective_vector_prefactor_;
-  // DoubleVect diffusive_vector_prefactor_;
+
   int compute_tangential_variables_;
 
   int boundary_condition_interface_;

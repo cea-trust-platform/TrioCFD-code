@@ -40,7 +40,6 @@ class IJK_FT_double;
 class Switch_FT_double;
 class IJK_Thermal_base;
 class IJK_Thermal_Subresolution;
-// class IJK_One_Dimensional_Subresolution;
 
 class IJK_One_Dimensional_Subproblems : public LIST(IJK_One_Dimensional_Subproblem)
 {
@@ -172,13 +171,6 @@ public :
   void compute_overall_quantities();
   void post_process_overall_bubbles_quantities(const int rank, const Nom& overall_bubbles_quantities);
 
-  /*
-   * Few getters for IJK_One_dimensional_subproblem
-   */
-//  ArrOfDouble& get_()
-//  {
-//  	;
-//  }
 
 protected :
   int init_ = 1;

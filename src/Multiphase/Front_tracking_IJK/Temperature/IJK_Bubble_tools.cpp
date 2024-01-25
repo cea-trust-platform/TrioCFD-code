@@ -109,12 +109,10 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
       const int ibulle_reelle = decoder_numero_bulle(-ighost);
       ghost_to_real_bubble(l) = ibulle_reelle;
     }
-  // Cerr << "Ghost to real bubble : " << ghost_to_real_bubble;
+
   ArrOfDouble bubbles_volume;
-  // DoubleTab bubbles_barycentre;
   interfaces.calculer_volume_bulles(bubbles_volume, bubbles_barycentre);
-  // Cerr << "bubbles_volume" << bubbles_volume;
-  // Cerr << "bubbles_barycentre" << bubbles_barycentre;
+
   /*
    * Considered a constant grid spacing
    */
@@ -286,8 +284,9 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
   liquid_velocity *= (1 / (1e-30 + sum_indicator_liquid));
 }
 
-// void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
-void fill_rising_velocity_double(const IJK_Field_double * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
+void fill_rising_velocity_double(const IJK_Field_double * eulerian_compo_connex_ns,
+                                 const ArrOfDouble& rising_velocities,
+                                 IJK_Field_double& eulerian_rising_velocity)
 {
   const int nk = (*eulerian_compo_connex_ns).nk();
   const int nj = (*eulerian_compo_connex_ns).nj();
@@ -305,7 +304,9 @@ void fill_rising_velocity_double(const IJK_Field_double * eulerian_compo_connex_
         }
 }
 
-void fill_rising_velocity_int(const IJK_Field_int * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity)
+void fill_rising_velocity_int(const IJK_Field_int * eulerian_compo_connex_ns,
+                              const ArrOfDouble& rising_velocities,
+                              IJK_Field_double& eulerian_rising_velocity)
 {
   const int nk = (*eulerian_compo_connex_ns).nk();
   const int nj = (*eulerian_compo_connex_ns).nj();

@@ -30,7 +30,7 @@
 class Switch_FT_double : public Switch_double
 {
   Declare_instanciable_sans_constructeur(Switch_FT_double);
-
+  friend class IJK_Thermals;
 public:
   Switch_FT_double();
 
@@ -50,6 +50,7 @@ protected:
   void initialise() override;
   int init_thermique() override;
   int init_thermals() override;
+  void prepare_run() override;
   void set_param(Param& param) override;
   void ecrire_fichier_reprise(const char *fichier_sauvegarde, const bool and_lata=true) override;
   void set_param_reprise(Param& param) override;

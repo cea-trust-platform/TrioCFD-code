@@ -470,7 +470,8 @@ int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
                                const IJK_Splitting& splitting_NS,
                                const Domaine_dis& domaine_dis,
                                const int thermal_probes_ghost_cells,
-                               const bool compute_vint)
+                               const bool compute_vint,
+                               const bool is_switch)
 {
   Cerr << "Entree dans IJK_Interfaces::initialize" << finl;
 
@@ -733,7 +734,7 @@ int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
    */
   intersection_ijk_cell_.initialize(splitting_NS, *this);
   intersection_ijk_face_.initialize(splitting_NS, *this);
-  nalloc += ijk_compo_connex_.initialize(splitting_NS, *this);
+  nalloc += ijk_compo_connex_.initialize(splitting_NS, *this, is_switch);
   return nalloc;
 }
 

@@ -226,16 +226,16 @@ public :
   {
     return disable_convection_qdm_;
   }
-//  Intersection_Interface_ijk_cell& get_intersection_ijk_cell()
-//  {
-//    return intersection_ijk_cell_;
-//  }
-//  Intersection_Interface_ijk_face& get_intersection_ijk_face()
-//  {
-//    return intersection_ijk_face_;
-//  }
-//  const Intersection_Interface_ijk_cell& get_intersection_ijk_cell() const {return intersection_ijk_cell_;}
-//  const Intersection_Interface_ijk_face& get_intersection_ijk_face() const {return intersection_ijk_face_;}
+  //  Intersection_Interface_ijk_cell& get_intersection_ijk_cell()
+  //  {
+  //    return intersection_ijk_cell_;
+  //  }
+  //  Intersection_Interface_ijk_face& get_intersection_ijk_face()
+  //  {
+  //    return intersection_ijk_face_;
+  //  }
+  //  const Intersection_Interface_ijk_cell& get_intersection_ijk_cell() const {return intersection_ijk_cell_;}
+  //  const Intersection_Interface_ijk_face& get_intersection_ijk_face() const {return intersection_ijk_face_;}
 
   void run();
   void euler_time_step(ArrOfDouble& var_volume_par_bulle);
@@ -314,6 +314,7 @@ public :
   void redistribute_from_splitting_ft_elem(const IJK_Field_double& input_field,
                                            IJK_Field_double& output_field);
   void copy_field_values(IJK_Field_double& field, const IJK_Field_double& field_to_copy);
+  void update_indicator_field();
 
 protected :
   // Interdit constructeur par copie et operateur copie

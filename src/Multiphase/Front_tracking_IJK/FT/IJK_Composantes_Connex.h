@@ -49,7 +49,9 @@ class IJK_Composantes_Connex : public Objet_U
   Declare_instanciable( IJK_Composantes_Connex ) ;
 
 public :
-  int initialize(const IJK_Splitting& splitting, const IJK_Interfaces& interfaces);
+  int initialize(const IJK_Splitting& splitting,
+                 const IJK_Interfaces& interfaces,
+                 const bool is_switch);
   void associer(const IJK_FT_double& ijk_ft);
   void initialise_bubbles_params();
   void compute_bounding_box_fill_compo_connex();

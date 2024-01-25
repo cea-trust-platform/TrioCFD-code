@@ -816,13 +816,6 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   return nalloc;
 }
 
-//void IJK_Thermal_Subresolution::sauvegarder_temperature(Nom& lata_name, int idx)
-//{
-//  fichier_reprise_temperature_ = lata_name;
-//  timestep_reprise_temperature_ = 1;
-//  dumplata_scalar(lata_name, Nom("TEMPERATURE_SUBRES_") + Nom(idx) , temperature_, 0 /*we store a 0 */);
-//}
-
 double IJK_Thermal_Subresolution::get_modified_time()
 {
   if (!disable_spherical_diffusion_start_)
@@ -910,7 +903,6 @@ void IJK_Thermal_Subresolution::compute_temperature_init()
             Cerr << "Time ini: " << time_ini << finl;
           const int nb_bubble_tot = ref_ijk_ft_->itfce().get_ijk_compo_connex().get_bubbles_barycentre().dimension(0);
           const int nb_bubbles_real = ref_ijk_ft_->itfce().get_nb_bulles_reelles();
-//					const int nb_bubbles_ghost = ref_ijk_ft_->itfce().get_nb_bulles_ghost();
           for (int index_bubble=0; index_bubble<nb_bubble_tot; index_bubble++)
             {
               int index_bubble_real = index_bubble;
@@ -923,12 +915,6 @@ void IJK_Thermal_Subresolution::compute_temperature_init()
               set_field_data(temperature_for_ini_per_bubble_, expression_T_ini);
               set_field_temperature_per_bubble(index_bubble);
             }
-
-//          if (liste_post_instantanes_.contient_("TEMPERATURE_ANA") || liste_post_instantanes_.contient_("ECART_T_ANA"))
-//            {
-//              set_field_data(temperature_ana_, expression_T_ini);
-//              correct_any_temperature_field_for_visu(temperature_ana_);
-//            }
           correct_temperature_for_visu();
           modified_time_init_ = time_ini;
         }
@@ -1091,12 +1077,11 @@ double IJK_Thermal_Subresolution::compute_spherical_steady_dirichlet_left_right_
   const double Delta_R = R1 - R0;
   temperature_integral = (T1 * R1) / (R1 - R0) * (Delta_R - R0 * (log(R1) - log(R0)));
   temperature_integral /= Delta_R;
-  //  temperature_integral += abs(T1);
-  // temperature_integral positive
   return temperature_integral;
 }
 
-double IJK_Thermal_Subresolution::find_time_dichotomy_integral(const double& temperature_integral, double& temperature_end_prev)
+double IJK_Thermal_Subresolution::find_time_dichotomy_integral(const double& temperature_integral,
+                                                               double& temperature_end_prev)
 {
   // Arbitrary large time
   const double time_integral = 100.;
@@ -1191,9 +1176,10 @@ double IJK_Thermal_Subresolution::get_time_inflection_derivative(double& tempera
   return inflection_time_temperature_derivative;
 }
 
-double IJK_Thermal_Subresolution::find_time_dichotomy_derivative(const double& temperature_derivative, double& temperature_limit_left, double& temperature_limit_right)
+double IJK_Thermal_Subresolution::find_time_dichotomy_derivative(const double& temperature_derivative,
+                                                                 double& temperature_limit_left,
+                                                                 double& temperature_limit_right)
 {
-  // double temperature_incr = 0.001;
   const double time_max = 1000.;
   const double T1 = delta_T_subcooled_overheated_;
   const double R0 = single_centred_bubble_radius_ini_;
@@ -1289,8 +1275,6 @@ void IJK_Thermal_Subresolution::set_field_T_ana()
         }
     }
 }
-
-//
 
 void IJK_Thermal_Subresolution::update_thermal_properties()
 {
@@ -1593,8 +1577,6 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
     Cerr << "Prepare thermal flux correction" << finl;
   update_intersections();
   prepare_thermal_flux_correction();
-
-  // apply_thermal_flux_correction();
 }
 
 void IJK_Thermal_Subresolution::compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init)
@@ -1671,7 +1653,6 @@ void IJK_Thermal_Subresolution::compute_radial_first_second_order_operators(Matr
 /*
  * TODO : Should be moved to a class of tools ?
  */
-
 void IJK_Thermal_Subresolution::compute_first_order_operator_raw(Matrice& radial_first_order_operator)
 {
   /*
@@ -2055,16 +2036,13 @@ void IJK_Thermal_Subresolution::compute_source_terms_impose_subresolution_bounda
 void IJK_Thermal_Subresolution::approximate_temperature_increment_material_derivative()
 {
   if (!disable_subresolution_)
-    {
-      thermal_local_subproblems_.approximate_temperature_increment_material_derivative();
-    }
+    thermal_local_subproblems_.approximate_temperature_increment_material_derivative();
 }
 
 void IJK_Thermal_Subresolution::solve_thermal_subproblems()
 {
   if (!disable_subresolution_)
     {
-      // int nb_points = copy_local_unknwowns_rhs();
       check_wrong_values_rhs();
       convert_into_sparse_matrix();
 
@@ -2141,6 +2119,7 @@ void IJK_Thermal_Subresolution::convert_into_sparse_matrix()
 void IJK_Thermal_Subresolution::compute_md_vector()
 {
   one_dimensional_advection_diffusion_thermal_solver_.reinit();
+
   ArrOfInt pe_voisins_dummy;
   ArrsOfInt items_to_send_dummy;
   ArrsOfInt items_to_recv_dummy;
@@ -2149,8 +2128,7 @@ void IJK_Thermal_Subresolution::compute_md_vector()
   items_to_send_dummy.resize(0);
   items_to_recv_dummy.resize(0);
   blocs_to_recv_dummy.resize(0);
-//          const int last_subproblem_index = thermal_local_subproblems_.get_subproblems_counter();
-//          const int subproblems_vector_size = thermal_local_subproblems_.get_end_index_subproblem(last_subproblem_index-1);
+
   const int subproblems_vector_size = thermal_subproblems_rhs_assembly_.size();
   MD_Vector_std md_std = MD_Vector_std(subproblems_vector_size, subproblems_vector_size,
                                        pe_voisins_dummy, items_to_send_dummy,
@@ -2165,8 +2143,6 @@ void IJK_Thermal_Subresolution::retrieve_temperature_solution()
   /*
    * Retrieve the overall vector
    */
-//  for (int i=0; i<thermal_subproblems_temperature_solution_for_solver_.size(); i++)
-//    thermal_subproblems_temperature_solution_(i) = thermal_subproblems_temperature_solution_for_solver_(i);
   thermal_local_subproblems_.retrieve_radial_quantities();
 }
 
@@ -2234,13 +2210,6 @@ void IJK_Thermal_Subresolution::compute_min_max_reachable_fluxes()
   const int discontinous_min_max_neighbours_faces = 1;
   const int remove_external_neighbour_values = 1;
   const int check_neighbour_cell_centre = !remove_external_neighbour_values;
-//  corrige_flux_->compute_min_max_ijk_reachable_fluxes(cell_faces_neighbours_corrected_all_bool_,
-//                                                      neighbours_temperature_to_correct_,
-//                                                      cell_faces_neighbours_corrected_min_max_bool_,
-//                                                      discontinous_min_max_neighbours_faces,
-//                                                      check_neighbour_cell_centre,
-//                                                      remove_external_neighbour_values,
-//                                                      neighbours_temperature_to_correct_trimmed_);
   corrige_flux_->compute_min_max_ijk_any_reachable_fluxes(cell_faces_neighbours_corrected_all_bool_,
                                                           neighbours_temperature_to_correct_,
                                                           cell_faces_neighbours_corrected_min_max_bool_,
@@ -2514,10 +2483,6 @@ void IJK_Thermal_Subresolution::set_thermal_subresolution_outputs(const Nom& int
                                                                         interfacial_quantities_thermal_probes,
                                                                         overall_bubbles_quantities,
                                                                         local_quantities_thermal_probes_time_index_folder);
-//      thermal_local_subproblems_.thermal_subresolution_outputs(rang_,
-//                                                               interfacial_quantities_thermal_probes,
-//                                                               overall_bubbles_quantities,
-//                                                               local_quantities_thermal_probes_time_index_folder);
     }
 }
 

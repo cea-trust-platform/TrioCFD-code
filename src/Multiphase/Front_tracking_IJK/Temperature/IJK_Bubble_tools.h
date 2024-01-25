@@ -42,6 +42,7 @@
 
 // Fill compo using a dummy bounding box
 std::vector<int> arg_sort_array(const ArrOfDouble& array_to_sort);
+
 std::vector<int> arg_sort_array_phi(const ArrOfDouble& angle_incr, const ArrOfDouble& first_angle, const ArrOfDouble& array_to_sort);
 
 void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
@@ -50,7 +51,7 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
                                      IJK_Field_double& eulerian_compo_connex,
                                      IJK_Field_double& eulerian_compo_connex_ghost,
                                      DoubleTab& bubbles_barycentre);
-// TODO: Fill compo starting from interfacial cells
+
 void compute_interfacial_compo_fill_compo(const IJK_Interfaces& interfaces, IJK_Field_double& eulerian_compo_connex);
 
 void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
@@ -58,17 +59,10 @@ void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, c
                              ArrOfDouble& rising_velocities, DoubleTab& rising_vectors,
                              Vecteur3& liquid_velocity);
 
-//void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
-//                             const IJK_Field_double& eulerian_compo_connex_ns, const int& gravity_dir,
-//                             ArrOfDouble& rising_velocities, DoubleTab& rising_vectors);
-
 void fill_rising_velocity_double(const IJK_Field_double * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
                                  IJK_Field_double& eulerian_rising_velocity);
+
 void fill_rising_velocity_int(const IJK_Field_int * eulerian_compo_connex_ns,
                               const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity);
-
-
-// void fill_rising_velocity(const IJK_Field_double& eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
-//                          IJK_Field_double& eulerian_rising_velocity);
 
 #endif /* IJK_Bubble_tools_included */

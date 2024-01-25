@@ -69,23 +69,19 @@ void Switch_double::switch_vit_direct(SFichier& binary_file)
       ArrOfFloat tmp((new_ni_+1) * (new_nj_+1) * 3);
       tmp = 0.;
       for (int dir = 0; dir < 3; dir++)
-        {
-          for (int j = 0; j < new_nj_; j++)
+        for (int j = 0; j < new_nj_; j++)
+          for (int i = 0; i < new_ni_; i++)
             {
-              for (int i = 0; i < new_ni_; i++)
-                {
-                  const int i2 = Indice_i[dir][i];
-                  const int j2 = Indice_j[dir][j];
-                  const int k2 = Indice_k[dir][k];
-                  double x = 0.;
-                  for (int di = 0; di < 2; di++)
-                    for (int dj = 0; dj < 2; dj++)
-                      for (int dk = 0; dk < 2; dk++)
-                        x += coeff_i[dir](i, di) * coeff_j[dir](j, dj) * coeff_k[dir](k, dk) * old_velocity_[dir](i2+di, j2+dj, k2+dk);
-                  tmp[(j * (new_ni_+1) + i) * 3 + dir] = (float)x;
-                }
+              const int i2 = Indice_i[dir][i];
+              const int j2 = Indice_j[dir][j];
+              const int k2 = Indice_k[dir][k];
+              double x = 0.;
+              for (int di = 0; di < 2; di++)
+                for (int dj = 0; dj < 2; dj++)
+                  for (int dk = 0; dk < 2; dk++)
+                    x += coeff_i[dir](i, di) * coeff_j[dir](j, dj) * coeff_k[dir](k, dk) * old_velocity_[dir](i2+di, j2+dj, k2+dk);
+              tmp[(j * (new_ni_+1) + i) * 3 + dir] = (float)x;
             }
-        }
       Cerr << "Writing velocity, layer " << k << " / " << new_nk_ << endl;
       binary_file.put(tmp.addr(), tmp.size_array(), 1);
     }
@@ -157,7 +153,8 @@ void Switch_double::set_param_reprise(Param& param)
 {
   param.ajouter("tinit", &current_time_);
   param.ajouter("terme_acceleration_init", &terme_source_acceleration_);
-  // GAB : gabriel.rmairez@cea.fr
+
+  // GAB : gabriel.ramirez@cea.fr
   /* Voir reprendre probleme dans IJK_FT.cpp */
   /*
   param.ajouter("forcage", &forcage_);
@@ -176,6 +173,7 @@ void Switch_double::set_param_reprise(Param& param)
   param.ajouter("reprise_v_target", &reprise_v_target_);
   */
   // fin GAB : gabriel.ramirez@cea.fr
+
   param.ajouter("fichier_reprise_vitesse", &fichier_old_vitesse_);
   param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_);
 }
@@ -187,8 +185,9 @@ void Switch_double::lire_fichier_reprise(const char *fichier_reprise)
   Param param(que_suis_je());
   set_param_reprise(param);
   param.lire_avec_accolades(fichier);
-  //Cout << "hahahah" <<  forcage_.get_b_flt() << finl;
-  //Cout << "hehehe" << forcage_.get_semi_gen() << finl;
+
+  // Cout << "hahahah" <<  forcage_.get_b_flt() << finl;
+  // Cout << "hehehe" << forcage_.get_semi_gen() << finl;
   // Appeler ensuite initialize() pour lire les fichiers lata etc...
 }
 
@@ -384,7 +383,7 @@ void Switch_double::calculer_coords(const IJK_Splitting::Localisation loc)
 
 void Switch_double::calculer_coords_elem()
 {
-  //const IJK_Splitting::Localisation loc = field.get_localisation();
+  // const IJK_Splitting::Localisation loc = field.get_localisation();
   const IJK_Splitting::Localisation loc=IJK_Splitting::ELEM;
   calculer_coords(loc);
   return;
@@ -417,13 +416,13 @@ void Switch_double::ecrire_header_lata(const Nom lata_name) // const
   dumplata_newtime(lata_name, current_time_);
 }
 
-// Interpole source dans cible les champs sont aux elements
-// Pas besoin de ghost dans new, donc pas de parcours des ghosts.
 void Switch_double::switch_scalar_field(const IJK_Field_double& oldf, IJK_Field_double& newf,
                                         DoubleTab coeff_i, IntTab Indice_i,
                                         DoubleTab coeff_j ,IntTab Indice_j,
                                         DoubleTab coeff_k ,IntTab Indice_k) const
 {
+  // Interpole source dans cible les champs sont aux elements
+  // Pas besoin de ghost dans new, donc pas de parcours des ghosts.
   const int ni = newf.ni();
   const int nj = newf.nj();
   const int nk = newf.nk();
@@ -444,17 +443,16 @@ void Switch_double::switch_scalar_field(const IJK_Field_double& oldf, IJK_Field_
 }
 
 
-// Swap J et K et interpole, ecrit le resultat directement dans un fichier lata
 void Switch_double::switch_scalar_field_direct(SFichier& binary_file,
                                                const IJK_Field_double& fld,
                                                DoubleTab coeff_i, IntTab Indice_i,
                                                DoubleTab coeff_j ,IntTab Indice_j,
                                                DoubleTab coeff_k ,IntTab Indice_k)
 {
+  // Swap J et K et interpole, ecrit le resultat directement dans un fichier lata
   for (int k = 0; k < new_nk_; k++)
     {
       ArrOfFloat tmp(new_ni_ * new_nj_);
-
       for (int j = 0; j < new_nj_; j++)
         for (int i = 0; i < new_ni_; i++)
           {
@@ -492,6 +490,7 @@ int Switch_double::allocate_fields(double& sz_arr)
   int nb_allocated_arrays = 6; // it's a mix of old and new!
 
   nb_allocated_arrays += init_thermique();
+  nb_allocated_arrays += init_thermals();
 
   sz_arr = old_velocity_[0].data().size_array();
   return nb_allocated_arrays;
@@ -519,7 +518,6 @@ void Switch_double::write_velocity(const Nom lata_name) const
           snprintf(sz_string, 100, "%lld", n); // Apparemment %lld est la bonne syntaxe pour les long long
           f << "Champ VELOCITY " << (lata_name + Nom(".VELOCITY.data")) <<  " geometrie=" << geom.le_nom() << " size=" << sz_string
             << " localisation=FACES composantes=3 nature=vector" << finl;
-
         }
     }
 }
@@ -536,7 +534,6 @@ void Switch_double::run()
 
   Cerr << " Allocating " << nb_allocated_arrays << " arrays, approx total size= "
        << sz_arr * sizeof(double) * nb_allocated_arrays * 9.537E-07 << " MB per core" << finl;
-
 
   // Intitialize other fields (velocity, interfaces, rho):
   initialise();
@@ -571,7 +568,7 @@ void Switch_double::run()
   old_velocity_[1].echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_J*/);
   old_velocity_[2].echange_espace_virtuel(1/*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/);
   // useless??
-  //old_rho_.echange_espace_virtuel(1/*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/);
+  // old_rho_.echange_espace_virtuel(1/*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/);
 
   Nom lata_name = nom_sauvegarde_ + Nom(".lata");
   prepare_thermique(lata_name);
@@ -613,7 +610,7 @@ void Switch_double::run()
         }
       write_velocity(lata_name);
 
-      // Compute and write rho/thermic if needed:
+      // Compute and write IJK_Thermals if needed:
       compute_and_write_extra_fields(lata_name, coeff_i,Indice_i,
                                      coeff_j,Indice_j,
                                      coeff_k,Indice_k);

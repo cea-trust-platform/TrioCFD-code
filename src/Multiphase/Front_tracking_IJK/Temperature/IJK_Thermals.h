@@ -70,7 +70,7 @@ public :
                                               const int latastep,
                                               const double current_time,
                                               int& n);
-  int init_thermals(const IJK_Splitting& splitting);
+  int init_switch_thermals(const IJK_Splitting& splitting);
   void prepare_thermals(const char *lataname);
   int ghost_fluid_flag();
   void ecrire_fichier_reprise(SFichier& fichier, const char *lata_name);
@@ -92,6 +92,15 @@ public :
   void set_post_pro_first_call() { post_pro_first_call_ = 1; } ;
   void set_temperature_ini();
   void recompute_interface_smoothing();
+  void compute_new_thermal_field(Switch_FT_double& switch_double_ft,
+                                 const IJK_Splitting& new_mesh,
+                                 const Nom& lata_name,
+                                 DoubleTab& coeff_i,
+                                 IntTab Indice_i,
+                                 DoubleTab& coeff_j,
+                                 IntTab Indice_j,
+                                 DoubleTab& coeff_k,
+                                 IntTab Indice_k);
 
 
 protected :

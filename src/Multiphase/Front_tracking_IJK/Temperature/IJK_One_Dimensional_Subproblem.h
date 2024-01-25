@@ -34,7 +34,6 @@
 #include <Matrice.h>
 #include <IJK_Finite_Difference_One_Dimensional_Matrix_Assembler.h>
 
-// #include <TRUSTArray.h>
 #define INVALID_TEMPERATURE 1e10
 #define INVALID_FIELD 1e10
 #define INVALID_VELOCITY 1e-12
@@ -490,7 +489,7 @@ protected :
   void compute_pure_spherical_basis_vectors();
   void compute_local_discretisation();
   void compute_local_time_step();
-  const int *  increase_number_of_points();
+  const int * increase_number_of_points();
   void compute_identity_matrix_local(Matrice& identity_matrix_explicit_implicit);
   void compute_first_order_operator_local(Matrice& radial_first_order_operator);
   void compute_second_order_operator_local(Matrice& second_first_order_operator);
@@ -669,6 +668,7 @@ protected :
   Matrice identity_matrix_explicit_implicit_local_;
   Matrice radial_first_order_operator_local_;
   Matrice radial_second_order_operator_local_;
+
   /*
    * Pointers to non-constant matrice
    * FIXME: Should I declare constant pointers ?
@@ -677,8 +677,8 @@ protected :
   Matrice *radial_diffusion_matrix_base_;
   Matrice *radial_convection_matrix_base_;
   const Matrice *radial_velocity_convection_matrix_base_;
-//  const Matrice* tangential_velocity_convection_matrix_base_;
-//  const Matrice* azymuthal_velocity_convection_matrix_base_;
+  //  const Matrice * tangential_velocity_convection_matrix_base_;
+  //  const Matrice * azymuthal_velocity_convection_matrix_base_;
 
   double dr_=0.;
   double dr_inv_=0.;
