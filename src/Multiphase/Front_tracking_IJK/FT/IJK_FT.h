@@ -315,6 +315,7 @@ public :
                                            IJK_Field_double& output_field);
   void copy_field_values(IJK_Field_double& field, const IJK_Field_double& field_to_copy);
   void update_indicator_field();
+  void update_twice_indicator_field();
 
 protected :
   // Interdit constructeur par copie et operateur copie

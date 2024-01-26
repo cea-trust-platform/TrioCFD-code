@@ -1255,7 +1255,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
 
   thermals_.sauvegarder_temperature(lata_name);
 
-  // curseur = thermique_; //RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
+  // curseur = thermique_; // RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
   SFichier fichier;
   if (Process::je_suis_maitre())
     {
@@ -1347,7 +1347,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       post_.sauvegarder_post_maitre(lata_name, fichier);
       fichier << "}\n" ;
 #endif
-      Cerr << "T= " << current_time_ << " Checkpointing dans le fichier l.1168	 " << fichier_sauvegarde << finl;
+      Cerr << "T= " << current_time_ << " Checkpointing dans le fichier l.1168 " << fichier_sauvegarde << finl;
     }
   statistiques().end_count(sauvegarde_counter_);
 
@@ -1696,7 +1696,7 @@ int IJK_FT_double::initialise()
   post_.complete(reprise_);
 
   // On la met a jour 2 fois, une fois next et une fois old
-  update_indicator_field();
+  update_twice_indicator_field();
 
   if (!disable_diphasique_)
     {
@@ -1756,13 +1756,13 @@ int IJK_FT_double::initialise()
   if (energie_.size() > 0)
     {
       interfaces_.set_compute_surfaces_mouillees();
-      update_indicator_field();
+      update_twice_indicator_field();
     }
 
   if (thermals_.size_thermal_problem(Nom("onefluidenergy")) > 0)
     {
       interfaces_.set_compute_surfaces_mouillees();
-      update_indicator_field();
+      update_twice_indicator_field();
     }
 
   if (!disable_diphasique_)
@@ -5060,22 +5060,25 @@ void IJK_FT_double::copy_field_values(IJK_Field_double& field, const IJK_Field_d
 void IJK_FT_double::update_indicator_field()
 {
   const double delta_rho = rho_liquide_ - rho_vapeur_;
-  for (int i=0; i<2; i++)
-    {
-      interfaces_.switch_indicatrice_next_old();
-      interfaces_.calculer_indicatrice_next(post_.potentiel(),
-                                            gravite_,
-                                            delta_rho,
-                                            sigma_,
-                                            /*Pour post-traitement : post_.rebuilt_indic()
-                                            */
+  interfaces_.switch_indicatrice_next_old();
+  interfaces_.calculer_indicatrice_next(post_.potentiel(),
+                                        gravite_,
+                                        delta_rho,
+                                        sigma_,
+                                        /*Pour post-traitement : post_.rebuilt_indic()
+                                        */
 #ifdef SMOOTHING_RHO
-                                            /* Pour le smoothing : */
-                                            rho_field_ft_,
-                                            rho_vapeur_,
-                                            smooth_density_,
+                                        /* Pour le smoothing : */
+                                        rho_field_ft_,
+                                        rho_vapeur_,
+                                        smooth_density_,
 #endif
-                                            current_time_, tstep_
-                                           );
-    }
+                                        current_time_, tstep_
+                                       );
+}
+
+void IJK_FT_double::update_twice_indicator_field()
+{
+  for(int i=0; i<2; i++)
+    update_indicator_field();
 }
