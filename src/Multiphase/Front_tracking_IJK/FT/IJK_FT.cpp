@@ -1652,6 +1652,7 @@ int IJK_FT_double::initialise()
    */
   if (compute_force_init_)
     {
+      terme_source_acceleration_ = 0.;
       double indicator_sum = 0;
       double terme_source_acceleration_increment;
       const int ni = interfaces_.I().ni();
@@ -2515,8 +2516,11 @@ void IJK_FT_double::run()
   post_.compute_extended_pressures(interfaces_.maillage_ft_ijk());
 //post_.compute_phase_pressures_based_on_poisson(0);
 //post_.compute_phase_pressures_based_on_poisson(1);
+
   modified_time_ini_ = thermals_.get_modified_time();
-  current_time_ = modified_time_ini_;
+  if (!reprise_)
+    current_time_ = modified_time_ini_;
+
   if (!first_step_interface_smoothing_)
     {
       Cout << "BF posttraiter_champs_instantanes "
@@ -2594,9 +2598,9 @@ void IJK_FT_double::run()
       var_volume_par_bulle.resize_array(nbulles_tot);
       var_volume_par_bulle = 0.; // Je ne suis pas sur que ce soit un bon choix. Si on ne le remet pas a zero
       //                          a chaque dt, on corrigera la petite erreur qui pouvait rester d'avant...
-#if 1
+
       compute_var_volume_par_bulle(var_volume_par_bulle);
-#endif
+
       // Choix de l'avancement en temps :
       // euler_explicite ou RK3.
       if (get_time_scheme() == EULER_EXPLICITE)

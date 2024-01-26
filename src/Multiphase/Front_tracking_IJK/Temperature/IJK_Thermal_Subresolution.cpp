@@ -346,6 +346,7 @@ Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
   os << front_space << "nb_theta_post_pro" << end_space << nb_theta_post_pro_ << escape;
   os << front_space << "nb_phi_post_pro" << end_space << nb_phi_post_pro_ << escape;
   os << front_space << "nb_probes_post_pro" << end_space << nb_probes_post_pro_ << escape;
+  os << front_space << "modified_time_init" << end_space << modified_time_init_ << escape;
 
   os << "}" << escape;
   return os;
@@ -377,6 +378,8 @@ Entree& IJK_Thermal_Subresolution::readOn( Entree& is )
 void IJK_Thermal_Subresolution::set_param( Param& param )
 {
   IJK_Thermal_base::set_param(param);
+
+  param.ajouter("modified_time_init", &modified_time_init_);
 
   param.ajouter_flag("reference_gfm_on_probes", &reference_gfm_on_probes_);
   param.ajouter_flag("compute_normal_derivatives_on_reference_probes", &compute_normal_derivatives_on_reference_probes_);
@@ -819,7 +822,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 double IJK_Thermal_Subresolution::get_modified_time()
 {
   if (!disable_spherical_diffusion_start_)
-    return ref_ijk_ft_->get_current_time() + modified_time_init_;
+    return modified_time_init_; // ref_ijk_ft_->get_current_time();
   else
     return ref_ijk_ft_->get_current_time();
 }
