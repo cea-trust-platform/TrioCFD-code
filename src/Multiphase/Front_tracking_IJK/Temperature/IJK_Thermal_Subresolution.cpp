@@ -36,6 +36,7 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
 
   reference_gfm_on_probes_ = 0;
   compute_normal_derivatives_on_reference_probes_ = 0;
+  enable_probe_collision_detection_=0;
 
   disable_spherical_diffusion_start_ = 0;
   probes_end_value_start_ = -1;
@@ -211,6 +212,8 @@ Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
   os << front_space << "# SUBRESOLUTION FLAGS #" << escape;
   os << escape;
 
+  if (enable_probe_collision_detection_)
+    os << front_space << "enable_probe_collision_detection " << escape;
   if (convective_flux_correction_)
     os << front_space << "convective_flux_correction " << escape;
   if (diffusive_flux_correction_)
@@ -383,6 +386,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
 
   param.ajouter_flag("reference_gfm_on_probes", &reference_gfm_on_probes_);
   param.ajouter_flag("compute_normal_derivatives_on_reference_probes", &compute_normal_derivatives_on_reference_probes_);
+  param.ajouter_flag("enable_probe_collision_detection", &enable_probe_collision_detection_);
 
   param.ajouter_flag("disable_spherical_diffusion_start", &disable_spherical_diffusion_start_);
   param.ajouter_flag("disable_subresolution", &disable_subresolution_);
@@ -1531,8 +1535,11 @@ void IJK_Thermal_Subresolution::compute_thermal_subproblems()
     Cerr << "Initialise thermal subproblems" << finl;
   initialise_thermal_subproblems();
 
-  interpolate_indicator_on_probes();
-  clear_problems_colliding_bubbles();
+  if (enable_probe_collision_detection_)
+    {
+      interpolate_indicator_on_probes();
+      clear_problems_colliding_bubbles();
+    }
 
   pre_initialise_thermal_subproblems_any_matrices();
 

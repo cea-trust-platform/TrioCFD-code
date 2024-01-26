@@ -139,6 +139,10 @@ public :
   {
     return subproblems_counter_;
   }
+  const int& get_effective_subproblems_counter() const
+  {
+    return effective_subproblems_counter_;
+  }
 
   double get_min_temperature() const;
   double get_max_temperature() const;
@@ -179,6 +183,7 @@ protected :
   int debug_ = 0;
   int max_subproblems_ = 0;
   int subproblems_counter_ = 0;
+  int effective_subproblems_counter_ = 0;
   int global_subproblems_counter_ = 0;
   int index_ini_=0;
   int index_end_=0;
@@ -321,6 +326,8 @@ protected :
 
   int nb_bubbles_ = 0;
   int * latastep_reprise_;
+
+  ArrOfInt collision_indices_;
 
 };
 

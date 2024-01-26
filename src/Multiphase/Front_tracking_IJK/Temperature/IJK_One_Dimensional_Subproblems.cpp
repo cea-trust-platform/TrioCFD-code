@@ -98,6 +98,8 @@ IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
   bubbles_volume_ = nullptr;
   prandtl_number_ = nullptr;
   latastep_reprise_ = nullptr;
+
+  collision_indices_.set_smart_resize(1);
 }
 
 IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblems()
@@ -341,13 +343,44 @@ void IJK_One_Dimensional_Subproblems::interpolate_indicator_on_probes()
 
 void IJK_One_Dimensional_Subproblems::clear_problems_colliding_bubbles()
 {
-
+  effective_subproblems_counter_ = subproblems_counter_;
+  collision_indices_.reset();
+  if ((*bubbles_rising_velocities_).size_array() == 1)
+    return;
+  int disable_probe_collision = 0;
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    {
+      disable_probe_collision = (*this)[itr].get_disable_probe_collision();
+      if (disable_probe_collision)
+        collision_indices_.append_array(itr);
+      (*this)[itr].set_reference_gfm_on_probes(1);
+    }
+  effective_subproblems_counter_ -= (collision_indices_.size_array());
+//	if (collision_indices_[collision_indices_.size_array() - 1] == (subproblems_counter_ - 1))
+//		collision_indices_.append_array(subproblems_counter_ - 1);
 }
 
 void IJK_One_Dimensional_Subproblems::interpolate_project_velocities_on_probes()
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].interpolate_project_velocities_on_probes();
+  const int nb_indices = collision_indices_.size_array();
+  if (!nb_indices)
+    for (int itr=0; itr < subproblems_counter_; itr++)
+      (*this)[itr].interpolate_project_velocities_on_probes();
+  else
+    {
+      collision_indices_.append_array(subproblems_counter_);
+      int collision_rank = 0;
+      int collision_index = collision_indices_[collision_rank];
+      for (int itr=0; itr < subproblems_counter_; itr++)
+        if (itr == collision_index)
+          {
+            collision_rank++;
+            collision_indices_[collision_rank];
+          }
+        else
+          (*this)[itr].interpolate_project_velocities_on_probes();
+      collision_indices_.resize(nb_indices);
+    }
 }
 
 void IJK_One_Dimensional_Subproblems::reajust_probes_length()

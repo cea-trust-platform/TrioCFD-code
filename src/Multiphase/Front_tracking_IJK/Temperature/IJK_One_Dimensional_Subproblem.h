@@ -272,6 +272,14 @@ public :
   {
     return probe_variations_enabled_;
   };
+  const int& get_disable_probe_collision() const
+  {
+    return disable_probe_collision_;
+  };
+  void set_reference_gfm_on_probes(const int& reference_gfm_on_probes)
+  {
+    reference_gfm_on_probes_ = reference_gfm_on_probes;
+  };
   const double& get_dist_cell() const
   {
     return cell_centre_distance_;

@@ -313,7 +313,7 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("T0v_source", &T0v_);
   param.ajouter("fichier_reprise_temperature", &fichier_reprise_temperature_);
   param.ajouter("timestep_reprise_temperature", &timestep_reprise_temperature_);
-  param.ajouter("latastep_reprise", &latastep_reprise_);
+  param.ajouter("latastep_reprise", &latastep_reprise_ini_);
   param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // XD_ADD_P rien neglect temperature convection
   param.ajouter_flag("diff_temperature_negligible", &diff_temperature_negligible_); // XD_ADD_P rien neglect temperature diffusion
   param.ajouter("temperature_diffusion_op", &temperature_diffusion_op_);
