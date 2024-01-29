@@ -3337,7 +3337,7 @@ void IJK_One_Dimensional_Subproblem::post_process_radial_quantities(const int ra
       {
         const int reset = 1;
         const int max_digit = 8;
-        const int last_time_index = ref_ijk_ft_->get_tstep();
+        const int last_time_index = (*latastep_reprise_) + ref_ijk_ft_->get_tstep();
         const int nb_digit_index_post_pro = index_post_processing_ < 1 ? 1 : (int) (log10(index_post_processing_) + 1);
         const int nb_digit_index_global = global_subproblem_index_ < 1 ? 1 : (int) (log10(global_subproblem_index_) + 1);
         const int nb_digit_tstep = last_time_index < 1 ? 1 : (int) (log10(last_time_index) + 1);
