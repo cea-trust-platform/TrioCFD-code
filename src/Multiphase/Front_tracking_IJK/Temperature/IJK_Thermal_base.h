@@ -71,6 +71,8 @@ public:
   void associer_switch(const Switch_FT_double& ijk_ft_switch);
   void associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
                                         const Intersection_Interface_ijk_face& intersection_ijk_face);
+  void retrieve_ghost_fluid_params(int& compute_distance, int& compute_curvature, int& n_iter_distance);
+  void get_boundary_fluxes(IJK_Field_local_double& boundary_flux_kmin, IJK_Field_local_double& boundary_flux_kmax);
   void euler_time_step(const double timestep);
   void rk3_sub_step(const int rk_step,
                     const double total_timestep,

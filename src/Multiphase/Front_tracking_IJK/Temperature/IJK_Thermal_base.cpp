@@ -843,6 +843,22 @@ void IJK_Thermal_base::associer_interface_intersections(const Intersection_Inter
   ref_intersection_ijk_face_ = intersection_ijk_face;
 }
 
+void IJK_Thermal_base::retrieve_ghost_fluid_params(int& compute_distance,
+                                                   int& compute_curvature,
+                                                   int& n_iter_distance)
+{
+  compute_distance = compute_distance || compute_distance_;
+  compute_curvature = compute_curvature || compute_curvature_;
+  n_iter_distance = std::max(n_iter_distance, n_iter_distance_);
+}
+
+void IJK_Thermal_base::get_boundary_fluxes(IJK_Field_local_double& boundary_flux_kmin,
+                                           IJK_Field_local_double& boundary_flux_kmax)
+{
+  boundary_flux_kmin = boundary_flux_kmin_;
+  boundary_flux_kmax = boundary_flux_kmax_;
+}
+
 void IJK_Thermal_base::euler_time_step(const double timestep)
 {
   calculer_dT(ref_ijk_ft_->get_velocity());

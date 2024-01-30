@@ -24,6 +24,7 @@
 
 #include <IJK_Thermal_base.h>
 #include <TRUST_Deriv.h>
+#include <IJK_Ghost_Fluid_Fields.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -44,6 +45,8 @@ public :
   /*
    * Getters
    */
+  void retrieve_ghost_fluid_params(int& compute_distance, int& compute_curvature, int& n_iter_distance);
+  void get_boundary_fluxes(IJK_Field_local_double& boundary_flux_kmin, IJK_Field_local_double& boundary_flux_kmax);
   void set_fichier_reprise(const char *lataname);
   const Nom& get_fichier_reprise() const { return valeur().get_fichier_reprise(); };
   inline Nom& get_thermal_problem_type() { return thermal_problem_type_; };
@@ -184,6 +187,7 @@ protected:
   REF(Switch_FT_double) ref_ijk_ft_switch_;
   REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
   REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
+
 };
 
 inline int IJK_Thermal::initialize(const IJK_Splitting& splitting, const int idx)
@@ -209,6 +213,18 @@ inline void IJK_Thermal::update_thermal_properties()
 inline double IJK_Thermal::get_modified_time()
 {
   return valeur().get_modified_time();
+}
+
+inline void IJK_Thermal::retrieve_ghost_fluid_params(int& compute_distance, int& compute_curvature, int& n_iter_distance)
+{
+  valeur().retrieve_ghost_fluid_params(compute_distance,
+                                       compute_curvature,
+                                       n_iter_distance);
+}
+
+inline void IJK_Thermal::get_boundary_fluxes(IJK_Field_local_double& boundary_flux_kmin, IJK_Field_local_double& boundary_flux_kmax)
+{
+  valeur().get_boundary_fluxes(boundary_flux_kmin, boundary_flux_kmax);
 }
 
 inline void IJK_Thermal::euler_time_step(const double timestep)

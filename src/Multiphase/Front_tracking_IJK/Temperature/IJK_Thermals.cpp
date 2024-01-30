@@ -62,6 +62,27 @@ void IJK_Thermals::associer(const IJK_FT_double& ijk_ft)
   associer_interface_intersections(ijk_ft.itfce().get_intersection_ijk_cell(), ijk_ft.itfce().get_intersection_ijk_face());
   for (auto& itr : *this)
     itr.associer(ijk_ft);
+  ghost_fluid_fields_.associer(ijk_ft);
+  retrieve_ghost_fluid_params();
+}
+
+void IJK_Thermals::retrieve_ghost_fluid_params()
+{
+  int compute_distance = 1;
+  int compute_curvature = 1;
+  int n_iter_distance = 6;
+  IJK_Field_local_double boundary_flux_kmin;
+  IJK_Field_local_double boundary_flux_kmax;
+  (*this)[0].get_boundary_fluxes(boundary_flux_kmin, boundary_flux_kmax);
+  for (auto& itr : *this)
+    itr.retrieve_ghost_fluid_params(compute_distance,
+                                    compute_curvature,
+                                    n_iter_distance);
+  ghost_fluid_fields_.retrieve_ghost_fluid_params(compute_distance,
+                                                  compute_curvature,
+                                                  n_iter_distance,
+                                                  boundary_flux_kmin,
+                                                  boundary_flux_kmax);
 }
 
 void IJK_Thermals::associer_post(const IJK_FT_Post& ijk_ft_post)
@@ -136,6 +157,7 @@ void IJK_Thermals::compute_timestep(double& dt_thermals, const double dxmin)
 
 void IJK_Thermals::initialize(const IJK_Splitting& splitting, int& nalloc)
 {
+  ghost_fluid_fields_.initialize(nalloc, splitting);
   int idth =0;
   Nom thermal_outputs_rank_base = Nom("thermal_outputs_rank_");
   const int max_digit = 3;
