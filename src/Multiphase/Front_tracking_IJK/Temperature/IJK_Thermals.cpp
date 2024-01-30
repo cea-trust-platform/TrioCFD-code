@@ -61,7 +61,10 @@ void IJK_Thermals::associer(const IJK_FT_double& ijk_ft)
   associer_post(ijk_ft.get_post());
   associer_interface_intersections(ijk_ft.itfce().get_intersection_ijk_cell(), ijk_ft.itfce().get_intersection_ijk_face());
   for (auto& itr : *this)
-    itr.associer(ijk_ft);
+    {
+      itr.associer(ijk_ft);
+      itr.associer_ghost_fluid_fields(ghost_fluid_fields_);
+    }
   ghost_fluid_fields_.associer(ijk_ft);
   retrieve_ghost_fluid_params();
 }
@@ -212,6 +215,7 @@ void IJK_Thermals::euler_time_step(const double timestep)
 {
   for (auto& itr : (*this))
     itr.euler_time_step(timestep);
+  ghost_fluid_fields_.enforce_distance_curvature_values_for_post_processings();
 }
 
 void IJK_Thermals::euler_rustine_step(const double timestep)
@@ -396,14 +400,29 @@ void IJK_Thermals::clean_ijk_intersections()
 
 void IJK_Thermals::compute_eulerian_distance()
 {
+  ghost_fluid_fields_.compute_eulerian_distance();
   for (auto& itr : (*this))
     itr.compute_eulerian_distance();
 }
 
+void IJK_Thermals::compute_eulerian_curvature()
+{
+  ghost_fluid_fields_.compute_eulerian_curvature();
+  for (auto& itr : (*this))
+    itr.compute_eulerian_curvature();
+}
+
 void IJK_Thermals::compute_eulerian_curvature_from_interface()
 {
+  ghost_fluid_fields_.compute_eulerian_curvature_from_interface();
   for (auto& itr : (*this))
     itr.compute_eulerian_curvature_from_interface();
+}
+
+void IJK_Thermals::compute_eulerian_distance_curvature()
+{
+  compute_eulerian_distance();
+  compute_eulerian_curvature_from_interface();
 }
 
 int IJK_Thermals::get_disable_post_processing_probes_out_files() const

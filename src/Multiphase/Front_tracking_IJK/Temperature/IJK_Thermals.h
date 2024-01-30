@@ -80,8 +80,12 @@ public :
 
   void update_intersections();
   void clean_ijk_intersections();
+
   void compute_eulerian_distance();
+  void compute_eulerian_curvature();
   void compute_eulerian_curvature_from_interface();
+  void compute_eulerian_distance_curvature();
+
   void set_latastep_reprise(const bool stop);
   void thermal_subresolution_outputs();
   int get_disable_post_processing_probes_out_files() const;

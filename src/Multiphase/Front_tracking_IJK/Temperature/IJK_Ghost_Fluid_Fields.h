@@ -47,6 +47,8 @@ public :
   void compute_eulerian_distance();
   void enforce_zero_value_eulerian_distance();
 
+  void enforce_distance_curvature_values_for_post_processings();
+
   void compute_eulerian_curvature_from_interface();
   void compute_eulerian_curvature();
   void enforce_zero_value_eulerian_curvature();
@@ -70,71 +72,71 @@ public :
     boundary_flux_kmax_ = boundary_flux_kmax;
   }
 
-  IJK_Field_double& get_set_eulerian_distance_ft()
+  const IJK_Field_double& get_eulerian_distance_ft() const
   {
     return eulerian_distance_ft_;
   }
-  IJK_Field_double& get_set_eulerian_distance_ns()
+  const IJK_Field_double& get_eulerian_distance_ns() const
   {
     return eulerian_distance_ns_;
   }
 
-  FixedVector<IJK_Field_double, 3>& get_set_eulerian_normal_vectors_ft()
+  const FixedVector<IJK_Field_double, 3>& get_eulerian_normal_vectors_ft() const
   {
     return eulerian_normal_vectors_ft_;
   }
-  FixedVector<IJK_Field_double, 3>& get_set_eulerian_facets_barycentre_ft()
+  const FixedVector<IJK_Field_double, 3>& get_eulerian_facets_barycentre_ft() const
   {
     return eulerian_facets_barycentre_ft_;
   }
-  FixedVector<IJK_Field_double, 3>& get_set_eulerian_normal_vectors_ns()
+  const FixedVector<IJK_Field_double, 3>& get_eulerian_normal_vectors_ns() const
   {
     return eulerian_normal_vectors_ns_;
   }
-  FixedVector<IJK_Field_double, 3>& get_set_eulerian_normal_vectors_ns_normed()
+  const FixedVector<IJK_Field_double, 3>& get_eulerian_normal_vectors_ns_normed() const
   {
     return eulerian_normal_vectors_ns_normed_;
   }
-  FixedVector<IJK_Field_double, 3>& get_set_eulerian_facets_barycentre_ns()
+  const FixedVector<IJK_Field_double, 3>& get_eulerian_facets_barycentre_ns() const
   {
     return eulerian_facets_barycentre_ns_;
   }
 
-  IJK_Field_double& get_set_eulerian_curvature_ft()
+  const IJK_Field_double& get_eulerian_curvature_ft() const
   {
     return eulerian_curvature_ft_;
   }
-  IJK_Field_double& get_set_eulerian_curvature_ns()
+  const IJK_Field_double& get_eulerian_curvature_ns() const
   {
     return eulerian_curvature_ns_;
   }
-  IJK_Field_double& get_set_eulerian_interfacial_area_ft()
+  const IJK_Field_double& get_eulerian_interfacial_area_ft() const
   {
     return eulerian_interfacial_area_ft_;
   }
-  IJK_Field_double& get_set_eulerian_interfacial_area_ns()
+  const IJK_Field_double& get_eulerian_interfacial_area_ns() const
   {
     return eulerian_interfacial_area_ns_;
   }
 
-  IJK_Field_double& get_set_eulerian_rising_velocities()
+  const IJK_Field_double& get_eulerian_rising_velocities() const
   {
     return eulerian_rising_velocities_;
   }
 
-  FixedVector<IJK_Field_int, 3>& get_set_dummy_int_vect()
+  const FixedVector<IJK_Field_int, 3>& get_dummy_int_vect() const
   {
     return dummy_int_vect_;
   }
-  FixedVector<IJK_Field_double, 3>& get_set_dummy_double_vect()
+  const FixedVector<IJK_Field_double, 3>& get_dummy_double_vect() const
   {
     return dummy_double_vect_;
   }
-  IJK_Field_int& get_set_dummy_int_field()
+  const IJK_Field_int& get_dummy_int_field() const
   {
     return dummy_int_field_;
   }
-  IJK_Field_double& get_set_dummy_double_field()
+  const IJK_Field_double& get_dummy_double_field() const
   {
     return dummy_double_field_;
   }

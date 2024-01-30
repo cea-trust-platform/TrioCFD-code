@@ -36,6 +36,7 @@
 #include <Corrige_flux_FT.h>
 #include <TRUST_Ref.h>
 #include <IJK_FT_Post.h>
+#include <IJK_Ghost_Fluid_Fields.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -71,6 +72,7 @@ public:
   void associer_switch(const Switch_FT_double& ijk_ft_switch);
   void associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
                                         const Intersection_Interface_ijk_face& intersection_ijk_face);
+  void associer_ghost_fluid_fields(const IJK_Ghost_Fluid_Fields& ghost_fluid_fields);
   void retrieve_ghost_fluid_params(int& compute_distance, int& compute_curvature, int& n_iter_distance);
   void get_boundary_fluxes(IJK_Field_local_double& boundary_flux_kmin, IJK_Field_local_double& boundary_flux_kmax);
   void euler_time_step(const double timestep);
@@ -159,15 +161,18 @@ public:
   }
   const IJK_Field_double& get_eulerian_distance_ft() const
   {
-    return eulerian_distance_ft_;
+    return ghost_fluid_fields_->get_eulerian_distance_ft();
+    // return eulerian_distance_ft_;
   }
   const IJK_Field_double& get_eulerian_curvature_ft() const
   {
-    return eulerian_curvature_ft_ ;
+    return ghost_fluid_fields_->get_eulerian_curvature_ft();
+    // return eulerian_curvature_ft_ ;
   }
   const IJK_Field_double& get_interfacial_area_ft() const
   {
-    return eulerian_interfacial_area_ft_;
+    return ghost_fluid_fields_->get_eulerian_interfacial_area_ft();
+    // return eulerian_interfacial_area_ft_;
   }
   const IJK_Field_double& get_grad_T_interface_ft() const
   {
@@ -223,15 +228,18 @@ public:
   }
   const IJK_Field_double& get_eulerian_distance_ns() const
   {
-    return eulerian_distance_ns_;
+    return ghost_fluid_fields_->get_eulerian_distance_ns();
+    // return eulerian_distance_ns_;
   }
   const IJK_Field_double& get_eulerian_curvature_ns() const
   {
-    return eulerian_curvature_ns_ ;
+    return ghost_fluid_fields_->get_eulerian_curvature_ns();
+    // return eulerian_curvature_ns_ ;
   }
   const IJK_Field_double& get_interfacial_area_ns() const
   {
-    return eulerian_interfacial_area_ns_;
+    return ghost_fluid_fields_->get_eulerian_interfacial_area_ns();
+    // return eulerian_interfacial_area_ns_;
   }
   const IJK_Field_double& get_grad_T_interface_ns() const
   {
@@ -389,8 +397,11 @@ public:
   void ecrire_reprise_thermique(SFichier& fichier);
 #endif
   virtual void compute_ghost_cell_numbers_for_subproblems(const IJK_Splitting& splitting, int ghost_init) { ghost_cells_ = ghost_init; };
+
   void compute_eulerian_distance();
+  void compute_eulerian_curvature();
   void compute_eulerian_curvature_from_interface();
+
   virtual void update_intersections() { ; };
   virtual void clean_ijk_intersections() { ; };
   virtual void set_thermal_subresolution_outputs(const Nom& interfacial_quantities_thermal_probes,
@@ -413,12 +424,11 @@ protected:
   virtual void store_temperature_before_extrapolation() { ; };
   virtual void correct_temperature_increment_for_interface_leaving_cell() { ; };
   void enforce_zero_value_eulerian_distance();
-  void compute_eulerian_curvature();
   void enforce_zero_value_eulerian_curvature();
   void enforce_max_value_eulerian_curvature();
-  void compute_eulerian_grad_T_interface();
+  void compute_eulerian_grad_T_interface(const int on_splitting_ns=0);
   void propagate_eulerian_grad_T_interface();
-  void compute_eulerian_temperature_ghost();
+  void compute_eulerian_temperature_ghost(const int on_splitting_ns=0);
   void compute_eulerian_bounding_box_fill_compo();
   void compute_rising_velocities();
   void enforce_zero_value_eulerian_field(IJK_Field_double& eulerian_field);
@@ -614,6 +624,7 @@ protected:
    */
   DoubleTab bounding_box_;
   DoubleTab min_max_larger_box_;
+  const IJK_Ghost_Fluid_Fields * ghost_fluid_fields_;
   IJK_Field_double eulerian_distance_ft_;
   IJK_Field_double eulerian_distance_ns_;
   FixedVector<IJK_Field_double, 3> eulerian_normal_vectors_ft_;

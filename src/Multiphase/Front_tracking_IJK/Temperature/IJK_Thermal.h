@@ -134,6 +134,7 @@ public :
   inline void associer_switch(const Switch_FT_double& ijk_ft_switch);
   inline void associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
                                                const Intersection_Interface_ijk_face& intersection_ijk_face);
+  inline void associer_ghost_fluid_fields(const IJK_Ghost_Fluid_Fields& ghost_fluid_fields);
   inline void sauvegarder_temperature(Nom& lata_name, int idx);
   inline double compute_timestep(const double timestep,
                                  const double dxmin);
@@ -148,8 +149,9 @@ public :
   inline void update_intersections() { valeur().update_intersections(); };
   inline void clean_ijk_intersections() { valeur().clean_ijk_intersections(); };
 
-  inline void compute_eulerian_curvature_from_interface();
   inline void compute_eulerian_distance();
+  inline void compute_eulerian_curvature();
+  inline void compute_eulerian_curvature_from_interface();
   inline double get_modified_time();
 
   void posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const;
@@ -258,6 +260,11 @@ inline void IJK_Thermal::associer_interface_intersections(const Intersection_Int
   valeur().associer_interface_intersections(intersection_ijk_cell, intersection_ijk_face);
 }
 
+inline void IJK_Thermal::associer_ghost_fluid_fields(const IJK_Ghost_Fluid_Fields& ghost_fluid_fields)
+{
+  valeur().associer_ghost_fluid_fields(ghost_fluid_fields);
+}
+
 inline void IJK_Thermal::sauvegarder_temperature(Nom& lata_name, int idx)
 {
   valeur().sauvegarder_temperature(lata_name, idx);
@@ -300,6 +307,11 @@ inline void IJK_Thermal::compute_interfacial_temperature2(ArrOfDouble& interfaci
 inline void IJK_Thermal::compute_eulerian_distance()
 {
   valeur().compute_eulerian_distance();
+}
+
+inline void IJK_Thermal::compute_eulerian_curvature()
+{
+  valeur().compute_eulerian_curvature();
 }
 
 inline void IJK_Thermal::compute_eulerian_curvature_from_interface()

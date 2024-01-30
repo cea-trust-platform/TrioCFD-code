@@ -4356,7 +4356,8 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
 
     if (IJK_Splitting::defilement_ == 1)
       {
-        redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
+        redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0],
+                                          boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
         redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1], 0., 1);
         redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2], 0., 2);
       }
@@ -4376,8 +4377,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   /*
    * Calculation of intersections on interface at time (n)
    */
-  thermals_.compute_eulerian_distance();
-  thermals_.compute_eulerian_curvature_from_interface();
+  thermals_.compute_eulerian_distance_curvature();
   thermals_.clean_ijk_intersections();
   // thermals_.update_intersections(); // no need as IJK_intersections call interfaces_nI interfaces_xI
   interfaces_.compute_compo_connex_from_bounding_box();
