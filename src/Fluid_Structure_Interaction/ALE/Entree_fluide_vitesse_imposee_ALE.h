@@ -27,11 +27,7 @@
 #include <Dirichlet_entree_fluide_leaves.h>
 
 
-/*! @brief classe Entree_fluide_vitesse_imposee Cas particulier de la classe Dirichlet_entree_fluide
- *
- *     pour la vitesse imposee: impose la vitesse d'entree du fluide dans
- *     une equation de type Navier_Stokes
- *
+/*! @brief Class for velocity boundary condition on a mobile boundary (ALE framework)
  * @sa Dirichlet_entree_fluide Navier_Stokes_std
  */
 class Entree_fluide_vitesse_imposee_ALE  : public Entree_fluide_vitesse_imposee
@@ -45,4 +41,5 @@ public :
 };
 
 #endif
+
 

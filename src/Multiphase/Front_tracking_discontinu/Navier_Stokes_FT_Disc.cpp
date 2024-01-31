@@ -22,7 +22,7 @@
 #include <Parametre_implicite.h>
 #include <Navier_Stokes_FT_Disc.h>
 #include <Probleme_FT_Disc_gen.h>
-#include <Modele_turbulence_hyd_nul.h>
+#include <Modele_turbulence_hyd_null.h>
 #include <Discret_Thyd.h>
 #include <Operateur_Diff_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
@@ -138,7 +138,10 @@ public:
   // Flag pour la method du saut de vitesse :
   int new_mass_source_;
 
-  enum Type_interpol_indic_pour_dI_dt { INTERP_STANDARD, INTERP_MODIFIEE, INTERP_AI_BASED };
+  enum Type_interpol_indic_pour_dI_dt { INTERP_STANDARD, INTERP_MODIFIEE, INTERP_AI_BASED,
+                                        INTERP_STANDARD_UVEXT, INTERP_MODIFIEE_UVEXT, INTERP_AI_BASED_UVEXT,
+                                        INTERP_STANDARD_UIEXT, INTERP_MODIFIEE_UIEXT, INTERP_AI_BASED_UIEXT
+                                      };
   Type_interpol_indic_pour_dI_dt type_interpol_indic_pour_dI_dt_;
 
   enum OutletCorrection_pour_dI_dt { NO_CORRECTION, CORRECTION_GHOST_INDIC, ZERO_NET_FLUX_ON_MIXED_CELLS, ZERO_OUT_FLUX_ON_MIXED_CELLS };
@@ -395,7 +398,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
       // Si on a lu le modele de turbulence et qu'il est nul,
       // alors on utilise l'operateur de diffusion standard.
       if (le_modele_turbulence.non_nul() // L'operateur a ete type (donc lu)
-          && sub_type(Modele_turbulence_hyd_nul, le_modele_turbulence.valeur()))
+          && sub_type(Modele_turbulence_hyd_null, le_modele_turbulence.valeur()))
         {
           is >> terme_diffusif; // Operateur de diffusion standard (non turbulent)
           if (Process::je_suis_maitre())
@@ -585,10 +588,16 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
     }
   else if (mot =="interpol_indic_pour_dI_dt")
     {
-      Motcles motcles2(3);
+      Motcles motcles2(9);
       motcles2[0] = "interp_standard";
       motcles2[1] = "interp_modifiee";
       motcles2[2] = "interp_ai_based";
+      motcles2[3] = "interp_standard_uvext";
+      motcles2[4] = "interp_modifiee_uvext";
+      motcles2[5] = "interp_ai_based_uvext";
+      motcles2[6] = "interp_standard_uiext";
+      motcles2[7] = "interp_modifiee_uiext";
+      motcles2[8] = "interp_ai_based_uiext";
       Motcle motlu;
       is >> motlu;
       Cerr << mot << " " << motlu << finl;
@@ -618,6 +627,60 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area"
                    << " and on the normal to the interface." << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the historical way"
+                   << " where a mean value + upwind is used."
+                   << " Additionally, uv_ext is used." << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the field indicatrice_faces"
+                   << " as defined by the interfacial transport option."
+                   << " Additionally, uv_ext is used."  << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area"
+                   << " and on the normal to the interface."
+                   << " Additionally, uv_ext is used."  << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the historical way"
+                   << " where a mean value + upwind is used."
+                   << " Additionally, ui_ext is used." << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the field indicatrice_faces"
+                   << " as defined by the interfacial transport option."
+                   << " Additionally, ui_ext is used."  << finl;
+            return 1;
+          }
+        case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT:
+          {
+            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT;
+            if (Process::je_suis_maitre())
+              Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area"
+                   << " and on the normal to the interface."
+                   << " Additionally, ui_ext is used."  << finl;
             return 1;
           }
         default:
@@ -1854,6 +1917,24 @@ void Navier_Stokes_FT_Disc::correct_at_exit_bad_gradient(DoubleTab& u0) const
     }
 }
 
+int get_num_face_den_face(const int num_face, const int elem, const IntTab& elem_faces )
+{
+  const int nb_faces=elem_faces.dimension(1) ;
+  int idx_face_de_lelem = 0;
+  for (idx_face_de_lelem=0; idx_face_de_lelem<nb_faces; idx_face_de_lelem++)
+    {
+      if (elem_faces(elem,idx_face_de_lelem) == num_face)
+        break; // Face found
+    }
+  if (nb_faces==idx_face_de_lelem)
+    {
+      Cerr << "Face is not found!! " << finl;
+      Process::exit();
+    }
+  const int num_face_den_face=elem_faces(elem,(idx_face_de_lelem+Objet_U::dimension)%nb_faces);
+  return num_face_den_face;
+}
+
 /*! @brief Calcul du saut de vitesse a l'interface du au changement de phase
  *
  *   phase_pilote = -1: u-u0 = champ de vitesse de deplacement de l'interface
@@ -1906,6 +1987,9 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
         mpoint +=mpv;
     }
 
+  // GB2023.10.10 : I don't understand why I did a distinction only on phase_pilote == 1 (should be the same when it's phase_pilote == 0
+  //                for instance in the convection of temperature in the vapour...
+  //        BESIDES, the "switch (phase_pilote)" makes no sense if only one phase_pilote is used.
   if ((variables_internes().new_mass_source_) && (phase_pilote != 1))
     {
       const DoubleTab& normale_elements = eq_transport.get_update_normale_interface().valeurs();
@@ -2042,8 +2126,50 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                 }
               u0(face) = xx;
             }
-        }
 
+          // GB 2023.10.10. On inclined interfaces, we realised that some configurations (interface topologies)
+          //                can lead to using faces where the velocity jump delta_u has not been extended
+          //                for the velocity interpolation at the markers. This leads to a misprediction of delta_u_i
+          u0.echange_espace_virtuel();
+
+          //  Pour parcourir les elements qui sont coupes par une facette "facette":
+          const Maillage_FT_Disc& mesh = eq_transport.maillage_interface();
+          const Intersections_Elem_Facettes& intersections = mesh.intersections_elem_facettes();
+          const ArrOfInt& index_facette = intersections.index_facette();
+          const Domaine_VF& zvf = ref_cast(Domaine_VF, domaine_dis().valeur());
+          const IntTab& elem_faces = zvf.elem_faces();
+          const int nb_faces_per_elem = elem_faces.line_size();
+          for (int facette=0; facette < mesh.nb_facettes(); facette++)
+            {
+              int index=index_facette[facette];
+              if (index >= 0)
+                {
+                  const Intersections_Elem_Facettes_Data& data = intersections.data_intersection(index);
+                  const int elem = data.numero_element_;
+                  // elem is mixed (crossed by an interface)
+                  // loop on its faces to find a neighbour:
+                  for (int idx_face_de_lelem=0; idx_face_de_lelem<nb_faces_per_elem; idx_face_de_lelem++)
+                    {
+                      const int face_of_elem = elem_faces(elem,idx_face_de_lelem);
+                      // The neighbour :
+                      const int e1 = face_voisins(face_of_elem, 0)+face_voisins(face_of_elem, 1)-elem;
+                      if ((e1 >= 0) && (fabs(interfacial_area(e1)) <DMINFLOAT))
+                        {
+                          // e1 exists (ie face is not a boundary) and is pure
+                          // face_of_elem is between elem and e1
+                          const int num_face_den_face = get_num_face_den_face(face_of_elem, e1, elem_faces);
+                          if (fabs(u0(num_face_den_face))<DMINFLOAT)
+                            {
+                              // There is no velocity on the face in front of "face_of_e1" (which is adjacent to a mixed element)
+                              // we should extrapolate the other one there.
+                              // (ie we assume that this other face was zero because the 2nd neighbour (rang 2) is pure too.
+                              u0(num_face_den_face) = u0(face_of_elem);
+                            }
+                        }
+                    }
+                }
+            }
+        }
       u0.echange_espace_virtuel();
       return;
     }
@@ -2282,7 +2408,7 @@ void correct_indicatrice_face_bord(const int num_face,
   // Correction de l'indicatrice face :
   const int n0 = face_voisins(num_face, 0);
   const int n1 = face_voisins(num_face, 1);
-  if (n0*n1<0)
+  if ((n0==-1) or (n1==-1))
     {
       // On a boundary face
       const int outward_normal = (n0 == -1) ? -1 : 1 ;
@@ -2324,10 +2450,61 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
   DoubleTab tmp(tab_vitesse); // copie du tableau des vitesses de ns
   const int dim = tab_vitesse.line_size();
   const int n = tab_vitesse.dimension(0);
+
+  // On cree un tableau avec la meme structure que la pression
+  DoubleTab resu;
+  resu.copy(variables_internes().second_membre_projection.valeurs(), Array_base::NOCOPY_NOINIT);
+  resu=0.;
+
+  //On utilise un operateur de divergence temporaire et pas celui porte par l equation
+  //pour ne pas modifier les flux_bords_ rempli au cours de Navier_Stokes_std::mettre_a_jour
+  Operateur_Div div_tmp;
+  div_tmp.associer_eqn(*this);
+  div_tmp.typer();
+  div_tmp.l_op_base().associer_eqn(*this);
+  div_tmp->completer();
+
+  if ((variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT)
+      || (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT)
+      || (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT))
+    {
+      // Avec changement de phase, on veut reconstruire u_vap (ie phase 0)
+      // Prise en compte du terme source div(u) du changement de phase
+      if (variables_internes().ref_equation_mpoint_.non_nul() || variables_internes().ref_equation_mpoint_vap_.non_nul())
+        {
+          calculer_delta_u_interface(variables_internes().vitesse_jump0_, 0,  variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
+          // u+u0 = champ de vitesse de la phase 0
+          tmp += variables_internes().vitesse_jump0_.valeurs();
+        }
+    }
+  if ((variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT)
+      || (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT)
+      || (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT))
+    {
+      // Reconstruction d'un champ de vitesse interfaciale (ie phase 1)
+      // Prise en compte du terme source div(u) du changement de phase
+      if (variables_internes().ref_equation_mpoint_.non_nul() || variables_internes().ref_equation_mpoint_vap_.non_nul())
+        {
+          calculer_delta_u_interface(variables_internes().delta_u_interface, -1,  variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
+          // u-dui = champ de vitesse d'interface
+          tmp -= variables_internes().delta_u_interface.valeurs();
+
+          // Question: il y a un assert_espace_virtuel_vect dans divergence.calculer,
+          //  mais l'operateur n'a normalement pas besoin de l'espace virtuel !
+          //  La ligne suivante devrait pouvoir etre retiree:
+          tmp.echange_espace_virtuel();
+
+          div_tmp->calculer(tmp,resu);
+          for (int i = 0; i < resu.size_array(); i++)
+            resu[i] *= indicatrice[i];
+        }
+    }
+
   const bool ghost_correction = ( variables_internes_->OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC);
   switch(variables_internes_->type_interpol_indic_pour_dI_dt_)
     {
     case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD:
+    case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT:
       {
         for (int i = 0; i < n; i++)
           {
@@ -2341,7 +2518,22 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
           }
         break;
       }
+    case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT:
+      {
+        for (int i = 0; i < n; i++)
+          {
+            double indic_face = calculer_indicatrice_face_privilegie_pure(indicatrice, face_voisins, i);
+            if (ghost_correction)
+              correct_indicatrice_face_bord(i, maillage, domVF, face_voisins, indicatrice,
+                                            true /* privilegie_pure */, indic_face);
+            const double x = -indic_face;
+            for (int j = 0; j < dim; j++)
+              tmp(i,j) *= x;
+          }
+        break;
+      }
     case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE:
+    case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT:
       {
         const DoubleTab& indicatrice_faces = refeq_transport.valeur().get_compute_indicatrice_faces().valeurs();
         for (int i = 0; i < n; i++)
@@ -2355,18 +2547,26 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
           }
         break;
       }
+    case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT:
+      {
+        const DoubleTab& indicatrice_faces = refeq_transport.valeur().get_compute_indicatrice_faces().valeurs();
+        for (int i = 0; i < n; i++)
+          {
+            double indic_face = indicatrice_faces(i);
+            if (ghost_correction)
+              correct_indicatrice_face_bord(i, maillage, domVF, face_voisins, indicatrice, false, indic_face);
+            const double x = -indic_face;
+            for (int j = 0; j < dim; j++)
+              tmp(i,j) *= x;
+          }
+        break;
+      }
     case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED:
+    case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT:
+    case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT:
       {
         const DoubleTab& indicatrice_faces = refeq_transport.valeur().get_compute_indicatrice_faces().valeurs();
         const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
-        // Avec changement de phase, on veut reconstruire u_vap (ie phase 0)
-        // Prise en compte du terme source div(u) du changement de phase
-        if (variables_internes().ref_equation_mpoint_.non_nul() || variables_internes().ref_equation_mpoint_vap_.non_nul())
-          {
-            calculer_delta_u_interface(variables_internes().vitesse_jump0_, 0,  variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
-            // u+u0 = champ de vitesse de la phase 0
-            tmp += variables_internes().vitesse_jump0_.valeurs();
-          }
         if (Process::je_suis_maitre())
           Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area"
                << " and on the normal to the interface." << finl;
@@ -2427,24 +2627,15 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
       Process::exit();
     }
 
+  if (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT)
+    tmp *=-1;
+
   // Question: il y a un assert_espace_virtuel_vect dans divergence.calculer,
   //  mais l'operateur n'a normalement pas besoin de l'espace virtuel !
   //  La ligne suivante devrait pouvoir etre retiree:
   tmp.echange_espace_virtuel();
 
-  // On cree un tableau avec la meme structure que la pression
-  DoubleTab resu;
-  resu.copy(variables_internes().second_membre_projection.valeurs(), Array_base::NOCOPY_NOINIT);
-
-  //On utilise un operateur de divergence temporaire et pas celui porte par l equation
-  //pour ne pas modifier les flux_bords_ rempli au cours de Navier_Stokes_std::mettre_a_jour
-
-  Operateur_Div div_tmp;
-  div_tmp.associer_eqn(*this);
-  div_tmp.typer();
-  div_tmp.l_op_base().associer_eqn(*this);
-  div_tmp->completer();
-  div_tmp->calculer(tmp,resu);
+  div_tmp->ajouter(tmp,resu);
 
   // Correction des flux bords :
   // resu = int_V div(tmp) dv    avec:   tmp = (rho_0_sur_delta_rho - indic_face)*vitesse_ns
@@ -2565,6 +2756,9 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
   switch(variables_internes_->type_interpol_indic_pour_dI_dt_)
     {
     case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED:
+    case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT:
+    case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT:
+    case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT:
       {
         // dI_dt contains div(chi_v * u_v^ext) * vol_cell (sign to be checked!!)
         // Integrated, this is equal to 0 or to the integral of chi_f entering or leaving the domain through boundaries...
@@ -2613,7 +2807,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
             }
         }
 #endif
-        if (variables_internes().ref_equation_mpoint_.non_nul())
+        if ((variables_internes().ref_equation_mpoint_.non_nul())&& !variables_internes().mpoint_inactif)
           {
             // Is it necessary to recompute them? no
             //variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
@@ -2659,6 +2853,32 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
                 // Besides, ai = \int_cell delta^i dv => It's homogeneous to the integral, there's no need for an additional "*volumes[elem]"
                 //                                       It can be directly summed to the divergence computed before.
                 const double x = mpoint[elem]*interfacial_area[elem]*un_sur_rho_0;
+                dI_dt[elem] += x;
+              }
+          }
+        break;
+      }
+    case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT:
+    case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT:
+    case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT:
+      {
+        if (probleme_ft().tcl().is_activated())
+          {
+            const double un_sur_rho_0 =  1./rho_0;
+            const DoubleTab& interfacial_area = variables_internes().ai.valeur().valeurs();
+            Cerr << "[TCL] Contact line model activated in volume correction" << finl;
+            ArrOfInt& tcl_elems =  probleme_ft().tcl().elems();
+            ArrOfDouble& tcl_mp =  probleme_ft().tcl().mp();
+            // We accounted for the contribution that is in Ui but not the contribution from TCL yet:
+            for (int idx=0; idx< tcl_elems.size_array(); idx++)
+              {
+                const int elem = tcl_elems[idx];
+                // By convention, mpoint is positive in condensation. Hence, mpoint >0 is responsible for dIv_dt < 0  => a minus sign!
+                //                But, \nabla \chi_v = -n_v \delta_i. => another minus sign!
+                //                ==> Consequently, it's a "+"
+                // Besides, ai = \int_cell delta^i dv => It's homogeneous to the integral, there's no need for an additional "*volumes[elem]"
+                //                                       It can be directly summed to the divergence computed before.
+                const double x = tcl_mp[idx]*interfacial_area[elem]*un_sur_rho_0;
                 dI_dt[elem] += x;
               }
           }
@@ -3516,15 +3736,24 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       if (probleme_ft().tcl().is_activated())
         {
           Cerr << "[TCL] Contact line model is activated" << finl;
-          ArrOfInt elems_with_CL_contrib;
-          ArrOfInt faces_with_CL_contrib;
-          ArrOfDouble mpoint_from_CL;
-          ArrOfDouble Q_from_CL;
+
+
+          const Triple_Line_Model_FT_Disc& tcl = ref_cast(Triple_Line_Model_FT_Disc, probleme_ft().tcl());
+
+          const ArrOfInt& elems_with_CL_contrib = tcl.elems();
+          // const ArrOfInt& faces_with_CL_contrib = probleme_ft().tctl().boundary_faces();
+          const ArrOfDouble& Q_from_CL = tcl.Q();
+          // const ArrOfDouble& mpoint_from_CL = probleme_ft().tcl().mp();
+
+          // ArrOfInt elems_with_CL_contrib;
+          // ArrOfInt faces_with_CL_contrib;
+          // ArrOfDouble mpoint_from_CL;
+          // ArrOfDouble Q_from_CL;
           // GB. 18/12/19. This call is actually the one filling the TCL tables (elems_, mp_ and Q_);
-          probleme_ft().tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib,
-                                                                       faces_with_CL_contrib,
-                                                                       mpoint_from_CL,
-                                                                       Q_from_CL);
+          // probleme_ft().tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib,
+          //                                                             faces_with_CL_contrib,
+          //                                                             mpoint_from_CL,
+          //                                                             Q_from_CL);
 
           // Correct the field mpoint in wall-adjacent cells to account for TCL model:
           // ---> It's not added to mpoint now. Its contribution is added in
@@ -3537,7 +3766,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           const double Lvap = fluide_diph.chaleur_latente();
           const double coef = jump_inv_rho/Lvap;
           // Correct the secmem2 contribution due to TCL :
-          probleme_ft().tcl().corriger_secmem(coef, secmem2);
+          if (!variables_internes().mpoint_inactif)
+            probleme_ft().tcl().corriger_secmem(coef, secmem2);
 
           const int check_consistency = 1 ; // local option to check that secmem2 in near-wall cell is actually well calculated
           if (check_consistency)

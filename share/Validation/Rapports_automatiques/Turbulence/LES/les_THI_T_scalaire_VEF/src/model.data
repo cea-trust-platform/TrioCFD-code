@@ -72,26 +72,25 @@ Read sch_Impl
 
 } 
 
-Fluide_Incompressible air
-Read air
-{
-	mu  Champ_Uniforme 1 1e-20
- 	rho Champ_Uniforme 1 1.
-  lambda Champ_Uniforme 1 1e-3
-  Cp Champ_Uniforme 1 1.
-  beta_th Champ_Uniforme 1 1.0
-}
 
 Associate pb dom
 Associate pb _SCHTPS_
-Associate pb air
 
 Discretize pb dis
 
 Read pb
 {
-  Navier_Stokes_Turbulent
 
+  Fluide_Incompressible
+  {
+    mu  Champ_Uniforme 1 1e-20
+    rho Champ_Uniforme 1 1.
+    lambda Champ_Uniforme 1 1e-3
+    Cp Champ_Uniforme 1 1.
+    beta_th Champ_Uniforme 1 1.0
+  }
+
+  Navier_Stokes_Turbulent
   {
     solveur_pression Petsc Cholesky { }
     
@@ -120,7 +119,7 @@ Read pb
     }     
 
     Traitement_particulier { THI { init_Ec 0 
-                                   calc_spectre 1 periode_calc_spectre 0.25 3D 1 1D 1 
+                                   calc_spectre 1 periode_calc_spectre 0.25 Spectre_3D 1 Spectre_1D 1
 			longueur_boite 6.283185307
 			champs_scalaires 3 temperature temperature0 temperature1
 				   
@@ -223,7 +222,7 @@ Solve pb
 End
 Champ_Don_lu_spec dom pb 3 ../pb_THIVITESSE_xyz_valelem
     Traitement_particulier { THI { init_Ec 1 val_Ec 8.27e-1
-                                   calc_spectre 0.25 3D 1 1D 1 
+                                   calc_spectre 0.25 Spectre_3D 1 Spectre_1D 1
 			conservation_Ec
 				   
 				   } }		

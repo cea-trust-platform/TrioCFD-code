@@ -42,6 +42,7 @@ public :
 
 protected:
   double alpha_omega_;
+  double omega_min_ = 1;
 };
 
 #endif

@@ -365,3 +365,4 @@ for i in range(nb_max_authorized_bubbles):
 print('THE END')
 exit(0)
 # T_inf= float(raw_input("Valeur de Tinfini ?"))
+

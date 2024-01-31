@@ -1,6 +1,9 @@
 3dOscillatingBeamALE_CoarseMesh
+ALE_K_Eps_Wall
 ALE_with_Periodic_BC_3D
 ALE_with_Periodic_BC
+Neumann_BC_for_grid_problem
+Align_Multiple_CF_ALE_RANS
 Align_Multiple_CF_Beams_Free_Vibration
 Align_Multiple_CF_Beams_LES
 Beam_CF
@@ -17,3 +20,7 @@ SquareObstacleALE_jdd3
 SquareObstacleALE_jdd4
 TwoCylindersALE_jdd1
 TwoOscillatingCylindersALE_jdd1
+Beam_Free_Vibration_jdd1
+Beam_Free_Vibration_jdd2
+Beam_Free_Vibration_jdd3
+Beam_Free_Vibration_jdd4

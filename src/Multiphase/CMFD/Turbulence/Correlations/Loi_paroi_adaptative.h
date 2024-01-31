@@ -25,7 +25,7 @@
 #include <TRUSTTab.h>
 #include <TRUSTTab.h>
 #include <Correlation_base.h>
-#include <Loi_paroi_base.h>
+#include <Loi_paroi_log.h>
 #include <vector>
 #include <map>
 #include <string>
@@ -36,16 +36,15 @@
  *
  *
  */
-class Loi_paroi_adaptative : public Loi_paroi_base
+class Loi_paroi_adaptative : public Loi_paroi_log
 {
   Declare_instanciable(Loi_paroi_adaptative);
 public:
   void   calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc) override;
+  double u_plus_de_y_plus(double y_p) override ; // Blended Reichardt model
+  double deriv_u_plus_de_y_plus(double y_p) override ;
 
 protected:
-  double calc_y_plus_loc( double y_p, double nu, double y, double y_p_0) ;
-  double u_plus_de_y_plus(double y_p) ; // Blended Reichardt model
-  double deriv_u_plus_de_y_plus(double y_p) ;
 
   double von_karman_ = 0.41;
   double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero

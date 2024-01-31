@@ -119,6 +119,17 @@ void Source_Transport_proto::verifier_pb_keps_anisotherme_concen(const Probleme_
   if (!sub_type(Pb_Thermohydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
 }
 
+void Source_Transport_proto::verifier_pb_komega(const Probleme_base& pb, const Nom& nom)
+{
+  if (!sub_type(Pb_Hydraulique_Turbulent, pb) &&
+      !sub_type(Pb_Thermohydraulique_Turbulent_QC, pb))
+    {
+      Cerr << "You should not do this with the K_Omega model, be patient."
+           << finl;
+      Process::exit();
+    }
+}
+
 void Source_Transport_proto::verifier_milieu_anisotherme(const Probleme_base& pb, const Nom& nom)
 {
   const Milieu_base& milieu = pb.equation(1).milieu(); // eq thermique

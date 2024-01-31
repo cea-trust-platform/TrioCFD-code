@@ -86,7 +86,7 @@ Lire sch
    tmax 0.008
    tcpumax 523.75
    dt_min 1.e-18
-   dt_max 1.E-7
+   dt_max 5.E-7
                # 1e-7 is necessary on coa test otherwise it is unstable at 89.4e-4 with remesh BEST #
    dt_impr 2.e-6
    impr_diffusion_implicite 1
@@ -115,7 +115,7 @@ Associate pb fluide
 Associate pb sch
 VDF dis
 Discretize pb dis
-system "mkdir -p bug"
+system "mkdir -p lata"
 option_vdf { All_options } # To set the BC of pressure on the Boundary, not at the center of ghost cells! #
 Lire pb
 {
@@ -126,7 +126,7 @@ Lire pb
         {
             solveur petsc gcp { precond block_jacobi_ilu { level 0 } rtol 1.e-13 impr }
         } #
-      modele_turbulence nul { }
+      modele_turbulence null { }
       solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
       convection { quick }
       diffusion { }
@@ -207,7 +207,7 @@ Lire pb
    {
     postraitement_ft_lata post1 { 
      format Lata 
-     fichier bug/interp_modifiee_CORRECTION_GHOST_INDIC 
+     fichier lata/interp_modifiee_CORRECTION_GHOST_INDIC 
      champs dt_post 1.0e-4 # -4 # { 
         VOLUME_MAILLE elem 
         indicatrice_interf elem 
@@ -238,8 +238,8 @@ Lire pb
     }   
    }
 
-sauvegarde binaire bug.sauv
-sauvegarde xyz bug.xyz
+sauvegarde binaire lata.sauv
+sauvegarde xyz lata.xyz
 # Resume_last_time xyz restart.xyz #
 Reprise xyz restart.xyz 
 

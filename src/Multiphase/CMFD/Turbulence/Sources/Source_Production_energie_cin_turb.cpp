@@ -30,7 +30,7 @@
 #include <Domaine_VF.h>
 
 Implemente_base(Source_Production_energie_cin_turb,"Source_Production_energie_cin_turb", Sources_Multiphase_base);
-// XD Production_energie_cin_turb source_base Production_energie_cin_turb 0 Production source term for the TKE equation
+// XD Production_energie_cin_turb source_base Production_energie_cin_turb 1 Production source term for the TKE equation
 
 
 Sortie& Source_Production_energie_cin_turb::printOn(Sortie& os) const
@@ -40,6 +40,10 @@ Sortie& Source_Production_energie_cin_turb::printOn(Sortie& os) const
 
 Entree& Source_Production_energie_cin_turb::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.ajouter("omega_min_", &omega_min_);
+  param.lire_avec_accolades_depuis(is);
+
   equation().probleme().creer_champ("gradient_vitesse"); // Besoin du gradient de vitesse
   return is;
 }

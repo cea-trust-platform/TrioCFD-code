@@ -60,7 +60,7 @@ void Frottement_interfacial_Ishii_Zuber_Deformable::coefficient(const DoubleTab&
         int ind_trav = (k>n_l) ? (n_l*(N-1)-(n_l-1)*(n_l)/2) + (k-n_l-1) : (k*(N-1)-(k-1)*(k)/2) + (n_l-k-1);
 
         double capillary = std::sqrt((rho[n_l]-rho[k])*9.81/sigma[ind_trav]);
-        double bubbly =  alpha[k]*rho[n_l]*0.5*capillary*std::pow(1-alpha[k], -.5);
+        double bubbly =  alpha[k]*rho[n_l]*0.5*capillary*std::pow( std::max(1-alpha[k], 1.e-3), -.5);
 
         coeff(k, n_l, 1) = bubbly ;
         coeff(k, n_l, 0) = bubbly * ndv(n_l,k);

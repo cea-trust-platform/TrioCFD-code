@@ -636,7 +636,7 @@
 \noalign{\vskip0.1cm}
 \hline
 \hline
-\rowcolor{Orchid} \multicolumn{8}{c}{\textbf{Two-phase Flows with Front-Tracking}} \\
+\rowcolor{Orchid} \multicolumn{8}{c}{\textbf{Two-phase flows with Front-Tracking}} \\
 \hline
 \rowcolor{Orchid!10}Bullage\_Huile\_ & Probleme\_FT\_Disc\_gen & VEF & 3 & 52920 hexa & 2 & Rapport on IBC with interfaces & old format \\ 
 \rowcolor{Orchid!10}Creuset\_Froid & & & & & & & \\
@@ -669,12 +669,6 @@
 \rowcolor{Orchid!10}FTD\_PhaseChange & Probleme\_FT\_Disc\_gen & VDF & 3 & 720 hexa & 4 & Validation Test for the Interface Movement & old format \\
 \rowcolor{Orchid!10}\_1D & & & & & & and the Diphasic Heating & \\
 \hline
-\rowcolor{Orchid!10}ftd\_remaillage & Probleme\_FT\_Disc\_gen & VDF & 3 & 1500 hexa & 4 & Test of the volume and surface conservation & old format \\ 
-\rowcolor{Orchid!10} & & VEF & & 5239 tetra & & during the remeshing & \\
-\hline
-\rowcolor{Orchid!10}ftd\_remesh & Probleme\_FT\_Disc\_gen & & & & & & old format \\ 
-\rowcolor{Orchid!10} \_bidim\_axi & & & & & & & \\
-\hline
 \end{tabular}
 \end{centering}
 \end{table}
@@ -690,17 +684,17 @@
 \noalign{\vskip0.1cm}
 \hline
 \hline
-\rowcolor{Orchid} \multicolumn{8}{c}{\textbf{Two-phase Flows with Front-Tracking}} \\
+\rowcolor{Orchid} \multicolumn{8}{c}{\textbf{Two-phase flows with Front-Tracking}} \\
+\hline
+\rowcolor{Orchid!10}ftd\_remaillage & Probleme\_FT\_Disc\_gen & VDF & 3 & 1500 hexa & 4 & Test of the volume and surface conservation & old format \\ 
+\rowcolor{Orchid!10} & & VEF & & 5239 tetra & & during the remeshing & \\
+\hline
+\rowcolor{Orchid!10}ftd\_remesh & Probleme\_FT\_Disc\_gen & & & & & & old format \\ 
+\rowcolor{Orchid!10} \_bidim\_axi & & & & & & & \\
 \hline
 \rowcolor{Orchid!10}FTD\_solid\_particle & Probleme\_FT\_Disc\_gen & VDF & 3 & 20000 hexa & 3 & Fall of a solid particle in viscous fluid & old format \\ 
 \rowcolor{Orchid!10}\_fall\_viscosity & & & & & & followed by FTD & \\
 \hline
-%\hline
-%\rowcolor{Orchid!10}FTD\_sloshing & Probleme\_FT\_Disc\_gen & VDF & 3 & 365520 hexa & 1 & Free surface oscillations due to the sloshing & old format \\ 
-%\rowcolor{Orchid!10} & & & & & & of a liquid in a cylindrical pool & \\
-%\hline
-%\rowcolor{Orchid!10}FTD\_rising\_drop & Probleme\_FT\_Disc\_gen & VDF & 3 & 11664000 hexa & 1 & Rising of an inclusion of light fluid in a & old format \\ 
-%\rowcolor{Orchid!10} &  & & & & & heavy fluid & exclu\_nr \\
 \rowcolor{Orchid!10} FTD\_TCL         & Probleme\_FT\_Disc\_gen & & & & & & old format \\ 
 \rowcolor{Orchid!10} \_boling\_bubble & & & & & & & \\
 \hline
@@ -722,6 +716,23 @@
 \rowcolor{Orchid!10}iodure-iodate-melange & Probleme\_FT\_Disc\_gen & VEF & 2 & 4 tri & 17 & Checking for competing reactions & old format \\ 
 \rowcolor{Orchid!10} & & & & & & & \\
 \hline
+\end{tabular}
+\end{centering}
+\end{table}
+
+\newpage
+
+\begin{table}[H]
+\begin{centering}
+\begin{tabular}{lclccclc}
+\hline
+\textbf{PDF File name} & \textbf{Problem} & \textbf{Dis.} & \textbf{Dim.} & \textbf{Mesh} & \textbf{Nb jdds} & \textbf{Goal of the sheet} & \textbf{State} \\
+\hline
+\noalign{\vskip0.1cm}
+\hline
+\hline
+\rowcolor{Orchid} \multicolumn{8}{c}{\textbf{Two-phase flows with Front-Tracking}} \\
+\hline
 \rowcolor{Orchid!10}iodure-iodate & Probleme\_FT\_Disc\_gen & VEF & 2 & 4 tri & 7 & Verification of competing reactions & old format \\ 
 \rowcolor{Orchid!10} & & & & & & &  \\
 \hline
@@ -740,6 +751,12 @@
 \end{tabular}
 \end{centering}
 \end{table}
+%\hline
+%\rowcolor{Orchid!10}FTD\_sloshing & Probleme\_FT\_Disc\_gen & VDF & 3 & 365520 hexa & 1 & Free surface oscillations due to the sloshing & old format \\ 
+%\rowcolor{Orchid!10} & & & & & & of a liquid in a cylindrical pool & \\
+%\hline
+%\rowcolor{Orchid!10}FTD\_rising\_drop & Probleme\_FT\_Disc\_gen & VDF & 3 & 11664000 hexa & 1 & Rising of an inclusion of light fluid in a & old format \\ 
+%\rowcolor{Orchid!10} &  & & & & & heavy fluid & exclu\_nr \\
 
 \newpage
 
@@ -752,11 +769,13 @@
 \noalign{\vskip0.1cm}
 \hline
 \hline
-\rowcolor{Plum} \multicolumn{8}{c}{\textbf{Two-phase Flows with Front-Tracking IJK}} \\
+\rowcolor{Plum} \multicolumn{8}{c}{\textbf{Two-phase flows with Front-Tracking IJK}} \\
 \hline
 \rowcolor{Plum!10}bulle\_oscillante & & & & & & & old format\\
 \hline
 \rowcolor{Plum!10}channel\_swarm\_fixed & & & & & & & old format\\
+\hline
+\rowcolor{Plum!10}chmtvar & & & & & & & old format\\
 \hline
 \rowcolor{Plum!10}compaTrioCFD\_and\_CPU & & & & & & & old format\\
 \hline
@@ -771,8 +790,6 @@
 \rowcolor{Plum!10}interfacial\_temperature\_and\_flux & & & & & & & old format\\
 \hline
 \rowcolor{Plum!10}reprise\_xyz\_ijk & & & & & & & old format\\
-\hline
-\rowcolor{Plum!10}repulsion & & & & & & & old format\\
 \hline
 \end{tabular}
 \end{centering}
@@ -789,7 +806,9 @@
 \noalign{\vskip0.1cm}
 \hline
 \hline
-\rowcolor{Plum} \multicolumn{8}{c}{\textbf{Two-phase Flows with Front-Tracking IJK}} \\
+\rowcolor{Plum} \multicolumn{8}{c}{\textbf{Two-phase flows with Front-Tracking IJK}} \\
+\hline
+\rowcolor{Plum!10}repulsion & & & & & & & old format\\
 \hline
 \rowcolor{Plum!10}schemas\_temps & & & & & & & old format\\
 \hline
@@ -809,8 +828,6 @@
 \hline
 \rowcolor{Plum!10}temperature\_channel\_swarm\_fixed & & & & & & & old format\\
 \hline
-\rowcolor{Plum!10}temperature\_monop & & & & & & & old format\\
-\hline
 \end{tabular}
 \end{centering}
 \end{table}
@@ -826,7 +843,9 @@
 \noalign{\vskip0.1cm}
 \hline
 \hline
-\rowcolor{Plum} \multicolumn{8}{c}{\textbf{Two-phase Flows with Front-Tracking IJK}} \\
+\rowcolor{Plum} \multicolumn{8}{c}{\textbf{Two-phase flows with Front-Tracking IJK}} \\
+\hline
+\rowcolor{Plum!10}temperature\_monop & & & & & & & old format\\
 \hline
 \rowcolor{Plum!10}temperature\_stat & & & & & & & old format\\
 \hline
@@ -851,16 +870,7 @@
 \noalign{\vskip0.1cm}
 \hline
 \hline
-\rowcolor{Rhodamine} \multicolumn{8}{c}{\textbf{Two-phase Flows with CMFD}} \\
-\hline
-\rowcolor{Rhodamine!20}Verification\_k\_tau\_ & Pb\_Multiphase & PolyMAC & 3 & 8000 & 2 & verification of velocity gradient and vorticity & Jupyter\\
-\rowcolor{Rhodamine!20}transport\_equation & & & & & & & \\
-\hline
-\rowcolor{Rhodamine!20}Verification\_wall\_law & Pb\_Multiphase & PolyMAC & 3 & 18000 & 2 & Coding verification of CMFD turbulent & Jupyter \\ 
-\rowcolor{Rhodamine!20}& & &  & & & wall laws & \\
-\hline
-\rowcolor{Rhodamine!20}canal\_plan & Pb\_Multiphase & PolyMAC & 2 & 81 $\Rightarrow$ 5 to & 1 & Verification of adaptive wall laws in a 2D  & Jupyter \\ 
-\rowcolor{Rhodamine!20}& & & & 7500 & & plane channel & \\
+\rowcolor{Rhodamine} \multicolumn{8}{c}{\textbf{Two-phase flows with CMFD}} \\
 \hline
 \rowcolor{Rhodamine!20}decroissance\_ktau & Pb\_Multiphase & PolyMAC & 2 & 4 tetra & 2 & Verification of velocity gradient and vorticity & Jupyter \\ 
 \rowcolor{Rhodamine!20} & & & & & & coding & \\
@@ -868,15 +878,31 @@
 \rowcolor{Rhodamine!20}expansion\_NO\_MASS & Pb\_HEM & PolyMAC & 2 & 4999 & 1 & Validation of the Homogeneous Equilibrium Model & new format \\ 
 \rowcolor{Rhodamine!20} & & & & & & coupled with Stiffened Gaz on an expansion tube & \\
 \hline
-\rowcolor{Rhodamine!20}expansion\_WITH\_ & Pb\_HEM & PolyMAC & 2 & 4999 & 1 & Validation of the Homogeneous Equilibrium Model  & new format \\ 
-\rowcolor{Rhodamine!20}MASS & & & & & & with mass transfert on an expansion tube & skip\_prm \\
+\rowcolor{Rhodamine!20}Gabillet & & & & & & & Jupyter\\
 \hline
 \rowcolor{Rhodamine!20}shock\_dodecane & Pb\_HEM & PolyMAC & 2 & 10000 & 1 & Validation of the Homogeneous Equilibrium & new format \\ 
 \rowcolor{Rhodamine!20} & & & & & & Model on a two-phase shock tube & \\
 \hline
+\rowcolor{Rhodamine!20}Tube\_solution\_analytique\_turbulent & & & & & & & Jupyter\\
+\hline
+\rowcolor{Rhodamine!20}Verification1D\_drift-flux\_models & & & & & & & Jupyter\\
+\hline
+\rowcolor{Rhodamine!20}Verification\_k\_tau\_ & Pb\_Multiphase & PolyMAC & 3 & 8000 & 2 & verification of velocity gradient and vorticity & Jupyter\\
+\rowcolor{Rhodamine!20}omega\_transport\_equation & & & & & & & \\
+\hline
+\rowcolor{Rhodamine!20}Verification\_wall\_law & Pb\_Multiphase & PolyMAC & 3 & 18000 & 2 & Coding verification of CMFD turbulent & Jupyter \\ 
+\rowcolor{Rhodamine!20}& & &  & & & wall laws & \\
+\hline
 \end{tabular}
 \end{centering}
 \end{table}
+%\rowcolor{Rhodamine!20}expansion\_WITH\_ & Pb\_HEM & PolyMAC & 2 & 4999 & 1 & Validation of the Homogeneous Equilibrium Model  & new format \\ 
+%\rowcolor{Rhodamine!20}MASS & & & & & & with mass transfert on an expansion tube & skip\_prm \\
+%\hline
+%\rowcolor{Rhodamine!20}canal\_plan & Pb\_Multiphase & PolyMAC & 2 & 81 $\Rightarrow$ 5 to & 1 & Verification of adaptive wall laws in a 2D  & Jupyter \\ 
+%\rowcolor{Rhodamine!20}& & & & 7500 & & plane channel & \\
+%\hline
+
 
 \newpage
 
@@ -890,7 +916,7 @@
 \hline
 \rowcolor{Goldenrod} \multicolumn{8}{c}{\textbf{Fluid-structure interactions with ALE}} \\
 \hline
-\rowcolor{Goldenrod!20}3dOscillatingBeam & Pb\_hydraulique\_ALE & VEF & 3 & 1454267 tetra & 1 & 3D oscillating cylindrical beam into a confined & new format \\ 
+\rowcolor{Goldenrod!20}3dOscillatingBeamALE & Pb\_hydraulique\_ALE & VEF & 3 & 1454267 tetra & 1 & 3D oscillating cylindrical beam into a confined & new format \\ 
 \rowcolor{Goldenrod!20} & & & & & & space & \\
 \hline
 \rowcolor{Goldenrod!20}DivaALE & Pb\_hydraulique\_ALE & VEF & 2 & 25806, 51146 & 3 & Vibrations of a cylinder in a square tube bundle & new format \\ 
@@ -909,6 +935,8 @@
 \hline
 \rowcolor{Goldenrod!20}TwoOscillating & Pb\_hydraulique\_ALE & VEF & 2 & 241618 tri & 1 & Hydrodynamic interaction of two cylinders  & new format \\ 
 \rowcolor{Goldenrod!20}CylindersALE & & & & & & subjected to small oscillations & \\
+\hline
+\rowcolor{Goldenrod!20}Beam\_Free\_Vibration & & & & & & & \\
 \hline
 \end{tabular}
 \end{centering}

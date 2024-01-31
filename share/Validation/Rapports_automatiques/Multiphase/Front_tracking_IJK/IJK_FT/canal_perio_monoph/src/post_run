@@ -1,5 +1,17 @@
 #!/bin/bash
+
 # Ce script est execute apres chaque cas tests (depuis leur repertoire)
 [ -f $1.lml ] && gzip -f $1.lml
 
-python3 $project_directory/share/PyTools3/follow_calcs/profils_turb.py
+src=${project_directory}/share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/canal_perio_monoph/src
+
+if [ -d "${project_directory}/share/PyTools" ]
+then
+  echo -e "Using 'external' PyTools"
+  source $project_directory/env_for_PyTools.sh
+else
+  echo -e "Using 'internal' PyTools"
+  export PYTHONPATH=${PYTHONPATH}:${project_directory}/share/bin/PyTools
+fi
+
+python ${src}/profils_turb.py

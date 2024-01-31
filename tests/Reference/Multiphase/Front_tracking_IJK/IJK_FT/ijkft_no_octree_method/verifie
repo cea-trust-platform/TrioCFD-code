@@ -1,0 +1,24 @@
+#!/bin/bash
+echo "Check that no_octree_method algorithm gives same results as TRUST octree_method"
+cp ijkft_no_octree_method.data ijkft.data
+sed -i "s/no_octree_method 1//" ijkft.data
+trust ijkft.data 4 1>ijkft.out 2>ijkft.err
+
+# ND: je desactive le test car parfois no_octree consomme plus de ram qu'octree
+# sur un gros cas, le calcul passe avec no_octree et plante avec octree par manque de ram
+#RAM_std=`grep MBytes ijkft_no_octree_method.out | cut -f1 -d' '`
+#RAM_no_octree=`grep MBytes ijkft.out | cut -f1 -d' '`
+#if [ $RAM_std -gt $RAM_no_octree ]
+#then
+#  echo "Seems OK, no_octree_method needs less RAM than default octree method ($RAM_no_octree Mb< $RAM_std Mb)"
+#else
+#  echo "Something wrong, no_octree_method needs more RAM than default method"
+#  echo "no_octree ($RAM_no_octree Mb) > default octree ($RAM_std Mb)"
+#  echo "Error!"
+#  exit 1
+#fi
+
+compare_lata ijkft_no_octree_method.lata ijkft.lata &>compare_lata.log
+
+exit $?
+

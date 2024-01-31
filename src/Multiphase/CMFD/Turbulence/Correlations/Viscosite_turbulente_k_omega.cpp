@@ -29,6 +29,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Viscosite_turbulente_k_omega, "Viscosite_turbulente_k_omega", Viscosite_turbulente_base);
+// XD type_diffusion_turbulente_multiphase_k_omega type_diffusion_turbulente_multiphase_deriv k_omega 1 not_set
 
 Sortie& Viscosite_turbulente_k_omega::printOn(Sortie& os) const
 {
@@ -38,10 +39,10 @@ Sortie& Viscosite_turbulente_k_omega::printOn(Sortie& os) const
 Entree& Viscosite_turbulente_k_omega::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("limiter|limiteur", &limiter_);
-  param.ajouter("sigma", &sigma_);
-  param.ajouter("beta_k", &beta_k_);
-  param.ajouter("gas_turb", &gas_turb_);
+  param.ajouter("limiter|limiteur", &limiter_); // XD_ADD_P chaine not_set
+  param.ajouter("sigma", &sigma_); // XD_ADD_P floattant not_set
+  param.ajouter("beta_k", &beta_k_); // XD_ADD_P floattant not_set
+  param.ajouter("gas_turb", &gas_turb_); // XD_ADD_P flag not_set
   param.lire_avec_accolades_depuis(is);
 
   return is;

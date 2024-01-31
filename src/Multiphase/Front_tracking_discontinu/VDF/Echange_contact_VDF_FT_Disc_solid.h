@@ -63,6 +63,7 @@ protected :
   Champ_front T2_autre_pb_;
   int numero_T_;
   Nom nom_champ_T2_autre_pb_;
+  double dt_impr_Tw_=DMAXFLOAT;
 };
 
 #endif /* Echange_contact_VDF_FT_Disc_solid_included */

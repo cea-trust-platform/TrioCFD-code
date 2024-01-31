@@ -1,9 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import numpy as np
 import os, glob, sys
-import DNSTools as dns
+import commons.DNSTools as dns
 
 pi = np.pi
 R = 0.004
@@ -34,7 +34,7 @@ inside.astype(float)
 #########################################
 # SPHERE                                #
 #########################################
-print "Computing analytical values for the sphere..."
+print("Computing analytical values for the sphere...")
 C=2*pi/(Lx*Ly)
 AI=np.ones(nz)*2*pi*R/(Lx*Ly)*inside
 aiNx=np.zeros(nz)
@@ -47,8 +47,8 @@ kaiNz=aiNz*kappa
 mat = np.zeros((len(lvar),nz))
 for i,var in enumerate(lvar):
    st="mat[%d]=%s"%(i,var)
-   print "\tRunning "+st
-   exec st
+   print("\tRunning "+st)
+   exec(st)
    pass
 
 try:
@@ -60,7 +60,7 @@ except:
 #########################################
 # HEMISPHERE                            #
 #########################################
-print "Computing analytical values for the hemisphere..."
+print("Computing analytical values for the hemisphere...")
 C=2*pi/(Lx*Ly)
 # L'aire du segment circulaire (cf wiki) sur la face:
 Af = 2*thetaf-np.sin(2*thetaf)
@@ -85,8 +85,8 @@ lvar=svar.split()
 mat = np.zeros((len(lvar),nz))
 for i,var in enumerate(lvar):
    st="mat[%d]=%s"%(i,var)
-   print "\tRunning "+st
-   exec st
+   print("\tRunning "+st)
+   exec(st)
    pass
 
 try:

@@ -106,12 +106,13 @@ void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, Dou
   const Domaine_VF&             domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
   const DoubleTab&                    k = equation().inconnue().valeur().valeurs();
   const Champ_Inc_base&  ch_alpha_rho_k = equation().champ_conserve();
-  const DoubleTab&          alpha_rho_k = ch_alpha_rho_k.valeurs();
+  const DoubleTab&          alpha_rho_k = ch_alpha_rho_k.passe();
   const tabs_t&         der_alpha_rho_k = ref_cast(Champ_Inc_base, ch_alpha_rho_k).derivees(); // dictionnaire des derivees
   const Navier_Stokes_std&       eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   const Viscosite_turbulente_base& visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
   const DoubleTab& nu = equation().probleme().get_champ("viscosite_cinematique").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
+  double dt = equation().schema_temps().pas_de_temps();
 
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
@@ -120,13 +121,13 @@ void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, Dou
       else if sub_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
     }
   if (Type_diss == "") abort();
-  const DoubleTab&                diss = equation().probleme().get_champ(Nom(Type_diss.c_str())).valeurs() ;
+  const DoubleTab&                diss = equation().probleme().get_champ(Nom(Type_diss.c_str())).passe() ;
   const DoubleTab&               pdiss = equation().probleme().get_champ(Nom(Type_diss.c_str())).passe() ;
 
   const int Nk = k.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size(), nb_elem = domaine.nb_elem();
 
   Matrice_Morse *Ma = matrices.count("alpha") ? matrices.at("alpha") : nullptr,
-                 *Mk = matrices.count(equation().inconnue().valeur().le_nom().getString()) ? matrices.at(equation().inconnue().valeur().le_nom().getString()) : nullptr,
+                 *Mk = matrices.count("k") ? matrices.at("k") : nullptr,
                   *Mdiss = matrices.count(Type_diss) ? matrices.at(Type_diss) : nullptr,
                    *Mp = matrices.count("pression") ? matrices.at("pression") : nullptr,
                     *Mt	= matrices.count("temperature") ? matrices.at("temperature") : nullptr;
@@ -160,12 +161,13 @@ void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, Dou
           }
         else if (Type_diss == "omega")
           {
-            secmem(e, mk) -= pe(e) * ve(e) * beta_k * alpha_rho_k(e,mk) * diss(e, mk);
-            if (!(Ma==nullptr)) 	(*Ma)(Nk * e + mk, Na * e + mk)   	  += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("alpha") ?       der_alpha_rho_k.at("alpha")(e,mk) : 0 )        * diss(e, mk);	// derivee en alpha
-            if (!(Mt==nullptr)) 	(*Mt)(Nk * e + mk, Nt * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("temperature") ? der_alpha_rho_k.at("temperature")(e, mk) : 0 ) * diss(e, mk);	// derivee par rapport a la temperature
-            if (!(Mp==nullptr)) 	(*Mp)(Nk * e + mk, Np * e + mp)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("pression") ?    der_alpha_rho_k.at("pression")(e, mp) : 0 )    * diss(e, mk);		// derivee par rapport a la pression
-            if (!(Mk==nullptr))   (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("k") ?           der_alpha_rho_k.at("k")(e,mk) : 0 )            * diss(e, mk); // derivee en k
-            if (!(Mdiss==nullptr)) (*Mdiss)(Nk * e + mk, Nk * e + mk)   += pe(e) * ve(e) * beta_k * alpha_rho_k(e, mk); // derivee en omega
+            secmem(e, mk) -= pe(e) * ve(e) * beta_k * (alpha_rho_k(e,mk)*0. + k(e,mk)) * diss(e, mk) * dt/dt ;
+            if (Ma) 	(*Ma)(Nk * e + mk, Na * e + mk)   	  += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("alpha") ?       der_alpha_rho_k.at("alpha")(e,mk) : 0 )        * diss(e, mk)*0;	// derivee en alpha
+            if (Mt) 	(*Mt)(Nk * e + mk, Nt * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("temperature") ? der_alpha_rho_k.at("temperature")(e, mk) : 0 ) * diss(e, mk)*0;	// derivee par rapport a la temperature
+            if (Mp) 	(*Mp)(Nk * e + mk, Np * e + mp)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("pression") ?    der_alpha_rho_k.at("pression")(e, mp) : 0 )    * diss(e, mk)*0;		// derivee par rapport a la pression
+            if (Mk)   (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("k") ?           der_alpha_rho_k.at("k")(e,mk) : 0 )            * diss(e, mk)*0; // derivee en k
+            if (Mk)   (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * diss(e, mk) ; // derivee en k
+            if (Mdiss) (*Mdiss)(Nk * e + mk, Nk * e + mk)   += pe(e) * ve(e) * beta_k * k(e, mk) *0.; // derivee en omega
           }
       }
 }

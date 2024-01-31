@@ -115,7 +115,7 @@ Read pb
 {
 eq_hydraulique
 {
-	modele_turbulence nul {  }
+	modele_turbulence null {  }
         solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-16 impr } 
 #	solveur_pression Petsc CLI { -ksp_type cg -pc_type hypre -pc_hypre_type boomerAMG -ksp_atol 5.e-16 -ksp_divtol 5.e+18 seuil 5.e-16 impr } #
 	convection           { quick }
@@ -169,7 +169,11 @@ agit
 	    type_vitesse_imposee analytique
 	    n_iterations_interpolation_ibc 1
             seuil_convergence_uzawa 1e-16 
-            nb_iteration_max_uzawa 50000 
+            
+            # the parameter 'nb_iteration_max_uzawa' shall be set to : #
+            # - 50000 for validation #
+            # - 100 for non-regression #
+            nb_iteration_max_uzawa 100 
 	    vitesse_imposee_regularisee 0
     }
     cuve

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,10 +14,10 @@
 *****************************************************************************/
 
 #include <Navier_Stokes_Turbulent.h>
-#include <Modele_turbulence_hyd_nul.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
+#include <Modele_turbulence_hyd_K_Omega.h>
 
 void Navier_Stokes_Turbulent::creer_champ(const Motcle& motlu)
 {
@@ -29,12 +29,16 @@ void Navier_Stokes_Turbulent::creer_champ(const Motcle& motlu)
   // to create k_eps_residu field
   if(le_modele_turbulence.non_nul())
     {
-      if (sub_type(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()))
-        ref_cast(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()).eqn_transp_K_Eps().creer_champ(motlu);
-      else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
-        ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()).eqn_transp_K_Eps().creer_champ(motlu);
+      if (sub_type(Modele_turbulence_hyd_K_Eps, le_modele_turbulence.valeur()))
+        ref_cast(Modele_turbulence_hyd_K_Eps,
+                 le_modele_turbulence.valeur()).eqn_transp_K_Eps().creer_champ(motlu);
+      else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable, le_modele_turbulence.valeur()))
+        ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,
+                 le_modele_turbulence.valeur()).eqn_transp_K_Eps().creer_champ(motlu);
+      else if (sub_type(Modele_turbulence_hyd_K_Omega, le_modele_turbulence.valeur()))
+        ref_cast(Modele_turbulence_hyd_K_Omega,
+                 le_modele_turbulence.valeur()).eqn_transp_K_Omega().creer_champ(motlu);
     }
-
 }
 
 // Impression du residu dans fic (generalement dt_ev)
@@ -53,6 +57,8 @@ void Navier_Stokes_Turbulent::imprime_residu(SFichier& fic)
       ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_K().imprime_residu(fic);
       ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_Eps().imprime_residu(fic);
     }
+  else if (sub_type(Modele_turbulence_hyd_K_Omega,le_modele_turbulence.valeur()))
+    ref_cast(Modele_turbulence_hyd_K_Omega,le_modele_turbulence.valeur()).eqn_transp_K_Omega().imprime_residu(fic);
 }
 
 // Retourne l'expression du residu (de meme peut etre surcharge)
@@ -63,6 +69,8 @@ Nom Navier_Stokes_Turbulent::expression_residu()
     tmp+=ref_cast(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()).eqn_transp_K_Eps().expression_residu();
   else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
     tmp+=ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()).eqn_transp_K_Eps().expression_residu();
+  else if (sub_type(Modele_turbulence_hyd_K_Omega,le_modele_turbulence.valeur()))
+    tmp+=ref_cast(Modele_turbulence_hyd_K_Omega,le_modele_turbulence.valeur()).eqn_transp_K_Omega().expression_residu();
   else if (sub_type(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()))
     {
       tmp+=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_K().expression_residu();

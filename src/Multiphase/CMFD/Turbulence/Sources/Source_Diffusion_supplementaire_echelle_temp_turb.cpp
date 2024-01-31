@@ -25,6 +25,8 @@
 #include <Echange_impose_base.h>
 #include <QDM_Multiphase.h>
 #include <Pb_Multiphase.h>
+#include <Matrix_tools.h>
+#include <Array_tools.h>
 
 #include <cmath>
 #include <vector>
@@ -45,3 +47,25 @@ void Source_Diffusion_supplementaire_echelle_temp_turb::completer()
     }
 }
 
+void Source_Diffusion_supplementaire_echelle_temp_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+{
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const DoubleTab& tau 	 = equation().inconnue().valeur().valeurs();
+  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = tau.line_size();
+
+  for (auto &&n_m : matrices)
+    if (n_m.first == "k")
+      {
+        Matrice_Morse& mat = *n_m.second, mat2;
+        const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
+        int nc = dep.dimension_tot(0),
+            M  = dep.line_size();
+        IntTrav sten(0, 2);
+        sten.set_smart_resize(1);
+        for (int e = 0; e < ne; e++)
+          for (int n = 0; n < N; n++)
+            if (n < M) sten.append_line(N * e + n, M * e + n);
+        Matrix_tools::allocate_morse_matrix(N * ne_tot, M * nc, sten, mat2);
+        mat.nb_colonnes() ? mat += mat2 : mat = mat2;
+      }
+}

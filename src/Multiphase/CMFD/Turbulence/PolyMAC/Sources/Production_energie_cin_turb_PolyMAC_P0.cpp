@@ -108,33 +108,33 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
 
             fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
 
-            if      (Type_diss == "tau")   nut_l =                         std::max(k(e, n) * (*diss)(e, n), limiter_ * nu(e, n)) ;
-            else if (Type_diss == "omega") nut_l = ( ((*pdiss)(e,n) > 0.) ? std::max(k(e, n) / (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)), limiter_ * nu(e, n)) : limiter_ * nu(e, n) );
+            if      (Type_diss == "tau")   nut_l = k(e, n) * (*diss)(e, n) + limiter_ * nu(e, n);
+            else if (Type_diss == "omega") nut_l = k(e, n) / std::max((*pdiss)(e, n), omega_min_) + 0.*(2-(*diss)(e, n)/std::max((*pdiss)(e, n), omega_min_)) + limiter_ * nu(e, n);
             else Process::exit(que_suis_je() + " : ajouter_blocs : probleme !!!") ;
 
-            secmem(e, n) += fac * alpha_rho(e, n)* alp(e,n) * nut_l ;
+            secmem(e, n) += fac * nut_l * (1.+ 0.*alpha_rho(e, n) * alp(e,n)) ;
             for (auto &&i_m : matrices)
               {
                 Matrice_Morse& mat = *i_m.second;
-                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= fac * nut_l * alp(e,n) * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, n) : 0 );			      // derivee par rapport au taux de vide
-                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= fac * nut_l * alpha_rho(e, n);			      // derivee par rapport au taux de vide
-                if (i_m.first == "temperature") mat(N * e + n, Nt * e + n) -= fac * nut_l * alp(e,n) * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, n) : 0 );// derivee par rapport a la temperature
-                if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= fac * nut_l * alp(e,n) * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		  // derivee par rapport a la pression
+                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, n) : 0 );			      // derivee par rapport au taux de vide
+                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= fac * nut_l ;			      // derivee par rapport au taux de vide
+                if (i_m.first == "temperature") mat(N * e + n, Nt * e + n) -= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, n) : 0 );// derivee par rapport a la temperature
+                if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		  // derivee par rapport a la pression
               }
 
-            if ( (Type_diss == "tau") && ((k(e, n)*(*diss)(e, n)) > (limiter_*nu(e, n))) )
+            if (Type_diss == "tau")
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;
-                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alpha_rho(e, n) * alp(e,n) *(*diss)(e,n);
-                  if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * alpha_rho(e, n) * alp(e,n) * k(e,n);
+                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alp(e,n) *(*diss)(e,n);
+                  if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * alp(e,n) * k(e,n);
                 }
-            if ( (Type_diss == "omega") && ((*pdiss)(e,n) > 0.) && ((k(e, n)/(*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) > (limiter_*nu(e, n))) ) )
+            else if (Type_diss == "omega")
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;
-                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alpha_rho(e, n) * alp(e,n) *      1./(*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
-                  if (i_m.first == "omega")     mat(N * e + n,  N * e + n) -= fac * alpha_rho(e, n) * alp(e,n) * -k(e,n)/((*pdiss)(e, n)*(*pdiss)(e, n)) ;
+                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alp(e,n) *      1./ std::max((*pdiss)(e, n), omega_min_) + 0. * std::max((*pdiss)(e, n), omega_min_)*(2-(*diss)(e, n)/std::max((*pdiss)(e, n), omega_min_)) ;
+                  if (i_m.first == "omega")     mat(N * e + n,  N * e + n) -= fac * alp(e,n) * -k(e,n)/(std::max((*pdiss)(e, n), omega_min_)*std::max((*pdiss)(e, n), omega_min_)) *0.;
                 }
           }
     }

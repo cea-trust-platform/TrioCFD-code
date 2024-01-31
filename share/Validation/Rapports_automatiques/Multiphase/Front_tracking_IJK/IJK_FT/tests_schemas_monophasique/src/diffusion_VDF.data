@@ -38,22 +38,22 @@ Lire sch
 	nb_pas_dt_max 512
 }
 
-Fluide_Incompressible air
-Lire air
-{
-	mu Champ_Uniforme 1 5.e-4
-	rho Champ_Uniforme 1 500
-}
 
 Associer pb dom
 Associer pb sch
-Associer pb air
 
 Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_standard
+
+  fluide_incompressible
+  {
+    mu Champ_Uniforme 1 5.e-4
+    rho Champ_Uniforme 1 500
+  }
+   
+   	Navier_Stokes_standard
 
 	{
 		solveur_pression petsc cholesky { }

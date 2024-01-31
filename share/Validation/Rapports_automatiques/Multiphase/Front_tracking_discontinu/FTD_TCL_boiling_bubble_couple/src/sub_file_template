@@ -1,0 +1,139 @@
+#!/bin/bash
+#MSUB -r @case@
+#MSUB -q rome
+#MSUB -Q normal # HACK test
+#MSUB -T 86400 # HACK 1800
+#MSUB -o myjob.%J.o
+#MSUB -e myjob.%J.e
+#MSUB -A gen7712
+#MSUB -E "--no-requeue"
+#MSUB -n @nproc@
+# #MSUB -x
+#MSUB -m work,scratch
+##MSUB -@ email:begin,end
+set -x
+[ ! -z $BRIDGE_MSUB_PWD ] && cd $BRIDGE_MSUB_PWD
+[ -f ld_env.sh ] && . ./ld_env.sh # To load an environment file if necessary
+# source $project_directory/env_TrioCFD.sh > /dev/null
+jdd=PAR_source
+nmax=20 # 20 HACK #
+JOBID_NEXT=0
+failure=0
+: > sub_file.log
+
+if [ ! -f .not_reprise ] ; then 
+    echo "Restart creation"
+    dir=$(basename $PWD) 
+    n=${dir:1}
+    let n--
+    before=$n
+    let n++
+    let n++
+    next=$n
+    let n--
+    #
+    if [ -f ${jdd}.dt_ev ] ; then
+       num1=$(tail -n1 *ev | awk '{print $1}')
+       num2=$(grep tmax *data | awk '{print $2}')
+       if awk "BEGIN {exit !($num1 >= 0.99*$num2)}"; then
+          echo "Maximal time reached"
+          exit 1
+       fi
+    fi
+    # In the next folder:
+    mkdir -p ../R$next && cp sub_file clean visit_Re_Nu2.py model.txt ${jdd}.data ../R$next && cd ../R$next/
+    sed -i "s/R$n/R$next/" sub_file
+    sed -i "s/R$before/R$n/;s/nb_pas_dt_max 10$/nb_pas_dt_max 10000000/" ${jdd}.data
+    [ $n == 0 ] && sed -i -e "/resume_last_time .*steady/d" \
+         -e "/resume_last_time/s/#//g" ${jdd}.data
+    [ -f ../R$n/injection.txt ] && cp ../R$n/injection.txt .
+    if [ -f ${jdd}.err ] ; then
+       if grep "Unexpected error during TRUST calculation" ${jdd}.err; then
+          echo "Unexpected TRUST error"
+          echo "Restart R$next created but not submitted"
+          exit 2
+       fi
+    fi
+    if [ $next -gt $nmax ] || [ -z "$(which ccc_msub)" ] ; then
+       echo "Restart R$next created but not submitted by ccc_msub"
+    else   
+       ccc_msub -E "--dependency=afterok:$BRIDGE_MSUB_JOBID" sub_file > thisjob.txt
+       JOBID_NEXT=$(awk '{print $4}' thisjob.txt)
+       echo "Restart R$next created and submitted as $JOBID_NEXT"
+    fi
+    # Back to current case:
+    cd ../R$n
+fi
+
+if [ $(basename $PWD) == "R0" ] ; then
+   [ -f ../../STEADY/end_time.txt ] && end_steady=$(python3 -c 'print(f"{'$(cat ../../STEADY/end_time.txt)'+1e-6}")')
+   [ -f ../../STEADY/end_time.txt ] && [ -f injection.txt ] && sed -i "s/@time@/$end_steady/" injection.txt \
+       || (echo "Files missing " && exit 3)
+fi
+
+failure=0
+if [ -z "$(which ccc_msub)" ] ; then 
+  # On a computer:
+  nproc=$(ls ../../STEADY/DOM_FLUIDE_00*Zones ../STEADY/DOM_FLUIDE_00*Zones 2>/dev/null | wc -l)
+  trust $jdd $nproc 1>${jdd}.out -journal=0 2>>${jdd}.err &
+  pid=$!
+  echo "X X X $pid" > thisjob.txt
+  touch .running
+  wait $pid
+  tail -n1 ${jdd}.err | grep "Arret des processes" > /dev/null
+  failure=$?
+  echo "trust $jdd $nproc is finished with $failure failure"
+  [ $failure != 0 ] && echo "Job failure" && echo $failure > .failure
+else
+  # On a cluster:
+  echo "X X X $BRIDGE_MSUB_JOBID" > thisjob.txt
+  echo ccc_mprun -n $BRIDGE_MSUB_NPROC $exec $jdd $BRIDGE_MSUB_NPROC -journal=0 
+  ccc_mprun -n $BRIDGE_MSUB_NPROC $exec $jdd $BRIDGE_MSUB_NPROC 1>${jdd}.out -journal=0 2>>${jdd}.err
+  [ $? != 0 ] && echo "Job $BRIDGE_MSUB_JOBID failure" && failure=1 && touch .failure
+fi
+echo "TrioCFD calculation is done" >> sub_file.log
+
+sauv=$(grep sauvegarde $jdd.data | tail -n1 | awk '{print $3}')
+sauv=$(basename $sauv .sauv)
+if ! ls $sauv*.sauv &> /dev/null ; then 
+  sauv=$(basename $sauv .xyz)
+  if ! ls $sauv*.xyz &> /dev/null ; then 
+    echo "No sauv found for next restart -> failure"; failure=1; touch .failure
+  fi
+fi
+echo "Sauv file has been searched" >> sub_file.log
+
+[ -f post_run ] && echo "Running post_run" && ./post_run $jdd &> post_run.log
+echo "post_run is finished (if any, see trace in post_run.log)" >> sub_file.log
+echo "failure value is $failure" >> sub_file.log
+[ $failure -ne 0 ] && [ $JOBID_NEXT -ne 0 ] && scancel $JOBID_NEXT
+[ $failure -ne 0 ] && [ -d ../R$next ] && touch ../R$next/.not_reprise && touch .failure && exit $failure
+
+[ -f post_run ] && [ -d ../R$next ] && cp -f post_run ../R$next/
+[ -f ${jdd}.dt_ev ] && cp -f ${jdd}.dt_ev ../R$next/
+
+# Waiting for the end of $1
+submission ()
+{
+  #waitpid ($1)
+  echo "Begin submission (waiting for pid=$1)" >> sub_file.log
+  # while [ -e /proc/$1 ] ; do sleep 1; done
+  # Job $1 is done, we can start:
+  # DON'T WAIT, LET'S START DIRECTLY (Call to submission is actually at the end)
+  echo "Job $1 is done, we can start" >> sub_file.log
+  [ -d ../R$next ] && echo "../R$next is a valid directory" >> sub_file.log
+  cd ../R$next && ./sub_file &> sub_file.log
+  echo "End of submitted sub_file in ../R$next (launched by submission())" >> sub_file.log
+}
+# Gestion de l'enchainement des calculs en bash:
+if [ ! -f .not_reprise ] && [ -z "$(which ccc_msub)" ] && [ $next -le $nmax ] ; then
+  this_pid=$$
+  submission $this_pid &
+  pidd=$!
+  echo "Restart $pidd submitted (but waiting $this_pid )" >> sub_file.log
+fi
+echo "submission occurred" >> sub_file.log
+
+[ -f .running ] && \rm .running
+echo "sub_file end" >> sub_file.log
+exit $failure

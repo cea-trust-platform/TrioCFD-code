@@ -49,11 +49,11 @@ class Beam_model;
 //////////////////////////////////////////////////////////////////////////////
 class Domaine_ALE : public Domaine
 {
-  Declare_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE);
+  Declare_instanciable_sans_constructeur(Domaine_ALE);
 
 public :
   Domaine_ALE();
-  ~Domaine_ALE();
+  void clear() override;
   inline const double& get_dt() const;
   void set_dt(double& dt) override;
   inline const DoubleTab& vitesse() const;
@@ -69,6 +69,7 @@ public :
   void reading_beam_model(Entree& is);
   void read_beam(Entree& is, int&);
   void reading_projection_ALE_boundary(Entree& is);
+  void reading_ALE_Neumann_BC_for_grid_problem(Entree& is);
   void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
   void  update_ALE_projection(const double);
   DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
@@ -93,6 +94,14 @@ public :
   void computeFluidForceOnBeam(const int&);
   Equation_base& getEquation() ;
   inline void associer_equation(const Equation_base& une_eq);
+  void update_coord_dom_extrait_surface();
+
+  inline const IntTab& les_elems_extrait_surf_reference() const;
+  inline void set_les_elems_extrait_surf_reference(const IntTab& );
+
+  inline bool extrait_surf_dom_deformable() const;
+  inline void set_extrait_surf_dom_deformable(bool def);
+
 protected:
 
   double dt_;
@@ -109,11 +118,20 @@ protected:
   DoubleTab ALEjacobian_new; // n+1
   int resumption; //1 if resumption of calculation else 0
   int nbBeam;
-  Beam_model *beam; // Mechanical model: a beam model
+//  Beam_model *beam; // Mechanical model: a beam model
+  std::vector<Beam_model> beam;
   REF(Equation_base) eq;
   Champs_front_ALE_projection field_ALE_projection_; // Definition of the modes of vibration in view of projection of the IFS force
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
   bool associate_eq;
+  Noms name_boundary_with_Neumann_BC; // Names of the boundary with Neumann CL for the grid problem (optional)
+  mutable SFichier modalForceProjectionALE_; //post-processing file
+  mutable SFichier modalForceBeam_; //post-processing file
+
+  //attributes necessary to perform surface extraction on a moving boundary (deformable domaine, like ALE)
+  IntTab les_elems_extrait_surf_reference_; // list of elements belonging to the extracted surface on a moving boundary defines at the initialization.
+
+  bool extrait_surf_dom_deformable_ = false;
 };
 
 
@@ -160,6 +178,26 @@ inline const DoubleTab& Domaine_ALE::getNewJacobian() const
 inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
 {
   eq = une_eq;
+}
+
+inline const IntTab& Domaine_ALE::les_elems_extrait_surf_reference() const
+{
+  return les_elems_extrait_surf_reference_;
+}
+
+inline void Domaine_ALE::set_les_elems_extrait_surf_reference(const IntTab& ref)
+{
+  les_elems_extrait_surf_reference_ = ref;
+}
+
+inline bool Domaine_ALE::extrait_surf_dom_deformable() const
+{
+  return extrait_surf_dom_deformable_;
+}
+
+inline void Domaine_ALE::set_extrait_surf_dom_deformable(bool def)
+{
+  extrait_surf_dom_deformable_ = def;
 }
 
 #endif

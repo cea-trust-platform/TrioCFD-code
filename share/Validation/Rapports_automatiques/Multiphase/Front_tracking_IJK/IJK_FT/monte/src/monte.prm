@@ -1,23 +1,29 @@
-Parametres {
-	Titre "Ascension gravitaire mono et multi-bulles periodique front-tracking en IJK"
-	Description "Cette fiche verifie pas mal de choses dont : " <<EOF
-o La force de gravite
-o La periodicite 
-o Les sauvegarde/reprise
-o La repulsion
-EOF
-	Auteur "G.B."
-	CasTest . pre_run.data
-	CasTest . ijkft_monte_seq.data
-	CasTest . ijkft_monte_slow_seq.data
-	CasTest . ijkft_monte_multi_seq.data
-	CasTest . ijkft_monte_multi_repr_seq.data
-	CasTest . ijkft_monte_par8.data 8
-	CasTest . ijkft_monte_multi_par8.data 8
-	CasTest . test_IJK_switch.data
-	CasTest . test_IJK_switch_par8.data 8
-	# DISABLE_PARALLEL_RUN #
+# DISABLE_PARALLEL_RUN #
+Parametres
+{
+  Auteur "G.B."
+  
+  Titre "Ascension gravitaire mono et multi-bulles periodique front-tracking en IJK"
+  
+  Description "Cette fiche verifie pas mal de choses dont : "
+  Description "- La force de gravite"
+  Description "- La periodicite"
+  Description "- Les sauvegarde/reprise"
+  Description "- La repulsion"
+
+  CasTest . pre_run.data
+  CasTest . ijkft_monte_seq.data
+  CasTest . ijkft_monte_slow_seq.data
+  CasTest . ijkft_monte_multi_seq.data
+  CasTest . ijkft_monte_multi_repr_seq.data
+  CasTest . ijkft_monte_par8.data 8
+  CasTest . ijkft_monte_multi_par8.data 8
+  CasTest . test_IJK_switch.data
+  CasTest . test_IJK_switch_par8.data 8
+
+  ExtraUsedFile init.lata.nodes init.lata.elem init_multi.lata.nodes init_multi.lata.elem
 }
+
 Chapitre {
 	Titre "Maillage généré par cree_multi_bulles.sh"
 

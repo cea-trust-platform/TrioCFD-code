@@ -75,7 +75,7 @@ void Viscosite_turbulente_WIF::reynolds_stress(DoubleTab& R_ij) const // Renvoie
       for (db = 0; db < D; db++)
         {
           R_ij(i, 1, d, db) = 0 ; // No WIF for gas phase
-          R_ij(i, 0, d, db) = tab_alpha(i, 0) * ( 3/20 * u_r_carre(i,0) * (db==d?1:0) + (1/20 + 1.5 * gamma_*gamma_*gamma_*0.25) * u_r(i, d)* u_r(i, db) ) ;
+          R_ij(i, 0, d, db) = tab_alpha(i, 1) * ( 3.0/20.0 * u_r_carre(i,0) * (db==d?1:0) + (1.0/20.0 + 1.5 * gamma_*gamma_*gamma_*0.25) * u_r(i, d)* u_r(i, db) ) ;
         }
 }
 

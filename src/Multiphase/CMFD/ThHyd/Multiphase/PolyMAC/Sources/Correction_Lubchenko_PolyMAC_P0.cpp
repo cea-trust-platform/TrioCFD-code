@@ -29,13 +29,21 @@
 #include <Dispersion_bulles_base.h>
 #include <Champ_Face_PolyMAC_P0.h>
 #include <Milieu_composite.h>
+#include <Navier_Stokes_std.h>
 #include <Viscosite_turbulente_base.h>
+#include <Viscosite_turbulente_multiple.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
 #include <math.h>
 #include <Dispersion_bulles_turbulente_Burns.h>
+#include <Domaine_PolyMAC_P0.h>
+#include <Probleme_base.h>
+#include <Champ_Elem_PolyMAC_P0.h>
 
 Implemente_instanciable(Correction_Lubchenko_PolyMAC_P0, "Correction_Lubchenko_Face_PolyMAC_P0", Source_base);
+// XD Correction_Lubchenko source_base Correction_Lubchenko 1 not_set
+// XD attr beta_lift floattant beta_lift 1 not_set
+// XD attr beta_disp floattant beta_disp 1 not_set
 
 Sortie& Correction_Lubchenko_PolyMAC_P0::printOn(Sortie& os) const
 {
@@ -49,6 +57,7 @@ Entree& Correction_Lubchenko_PolyMAC_P0::readOn(Entree& is)
   param.ajouter("beta_disp", &beta_disp_);
   param.ajouter("portee_disp", &portee_disp_);
   param.ajouter("portee_lift", &portee_lift_);
+  param.ajouter("use_bif", &use_bif_);
   param.lire_avec_accolades_depuis(is);
 
   //identification des phases
@@ -91,6 +100,9 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
 {
   ajouter_blocs_disp(matrices, secmem, semi_impl);
   ajouter_blocs_lift(matrices, secmem, semi_impl);
+  // Le terme source_BIF peut entrainer une mauvaise prédiction des forces normales à la paroi : une correction est mise en place
+  if ((use_bif_) && (sub_type(Viscosite_turbulente_multiple, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, ref_cast(Navier_Stokes_std, equation().probleme().equation(0)).operateur(0).l_op_base()).correlation().valeur())))
+    ajouter_blocs_BIF(matrices, secmem, semi_impl);
 }
 
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
@@ -112,7 +124,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
                           &n_y_elem = domaine.normale_paroi_elem(),
                            &n_y_faces = domaine.normale_paroi_faces(),
                             &d_bulles = equation().probleme().get_champ("diametre_bulles").valeurs(),
-                             *k_turb = (equation().probleme().has_champ("k")) ? &equation().probleme().get_champ("k").passe() : NULL ;
+                             *k_turb = (equation().probleme().has_champ("k")) ? &equation().probleme().get_champ("k").passe() : NULL,
+                              * k_WIT = (equation().probleme().has_champ("k_WIT")) ? &equation().probleme().get_champ("k_WIT").passe() : NULL ;
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
   int N = pvit.line_size() , Np = press.line_size(), Nk = (k_turb) ? (*k_turb).dimension(1) : 1, D = dimension,
@@ -143,12 +156,10 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
           {
             Saturation_base& z_sat = milc.get_saturation(k, l);
             const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-            // XXX XXX XXX
-            // Attention c'est dangereux ! on suppose pour le moment que le champ de pression a 1 comp. Par contre la taille de res est nb_max_sat*nbelem !!
-            // Aussi, on passe le Span le nbelem pour le champ de pression et pas nbelem_tot ....
-            assert(press.line_size() == 1);
-            assert(temp.line_size() == N);
-            z_sat.get_sigma(temp.get_span_tot(), press.get_span_tot(), Sigma_tab.get_span_tot(), nb_max_sat, ind_trav);
+            // recuperer sigma ...
+            const DoubleTab& sig = z_sat.get_sigma_tab();
+            // fill in the good case
+            for (int ii = 0; ii < ne_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
           }
         else if (milc.has_interface(k, l))
           {
@@ -185,6 +196,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
                   in.nv(k, n) += vf_dir(f, c)/vf(f) * ch.v_norm(pvit, pvit, e, f, k, n, nullptr, nullptr);
               }
             for (int n = 0; n <Nk; n++) in.k_turb[n]   += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,0) : 0;
+            in.k_WIT   += (k_WIT)   ? vf_dir(f, c)/vf(f) * (*k_WIT)(e,0) : 0.;
+            in.e = e;
           }
 
         correlation_db.coefficient(in, out);
@@ -231,6 +244,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
             in.nv(k, n) = ch.v_norm(pvit, pvit, e, -1, k, n, nullptr, nullptr);
         }
       for (int n = 0; n <Nk; n++) in.k_turb[n]   = (k_turb) ? (*k_turb)(e,0) : 0;
+      in.k_WIT   = (k_WIT) ? (*k_WIT)(e,0) : 0;
+      in.e = e;
 
       correlation_db.coefficient(in, out);
 
@@ -406,12 +421,12 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
                 else if (y_elem(e) >    d_bulles(e,k)*portee_lift_) fac_e *=  0 ; // no effect
                 else fac_e *= (3*std::pow(2*y_elem(e)/(d_bulles(e,k)*portee_lift_)-1, 2) - 2*std::pow(2*y_elem(e)/(d_bulles(e,k)*portee_lift_)-1, 3)) - 1; // partial damping
 
-                secmem(i, n_l) += fac_e * out.Cl(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
-                secmem(i,  k ) -= fac_e * out.Cl(n_l, k) * (vr_l(k, 1) * vort(e, n_l*D+ 2) - vr_l(k, 2) * vort(e, n_l*D+ 1)) ;
-                secmem(i+1,n_l)+= fac_e * out.Cl(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
-                secmem(i+1, k )-= fac_e * out.Cl(n_l, k) * (vr_l(k, 2) * vort(e, n_l*D+ 0) - vr_l(k, 0) * vort(e, n_l*D+ 2)) ;
-                secmem(i+2,n_l)+= fac_e * out.Cl(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
-                secmem(i+2, k )-= fac_e * out.Cl(n_l, k) * (vr_l(k, 0) * vort(e, n_l*D+ 1) - vr_l(k, 1) * vort(e, n_l*D+ 0)) ;
+                secmem(i, n_l) += fac_e * out.Cl(n_l, k) * (vr_l(k, 1) * vort(e, 2*N+n_l) - vr_l(k, 2) * vort(e, 1*N+n_l)) ;
+                secmem(i,  k ) -= fac_e * out.Cl(n_l, k) * (vr_l(k, 1) * vort(e, 2*N+n_l) - vr_l(k, 2) * vort(e, 1*N+n_l)) ;
+                secmem(i+1,n_l)+= fac_e * out.Cl(n_l, k) * (vr_l(k, 2) * vort(e, 0*N+n_l) - vr_l(k, 0) * vort(e, 2*N+n_l)) ;
+                secmem(i+1, k )-= fac_e * out.Cl(n_l, k) * (vr_l(k, 2) * vort(e, 0*N+n_l) - vr_l(k, 0) * vort(e, 2*N+n_l)) ;
+                secmem(i+2,n_l)+= fac_e * out.Cl(n_l, k) * (vr_l(k, 0) * vort(e, 1*N+n_l) - vr_l(k, 1) * vort(e, 0*N+n_l)) ;
+                secmem(i+2, k )-= fac_e * out.Cl(n_l, k) * (vr_l(k, 0) * vort(e, 1*N+n_l) - vr_l(k, 1) * vort(e, 0*N+n_l)) ;
               } // 100% explicit
         }
 
@@ -515,5 +530,135 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
               } // 100% explicit
         }
 
+
+}
+
+
+void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_BIF(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
+{
+  const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
+  const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
+  const Op_Diff_Turbulent_PolyMAC_P0_Face& Op_diff = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
+  const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
+  const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
+  const DoubleTab& d_bulles = equation().probleme().get_champ("diametre_bulles").valeurs();
+  const DoubleTab& y_elem = domaine.y_elem(),
+                   &y_faces = domaine.y_faces();
+
+  const DoubleTab&                       vf_dir = domaine.volumes_entrelaces_dir(), &xp = domaine.xp(), &xv = domaine.xv();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes(), &fs = domaine.face_surfaces(), &vf = domaine.volumes_entrelaces();
+  const DoubleTab& normales_f = domaine.face_normales();
+  const IntTab& voisins_f = domaine.face_voisins(), &e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
+
+  const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.correlation().valeur());
+
+  int N = pb.get_champ("vitesse").valeurs().dimension(1), D = dimension, nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot() ;
+
+  // On recupere les tensions de reynolds des termes de BIF
+  DoubleTrav Rij(0, N, D, D);
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
+  visc_turb.reynolds_stress_BIF(Rij);
+
+  DoubleTrav grad_Rij(0, N, D, D);
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.vitesse()->valeurs().get_md_vector(), grad_Rij); //Necessary to exchange virtual elements after calculation of the gradient at the faces()
+
+  const Champ_Elem_PolyMAC_P0& ch_alpha = ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("alpha"));	// Champ alpha qui servira à obtenir les coeffs du gradient ; normalement toujours des CAL de Neumann ; terme source qui n'apparait qu'en multiphase
+  ch_alpha.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
+  IntTab& fg_d = ch_alpha.fgrad_d, fg_e = ch_alpha.fgrad_e; // Tables utilisees dans domaine_PolyMAC_P0::fgrad pour le calcul du gradient
+  DoubleTab fg_w = ch_alpha.fgrad_w;
+
+  // On calcule le gradient de Rij aux faces
+  for (int n = 0; n < N; n++)
+    for (int f = 0; f < nf_tot; f++)
+      for (int d_i = 0; d_i <D ; d_i++)
+        for (int d_j = 0; d_j <D ; d_j++)
+          {
+            grad_Rij(f, n, d_i, d_j) = 0;
+            // grad_Rij(face, phase, x-coord, y-coord)   or
+            // grad_Rij(nb_face_tot + dimension*element*gradient_component, phase, x-coord, y-coord)
+            for (int j = fg_d(f); j < fg_d(f+1) ; j++)
+              {
+                int e = fg_e(j);
+                int f_bord;
+                if ( (f_bord = e - ne_tot) < 0) //contribution d'un element
+                  grad_Rij(f, n, d_i, d_j) += fg_w(j) * Rij(e, n, d_i, d_j);
+                else if ( (ch_alpha.fcl()(f_bord, 0) == 1) || (ch_alpha.fcl()(f_bord, 0) == 2)
+                          || (ch_alpha.fcl()(f_bord, 0) == 3) || (ch_alpha.fcl()(f_bord, 0) == 6))
+                  {
+                    Process::exit("You must have a neumann limit condition on alpha for RIJ_BIF to work !");
+                  }
+              }
+          }
+
+  // On interpole le gradient de Rij aux elements
+  for (int n = 0; n < N; n++)
+    for (int e = 0; e < ne_tot; e++)
+      for (int d_d=0 ; d_d<D ; d_d++) // on derive / d_d
+        for (int d_i = 0; d_i <D ; d_i++)
+          for (int d_j = 0; d_j <D ; d_j++)
+            {
+              grad_Rij(nf_tot + D *e + d_d, n, d_i,  d_j) = 0;
+              for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
+                grad_Rij(nf_tot + D *e + d_d, n, d_i,  d_j) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d_d) - xp(e, d_d)) / ve(e) * grad_Rij(f, n, d_i,  d_j);
+            }
+
+  // On calcule le second membre aux elements
+
+  for(int e = 0 ; e < ne_tot ; e++)
+    for(int n = 0; n<N ; n++)
+      for (int d_i = 0; d_i < D; d_i++)
+        {
+          // Find max value of d_bulles
+          double d_b_elem = 0;
+          for(int k = 0; k<N ; k++)
+            {
+              if (k!=n_l && d_bulles(e,k)>d_b_elem) d_b_elem = d_bulles(e,k);
+            }
+          // BIF correction in the near wall region
+          if (y_elem(e) < 0.5 * d_b_elem)
+            {
+              double secmem_en = 0;
+              for (int d_j = 0; d_j < D; d_j++)
+                secmem_en -= grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ; // On annule la contribution de BIF sur la qdm lorsque la distance à la paroi y<0.5*d_bulles
+              secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ; // For us, Rij = < u_i u_j >, therefore *(-1)
+              secmem(nf_tot + e*D + d_i, n) += secmem_en;
+            }
+        }
+
+
+  // On calcule le second membre aux faces
+
+  int e;
+
+  for(int f = 0 ; f < nf ; f++)
+    for(int n = 0; n<N ; n++)
+      for (int i = 0; i < 2 && (e = voisins_f(f, i)) >= 0; i++)
+        {
+          // Find max value of d_bulles
+          double d_b_face = 0;
+          for(int k = 0; k<N ; k++)
+            {
+              if (k!=n_l && d_bulles(e,k)>d_b_face) d_b_face = d_bulles(e,k);
+            }
+          // BIF correction in the near wall region
+          double d_b = vf_dir(f, i)/vf(f) * d_b_face ;
+          if (y_faces(f) < 0.5 * d_b)
+            {
+              DoubleTrav secmem_en(3); // Contains the vector of the divergence of R_ij at the face
+              secmem_en = 0;
+              for (int d_i = 0; d_i < D; d_i++)
+                for (int d_j = 0; d_j < D; d_j++)
+                  {
+                    secmem_en(d_i) -= grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ;
+                  }
+
+              for (int d_i = 0; d_i < D; d_i++)
+                secmem_en(d_i) *= (-1) * pe(e) * vf_dir(f, i) * tab_alp(e, n) * tab_rho(e, n);// For us, Rij = < u_i u_j >, therefore *(-1)
+              double flux_face = domaine.dot(&normales_f(f, 0), &secmem_en(0));
+              secmem(f, n) += flux_face;
+            }
+
+        }
 
 }

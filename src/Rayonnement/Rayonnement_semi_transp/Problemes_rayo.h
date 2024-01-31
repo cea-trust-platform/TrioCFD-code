@@ -30,36 +30,50 @@
 class Pb_Rayo_Conduction : public Pb_Conduction
 {
   Declare_instanciable(Pb_Rayo_Conduction);
+public:
+  bool is_pb_rayo() override { return true ; }
 };
 
 class Pb_Rayo_Hydraulique : public Pb_Hydraulique
 {
   Declare_instanciable(Pb_Rayo_Hydraulique);
+public:
+  bool is_pb_rayo() override { return true ; }
 };
 
 class Pb_Rayo_Thermohydraulique : public Pb_Thermohydraulique
 {
   Declare_instanciable(Pb_Rayo_Thermohydraulique);
+public:
+  bool is_pb_rayo() override { return true ; }
 };
 
 class Pb_Rayo_Thermohydraulique_QC : public Pb_Thermohydraulique_QC
 {
   Declare_instanciable(Pb_Rayo_Thermohydraulique_QC);
+public:
+  bool is_pb_rayo() override { return true ; }
 };
 
 class Pb_Rayo_Hydraulique_Turbulent : public Pb_Hydraulique_Turbulent
 {
   Declare_instanciable(Pb_Rayo_Hydraulique_Turbulent);
+public:
+  bool is_pb_rayo() override { return true ; }
 };
 
 class Pb_Rayo_Thermohydraulique_Turbulent : public Pb_Thermohydraulique_Turbulent
 {
   Declare_instanciable(Pb_Rayo_Thermohydraulique_Turbulent);
+public:
+  bool is_pb_rayo() override { return true ; }
 };
 
 class Pb_Rayo_Thermohydraulique_Turbulent_QC : public Pb_Thermohydraulique_Turbulent_QC
 {
   Declare_instanciable(Pb_Rayo_Thermohydraulique_Turbulent_QC);
+public:
+  bool is_pb_rayo() override { return true ; }
 };
 
 #endif /* Problemes_rayo_included */

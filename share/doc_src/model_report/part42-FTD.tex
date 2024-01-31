@@ -1,130 +1,366 @@
 \newpage
+
 \rhead{\'ECOULEMENTS DIPHASIQUES}
-\chapter{\label{sec:FTD}Front-Tracking discontinu}
 \lhead{Front-Tracking discontinu}
 
+\chapter{Front-Tracking discontinu}
+\label{sec:FTD}
+
 \section{Pr\'esentation du mod\`ele}
-Le mod\`ele \textit{Front-Tracking discontinu} a pour objectif de r\'esoudre des probl\`emes instationnaires de type croissance de bulles en paroi et instabilit\'es par exemple. Les m\'ethodes num\'eriques existantes ont toutes des d\'efauts qui rendent difficiles ou impossibles ce type de calculs. C'est pour cette raison qu'une m\'ethode num\'erique adapt\'ee \`a ces probl\`emes a \'et\'e construite : la m\'ethode mixte Front-Tracking/VOF. A l'heure actuelle, celle-ci traite principalement des simulations axisym\'etriques ou bidimensionnelles afin de concentrer les efforts sur la qualit\'e de la physique des simulations, mais la m\'ethode tridimensionnelle est d'ores et d\'ej\`a en cours de mise en oeuvre.
-Apr\`es avoir d\'efini les crit\`eres de qualit\'e attendus de la solution num\'erique, les diff\'erentes m\'ethodes disponibles vont rapidement \^etre pr\'esent\'ees . Les manquements des m\'ethodes existantes sur les crit\`eres d\'efinis seront ensuite explicit\'es. La m\'ethode choisie comme base de travail sera alors d\'efinie et l'algorithme le plus proche des crit\`eres impos\'es sera finalement d\'ecrit.
+
+Le mod\`ele \textit{Front-Tracking discontinu} a pour objectif de r\'esoudre des probl\`emes instationnaires
+de type croissance de bulles en paroi et instabilit\'es par exemple.
+Les m\'ethodes num\'eriques existantes ont toutes des d\'efauts qui rendent difficiles ou impossibles
+ce type de calculs.
+C'est pour cette raison qu'une m\'ethode num\'erique adapt\'ee \`a ces probl\`emes a \'et\'e construite :
+la m\'ethode mixte Front-Tracking/VOF.
+A l'heure actuelle, celle-ci traite principalement des simulations axisym\'etriques ou bidimensionnelles
+afin de concentrer les efforts sur la qualit\'e de la physique des simulations,
+mais la m\'ethode tridimensionnelle est d'ores et d\'ej\`a en cours de mise en oeuvre.
+
+Apr\`es avoir d\'efini les crit\`eres de qualit\'e attendus de la solution num\'erique,
+les diff\'erentes m\'ethodes disponibles vont rapidement \^etre pr\'esent\'ees .
+Les manquements des m\'ethodes existantes sur les crit\`eres d\'efinis seront ensuite explicit\'es.
+
+La m\'ethode choisie comme base de travail sera alors d\'efinie et l'algorithme le plus proche
+des crit\`eres impos\'es sera finalement d\'ecrit.
+
 
 \subsection{Discussion sur les m\'ethodes num\'eriques}
 
-L'objectif de ce Baltik est de simuler num\'eriquement les interactions des interfaces avec des objets de petite taille (sondes optiques par exemple), et les ph\'enom\'enes li\'es à l'\'ebullition et \`a la crise d'\'ebullition. L'interaction des interfaces avec les petites structures est un problème gouvern\'e par la dynamique des lignes de contact et la tension de surface.
-Lors de l'\'ebullition, les m\'ecanismes suivants sont susceptibles de jouer un r\^ole fondamental et doivent pouvoir \^etre trait\'es num\'eriquement :
-- la croissance d'une bulle de vapeur sur une paroi chauff\'ee,
-- le processus de formation d'un film de liquide sous la bulle,
-- l'instabilit\'e de recul de la ligne de contact (pour d\'eterminer si elle peut jouer un r\^ole dans la d\'etermination du flux critique),
-- le remouillage des parois.
-Tous ces probl\`emes n\'ecessitent la prise en compte d'un \'ecoulement diphasique avec changement de phase o\`u la tension de surface est du m\^eme ordre de grandeur que les forces d'inertie, de dissipation visqueuse ou de gravit\'e. Les lignes de contact y jouent un r\^ole essentiel dont la m\'ethode num\'erique doit rendre compte.
+L'objectif de ce module est de simuler num\'eriquement les interactions des interfaces
+avec des objets de petite taille (sondes optiques par exemple)
+et les ph\'enom\'enes li\'es à l'\'ebullition et \`a la crise d'\'ebullition.
+
+L'interaction des interfaces avec les petites structures est un problème gouvern\'e
+par la dynamique des lignes de contact et la tension de surface.
+Lors de l'\'ebullition, les m\'ecanismes suivants sont susceptibles de jouer un r\^ole fondamental
+et doivent pouvoir \^etre trait\'es num\'eriquement :
+\begin{itemize}
+  \item la croissance d'une bulle de vapeur sur une paroi chauff\'ee,
+  \item le processus de formation d'un film de liquide sous la bulle,
+  \item l'instabilit\'e de recul de la ligne de contact
+        (pour d\'eterminer si elle peut jouer un r\^ole dans la d\'etermination du flux critique),
+  \item le remouillage des parois.
+\end{itemize}
+Tous ces probl\`emes n\'ecessitent la prise en compte d'un \'ecoulement diphasique avec changement de phase
+o\`u la tension de surface est du m\^eme ordre de grandeur que les forces d'inertie,
+de dissipation visqueuse ou de gravit\'e.
+Les lignes de contact y jouent un r\^ole essentiel dont la m\'ethode num\'erique doit rendre compte.
+
 
 \subsubsection{Revue de quelques m\'ethodes num\'eriques existantes}
-La revue pr\'esent\'ee ici sera relativement sommaire, car un tel exercice a d\'ej\`a \'et\'e men\'e par ailleurs (voir \cite{Jamet2002}, \cite{Duquennoy2000}, \cite{Lebaigue1998}). Seules les diff\'erentes caract\'eristiques des m\'ethodes disponibles seront explicit\'ees afin de justifier le choix de la m\'ethode de d\'epart.\smallskip \\
 
-\textit{\textbf{Les m\'ethodes de suivi lagrangiennes}}\smallskip \\
+La revue pr\'esent\'ee ici sera relativement sommaire car un tel exercice
+a d\'ej\`a \'et\'e men\'e par ailleurs (voir \cite{Jamet2002}, \cite{Duquennoy2000}, \cite{Lebaigue1998}).
+Seules les diff\'erentes caract\'eristiques des m\'ethodes disponibles seront explicit\'ees
+afin de justifier le choix de la m\'ethode de d\'epart.
+\smallskip \\
 
-L'approche qui vient imm\'ediatement \'a l'esprit consiste \'a d\'ecrire les interfaces par un maillage mobile. Cette approche conduit \`a deux classes de m\'ethodes : d'une part les m\'ethodes de suivi lagrangiennes et mixtes eul\'eriennes lagrangiennes (appel\'ees m\'ethodes ALE pour Arbitrary Lagrangian Eulerian) et d'autre part les m\'ethodes de front-tracking. Dans les premi\`eres (voir par exemple \cite{Maury1996}), tout le maillage du fluide se d\'eforme de sorte que les interfaces soient \`a chaque instant une ligne du maillage. Avec une telle formulation, les conditions aux limites de contrainte m\'ecanique, de vitesse ou de flux de chaleur sont naturelles, mais les changements de topologie des interfaces sont pratiquement hors de port\'ee pour des raisons de complexit\'e g\'eom\'etrique. Cette m\'ethode est utilis\'ee lorsqu'on cherche des r\'esultats très pr\'ecis sur des g\'eom\'etries relativement simples.\smallskip \\
+\textit{\textbf{Les m\'ethodes de suivi lagrangiennes}}
+\smallskip \\
 
-\textit{\textbf{Les m\'ethodes \`a double maillage eul\'erien/lagrangien}}\smallskip \\
+L'approche qui vient imm\'ediatement \'a l'esprit consiste \'a d\'ecrire les interfaces par un maillage mobile.
+Cette approche conduit \`a deux classes de m\'ethodes :
+d'une part les m\'ethodes de suivi lagrangiennes et mixtes eul\'eriennes lagrangiennes
+(appel\'ees m\'ethodes ALE pour Arbitrary Lagrangian Eulerian)
+et d'autre part les m\'ethodes de front-tracking.
 
-Dans la m\'ethode de front-tracking \cite{Unverdi1992}, \cite{Shin2002}, \cite{Duquennoy2000}, un maillage surfacique mobile repr\'esente les interfaces tandis que la vitesse, la pression, la temp\'erature et les autres grandeurs volumiques sont discr\'etis\'ees sur un maillage fixe. Dans cette approche, les conditions aux limites aux interfaces sont difficiles \`a ma\^itriser.
-Certaines propri\'et\'es accessibles dans une approche lagrangienne, comme les propri\'et\'es de conservation du volume ou les bilans d'\'energie sur les phases sont tr\`es compliqu\'ees à v\'erifier lorsque les interfaces ne
-coincident pas avec les lignes du maillage. Ces m\'ethodes sont donc caract\'eris\'ees par des impr\'ecisions au niveau des bilans, compens\'ees par un grand nombre d'astuces permettant de rendre ces impr\'ecisions acceptables.
-Beaucoup moins lourdes que les m\'ethodes lagrangiennes, ces m\'ethodes b\'en\'eficient de toute l'exp\'erience acquise en simulation d'\'ecoulements monophasiques. La gestion du maillage surfacique des interfaces reste une
-difficult\'e majeure, notamment lors des changements de topologie, mais les contraintes sur ce maillage sont nettement moins s\'ev\`eres que pour le maillage volumique des m\'ethodes lagrangiennes. Elles se r\'ev\`elent bien plus
-efficaces pour r\'esoudre l'\'ecoulement monophasique \`a l'int\'erieur des phases, o\`u le sch\'ema classique "Marker And Cell" reste une valeur s\^ure.\smallskip \\
+Dans les premi\`eres (voir par exemple \cite{Maury1996}), tout le maillage du fluide se d\'eforme
+de sorte que les interfaces soient \`a chaque instant une ligne du maillage.
+Avec une telle formulation, les conditions aux limites de contrainte m\'ecanique,
+de vitesse ou de flux de chaleur sont naturelles, mais les changements de topologie des interfaces
+sont pratiquement hors de port\'ee pour des raisons de complexit\'e g\'eom\'etrique.
+Cette m\'ethode est utilis\'ee lorsqu'on cherche des r\'esultats très pr\'ecis
+sur des g\'eom\'etries relativement simples.
+\smallskip \\
 
-\textit{\textbf{Les m\'ethodes purement eul\'eriennes}}\smallskip \\
+\textit{\textbf{Les m\'ethodes \`a double maillage eul\'erien/lagrangien}}
+\smallskip \\
 
-La m\'ethode la plus r\'epandue et une des plus robustes \`a ce jour est la m\'ethode VOF, pour Volume Of Fluid \cite{Hirt1981}. Dans cette m\'ethode, on discr\'etise le champ de masse volumique sur le m\^eme maillage fixe que la
-vitesse, la pression et la temp\'erature. De ce champ de masse volumique, on d\'eduit par des algorithmes g\'eom\'etriques, la position des interfaces dans chaque maille. Cette position permet de calculer l'effet de la tension de
-surface sur le fluide et les variations de masse volumique dans chaque maille. Selon le niveau de raffinement de l'algorithme de reconstruction, on obtient une m\'ethode plus ou moins facile à mettre en oeuvre. La prise en compte
-de la tension de surface d\'epend \'enorm\'ement de cet algorithme de reconstruction et les m\'ethodes les plus pr\'ecises sont tout aussi complexes à mettre en oeuvre que les m\'ethodes de front-tracking. En revanche, le suivi des
-interfaces est r\'ealis\'e par un algorithme de transport sur le maillage eul\'erien. On \'evite ainsi une grande partie des difficult\'es d'ordre algorithmique li\'ees au maillage mobile.\\
-Parmi les autres m\'ethodes purement eul\'eriennes, on trouve aussi les m\'ethodes dites "level-set", o\`u l'indicatrice de phase est une fonction continue discr\'etis\'ee. Les interfaces sont implicitement d\'efinies comme l'isovaleur 0.5 de l'indicatrice de phase. L'indicatrice est associ\'ee à une \'equation de transport qui comporte obligatoirement un terme anti-diffusif (la d\'efinition de ce terme pose quelques difficult\'es). Ces m\'ethodes pr\'esentent encore moins de difficult\'es num\'eriques que les m\'ethodes VOF, car les grandeurs physiques sont r\'eguli\`eres.\\
+Dans la m\'ethode de front-tracking \cite{Unverdi1992}, \cite{Shin2002}, \cite{Duquennoy2000},
+un maillage surfacique mobile repr\'esente les interfaces tandis que la vitesse,
+la pression, la temp\'erature et les autres grandeurs volumiques sont discr\'etis\'ees sur un maillage fixe.
+
+Dans cette approche, les conditions aux limites aux interfaces sont difficiles \`a ma\^itriser.
+Certaines propri\'et\'es accessibles dans une approche lagrangienne,
+comme les propri\'et\'es de conservation du volume ou les bilans d'\'energie sur les phases
+sont tr\`es compliqu\'ees à v\'erifier lorsque les interfaces ne coincident pas avec les lignes du maillage.
+
+Ces m\'ethodes sont donc caract\'eris\'ees par des impr\'ecisions au niveau des bilans,
+compens\'ees par un grand nombre d'astuces permettant de rendre ces impr\'ecisions acceptables.\\
+
+Beaucoup moins lourdes que les m\'ethodes lagrangiennes, les m\'ethodes de Front-Tracking b\'en\'eficient
+de toute l'exp\'erience acquise en simulation d'\'ecoulements monophasiques.
+La gestion du maillage surfacique des interfaces reste une difficult\'e majeure,
+notamment lors des changements de topologie, mais les contraintes sur ce maillage sont
+nettement moins s\'ev\`eres que pour le maillage volumique des m\'ethodes lagrangiennes.
+Elles se r\'ev\`elent bien plus efficaces pour r\'esoudre l'\'ecoulement monophasique \`a l'int\'erieur des phases,
+o\`u le sch\'ema classique "Marker And Cell" reste une valeur s\^ure.
+\smallskip \\
+
+\textit{\textbf{Les m\'ethodes purement eul\'eriennes}}
+\smallskip \ \\
+
+La m\'ethode la plus r\'epandue et l'une des plus robustes \`a ce jour est
+la m\'ethode VOF (\emph{Volume Of Fluid} \cite{Hirt1981}).
+Dans cette m\'ethode, on discr\'etise le champ de masse volumique sur le m\^eme maillage fixe que la vitesse,
+la pression et la temp\'erature.
+De ce champ de masse volumique, on d\'eduit par des algorithmes g\'eom\'etriques la position
+des interfaces dans chaque maille. Cette position permet de calculer l'effet de la tension de surface sur le fluide
+et les variations de masse volumique dans chaque maille.
+
+Selon le niveau de raffinement de l'algorithme de reconstruction, on obtient une m\'ethode plus ou moins facile
+à mettre en oeuvre. La prise en compte de la tension de surface d\'epend \'enorm\'ement de cet algorithme
+de reconstruction et les m\'ethodes les plus pr\'ecises sont tout aussi complexes à mettre en oeuvre
+que les m\'ethodes de front-tracking.
+
+En revanche, le suivi des interfaces est r\'ealis\'e par un algorithme de transport sur le maillage eul\'erien.
+On \'evite ainsi une grande partie des difficult\'es d'ordre algorithmique li\'ees au maillage mobile.\\
+
+Parmi les autres m\'ethodes purement eul\'eriennes, on trouve aussi les m\'ethodes dites "level-set",
+o\`u l'indicatrice de phase est une fonction continue discr\'etis\'ee.
+Les interfaces sont implicitement d\'efinies comme l'isovaleur 0.5 de l'indicatrice de phase.
+L'indicatrice est associ\'ee à une \'equation de transport qui comporte obligatoirement un terme anti-diffusif
+(la d\'efinition de ce terme pose quelques difficult\'es).
+
+Ces m\'ethodes pr\'esentent encore moins de difficult\'es num\'eriques que les m\'ethodes VOF,
+car les grandeurs physiques sont r\'eguli\`eres.\\
+
 On peut citer la m\'ethode fond\'ee sur les \'equations du second-gradient \cite{Jamet2001}.
-Plus proche de la physique, elle ne manque pas d'\'el\'egance puisque les propri\'et\'es physiques propres aux interfaces -telles que la tension de surface ou la chaleur latente de changement d'\'etat sont naturellement prises en compte par les \'equations d'\'evolution des variables eul\'eriennes. Les grandeurs physiques sont continues \`a l'\'echelle du maillage et c'est sans doute la m\'ethode la plus simple à mettre en oeuvre num\'eriquement.\smallskip \\
+Plus proche de la physique, elle ne manque pas d'\'el\'egance puisque les propri\'et\'es physiques
+propres aux interfaces -telles que la tension de surface ou la chaleur latente de changement d'\'etat-
+sont naturellement prises en compte par les \'equations d'\'evolution des variables eul\'eriennes.
+Les grandeurs physiques sont continues \`a l'\'echelle du maillage et c'est sans doute
+la m\'ethode la plus simple à mettre en oeuvre num\'eriquement.
+\smallskip \\
 
-\textit{\textbf{Le compromis complexit\'e/pr\'ecision/efficacit\'e}}\smallskip \\
+\textit{\textbf{Le compromis complexit\'e/pr\'ecision/efficacit\'e}}
+\smallskip \\
 
-Les m\'ethodes ont \'et\'e cit\'ees dans l'ordre d\'ecroissant d'efficacit\'e num\'erique, de pr\'ecision et de complexit\'e. Les m\'ethodes lagrangiennes sont naturellement les plus pr\'ecises, car la discr\'etisation des champs de grandeurs physiques respecte la topologie de ces champs : les lignes du maillage suivent les discontinuit\'es du champ physique. Ces m\'ethodes sont aussi les plus compliqu\'ees à mettre en oeuvre.\\
-Les m\'ethodes mixtes eul\'eriennes-lagrangiennes constituent un compromis int\'eressant car elles \'evitent la gestion compliqu\'ee d'un maillage volumique mobile qui suive les champs physiques mais conservent une information pr\'ecise sur la localisation des discontinuit\'es.\\
-Les m\'ethodes purement eul\'eriennes sont en g\'en\'eral les plus simples car elles \'evitent la gestion d'un maillage mobile, mais les discontinuit\'es des champs sont repr\'esent\'ees par une grandeur sur le maillage eul\'erien et la localisation n'est donc pas très pr\'ecise. Ces m\'ethodes requi\`erent donc souvent un maillage plus fin pour obtenir la même pr\'ecision.\\
-Il semble qu'\`a l'heure actuelle, toutes les m\'ethodes cit\'ees ont \'et\'e appliqu\'ees \`a des calculs d'\'ecoulements diphasiques en 3D, et la plupart l'ont \'et\'e pour des \'ecoulements avec transfert de masse.
+Les m\'ethodes ont \'et\'e cit\'ees dans l'ordre d\'ecroissant
+d'efficacit\'e num\'erique, de pr\'ecision et de complexit\'e.
+
+Les m\'ethodes lagrangiennes sont naturellement les plus pr\'ecises car la discr\'etisation des champs
+de grandeurs physiques respecte la topologie de ces champs :
+les lignes du maillage suivent les discontinuit\'es du champ physique.
+
+Ces m\'ethodes sont aussi les plus compliqu\'ees à mettre en oeuvre.\\
+
+Les m\'ethodes mixtes eul\'eriennes-lagrangiennes constituent un compromis int\'eressant
+car elles \'evitent la gestion compliqu\'ee d'un maillage volumique mobile qui suive
+les champs physiques mais conservent une information pr\'ecise sur la localisation des discontinuit\'es.\\
+
+Les m\'ethodes purement eul\'eriennes sont en g\'en\'eral les plus simples
+car elles \'evitent la gestion d'un maillage mobile,
+mais les discontinuit\'es des champssont repr\'esent\'ees par une grandeur sur le maillage eul\'erien
+et la localisation n'est donc pas très pr\'ecise.
+
+Ces m\'ethodes requi\`erent donc souvent un maillage plus fin pour obtenir la même pr\'ecision.\\
+
+Il semble qu'\`a l'heure actuelle, toutes les m\'ethodes cit\'ees
+ont \'et\'e appliqu\'ees \`a des calculs d'\'ecoulements diphasiques en 3D,
+et la plupart l'ont \'et\'e pour des \'ecoulements avec transfert de masse.
+
 
 \subsubsection{Critères de qualit\'e de la m\'ethode}
-Duquennoy \cite{Duquennoy2000}, \cite{Duquennoy2000_2} a mis en oeuvre une m\'ethode de front-tracking, dans laquelle il a plus sp\'ecifiquement am\'elior\'e la prise en compte du changement de phase et des lignes de contact. Le travail qu'il a r\'ealis\'e a mis en \'evidence plusieurs points faibles de la m\'ethode de front-tracking :\\
-- les courants parasites,\\
-- le d\'efaut de conservation de la masse,\\
-- les limitations li\'ees aux lignes de contact,\\
-- la coh\'erence de la description du champ de temp\'erature.\\
+Duquennoy (\cite{Duquennoy2000}, \cite{Duquennoy2000_2}) a mis en oeuvre une m\'ethode de front-tracking
+dans laquelle il a plus sp\'ecifiquement am\'elior\'e la prise en compte
+du changement de phase et des lignes de contact.
+
+Le travail qu'il a r\'ealis\'e a mis en \'evidence plusieurs points faibles de la m\'ethode de front-tracking :
+\begin{itemize}
+  \item les courants parasites,
+  \item le d\'efaut de conservation de la masse,
+  \item les limitations li\'ees aux lignes de contact,
+  \item la coh\'erence de la description du champ de temp\'erature.
+\end{itemize}
+
 Ces points faibles constituent autant de crit\`eres de s\'election d'une m\'ethode
-mieux adapt\'ee aux problèmes consid\'er\'es.\smallskip \\
+mieux adapt\'ee aux problèmes consid\'er\'es.
+\smallskip \\
 
-\textit{\textbf{Les courants parasites}}\smallskip \\
+\textit{\textbf{Les courants parasites}}
+\smallskip \\
 
-On appelle courants parasites les courants observ\'es dans une simulation num\'erique ayant atteint un \'etat stationnaire d'\'equilibre alors qu'aucune \'energie n'est inject\'ee dans le syst\`eme. Ces courants r\'esultent d'erreurs de discr\'etisation de la tension de surface et ont de graves cons\'equences sur les r\'esultats des calculs.\\
-La première cons\'equence est qu'ils rendent certains calculs impossibles. D'apr\`es Duquennoy \cite{Duquennoy2000}, l'intensit\'e des courants parasites augmente lorsque la valeur du nombre d'Ohnesorge diminue (la longueur D est la dimension caract\'eristique des gouttes ou des bulles) :
+On appelle courants parasites les courants observ\'es dans une simulation num\'erique
+ayant atteint un \'etat stationnaire d'\'equilibre alors qu'aucune \'energie n'est inject\'ee dans le syst\`eme.
+
+Ces courants r\'esultent d'erreurs de discr\'etisation de la tension de surface
+et ont de graves cons\'equences sur les r\'esultats des calculs.\\
+
+La première cons\'equence est qu'ils rendent certains calculs impossibles.
+D'apr\`es Duquennoy \cite{Duquennoy2000}, l'intensit\'e des courants parasites augmente lorsque
+la valeur du nombre d'Ohnesorge diminue (la longueur D est la dimension caract\'eristique des gouttes ou des bulles) :
 \begin{equation}
-Oh = \dfrac{\mu_{l}}{\sigma \rho_{l} D}
+  Oh = \dfrac{\mu_{l}}{\sigma \rho_{l} D}
 \end{equation}
-En pratique, avec de l'eau \`a pression atmosph\'erique et une dimension caract\'eristique de l'ordre du centim\`etre, les courants parasites rendent les interfaces compl\`etement instables aux temps longs. La simulation de
-ph\'enom\`enes lents dont la dur\'ee exc\`ede quelques secondes est alors impossible.\\
-La deuxi\`eme cons\'equence est qu'ils rendent irr\'ealistes les calculs anisothermes o\`u le transfert de chaleur n'est pas domin\'e par la conduction. Lors de la croissance d'une bulle de vapeur \`a haute pression par exemple, la g\'eom\'etrie des couches limites thermiques d\'etermine l'intensit\'e du transfert de masse en dehors des lignes de contact et de la micro-couche. Or, les courants parasites d\'etruisent complètement ces couches limites, rendant le calcul du champ de temp\'erature irr\'ealiste.
-Il est donc extr\^emement important de r\'eduire l'intensit\'e des courants parasites au moins jusqu'\`a un niveau tel que la valeur du nombre de P\'eclet soit tr\`es inf\'erieure \`a 1. Dans ce cas, les courants parasites n'ont plus aucune influence sur le champ de temp\'erature.\smallskip \\
 
-\textit{\textbf{La conservation du volume}}\smallskip \\
+En pratique, avec de l'eau \`a pression atmosph\'erique et une dimension caract\'eristique de l'ordre du centim\`etre,
+les courants parasites rendent les interfaces compl\`etement instables aux temps longs.
+La simulation de ph\'enom\`enes lents dont la dur\'ee exc\`ede quelques secondes est alors impossible.\\
 
-Cette propri\'et\'e est un enjeu tr\`es important pour la m\'ethode de front-tracking comme pour la m\'ethode VOF. Par nature, la m\'ethode VOF a de bonnes propri\'et\'es de conservation du volume, mais certaines \'etapes de l'algorithme sont approximatives et la conservation est inexacte dans la plupart des algorithmes existants \cite{Aulisa2003}. La m\'ethode de front-tracking mise en oeuvre par Duquennoy pr\'esente une erreur encore plus importante que les m\'ethodes VOF sur le bilan de volume des phases, d'une part en raison de la m\'ethode d'interpolation par splines utilis\'ee pour garantir la r\'egularit\'e du maillage lagrangien, d'autre part en raison de l'algorithme de transport de ce maillage.\\
-L'erreur sur le bilan de volume a des cons\'equences importantes sur la simulation de la croissance de bulles en paroi : dans certains cas, la bulle diminue de volume alors que le fluide est partout surchauff\'e. Si l'erreur est moins importante, le temps de croissance et le diam\`etre au d\'etachement peuvent \^etre mal pr\'edits.\\
-Par cons\'equent, l'exactitude du bilan de volume des phases est un ingr\'edient indispensable de la m\'ethode num\'erique.\smallskip \\
+La deuxi\`eme cons\'equence est qu'ils rendent irr\'ealistes les calculs anisothermes
+o\`u le transfert de chaleur n'est pas domin\'e par la conduction.
+Lors de la croissance d'une bulle de vapeur \`a haute pression par exemple,
+la g\'eom\'etrie des couches limites thermiques d\'etermine l'intensit\'e du transfert de masse
+en dehors des lignes de contact et de la micro-couche.
+Or, les courants parasites d\'etruisent complètement ces couches limites,
+rendant le calcul du champ de temp\'erature irr\'ealiste.
 
-\textit{\textbf{Les lignes de contact}}\smallskip \\
+Il est donc extr\^emement important de r\'eduire l'intensit\'e des courants parasites au moins jusqu'\`a
+un niveau tel que la valeur du nombre de P\'eclet soit tr\`es inf\'erieure \`a 1.
+Dans ce cas, les courants parasites n'ont plus aucune influence sur le champ de temp\'erature.
+\smallskip \\
 
-La m\'ethode de front-tracking \cite{Duquennoy2000} n'est pas la seule dans laquelle des conditions aux limites sur les angles de contact ont \'et\'e mises en oeuvre. Cependant, c'est peut-\^etre avec les m\'ethodes lagrangiennes
-celle pour laquelle l'expression d'une condition aux limites d'angle de contact est la plus directe. La formulation utilis\'ee par Duquennoy emp\^eche pour l'instant la simulation d'angles inf\'erieurs \`a $30^{circ}$ environ, et la
-mod\'elisation de l'angle de contact est mal contr\^ol\'ee (l'angle de contact dynamique notamment n'est pas mod\'elis\'e rigoureusement). \smallskip \\
+\textit{\textbf{La conservation du volume}}
+\smallskip \\
 
-\textit{\textbf{La coh\'erence du champ de temp\'erature}}\smallskip \\
+Cette propri\'et\'e est un enjeu tr\`es important pour la m\'ethode de front-tracking comme pour la m\'ethode VOF.
+Par nature, la m\'ethode VOF a de bonnes propri\'et\'es de conservation du volume
+mais certaines \'etapes de l'algorithme sont approximatives
+et la conservation est inexacte dans la plupart des algorithmes existants \cite{Aulisa2003}.
+
+La m\'ethode de front-tracking mise en oeuvre par Duquennoy pr\'esente une erreur encore plus importante
+que les m\'ethodes VOF sur le bilan de volume des phases,
+d'une part en raison de la m\'ethode d'interpolation par splines utilis\'ee pour garantir
+la r\'egularit\'e du maillage lagrangien,
+d'autre part en raison de l'algorithme de transport de ce maillage.\\
+
+L'erreur sur le bilan de volume a des cons\'equences importantes
+sur la simulation de la croissance de bulles en paroi :
+dans certains cas, le volume de la bulle diminue alors que le fluide est partout surchauff\'e.
+
+Si l'erreur est moins importante, le temps de croissance
+et le diam\`etre au d\'etachement peuvent \^etre mal pr\'edits.\\
+
+Par cons\'equent, l'exactitude du bilan de volume des phases
+est un ingr\'edient indispensable de la m\'ethode num\'erique.
+\smallskip \\
+
+\textit{\textbf{Les lignes de contact}}
+\smallskip \\
+
+La m\'ethode de front-tracking \cite{Duquennoy2000} n'est pas la seule dans laquelle
+des conditions aux limites sur les angles de contact ont \'et\'e mises en oeuvre.
+Cependant, c'est peut-\^etre, avec les m\'ethodes lagrangiennes, celle pour laquelle l'expression
+d'une condition aux limites d'angle de contact est la plus directe.
+La formulation utilis\'ee par Duquennoy emp\^eche pour l'instant la simulation
+d'angles inf\'erieurs \`a $30^{\circ}$ environ
+et la mod\'elisation de l'angle de contact est mal contr\^ol\'ee
+(l'angle de contact dynamique notamment n'est pas mod\'elis\'e rigoureusement). 
+\smallskip \\
+
+\textit{\textbf{La coh\'erence du champ de temp\'erature}}
+\smallskip \\
 
 La formulation pr\'ec\'edente du front-tracking n'assure pas exactement la
-condition aux limites $T = T_{sat}$ aux interfaces. Ainsi, on peut observer qu'une
-bulle de vapeur initialement \`a $T_{sat}$ se r\'echauffe au contact d'un liquide surchauff\'e, ce qui contredit le sens physique. Cette incoh\'erence, ainsi que l'impr\'ecision de la formulation du transfert de masse aux interfaces
-n'est pas compatible avec la mise en oeuvre d'un mod\`ele pr\'ecis de transfert de chaleur singulier aux lignes de contact.
+condition aux limites $T = T_{sat}$ aux interfaces.
+Ainsi, on peut observer qu'une bulle de vapeur initialement \`a $T_{sat}$ se r\'echauffe
+au contact d'un liquide surchauff\'e, ce qui contredit le sens physique.
+
+Cette incoh\'erence, ainsi que l'impr\'ecision de la formulation du transfert de masse aux interfaces n'est pas
+compatible avec la mise en oeuvre d'un mod\`ele pr\'ecis de transfert de chaleur singulier aux lignes de contact.
+
 
 \subsubsection{Choix d'impl\'ementation : une m\'ethode de front-tracking}
 
-\textit{\textbf{Argumentaire}}\smallskip \\
-Le choix s'est port\'e sur une m\'ethode de front-tracking pour les raisons suivantes : \\
-- Il nous faut une m\'ethode capable de g\'erer des grandes d\'eformations, relativement facile \`a mettre en oeuvre et extensible au 3D, ce qui fait des m\'ethodes purement lagrangiennes de mauvais candidats (notamment pour le passage au 3D).\\
-- La m\'ethode doit pouvoir traiter des probl\`emes o\`u la tension de surface est dominante sans aucun champ de vitesse parasite. Or, \`a notre connaissance, il n'existe pas de formulation de la m\'ethode VOF sans maillage lagrangien qui v\'erifie ce critère, alors que nous en avons trouv\'e une pour le front-tracking.\\
-- Nous disposons d\'ej\`a d'une bonne exp\'erience des m\'ethodes de Front-Tracking ainsi que d'une base logicielle suite \`a la th\`ese de Duquennoy \cite{Duquennoy2000}.\\
-Pourtant, la m\'ethode originale de front-tracking pr\'esente de nombreux inconv\'enients, dont le plus important est peut-\^etre la pr\'esence de courants parasites. C'est la raison pour laquelle de nombreux aspects de la formulation initiale ont \'et\'e profond\'ement modifi\'es , \`a commencer par la d\'emarche de discr\'etisation des \'equations continues.\smallskip \\
+\textit{\textbf{Argumentaire}}
+\smallskip \\
+Le choix s'est port\'e sur une m\'ethode de front-tracking pour les raisons suivantes :
+\begin{itemize}
+  \item Il nous faut une m\'ethode capable de g\'erer des grandes d\'eformations,
+        relativement facile \`a mettre en oeuvre et extensible au 3D,
+        ce qui fait des m\'ethodes purement lagrangiennes de mauvais candidats (notamment pour le passage au 3D).
+  \item La m\'ethode doit pouvoir traiter des probl\`emes o\`u la tension de surface
+        est dominante sans aucun champ de vitesse parasite.
+        Or, \`a notre connaissance, il n'existe pas de formulation de la m\'ethode VOF sans maillage lagrangien
+        qui v\'erifie ce critère, alors que nous en avons trouv\'e une pour le front-tracking.
+  \item Nous disposons d\'ej\`a d'une bonne exp\'erience des m\'ethodes de Front-Tracking
+        ainsi que d'une base logicielle suite \`a la th\`ese de Duquennoy \cite{Duquennoy2000}.
+\end{itemize}
 
-\textit{\textbf{D\'emarche de discr\'etisation des \'equations continues}}\smallskip \\
+Pourtant, la m\'ethode originale de front-tracking pr\'esente de nombreux inconv\'enients,
+dont le plus important est peut-\^etre la pr\'esence de courants parasites.
+C'est la raison pour laquelle de nombreux aspects de la formulation initiale ont \'et\'e profond\'ement modifi\'es,
+\`a commencer par la d\'emarche de discr\'etisation des \'equations continues.
+\smallskip \\
 
-Sur le fond, cette d\'emarche change radicalement par rapport \`a la m\'ethode initiale \cite{Unverdi1992} : l'ancienne approche consiste \`a appliquer un op\'erateur de filtrage aux \'equations de Navier-Stokes pour rendre toutes
-les grandeurs continues (masse volumique, champ de vitesse, etc.), puis \`a discr\'etiser ces \'equations filtr\'ees. Les outils d'analyse num\'erique classiques pr\'edisent alors une convergence rapide en fonction de la
-discr\'etisation car la solution du probl\`eme est r\'eguli\`ere.\\ L'inconv\'enient de la m\'ethode est que l'on converge rapidement vers la solution du problème filtr\'e et non vers la solution du probl\`eme r\'eel. En ce sens,
-la m\'ethode n'est m\^eme pas "consistante". Si on fait d\'ecroître le support de la fonction de filtrage en m\^eme temps que l'on raffine le maillage, on ne dispose d'aucun r\'esultat de convergence de la m\'ethode num\'erique. Ainsi, dans la m\'ethode de front-tracking mise en oeuvre par Duquennoy, l'intensit\'e des courants parasites est constante lorsqu'on raffine le maillage. La m\'ethode ne converge donc pas vers la solution du probl\`eme continu.\\
-La nouvelle approche est fond\'ee sur des bilans sur des volumes de contr\^ole, exactement comme dans une m\'ethode de volumes finis classique. On discr\'etise donc directement les \'equations de Navier-Stokes, y compris les
-discontinuit\'es aux interfaces. Pour obtenir la convergence en maillage de la m\'ethode, un mod\`ele de sous-maille des grandeurs physiques doit \^etre introduit dans les \'el\'ements o\`u ces grandeurs sont discontinues. Ainsi, on
-utilise une repr\'esentation discr\`ete un peu plus fine des champs physiques qui tient compte de la position des interfaces. La convergence obtenue est d'ordre 1 si on utilise un mod\`ele de sous-maille d'ordre z\'ero dans les \'el\'ements contenant des interfaces. Des mod\`eles de sous-maille plus raffin\'es permettraient d'augmenter la pr\'ecision de la m\'ethode, et on devrait pouvoir obtenir les m\^emes qualit\'es qu'une m\'ethode lagrangienne.\smallskip \\
+\textit{\textbf{D\'emarche de discr\'etisation des \'equations continues}}
+\smallskip \\
 
-\textit{\textbf{R\'esum\'e des apports essentiels de la m\'ethode}}\smallskip \\
+Sur le fond, cette d\'emarche change radicalement par rapport \`a la m\'ethode initiale \cite{Unverdi1992} :
+l'ancienne approche consiste \`a appliquer un op\'erateur de filtrage aux \'equations de Navier-Stokes
+pour rendre toutes les grandeurs continues (masse volumique, champ de vitesse, etc.)
+puis \`a discr\'etiser ces \'equations filtr\'ees.
 
-Cette nouvelle approche de discr\'etisation est emprunt\'ee aux m\'ethodes VOF, et
-n'est donc pas nouvelle. Les apports essentiels du travail men\'e dans Trio concernent :\\
-- les algorithmes de transport, pour assurer un bilan de masse exact des
-phases,\\
-- la discr\'etisation de la tension de surface et de la gravit\'e, pour \'eliminer pratiquement les courants parasites,\\
-- le calcul du flux de chaleur aux interfaces pour une meilleure pr\'ecision,\\
-- la prise en compte des lignes de contact.\\
-La m\'ethode propos\'ee peut \^etre \'etendue \`a des sch\'emas en trois dimensions et d'autres types de discr\'etisations eul\'eriennes. On propose en effet une formulation des diff\'erentes grandeurs physiques (en particulier les forces de tension de surface et de gravit\'e) et des op\'erateurs d'interpolation qui s'\'etend directement en trois dimensions. D'autre part, pour peu que la discr\'etisation de la vitesse et de la pression permette d'\'ecrire un bilan de volume discret, le sch\'ema est extensible à des discr\'etisations plus riches que celle du sch\'ema MAC (par exemple la discr\'etisation Volume-\'el\'ements finis \cite{Emonot2003}, \cite{Heib2003}).
-On peut remarquer que les approches "VOF" et "front-tracking" semblent converger vers une m\^eme formulation. La formulation VOF d'origine a ainsi \'et\'e modifi\'ee \cite{Popinet2000} par l'ajout d'un maillage lagrangien des
-interfaces. Elle constitue maintenant une m\'ethode "VOF avec marqueurs" (\`a notre connaissance, une telle m\'ethode n'existe cependant pas encore en 3D). Cette m\'ethode de front-tracking comporte d\'ej\`a un maillage lagrangien des interfaces, et la discr\'etisation actuelle
-des grandeurs à partir de bilans sur les volumes de contr\^oles la rapproche des
-m\'ethodes VOF. Une telle convergence est peut-\^etre le signe que l'on s'approche
+Les outils d'analyse num\'erique classiques pr\'edisent alors une convergence rapide en fonction de la
+discr\'etisation car la solution du probl\`eme est r\'eguli\`ere.\\
+
+L'inconv\'enient de la m\'ethode est que l'on converge rapidement vers la solution du problème filtr\'e
+et non vers la solution du probl\`eme r\'eel.
+En ce sens, la m\'ethode n'est m\^eme pas "consistante".
+
+Si on fait d\'ecroître le support de la fonction de filtrage en m\^eme temps que l'on raffine le maillage,
+on ne dispose d'aucun r\'esultat de convergence de la m\'ethode num\'erique.
+
+Ainsi, dans la m\'ethode de front-tracking mise en oeuvre par Duquennoy,
+l'intensit\'e des courants parasites est constante lorsqu'on raffine le maillage.
+
+La m\'ethode ne converge donc pas vers la solution du probl\`eme continu.\\
+
+La nouvelle approche est fond\'ee sur des bilans sur des volumes de contr\^ole,
+exactement comme dans une m\'ethode de volumes finis classique.
+On discr\'etise donc directement les \'equations de Navier-Stokes, y compris les discontinuit\'es aux interfaces.
+
+Pour obtenir la convergence en maillage de la m\'ethode, un mod\`ele de sous-maille des grandeurs physiques
+doit \^etre introduit dans les \'el\'ements o\`u ces grandeurs sont discontinues.
+Ainsi, on utilise une repr\'esentation discr\`ete un peu plus fine des champs physiques
+qui tient compte de la position des interfaces.
+La convergence obtenue est d'ordre 1 si on utilise un mod\`ele de sous-maille d'ordre z\'ero
+dans les \'el\'ements contenant des interfaces.
+Des mod\`eles de sous-maille plus raffin\'es permettraient d'augmenter la pr\'ecision de la m\'ethode
+et on devrait pouvoir obtenir les m\^emes qualit\'es qu'une m\'ethode lagrangienne.
+\smallskip \\
+
+\textit{\textbf{R\'esum\'e des apports essentiels de la m\'ethode}}
+\smallskip \\
+
+Cette nouvelle approche de discr\'etisation est emprunt\'ee aux m\'ethodes VOF
+et n'est donc pas nouvelle.
+Les apports essentiels du travail men\'e dans TrioCFD concernent :
+\begin{itemize}
+  \item les algorithmes de transport, pour assurer un bilan de masse exact des phases,
+  \item la discr\'etisation de la tension de surface
+        et de la gravit\'e pour \'eliminer pratiquement les courants parasites,
+  \item le calcul du flux de chaleur aux interfaces pour une meilleure pr\'ecision,\\
+  \item la prise en compte des lignes de contact.
+\end{itemize}
+
+La m\'ethode propos\'ee peut \^etre \'etendue \`a des sch\'emas en trois dimensions
+et \`a d'autres types de discr\'etisations eul\'eriennes.
+
+On propose en effet une formulation des diff\'erentes grandeurs physiques
+(en particulier les forces de tension de surface et de gravit\'e)
+et des op\'erateurs d'interpolation qui s'\'etend directement en trois dimensions.
+
+D'autre part, pour peu que la discr\'etisation de la vitesse et de la pression permette d'\'ecrire
+un bilan de volume discret, le sch\'ema est extensible à des discr\'etisations plus riches que celle
+du sch\'ema MAC (par exemple la discr\'etisation Volume-\'el\'ements finis \cite{Emonot2003}, \cite{Heib2003}).
+
+On peut remarquer que les approches "VOF" et "front-tracking" semblent converger vers une m\^eme formulation.
+La formulation VOF d'origine a ainsi \'et\'e modifi\'ee \cite{Popinet2000} par
+l'ajout d'un maillage lagrangien des interfaces.
+
+Elle constitue maintenant une m\'ethode "VOF avec marqueurs"
+(\`a notre connaissance, une telle m\'ethode n'existe cependant pas encore en 3D).
+Cette m\'ethode de front-tracking comporte d\'ej\`a un maillage lagrangien des interfaces
+et la discr\'etisation actuelle des grandeurs à partir de bilans sur les volumes de contr\^oles la rapproche des
+m\'ethodes VOF.
+
+Une telle convergence est peut-\^etre le signe que l'on s'approche
 d'une formulation optimale pour ce type de probl\`emes...
+
 
 \subsection{D\'efinition des grandeurs discr\`etes}
 Nous utiliserons les conventions de notation suivantes pour les grandeurs discr\`etes :\\
@@ -139,9 +375,11 @@ Pour le bon fonctionnement des algorithmes, le maillage doit v\'erifier certaine
 - soit les interfaces sont ferm\'ees, soit leurs extr\'emit\'es (les noeuds n'ayant qu'un seul segment raccord\'e) sont situ\'ees sur un bord du domaine,\\
 - les interfaces d\'efinissent donc des volumes ferm\'es, on demande que toutes les interfaces d\'efinissant le bord d'un volume aient leurs normales orient\'ees dans la m\^eme direction.\\
 Ces propri\'et\'es assurent la coh\'erence topologique du maillage, en particulier la d\'efinition du contenu (gaz ou liquide) des volumes d\'efinis par les interfaces. Les interfaces sont consid\'er\'ees comme une succession de
-segments. En particulier, on ne cherche pas \`a augmenter l'ordre de la m\'ethode par l'utilisation de splines pour le calcul de l'indicatrice. En effet, les propri\'et\'es topologiques \'enonc\'ees plus haut sont plus faciles \`a v\'erifier avec l'utilisation des segments. Les algorithmes sont plus faciles à mettre en oeuvre et plus robustes. Si cette m\'ethode simple donne des r\'esultats satisfaisants, on peut penser qu'en trois dimensions, un maillage en triangles n'ayant pas plus de propri\'et\'es de r\'egularit\'e conviendra aussi. Au vu des difficult\'es rencontr\'ees dans la gestion des maillages surfaciques en trois dimensions, il semble judicieux de privil\'egier les m\'ethodes les plus simples et les plus robustes.\smallskip \\
+segments. En particulier, on ne cherche pas \`a augmenter l'ordre de la m\'ethode par l'utilisation de splines pour le calcul de l'indicatrice. En effet, les propri\'et\'es topologiques \'enonc\'ees plus haut sont plus faciles \`a v\'erifier avec l'utilisation des segments. Les algorithmes sont plus faciles à mettre en oeuvre et plus robustes. Si cette m\'ethode simple donne des r\'esultats satisfaisants, on peut penser qu'en trois dimensions, un maillage en triangles n'ayant pas plus de propri\'et\'es de r\'egularit\'e conviendra aussi. Au vu des difficult\'es rencontr\'ees dans la gestion des maillages surfaciques en trois dimensions, il semble judicieux de privil\'egier les m\'ethodes les plus simples et les plus robustes.
+\smallskip \\
 
-\textit{\textbf{D\'efinitions}}\smallskip \\
+\textit{\textbf{D\'efinitions}}
+\smallskip \\
 
 On appellera $\Gamma$ l'ensemble des interfaces et E un \'el\'ement d'interface (segment en 2D et triangle en 3D).\\
 Nous utiliserons quelques fois la notion de "portion d'interface connexe complète". La connexit\'e signifie que l'on peut passer d'un noeud \`a n'importe quel autre de la portion d'interface en traversant des \'el\'ements de proche en proche. On parle de portion compl\`ete si pour tout \'el\'ement de la portion, ses voisins y sont aussi. Ainsi, si une portion compl\`ete a des bords, ces derniers sont forc\'ement sur un bord du domaine.
@@ -151,9 +389,11 @@ Nous utiliserons quelques fois la notion de "portion d'interface connexe complè
 La courbure est calcul\'ee aux noeuds du maillage surfacique. Ce choix est imp\'eratif pour que la tension de surface qui en r\'esulte n'admette que la solution "courbure constante" pour solution stationnaire du probl\`eme. Si on choisissait de discr\'etiser la courbure aux centres des segments, elle serait nulle pour un profil d'interface ondul\'e et ce profil serait une solution num\'erique stationnaire.\\
 On peut envisager deux formulations de la courbure discr\`ete :\\
 - une formulation fond\'ee sur une interpolation g\'eom\'etrique,\\
-- une formulation fond\'ee sur la diff\'erentielle de l'\'energie d'interface.\smallskip \\
+- une formulation fond\'ee sur la diff\'erentielle de l'\'energie d'interface.
+\smallskip \\
 
-\textit{\textbf{Formulation g\'eom\'etrique}}\smallskip \\
+\textit{\textbf{Formulation g\'eom\'etrique}}
+\smallskip \\
 
 La première est la plus intuitive en deux dimensions : on utilise la d\'efinition g\'eom\'etrique de la courbure
 \begin{equation}
@@ -199,7 +439,8 @@ L'indicatrice est calcul\'ee en fonction de la position des noeuds de l'interfac
 
 \subsubsection{Discr\'etisation de la vitesse et de la pression}
 
-\textit{\textbf{Choix d'une formulation en vitesse ou en quantit\'e de mouvement}}\smallskip \\
+\textit{\textbf{Choix d'une formulation en vitesse ou en quantit\'e de mouvement}}
+\smallskip \\
 
 Nous disposons d'une discr\'etisation de la masse volumique, au travers de l'indicatrice.\\
 Il s'agit maintenant de choisir si on discr\'etise la vitesse $v$ ou la quantit\'e de mouvement $\rho v$. Il s'agit en fait de faire le choix de privil\'egier la conservation du volume ou la conservation de la quantit\'e de mouvement.\\
@@ -215,9 +456,11 @@ Si l'on choisit de discr\'etiser la quantit\'e de mouvement $\overline{\rho v}$,
 Pour illustrer les problèmes li\'es à cette discr\'etisation, consid\'erons un probl\`eme dont la solution est un champ de vitesse $\overline{v}$ uniforme. On discr\'etise la quantit\'e $\overline{\rho v}$ qui est donc discontinue aux interfaces. Les diff\'erents \'el\'ements du sch\'ema num\'erique (op\'erateurs de diffusion et de convection notamment) introduisent des erreurs num\'eriques lors du traitement de cette grandeur discontinue, en particulier une diffusion num\'erique. Si on tente ensuite de calculer une vitesse $\overline{v}$ en divisant par $\overline{\rho}$, la vitesse n'est plus uniforme.\\
 Une telle erreur aurait des cons\'equences f\^acheuses en front-tracking. Elle augmenterait d'ailleurs avec le rapport de masse volumique. Les interfaces ne seraient pas transport\'ees sans d\'eformation m\^eme si la solution du probl\`eme est un champ de vitesse uniforme. Cela implique que l'on modifie l'\'energie de surface des interfaces, ce qui conduit \`a des courants parasites ou des instabilit\'es num\'eriques.\\
 Il n'est pas exclu que l'on puisse construire un sch\'ema num\'erique de transport
-de $\overline{v}$ qui ait de bonnes propri\'et\'es, mais le choix retenu pour l'instant est d'utiliser une discr\'etisation de la vitesse.\smallskip \\
+de $\overline{v}$ qui ait de bonnes propri\'et\'es, mais le choix retenu pour l'instant est d'utiliser une discr\'etisation de la vitesse.
+\smallskip \\
 
-\textit{\textbf{Discr\'etisation}}\smallskip \\
+\textit{\textbf{Discr\'etisation}}
+\smallskip \\
 
 Dans la mise en oeuvre actuelle, la discr\'etisation de la vitesse et de la pression est de type "marker and cell". La pression est discr\'etis\'ee au centre des volumes de contr\^ole $\Omega_{x}$ et $\Omega_{y}$. Dans la formulation classique on donne les d\'efinitions suivantes pour la vitesse :\\
 - les faces verticales portent une composante de vitesse horizontale $\overline{v_{x}}$,\\
@@ -254,7 +497,8 @@ De fa\c con coh\'erente avec cette d\'efinition, la capacit\'e calorifique de l'
 
 \subsubsection{Transfert de chaleur et de masse aux interfaces}
 
-\textit{\textbf{Temp\'erature de saturation}}\smallskip \\
+\textit{\textbf{Temp\'erature de saturation}}
+\smallskip \\
 
 D'apr\`es les \'equations continues utilis\'ees, la temp\'erature de saturation locale d\'epend de la courbure des interfaces et s'exprime en fonction des pressions de part et d'autre de l'interface :
 \begin{equation}
@@ -293,9 +537,11 @@ Cette propri\'et\'e sugg\`ere d'utiliser l'expression suivante, exacte \`a l'\'e
 \overline{T_{sat}} \hat{=} T_{sat}(P), avec\:P\:\hat{=}\:\overline{P} + \overline{\rho} \overline{\phi} + (1 - I)\overline{\kappa}
 \end{equation}
 Cette \'equation para\^it tr\`es simple \`a mettre en oeuvre. De plus, si $\overline{\kappa}$ est constante, le système discret peut-\^etre simultan\'ement \`a l'\'equilibre m\'ecanique et \`a l'\'equilibre thermique. En effet,
-d'une part le champ de vitesse nul est solution du syst\`eme ce qui correspond \`a l'\'equilibre m\'ecanique, et d'autre part $\overline{T_{sat}}$ est constant donc le champ de temp\'erature constant $T = T_{sat}$ est une solution stationnaire du syst\`eme d'\'equations (en pr\'esence de gravit\'e, ce r\'esultat n'est pas imm\'ediat sur le système discret). Malheureusement, elle introduit un couplage extr\^emement fort entre l'\'equation de temp\'erature et l'\'equation de quantit\'e de mouvement. Sans un traitement particulier (traitement implicite de la variation de temp\'erature de saturation), le sch\'ema num\'erique est tr\`es instable.\smallskip \\
+d'une part le champ de vitesse nul est solution du syst\`eme ce qui correspond \`a l'\'equilibre m\'ecanique, et d'autre part $\overline{T_{sat}}$ est constant donc le champ de temp\'erature constant $T = T_{sat}$ est une solution stationnaire du syst\`eme d'\'equations (en pr\'esence de gravit\'e, ce r\'esultat n'est pas imm\'ediat sur le système discret). Malheureusement, elle introduit un couplage extr\^emement fort entre l'\'equation de temp\'erature et l'\'equation de quantit\'e de mouvement. Sans un traitement particulier (traitement implicite de la variation de temp\'erature de saturation), le sch\'ema num\'erique est tr\`es instable.
+\smallskip \\
 
-\textit{\textbf{Enthalpie de changement de phase}}\smallskip \\
+\textit{\textbf{Enthalpie de changement de phase}}
+\smallskip \\
 
 On d\'efinit maintenant la puissance volumique de changement de phase sur un volume de contr\^ole $\Omega$. C'est l'int\'egrale du flux de chaleur des phases vers les interfaces contenues dans ce volume :
 \begin{equation}
@@ -338,9 +584,11 @@ Il convient donc de majorer cette valeur pour assurer la stabilit\'e en temps du
 |\overline{h}| \leq \overline{\rho c_{P}} | \overline{T} - \overline{T_{sat}}| \vartriangle t
 \end{equation}
 On a choisi de privil\'egier le transfert de chaleur dans le liquide, ce qui convient pour les calculs du chapitre suivant. Pour \^etre plus pr\'ecis, il faudrait explorer le champ de temp\'erature des mailles voisines pour d\'eterminer quelle est la part du flux de chaleur provenant du liquide et de la vapeur. Une autre solution consiste \`a discr\'etiser deux champs de temp\'erature - un pour le liquide et un pour la vapeur - \`a l'image des m\'ethodes moyenn\'ees.\\
-Un mod\`ele encore plus fruste peut \^etre utilis\'e : on utilise une conductivit\'e thermique infinie dans l'\'el\'ement. Ainsi, les \'el\'ements contenant une interface ont toujours une temp\'erature $T = T_{sat}$. La pr\'ecision spatiale de ce mod\`ele n'est pas beaucoup plus faible que celle du pr\'ec\'edent (il est consistant et d'ordre 1 en espace) mais le flux de chaleur est discontinu en temps lorsque l'interface p\'enètre un nouvel \'el\'ement. Ces discontinuit\'es provoquent des \`a-coups de vitesse et de pression qui rendent les calculs difficilement exploitables\smallskip \\
+Un mod\`ele encore plus fruste peut \^etre utilis\'e : on utilise une conductivit\'e thermique infinie dans l'\'el\'ement. Ainsi, les \'el\'ements contenant une interface ont toujours une temp\'erature $T = T_{sat}$. La pr\'ecision spatiale de ce mod\`ele n'est pas beaucoup plus faible que celle du pr\'ec\'edent (il est consistant et d'ordre 1 en espace) mais le flux de chaleur est discontinu en temps lorsque l'interface p\'enètre un nouvel \'el\'ement. Ces discontinuit\'es provoquent des \`a-coups de vitesse et de pression qui rendent les calculs difficilement exploitables
+\smallskip \\
 
-\textit{\textbf{Flux de masse aux interfaces}}\smallskip \\
+\textit{\textbf{Flux de masse aux interfaces}}
+\smallskip \\
 On voudrait d\'efinir le transfert de masse volumique sur le maillage eul\'erien
 comme suit :
 \begin{equation}
@@ -409,9 +657,11 @@ Remarque : cette valeur de la masse volumique aux faces est sp\'ecifique au calc
 
 \subsubsection{Bilan de masse des phases}
 
-Le but de cette d\'emonstration un peu technique est d'obtenir une condition g\'eom\'etrique sur le d\'eplacement des noeuds de l'interface pour que le bilan de masse des inclusions soit respect\'e exactement. Comme nous l'avons mentionn\'e au d\'ebut du chapitre, cette propri\'et\'e est un ingr\'edient essentiel et non trivial de la m\'ethode num\'erique. La d\'emonstration commence par la d\'efinition du bilan de masse continu.\smallskip \\
+Le but de cette d\'emonstration un peu technique est d'obtenir une condition g\'eom\'etrique sur le d\'eplacement des noeuds de l'interface pour que le bilan de masse des inclusions soit respect\'e exactement. Comme nous l'avons mentionn\'e au d\'ebut du chapitre, cette propri\'et\'e est un ingr\'edient essentiel et non trivial de la m\'ethode num\'erique. La d\'emonstration commence par la d\'efinition du bilan de masse continu.
+\smallskip \\
 
-\textit{\textbf{D\'efinition du bilan de masse des phases}}\smallskip \\
+\textit{\textbf{D\'efinition du bilan de masse des phases}}
+\smallskip \\
 
 On veut assurer la conservation de la masse des phases dans la formulation discrète des \'equations. Pour un domaine $\Omega(t)$ born\'e par des interfaces mobiles $\Gamma_{i}$ et des bords fixes $\Gamma_{b}$ et ne contenant qu'une seule phase de masse volumique $\rho$, le bilan continu s'\'ecrit :
 \begin{equation}
@@ -421,9 +671,11 @@ o\`u $n$ est la normale aux interfaces dirig\'ee vers la vapeur et $n_{e}$ est l
 \begin{equation}
 \dfrac{\partial}{\partial t} \int_{\Omega(t)} d\Omega = \partial_{t} vol.(\Omega) = \int_{\Gamma i} - \dfrac{\dot{m}}{\rho} n \cdot n_{e} ds - \int_{\Gamma b} - v \cdot n_{e} ds \label{eq:FTD_sommeVarVolume}
 \end{equation}
-Le volume $\Omega$ des interfaces discr\'etis\'ees est calculable exactement, de m\^eme que l'int\'egrale du d\'ebit volumique sur les bords et du flux de masse sur les interfaces. On cherche \`a exprimer une condition locale sur le d\'eplacement des interfaces pour que le bilan discret global soit v\'erifi\'e.\smallskip \\
+Le volume $\Omega$ des interfaces discr\'etis\'ees est calculable exactement, de m\^eme que l'int\'egrale du d\'ebit volumique sur les bords et du flux de masse sur les interfaces. On cherche \`a exprimer une condition locale sur le d\'eplacement des interfaces pour que le bilan discret global soit v\'erifi\'e.
+\smallskip \\
 
-\textit{\textbf{Bilan de volume d'une interface}}\smallskip \\
+\textit{\textbf{Bilan de volume d'une interface}}
+\smallskip \\
 
 Consid\'erons une portion d'interface connexe $\Gamma_{i}$ compl\`ete (si cette surface a des bords, ils sont situ\'es sur un bord du domaine fluide). Cette interface divise le fluide en deux parties $\Omega_{l}$ et $\Omega_{v}$
 d\'esign\'ees en fonction de la phase directement adjacente \`a l'interface, chaque volume contenant \'eventuellement d'autres interfaces $\Gamma_{j}$ . Pour chacun des deux volumes, on consid\`ere la somme des variations de volume \ref{eq:FTD_sommeVarVolume} des phases qu'il contient. Les interfaces $\Gamma_{j}$ int\'erieures au volume contribuent pour deux termes au bilan, une fois pour le liquide et une fois pour la vapeur. Le bilan total s'\'ecrit (par exemple pour le volume $\Omega_{l}$) :
@@ -445,9 +697,11 @@ Utilisons cette expression dans l'\'equation \ref{eq:FTD_bilanTot}. Le bord $\Ga
 \begin{equation}
 =\:-\partial_{t}vol.(\Omega_{v})\:=\:-\int_{\Gamma i}\dfrac{\dot{m}}{\rho_{v}}n\cdot n_{e}ds\:-\:\int_{\overline{\Gamma}v}v \cdot n_{e} ds\:+\:\int_{\Gamma b,i \cap \Omega v} v \cdot n_{e} ds
 \end{equation}
-Les int\'egrales sur $\Gamma_{b,i}$ n'ont pas de contrepartie discrète exacte (le domaine d'int\'egration est une fraction de maille qui change au cours du pas de temps), sauf si la vitesse $v \cdot n_{e}$ est explicitement nulle (condition aux limites de paroi fixe par exemple). Ainsi, le bilan discret de volume des phases est exact seulement si les lignes de contact sont situ\'ees sur des bords ferm\'es du domaine. Supposons pour la suite que c'est le cas.\smallskip \\
+Les int\'egrales sur $\Gamma_{b,i}$ n'ont pas de contrepartie discrète exacte (le domaine d'int\'egration est une fraction de maille qui change au cours du pas de temps), sauf si la vitesse $v \cdot n_{e}$ est explicitement nulle (condition aux limites de paroi fixe par exemple). Ainsi, le bilan discret de volume des phases est exact seulement si les lignes de contact sont situ\'ees sur des bords ferm\'es du domaine. Supposons pour la suite que c'est le cas.
+\smallskip \\
 
-\textit{\textbf{Expression du bilan de volume discret d'une interface}}\smallskip \\
+\textit{\textbf{Expression du bilan de volume discret d'une interface}}
+\smallskip \\
 En multipliant $\partial_{t}vol.(\Omega_{l})$ par $\rho_{l}$ et $\partial_{t}vol.(\Omega_{v})$ par $\rho_{v}$ et en sommant, on a :
 \begin{equation}
 \rho_{v}\partial_{t}vol.(\Omega_{v})\:-\:\rho_{l}\partial_{t}vol.(\Omega_{v})\:=\:\rho_{l}\int_{\overline{\Gamma}_{l}} v \cdot n_{e} ds\:+\:\rho_{v}\int_{\overline{\Gamma}_{v}} v \cdot n_{e} ds
@@ -461,9 +715,11 @@ Comme les vitesses discrètes sont constantes au cours d'un pas de temps $\vartr
 \vartriangle vol.(\Omega_{v})\:=\:\vartriangle t \int_{\overline{\Omega}_{i}} V' d\Omega
 \end{equation}
 Pour assurer la conservation du volume des phases, il faut donc s'assurer que la variation de volume g\'eom\'etrique de chaque portion d'interface connexe au cours du pas de temps est \'egale \`a l'int\'egrale discr\`ete de $V'$.
-Pour cela, on attribue \`a chaque noeud d'interface une variation de volume $V'_{i}$ , \`a l'aide des relations de passage conservatives. Le d\'eplacement de chaque noeud devra alors contribuer \`a la variation de volume qui lui est associ\'ee.\smallskip \\
+Pour cela, on attribue \`a chaque noeud d'interface une variation de volume $V'_{i}$ , \`a l'aide des relations de passage conservatives. Le d\'eplacement de chaque noeud devra alors contribuer \`a la variation de volume qui lui est associ\'ee.
+\smallskip \\
 
-\textit{\textbf{Bilan de volume d"une interface}}\smallskip \\
+\textit{\textbf{Bilan de volume d"une interface}}
+\smallskip \\
 
 On a obtenu une condition g\'eom\'etrique sur le d\'eplacement des interfaces et les vitesses sur le maillage fixe pour respecter le bilan de masse exact des phases. Cette condition utilise uniquement la grandeur locale $V'$ pour le maillage fixe.On a essentiellement utilis\'e deux ingr\'edients :\\
 - le bilan exact de volume sur le champ de vitesse discret dans les phases,
