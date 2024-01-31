@@ -243,10 +243,10 @@ void IJK_One_Dimensional_Subproblems::associate_variables_for_post_processing(IJ
     {
       debug_ = ref_thermal_subresolution.debug_;
       reference_gfm_on_probes_ = ref_thermal_subresolution.reference_gfm_on_probes_;
-      bubbles_volume_ = &ref_thermal_subresolution.bubbles_volume_;
-      bubbles_rising_velocities_ = &ref_thermal_subresolution.rising_velocities_;
-      bubbles_rising_vectors_per_bubble_ = &ref_thermal_subresolution.rising_vectors_;
-      liquid_velocity_ = &ref_thermal_subresolution.liquid_velocity_;
+      bubbles_volume_ = ref_thermal_subresolution.bubbles_volume_;
+      bubbles_rising_velocities_ = ref_thermal_subresolution.rising_velocities_;
+      bubbles_rising_vectors_per_bubble_ = ref_thermal_subresolution.rising_vectors_;
+      liquid_velocity_ = ref_thermal_subresolution.liquid_velocity_;
       prandtl_number_ = &ref_thermal_subresolution.prandtl_number_;
       latastep_reprise_= &ref_thermal_subresolution.latastep_reprise_ini_;
     }
@@ -277,29 +277,29 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
 
   if (debug_)
     Cerr << "Mixed cell indices (i,j,k) : (" << i << ";" << j << ";" << k << ")" << finl;
-  const int compo_connex = (*(ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_))(i, j, k);
-  const int compo_connex_ghost = (*(ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_))(i,j,k);
+  const int compo_connex = (*ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_)(i, j, k);
+  const int compo_connex_ghost = (*ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_)(i,j,k);
   if (debug_)
     {
       Cerr << "compo_connex : " << compo_connex << finl;
       Cerr << "compo_connex_ghost : " << compo_connex_ghost << finl;
-      Cerr << "bubbles_barycentre : " << ref_thermal_subresolution.bubbles_barycentre_ << finl;
+      Cerr << "bubbles_barycentre : " << *ref_thermal_subresolution.bubbles_barycentre_ << finl;
     }
 
   // Need for a Navier-Stokes field (NOT FT)
-  const double distance = ref_thermal_subresolution.eulerian_distance_ns_(i, j ,k);
-  const double curvature = ref_thermal_subresolution.eulerian_curvature_ns_(i, j ,k);
-  const double interfacial_area = ref_thermal_subresolution.eulerian_interfacial_area_ns_(i, j ,k);
+  const double distance = (*ref_thermal_subresolution.eulerian_distance_ns_)(i, j ,k);
+  const double curvature = (*ref_thermal_subresolution.eulerian_curvature_ns_)(i, j ,k);
+  const double interfacial_area = (*ref_thermal_subresolution.eulerian_interfacial_area_ns_)(i, j ,k);
 
-  IJK_Splitting splitting = (*(ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_)).get_splitting();
-  const double bubble_rising_velocity = ref_thermal_subresolution.rising_velocities_(compo_connex);
+  IJK_Splitting splitting = (*ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_).get_splitting();
+  const double bubble_rising_velocity = (*ref_thermal_subresolution.rising_velocities_)(compo_connex);
 
   for (int dir=0; dir < 3; dir++)
     {
-      facet_barycentre(dir) = ref_thermal_subresolution.eulerian_facets_barycentre_ns_[dir](i, j, k);
-      normal_vector(dir) = ref_thermal_subresolution.eulerian_normal_vectors_ns_[dir](i, j, k);
-      bubble_rising_vector(dir) = ref_thermal_subresolution.rising_vectors_(compo_connex, dir);
-      bubble_barycentre(dir) = ref_thermal_subresolution.bubbles_barycentre_(compo_connex_ghost, dir);
+      facet_barycentre(dir) = (*ref_thermal_subresolution.eulerian_facets_barycentre_ns_)[dir](i, j, k);
+      normal_vector(dir) = (*ref_thermal_subresolution.eulerian_normal_vectors_ns_)[dir](i, j, k);
+      bubble_rising_vector(dir) = (*ref_thermal_subresolution.rising_vectors_)(compo_connex, dir);
+      bubble_barycentre(dir) = (*ref_thermal_subresolution.bubbles_barycentre_)(compo_connex_ghost, dir);
     }
 
   const int total_subproblems = (*this).size();

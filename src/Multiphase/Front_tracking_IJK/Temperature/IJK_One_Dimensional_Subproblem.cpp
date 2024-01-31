@@ -220,12 +220,12 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                  ref_thermal_subresolution.cell_diagonal_,
                                  ref_thermal_subresolution.dr_,
                                  ref_thermal_subresolution.radial_coordinates_);
-      associate_bubble_parameters(ref_thermal_subresolution.bubbles_volume_,
-                                  ref_one_dimensional_subproblems.total_surface_per_bubble_,
+      associate_bubble_parameters(ref_one_dimensional_subproblems.total_surface_per_bubble_,
                                   ref_one_dimensional_subproblems.radius_from_surfaces_per_bubble_,
                                   ref_one_dimensional_subproblems.radius_from_volumes_per_bubble_,
                                   ref_one_dimensional_subproblems.delta_temperature_,
                                   ref_thermal_subresolution.mean_liquid_temperature_,
+                                  ref_thermal_subresolution.bubbles_volume_,
                                   ref_thermal_subresolution.rising_vectors_);
       associate_finite_difference_operators(ref_thermal_subresolution.radial_first_order_operator_raw_,
                                             ref_thermal_subresolution.radial_second_order_operator_raw_,
@@ -335,11 +335,11 @@ void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_sparse_matrix(
 }
 
 void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
-                                                                          const IJK_Field_double& eulerian_distance,
-                                                                          const IJK_Field_double& eulerian_curvature,
-                                                                          const IJK_Field_double& eulerian_interfacial_area,
-                                                                          const FixedVector<IJK_Field_double, 3>& eulerian_normal_vect,
-                                                                          const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
+                                                                          const IJK_Field_double * eulerian_distance,
+                                                                          const IJK_Field_double * eulerian_curvature,
+                                                                          const IJK_Field_double * eulerian_interfacial_area,
+                                                                          const FixedVector<IJK_Field_double, 3> * eulerian_normal_vect,
+                                                                          const FixedVector<IJK_Field_double, 3> * eulerian_facets_barycentre,
                                                                           const IJK_Field_double& temperature,
                                                                           const IJK_Field_double& temperature_ft,
                                                                           const IJK_Field_double& temperature_before_extrapolation,
@@ -352,11 +352,11 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
                                                                           const IJK_Field_double& eulerian_grad_T_interface_ns)
 {
   interfaces_ = &interfaces;
-  eulerian_distance_ = &eulerian_distance;
-  eulerian_curvature_ = &eulerian_curvature;
-  eulerian_interfacial_area_ = &eulerian_interfacial_area;
-  eulerian_normal_vect_ = &eulerian_normal_vect;
-  eulerian_facets_barycentre_ = &eulerian_facets_barycentre;
+  eulerian_distance_ = eulerian_distance;
+  eulerian_curvature_ = eulerian_curvature;
+  eulerian_interfacial_area_ = eulerian_interfacial_area;
+  eulerian_normal_vect_ = eulerian_normal_vect;
+  eulerian_facets_barycentre_ = eulerian_facets_barycentre;
   temperature_ = &temperature ;
   temperature_ft_ = &temperature_ft ;
   temperature_before_extrapolation_ = &temperature_before_extrapolation;
@@ -514,21 +514,21 @@ void IJK_One_Dimensional_Subproblem::associate_probe_parameters(const int& point
     points_per_thermal_subproblem_ = increase_number_of_points(); //copy if modified later
 }
 
-void IJK_One_Dimensional_Subproblem::associate_bubble_parameters(const ArrOfDouble& bubbles_volume,
-                                                                 const ArrOfDouble& bubbles_surface,
+void IJK_One_Dimensional_Subproblem::associate_bubble_parameters(const ArrOfDouble& bubbles_surface,
                                                                  const ArrOfDouble& radius_from_surfaces_per_bubble,
                                                                  const ArrOfDouble& radius_from_volumes_per_bubble,
                                                                  const double& delta_temperature,
                                                                  const double& mean_liquid_temperature,
-                                                                 const DoubleTab& rising_vectors)
+                                                                 const ArrOfDouble * bubbles_volume,
+                                                                 const DoubleTab * rising_vectors)
 {
-  bubbles_volume_ = &bubbles_volume;
   bubbles_surface_ = &bubbles_surface;
   radius_from_surfaces_per_bubble_ = &radius_from_surfaces_per_bubble;
   radius_from_volumes_per_bubble_ = &radius_from_volumes_per_bubble;
   delta_temperature_ = &delta_temperature;
   mean_liquid_temperature_ = &mean_liquid_temperature;
-  bubbles_rising_vectors_per_bubble_ = &rising_vectors;
+  bubbles_volume_ = bubbles_volume;
+  bubbles_rising_vectors_per_bubble_ = rising_vectors;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,

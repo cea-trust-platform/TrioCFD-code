@@ -587,20 +587,21 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter_flag("test_etapes_et_bilan", &test_etapes_et_bilan_); // XD_ADD_P chaine not_set
   // GAB, champ de reprise + champ initial
   param.ajouter_flag("ajout_init_a_reprise", &add_initial_field_); // XD_ADD_P chaine not_set
-  //
+
 
   param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_); // XD_ADD_P chaine not_set
   param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_); // XD_ADD_P chaine not_set
   vap_velocity_tmoy_ = reprise_vap_velocity_tmoy_;
   liq_velocity_tmoy_ = reprise_liq_velocity_tmoy_;
 
-  //
+
   param.ajouter("sigma", &sigma_); // XD_ADD_P floattant surface tension
   param.ajouter("rho_vapeur", &rho_vapeur_); // XD_ADD_P floattant vapour density
   param.ajouter("mu_vapeur", &mu_vapeur_); // XD_ADD_P floattant vapour viscosity
 
   param.ajouter_flag("first_step_interface_smoothing", &first_step_interface_smoothing_);
   post_.complete_interpreter(param, is);
+
 // XD attr check_stats rien check_stats 1 Flag to compute additional (xy)-plane averaged statistics
 // XD attr dt_post entier dt_post 1 Post-processing frequency (for lata output)
 // XD attr dt_post_stats_plans entier dt_post_stats_plans 1 Post-processing frequency for averaged statistical files (txt files containing averaged information on (xy) planes for each z-center) both instantaneous, or cumulated time-integration (see file header for variables list)
@@ -1745,6 +1746,11 @@ int IJK_FT_double::initialise()
    */
   interfaces_.initialise_ijk_compo_connex_bubbles_params();
   thermals_.initialize(splitting_, nalloc);
+  thermals_.get_rising_velocities_parameters(compute_rising_velocities_,
+                                             fill_rising_velocities_);
+  nalloc += interfaces_.associate_rising_velocities_parameters(splitting_,
+                                                               compute_rising_velocities_,
+                                                               fill_rising_velocities_);
 
   statistiques().end_count(calculer_thermique_prop_counter_);
   Cout << "End of IJK_FT_double::initialise()" << finl;
@@ -2294,21 +2300,19 @@ void IJK_FT_double::run()
       Cout << "Schema temps de type : RK3_FT" << finl;
     }
   else
-    {
-      Cout << "Schema temps de type : euler_explicite" << finl;
-    }
+    Cout << "Schema temps de type : euler_explicite" << finl;
+
 
   velocity_diffusion_op_.initialize(splitting_);
   velocity_diffusion_op_.set_bc(boundary_conditions_);
   velocity_convection_op_.initialize(splitting_);
 
-// Economise la memoire si pas besoin
+  // Economise la memoire si pas besoin
   if (!disable_solveur_poisson_)
-    {
-      poisson_solver_.initialize(splitting_);
-    }
+    poisson_solver_.initialize(splitting_);
 
-// C'est ici aussi qu'on alloue les champs de temperature.
+
+  // C'est ici aussi qu'on alloue les champs de temperature.
   nalloc += initialise();
 
 //  rho_field_.echange_espace_virtuel(2);
@@ -4382,6 +4386,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   // thermals_.update_intersections(); // no need as IJK_intersections call interfaces_nI interfaces_xI
   interfaces_.compute_compo_connex_from_bounding_box();
   interfaces_.compute_compo_connex_from_interface();
+  interfaces_.compute_rising_velocities_from_compo();
 
   // On supprime les duplicatas avant le transport :
   interfaces_.supprimer_duplicata_bulles();

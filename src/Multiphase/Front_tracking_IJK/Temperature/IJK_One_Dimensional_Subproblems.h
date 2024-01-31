@@ -243,9 +243,9 @@ protected :
   double error_temperature_ana_squared_total_ = 0.;
   double error_temperature_ana_rel_total_ = 0.;
 
-  ArrOfDouble * bubbles_volume_;
-  ArrOfDouble * bubbles_rising_velocities_;
-  DoubleTab * bubbles_rising_vectors_per_bubble_;
+  const ArrOfDouble * bubbles_volume_;
+  const ArrOfDouble * bubbles_rising_velocities_;
+  const DoubleTab * bubbles_rising_vectors_per_bubble_;
   ArrOfDouble bubbles_rising_relative_velocities_;
   ArrOfDouble bubbles_rising_relative_velocities_upstream_;
   ArrOfDouble bubbles_reynolds_numbers_per_bubble_;
@@ -322,7 +322,7 @@ protected :
   double bubbles_total_peclet_numbers_from_surface_per_bubble_upstream_ = 0.;
   double bubbles_total_peclet_numbers_from_volume_per_bubble_upstream_  = 0.;
 
-  Vecteur3 * liquid_velocity_;
+  const Vecteur3 * liquid_velocity_;
 
   int nb_bubbles_ = 0;
   int * latastep_reprise_;

@@ -81,9 +81,9 @@ public :
     cell_faces_neighbours_corrected_bool_ = &cell_faces_neighbours_corrected_bool;
   }
 
-  void set_eulerian_normal_vectors_ns_normed(FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors_ns_normed) override
+  void set_eulerian_normal_vectors_ns_normed(const FixedVector<IJK_Field_double, 3> * eulerian_normal_vectors_ns_normed) override
   {
-    eulerian_normal_vectors_ns_normed_ = &eulerian_normal_vectors_ns_normed;
+    eulerian_normal_vectors_ns_normed_ = eulerian_normal_vectors_ns_normed;
   }
 
   void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
@@ -451,8 +451,8 @@ protected :
   int find_reachable_fluxes_;
   int use_reachable_fluxes_;
   int keep_first_reachable_fluxes_;
-  FixedVector<IJK_Field_int, 3>* cell_faces_neighbours_corrected_bool_;
-  FixedVector<IJK_Field_double, 3>* eulerian_normal_vectors_ns_normed_;
+  FixedVector<IJK_Field_int, 3> * cell_faces_neighbours_corrected_bool_;
+  const FixedVector<IJK_Field_double, 3> * eulerian_normal_vectors_ns_normed_;
 
   int convective_flux_correction_;
   int diffusive_flux_correction_;

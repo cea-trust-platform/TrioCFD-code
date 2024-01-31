@@ -226,6 +226,14 @@ public :
   {
     return disable_convection_qdm_;
   }
+  const int& get_compute_rising_velocities() const
+  {
+    return compute_rising_velocities_;
+  }
+  const int& get_fill_rising_velocities() const
+  {
+    return fill_rising_velocities_;
+  }
   //  Intersection_Interface_ijk_cell& get_intersection_ijk_cell()
   //  {
   //    return intersection_ijk_cell_;
@@ -714,6 +722,9 @@ protected :
 
   int counter_first_iter_ = 2;
   int first_step_interface_smoothing_ = 0;
+
+  int compute_rising_velocities_ = 0;
+  int fill_rising_velocities_ = 0;
 };
 
 #endif /* IJK_FT_included */

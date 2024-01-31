@@ -643,6 +643,24 @@ public :
     ijk_compo_connex_.initialise_bubbles_params();
   }
 
+  int associate_rising_velocities_parameters(const IJK_Splitting& splitting,
+                                             const int& compute_rising_velocities,
+                                             const int& fill_rising_velocities)
+  {
+    if (!is_diphasique_)
+      return 0;
+    return ijk_compo_connex_.associate_rising_velocities_parameters(splitting,
+                                                                    compute_rising_velocities,
+                                                                    fill_rising_velocities);
+  }
+
+  void compute_rising_velocities_from_compo()
+  {
+    if (!is_diphasique_)
+      return;
+    ijk_compo_connex_.compute_rising_velocities();
+  }
+
 protected:
   // Met a jour les valeurs de surface_vapeur_par_face_ et barycentre_vapeur_par_face_
   SurfaceVapeurIJKComputation surface_vapeur_par_face_computation_;

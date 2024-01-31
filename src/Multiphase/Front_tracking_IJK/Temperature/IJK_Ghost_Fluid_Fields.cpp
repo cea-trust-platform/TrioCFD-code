@@ -23,6 +23,8 @@
 #include <IJK_FT.h>
 #include <IJK_Navier_Stokes_tools.h>
 #include <IJK_Ghost_Fluid_tools.h>
+#include <IJK_Bubble_tools.h>
+
 
 Implemente_instanciable( IJK_Ghost_Fluid_Fields, "IJK_Ghost_Fluid_Fields", Objet_U ) ;
 

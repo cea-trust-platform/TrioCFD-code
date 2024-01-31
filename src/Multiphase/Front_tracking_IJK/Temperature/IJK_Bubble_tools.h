@@ -55,14 +55,14 @@ void compute_bounding_box_fill_compo(const IJK_Interfaces& interfaces,
 void compute_interfacial_compo_fill_compo(const IJK_Interfaces& interfaces, IJK_Field_double& eulerian_compo_connex);
 
 void compute_rising_velocity(const FixedVector<IJK_Field_double, 3>& velocity, const IJK_Interfaces& interfaces,
-                             const IJK_Field_int * eulerian_compo_connex_ns, const int& gravity_dir,
+                             const IJK_Field_int& eulerian_compo_connex_ns, const int& gravity_dir,
                              ArrOfDouble& rising_velocities, DoubleTab& rising_vectors,
                              Vecteur3& liquid_velocity);
 
 void fill_rising_velocity_double(const IJK_Field_double * eulerian_compo_connex_ns, const ArrOfDouble& rising_velocities,
                                  IJK_Field_double& eulerian_rising_velocity);
 
-void fill_rising_velocity_int(const IJK_Field_int * eulerian_compo_connex_ns,
+void fill_rising_velocity_int(const IJK_Field_int& eulerian_compo_connex_ns,
                               const ArrOfDouble& rising_velocities, IJK_Field_double& eulerian_rising_velocity);
 
 #endif /* IJK_Bubble_tools_included */

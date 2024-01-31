@@ -100,7 +100,7 @@ public :
   inline void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs);
   inline void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting);
   inline void set_cell_faces_neighbours_corrected_bool(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool);
-  inline void set_eulerian_normal_vectors_ns_normed(FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors_ns_normed);
+  inline void set_eulerian_normal_vectors_ns_normed(const FixedVector<IJK_Field_double, 3> * eulerian_normal_vectors_ns_normed);
   inline void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
                                                    const int& use_cell_neighbours_for_fluxes_spherical_correction,
                                                    const int& compute_reachable_fluxes,
@@ -291,7 +291,7 @@ inline void Corrige_flux_FT::set_cell_faces_neighbours_corrected_bool(FixedVecto
   valeur().set_cell_faces_neighbours_corrected_bool(cell_faces_neighbours_corrected_bool);
 }
 
-inline void Corrige_flux_FT::set_eulerian_normal_vectors_ns_normed(FixedVector<IJK_Field_double, 3>& eulerian_normal_vectors_ns_normed)
+inline void Corrige_flux_FT::set_eulerian_normal_vectors_ns_normed(const FixedVector<IJK_Field_double, 3> * eulerian_normal_vectors_ns_normed)
 {
   valeur().set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed);
 }

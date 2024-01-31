@@ -443,11 +443,11 @@ protected :
   };
 
   void associate_eulerian_fields_references(const IJK_Interfaces& interfaces,
-                                            const IJK_Field_double& eulerian_distance,
-                                            const IJK_Field_double& eulerian_curvature,
-                                            const IJK_Field_double& eulerian_interfacial_area,
-                                            const FixedVector<IJK_Field_double, 3>& eulerian_normal_vect,
-                                            const FixedVector<IJK_Field_double, 3>& eulerian_facets_barycentre,
+                                            const IJK_Field_double *  eulerian_distance,
+                                            const IJK_Field_double * eulerian_curvature,
+                                            const IJK_Field_double * eulerian_interfacial_area,
+                                            const FixedVector<IJK_Field_double, 3> * eulerian_normal_vect,
+                                            const FixedVector<IJK_Field_double, 3> * eulerian_facets_barycentre,
                                             const IJK_Field_double& temperature,
                                             const IJK_Field_double& temperature_ft,
                                             const IJK_Field_double& temperature_before_extrapolation,
@@ -479,13 +479,13 @@ protected :
                                   const double& cell_diagonal,
                                   const double& dr_base,
                                   const DoubleVect& radial_coordinates);
-  void associate_bubble_parameters(const ArrOfDouble& bubbles_volume,
-                                   const ArrOfDouble& bubbles_surface,
+  void associate_bubble_parameters(const ArrOfDouble& bubbles_surface,
                                    const ArrOfDouble& radius_from_surfaces_per_bubble,
                                    const ArrOfDouble& radius_from_volumes_per_bubble,
                                    const double& delta_temperature,
                                    const double& mean_liquid_temperature,
-                                   const DoubleTab& rising_vectors);
+                                   const ArrOfDouble * bubbles_volume,
+                                   const DoubleTab * rising_vectors);
   void associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,
                                              const Matrice& radial_second_order_operator_raw,
                                              const Matrice& radial_first_order_operator,

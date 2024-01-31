@@ -119,6 +119,12 @@ double IJK_Thermals::get_modified_time()
   return modified_time;
 }
 
+void IJK_Thermals::get_rising_velocities_parameters(int& compute_rising_velocities, int& fill_rising_velocities)
+{
+  for (auto& itr : *this)
+    itr.get_rising_velocities_parameters(compute_rising_velocities, fill_rising_velocities);
+}
+
 void IJK_Thermals::sauvegarder_temperature(Nom& lata_name)
 {
   int idth = 0;
@@ -401,22 +407,22 @@ void IJK_Thermals::clean_ijk_intersections()
 void IJK_Thermals::compute_eulerian_distance()
 {
   ghost_fluid_fields_.compute_eulerian_distance();
-  for (auto& itr : (*this))
-    itr.compute_eulerian_distance();
+  //  for (auto& itr : (*this))
+  //    itr.compute_eulerian_distance();
 }
 
 void IJK_Thermals::compute_eulerian_curvature()
 {
   ghost_fluid_fields_.compute_eulerian_curvature();
-  for (auto& itr : (*this))
-    itr.compute_eulerian_curvature();
+  //  for (auto& itr : (*this))
+  //    itr.compute_eulerian_curvature();
 }
 
 void IJK_Thermals::compute_eulerian_curvature_from_interface()
 {
   ghost_fluid_fields_.compute_eulerian_curvature_from_interface();
-  for (auto& itr : (*this))
-    itr.compute_eulerian_curvature_from_interface();
+  //  for (auto& itr : (*this))
+  //    itr.compute_eulerian_curvature_from_interface();
 }
 
 void IJK_Thermals::compute_eulerian_distance_curvature()

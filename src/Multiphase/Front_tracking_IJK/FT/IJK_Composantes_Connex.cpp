@@ -103,6 +103,8 @@ int IJK_Composantes_Connex::initialize(const IJK_Splitting& splitting,
       nalloc += 1;
       eulerian_compo_connex_valid_compo_field_.data() = 0;
       eulerian_compo_connex_valid_compo_field_.echange_espace_virtuel(eulerian_compo_connex_valid_compo_field_.ghost());
+
+
     }
   return nalloc;
 }
@@ -115,6 +117,23 @@ void IJK_Composantes_Connex::associer(const IJK_FT_double& ijk_ft)
 void IJK_Composantes_Connex::initialise_bubbles_params()
 {
   interfaces_->calculer_volume_bulles(bubbles_volume_, bubbles_barycentre_);
+}
+
+int IJK_Composantes_Connex::associate_rising_velocities_parameters(const IJK_Splitting& splitting,
+                                                                   const int& compute_rising_velocities,
+                                                                   const int& fill_rising_velocities)
+{
+  int nalloc = 0;
+  compute_rising_velocities_ = compute_rising_velocities;
+  fill_rising_velocities_ = fill_rising_velocities;
+  if (fill_rising_velocities_)
+    {
+      eulerian_rising_velocities_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      eulerian_rising_velocities_.data() = 0;
+      nalloc += 1;
+      eulerian_rising_velocities_.echange_espace_virtuel(eulerian_rising_velocities_.ghost());
+    }
+  return nalloc;
 }
 
 void IJK_Composantes_Connex::compute_bounding_box_fill_compo_connex()
@@ -351,4 +370,26 @@ void IJK_Composantes_Connex::fill_mixed_cell_compo()
   eulerian_compo_connex_from_interface_int_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_int_ns_.ghost());
   eulerian_compo_connex_from_interface_ghost_int_ns_.echange_espace_virtuel(eulerian_compo_connex_from_interface_ghost_int_ns_.ghost());
   eulerian_compo_connex_valid_compo_field_.echange_espace_virtuel(eulerian_compo_connex_valid_compo_field_.ghost());
+}
+
+void IJK_Composantes_Connex::compute_rising_velocities()
+{
+  if (compute_rising_velocities_)
+    {
+      int nb_bubbles = ref_ijk_ft_->itfce().get_nb_bulles_reelles();
+      rising_velocities_ = ArrOfDouble(nb_bubbles);
+      rising_vectors_ = DoubleTab(nb_bubbles, 3);
+      compute_rising_velocity(ref_ijk_ft_->get_velocity(), ref_ijk_ft_->itfce(),
+                              eulerian_compo_connex_from_interface_int_ns_, ref_ijk_ft_->get_direction_gravite(),
+                              rising_velocities_, rising_vectors_,
+                              liquid_velocity_);
+      if (fill_rising_velocities_)
+        {
+          eulerian_rising_velocities_.data() = 0.;
+          eulerian_rising_velocities_.echange_espace_virtuel(eulerian_rising_velocities_.ghost());
+          fill_rising_velocity_int(eulerian_compo_connex_from_interface_int_ns_, rising_velocities_, eulerian_rising_velocities_);
+        }
+    }
+  else
+    Cerr << "Don't compute the ghost temperature field" << finl;
 }

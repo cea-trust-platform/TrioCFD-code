@@ -90,7 +90,8 @@ public :
   void thermal_subresolution_outputs();
   int get_disable_post_processing_probes_out_files() const;
   double get_modified_time();
-
+  void get_rising_velocities_parameters(int& compute_rising_velocities,
+                                        int& fill_rising_velocities);
   void create_folders_for_probes();
   void create_folders(Nom folder_name_base);
   void set_first_step_thermals_post(int& first_step_thermals_post);
