@@ -207,6 +207,9 @@ void IJK_Ghost_Fluid_Fields::compute_eulerian_distance()
 
 void IJK_Ghost_Fluid_Fields::enforce_distance_curvature_values_for_post_processings()
 {
+  /*
+   * For post-processings purposes
+   */
   enforce_zero_value_eulerian_distance();
   enforce_max_value_eulerian_curvature();
   enforce_max_value_eulerian_field(eulerian_interfacial_area_ft_);

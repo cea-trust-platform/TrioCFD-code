@@ -407,22 +407,16 @@ void IJK_Thermals::clean_ijk_intersections()
 void IJK_Thermals::compute_eulerian_distance()
 {
   ghost_fluid_fields_.compute_eulerian_distance();
-  //  for (auto& itr : (*this))
-  //    itr.compute_eulerian_distance();
 }
 
 void IJK_Thermals::compute_eulerian_curvature()
 {
   ghost_fluid_fields_.compute_eulerian_curvature();
-  //  for (auto& itr : (*this))
-  //    itr.compute_eulerian_curvature();
 }
 
 void IJK_Thermals::compute_eulerian_curvature_from_interface()
 {
   ghost_fluid_fields_.compute_eulerian_curvature_from_interface();
-  //  for (auto& itr : (*this))
-  //    itr.compute_eulerian_curvature_from_interface();
 }
 
 void IJK_Thermals::compute_eulerian_distance_curvature()
@@ -506,10 +500,6 @@ void IJK_Thermals::create_folders(Nom folder_name_base)
       assert(!error);
       if (error)
         Process::exit();
-      //  istringstream folder_name_istringstream(folder_name.c_str());
-      //  istream& folder_name_istream = folder_name_istringstream;
-      //  Entree folder_name_entry(folder_name_istream);
-      //  make_dir_for_out_files_.interpreter(folder_name_entry);
     }
 }
 
