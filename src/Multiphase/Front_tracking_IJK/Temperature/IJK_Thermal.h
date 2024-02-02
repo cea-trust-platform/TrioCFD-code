@@ -64,7 +64,9 @@ public :
   inline const IJK_Field_double& get_ecart_t_ana() const { return valeur().get_ecart_t_ana(); }
   inline const IJK_Field_double& get_ecart_t_ana_rel() const { return valeur().get_ecart_t_ana_rel(); }
   inline const FixedVector<IJK_Field_double, 3>& get_grad_T() const { return valeur().get_grad_T(); }
+  inline const IJK_Field_double& get_div_lambda_grad_T_volume() const { return valeur().get_div_lambda_grad_T_volume(); }
   inline const IJK_Field_double& get_div_lambda_grad_T() const { return valeur().get_div_lambda_grad_T(); }
+  inline const IJK_Field_double& get_u_T_convective_volume() const { return valeur().get_u_T_convective_volume(); }
   inline const IJK_Field_double& get_u_T_convective() const { return valeur().get_u_T_convective(); }
   inline const IJK_Field_double& get_eulerian_distance_ft() const { return valeur().get_eulerian_distance_ft(); }
   inline const IJK_Field_double& get_eulerian_curvature_ft() const { return valeur().get_eulerian_curvature_ft(); }
@@ -135,7 +137,7 @@ public :
   inline void associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell,
                                                const Intersection_Interface_ijk_face& intersection_ijk_face);
   inline void associer_ghost_fluid_fields(const IJK_Ghost_Fluid_Fields& ghost_fluid_fields);
-  inline void sauvegarder_temperature(Nom& lata_name, int idx);
+  inline void sauvegarder_temperature(Nom& lata_name, int idx, const int& stop);
   inline double compute_timestep(const double timestep,
                                  const double dxmin);
   inline double compute_global_energy();
@@ -271,9 +273,9 @@ inline void IJK_Thermal::associer_ghost_fluid_fields(const IJK_Ghost_Fluid_Field
   valeur().associer_ghost_fluid_fields(ghost_fluid_fields);
 }
 
-inline void IJK_Thermal::sauvegarder_temperature(Nom& lata_name, int idx)
+inline void IJK_Thermal::sauvegarder_temperature(Nom& lata_name, int idx, const int& stop)
 {
-  valeur().sauvegarder_temperature(lata_name, idx);
+  valeur().sauvegarder_temperature(lata_name, idx, stop);
 }
 
 inline double IJK_Thermal::compute_timestep(const double timestep, const double dxmin)

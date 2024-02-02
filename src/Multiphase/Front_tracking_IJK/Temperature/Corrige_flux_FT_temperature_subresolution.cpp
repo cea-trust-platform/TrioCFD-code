@@ -47,6 +47,7 @@ Corrige_flux_FT_temperature_subresolution::Corrige_flux_FT_temperature_subresolu
   flux_init_ = 0;
   convective_flux_correction_ = 0;
   diffusive_flux_correction_ = 0;
+  smooth_temperature_field_=0;
 
   copy_fluxes_on_every_procs_ = 1;
   copy_temperature_on_every_procs_ = 1;
@@ -441,6 +442,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre_
 
 void Corrige_flux_FT_temperature_subresolution::receive_temperature_cell_centre_neighbours_from_procs()
 {
+  Cerr << "Copy temperature on every processors" << finl;
   if (copy_temperature_on_every_procs_)
     {
       const int nb_procs = Process::nproc();
@@ -460,7 +462,7 @@ void Corrige_flux_FT_temperature_subresolution::receive_temperature_cell_centre_
           mp_sum_for_each_item(overall_numerotation);
           int l;
           for (l=1; l<overall_numerotation.size_array(); l++)
-            start_indices(l) = start_indices(l-1) + overall_numerotation(l);
+            start_indices(l) = start_indices(l-1) + overall_numerotation(l-1);
 
           for (int c=0; c<3; c++)
             {
@@ -509,6 +511,7 @@ void Corrige_flux_FT_temperature_subresolution::combine_temperature_cell_centre_
                                                                                                       const int& offset_j,
                                                                                                       const int& offset_k)
 {
+  Cerr << "Combine temperature on every processors" << finl;
   if (copy_temperature_on_every_procs_)
     {
       const int size_array = indices_temperature_neighbours_on_procs_[0].size_array();
@@ -893,7 +896,7 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_mixed_ce
       const int nk = ref_ijk_ft_->itfce().I().nk();
 
       IJK_Field_local_int cell_faces_neighbours_corrected_bool_tmp;
-      cell_faces_neighbours_corrected_bool_tmp.allocate(ni, nj, nk, 0);
+      cell_faces_neighbours_corrected_bool_tmp.allocate(ni, nj, nk, 1);
 
       const int neighbours_i[6] = NEIGHBOURS_I;
       const int neighbours_j[6] = NEIGHBOURS_J;
@@ -924,6 +927,22 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_mixed_ce
                           const int cell_faces_neighbours_ijk = cell_faces_neighbours_corrected_bool_mixed_cell[c](i + ii,j + jj, k + kk);
                           const double indic_neighbour = ref_ijk_ft_->itfce().I()(i+i_neighbour,j+j_neighbour,k+k_neighbour);
                           if (cell_faces_neighbours_ijk && indic_neighbour > LIQUID_INDICATOR_TEST)
+                            cell_faces_neighbours_corrected_bool_tmp(i+ii,j+jj,k+kk) = cell_faces_neighbours_ijk;
+                        }
+                    }
+                  if (indic > LIQUID_INDICATOR_TEST)
+                    {
+                      for (int l=index_ini; l<index_ini + 2; l++)
+                        {
+                          const int i_neighbour = neighbours_i[l];
+                          const int j_neighbour = neighbours_j[l];
+                          const int k_neighbour = neighbours_k[l];
+                          const int ii = neighbours_faces_i[l];
+                          const int jj = neighbours_faces_j[l];
+                          const int kk = neighbours_faces_k[l];
+                          const int cell_faces_neighbours_ijk = cell_faces_neighbours_corrected_bool_mixed_cell[c](i + ii,j + jj, k + kk);
+                          const double indic_neighbour = ref_ijk_ft_->itfce().I()(i+i_neighbour,j+j_neighbour,k+k_neighbour);
+                          if (cell_faces_neighbours_ijk && (indic_neighbour < LIQUID_INDICATOR_TEST && indic_neighbour > VAPOUR_INDICATOR_TEST))
                             cell_faces_neighbours_corrected_bool_tmp(i+ii,j+jj,k+kk) = cell_faces_neighbours_ijk;
                         }
                     }
@@ -980,7 +999,9 @@ void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_mixed_ce
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
             cell_faces_neighbours_corrected_field_mixed_cell[c](i,j,k) = cell_faces_neighbours_corrected_field(i,j,k);
+
     }
+  cell_faces_neighbours_corrected_field_mixed_cell.echange_espace_virtuel();
 }
 
 void Corrige_flux_FT_temperature_subresolution::compute_cell_neighbours_faces_indices_to_correct(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool,
@@ -1393,12 +1414,12 @@ void Corrige_flux_FT_temperature_subresolution::complete_neighbours_and_weightin
   cell_faces_neighbours_corrected_bool.echange_espace_virtuel();
   if (compute_fluxes_values)
     {
-//      if (convective_flux_correction_)
-//        cell_faces_neighbours_corrected_convective.echange_espace_virtuel();
-//      if (diffusive_flux_correction_)
-//        cell_faces_neighbours_corrected_diffusive.echange_espace_virtuel();
-//			if (neighbours_colinearity_weighting_)
-//				neighbours_weighting_colinearity.echange_espace_virtuel();
+      //      if (convective_flux_correction_)
+      //        cell_faces_neighbours_corrected_convective.echange_espace_virtuel();
+      //      if (diffusive_flux_correction_)
+      //        cell_faces_neighbours_corrected_diffusive.echange_espace_virtuel();
+      //			if (neighbours_colinearity_weighting_)
+      //				neighbours_weighting_colinearity.echange_espace_virtuel();
       const int ni = cell_faces_neighbours_corrected_bool[0].ni();
       const int nj = cell_faces_neighbours_corrected_bool[0].nj();
       const int nk = cell_faces_neighbours_corrected_bool[0].nk();
@@ -1624,48 +1645,62 @@ void Corrige_flux_FT_temperature_subresolution::replace_cell_neighbours_thermal_
   const int ni = cell_faces_neighbours_corrected_min_max_bool[0].ni();
   const int nj = cell_faces_neighbours_corrected_min_max_bool[0].nj();
   const int nk = cell_faces_neighbours_corrected_min_max_bool[0].nk();
+
   for (int c=0; c<3; c++)
-    for (int k = 0; k < nk; k++)
-      for (int j = 0; j < nj; j++)
-        for (int i = 0; i < ni; i++)
-          if (cell_faces_neighbours_corrected_min_max_bool[c](i,j,k))
-            {
-              flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
-              index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(i);
-              index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(j);
-              /*
-               * Handle the periodicity
-               */
-              switch(c)
-                {
-                case 0:
-                  if (i == 0)
-                    {
-                      flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
-                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(ni);
-                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(j);
-                    }
-                  break;
-                case 1:
-                  if (j == 0)
-                    {
-                      flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
-                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(i);
-                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(nj);
-                    }
-                  break;
-                case 2:
-                  if (k == 0)
-                    {
-                      flux_xyz[c][nk].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
-                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(i);
-                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(j);
-                    }
-                  break;
-                default:
-                  break;
-                }
-            }
+    {
+      const int ni_max = (c == 0 ? ni + 1 : ni);
+      const int nj_max = (c == 1 ? nj + 1 : nj);
+      const int nk_max = (c == 2 ? nk + 1 : nk);
+      for (int k = 0; k < nk_max; k++)
+        for (int j = 0; j < nj_max; j++)
+          for (int i = 0; i < ni_max; i++)
+            if (cell_faces_neighbours_corrected_min_max_bool[c](i,j,k))
+              {
+                flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
+                index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(i);
+                index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(j);
+                /*
+                 * Handle the global periodicity
+                 * It works because we have performed an echange_espace_virtuel on fluxes
+                 */
+                //              const IJK_Splitting& splitting_ns = ref_ijk_ft_->itfce().I().get_splitting();
+                //							const int offset_i = splitting_ns.get_offset_local(0);
+                //							const int offset_j = splitting_ns.get_offset_local(1);
+                //							const int offset_k = splitting_ns.get_offset_local(2);
+                //							const int i_global = i + offset_i;
+                //							const int j_global = j + offset_j;
+                //							const int k_global = k + offset_k;
+                //              switch(c)
+                //                {
+                //                case 0:
+                //                  if (i_global == 0)
+                //                    {
+                //                      flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
+                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(ni);
+                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(j);
+                //                    }
+                //                  break;
+                //                case 1:
+                //                  if (j_global == 0)
+                //                    {
+                //                      flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
+                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(i);
+                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(nj);
+                //                    }
+                //                  break;
+                //                case 2:
+                //                  if (k_global == 0)
+                //                    {
+                //                      flux_xyz[c][nk].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
+                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][nk].append_array(i);
+                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][nk].append_array(j);
+                //                    }
+                //                  break;
+                //                default:
+                //                  break;
+                //                }
+              }
+    }
 }
 
 void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
@@ -1674,7 +1709,7 @@ void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_
                                                                                            IJK_Field_double& neighbours_weighting_colinearity) const
 {
   if (debug_)
-    Cerr << "Replace temperature cell neighbours" << finl;
+    Cerr << "Corrige flux - Replace temperature cell neighbours - INI" << finl;
   if (distance_cell_faces_from_lrs_ && find_temperature_cell_neighbours_)
     {
       temperature_neighbours.echange_espace_virtuel(temperature_neighbours.ghost());
@@ -1684,19 +1719,157 @@ void Corrige_flux_FT_temperature_subresolution::replace_temperature_cell_centre_
       const int ni = temperature.ni();
       const int nj = temperature.nj();
       const int nk = temperature.nk();
+
+      const IJK_Splitting& splitting = temperature.get_splitting();
+      ArrOfInt corrected_values;
+      ArrOfInt out_of_bounds_corrected_values;
+      ArrOfDouble out_of_bounds_values;
+      corrected_values.set_smart_resize(1);
+      out_of_bounds_values.set_smart_resize(1);
+      out_of_bounds_corrected_values.set_smart_resize(1);
+
       for (int k = 0; k < nk; k++)
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
             {
               double neighbours_weighting_ijk;
+              const double temperature_old = temperature(i,j,k);
               if (neighbours_colinearity_weighting_)
                 neighbours_weighting_ijk = neighbours_weighting_colinearity(i,j,k);
               else
                 neighbours_weighting_ijk = (double) neighbours_weighting(i,j,k);
+              const int elem = splitting.convert_ijk_cell_to_packed(i,j,k);
               if (neighbours_weighting(i,j,k))
-                temperature(i,j,k) = temperature_neighbours(i,j,k) / neighbours_weighting_ijk;
+                {
+                  temperature(i,j,k) = temperature_neighbours(i,j,k) / neighbours_weighting_ijk;
+                  if (smooth_temperature_field_)
+                    corrected_values.append_array(elem);
+
+                }
+              if (smooth_temperature_field_)
+                {
+                  const double local_temperature = temperature(i,j,k);
+                  const double indic = ref_ijk_ft_->itfce().I()(i,j,k);
+                  if (local_temperature > 0)
+                    {
+                      if (indic < LIQUID_INDICATOR_TEST && indic > VAPOUR_INDICATOR_TEST)
+                        if (indic > 0.5)
+                          {
+                            const int rank = thermal_subproblems_->get_subproblem_index_from_ijk_indices(i,j,k);
+                            const double dist_sub_res = thermal_subproblems_->get_dist_cell_interface(rank);
+                            if (dist_sub_res > 0)
+                              {
+                                if (debug_)
+                                  {
+                                    Cerr << "Thermal subproblem is: " << rank << finl;
+                                    Cerr << "Temperature value has the wrong sign at i: " << i << ", j: " << j << ", k: " << k << finl;
+                                    Cerr << "Temperature value is: " << local_temperature << finl;
+                                    Cerr << "Distance to cell centre is: " << dist_sub_res << finl;
+                                    Cerr << "Enforce zero value" << finl;
+                                  }
+                                // temperature(i,j,k) = 0.;
+                                out_of_bounds_corrected_values.append_array(elem);
+                                out_of_bounds_values.append_array(local_temperature);
+                                temperature(i,j,k) = temperature_old;
+                              }
+                          }
+                      if (indic > LIQUID_INDICATOR_TEST)
+                        {
+                          if (debug_)
+                            {
+                              Cerr << "Temperature value has the wrong sign at i: " << i << ", j: " << j << ", k: " << k << finl;
+                              Cerr << "Temperature value is: " << local_temperature << finl;
+                              Cerr << "Enforce zero value" << finl;
+                            }
+                          // temperature(i,j,k) = 0.;
+                          out_of_bounds_corrected_values.append_array(elem);
+                          out_of_bounds_values.append_array(local_temperature);
+                          temperature(i,j,k) = temperature_old;
+                        }
+                    }
+                }
             }
       temperature.echange_espace_virtuel(temperature.ghost());
+      smooth_temperature_cell_centre_neighbours(temperature,
+                                                corrected_values,
+                                                out_of_bounds_corrected_values,
+                                                out_of_bounds_values,
+                                                temperature);
+    }
+
+  if (debug_)
+    Cerr << "Corrige flux - Replace temperature cell neighbours - END" << finl;
+}
+
+void Corrige_flux_FT_temperature_subresolution::smooth_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
+                                                                                          ArrOfInt& corrected_values,
+                                                                                          ArrOfInt& out_of_bounds_corrected_values,
+                                                                                          ArrOfDouble& out_of_bounds_values,
+                                                                                          IJK_Field_double& distance) const
+{
+  // const IJK_Splitting& splitting = temperature.get_splitting();
+  //	const Int3 num_elem_ijk = splitting.convert_packed_to_ijk_cell(elem);
+  //	(num_elem_ijk[DIRECTION_I], num_elem_ijk[DIRECTION_J], num_elem_ijk[DIRECTION_K]);
+  if (smooth_temperature_field_)
+    {
+      const IJK_Splitting& splitting = temperature.get_splitting();
+      ArrOfDouble temperature_smoothed;
+      temperature_smoothed.set_smart_resize(1);
+      int counter;
+      double temperature_neighbour;
+      for (int ielem=0; ielem<out_of_bounds_corrected_values.size_array(); ielem++)
+        {
+          const int elem = out_of_bounds_corrected_values[ielem];
+          const Int3 num_elem_ijk = splitting.convert_packed_to_ijk_cell(elem);
+          const int i = num_elem_ijk[DIRECTION_I];
+          const int j = num_elem_ijk[DIRECTION_J];
+          const int k = num_elem_ijk[DIRECTION_K];
+          const int neighbours_i[6] = NEIGHBOURS_I;
+          const int neighbours_j[6] = NEIGHBOURS_J;
+          const int neighbours_k[6] = NEIGHBOURS_K;
+          // const double temperature_old = temperature(i,j,k);
+          const double temperature_old_subres = out_of_bounds_values[ielem];
+          const double temperature_old = temperature(i,j,k);
+          counter=0;
+          temperature_neighbour=0;
+          for (int l=0; l<6; l++)
+            {
+              const int ii = neighbours_i[l];
+              const int jj = neighbours_j[l];
+              const int kk = neighbours_k[l];
+              const double indic = ref_ijk_ft_->itfce().I()(i+ii, j+jj, k+kk);
+              // if (indic > VAPOUR_INDICATOR_TEST)
+              if (indic > LIQUID_INDICATOR_TEST)
+                {
+                  temperature_neighbour += temperature(i+ii, j+jj, k+kk);
+                  counter++;
+                }
+            }
+          double mean_temperature = 1e20;
+          if (counter != 0)
+            mean_temperature = (temperature_neighbour / counter + temperature_old_subres) * 0.5;
+          if (counter != 0)
+            {
+              if (mean_temperature < 0.)
+                temperature_smoothed.append_array(mean_temperature);
+              else
+                temperature_smoothed.append_array(temperature_neighbour/counter);
+            }
+          else
+            temperature_smoothed.append_array(temperature_old);
+        }
+
+      for (int ielem=0; ielem<out_of_bounds_corrected_values.size_array(); ielem++)
+        {
+          const int elem = out_of_bounds_corrected_values[ielem];
+          const Int3 num_elem_ijk = splitting.convert_packed_to_ijk_cell(elem);
+          const int i = num_elem_ijk[DIRECTION_I];
+          const int j = num_elem_ijk[DIRECTION_J];
+          const int k = num_elem_ijk[DIRECTION_K];
+          temperature(i,j,k) = temperature_smoothed(ielem);
+          if (debug_)
+            Cerr << "Smoothed temperature value is:" << temperature_smoothed(ielem) << finl;
+        }
     }
 }
 
@@ -2924,7 +3097,8 @@ void Corrige_flux_FT_temperature_subresolution::receive_fluxes_from_frontier_on_
                   overall_numerotation_array[c][k](proc_num) = size_array;
                   mp_sum_for_each_item(overall_numerotation_array[c][k]);
                   for (l=1; l<overall_numerotation_array[c][k].size_array(); l++)
-                    start_indices_array[c][k](l) = start_indices_array[c][k](l-1) + start_indices_array[c][k](l-1);
+                    start_indices_array[c][k](l) = start_indices_array[c][k](l-1) + overall_numerotation_array[c][k](l-1);
+                  // start_indices_array[c][k](l) = start_indices_array[c][k](l-1) + start_indices_array[c][k](l-1);
 
                   if (debug_)
                     {

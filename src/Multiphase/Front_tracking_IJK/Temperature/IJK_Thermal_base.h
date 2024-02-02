@@ -79,7 +79,7 @@ public:
   void rk3_sub_step(const int rk_step,
                     const double total_timestep,
                     const double time);
-  void sauvegarder_temperature(Nom& lata_name, int idx);  // const
+  void sauvegarder_temperature(Nom& lata_name, int idx, const int& stop=0);
 
   double compute_global_energy(const IJK_Field_double& temperature);
   double compute_global_energy()
@@ -149,11 +149,15 @@ public:
   }
   const IJK_Field_double& get_div_lambda_grad_T() const
   {
+    return div_coeff_grad_T_ ;
+  }
+  const IJK_Field_double& get_div_lambda_grad_T_volume() const
+  {
     return div_coeff_grad_T_volume_ ;
   }
   const IJK_Field_double& get_u_T_convective() const
   {
-    return u_T_convective_volume_;
+    return u_T_convective_;
   }
   const IJK_Field_double& get_u_T_convective_volume() const
   {
@@ -446,6 +450,7 @@ protected:
   virtual void correct_temperature_for_visu() { ; };
   virtual void correct_operators_for_visu() { ; };
   virtual void clip_temperature_values() { ; };
+  virtual void clip_max_temperature_values() { ; };
   virtual void compute_thermal_subproblems() { ; };
   virtual void compute_convective_diffusive_fluxes_face_centre() { ; };
   virtual void compute_convective_fluxes_face_centre() { ; };
@@ -573,7 +578,9 @@ protected:
   Operateur_IJK_elem_conv temperature_convection_op_;
   Operateur_IJK_elem_diff temperature_diffusion_op_;
   IJK_Field_double div_coeff_grad_T_volume_;
+  IJK_Field_double div_coeff_grad_T_;
   IJK_Field_double u_T_convective_volume_;
+  IJK_Field_double u_T_convective_;
   OpGradCentre2IJKScalar_double temperature_grad_op_centre_;
   OpHessCentre2IJKScalar_double temperature_hess_op_centre_;
 

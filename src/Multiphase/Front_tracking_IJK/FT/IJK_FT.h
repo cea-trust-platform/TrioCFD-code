@@ -100,6 +100,10 @@ public :
   {
     return timestep_ ;
   }
+  const int& get_nb_timesteps() const
+  {
+    return nb_timesteps_ ;
+  }
   const int& get_splitting_extension() const
   {
     return ijk_splitting_ft_extension_ ;
@@ -341,7 +345,8 @@ protected :
   //ab-sauv/repr-deb
   void ecrire_donnees(const FixedVector<IJK_Field_double, 3>& f3compo, SFichier& le_fichier, const int compo, bool binary) const;
   void dumpxyz_vector(const FixedVector<IJK_Field_double, 3>& f3compo, const char * filename, bool binary) const;
-  void sauvegarder_probleme(const char *fichier_sauvegarde); //  const;
+  void sauvegarder_probleme(const char *fichier_sauvegarde,
+                            const int& stop); //  const;
   void reprendre_probleme(const char *fichier_reprise);
   //ab-sauv/repr-fin
 

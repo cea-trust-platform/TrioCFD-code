@@ -273,8 +273,19 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
    * DIV_LAMBDA_GRAD_T_VOLUME
    */
   oss << "DIV_LAMBDA_GRAD_T_VOLUME_" << lata_suffix << idx;
+  Nom nom_div_lambda_grad_T_volume(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("DIV_LAMBDA_GRAD_T_VOLUME") || liste_post_instantanes.contient_(nom_div_lambda_grad_T_volume)))
+    {
+      n++, dumplata_scalar(lata_name, nom_div_lambda_grad_T_volume, get_div_lambda_grad_T_volume(), latastep);
+    }
+  oss.str("");
+
+  /*
+   * DIV_LAMBDA_GRAD_T
+   */
+  oss << "DIV_LAMBDA_GRAD_T_" << lata_suffix << idx;
   Nom nom_div_lambda_grad_T(oss.str().c_str());
-  if ((liste_post_instantanes.contient_("DIV_LAMBDA_GRAD_T_VOLUME") || liste_post_instantanes.contient_(nom_div_lambda_grad_T)))
+  if ((liste_post_instantanes.contient_("DIV_LAMBDA_GRAD_T") || liste_post_instantanes.contient_(nom_div_lambda_grad_T)))
     {
       n++, dumplata_scalar(lata_name, nom_div_lambda_grad_T, get_div_lambda_grad_T(), latastep);
     }
@@ -287,7 +298,18 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
   Nom nom_u_T_convective_volume(oss.str().c_str());
   if ((liste_post_instantanes.contient_("U_T_CONVECTIVE_VOLUME") || liste_post_instantanes.contient_(nom_u_T_convective_volume)))
     {
-      n++, dumplata_scalar(lata_name, nom_u_T_convective_volume, get_u_T_convective(), latastep);
+      n++, dumplata_scalar(lata_name, nom_u_T_convective_volume, get_u_T_convective_volume(), latastep);
+    }
+  oss.str("");
+
+  /*
+   * U_T_CONVECTIVE
+   */
+  oss << "U_T_CONVECTIVE_" << lata_suffix << idx;
+  Nom nom_u_T_convective(oss.str().c_str());
+  if ((liste_post_instantanes.contient_("U_T_CONVECTIVE") || liste_post_instantanes.contient_(nom_u_T_convective)))
+    {
+      n++, dumplata_scalar(lata_name, nom_u_T_convective, get_u_T_convective(), latastep);
     }
   oss.str("");
 

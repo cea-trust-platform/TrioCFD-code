@@ -50,8 +50,8 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   heat_flux_spherical_ = 0.;
   mean_liquid_temperature_ = -1;
 
-  disable_mixed_cells_increment_=1;
-  enable_mixed_cells_increment_=0;
+  disable_mixed_cells_increment_=0;
+  enable_mixed_cells_increment_=1;
   allow_temperature_correction_for_visu_=0;
   subproblem_temperature_extension_=0;
   disable_subresolution_=0;
@@ -152,6 +152,8 @@ IJK_Thermal_Subresolution::IJK_Thermal_Subresolution()
   neighbours_colinearity_weighting_ = 0.;
   neighbours_distance_weighting_ = 0;
   neighbours_colinearity_distance_weighting_ = 0;
+  smooth_temperature_field_=0;
+  reajust_probe_length_from_vertices_=0;
 
   clip_temperature_values_ = 0;
   disable_post_processing_probes_out_files_ = 0;
@@ -278,6 +280,10 @@ Sortie& IJK_Thermal_Subresolution::printOn( Sortie& os ) const
     os << front_space << "neighbours_distance_weighting" << escape;
   if (neighbours_colinearity_distance_weighting_)
     os << front_space << "neighbours_colinearity_distance_weighting" << escape;
+  if (smooth_temperature_field_)
+    os << front_space << "smooth_temperature_field" << escape;
+  if (reajust_probe_length_from_vertices_)
+    os << front_space << "reajust_probe_length_from_vertices" << escape;
   if (use_temperature_cell_neighbours_)
     os << front_space << "use_temperature_cell_neighbours" << escape;
   if (clip_temperature_values_)
@@ -399,6 +405,7 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter("finite_difference_assembler", &finite_difference_assembler_);
   // param.ajouter_flag("disable_mixed_cells_increment", &disable_mixed_cells_increment_);
   param.ajouter_flag("enable_mixed_cells_increment", &enable_mixed_cells_increment_);
+  param.ajouter_flag("disable_mixed_cells_increment", &disable_mixed_cells_increment_);
   param.ajouter_flag("allow_temperature_correction_for_visu", &allow_temperature_correction_for_visu_);
 
   param.ajouter("boundary_condition_interface", &boundary_condition_interface_);
@@ -459,6 +466,8 @@ void IJK_Thermal_Subresolution::set_param( Param& param )
   param.ajouter_flag("neighbours_colinearity_weighting", &neighbours_colinearity_weighting_);
   param.ajouter_flag("neighbours_distance_weighting", &neighbours_distance_weighting_);
   param.ajouter_flag("neighbours_colinearity_distance_weighting", &neighbours_colinearity_distance_weighting_);
+  param.ajouter_flag("smooth_temperature_field", &smooth_temperature_field_);
+  param.ajouter_flag("reajust_probe_length_from_vertices", &reajust_probe_length_from_vertices_);
   param.ajouter_flag("use_temperature_cell_neighbours", &use_temperature_cell_neighbours_);
 
   param.ajouter_flag("clip_temperature_values", &clip_temperature_values_);
@@ -635,13 +644,18 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   if(find_reachable_fluxes_)
     find_temperature_cell_neighbours_ = 1;
 
-  disable_mixed_cells_increment_ = (!enable_mixed_cells_increment_);
+  if (enable_mixed_cells_increment_)
+    disable_mixed_cells_increment_ = (!enable_mixed_cells_increment_);
+  if (!disable_mixed_cells_increment_)
+    enable_mixed_cells_increment_ = (!disable_mixed_cells_increment_);
 
   corrige_flux_.set_convection_diffusion_correction(convective_flux_correction_, diffusive_flux_correction_);
   corrige_flux_.set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
   corrige_flux_.set_debug(debug_);
   corrige_flux_.set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs_);
-  corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_weighting_);
+  corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_,
+                                               neighbours_weighting_,
+                                               smooth_temperature_field_);
   corrige_flux_.set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed_);
   corrige_flux_.set_temperature_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs_,
                                                                                copy_temperature_on_every_procs_);
@@ -1291,7 +1305,11 @@ void IJK_Thermal_Subresolution::update_thermal_properties()
 void IJK_Thermal_Subresolution::post_process_after_temperature_increment()
 {
   IJK_Thermal_base::post_process_after_temperature_increment();
+  if (debug_)
+    Cerr << "Compute mean liquid temperature" << finl;
   compute_mean_liquid_temperature();
+  if (debug_)
+    Cerr << "Compute Nusselt spherical diffusion" << finl;
   compute_Nusselt_spherical_diffusion();
 }
 
@@ -1313,7 +1331,10 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
           const double rhocpVol = rhocp_l * vol_;
           const double ope = div_coeff_grad_T_volume_(i,j,k);
           const double resu = ope / rhocpVol;
+          div_coeff_grad_T_volume_(i,j,k) = ope / rhocp_l;
           d_temperature_(i,j,k) += resu;
+          if (liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T"))
+            div_coeff_grad_T_(i,j,k) = resu;
         }
   if (debug_)
     Cerr << "Uniform lambda: " << temperature_diffusion_op_.get_uniform_lambda() << finl;
@@ -1477,6 +1498,14 @@ void IJK_Thermal_Subresolution::correct_temperature_for_visu()
    */
   if (liste_post_instantanes_.contient_("GRAD_T_ELEM") && allow_temperature_correction_for_visu_)
     correct_any_temperature_field_for_visu(temperature_);
+  if (liste_post_instantanes_.contient_("U_T_CONVECTIVE") && allow_temperature_correction_for_visu_)
+    correct_any_temperature_field_for_visu(u_T_convective_);
+  if (liste_post_instantanes_.contient_("U_T_CONVECTIVE_VOLUME") && allow_temperature_correction_for_visu_)
+    correct_any_temperature_field_for_visu(u_T_convective_volume_);
+  if (liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T") && allow_temperature_correction_for_visu_)
+    correct_any_temperature_field_for_visu(div_coeff_grad_T_);
+  if (liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T_VOLUME") && allow_temperature_correction_for_visu_)
+    correct_any_temperature_field_for_visu(div_coeff_grad_T_volume_);
 }
 
 void IJK_Thermal_Subresolution::clip_temperature_values()
@@ -1493,6 +1522,26 @@ void IJK_Thermal_Subresolution::clip_temperature_values()
               const double temperature = temperature_(i,j,k);
               if (temperature < delta_T_subcooled_overheated_)
                 temperature_(i,j,k) = delta_T_subcooled_overheated_;
+            }
+      temperature_.echange_espace_virtuel(temperature_.ghost());
+    }
+}
+
+void IJK_Thermal_Subresolution::clip_max_temperature_values()
+{
+  if (clip_temperature_values_)
+    {
+      const int ni = temperature_.ni();
+      const int nj = temperature_.nj();
+      const int nk = temperature_.nk();
+      for (int k = 0; k < nk; k++)
+        for (int j = 0; j < nj; j++)
+          for (int i = 0; i < ni; i++)
+            {
+              const double temperature = temperature_(i,j,k);
+              const double indic = ref_ijk_ft_->itfce().I(i,j,k);
+              if (temperature > 0 && indic > LIQUID_INDICATOR_TEST)
+                temperature_(i,j,k) = 0;
             }
       temperature_.echange_espace_virtuel(temperature_.ghost());
     }
@@ -1836,12 +1885,14 @@ void IJK_Thermal_Subresolution::interpolate_project_velocities_on_probes()
 void IJK_Thermal_Subresolution::reajust_probes_length()
 {
   if (!disable_subresolution_)
-    if (first_time_step_varying_probes_)
+    if (reajust_probe_length_from_vertices_ || first_time_step_varying_probes_)
       {
         thermal_local_subproblems_.reajust_probes_length();
-        //
-        probe_variations_enabled_ = thermal_local_subproblems_.get_probe_variations_enabled(probe_variations_priority_);
-        first_time_step_varying_probes_ = probe_variations_enabled_;
+        if (first_time_step_varying_probes_)
+          {
+            probe_variations_enabled_ = thermal_local_subproblems_.get_probe_variations_enabled(probe_variations_priority_);
+            first_time_step_varying_probes_ = probe_variations_enabled_;
+          }
         thermal_local_subproblems_.compute_modified_probe_length(probe_variations_enabled_);
       }
 }
@@ -2280,7 +2331,9 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
 
       find_temperature_cell_neighbours_ = 0;
       use_temperature_cell_neighbours_ = 0;
-      corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_, neighbours_weighting_);
+      corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_,
+                                                   neighbours_weighting_,
+                                                   smooth_temperature_field_);
     }
 
 
@@ -2310,7 +2363,11 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
 void IJK_Thermal_Subresolution::compute_temperature_cell_centres_second_correction()
 {
   if (disable_mixed_cells_increment_)
-    replace_temperature_cell_centres_neighbours(use_reachable_fluxes_ && !keep_first_reachable_fluxes_);
+    {
+      if (debug_)
+        Cerr << "Apply second temperature correction (Case C)" << finl;
+      replace_temperature_cell_centres_neighbours(use_reachable_fluxes_ && !keep_first_reachable_fluxes_);
+    }
 }
 
 void IJK_Thermal_Subresolution::replace_temperature_cell_centres_neighbours(const int& use_neighbours_temperature_to_correct_trimmed)

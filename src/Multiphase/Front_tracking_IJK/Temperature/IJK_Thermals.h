@@ -53,7 +53,7 @@ public :
   void associer_interface_intersections(const Intersection_Interface_ijk_cell& intersection_ijk_cell_,
                                         const Intersection_Interface_ijk_face& intersection_ijk_face_);
   void retrieve_ghost_fluid_params();
-  void sauvegarder_temperature(Nom& lata_name);
+  void sauvegarder_temperature(Nom& lata_name, const int& stop);
   void sauvegarder_thermals(SFichier& fichier);
   void compute_timestep(double& dt_thermals, const double dxmin);
   void initialize(const IJK_Splitting& splitting, int& nalloc);
@@ -87,7 +87,7 @@ public :
   void compute_eulerian_distance_curvature();
 
   void set_latastep_reprise(const bool stop);
-  void thermal_subresolution_outputs();
+  void thermal_subresolution_outputs(const int& dt_post_thermals_probes=0);
   int get_disable_post_processing_probes_out_files() const;
   double get_modified_time();
   void get_rising_velocities_parameters(int& compute_rising_velocities,

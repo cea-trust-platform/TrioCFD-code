@@ -100,7 +100,9 @@ public :
   double find_cell_related_indicator_on_probes(const int& last_index);
   void interpolate_project_velocities_on_probes();
   void reajust_probe_length();
-  void compute_modified_probe_length_condition();
+  void compute_modified_probe_length_condition(const int probe_length_condition);
+  void compute_modified_probe_length_vertex_condition();
+  void compute_modified_probe_length_temporal_condition();
   void compute_distance_cell_centre();
   void compute_distance_faces_centres();
   void compute_distance_cell_centres_neighbours();
@@ -129,11 +131,13 @@ public :
   double compute_min_distance_pure_face_vertices();
   double compute_max_distance_pure_face_centre();
   double compute_max_distance_pure_face_vertices();
+  double compute_max_distance_pure_face_vertices(int& lmax, int& mmax);
   void compute_vertex_position(const int& vertex_number,
                                const int& face_dir,
-                               const Vecteur3& bary_face,
+                               Vecteur3& bary_vertex,
                                double& distance_vertex_centre,
-                               Vecteur3& bary_vertex);
+                               double& tangential_distance_vertex_centre,
+                               Vecteur3& tangential_distance_vector_vertex_centre);
   void compute_modified_probe_length(const int& probe_variations_enabled);
   void compute_radial_convection_diffusion_operators();
   void prepare_temporal_schemes();
@@ -386,6 +390,7 @@ public :
 protected :
   void clear_vectors();
   void reset_counters();
+  void reset_flags();
   void reinit_variable(DoubleVect& vect);
   void associate_thermal_subproblem_parameters(const int& reference_gfm_on_probes,
                                                const int& debug,
@@ -419,7 +424,8 @@ protected :
                                              const double& local_cfl,
                                              const double& min_delta_xyz,
                                              int max_u_radial);
-  void associate_varying_probes_params(const int& first_time_step_varying_probes,
+  void associate_varying_probes_params(const int& reajust_probe_length_from_vertices,
+                                       const int& first_time_step_varying_probes,
                                        const int& probe_variations_priority,
                                        const int& disable_interpolation_in_mixed_cells);
   void associate_compos(int compo_connex) { compo_connex_ = compo_connex; };
@@ -583,7 +589,6 @@ protected :
   double osculating_radius_ = 0.;
   Vecteur3 facet_barycentre_;
   Vecteur3 normal_vector_compo_;
-  Vecteur3 tangential_distance_vector_;
 
   double bubble_rising_velocity_ = 0.;
   Vecteur3 bubble_rising_vector_;
@@ -874,6 +879,7 @@ protected :
   /*
    * Some tries to make the probe length varies at the beginning of the simulation
    */
+  int reajust_probe_length_from_vertices_ = 0;
   int first_time_step_varying_probes_ = 0;
   int probe_variations_enabled_ = 0;
   int probe_variations_priority_ = 0;
@@ -887,9 +893,17 @@ protected :
   int max_u_radial_=0;
   double cell_centre_distance_ = 0;
   double cell_centre_tangential_distance_ = 0.;
+  Vecteur3 tangential_distance_vector_;
   FixedVector<bool,6> pure_liquid_neighbours_;
   FixedVector<double,6> face_centres_distance_;
+  FixedVector<double,6> face_centres_tangential_distance_;
+  FixedVector<Vecteur3,6> face_tangential_distance_vector_;
   FixedVector<FixedVector<double,4>,6> vertices_centres_distance_;
+  FixedVector<FixedVector<double,4>,6> vertices_centres_tangential_distance_;
+  FixedVector<FixedVector<Vecteur3,4>,6> vertices_tangential_distance_vector_;
+  double modified_probe_length_from_vertices_ = 0.;
+  bool has_computed_cell_centre_distance_;
+  bool has_computed_cell_faces_distance_;
   int correct_fluxes_ = 0;
   double cell_temperature_ = 0.;
 

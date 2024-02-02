@@ -122,6 +122,9 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   bubbles_rising_vectors_per_bubble_ = nullptr;
 
   latastep_reprise_ = nullptr;
+
+  has_computed_cell_centre_distance_ = false;
+  has_computed_cell_faces_distance_ = false;
 }
 
 IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblem()
@@ -250,7 +253,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                             || ref_thermal_subresolution.diffusive_flux_correction_),
                                            ref_thermal_subresolution.distance_cell_faces_from_lrs_,
                                            ref_thermal_subresolution.interp_eulerian_);
-      associate_varying_probes_params(ref_thermal_subresolution.first_time_step_varying_probes_,
+      associate_varying_probes_params(ref_thermal_subresolution.reajust_probe_length_from_vertices_,
+                                      ref_thermal_subresolution.first_time_step_varying_probes_,
                                       ref_thermal_subresolution.probe_variations_priority_,
                                       ref_thermal_subresolution.disable_interpolation_in_mixed_cells_);
       associate_flags_neighbours_correction(ref_thermal_subresolution.find_temperature_cell_neighbours_,
@@ -282,6 +286,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
    */
   clear_vectors();
   reset_counters();
+  reset_flags();
   set_global_index(0);
   reset_post_processing_theta_phi_scope();
   associate_temporal_parameters(global_time_step, current_time);
@@ -308,6 +313,12 @@ void IJK_One_Dimensional_Subproblem::clear_vectors()
 void IJK_One_Dimensional_Subproblem::reset_counters()
 {
   velocities_calculation_counter_ = 0;
+}
+
+void IJK_One_Dimensional_Subproblem::reset_flags()
+{
+  has_computed_cell_centre_distance_ = false;
+  has_computed_cell_faces_distance_ = false;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(const int& reference_gfm_on_probes,
@@ -387,10 +398,12 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_temporal_params(const
   max_u_cartesian_ = !max_u_radial_;
 }
 
-void IJK_One_Dimensional_Subproblem::associate_varying_probes_params(const int& first_time_step_varying_probes,
+void IJK_One_Dimensional_Subproblem::associate_varying_probes_params(const int& reajust_probe_length_from_vertices,
+                                                                     const int& first_time_step_varying_probes,
                                                                      const int& probe_variations_priority,
                                                                      const int& disable_interpolation_in_mixed_cells)
 {
+  reajust_probe_length_from_vertices_ = reajust_probe_length_from_vertices;
   first_time_step_varying_probes_ = first_time_step_varying_probes;
   probe_variations_priority_ = probe_variations_priority;
   disable_interpolation_in_mixed_cells_ = disable_interpolation_in_mixed_cells;
@@ -1070,11 +1083,55 @@ void IJK_One_Dimensional_Subproblem::interpolate_project_velocities_on_probes()
 
 void IJK_One_Dimensional_Subproblem::reajust_probe_length()
 {
-  if (first_time_step_varying_probes_)
-    compute_modified_probe_length_condition();
+  if (reajust_probe_length_from_vertices_)
+    compute_modified_probe_length_condition(0);
+  else if (first_time_step_varying_probes_)
+    compute_modified_probe_length_condition(1);
+  else
+    Cerr << "This strategy for readjusting the probe length does not exist" << finl;
+
 }
 
-void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
+void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition(const int probe_length_condition)
+{
+  switch(probe_length_condition)
+    {
+    case 0:
+      compute_modified_probe_length_vertex_condition();
+      break;
+    case 1:
+      compute_modified_probe_length_temporal_condition();
+      break;
+    default:
+      break;
+    }
+}
+
+void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_vertex_condition()
+{
+  compute_distance_faces_centres();
+  bool has_liquid_neighbours = 1;
+  for (int i=0; i<6; i++)
+    has_liquid_neighbours = has_liquid_neighbours && pure_liquid_neighbours_[i];
+  // const double max_distance_pure_face_centre = compute_max_distance_pure_face_centre();
+  // const double max_distance_face_centre_vertex = std::max(max_distance_pure_face_centre, max_distance_pure_vertex_centre);
+  int lmax, mmax;
+  const double max_distance_pure_vertex_centre = compute_max_distance_pure_face_vertices(lmax, mmax);
+  //  Vecteur3 normal_contrib = normal_vector_compo_;
+  //  normal_contrib *= vertices_centres_distance_[lmax][mmax];
+  //  Vecteur3 tangential_distance = vertices_tangential_distance_vector_[lmax][mmax];
+  //  tangential_distance *= vertices_centres_tangential_distance_[lmax][mmax];
+  //  Vecteur3 facet_to_vertex = facet_to_vertex;
+  //  facet_to_vertex += tangential_distance;
+
+  modified_probe_length_from_vertices_ = vertices_centres_distance_[lmax][mmax];
+  modified_probe_length_from_vertices_ += (*cell_diagonal_) / 2;
+
+  if (debug_)
+    Cerr << "Maximum vertex distance:" << max_distance_pure_vertex_centre << finl;
+}
+
+void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_temporal_condition()
 {
   const double current_time = ref_ijk_ft_->get_current_time();
   cfl_probe_length_ = (max_u_ * current_time) / local_cfl_; // Add 3D constants ?
@@ -1136,76 +1193,118 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition()
 
 void IJK_One_Dimensional_Subproblem::compute_distance_cell_centre()
 {
-  Vecteur3 centre = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_, index_j_, index_k_, IJK_Splitting::ELEM);
+  if (!has_computed_cell_centre_distance_)
+    {
+      Vecteur3 centre = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_, index_j_, index_k_, IJK_Splitting::ELEM);
 
-  Vecteur3 facet_to_cell_centre = facet_barycentre_;
-  facet_to_cell_centre *= -1;
-  facet_to_cell_centre += centre;
-  cell_centre_distance_ = Vecteur3::produit_scalaire(facet_to_cell_centre, normal_vector_compo_);
+      Vecteur3 facet_to_cell_centre = facet_barycentre_;
+      facet_to_cell_centre *= -1;
+      facet_to_cell_centre += centre;
+      cell_centre_distance_ = Vecteur3::produit_scalaire(facet_to_cell_centre, normal_vector_compo_);
 
-  Vecteur3 normal_contrib = normal_vector_compo_;
-  normal_contrib *= cell_centre_distance_;
-  Vecteur3 tangential_displacement = normal_contrib;
-  tangential_displacement *= (-1);
-  tangential_displacement += facet_to_cell_centre;
-  cell_centre_tangential_distance_ = tangential_displacement.length();
-  tangential_distance_vector_ = tangential_displacement;
-  if (cell_centre_tangential_distance_ > 1e-16)
-    tangential_distance_vector_ *= (1 / cell_centre_tangential_distance_);
+      Vecteur3 normal_contrib = normal_vector_compo_;
+      normal_contrib *= cell_centre_distance_;
+      Vecteur3 tangential_displacement = normal_contrib;
+      tangential_displacement *= (-1);
+      tangential_displacement += facet_to_cell_centre;
+      cell_centre_tangential_distance_ = tangential_displacement.length();
+      tangential_distance_vector_ = tangential_displacement;
+      if (cell_centre_tangential_distance_ > 1e-16)
+        tangential_distance_vector_ *= (1 / cell_centre_tangential_distance_);
+      has_computed_cell_centre_distance_ = true;
+    }
+  else if (debug_)
+    Cerr << "Cell centre distances have already been computed" << finl;
 }
 
 void IJK_One_Dimensional_Subproblem::compute_distance_faces_centres()
 {
-  Vecteur3 bary_face {0., 0., .0};
-  Vecteur3 vector_relative {0., 0., 0.};
-  Vecteur3 bary_vertex {0., 0., 0.};
-  int neighbours_i[6] = NEIGHBOURS_I;
-  int neighbours_j[6] = NEIGHBOURS_J;
-  int neighbours_k[6] = NEIGHBOURS_K;
-  int neighbours_faces_i[6] = NEIGHBOURS_FACES_I;
-  int neighbours_faces_j[6] = NEIGHBOURS_FACES_J;
-  int neighbours_faces_k[6] = NEIGHBOURS_FACES_K;
-  int face_dir[6] = FACES_DIR;
-  int m;
-  for (int l=0; l<6; l++)
+  if (!has_computed_cell_faces_distance_)
     {
-      const int ii = neighbours_i[l];
-      const int jj = neighbours_j[l];
-      const int kk = neighbours_k[l];
-      const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_+ii, index_j_+jj, index_k_+kk);
-      if (fabs(indic_neighbour) > LIQUID_INDICATOR_TEST)
+      Vecteur3 bary_face {0., 0., .0};
+      Vecteur3 vector_relative {0., 0., 0.};
+      Vecteur3 bary_vertex {0., 0., 0.};
+      int neighbours_i[6] = NEIGHBOURS_I;
+      int neighbours_j[6] = NEIGHBOURS_J;
+      int neighbours_k[6] = NEIGHBOURS_K;
+      int neighbours_faces_i[6] = NEIGHBOURS_FACES_I;
+      int neighbours_faces_j[6] = NEIGHBOURS_FACES_J;
+      int neighbours_faces_k[6] = NEIGHBOURS_FACES_K;
+      int face_dir[6] = FACES_DIR;
+      int m;
+      for (int l=0; l<6; l++)
         {
-          const int ii_f = neighbours_faces_i[l];
-          const int jj_f = neighbours_faces_j[l];
-          const int kk_f = neighbours_faces_k[l];
-          pure_liquid_neighbours_[l] = 1;
-          if (ii)
-            bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_I);
-          if (jj)
-            bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_J);
-          if (kk)
-            bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_K);
-          vector_relative = facet_barycentre_;
-          vector_relative *= (-1);
-          vector_relative += bary_face;
-          const double distance_face_centre = Vecteur3::produit_scalaire(vector_relative, normal_vector_compo_);
-          face_centres_distance_[l] = distance_face_centre;
-          for (m=0; m<4; m++)
+          const int ii = neighbours_i[l];
+          const int jj = neighbours_j[l];
+          const int kk = neighbours_k[l];
+          const double indic_neighbour = ref_ijk_ft_->itfce().I()(index_i_+ii, index_j_+jj, index_k_+kk);
+          if (fabs(indic_neighbour) > LIQUID_INDICATOR_TEST)
             {
-              double distance_vertex_centre = 0.;
-              bary_vertex = vector_relative;
-              compute_vertex_position(m, face_dir[l], bary_face, distance_vertex_centre, bary_vertex);
-              vertices_centres_distance_[l][m] = distance_vertex_centre;
+              const int ii_f = neighbours_faces_i[l];
+              const int jj_f = neighbours_faces_j[l];
+              const int kk_f = neighbours_faces_k[l];
+              pure_liquid_neighbours_[l] = 1;
+              if (ii)
+                bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_I);
+              if (jj)
+                bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_J);
+              if (kk)
+                bary_face = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_+ii_f, index_j_+jj_f, index_k_+kk_f, IJK_Splitting::FACES_K);
+
+              // Normal distance
+              vector_relative = facet_barycentre_;
+              vector_relative *= (-1);
+              vector_relative += bary_face;
+              {
+                const double distance_face_centre = Vecteur3::produit_scalaire(vector_relative, normal_vector_compo_);
+                face_centres_distance_[l] = distance_face_centre;
+                // Tangential distance
+                Vecteur3 normal_contrib = normal_vector_compo_;
+                normal_contrib *= distance_face_centre;
+                Vecteur3 tangential_displacement = normal_contrib;
+                tangential_displacement *= (-1);
+                tangential_displacement += vector_relative;
+                face_centres_tangential_distance_[l] = tangential_displacement.length();
+                if (face_centres_tangential_distance_[l] > 1e-16)
+                  tangential_displacement *= (1 / face_centres_tangential_distance_[l]);
+                face_tangential_distance_vector_[l] = tangential_displacement;
+              }
+              // Distance to vertex
+              for (m=0; m<4; m++)
+                {
+                  double distance_vertex_centre = 0.;
+                  double tangential_distance_vertex_centre = 0.;
+                  Vecteur3 tangential_distance_vector_vertex_centre = {0., 0., 0.};
+                  bary_vertex = vector_relative;
+                  compute_vertex_position(m,
+                                          face_dir[l],
+                                          bary_vertex,
+                                          distance_vertex_centre,
+                                          tangential_distance_vertex_centre,
+                                          tangential_distance_vector_vertex_centre);
+                  vertices_centres_distance_[l][m] = distance_vertex_centre;
+                  vertices_centres_tangential_distance_[l][m] = tangential_distance_vertex_centre;
+                  vertices_tangential_distance_vector_[l][m] = tangential_distance_vector_vertex_centre;
+                }
+            }
+          else
+            {
+              pure_liquid_neighbours_[l] = 0;
+              face_centres_distance_[l] = 0.;
+              face_centres_tangential_distance_[l] = 0.;
+              face_tangential_distance_vector_[l] = {0., 0., 0.};
+              for (m=0; m<4; m++)
+                {
+                  vertices_centres_distance_[l][m] = 0.;
+                  vertices_centres_tangential_distance_[l][m] = 0.;
+                  vertices_tangential_distance_vector_[l][m] = {0., 0., 0.};
+                }
             }
         }
-      else
-        {
-          pure_liquid_neighbours_[l] = 0;
-          face_centres_distance_[l] = 0.;
-          for (m=0; m<4; m++)
-            vertices_centres_distance_[l][m] = 0.;
-        }
+      has_computed_cell_faces_distance_ = true;
     }
+  else if (debug_)
+    Cerr << "Cell face distances have already been computed" << finl;
 }
 
 double IJK_One_Dimensional_Subproblem::compute_min_distance_pure_face_centre()
@@ -1252,11 +1351,33 @@ double IJK_One_Dimensional_Subproblem::compute_max_distance_pure_face_vertices()
   return max_face_vertex_distance;
 }
 
+double IJK_One_Dimensional_Subproblem::compute_max_distance_pure_face_vertices(int& lmax, int& mmax)
+{
+  double max_face_vertex_distance = 0.;
+  int m;
+  lmax = 0;
+  mmax = 0;
+  for (int l=0; l<6; l++)
+    if (pure_liquid_neighbours_[l])
+      for (m=0; m<4; m++)
+        if(vertices_centres_distance_[l][m] > 0)
+          {
+            max_face_vertex_distance = std::max(max_face_vertex_distance, vertices_centres_distance_[l][m]);
+            if (vertices_centres_distance_[l][m] >= max_face_vertex_distance)
+              {
+                lmax = l;
+                mmax = m;
+              }
+          }
+  return max_face_vertex_distance;
+}
+
 void IJK_One_Dimensional_Subproblem::compute_vertex_position(const int& vertex_number,
                                                              const int& face_dir,
-                                                             const Vecteur3& bary_face,
+                                                             Vecteur3& bary_vertex,
                                                              double& distance_vertex_centre,
-                                                             Vecteur3& bary_vertex)
+                                                             double& tangential_distance_vertex_centre,
+                                                             Vecteur3& tangential_distance_vector_vertex_centre)
 {
   const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
   const double dx = geom.get_constant_delta(DIRECTION_I);
@@ -1296,6 +1417,14 @@ void IJK_One_Dimensional_Subproblem::compute_vertex_position(const int& vertex_n
     }
   bary_vertex += point_coords;
   distance_vertex_centre = Vecteur3::produit_scalaire(bary_vertex, normal_vector_compo_);
+  Vecteur3 tangential_distance_vector = normal_vector_compo_;
+  tangential_distance_vector *= distance_vertex_centre;
+  tangential_distance_vector *= (-1);
+  tangential_distance_vector += bary_vertex;
+  tangential_distance_vertex_centre = tangential_distance_vector.length();
+  if (tangential_distance_vertex_centre > 1e-16)
+    tangential_distance_vector *= (1 / tangential_distance_vertex_centre);
+  tangential_distance_vector_vertex_centre = tangential_distance_vector;
 }
 
 void IJK_One_Dimensional_Subproblem::compute_distance_cell_centres_neighbours()
@@ -1419,6 +1548,7 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
    */
   pure_neighbours_last_faces_to_correct_.resize(3);
   pure_neighbours_last_faces_corrected_distance_.resize(3);
+  //	if (neighbours_last_faces_weighting_) ?
   pure_neighbours_last_faces_corrected_colinearity_.resize(3);
   for (int c=0; c<3; c++)
     {
@@ -1427,21 +1557,25 @@ void IJK_One_Dimensional_Subproblem::compute_distance_last_cell_faces_neighbours
       const int third_incr = third_increment[c];
       pure_neighbours_last_faces_to_correct_[c].resize(first_incr + 1);
       pure_neighbours_last_faces_corrected_distance_[c].resize(first_incr + 1);
+      //	if (neighbours_last_faces_weighting_) ?
       pure_neighbours_last_faces_corrected_colinearity_[c].resize(first_incr + 1);
       for (l=first_incr; l>=0; l--)
         {
           pure_neighbours_last_faces_to_correct_[c][l].resize(second_incr + 1);
           pure_neighbours_last_faces_corrected_distance_[c][l].resize(second_incr + 1);
+          //	if (neighbours_last_faces_weighting_) ?
           pure_neighbours_last_faces_corrected_colinearity_[c][l].resize(second_incr + 1);
           for (m=second_incr; m>=0; m--)
             {
               pure_neighbours_last_faces_to_correct_[c][l][m].resize(third_incr + 1);
               pure_neighbours_last_faces_corrected_distance_[c][l][m].resize(third_incr + 1);
+              //	if (neighbours_last_faces_weighting_) ?
               pure_neighbours_last_faces_corrected_colinearity_[c][l][m].resize(third_incr + 1);
               for (n=third_incr; n>=0; n--)
                 {
                   pure_neighbours_last_faces_to_correct_[c][l][m][n] = false;
                   pure_neighbours_last_faces_corrected_distance_[c][l][m][n] = 0.;
+                  //	if (neighbours_last_faces_weighting_) ?
                   pure_neighbours_last_faces_corrected_colinearity_[c][l][m][n] = 0.;
                 }
             }
@@ -1696,7 +1830,12 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length(const int& pr
 {
   if (probe_variations_enabled && probe_variations_enabled_)
     {
-      probe_length_ = max_cfl_fourier_probe_length_;
+      if (reajust_probe_length_from_vertices_)
+        probe_length_ = modified_probe_length_from_vertices_;
+      else if (first_time_step_varying_probes_)
+        probe_length_ = max_cfl_fourier_probe_length_;
+      else
+        probe_length_ = (*coeff_distance_diagonal_) * (*cell_diagonal_);
       compute_local_discretisation();
       recompute_finite_difference_matrices_varying_probe_length();
       // probe_variations_enabled_ = 0;
@@ -2716,6 +2855,19 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
                                                                   const int interp_eulerian) const
 {
   double field_value = INVALID_TEMPERATURE;
+  if (debug_ && temp_bool)
+    {
+      Cerr << "Thermal subproblem index: " << sub_problem_index_ << finl;
+      Cerr << "Radial ini: " << (*radial_coordinates_)[0] << finl;
+      Cerr << "Radial coordinate end: " << (*radial_coordinates_)[*points_per_thermal_subproblem_-1] << finl;
+      Cerr << "Field ini: " << field[0] << finl;
+      Cerr << "Field end: " << field[*points_per_thermal_subproblem_-1] << finl;
+      Cerr << "Field interp ini: " << temperature_interp_[0] << finl;
+      Cerr << "Field interp end: " << temperature_interp_[*points_per_thermal_subproblem_-1] << finl;
+      Cerr << "End_boundary_condition_value: " << end_boundary_condition_value_ << finl;
+      Cerr << "Curvature: " << curvature_ << finl;
+      Cerr << "Osculating radius: " << osculating_radius_ << finl;
+    }
   if (dist >= (*radial_coordinates_)[0] && dist <= (*radial_coordinates_)[*points_per_thermal_subproblem_-1])
     {
       /*
@@ -2783,7 +2935,8 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
     }
   if (debug_ && temp_bool)
     {
-      Cerr << "Radial coordinate ini: " << (*radial_coordinates_)[0] << finl;
+      Cerr << "Thermal subproblem index: " << sub_problem_index_ << finl;
+      Cerr << "Radial 	 ini: " << (*radial_coordinates_)[0] << finl;
       Cerr << "Radial coordinate end: " << (*radial_coordinates_)[*points_per_thermal_subproblem_-1] << finl;
       Cerr << "Field ini: " << field[0] << finl;
       Cerr << "Field end: " << field[*points_per_thermal_subproblem_-1] << finl;

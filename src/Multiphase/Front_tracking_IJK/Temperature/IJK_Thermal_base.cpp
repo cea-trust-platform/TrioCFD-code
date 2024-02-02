@@ -433,18 +433,30 @@ int IJK_Thermal_base::initialize(const IJK_Splitting& splitting, const int idx)
   compute_cell_volume();
   compute_min_cell_delta();
 
-  //if (!diff_temperature_negligible_)
+  // if (!diff_temperature_negligible_)
   {
     div_coeff_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
     nalloc += 1;
     div_coeff_grad_T_volume_.data() = 0.;
   }
+  if (liste_post_instantanes_.contient_("DIV_LAMBDA_GRAD_T"))
+    {
+      div_coeff_grad_T_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      nalloc += 1;
+      div_coeff_grad_T_.data() = 0.;
+    }
   // if (!conv_temperature_negligible_)
   {
     u_T_convective_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
     nalloc += 1;
     u_T_convective_volume_.data() = 0.;
   }
+  if (liste_post_instantanes_.contient_("U_T_CONVECTIVE"))
+    {
+      u_T_convective_.allocate(splitting, IJK_Splitting::ELEM, 0);
+      nalloc += 1;
+      u_T_convective_.data() = 0.;
+    }
 
   rho_cp_post_ = (liste_post_instantanes_.size() && liste_post_instantanes_.contient_("RHO_CP"));
   if (rho_cp_post_)
@@ -862,10 +874,14 @@ void IJK_Thermal_base::get_boundary_fluxes(IJK_Field_local_double& boundary_flux
 
 void IJK_Thermal_base::euler_time_step(const double timestep)
 {
+  if (debug_)
+    Cerr << "Thermal Euler time-step" << finl;
   calculer_dT(ref_ijk_ft_->get_velocity());
   // Update the temperature :
   const int kmax = temperature_.nk();
   const double ene_ini = compute_global_energy();
+  if (debug_)
+    Cerr << "Apply temperature increment d_temperature" << finl;
   for (int k = 0; k < kmax; k++)
     {
       ref_ijk_ft_->euler_explicit_update(d_temperature_, temperature_, k);
@@ -877,7 +893,7 @@ void IJK_Thermal_base::euler_time_step(const double timestep)
 
   temperature_.echange_espace_virtuel(temperature_.ghost());
   const double ene_post = compute_global_energy();
-  Cerr << "[Energy-Budget-T"<<rang_<<"] time t=" << ref_ijk_ft_->get_current_time()
+  Cerr << "[Energy-Budget-T"<< rang_ << "] time t=" << ref_ijk_ft_->get_current_time()
        << " " << ene_ini
        << " " << ene_post << " [W.m-3]." << finl;
   source_callback();
@@ -902,11 +918,13 @@ void IJK_Thermal_base::rk3_sub_step(const int rk_step, const double total_timest
   source_callback();
 }
 
-void IJK_Thermal_base::sauvegarder_temperature(Nom& lata_name, int idx)
+void IJK_Thermal_base::sauvegarder_temperature(Nom& lata_name, int idx, const int& stop)
 {
   fichier_reprise_temperature_ = lata_name;
   timestep_reprise_temperature_ = 1;
   dumplata_scalar(lata_name, Nom("TEMPERATURE_") + Nom(idx) , temperature_, 0 /*we store a 0 */);
+  if (stop)
+    latastep_reprise_ = latastep_reprise_ini_ + ref_ijk_ft_->get_tstep() + 1;
 }
 
 /********************************************
@@ -923,9 +941,13 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
   /*
    * Clean_subproblems !
    */
+  if (debug_)
+    Cerr << "Clean thermal subproblems" << finl;
   clean_thermal_subproblems();
 
   // Correct the vapour and mixed cells values
+  if (debug_)
+    Cerr << "Store temperature before extrapolation" << finl;
   store_temperature_before_extrapolation();
   correct_temperature_for_eulerian_fluxes();
 
@@ -1038,11 +1060,25 @@ void IJK_Thermal_base::calculer_dT(const FixedVector<IJK_Field_double, 3>& veloc
 
 void IJK_Thermal_base::post_process_after_temperature_increment()
 {
+  if (debug_)
+    Cerr << "Post-Processing routines for visu" << finl;
+  Cerr << "Override temperature cell centres for visu" << finl;
   compute_temperature_cell_centres(1);
+  if (debug_)
+    Cerr << "Enforce periodic boundary conditions values" << finl;
   enforce_periodic_temperature_boundary_value();
+  if (debug_)
+    Cerr << "Clip temperature values" << finl;
   clip_temperature_values();
+  clip_max_temperature_values();
+  if (debug_)
+    Cerr << "Correct temperature for visu" << finl;
   correct_temperature_for_visu();
+  if (debug_)
+    Cerr << "set analytical temperature field" << finl;
   set_field_T_ana();
+  if (debug_)
+    Cerr << "Correct operators in mixed cells for visu" << finl;
   correct_operators_for_visu();
 }
 
@@ -1218,8 +1254,11 @@ void IJK_Thermal_base::compute_temperature_convection(const FixedVector<IJK_Fiel
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
             {
-              d_temperature_(i,j,k) /= vol_ ;
               u_T_convective_volume_(i,j,k) = d_temperature_(i,j,k);
+              const double resu = d_temperature_(i,j,k) / vol_;
+              d_temperature_(i,j,k) = resu;
+              if (liste_post_instantanes_.contient_("U_T_CONVECTIVE"))
+                u_T_convective_(i,j,k) = resu;
             }
     }
   statistiques().end_count(cnt_conv_temp);
@@ -1540,6 +1579,8 @@ void IJK_Thermal_base::add_temperature_source()
 
 void IJK_Thermal_base::source_callback()
 {
+  if (debug_)
+    Cerr << "Source terms post-processing routines" << finl;
   if (liste_post_instantanes_.contient_("TEMPERATURE_ADIM_BULLES"))
     calculer_temperature_adim_bulles();
 }

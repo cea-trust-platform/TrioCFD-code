@@ -66,6 +66,20 @@ public :
   void add_subproblems(int n);
   void compute_global_indices();
   void set_global_index();
+  void associate_subproblem_to_ijk_indices(const int& i,
+                                           const int& j,
+                                           const int& k);
+  void get_ijk_indices_from_subproblems(const int& rank,
+                                        int& i,
+                                        int& j,
+                                        int& k);
+  void associate_ijk_indices_to_subproblem(const int& rank,
+                                           const int& i,
+                                           const int& j,
+                                           const int& k);
+  int get_subproblem_index_from_ijk_indices(const int& i,
+                                            const int& j,
+                                            const int& k) const;
   void associate_sub_problem_to_inputs(IJK_Thermal_Subresolution& ref_thermal_subresolution,
                                        int i, int j, int k,
                                        const double& indicator,
@@ -190,6 +204,9 @@ protected :
   int reallocate_subproblems_ = 1;
   bool is_updated_ = 0;
   REF(IJK_FT_double) ref_ijk_ft_;
+
+  FixedVector<ArrOfInt, 3> ijk_indices_to_subproblem_;
+  std::map<int, std::map<int, std::map<int, int>>> subproblem_to_ijk_indices_;
 
   int reference_gfm_on_probes_ = 0;
   int pre_initialise_thermal_subproblems_list_ = 0;

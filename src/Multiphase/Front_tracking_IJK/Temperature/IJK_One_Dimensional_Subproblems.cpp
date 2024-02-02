@@ -30,6 +30,10 @@ Implemente_instanciable_sans_constructeur(IJK_One_Dimensional_Subproblems, "IJK_
 
 IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
 {
+  for (int dir=0; dir<3; dir++)
+    ijk_indices_to_subproblem_[dir].set_smart_resize(1);
+  subproblem_to_ijk_indices_.clear();
+
   interfacial_thermal_flux_per_bubble_.set_smart_resize(1);
   interfacial_thermal_flux_per_bubble_gfm_.set_smart_resize(1);
   interfacial_thermal_flux_per_bubble_spherical_.set_smart_resize(1);
@@ -144,6 +148,9 @@ void IJK_One_Dimensional_Subproblems::clean(int add, int append)
   else
     clean_remove();
   subproblems_counter_ = 0;
+  for (int dir=0; dir<3; dir++)
+    ijk_indices_to_subproblem_[dir].reset();
+  subproblem_to_ijk_indices_.clear();
 }
 
 void IJK_One_Dimensional_Subproblems::clean_remove()
@@ -237,6 +244,60 @@ void IJK_One_Dimensional_Subproblems::set_global_index()
     }
 }
 
+void IJK_One_Dimensional_Subproblems::associate_subproblem_to_ijk_indices(const int& i,
+                                                                          const int& j,
+                                                                          const int& k)
+{
+  ijk_indices_to_subproblem_[0].append_array(i);
+  ijk_indices_to_subproblem_[1].append_array(j);
+  ijk_indices_to_subproblem_[2].append_array(k);
+}
+
+void IJK_One_Dimensional_Subproblems::get_ijk_indices_from_subproblems(const int& rank,
+                                                                       int& i,
+                                                                       int& j,
+                                                                       int& k)
+{
+  i = ijk_indices_to_subproblem_[0][rank];
+  j = ijk_indices_to_subproblem_[1][rank];
+  k = ijk_indices_to_subproblem_[2][rank];
+}
+
+void IJK_One_Dimensional_Subproblems::associate_ijk_indices_to_subproblem(const int& rank,
+                                                                          const int& i,
+                                                                          const int& j,
+                                                                          const int& k)
+{
+  subproblem_to_ijk_indices_[i][j][k] = rank;
+  //	void print_map(std::string_view comment, const std::map<std::string, std::string>& m)
+  //	{
+  //	    std::cout << comment;
+  //	    // Iterate using C++17 facilities
+  //	    for (const auto& [key, value] : m)
+  //	        std::cout << '[' << key << "] = " << value << "; ";
+  //
+  //	// C++11 alternative:
+  //	//  for (const auto& n : m)
+  //	//      std::cout << n.first << " = " << n.second << "; ";
+  //	//
+  //	// C++98 alternative:
+  //	//  for (std::map<std::string, int>::const_iterator it = m.begin(); it != m.end(); ++it)
+  //	//      std::cout << it->first << " = " << it->second << "; ";
+  //
+  //	    std::cout << '\n';
+  //	}
+  //	std::map<std::string, std::string> inner;
+  //	inner.insert(std::make_pair("key2", "value2"));
+  //	someStorage.insert(std::make_pair("key", inner));
+}
+
+int IJK_One_Dimensional_Subproblems::get_subproblem_index_from_ijk_indices(const int& i,
+                                                                           const int& j,
+                                                                           const int& k) const
+{
+  return ((subproblem_to_ijk_indices_.at(i)).at(j)).at(k);
+}
+
 void IJK_One_Dimensional_Subproblems::associate_variables_for_post_processing(IJK_Thermal_Subresolution& ref_thermal_subresolution)
 {
   if (init_)
@@ -269,11 +330,13 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
     }
 
   associate_variables_for_post_processing(ref_thermal_subresolution);
+  associate_ijk_indices_to_subproblem(subproblems_counter_, i,j,k);
 
   ArrOfDouble bubble_rising_vector(3);
   ArrOfDouble normal_vector(3);
   ArrOfDouble facet_barycentre(3);
   ArrOfDouble bubble_barycentre(3);
+
 
   if (debug_)
     Cerr << "Mixed cell indices (i,j,k) : (" << i << ";" << j << ";" << k << ")" << finl;

@@ -1992,7 +1992,7 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
   if (tstep % dt_post_thermals_probes_ == dt_post_thermals_probes_ - 1 || stop || first_step_thermals_post_)
     {
       Cout << "tstep : " << tstep << finl;
-      thermals_.thermal_subresolution_outputs();
+      thermals_.thermal_subresolution_outputs(dt_post_thermals_probes_);
     }
   if (tstep % dt_post_stats_bulles_ == dt_post_stats_bulles_ - 1 || stop)
     {

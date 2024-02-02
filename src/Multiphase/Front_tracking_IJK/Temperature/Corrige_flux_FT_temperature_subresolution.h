@@ -70,10 +70,12 @@ public :
   void set_fluxes_feedback_params(const int discrete_integral, const int levels) override { discrete_integral_ = discrete_integral; levels_ = levels; };
   void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs) override { distance_cell_faces_from_lrs_=distance_cell_faces_from_lrs; };
   void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours,
-                                      const int& neighbours_colinearity_weighting) override
+                                      const int& neighbours_colinearity_weighting,
+                                      const int& smooth_temperature_field) override
   {
     find_temperature_cell_neighbours_ = correct_temperature_cell_neighbours;
     neighbours_colinearity_weighting_ = neighbours_colinearity_weighting;
+    smooth_temperature_field_ = smooth_temperature_field;
   }
 
   void set_cell_faces_neighbours_corrected_bool(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool) override
@@ -166,7 +168,11 @@ public :
                                                   IJK_Field_double& temperature_neighbours,
                                                   IJK_Field_int& neighbours_weighting,
                                                   IJK_Field_double& neighbours_weighting_colinearity) const override;
-
+  void smooth_temperature_cell_centre_neighbours(IJK_Field_double& temperature,
+                                                 ArrOfInt& corrected_values,
+                                                 ArrOfInt& out_of_bounds_corrected_values,
+                                                 ArrOfDouble& out_of_bounds_values,
+                                                 IJK_Field_double& distance) const;
   void initialise_cell_neighbours_indices_to_correct() override;
   void initialise_fixed_vectors(FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2>& fixed_vectors,
                                 const int nb_k_layer);
@@ -457,6 +463,7 @@ protected :
   int convective_flux_correction_;
   int diffusive_flux_correction_;
 
+  int smooth_temperature_field_;
   /*
    * Very large memory footprint ?
    */

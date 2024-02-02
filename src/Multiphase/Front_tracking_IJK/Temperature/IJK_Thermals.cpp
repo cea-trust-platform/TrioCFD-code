@@ -125,11 +125,12 @@ void IJK_Thermals::get_rising_velocities_parameters(int& compute_rising_velociti
     itr.get_rising_velocities_parameters(compute_rising_velocities, fill_rising_velocities);
 }
 
-void IJK_Thermals::sauvegarder_temperature(Nom& lata_name)
+void IJK_Thermals::sauvegarder_temperature(Nom& lata_name,
+                                           const int& stop)
 {
   int idth = 0;
   for (auto& itr : *this)
-    itr.sauvegarder_temperature(lata_name, idth);
+    itr.sauvegarder_temperature(lata_name, idth, stop);
   idth++;
 }
 
@@ -295,6 +296,7 @@ void IJK_Thermals::posttraiter_champs_instantanes_thermal(const Motcles& liste_p
                                                           const double current_time,
                                                           int& n)
 {
+  Cerr << "Post-process Eulerian fields related to the temperature resolution" << finl;
   int idx_th = 0;
   for (auto &itr : (*this))
     {
@@ -440,7 +442,7 @@ void IJK_Thermals::set_latastep_reprise(const bool stop)
       itr.valeur().set_latastep_reprise(ref_ijk_ft_->get_tstep() + 1);
 }
 
-void IJK_Thermals::thermal_subresolution_outputs()
+void IJK_Thermals::thermal_subresolution_outputs(const int& dt_post_thermals_probes)
 {
   const int disable_post_processing_probes_out_files = get_disable_post_processing_probes_out_files();
   if (!disable_post_processing_probes_out_files && post_pro_first_call_)
@@ -470,7 +472,11 @@ void IJK_Thermals::thermal_subresolution_outputs()
                                             overall_bubbles_quantities,
                                             local_quantities_thermal_probes_time_index_folder);
           // .sauv written before the post-processing on probes
-          itr.valeur().set_latastep_reprise(lata_step_reprise_ini_[rank] + ref_ijk_ft_->get_tstep() + 2);
+          int latastep_reprise = lata_step_reprise_ini_[rank] + ref_ijk_ft_->get_tstep() + 2;
+          const int nb_dt_max = ref_ijk_ft_->get_nb_timesteps();
+          if ((ref_ijk_ft_->get_tstep() + dt_post_thermals_probes) >= nb_dt_max)
+            latastep_reprise = nb_dt_max + 1;
+          itr.valeur().set_latastep_reprise(latastep_reprise);
           rank++;
         }
     }

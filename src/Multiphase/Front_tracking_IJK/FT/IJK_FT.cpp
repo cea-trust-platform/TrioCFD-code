@@ -1000,6 +1000,7 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
 
   assert(interfaces.get_nb_bulles_reelles() == 1);
   DoubleTab bounding_box;
+  Cerr << "Upstream Velocity - Compute Bounding box" << finl;
   interfaces.calculer_bounding_box_bulles(bounding_box);
   // Calcule la hauteur en x de la permiere bulle et la position de son cdg :
   const double Dbdir = bounding_box(0, dir, 1) - bounding_box(0, dir, 0);
@@ -1111,6 +1112,7 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
               velocity(i,j,k) = imposed[direction];
       }
   }
+  Cerr << "Upstream Velocity has been forced" << finl;
 }
 
 void IJK_FT_double::ecrire_donnees(const FixedVector<IJK_Field_double, 3>& f3compo, SFichier& le_fichier, const int compo, bool binary) const
@@ -1212,7 +1214,8 @@ void IJK_FT_double::dumpxyz_vector(const FixedVector<IJK_Field_double, 3>& f3com
 }
 
 
-void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  const
+void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde,
+                                         const int& stop)//  const
 {
   statistiques().begin_count(sauvegarde_counter_);
 
@@ -1254,7 +1257,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       ++idx2;
     }
 
-  thermals_.sauvegarder_temperature(lata_name);
+  thermals_.sauvegarder_temperature(lata_name, stop);
 
   // curseur = thermique_; // RAZ : Remise au depart du curseur. GB -> Anida : Ne marche pas sur une liste vide? Je dois grader le curseur_bis ensuite.
   SFichier fichier;
@@ -2991,7 +2994,7 @@ void IJK_FT_double::run()
           if (!disable_diphasique_)
             interfaces_.supprimer_duplicata_bulles();
 
-          sauvegarder_probleme(nom_sauvegarde_);
+          sauvegarder_probleme(nom_sauvegarde_, stop);
           if (!disable_diphasique_)
             {
               // On les recree :
@@ -4036,6 +4039,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
               parser.setVar((int) 0, (*this).current_time_ - modified_time_ini_);
               vitesse_upstream_ = parser.eval();
             }
+          Cerr << "Force upstream velocity" << finl;
           force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
                                   vitesse_upstream_, interfaces_, nb_diam_upstream_,
                                   upstream_dir_, get_direction_gravite(), upstream_stencil_);
@@ -4137,6 +4141,8 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
         }
       //statistiques().end_count(projection_counter_);
     }
+
+  Cerr << "Copy pressure on extended field for probes" << finl;
   copy_field_values(pressure_ghost_cells_, pressure_);
 
   if (Process::je_suis_maitre())
@@ -4381,11 +4387,16 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   /*
    * Calculation of intersections on interface at time (n)
    */
+  Cerr << "Compute Eulerian distance and curvature fields" << finl;
   thermals_.compute_eulerian_distance_curvature();
+  Cerr << "Clean IJK intersections" << finl;
   thermals_.clean_ijk_intersections();
   // thermals_.update_intersections(); // no need as IJK_intersections call interfaces_nI interfaces_xI
+  Cerr << "Compute compo_connex from bounding box" << finl;
   interfaces_.compute_compo_connex_from_bounding_box();
+  Cerr << "Compute compo_connex from interface compo in mixed cells" << finl;
   interfaces_.compute_compo_connex_from_interface();
+  Cerr << "Compute rising velocity from compo connex (barycentre calc)" << finl;
   interfaces_.compute_rising_velocities_from_compo();
 
   // On supprime les duplicatas avant le transport :

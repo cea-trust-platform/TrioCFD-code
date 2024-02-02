@@ -202,6 +202,7 @@ protected :
   void correct_any_temperature_field_for_visu(IJK_Field_double& temperature);
   void correct_temperature_for_visu() override;
   void clip_temperature_values() override;
+  void clip_max_temperature_values() override;
   void compute_mean_liquid_temperature();
   void compute_overall_probes_parameters();
 
@@ -434,6 +435,8 @@ protected :
   int neighbours_colinearity_weighting_;
   int neighbours_distance_weighting_;
   int neighbours_colinearity_distance_weighting_;
+  int smooth_temperature_field_;
+  int reajust_probe_length_from_vertices_;
   IJK_Field_double temperature_cell_neighbours_;
   IJK_Field_double temperature_cell_neighbours_debug_;
   IJK_Field_int neighbours_temperature_to_correct_;

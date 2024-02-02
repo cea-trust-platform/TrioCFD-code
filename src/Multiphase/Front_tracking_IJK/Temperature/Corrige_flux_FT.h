@@ -98,7 +98,9 @@ public :
   inline void sort_ijk_intersections_subproblems_indices_by_k_layers();
 
   inline void set_distance_cell_faces_from_lrs(const int& distance_cell_faces_from_lrs);
-  inline void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting);
+  inline void set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours,
+                                             const int& neighbours_colinearity_weighting,
+                                             const int& smooth_temperature_field);
   inline void set_cell_faces_neighbours_corrected_bool(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool);
   inline void set_eulerian_normal_vectors_ns_normed(const FixedVector<IJK_Field_double, 3> * eulerian_normal_vectors_ns_normed);
   inline void set_correction_cell_faces_neighbours(const int& find_cell_neighbours_for_fluxes_spherical_correction,
@@ -281,9 +283,13 @@ inline void Corrige_flux_FT::set_distance_cell_faces_from_lrs(const int& distanc
   valeur().set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs);
 }
 
-inline void Corrige_flux_FT::set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours, const int& neighbours_colinearity_weighting)
+inline void Corrige_flux_FT::set_correction_cell_neighbours(const int& correct_temperature_cell_neighbours,
+                                                            const int& neighbours_colinearity_weighting,
+                                                            const int& smooth_temperature_field)
 {
-  valeur().set_correction_cell_neighbours(correct_temperature_cell_neighbours, neighbours_colinearity_weighting);
+  valeur().set_correction_cell_neighbours(correct_temperature_cell_neighbours,
+                                          neighbours_colinearity_weighting,
+                                          smooth_temperature_field);
 }
 
 inline void Corrige_flux_FT::set_cell_faces_neighbours_corrected_bool(FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_bool)
