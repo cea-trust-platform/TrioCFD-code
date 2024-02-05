@@ -30,11 +30,11 @@ Schema_euler_implicite sch
 Read sch
 {
     tinit 0
+	nb_pas_dt_max 1
     tmax 8
     dt_impr 1e-8
     facsec 1
     facsec_max 1
-    nb_pas_dt_max $nb_pas_dt_max
     seuil_statio 1.e-3
     solveur ice
     {
@@ -54,7 +54,7 @@ Lire pb
 {
 	Milieu_composite
 	{
-	$fluids
+	liquide_r134a Fluide_generique_CoolProp { model BICUBIC&HEOS fluid r134a phase liquid } gaz_r134a Fluide_generique_CoolProp { model BICUBIC&HEOS fluid r134a phase vapor } saturation_r134a saturation_generique_CoolProp { model BICUBIC&HEOS fluid r134a phase liquid sigma_mano 0.004999019378771977 }
 	}
 
     correlations
@@ -76,15 +76,15 @@ Lire pb
         diffusion  { turbulente k_omega { } }
         initial_conditions
         {
-            vitesse  champ_fonc_t 6 0 0 0 0 $u_0 $u_0 
-            pression Champ_uniforme 1 $P0
+            vitesse  champ_fonc_t 6 0 0 0 0 0.8223464406304708*(t_MIN_1) 0.8223464406304708*(t_MIN_1) 
+            pression Champ_uniforme 1 1390000.0
         }
 	    conditions_limites	
 	    {
             wall_hot  paroi_frottante_loi { } 
             wall_cold paroi_frottante_loi { }
-            bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_t 6 0 0 0 0 $u_0 $u_0
-            top frontiere_ouverte_pression_imposee champ_front_uniforme 1 $P0
+            bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_t 6 0 0 0 0 0.8223464406304708*(t_MIN_1) 0.8223464406304708*(t_MIN_1)
+            top frontiere_ouverte_pression_imposee champ_front_uniforme 1 1390000.0
 			symetrie symetrie
       	}
         sources
@@ -116,13 +116,13 @@ Lire pb
     {
         diffusion { turbulente SGDH { Pr_t 0.9 } }
         convection { amont }
-        initial_conditions { temperature Champ_Uniforme 2 $Tl0 $Tg0  }
+        initial_conditions { temperature Champ_Uniforme 2 20.1 325.2830902789976  }
         boundary_conditions
         {
-            wall_hot  neumann_paroi champ_front_fonc_t 1 $P_surf
+            wall_hot  neumann_paroi champ_front_fonc_t 1 19700.0*(t_MIN_1)
             wall_cold paroi_adiabatique	    
-            bottom	frontiere_ouverte T_ext Champ_Front_Uniforme 2 $Tl0 $Tg0
-            top	frontiere_ouverte T_ext Champ_Front_Uniforme 2 $Tl0 $Tg0
+            bottom	frontiere_ouverte T_ext Champ_Front_Uniforme 2 20.1 325.2830902789976
+            top	frontiere_ouverte T_ext Champ_Front_Uniforme 2 20.1 325.2830902789976
             symetrie paroi_adiabatique
         }
         sources 
@@ -135,13 +135,13 @@ Lire pb
     {
         diffusion { turbulente SGDH { sigma 0.5 } }
         convection { amont }
-        initial_conditions { omega Champ_Fonc_xyz dom 1 $om0 }
+        initial_conditions { omega Champ_Fonc_xyz dom 1 21.415271891418513 }
         boundary_conditions
         {
             wall_hot  Cond_lim_omega_demi {  }
             wall_cold Cond_lim_omega_demi {  }	    
-            bottom	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 $om0
-            top	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 $om0
+            bottom	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 21.415271891418513
+            top	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 21.415271891418513
             symetrie paroi
         }
         sources
@@ -157,13 +157,13 @@ Lire pb
     {
         diffusion { turbulente SGDH { sigma 0.67 } }
         convection { amont }
-        initial_conditions { k champ_fonc_xyz dom 1 $k0 }
+        initial_conditions { k champ_fonc_xyz dom 1 0.006762536684176045 }
         boundary_conditions
         {
             wall_hot  Cond_lim_k_complique_transition_flux_nul_demi
             wall_cold Cond_lim_k_complique_transition_flux_nul_demi	    
-            bottom	frontiere_ouverte k_ext Champ_Front_Uniforme 1 $k0
-            top	frontiere_ouverte k_ext Champ_Front_Uniforme 1 $k0
+            bottom	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.006762536684176045
+            top	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.006762536684176045
             symetrie paroi
         }
         sources
