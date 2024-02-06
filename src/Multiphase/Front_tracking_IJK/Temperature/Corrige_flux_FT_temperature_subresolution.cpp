@@ -201,15 +201,18 @@ void Corrige_flux_FT_temperature_subresolution::initialize_with_subproblems(cons
 void Corrige_flux_FT_temperature_subresolution::update_intersections()
 {
 
-  // On commence par calculer les temperatures aux faces mouillées
-  intersection_ijk_cell_->update_interpolations_cell_centres_on_interface();
-  /*
-   * TODO update with face cell centres positions
-   */
-  if (!convection_negligible_ || !diffusion_negligible_)
-    intersection_ijk_cell_->update_interpolations_cell_faces_on_interface();
+  // if (!distance_cell_faces_from_lrs_)
+  {
+    // On commence par calculer les temperatures aux faces mouillées
+    intersection_ijk_cell_->update_interpolations_cell_centres_on_interface();
+    /*
+     * TODO update with face cell centres positions
+     */
+    if (!convection_negligible_ || !diffusion_negligible_)
+      intersection_ijk_cell_->update_interpolations_cell_faces_on_interface();
 
-  Cerr << "The intersections have been updated" << finl;
+    Cerr << "The intersections have been updated" << finl;
+  }
 }
 
 void Corrige_flux_FT_temperature_subresolution::update()
@@ -223,15 +226,16 @@ void Corrige_flux_FT_temperature_subresolution::associate_indices_and_check_subp
     {
       const int nb_diph = intersection_ijk_cell_->get_nb_diph();
       const int nb_subproblems = thermal_subproblems_->get_subproblems_counter();
+      const int nb_effective_subproblems = thermal_subproblems_->get_effective_subproblems_counter();
       has_checked_consistency_ = (nb_diph==nb_subproblems);
       assert(has_checked_consistency_);
       ijk_intersections_subproblems_indices_.reset();
-      ijk_intersections_subproblems_indices_.resize(nb_subproblems);
+      ijk_intersections_subproblems_indices_.resize(nb_effective_subproblems);
       int index_i_problem = 0;
       int index_j_problem = 0;
       int index_k_problem = 0;
       int problem_index;
-      for (problem_index=0; problem_index<nb_subproblems; problem_index++)
+      for (problem_index=0; problem_index<nb_effective_subproblems; problem_index++)
         {
           thermal_subproblems_->get_subproblem_ijk_indices(index_i_problem, index_j_problem, index_k_problem, problem_index);
           const int ijk_intersections_index = (*intersection_ijk_cell_)(index_i_problem, index_j_problem, index_k_problem);
@@ -259,8 +263,11 @@ void Corrige_flux_FT_temperature_subresolution::associate_indices_and_check_subp
 
 void Corrige_flux_FT_temperature_subresolution::clean()
 {
-  has_checked_consistency_=false;
-  intersection_ijk_cell_->set_pas_a_jour();
+  if (!distance_cell_faces_from_lrs_)
+    {
+      has_checked_consistency_=false;
+      intersection_ijk_cell_->set_pas_a_jour();
+    }
 }
 
 
@@ -269,47 +276,63 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre(
   /*
    * For each subproblem fill the right interfacial_cell
    */
-  const DoubleTab dist_interf = intersection_ijk_cell_->dist_interf();
+  DoubleTab dist_interf;
+  if (!distance_cell_faces_from_lrs_)
+    dist_interf = intersection_ijk_cell_->dist_interf();
+
   const double min_temperature = thermal_subproblems_->get_min_temperature_domain_ends();
   const double max_temperature = thermal_subproblems_->get_max_temperature_domain_ends();
-  for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
+
+  for (int i=0; i<thermal_subproblems_->get_effective_subproblems_counter(); i++)
     {
-      const int intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
-      const double dist = dist_interf(intersection_ijk_cell_index, 0);
-      const double dist_sub_res = thermal_subproblems_->get_dist_cell_interface(i);
-
+      double dist = 0;
+      double dist_sub_res = 0;
       double temperature_ghost = 0.;
-      if (distance_cell_faces_from_lrs_)
-        temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist_sub_res);
+      int intersection_ijk_cell_index = 0;
+      int ijk_indices_i = 0;
+      int ijk_indices_j = 0;
+      int ijk_indices_k = 0;
+      dist_sub_res = thermal_subproblems_->get_dist_cell_interface(i);
+      if (!distance_cell_faces_from_lrs_)
+        {
+          intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
+          dist = dist_interf(intersection_ijk_cell_index, 0);
+          temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist_sub_res);
+          ijk_indices_i = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 0);
+          ijk_indices_j = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 1);
+          ijk_indices_k = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 2);
+        }
       else
-        temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist);
+        {
+          temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist);
+          thermal_subproblems_->get_subproblem_ijk_indices(ijk_indices_i, ijk_indices_j, ijk_indices_k, i);
+        }
 
-      const int ijk_indices_i = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 0);
-      const int ijk_indices_j = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 1);
-      const int ijk_indices_k = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 2);
+      temperature(ijk_indices_i, ijk_indices_j, ijk_indices_k) = temperature_ghost;
 
       if (debug_)
         {
           Cerr << "Time-step: " << ref_ijk_ft_->get_tstep() << "--" << ref_ijk_ft_->get_timestep() << " s" << finl;
-          Cerr << "Distance at cell : " << intersection_ijk_cell_index <<
-               ", subproblem " << i << "."<<
-               " -- (" << ijk_indices_i << ", " << ijk_indices_j << ", " << ijk_indices_k << ")" << finl;
-          Cerr << "Distance from intersection_ijk_cell: " << dist << finl;
+          if (!distance_cell_faces_from_lrs_)
+            {
+              Cerr << "Distance at cell : " << intersection_ijk_cell_index <<
+                   ", subproblem " << i << "."<<
+                   " -- (" << ijk_indices_i << ", " << ijk_indices_j << ", " << ijk_indices_k << ")" << finl;
+              Cerr << "Distance from intersection_ijk_cell: " << dist << finl;
+            }
           Cerr << "Distance from sub-resolution: " << dist_sub_res << finl;
           Vecteur3 bary_facet_debug = thermal_subproblems_->get_bary_facet(i);
           Cerr << "Facet barycentre: " << bary_facet_debug[0] << ";"
                << bary_facet_debug[1] << ";"
                << bary_facet_debug[2] << finl;
+
+          const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I();
+          const double indic = indicator(ijk_indices_i, ijk_indices_j, ijk_indices_k);
+          if (temperature_ghost < min_temperature && indic > 0.5)
+            Cerr << "Ghost temperature: " << temperature_ghost << " is lower than the minimum temperature:" << min_temperature << finl;
+          if (temperature_ghost > max_temperature && indic > 0.5)
+            Cerr << "Ghost temperature: " << temperature_ghost << " is higher than the maximum temperature:" << max_temperature << finl;
         }
-
-      const IJK_Field_double& indicator = ref_ijk_ft_->itfce().I();
-      const double indic = indicator(ijk_indices_i, ijk_indices_j, ijk_indices_k);
-      if (temperature_ghost < min_temperature && indic > 0.5)
-        Cerr << "Ghost temperature: " << temperature_ghost << " is lower than the minimum temperature:" << min_temperature << finl;
-      if (temperature_ghost > max_temperature && indic > 0.5)
-        Cerr << "Ghost temperature: " << temperature_ghost << " is higher than the maximum temperature:" << max_temperature << finl;
-
-      temperature(ijk_indices_i, ijk_indices_j, ijk_indices_k) = temperature_ghost;
     }
 }
 
@@ -1846,14 +1869,20 @@ void Corrige_flux_FT_temperature_subresolution::compute_thermal_diffusive_fluxes
 
 void Corrige_flux_FT_temperature_subresolution::set_zero_temperature_increment(IJK_Field_double& d_temperature) const
 {
-  for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
+  for (int i=0; i<thermal_subproblems_->get_effective_subproblems_counter(); i++)
     {
-      const int intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
-      const int ijk_indices_i = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 0);
-      const int ijk_indices_j = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 1);
-      const int ijk_indices_k = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 2);
+      int ijk_indices_i, ijk_indices_j, ijk_indices_k;
+      thermal_subproblems_->get_subproblem_ijk_indices(ijk_indices_i, ijk_indices_j, ijk_indices_k, i);
       d_temperature(ijk_indices_i, ijk_indices_j, ijk_indices_k) = 0.;
     }
+  //  for (int i=0; i<ijk_intersections_subproblems_indices_.size_array(); i++)
+  //    {
+  //      const int intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
+  //      const int ijk_indices_i = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 0);
+  //      const int ijk_indices_j = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 1);
+  //      const int ijk_indices_k = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 2);
+  //      d_temperature(ijk_indices_i, ijk_indices_j, ijk_indices_k) = 0.;
+  //    }
 }
 
 void Corrige_flux_FT_temperature_subresolution::compute_thermal_convective_fluxes_face_centre()

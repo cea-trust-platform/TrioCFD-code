@@ -103,6 +103,8 @@ IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
   prandtl_number_ = nullptr;
   latastep_reprise_ = nullptr;
 
+  points_per_thermal_subproblem_ = nullptr;
+
   collision_indices_.set_smart_resize(1);
 }
 
@@ -148,9 +150,14 @@ void IJK_One_Dimensional_Subproblems::clean(int add, int append)
   else
     clean_remove();
   subproblems_counter_ = 0;
+  effective_subproblems_counter_ = 0;
+  effective_and_disabled_subproblems_counter_ = 0;
   for (int dir=0; dir<3; dir++)
     ijk_indices_to_subproblem_[dir].reset();
+  subproblem_to_ijk_indices_previous_ = subproblem_to_ijk_indices_;
   subproblem_to_ijk_indices_.clear();
+  one_dimensional_effective_subproblems_.clear();
+  one_dimensional_disabled_subproblems_.clear();
 }
 
 void IJK_One_Dimensional_Subproblems::clean_remove()
@@ -172,13 +179,14 @@ void IJK_One_Dimensional_Subproblems::complete_subproblems()
 {
   if (init_)
     {
+      // int total_subproblems = subproblems_counter_;
       int total_subproblems = subproblems_counter_;
       if (!(ref_ijk_ft_->get_disable_convection_qdm() && ref_ijk_ft_->get_disable_diffusion_qdm()))
         total_subproblems = Process::mp_sum(total_subproblems);
       max_subproblems_ = (int) (pre_factor_subproblems_number_ * total_subproblems);
-      if (subproblems_counter_ < max_subproblems_)//
+      if (effective_subproblems_counter_ < max_subproblems_)//
         {
-          const int sub_problem_end_index = subproblems_counter_ - 1;
+          const int sub_problem_end_index = effective_subproblems_counter_ - 1;
           IJK_One_Dimensional_Subproblem subproblem = (*this)[sub_problem_end_index];
           while(subproblems_counter_ < max_subproblems_)
             {
@@ -310,6 +318,7 @@ void IJK_One_Dimensional_Subproblems::associate_variables_for_post_processing(IJ
       liquid_velocity_ = ref_thermal_subresolution.liquid_velocity_;
       prandtl_number_ = &ref_thermal_subresolution.prandtl_number_;
       latastep_reprise_= &ref_thermal_subresolution.latastep_reprise_ini_;
+      points_per_thermal_subproblem_ = &ref_thermal_subresolution.points_per_thermal_subproblem_;
     }
 }
 
@@ -396,6 +405,345 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
                                                                 pressure);
 
   subproblems_counter_++;
+  effective_subproblems_counter_++;
+}
+
+void IJK_One_Dimensional_Subproblems::store_previous_temperature_indicator_velocities()
+{
+  temperature_probes_previous_.clear();
+  indicator_probes_previous_.clear();
+  velocities_probes_previous_.clear();
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    {
+      temperature_probes_previous_.push_back((*this)[itr].get_current_temperature_solution());
+      indicator_probes_previous_.push_back((*this)[itr].get_current_indicator());
+      velocities_probes_previous_.push_back((*this)[itr].get_current_cell_xyz_velocities());
+    }
+  share_previous_temperature_indicator_velocities();
+}
+
+void IJK_One_Dimensional_Subproblems::share_previous_temperature_indicator_velocities()
+{
+  const int nk_tot = ref_ijk_ft_->get_splitting_ns().get_grid_geometry().get_nb_elem_tot(2);
+
+  if (ref_ijk_ft_->get_tstep() == 0)
+    {
+      for (int ij = 0; ij<2; ij++)
+        index_ij_subproblems_local_perio_[ij].resize(nk_tot);
+      temperature_probes_previous_local_perio_.resize(nk_tot);
+      indicator_probes_previous_local_perio_.resize(nk_tot);
+      velocities_probes_previous_local_perio_.resize(nk_tot);
+
+      for (int ij = 0; ij<2; ij++)
+        index_ij_subproblems_global_[ij].resize(nk_tot);
+      temperature_probes_previous_global_.resize(nk_tot);
+      indicator_probes_previous_global_.resize(nk_tot);
+      velocities_probes_previous_global_.resize(nk_tot);
+
+      for (int k=0; k<nk_tot; k++)
+        {
+          for (int ij = 0; ij<2; ij++)
+            index_ij_subproblems_local_perio_[ij][k].set_smart_resize(1);
+          temperature_probes_previous_local_perio_[k].resize(*points_per_thermal_subproblem_);
+          for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+            temperature_probes_previous_local_perio_[k][point].set_smart_resize(1);
+          indicator_probes_previous_local_perio_[k].set_smart_resize(1);
+          velocities_probes_previous_local_perio_[k].resize(3);
+          for (int compo=0; compo<3; compo++)
+            velocities_probes_previous_local_perio_[k][compo].set_smart_resize(1);
+
+          for (int ij = 0; ij<2; ij++)
+            index_ij_subproblems_global_[ij][k].set_smart_resize(1);
+          temperature_probes_previous_global_[k].resize(*points_per_thermal_subproblem_);
+          for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+            temperature_probes_previous_global_[k][point].set_smart_resize(1);
+          indicator_probes_previous_global_[k].set_smart_resize(1);
+          velocities_probes_previous_global_[k].resize(3);
+          for (int compo=0; compo<3; compo++)
+            velocities_probes_previous_global_[k][compo].set_smart_resize(1);
+        }
+    }
+  else
+    {
+      for (int k=0; k<nk_tot; k++)
+        {
+          for (int ij = 0; ij<2; ij++)
+            index_ij_subproblems_local_perio_[ij][k].reset();
+          for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+            temperature_probes_previous_local_perio_[k][point].reset();
+          indicator_probes_previous_local_perio_[k].reset();
+          for (int compo=0; compo<3; compo++)
+            velocities_probes_previous_local_perio_[k][compo].reset();
+
+          for (int ij = 0; ij<2; ij++)
+            index_ij_subproblems_global_[ij][k].reset();
+          for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+            temperature_probes_previous_global_[k][point].reset();
+          indicator_probes_previous_global_[k].reset();
+          for (int compo=0; compo<3; compo++)
+            velocities_probes_previous_global_[k][compo].reset();
+        }
+    }
+  retrieve_boundary_previous_values();
+  share_boundary_previous_values();
+  complete_boundary_previous_values();
+}
+
+void IJK_One_Dimensional_Subproblems::retrieve_boundary_previous_values()
+{
+  const int ni = ref_ijk_ft_->itfce().I().ni();
+  const int nj = ref_ijk_ft_->itfce().I().nj();
+  const int nk = ref_ijk_ft_->itfce().I().nk();
+
+  const int offset_i = ref_ijk_ft_->get_splitting_ns().get_offset_local(0);
+  const int offset_j = ref_ijk_ft_->get_splitting_ns().get_offset_local(1);
+  const int offset_k = ref_ijk_ft_->get_splitting_ns().get_offset_local(2);
+
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    {
+      int i, j, k;
+      (*this)[itr].get_ijk_indices(i, j, k);
+      if ((i==ni-1 || i==0) || (j==nj-1 || j==0) || (k==nk-1 || k==0))
+        {
+          const int i_global = i + offset_i;
+          const int j_global = j + offset_j;
+          const int k_global = k + offset_k;
+          index_ij_subproblems_local_perio_[0][k_global].append_array(i_global);
+          index_ij_subproblems_local_perio_[1][k_global].append_array(j_global);
+          DoubleVect& temperature_vect = temperature_probes_previous_[itr];
+          Vecteur3& velocities_xyz = velocities_probes_previous_[itr];
+          for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+            temperature_probes_previous_local_perio_[k][point].append_array(temperature_vect[point]);
+          indicator_probes_previous_local_perio_[k].append_array(indicator_probes_previous_[itr]);
+          for (int compo=0; compo<3; compo++)
+            velocities_probes_previous_local_perio_[k][compo].append_array(velocities_xyz[compo]);
+        }
+    }
+}
+
+void IJK_One_Dimensional_Subproblems::share_boundary_previous_values()
+{
+  const int nb_procs = Process::nproc();
+  const int proc_num = Process::me();
+  if (nb_procs)
+    {
+      const int size_k_layers = (int) index_ij_subproblems_local_perio_[0].size();
+      for (int k=0; k<size_k_layers; k++)
+        {
+          const int size_array = index_ij_subproblems_local_perio_[0][k].size_array();
+          int size_array_global = size_array;
+          size_array_global = mp_sum(size_array_global);
+          ArrOfInt overall_numerotation(nb_procs);
+          ArrOfInt start_indices(nb_procs);
+          overall_numerotation(proc_num) = size_array;
+          mp_sum_for_each_item(overall_numerotation);
+          int l;
+          for (l=1; l<overall_numerotation.size_array(); l++)
+            start_indices(l) = start_indices(l-1) + overall_numerotation(l-1);
+
+          const ArrOfInt& local_indices_i_tmp = index_ij_subproblems_local_perio_[0][k];
+          const ArrOfInt& local_indices_j_tmp = index_ij_subproblems_local_perio_[1][k];
+          const ArrOfDouble& local_indicator = indicator_probes_previous_local_perio_[k];
+
+
+          ArrOfInt& global_indices_i_tmp = index_ij_subproblems_global_[0][k];
+          ArrOfInt& global_indices_j_tmp = index_ij_subproblems_global_[1][k];
+          ArrOfDouble& global_indicator = indicator_probes_previous_global_[k];
+
+          global_indices_i_tmp.resize(size_array_global);
+          global_indices_j_tmp.resize(size_array_global);
+          global_indicator.resize(size_array_global);
+
+          global_indices_i_tmp *= 0;
+          global_indices_j_tmp *= 0;
+          global_indicator *= 0.;
+
+          for (l=0; l<local_indices_i_tmp.size_array(); l++)
+            {
+              global_indices_i_tmp(start_indices(proc_num) + l) = local_indices_i_tmp(l);
+              global_indices_j_tmp(start_indices(proc_num) + l) = local_indices_j_tmp(l);
+              global_indicator(start_indices(proc_num) + l) = local_indicator(l);
+            }
+          mp_sum_for_each_item(global_indices_i_tmp);
+          mp_sum_for_each_item(global_indices_j_tmp);
+          mp_sum_for_each_item(global_indicator);
+
+          for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+            {
+              const ArrOfDouble& local_temperature = temperature_probes_previous_local_perio_[k][point];
+              ArrOfDouble& global_temperature = temperature_probes_previous_global_[k][point];
+              global_temperature.resize(size_array_global);
+              global_temperature *= 0.;
+              for (l=0; l<local_indices_i_tmp.size_array(); l++)
+                global_temperature(start_indices(proc_num) + l) = local_temperature(l);
+              mp_sum_for_each_item(global_temperature);
+            }
+
+          for (int compo=0; compo<3; compo++)
+            {
+              const ArrOfDouble& local_velocity = velocities_probes_previous_local_perio_[k][compo];
+              ArrOfDouble& global_velocity = velocities_probes_previous_global_[k][compo];
+              global_velocity.resize(size_array_global);
+              global_velocity *= 0.;
+              for (l=0; l<local_indices_i_tmp.size_array(); l++)
+                global_velocity(start_indices(proc_num) + l) = local_velocity(l);
+              mp_sum_for_each_item(global_velocity);
+            }
+        }
+    }
+}
+
+void IJK_One_Dimensional_Subproblems::complete_boundary_previous_values()
+{
+  const int ni = ref_ijk_ft_->itfce().I().ni();
+  const int nj = ref_ijk_ft_->itfce().I().nj();
+  const int nk = ref_ijk_ft_->itfce().I().nk();
+
+  const int offset_i = ref_ijk_ft_->get_splitting_ns().get_offset_local(0);
+  const int offset_j = ref_ijk_ft_->get_splitting_ns().get_offset_local(1);
+  const int offset_k = ref_ijk_ft_->get_splitting_ns().get_offset_local(2);
+
+  const int ni_tot = ref_ijk_ft_->get_splitting_ns().get_grid_geometry().get_nb_elem_tot(0);
+  const int nj_tot = ref_ijk_ft_->get_splitting_ns().get_grid_geometry().get_nb_elem_tot(1);
+  const int nk_tot = ref_ijk_ft_->get_splitting_ns().get_grid_geometry().get_nb_elem_tot(2);
+
+  const int nb_procs = Process::nproc();
+  int counter_prev = subproblems_counter_;
+  if (nb_procs)
+    {
+      const int size_k_layers = (int) index_ij_subproblems_global_[0].size();
+      for (int k_global=0; k_global<size_k_layers; k_global++)
+        {
+          const int size_val = (int) index_ij_subproblems_global_[0][k_global].size_array();
+          for (int ival=0; ival<size_val; ival++)
+            {
+              const int i_global = index_ij_subproblems_global_[0][k_global][ival];
+              const int j_global = index_ij_subproblems_global_[1][k_global][ival];
+              /*
+               * Global perio
+               */
+              int i = i_global - offset_i;
+              int j = j_global - offset_j;
+              int k = k_global - offset_k;
+              if (i_global == ni && offset_i==0)
+                i = -1;
+              if (i_global == 0 && (ni + offset_i==ni_tot))
+                i = ni;
+              if (j_global == nj && offset_j==0)
+                j = -1;
+              if (j_global == 0 && (nj + offset_j==nj_tot))
+                j = nj;
+              if (k_global == nk && offset_k==0)
+                k = -1;
+              if (k_global == 0 && (nk + offset_k==nk_tot))
+                k = nk;
+              /*
+               * Neighbours
+               */
+              const int i_dir = (i==-1 && i==ni) && (0 <= j && j < nj) && (0 <= k && k < nk);
+              const int j_dir = (0 <= i && i < ni) && (j==-1 && j==nj) && (0 <= k && k < nk);
+              const int k_dir = (0 <= i && i < ni) && (0 <= j && j < nj) && (k==-1 && k==nk);
+              if (i_dir || j_dir || k_dir)
+                {
+                  DoubleVect temperature_prev;
+                  temperature_prev.resize((*points_per_thermal_subproblem_));
+                  for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+                    temperature_prev[point]	= temperature_probes_previous_global_[k_global][point][ival];
+                  temperature_probes_previous_.push_back(temperature_prev);
+
+                  indicator_probes_previous_.push_back(indicator_probes_previous_global_[k][ival]);
+
+                  Vecteur3 velocities_compo;
+                  for (int compo=0; compo<3; compo++)
+                    velocities_compo[compo] = velocities_probes_previous_local_perio_[k][compo][ival];
+                  velocities_probes_previous_.push_back(velocities_compo);
+
+                  if (!is_in_map_index_ijk(subproblem_to_ijk_indices_, i, j, k))
+                    {
+                      subproblem_to_ijk_indices_[i][j][k] = counter_prev;
+                      counter_prev++;
+                    }
+                }
+            }
+        }
+    }
+  else
+    {
+      const int size_k_layers = (int) index_ij_subproblems_local_perio_[0].size();
+      for (int k_global=0; k_global<size_k_layers; k_global++)
+        {
+          const int size_val = (int) index_ij_subproblems_global_[0][k_global].size_array();
+          for (int ival=0; ival<size_val; ival++)
+            {
+              /*
+               * Global perio
+               */
+              int i = index_ij_subproblems_local_perio_[0][k_global][ival];
+              int j = index_ij_subproblems_local_perio_[1][k_global][ival];
+              int k = k_global - offset_k;
+              if (i == ni-1)
+                i = 0;
+              if (i == 0)
+                i = ni-1;
+              if (j == nj-1)
+                j = 0;
+              if (j == 0)
+                j = nj-1;
+              if (k == nk-1)
+                k = 0;
+              if (k == 0)
+                k = nk-1;
+              {
+                DoubleVect temperature_prev;
+                temperature_prev.resize((*points_per_thermal_subproblem_));
+                for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+                  temperature_prev[point]	= temperature_probes_previous_local_perio_[k_global][point][ival];
+                temperature_probes_previous_.push_back(temperature_prev);
+
+                indicator_probes_previous_.push_back(indicator_probes_previous_local_perio_[k][ival]);
+
+                Vecteur3 velocities_compo;
+                for (int compo=0; compo<3; compo++)
+                  velocities_compo[compo] = velocities_probes_previous_local_perio_[k][compo][ival];
+                velocities_probes_previous_.push_back(velocities_compo);
+
+                if (!is_in_map_index_ijk(subproblem_to_ijk_indices_, i, j, k))
+                  {
+                    subproblem_to_ijk_indices_[i][j][k] = counter_prev;
+                    counter_prev++;
+                  }
+              }
+            }
+        }
+    }
+}
+
+int IJK_One_Dimensional_Subproblems::is_in_map_index_ijk(const std::map<int, std::map<int, std::map<int, int>>>& subproblem_to_ijk_indices,
+                                                         const int& index_i,
+                                                         const int& index_j,
+                                                         const int& index_k)
+{
+  const int count_index_i = (int) subproblem_to_ijk_indices.count(index_i);
+  int count_index_j = 0;
+  int count_index_k = 0;
+  if (count_index_i)
+    {
+      count_index_j = (int) subproblem_to_ijk_indices.at(index_i).count(index_j);
+      if (count_index_j)
+        count_index_k = (int) subproblem_to_ijk_indices.at(index_i).at(index_j).count(index_k);
+    }
+  return (count_index_i && count_index_j && count_index_k);
+}
+
+void IJK_One_Dimensional_Subproblems::set_effective_subproblems(const int& enable_probe_collision_detection)
+{
+  if (!enable_probe_collision_detection)
+    {
+      effective_subproblems_counter_ = subproblems_counter_;
+      effective_and_disabled_subproblems_counter_ = subproblems_counter_;
+      for (int itr=0; itr < effective_subproblems_counter_; itr++)
+        one_dimensional_effective_subproblems_.push_back(&((*this)[itr]));
+    }
 }
 
 void IJK_One_Dimensional_Subproblems::interpolate_indicator_on_probes()
@@ -404,52 +752,59 @@ void IJK_One_Dimensional_Subproblems::interpolate_indicator_on_probes()
     (*this)[itr].interpolate_indicator_on_probes();
 }
 
-void IJK_One_Dimensional_Subproblems::clear_problems_colliding_bubbles()
+void IJK_One_Dimensional_Subproblems::clear_sort_problems_colliding_bubbles()
 {
   effective_subproblems_counter_ = subproblems_counter_;
   collision_indices_.reset();
-  if ((*bubbles_rising_velocities_).size_array() == 1)
-    return;
+  //  if ((*bubbles_rising_velocities_).size_array() == 1)
+  //    return;
   int disable_probe_collision = 0;
+  int counter_enabled = 0;
   for (int itr=0; itr < subproblems_counter_; itr++)
     {
       disable_probe_collision = (*this)[itr].get_disable_probe_collision();
       if (disable_probe_collision)
-        collision_indices_.append_array(itr);
-      (*this)[itr].set_reference_gfm_on_probes(1);
+        {
+          collision_indices_.append_array(itr);
+          (*this)[itr].set_reference_gfm_on_probes(1);
+        }
+      else
+        {
+          (*this)[itr].set_subproblem_index(counter_enabled);
+          one_dimensional_effective_subproblems_.push_back(&((*this)[itr]));
+          counter_enabled++;
+        }
     }
   effective_subproblems_counter_ -= (collision_indices_.size_array());
-//	if (collision_indices_[collision_indices_.size_array() - 1] == (subproblems_counter_ - 1))
-//		collision_indices_.append_array(subproblems_counter_ - 1);
+  assert(effective_subproblems_counter_==counter_enabled);
+  int counter_disabled = effective_subproblems_counter_;
+  for (int itr=0; itr < collision_indices_.size_array(); itr++)
+    {
+      (*this)[collision_indices_[itr]].set_subproblem_index(counter_disabled);
+      one_dimensional_disabled_subproblems_.push_back(&((*this)[collision_indices_[itr]]));
+      counter_disabled++;
+    }
+  effective_and_disabled_subproblems_counter_ = counter_disabled;
+  assert(effective_and_disabled_subproblems_counter_ == subproblems_counter_);
+  disabled_subproblems_counter_ = effective_and_disabled_subproblems_counter_ - effective_subproblems_counter_;
 }
 
 void IJK_One_Dimensional_Subproblems::interpolate_project_velocities_on_probes()
 {
-  const int nb_indices = collision_indices_.size_array();
-  if (!nb_indices)
-    for (int itr=0; itr < subproblems_counter_; itr++)
-      (*this)[itr].interpolate_project_velocities_on_probes();
-  else
-    {
-      collision_indices_.append_array(subproblems_counter_);
-      int collision_rank = 0;
-      int collision_index = collision_indices_[collision_rank];
-      for (int itr=0; itr < subproblems_counter_; itr++)
-        if (itr == collision_index)
-          {
-            collision_rank++;
-            collision_indices_[collision_rank];
-          }
-        else
-          (*this)[itr].interpolate_project_velocities_on_probes();
-      collision_indices_.resize(nb_indices);
-    }
+  for (int itr=0; itr < subproblems_counter_; itr++)
+    (*this)[itr].interpolate_project_velocities_on_probes();
 }
 
 void IJK_One_Dimensional_Subproblems::reajust_probes_length()
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
     (*this)[itr].reajust_probe_length();
+}
+
+void IJK_One_Dimensional_Subproblems::reajust_probes_length(const int probe_length_condition)
+{
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    (*this)[itr].compute_modified_probe_length_condition(probe_length_condition);
 }
 
 int IJK_One_Dimensional_Subproblems::get_probe_variations_enabled(const int& probe_variations_priority)
@@ -463,29 +818,29 @@ int IJK_One_Dimensional_Subproblems::get_probe_variations_enabled(const int& pro
 int IJK_One_Dimensional_Subproblems::get_probe_variations_enabled_priority()
 {
   int probe_variations_enabled = 0;
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    probe_variations_enabled = (probe_variations_enabled || (*this)[itr].get_probe_variations_enabled());
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    probe_variations_enabled = (probe_variations_enabled || one_dimensional_effective_subproblems_[itr]->get_probe_variations_enabled());
   return probe_variations_enabled;
 }
 
 int IJK_One_Dimensional_Subproblems::get_probe_variations_enabled_non_priority()
 {
   int probe_variations_enabled = 1;
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    probe_variations_enabled = (probe_variations_enabled && (*this)[itr].get_probe_variations_enabled());
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    probe_variations_enabled = (probe_variations_enabled && one_dimensional_effective_subproblems_[itr]->get_probe_variations_enabled());
   return probe_variations_enabled;
 }
 
 void IJK_One_Dimensional_Subproblems::compute_modified_probe_length(const int& probe_variations_enabled)
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
     (*this)[itr].compute_modified_probe_length(probe_variations_enabled);
 }
 
 void IJK_One_Dimensional_Subproblems::compute_radial_convection_diffusion_operators()
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].compute_radial_convection_diffusion_operators();
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    one_dimensional_effective_subproblems_[itr]->compute_radial_convection_diffusion_operators();
 }
 
 void IJK_One_Dimensional_Subproblems::compute_source_terms_impose_boundary_conditions(const int& boundary_condition_interface,
@@ -495,151 +850,155 @@ void IJK_One_Dimensional_Subproblems::compute_source_terms_impose_boundary_condi
                                                                                       const double& end_boundary_condition_value,
                                                                                       const int& impose_user_boundary_condition_end_value)
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].compute_source_terms_impose_boundary_conditions(boundary_condition_interface,
-                                                                 interfacial_boundary_condition_value,
-                                                                 impose_boundary_condition_interface_from_simulation,
-                                                                 boundary_condition_end,
-                                                                 end_boundary_condition_value,
-                                                                 impose_user_boundary_condition_end_value);
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    one_dimensional_effective_subproblems_[itr]->compute_source_terms_impose_boundary_conditions(boundary_condition_interface,
+                                                                                                 interfacial_boundary_condition_value,
+                                                                                                 impose_boundary_condition_interface_from_simulation,
+                                                                                                 boundary_condition_end,
+                                                                                                 end_boundary_condition_value,
+                                                                                                 impose_user_boundary_condition_end_value);
 }
 
 void IJK_One_Dimensional_Subproblems::approximate_temperature_increment_material_derivative()
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].approximate_temperature_increment_material_derivative();
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    one_dimensional_effective_subproblems_[itr]->approximate_temperature_increment_material_derivative();
+  for (int itr=0; itr < disabled_subproblems_counter_; itr++)
+    one_dimensional_disabled_subproblems_[itr]->approximate_temperature_increment_material_derivative();
 }
 
 void IJK_One_Dimensional_Subproblems::retrieve_radial_quantities()
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].retrieve_radial_quantities();
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    one_dimensional_effective_subproblems_[itr]->retrieve_radial_quantities();
+  for (int itr=0; itr < disabled_subproblems_counter_; itr++)
+    one_dimensional_disabled_subproblems_[itr]->retrieve_radial_quantities();
 }
 
 void IJK_One_Dimensional_Subproblems::retrieve_temperature_solutions()
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].retrieve_temperature_solution();
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    one_dimensional_effective_subproblems_[itr]->retrieve_temperature_solution();
 }
 
 void IJK_One_Dimensional_Subproblems::compute_local_temperature_gradient_solutions()
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].compute_local_temperature_gradient_solution();
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    one_dimensional_effective_subproblems_[itr]->compute_local_temperature_gradient_solution();
 }
 
 void IJK_One_Dimensional_Subproblems::compute_local_velocity_gradient()
 {
-  for (int itr=0; itr < subproblems_counter_; itr++)
-    (*this)[itr].compute_local_velocity_gradient();
+  for (int itr=0; itr < effective_subproblems_counter_; itr++)
+    one_dimensional_effective_subproblems_[itr]->compute_local_velocity_gradient();
 }
 
 void IJK_One_Dimensional_Subproblems::get_subproblem_ijk_indices(int& i, int& j, int& k, int& subproblem_index) const
 {
-  (*this)[subproblem_index].get_ijk_indices(i,j,k);
+  one_dimensional_effective_subproblems_[subproblem_index]->get_ijk_indices(i,j,k);
 }
 
 const int& IJK_One_Dimensional_Subproblems::get_dxyz_increment_bool(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_dxyz_increment_bool();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_dxyz_increment_bool();
 }
 
 const int& IJK_One_Dimensional_Subproblems::get_dxyz_over_two_increment_bool(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_dxyz_over_two_increment_bool();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_dxyz_over_two_increment_bool();
 }
 
 const FixedVector<int,3>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_corrected_sign(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_pure_neighbours_corrected_sign();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_pure_neighbours_corrected_sign();
 }
 
 const std::vector<std::vector<std::vector<bool>>>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_to_correct(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_pure_neighbours_to_correct();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_pure_neighbours_to_correct();
 }
 
 const std::vector<std::vector<std::vector<double>>>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_corrected_distance(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_pure_neighbours_corrected_distance();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_pure_neighbours_corrected_distance();
 }
 
 const std::vector<std::vector<std::vector<double>>>& IJK_One_Dimensional_Subproblems::get_pure_neighbours_corrected_colinearity(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_pure_neighbours_corrected_colinearity();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_pure_neighbours_corrected_colinearity();
 }
 
 const std::vector<std::vector<std::vector<std::vector<bool>>>> IJK_One_Dimensional_Subproblems::get_pure_neighbours_last_faces_to_correct(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_pure_neighbours_last_faces_to_correct();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_pure_neighbours_last_faces_to_correct();
 }
 const std::vector<std::vector<std::vector<std::vector<double>>>> IJK_One_Dimensional_Subproblems::get_pure_neighbours_last_faces_corrected_distance(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_pure_neighbours_last_faces_corrected_distance();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_pure_neighbours_last_faces_corrected_distance();
 }
 const std::vector<std::vector<std::vector<std::vector<double>>>> IJK_One_Dimensional_Subproblems::get_pure_neighbours_last_faces_corrected_colinearity(const int& subproblem_index) const
 {
-  return (*this)[subproblem_index].get_pure_neighbours_last_faces_corrected_colinearity();
+  return one_dimensional_effective_subproblems_[subproblem_index]->get_pure_neighbours_last_faces_corrected_colinearity();
 }
 
 double IJK_One_Dimensional_Subproblems::get_interfacial_gradient_corrected(int i)
 {
-  return (*this)[i].get_interfacial_gradient_corrected();
+  return one_dimensional_effective_subproblems_[i]->get_interfacial_gradient_corrected();
 }
 
 double IJK_One_Dimensional_Subproblems::get_temperature_profile_at_point(const int& i, const double& dist) const
 {
-  return (*this)[i].get_temperature_profile_at_point(dist);
+  return one_dimensional_effective_subproblems_[i]->get_temperature_profile_at_point(dist);
 }
 
 const Vecteur3& IJK_One_Dimensional_Subproblems::get_bary_facet(const int& i) const
 {
-  return (*this)[i].get_bary_facet();
+  return one_dimensional_effective_subproblems_[i]->get_bary_facet();
 }
 
 const double& IJK_One_Dimensional_Subproblems::get_dist_cell_interface(const int& i) const
 {
-  return (*this)[i].get_dist_cell();
+  return one_dimensional_effective_subproblems_[i]->get_dist_cell();
 }
 
 const FixedVector<double,6>& IJK_One_Dimensional_Subproblems::get_dist_faces_interface(const int& i) const
 {
-  return (*this)[i].get_dist_faces();
+  return one_dimensional_effective_subproblems_[i]->get_dist_faces();
 }
 
 double IJK_One_Dimensional_Subproblems::get_temperature_times_velocity_profile_at_point(const int& i, const double& dist, const int& dir) const
 {
-  return (*this)[i].get_temperature_times_velocity_profile_at_point(dist, dir);
+  return one_dimensional_effective_subproblems_[i]->get_temperature_times_velocity_profile_at_point(dist, dir);
 }
 
 DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const
 {
-  return (*this)[i].get_temperature_profile_discrete_integral_at_point(dist, level, dir);
+  return one_dimensional_effective_subproblems_[i]->get_temperature_profile_discrete_integral_at_point(dist, level, dir);
 }
 
 DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_times_velocity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const
 {
-  return (*this)[i].get_temperature_times_velocity_profile_discrete_integral_at_point(dist, level, dir);
+  return one_dimensional_effective_subproblems_[i]->get_temperature_times_velocity_profile_discrete_integral_at_point(dist, level, dir);
 }
 
 double IJK_One_Dimensional_Subproblems::get_temperature_gradient_profile_at_point(const int& i, const double& dist, const int& dir) const
 {
-  return (*this)[i].get_temperature_gradient_profile_at_point(dist, dir);
+  return one_dimensional_effective_subproblems_[i]->get_temperature_gradient_profile_at_point(dist, dir);
 }
 
 double IJK_One_Dimensional_Subproblems::get_temperature_gradient_times_conductivity_profile_at_point(const int& i, const double& dist, const int& dir) const
 {
-  return (*this)[i].get_temperature_gradient_times_conductivity_profile_at_point(dist, dir);
+  return one_dimensional_effective_subproblems_[i]->get_temperature_gradient_times_conductivity_profile_at_point(dist, dir);
 }
 
 DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_gradient_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const
 {
-  return (*this)[i].get_temperature_gradient_profile_discrete_integral_at_point(dist, level, dir);
+  return one_dimensional_effective_subproblems_[i]->get_temperature_gradient_profile_discrete_integral_at_point(dist, level, dir);
 }
 
 DoubleVect IJK_One_Dimensional_Subproblems::get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(const int& i, const double& dist, const int& level, const int& dir) const
 {
-  return (*this)[i].get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(dist, level, dir);
+  return one_dimensional_effective_subproblems_[i]->get_temperature_gradient_times_conductivity_profile_discrete_integral_at_point(dist, level, dir);
 }
 
 Nom IJK_One_Dimensional_Subproblems::get_header_from_string_lists(const std::vector<std::string>& key_results_int,

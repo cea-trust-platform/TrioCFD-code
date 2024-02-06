@@ -35,10 +35,24 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   init_ = 1;
   debug_ = 0;
 
-  disable_probe_collision_ = 0;
+  disable_probe_because_collision_ = 0;
   disable_find_cell_centre_probe_tip_ = 0;
+  enable_probe_collision_detection_=0;
   enable_resize_probe_collision_ = 0;
+  debug_probe_collision_ = 0;
+  resize_probe_collision_ = 0;
   resize_probe_collision_index_ = 0;
+  modified_probe_length_from_collision_ = 0.;
+
+  disable_probe_weak_gradient_=0;
+  disable_probe_weak_gradient_gfm_=0;
+  disable_probe_weak_gradient_local_=0;
+
+  reconstruct_previous_probe_field_ = 0;
+  subproblem_to_ijk_indices_previous_ = nullptr;
+  temperature_probes_previous_ = nullptr;
+  indicator_probes_previous_ = nullptr;
+  velocities_probes_previous_ = nullptr;
 
   points_per_thermal_subproblem_ = nullptr;
   points_per_thermal_subproblem_base_ = nullptr;
@@ -62,6 +76,7 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   velocity_ft_ = nullptr;
   pressure_ = nullptr;
   eulerian_grad_T_interface_ns_=nullptr;
+  probe_collision_debug_field_= nullptr;
 
   grad_T_elem_ = nullptr;
   hess_diag_T_elem_ = nullptr;
@@ -214,7 +229,8 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                            ref_thermal_subresolution.grad_T_elem_,
                                            ref_thermal_subresolution.hess_diag_T_elem_,
                                            ref_thermal_subresolution.hess_cross_T_elem_,
-                                           ref_thermal_subresolution.eulerian_grad_T_interface_ns_);
+                                           ref_thermal_subresolution.eulerian_grad_T_interface_ns_,
+                                           ref_thermal_subresolution.probe_collision_debug_field_);
       associate_probe_parameters(ref_thermal_subresolution.points_per_thermal_subproblem_,
                                  ref_thermal_subresolution.uniform_alpha_,
                                  ref_thermal_subresolution.uniform_lambda_,
@@ -230,6 +246,11 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                   ref_thermal_subresolution.mean_liquid_temperature_,
                                   ref_thermal_subresolution.bubbles_volume_,
                                   ref_thermal_subresolution.rising_vectors_);
+      associate_global_subproblems_parameters(ref_thermal_subresolution.reconstruct_previous_probe_field_,
+                                              ref_one_dimensional_subproblems.subproblem_to_ijk_indices_previous_,
+                                              ref_one_dimensional_subproblems.temperature_probes_previous_,
+                                              ref_one_dimensional_subproblems.indicator_probes_previous_,
+                                              ref_one_dimensional_subproblems.velocities_probes_previous_);
       associate_finite_difference_operators(ref_thermal_subresolution.radial_first_order_operator_raw_,
                                             ref_thermal_subresolution.radial_second_order_operator_raw_,
                                             ref_thermal_subresolution.radial_first_order_operator_,
@@ -253,7 +274,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                             || ref_thermal_subresolution.diffusive_flux_correction_),
                                            ref_thermal_subresolution.distance_cell_faces_from_lrs_,
                                            ref_thermal_subresolution.interp_eulerian_);
-      associate_varying_probes_params(ref_thermal_subresolution.reajust_probe_length_from_vertices_,
+      associate_varying_probes_params(ref_thermal_subresolution.readjust_probe_length_from_vertices_,
                                       ref_thermal_subresolution.first_time_step_varying_probes_,
                                       ref_thermal_subresolution.probe_variations_priority_,
                                       ref_thermal_subresolution.disable_interpolation_in_mixed_cells_);
@@ -270,6 +291,11 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                             ref_thermal_subresolution.neighbours_last_faces_distance_colinearity_face_weighting_,
                                             ref_thermal_subresolution.find_reachable_fluxes_,
                                             ref_thermal_subresolution.find_cell_neighbours_for_fluxes_spherical_correction_);
+      associate_tweaked_parameters(ref_thermal_subresolution.disable_probe_weak_gradient_,
+                                   ref_thermal_subresolution.disable_probe_weak_gradient_gfm_);
+      associate_collisions_parameters(ref_thermal_subresolution.enable_probe_collision_detection_,
+                                      ref_thermal_subresolution.enable_resize_probe_collision_,
+                                      ref_thermal_subresolution.debug_probe_collision_);
 
 //      // TODO: If the calculation of the distance is changed in intersection_ijk, it will be useless...
       associate_sub_problem_temporal_params(ref_thermal_subresolution.is_first_time_step_,
@@ -319,6 +345,8 @@ void IJK_One_Dimensional_Subproblem::reset_flags()
 {
   has_computed_cell_centre_distance_ = false;
   has_computed_cell_faces_distance_ = false;
+  disable_probe_because_collision_ = 0;
+  disable_probe_weak_gradient_local_= 0;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_thermal_subproblem_parameters(const int& reference_gfm_on_probes,
@@ -360,7 +388,8 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
                                                                           const FixedVector<IJK_Field_double, 3>& grad_T_elem,
                                                                           const FixedVector<IJK_Field_double, 3>& hess_diag_T_elem,
                                                                           const FixedVector<IJK_Field_double, 3>& hess_cross_T_elem,
-                                                                          const IJK_Field_double& eulerian_grad_T_interface_ns)
+                                                                          const IJK_Field_double& eulerian_grad_T_interface_ns,
+                                                                          IJK_Field_double& probe_collision_debug_field)
 {
   interfaces_ = &interfaces;
   eulerian_distance_ = eulerian_distance;
@@ -378,6 +407,25 @@ void IJK_One_Dimensional_Subproblem::associate_eulerian_fields_references(const 
   hess_diag_T_elem_ = &hess_diag_T_elem;
   hess_cross_T_elem_ = &hess_cross_T_elem;
   eulerian_grad_T_interface_ns_ = &eulerian_grad_T_interface_ns;
+  probe_collision_debug_field_ = &probe_collision_debug_field;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_tweaked_parameters(const int& disable_probe_weak_gradient,
+                                                                  const int& disable_probe_weak_gradient_gfm)
+{
+  disable_probe_weak_gradient_ = disable_probe_weak_gradient;
+  disable_probe_weak_gradient_gfm_ = disable_probe_weak_gradient_gfm;
+  if (disable_probe_weak_gradient_gfm_)
+    disable_probe_weak_gradient_ = 1;
+}
+
+void IJK_One_Dimensional_Subproblem::associate_collisions_parameters(const int& enable_probe_collision_detection,
+                                                                     const int& enable_resize_probe_collision,
+                                                                     const int& debug_probe_collision)
+{
+  enable_probe_collision_detection_ = enable_probe_collision_detection;
+  enable_resize_probe_collision_ = enable_resize_probe_collision;
+  debug_probe_collision_ = debug_probe_collision;
 }
 
 void IJK_One_Dimensional_Subproblem::associate_sub_problem_temporal_params(const bool& is_first_time_step,
@@ -398,12 +446,12 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_temporal_params(const
   max_u_cartesian_ = !max_u_radial_;
 }
 
-void IJK_One_Dimensional_Subproblem::associate_varying_probes_params(const int& reajust_probe_length_from_vertices,
+void IJK_One_Dimensional_Subproblem::associate_varying_probes_params(const int& readjust_probe_length_from_vertices,
                                                                      const int& first_time_step_varying_probes,
                                                                      const int& probe_variations_priority,
                                                                      const int& disable_interpolation_in_mixed_cells)
 {
-  reajust_probe_length_from_vertices_ = reajust_probe_length_from_vertices;
+  readjust_probe_length_from_vertices_ = readjust_probe_length_from_vertices;
   first_time_step_varying_probes_ = first_time_step_varying_probes;
   probe_variations_priority_ = probe_variations_priority;
   disable_interpolation_in_mixed_cells_ = disable_interpolation_in_mixed_cells;
@@ -544,6 +592,20 @@ void IJK_One_Dimensional_Subproblem::associate_bubble_parameters(const ArrOfDoub
   bubbles_rising_vectors_per_bubble_ = rising_vectors;
 }
 
+void  IJK_One_Dimensional_Subproblem::associate_global_subproblems_parameters(const int& reconstruct_previous_probe_field,
+                                                                              const std::map<int, std::map<int, std::map<int, int>>>& subproblem_to_ijk_indices_previous,
+                                                                              const std::vector<DoubleVect>& temperature_probe_previous,
+                                                                              const std::vector<double>& indicator_probes_previous,
+                                                                              const std::vector<Vecteur3>& velocities_probes_previous)
+
+{
+  reconstruct_previous_probe_field_ = reconstruct_previous_probe_field;
+  subproblem_to_ijk_indices_previous_ = &subproblem_to_ijk_indices_previous;
+  temperature_probes_previous_ = &temperature_probe_previous;
+  indicator_probes_previous_ = &indicator_probes_previous;
+  velocities_probes_previous_ = &velocities_probes_previous;
+}
+
 void IJK_One_Dimensional_Subproblem::associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,
                                                                            const Matrice& radial_second_order_operator_raw,
                                                                            const Matrice& radial_first_order_operator,
@@ -611,17 +673,22 @@ void IJK_One_Dimensional_Subproblem::initialise_thermal_probe()
         compute_distance_cell_centre();
         if (debug_)
           Cerr << "Compute cell and faces distance to the interface" << finl;
-        if (correct_fluxes_ || correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_ || compute_reachable_fluxes_)
+        if (correct_fluxes_ || correct_temperature_cell_neighbours_
+            || find_cell_neighbours_for_fluxes_spherical_correction_
+            || compute_reachable_fluxes_)
           {
             compute_distance_faces_centres();
-            if (debug_)
-              Cerr << "Compute distance cell neighbours" << finl;
-            if (correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_)
-              compute_distance_cell_centres_neighbours();
-            if (debug_)
-              Cerr << "Compute distance faces neighbours" << finl;
-            if (compute_reachable_fluxes_)
-              compute_distance_last_cell_faces_neighbours();
+            if (!readjust_probe_length_from_vertices_ || !enable_resize_probe_collision_)
+              {
+                if (debug_)
+                  Cerr << "Compute distance cell neighbours" << finl;
+                if (correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_)
+                  compute_distance_cell_centres_neighbours();
+                if (debug_)
+                  Cerr << "Compute distance faces neighbours" << finl;
+                if (compute_reachable_fluxes_)
+                  compute_distance_last_cell_faces_neighbours();
+              }
           }
       }
 
@@ -765,6 +832,10 @@ void IJK_One_Dimensional_Subproblem::compute_pure_spherical_basis_vectors()
   const double atan_theta_incr_ini = M_PI / 2;
   const double atan_incr_factor = -1;
   theta_sph_ = (theta_sph_ - atan_theta_incr_ini) * atan_incr_factor;
+
+  if (debug_probe_collision_)
+    if (theta_sph_ < 0)
+      disable_probe_because_collision_ = 1;
 
   if (debug_)
     {
@@ -968,44 +1039,51 @@ void IJK_One_Dimensional_Subproblem::recompute_finite_difference_matrices_varyin
 
 void IJK_One_Dimensional_Subproblem::interpolate_indicator_on_probes()
 {
-  indicator_interp_.resize(*points_per_thermal_subproblem_);
-  const IJK_Field_double& indicator = interfaces_->I();
-  ijk_interpolate_skip_unknown_points(indicator, coordinates_cartesian_compo_, indicator_interp_, INVALID_INTERP);
-  if (enable_resize_probe_collision_)
+  if (enable_probe_collision_detection_)
     {
-      for (int i=(*points_per_thermal_subproblem_)-1; i>=0; i--)
+      if (readjust_probe_length_from_vertices_)
+        compute_modified_probe_length_vertex_condition();
+      indicator_interp_.resize(*points_per_thermal_subproblem_);
+      const IJK_Field_double& indicator = interfaces_->I();
+      ijk_interpolate_skip_unknown_points(indicator, coordinates_cartesian_compo_, indicator_interp_, INVALID_INTERP);
+      if (enable_resize_probe_collision_)
         {
-          const double indic_last = find_cell_related_indicator_on_probes(i);
-          if (indic_last > LIQUID_INDICATOR_TEST)
+          for (int i=(*points_per_thermal_subproblem_)-1; i>=0; i--)
             {
-              resize_probe_collision_index_ = i;
-              return;
-            }
-          disable_probe_collision_ = (i == 0);
-        }
-    }
-  else
-    {
-      if (!disable_find_cell_centre_probe_tip_)
-        {
-
-          const int last_index = (*points_per_thermal_subproblem_) - 1;
-          const double indic_last = find_cell_related_indicator_on_probes(last_index);
-          if (indic_last < LIQUID_INDICATOR_TEST)
-            {
-              disable_probe_collision_ = 1;
-              return;
+              const double indic_last = find_cell_related_indicator_on_probes(i);
+              if (indic_last > LIQUID_INDICATOR_TEST)
+                {
+                  resize_probe_collision_index_ = i;
+                  if (i != (*points_per_thermal_subproblem_)-1)
+                    resize_probe_collision_ = 1;
+                  return;
+                }
+              disable_probe_because_collision_ = (i == 0);
             }
         }
       else
         {
-          for (int i=(*points_per_thermal_subproblem_)-1; i>=0; i--)
+          if (!disable_find_cell_centre_probe_tip_)
             {
-              const double indicator_val = indicator_interp_(i);
-              if (indicator_val < LIQUID_INDICATOR_TEST)
+
+              const int last_index = (*points_per_thermal_subproblem_) - 1;
+              const double indic_last = find_cell_related_indicator_on_probes(last_index);
+              if (indic_last < LIQUID_INDICATOR_TEST)
                 {
-                  disable_probe_collision_ = 1;
+                  disable_probe_because_collision_ = 1;
                   return;
+                }
+            }
+          else
+            {
+              for (int i=(*points_per_thermal_subproblem_)-1; i>=0; i--)
+                {
+                  const double indicator_val = indicator_interp_(i);
+                  if (indicator_val < LIQUID_INDICATOR_TEST)
+                    {
+                      disable_probe_because_collision_ = 1;
+                      return;
+                    }
                 }
             }
         }
@@ -1075,6 +1153,7 @@ void IJK_One_Dimensional_Subproblem::interpolate_project_velocities_on_probes()
 
       interpolate_pressure_on_probes();
       interpolate_cartesian_velocities_on_probes();
+      interpolate_velocity_at_cell_centre();
       compute_velocity_magnitude();
       project_velocities_on_probes();
       velocities_calculation_counter_++;
@@ -1083,10 +1162,10 @@ void IJK_One_Dimensional_Subproblem::interpolate_project_velocities_on_probes()
 
 void IJK_One_Dimensional_Subproblem::reajust_probe_length()
 {
-  if (reajust_probe_length_from_vertices_)
-    compute_modified_probe_length_condition(0);
-  else if (first_time_step_varying_probes_)
+  if (readjust_probe_length_from_vertices_)
     compute_modified_probe_length_condition(1);
+  else if (first_time_step_varying_probes_)
+    compute_modified_probe_length_condition(2);
   else
     Cerr << "This strategy for readjusting the probe length does not exist" << finl;
 
@@ -1097,14 +1176,22 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_condition(con
   switch(probe_length_condition)
     {
     case 0:
-      compute_modified_probe_length_vertex_condition();
+      compute_modified_probe_length_collision();
       break;
     case 1:
+      compute_modified_probe_length_vertex_condition();
+      break;
+    case 2:
       compute_modified_probe_length_temporal_condition();
       break;
     default:
       break;
     }
+}
+
+void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_collision()
+{
+  modified_probe_length_from_collision_ = (*radial_coordinates_)(resize_probe_collision_index_);
 }
 
 void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_vertex_condition()
@@ -1126,7 +1213,7 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length_vertex_condit
 
   modified_probe_length_from_vertices_ = vertices_centres_distance_[lmax][mmax];
   modified_probe_length_from_vertices_ += (*cell_diagonal_) / 2;
-
+  probe_variations_enabled_ = 1;
   if (debug_)
     Cerr << "Maximum vertex distance:" << max_distance_pure_vertex_centre << finl;
 }
@@ -1830,21 +1917,76 @@ void IJK_One_Dimensional_Subproblem::compute_modified_probe_length(const int& pr
 {
   if (probe_variations_enabled && probe_variations_enabled_)
     {
-      if (reajust_probe_length_from_vertices_)
+      if (enable_resize_probe_collision_ && readjust_probe_length_from_vertices_)
+        {
+          double min_probe_length_ = std::min(modified_probe_length_from_collision_, modified_probe_length_from_vertices_);
+          if (min_probe_length_ == modified_probe_length_from_vertices_)
+            probe_length_ = min_probe_length_;
+          else
+            {
+              disable_probe_because_collision_ = 1;
+              return;
+            }
+        }
+      else if (enable_resize_probe_collision_)
+        probe_length_ = modified_probe_length_from_collision_;
+      else if (readjust_probe_length_from_vertices_)
         probe_length_ = modified_probe_length_from_vertices_;
       else if (first_time_step_varying_probes_)
         probe_length_ = max_cfl_fourier_probe_length_;
       else
         probe_length_ = (*coeff_distance_diagonal_) * (*cell_diagonal_);
+
       compute_local_discretisation();
       recompute_finite_difference_matrices_varying_probe_length();
-      // probe_variations_enabled_ = 0;
+
+      if (readjust_probe_length_from_vertices_ || enable_resize_probe_collision_)
+        {
+          clear_vectors();
+          if (debug_)
+            Cerr << "Compute distance cell neighbours" << finl;
+          if (correct_temperature_cell_neighbours_ || find_cell_neighbours_for_fluxes_spherical_correction_)
+            compute_distance_cell_centres_neighbours();
+          if (debug_)
+            Cerr << "Compute distance faces neighbours" << finl;
+          if (compute_reachable_fluxes_)
+            compute_distance_last_cell_faces_neighbours();
+        }
     }
   else
     {
       probe_variations_enabled_ = 0;
       first_time_step_varying_probes_ = 0;
     }
+}
+
+
+void IJK_One_Dimensional_Subproblem::interpolate_velocity_at_cell_centre()
+{
+  Vecteur3 bary_cell = ref_ijk_ft_->get_splitting_ns().get_coords_of_dof(index_i_, index_j_, index_k_, IJK_Splitting::ELEM);
+  xyz_velocity_cell_ = {0., 0., 0.};
+  double x_velocity_cell, y_velocity_cell, z_velocity_cell;
+  interpolate_quantities_at_point((*velocity_)[0], bary_cell, x_velocity_cell);
+  interpolate_quantities_at_point((*velocity_)[1], bary_cell, y_velocity_cell);
+  interpolate_quantities_at_point((*velocity_)[2], bary_cell, z_velocity_cell);
+  xyz_velocity_cell_ = {x_velocity_cell, y_velocity_cell, z_velocity_cell};
+}
+
+void IJK_One_Dimensional_Subproblem::interpolate_quantities_at_point(const IJK_Field_double& eulerian_field, const Vecteur3& compo_xyz, double& field_value)
+{
+  DoubleVect field_interp(1);
+  DoubleTab coordinates_point = get_single_point_coordinates(compo_xyz);
+  ijk_interpolate_skip_unknown_points(eulerian_field, coordinates_point, field_interp, INVALID_INTERP);
+  field_value = field_interp(0);
+}
+
+DoubleTab IJK_One_Dimensional_Subproblem::get_single_point_coordinates(const Vecteur3& compo_xyz)
+{
+  DoubleTab coordinates_point;
+  coordinates_point.resize(1,3);
+  for (int c=0; c<3; c++)
+    coordinates_point(0,c) = compo_xyz[c];
+  return coordinates_point;
 }
 
 void IJK_One_Dimensional_Subproblem::interpolate_pressure_on_probes()
@@ -2025,6 +2167,124 @@ void IJK_One_Dimensional_Subproblem::project_basis_vector_onto_cartesian_dir(con
     }
 }
 
+void IJK_One_Dimensional_Subproblem::compute_integral_quantity(DoubleVect& quantity, double& integrated_quantity)
+{
+  double integrated_quantity_tmp = 0.;
+  for (int i=0; i<quantity.size()-1; i++)
+    {
+      integrated_quantity_tmp += 0.5*(quantity[i] + quantity[i+1]) * dr_;
+    }
+  integrated_quantity = integrated_quantity_tmp;
+}
+
+void IJK_One_Dimensional_Subproblem::compute_integral_quantity_on_probe(DoubleVect& quantity, double& integrated_quantity)
+{
+  compute_integral_quantity(quantity, integrated_quantity);
+  integrated_quantity /= (probe_length_);
+}
+
+void IJK_One_Dimensional_Subproblem::compute_energy_from_temperature_interp()
+{
+  compute_integral_quantity_on_probe(temperature_interp_, energy_temperature_interp_);
+}
+
+void IJK_One_Dimensional_Subproblem::retrieve_previous_temperature_on_probe()
+{
+  if (!reconstruct_previous_probe_field_)
+    temperature_previous_ = temperature_interp_;
+  else
+    {
+      if (ref_ijk_ft_->get_tstep() == 0)
+        {
+          temperature_previous_.resize((*points_per_thermal_subproblem_));
+          const double radius_ini = osculating_radius_;
+          for (int i=0; i<(*points_per_thermal_subproblem_); i++)
+            temperature_previous_[i] = delta_T_subcooled_overheated_ - delta_T_subcooled_overheated_
+                                       * (radius_ini / osculating_radial_coordinates_[i])
+                                       * (1 - erf( (*radial_coordinates_)[i] / (2 * sqrt((*alpha_) * ref_ijk_ft_->get_current_time())) ) );
+        }
+      else
+        {
+          const int count_index_ijk = is_in_map_index_ijk((*subproblem_to_ijk_indices_previous_), index_i_, index_j_, index_k_);
+          if (count_index_ijk)
+            {
+              const int previous_rank = (*subproblem_to_ijk_indices_previous_).at(index_i_).at(index_j_).at(index_k_);
+              temperature_previous_ = (*temperature_probes_previous_)[previous_rank];
+            }
+          else
+            {
+              int neighbours_i[6] = NEIGHBOURS_I;
+              int neighbours_j[6] = NEIGHBOURS_J;
+              int neighbours_k[6] = NEIGHBOURS_K;
+              int counter_mixed_neighbours = 0;
+              double vapour_indicator_mixed_neighbours = 0;
+              for (int l=0; l<6; l++)
+                {
+                  const int ii = neighbours_i[l];
+                  const int jj = neighbours_j[l];
+                  const int kk = neighbours_k[l];
+                  int index_i_neighbour_prev = index_i_ + neighbours_i[l];
+                  int index_j_neighbour_prev = index_j_ + neighbours_j[l];
+                  int index_k_neighbour_prev = index_k_ + neighbours_k[l];
+                  const int count_index_ijk_neighbour = is_in_map_index_ijk((*subproblem_to_ijk_indices_previous_), index_i_neighbour_prev, index_j_neighbour_prev, index_k_neighbour_prev);
+                  if (count_index_ijk_neighbour)
+                    {
+                      const int previous_rank = (*subproblem_to_ijk_indices_previous_).at(index_i_neighbour_prev).at(index_j_neighbour_prev).at(index_k_neighbour_prev);
+                      const double indicator_prev = (*indicator_probes_previous_)[previous_rank];
+                      const double indicator_prev_vapour = 1 - indicator_prev;
+                      double velocity = 0.;
+                      Vecteur3 velocities_xyz = (*velocities_probes_previous_)[previous_rank];
+                      int incr = 0;
+                      if (ii)
+                        {
+                          velocity = velocities_xyz[0];
+                          incr = ii;
+                        }
+                      if (jj)
+                        {
+                          velocity = velocities_xyz[1];
+                          incr = jj;
+                        }
+                      if (kk)
+                        {
+                          velocity = velocities_xyz[2];
+                          incr = kk;
+                        }
+                      if (signbit(velocity) != signbit(incr))
+                        {
+                          temperature_previous_ +=  (*temperature_probes_previous_)[previous_rank];
+                          temperature_previous_ *= (indicator_prev_vapour * velocity);
+                          vapour_indicator_mixed_neighbours += (indicator_prev_vapour * velocity);
+                          counter_mixed_neighbours++;
+                        }
+                    }
+                }
+              if (!counter_mixed_neighbours)
+                temperature_previous_ *= (1 / vapour_indicator_mixed_neighbours);
+              else
+                temperature_previous_ = temperature_interp_;
+            }
+        }
+    }
+}
+
+int IJK_One_Dimensional_Subproblem::is_in_map_index_ijk(const std::map<int, std::map<int, std::map<int, int>>>& subproblem_to_ijk_indices,
+                                                        const int& index_i,
+                                                        const int& index_j,
+                                                        const int& index_k)
+{
+  const int count_index_i = (int) subproblem_to_ijk_indices.count(index_i);
+  int count_index_j = 0;
+  int count_index_k = 0;
+  if (count_index_i)
+    {
+      count_index_j = (int) subproblem_to_ijk_indices.at(index_i).count(index_j);
+      if (count_index_j)
+        count_index_k = (int) subproblem_to_ijk_indices.at(index_i).at(index_j).count(index_k);
+    }
+  return (count_index_i && count_index_j && count_index_k);
+}
+
 void IJK_One_Dimensional_Subproblem::interpolate_temperature_on_probe()
 {
   temperature_interp_.resize(*points_per_thermal_subproblem_);
@@ -2032,6 +2292,9 @@ void IJK_One_Dimensional_Subproblem::interpolate_temperature_on_probe()
     ijk_interpolate_skip_unknown_points(*temperature_before_extrapolation_, coordinates_cartesian_compo_, temperature_interp_, INVALID_INTERP);
   else
     ijk_interpolate_skip_unknown_points(*temperature_, coordinates_cartesian_compo_, temperature_interp_, INVALID_INTERP);
+  temperature_cell_ = (*temperature_)(index_i_, index_j_, index_k_);
+  compute_energy_from_temperature_interp();
+  retrieve_previous_temperature_on_probe();
 }
 
 void IJK_One_Dimensional_Subproblem::interpolate_temperature_gradient_on_probe()
@@ -2162,25 +2425,33 @@ void IJK_One_Dimensional_Subproblem::project_matrix_on_basis(const Matrice33& pr
 
 void IJK_One_Dimensional_Subproblem::initialise_radial_convection_operator_local()
 {
-  if (!global_probes_characteristics_ || first_time_step_varying_probes_ || pre_initialise_thermal_subproblems_list_)
+  if (!global_probes_characteristics_ ||
+      first_time_step_varying_probes_ ||
+      readjust_probe_length_from_vertices_ ||
+      pre_initialise_thermal_subproblems_list_)
     (*finite_difference_assembler_).reinitialise_any_matrix_subproblem(radial_convection_matrix_base_,
                                                                        radial_first_order_operator_,
                                                                        sub_problem_index_,
                                                                        use_sparse_matrix_,
                                                                        first_indices_sparse_matrix_,
-                                                                       operators_reinitialisation_);
+                                                                       operators_reinitialisation_,
+                                                                       global_probes_characteristics_);
   operators_reinitialisation_ = 0;
 }
 
 void IJK_One_Dimensional_Subproblem::initialise_radial_diffusion_operator_local()
 {
-  if (!global_probes_characteristics_ || first_time_step_varying_probes_ || pre_initialise_thermal_subproblems_list_)
+  if (!global_probes_characteristics_ ||
+      first_time_step_varying_probes_ ||
+      readjust_probe_length_from_vertices_ ||
+      pre_initialise_thermal_subproblems_list_)
     (*finite_difference_assembler_).reinitialise_any_matrix_subproblem(radial_diffusion_matrix_base_,
                                                                        radial_second_order_operator_,
                                                                        sub_problem_index_,
                                                                        use_sparse_matrix_,
                                                                        first_indices_sparse_matrix_,
-                                                                       operators_reinitialisation_);
+                                                                       operators_reinitialisation_,
+                                                                       global_probes_characteristics_);
   operators_reinitialisation_ = 0;
 }
 
@@ -2192,7 +2463,8 @@ void IJK_One_Dimensional_Subproblem::initialise_identity_operator_local()
                                                                        sub_problem_index_,
                                                                        use_sparse_matrix_,
                                                                        first_indices_sparse_matrix_,
-                                                                       operators_reinitialisation_);
+                                                                       operators_reinitialisation_,
+                                                                       global_probes_characteristics_);
   operators_reinitialisation_ = 0;
 }
 
@@ -2383,12 +2655,7 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms()
       /*
        * Compute at least the tangential convection
        */
-      tangential_convection_source_terms_first_ = (*tangential_temperature_gradient_first_solver_);
-      if (correct_tangential_temperature_gradient_)
-        correct_tangential_temperature_gradient(tangential_convection_source_terms_first_);
-      tangential_convection_source_terms_first_ *= (*first_tangential_velocity_solver_);
-      const double alpha_inv = 1 / (*alpha_);
-      tangential_convection_source_terms_first_ *= alpha_inv;
+      compute_tangential_convection_source_terms_first();
       switch (source_terms_type_)
         {
         case tangential_conv_2D:
@@ -2396,11 +2663,7 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms()
           source_terms_ = tangential_convection_source_terms_;
           break;
         case tangential_conv_3D:
-          tangential_convection_source_terms_second_ = (*tangential_temperature_gradient_second_solver_);
-          if (correct_tangential_temperature_gradient_)
-            correct_tangential_temperature_gradient(tangential_convection_source_terms_second_);
-          tangential_convection_source_terms_second_ *= (*second_tangential_velocity_solver_);
-          tangential_convection_source_terms_second_ *= alpha_inv;
+          compute_tangential_convection_source_terms_second();
           tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
           tangential_convection_source_terms_ += tangential_convection_source_terms_second_;
           source_terms_ = tangential_convection_source_terms_;
@@ -2408,25 +2671,17 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms()
         case tangential_conv_2D_tangential_diffusion_3D:
           tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
           source_terms_ = tangential_convection_source_terms_;
-          tangential_diffusion_source_terms_ = tangential_temperature_diffusion_;
-          if (correct_tangential_temperature_hessian_)
-            correct_tangential_temperature_hessian(tangential_diffusion_source_terms_);
+          compute_tangential_diffusion_source_terms();
           // Be careful to the sign
           source_terms_ += tangential_diffusion_source_terms_;
           break;
         case tangential_conv_3D_tangentual_diffusion_3D:
-          tangential_convection_source_terms_second_ = (*tangential_temperature_gradient_second_solver_);
-          if (correct_tangential_temperature_gradient_)
-            correct_tangential_temperature_gradient(tangential_convection_source_terms_second_);
-          tangential_convection_source_terms_second_ *= second_tangential_velocity_;
-          tangential_convection_source_terms_second_ *= alpha_inv;
+          compute_tangential_convection_source_terms_second();
           tangential_convection_source_terms_ = tangential_convection_source_terms_first_;
           tangential_convection_source_terms_ += tangential_convection_source_terms_second_;
           source_terms_ = tangential_convection_source_terms_;
 
-          // tangential_diffusion_source_terms_;
-          // if (correct_tangential_temperature_hessian_)
-          // 	correct_tangential_temperature_hessian(tangential_diffusion_source_terms_)
+          compute_tangential_diffusion_source_terms();
           // Be careful to the sign
 
           source_terms_ += tangential_diffusion_source_terms_;
@@ -2447,6 +2702,34 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms()
             rhs_assembly_ += temperature_ini_temporal_schemes_;
         }
     }
+}
+
+void IJK_One_Dimensional_Subproblem::compute_tangential_convection_source_terms_first()
+{
+  tangential_convection_source_terms_first_ = (*tangential_temperature_gradient_first_solver_);
+  if (correct_tangential_temperature_gradient_)
+    correct_tangential_temperature_gradient(tangential_convection_source_terms_first_);
+  tangential_convection_source_terms_first_ *= (*first_tangential_velocity_solver_);
+  const double alpha_inv = 1 / (*alpha_);
+  tangential_convection_source_terms_first_ *= alpha_inv;
+}
+
+void IJK_One_Dimensional_Subproblem::compute_tangential_convection_source_terms_second()
+{
+  tangential_convection_source_terms_second_ = (*tangential_temperature_gradient_second_solver_);
+  if (correct_tangential_temperature_gradient_)
+    correct_tangential_temperature_gradient(tangential_convection_source_terms_second_);
+  tangential_convection_source_terms_second_ *= (*second_tangential_velocity_solver_);
+  const double alpha_inv = 1 / (*alpha_);
+  tangential_convection_source_terms_second_ *= alpha_inv;
+}
+
+void IJK_One_Dimensional_Subproblem::compute_tangential_diffusion_source_terms()
+{
+  tangential_diffusion_source_terms_ = tangential_temperature_diffusion_;
+  tangential_diffusion_source_terms_ *= (-1);
+  if (correct_tangential_temperature_hessian_)
+    correct_tangential_temperature_hessian(tangential_diffusion_source_terms_);
 }
 
 void IJK_One_Dimensional_Subproblem::add_source_terms(const int& boundary_condition_interface, const int& boundary_condition_end)
@@ -2597,7 +2880,55 @@ void IJK_One_Dimensional_Subproblem::retrieve_radial_quantities()
     {
       retrieve_variables_solution_gfm_on_probes();
     }
+  compute_integral_quantities_solution();
+  if (debug_probe_collision_ && disable_probe_because_collision_)
+    (*probe_collision_debug_field_)(index_i_, index_j_, index_k_) = 1;
   is_updated_ = true;
+}
+
+void IJK_One_Dimensional_Subproblem::compute_integral_quantities_solution()
+{
+  compute_integral_quantity_on_probe(temperature_solution_, energy_temperature_solution_);
+  compute_integral_quantity_on_probe(normal_temperature_gradient_solution_, normal_temperature_gradient_solution_numerical_integral_);
+  normal_temperature_gradient_solution_integral_exact_ = (temperature_solution_[(*points_per_thermal_subproblem_)-1] -
+                                                          temperature_solution_[0]) / (probe_length_);
+  compute_integral_quantity_on_probe(normal_temperature_double_derivative_solution_, normal_temperature_double_derivative_solution_numerical_integral_);
+  normal_temperature_double_derivative_solution_integral_exact_ = (normal_temperature_gradient_solution_[(*points_per_thermal_subproblem_)-1] -
+                                                                   normal_temperature_gradient_solution_[0]) / (probe_length_);
+  compute_integral_quantity_on_probe(radial_scale_factor_solution_, radial_scale_factor_solution_integral_);
+  compute_integral_quantity_on_probe(radial_convection_solution_, radial_convection_solution_integral_);
+
+  if (compute_tangential_variables_)
+    {
+      compute_integral_quantity_on_probe(tangential_convection_source_terms_first_, tangential_convection_first_integral_);
+      switch (source_terms_type_)
+        {
+        case tangential_conv_2D:
+          compute_tangential_convection_source_terms_second();
+          compute_tangential_diffusion_source_terms();
+          break;
+        case tangential_conv_3D:
+          compute_tangential_diffusion_source_terms();
+          break;
+        case tangential_conv_2D_tangential_diffusion_3D:
+          compute_tangential_convection_source_terms_second();
+          break;
+        case tangential_conv_3D_tangentual_diffusion_3D:
+          break;
+        default:
+          break;
+        }
+      compute_integral_quantity_on_probe(tangential_convection_source_terms_second_, tangential_convection_second_integral_);
+      compute_integral_quantity_on_probe(tangential_diffusion_source_terms_, tangential_diffusion_integral_);
+      tangential_diffusion_integral_ *= (- 1);
+      DoubleVect total_source_terms_local = tangential_convection_source_terms_first_;
+      total_source_terms_local += tangential_convection_source_terms_second_;
+      total_source_terms_local += tangential_diffusion_source_terms_;
+      compute_integral_quantity_on_probe(total_source_terms_local, tangential_source_terms_integral_);
+    }
+  energy_increment_times_dt =  (normal_temperature_double_derivative_solution_integral_exact_ + radial_scale_factor_solution_integral_) -
+                               (radial_convection_solution_integral_ + tangential_source_terms_integral_);
+  time_increment_from_energy_increment_ = (energy_temperature_solution_ - energy_temperature_interp_) / energy_increment_times_dt;
 }
 
 void IJK_One_Dimensional_Subproblem::retrieve_variables_solution_gfm_on_probes()
@@ -2691,19 +3022,58 @@ void IJK_One_Dimensional_Subproblem::compute_local_temperature_gradient_solution
                                               temperature_z_gradient_solution_);
     }
 
+
+  disable_probe_weak_gradient_local_ = 0;
+  if (disable_probe_weak_gradient_)
+    {
+      const double interfacial_gradient_solution = abs(normal_temperature_gradient_solution_[0]);
+      const double interfacial_gradient_interp = abs(normal_temperature_gradient_[0]);
+      const double interfacial_gradient_gfm = abs((*eulerian_grad_T_interface_ns_)(index_i_, index_j_, index_k_));
+      if (disable_probe_weak_gradient_gfm_)
+        {
+          if (interfacial_gradient_solution < interfacial_gradient_gfm)
+            disable_probe_weak_gradient_local_ = 1;
+        }
+      else
+        {
+          if (interfacial_gradient_solution < interfacial_gradient_interp)
+            disable_probe_weak_gradient_local_ = 1;
+        }
+    }
+
   if ((source_terms_type_ == linear_diffusion
        || source_terms_type_ == spherical_diffusion
        || source_terms_type_ == spherical_diffusion_approx)
       && avoid_post_processing_all_terms_)
     initialise_empty_variables_for_post_processing();
 
+  compute_radial_convection_scale_factor_solution();
   compute_radial_temperature_diffusion_solution();
 
-  thermal_flux_ = normal_temperature_gradient_solution_;
+  if (disable_probe_weak_gradient_local_)
+    thermal_flux_ = normal_temperature_gradient_;
+  else
+    thermal_flux_ = normal_temperature_gradient_solution_;
+
   if (reference_gfm_on_probes_)
-    thermal_flux_[0] = (*eulerian_grad_T_interface_ns_)(index_i_, index_j_, index_k_);
+    {
+      const double grad_T_elem_gfm = (*eulerian_grad_T_interface_ns_)(index_i_, index_j_, index_k_);
+      normal_temperature_gradient_solution_[0] = grad_T_elem_gfm;
+      thermal_flux_[0] = grad_T_elem_gfm;
+    }
   thermal_flux_*= ((*lambda_) * surface_);
 
+}
+
+void IJK_One_Dimensional_Subproblem::compute_radial_convection_scale_factor_solution()
+{
+  radial_scale_factor_solution_ = osculating_radial_coordinates_inv_;
+  radial_scale_factor_solution_ *= 2;
+  radial_scale_factor_solution_ *= normal_temperature_gradient_solution_;
+  radial_convection_solution_ = normal_temperature_gradient_solution_;
+  radial_convection_solution_ *= radial_velocity_;
+  const double alpha_inv = 1 / (*alpha_);
+  radial_convection_solution_ *= alpha_inv;
 }
 
 void IJK_One_Dimensional_Subproblem::compute_radial_temperature_diffusion_solution()
@@ -2738,6 +3108,9 @@ void IJK_One_Dimensional_Subproblem::initialise_empty_variables_for_post_process
   radial_temperature_diffusion_.resize(*points_per_thermal_subproblem_);
   tangential_temperature_diffusion_.resize(*points_per_thermal_subproblem_);
   radial_temperature_diffusion_solution_.resize(*points_per_thermal_subproblem_);
+
+  radial_convection_solution_.resize(*points_per_thermal_subproblem_);
+  radial_scale_factor_solution_.resize(*points_per_thermal_subproblem_);
 
   tangential_convection_source_terms_first_.resize(*points_per_thermal_subproblem_);
   tangential_convection_source_terms_second_.resize(*points_per_thermal_subproblem_);
@@ -2850,11 +3223,21 @@ double IJK_One_Dimensional_Subproblem::get_azymuthal_velocity_normal_gradient() 
 
 double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& dist,
                                                                   const DoubleVect& field,
+                                                                  const DoubleVect& field_weak_gradient,
                                                                   const IJK_Field_double& eulerian_field,
                                                                   const int temp_bool,
+                                                                  const int weak_gradient_variable,
                                                                   const int interp_eulerian) const
 {
   double field_value = INVALID_TEMPERATURE;
+  const DoubleVect * field_ref = &field;
+  if (disable_probe_weak_gradient_local_)
+    {
+      if (temp_bool)
+        return temperature_cell_;
+      if (disable_probe_weak_gradient_local_)
+        field_ref = &field_weak_gradient;
+    }
   if (debug_ && temp_bool)
     {
       Cerr << "Thermal subproblem index: " << sub_problem_index_ << finl;
@@ -2876,9 +3259,9 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
       int left_interval = 0;
       int right_interval = *points_per_thermal_subproblem_-1;
       find_interval(dist, left_interval, right_interval);
-      const double field_interp = (field[right_interval] - field[left_interval])
+      const double field_interp = ((*field_ref)[right_interval] - (*field_ref)[left_interval])
                                   / ((*radial_coordinates_)[right_interval] - (*radial_coordinates_)[left_interval]) *
-                                  (dist-(*radial_coordinates_)[left_interval]) + field[left_interval];
+                                  (dist-(*radial_coordinates_)[left_interval]) + (*field_ref)[left_interval];
       field_value = field_interp;
     }
   else if (dist < (*radial_coordinates_)[0])
@@ -2914,7 +3297,7 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
           compo_xyz *= dist;
           compo_xyz += facet_barycentre_;
           for (int c=0; c<3; c++)
-            coordinates_point(0,c) = compo_xyz[0];
+            coordinates_point(0,c) = compo_xyz[c];
           ijk_interpolate_skip_unknown_points(eulerian_field, coordinates_point, field_interp, INVALID_INTERP);
           field_value = field_interp(0);
         }
@@ -3008,7 +3391,7 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
 
 double IJK_One_Dimensional_Subproblem::get_temperature_profile_at_point(const double& dist) const
 {
-  return get_field_profile_at_point(dist, temperature_solution_, *temperature_, 1, interp_eulerian_);
+  return get_field_profile_at_point(dist, temperature_solution_, temperature_interp_, *temperature_, 1, 1, interp_eulerian_);
   // return get_field_profile_at_point(dist, temperature_solution_, 1);
 }
 
@@ -3018,16 +3401,16 @@ double IJK_One_Dimensional_Subproblem::get_velocity_component_at_point(const dou
   switch(dir)
     {
     case 0:
-      velocity = get_field_profile_at_point(dist, x_velocity_, (*velocity_)[0] , 0, interp_eulerian_);
+      velocity = get_field_profile_at_point(dist, x_velocity_, x_velocity_, (*velocity_)[0] , 0, 0, interp_eulerian_);
       break;
     case 1:
-      velocity = get_field_profile_at_point(dist, y_velocity_, (*velocity_)[1] , 0, interp_eulerian_);
+      velocity = get_field_profile_at_point(dist, y_velocity_, y_velocity_, (*velocity_)[1] , 0, 0, interp_eulerian_);
       break;
     case 2:
-      velocity = get_field_profile_at_point(dist, z_velocity_, (*velocity_)[2] , 0, interp_eulerian_);
+      velocity = get_field_profile_at_point(dist, z_velocity_, z_velocity_, (*velocity_)[2] , 0, 0, interp_eulerian_);
       break;
     default:
-      velocity = get_field_profile_at_point(dist, x_velocity_, (*velocity_)[0] , 0, interp_eulerian_);
+      velocity = get_field_profile_at_point(dist, x_velocity_, x_velocity_, (*velocity_)[0] , 0, 0, interp_eulerian_);
       break;
     }
   return velocity;
@@ -3039,16 +3422,36 @@ double IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_at_point
   switch(dir)
     {
     case 0:
-      temperature_gradient = get_field_profile_at_point(dist, temperature_x_gradient_solution_, (*grad_T_elem_)[0], 0, interp_eulerian_);
+      temperature_gradient = get_field_profile_at_point(dist,
+                                                        temperature_x_gradient_solution_,
+                                                        grad_T_elem_interp_[0],
+                                                        (*grad_T_elem_)[0],
+                                                        0, 1,
+                                                        interp_eulerian_);
       break;
     case 1:
-      temperature_gradient = get_field_profile_at_point(dist, temperature_y_gradient_solution_, (*grad_T_elem_)[1], 0, interp_eulerian_);
+      temperature_gradient = get_field_profile_at_point(dist,
+                                                        temperature_y_gradient_solution_,
+                                                        grad_T_elem_interp_[1],
+                                                        (*grad_T_elem_)[1],
+                                                        0, 1,
+                                                        interp_eulerian_);
       break;
     case 2:
-      temperature_gradient = get_field_profile_at_point(dist, temperature_z_gradient_solution_, (*grad_T_elem_)[2], 0, interp_eulerian_);
+      temperature_gradient = get_field_profile_at_point(dist,
+                                                        temperature_z_gradient_solution_,
+                                                        grad_T_elem_interp_[2],
+                                                        (*grad_T_elem_)[2],
+                                                        0, 1,
+                                                        interp_eulerian_);
       break;
     default:
-      temperature_gradient = get_field_profile_at_point(dist, temperature_x_gradient_solution_, (*grad_T_elem_)[0], 0, interp_eulerian_);
+      temperature_gradient = get_field_profile_at_point(dist,
+                                                        temperature_x_gradient_solution_,
+                                                        grad_T_elem_interp_[0],
+                                                        (*grad_T_elem_)[0],
+                                                        0, 1,
+                                                        interp_eulerian_);
       break;
     }
   return temperature_gradient;
@@ -3056,7 +3459,8 @@ double IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_at_point
 
 double IJK_One_Dimensional_Subproblem::get_temperature_times_velocity_profile_at_point(const double& dist, const int& dir) const
 {
-  double temperature_interp = get_field_profile_at_point(dist, temperature_solution_, *temperature_, 1, interp_eulerian_);
+  double temperature_interp = get_field_profile_at_point(dist, temperature_solution_, temperature_interp_, *temperature_,
+                                                         1, 1, interp_eulerian_);
   double velocity_interp = get_velocity_component_at_point(dist, dir);
   return temperature_interp * velocity_interp;
 }
@@ -3073,8 +3477,10 @@ DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_velocity_
                                                                                                    const int& levels,
                                                                                                    const int& dir,
                                                                                                    const DoubleVect& field,
+                                                                                                   const DoubleVect& field_weak_gradient,
                                                                                                    const IJK_Field_double& eulerian_field,
                                                                                                    const int temp_bool,
+                                                                                                   const int weak_gradient_variable,
                                                                                                    const int vel) const
 {
   const int nb_values = (int) pow(4., (double) levels);
@@ -3086,7 +3492,7 @@ DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_velocity_
   if (levels==0)
     {
       velocity = get_velocity_weighting(dist, dir, vel);
-      value = get_field_profile_at_point(dist, field, eulerian_field, temp_bool, interp_eulerian_);
+      value = get_field_profile_at_point(dist, field, field_weak_gradient, eulerian_field, temp_bool, weak_gradient_variable, interp_eulerian_);
       discrete_values(0) = value * surface * velocity;
     }
   else
@@ -3094,7 +3500,11 @@ DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_velocity_
       double dl1_ini = 0.;
       double dl2_ini = 0.;
       Vecteur3 point_coords_ini = {0., 0., 0.};
-      get_field_discrete_value_recursive(1, levels + 1, dir, dist, vel, surface, field, dl1_ini, dl2_ini, point_coords_ini, discrete_values, value_counter);
+      get_field_discrete_value_recursive(1, levels + 1, dir, dist, vel, surface,
+                                         field, field_weak_gradient, eulerian_field,
+                                         temp_bool, weak_gradient_variable,
+                                         dl1_ini, dl2_ini,
+                                         point_coords_ini, discrete_values, value_counter);
     }
   return discrete_values;
 }
@@ -3104,6 +3514,10 @@ void IJK_One_Dimensional_Subproblem::get_field_discrete_value_recursive(const in
                                                                         const int& vel,
                                                                         const double& surface,
                                                                         const DoubleVect& field,
+                                                                        const DoubleVect& field_weak_gradient,
+                                                                        const IJK_Field_double& eulerian_field,
+                                                                        const int temp_bool,
+                                                                        const int weak_gradient_variable,
                                                                         const double dl1_parent,
                                                                         const double dl2_parent,
                                                                         Vecteur3& point_coords_parent,
@@ -3129,7 +3543,10 @@ void IJK_One_Dimensional_Subproblem::get_field_discrete_value_recursive(const in
                   dl1 += dl1_parent;
                   dl2 += dl2_parent;
                   point_coords += point_coords_parent;
-                  get_field_discrete_value_recursive(i+1, max_level, dir, dist, vel, surface, field, dl1, dl2, point_coords, discrete_values, value_counter);
+                  get_field_discrete_value_recursive(i+1, max_level, dir, dist, vel, surface,
+                                                     field, field_weak_gradient, eulerian_field,
+                                                     temp_bool, weak_gradient_variable,
+                                                     dl1, dl2, point_coords, discrete_values, value_counter);
                 }
             }
         }
@@ -3138,7 +3555,9 @@ void IJK_One_Dimensional_Subproblem::get_field_discrete_value_recursive(const in
     {
       const double dist_increment = Vecteur3::produit_scalaire(point_coords_parent, normal_vector_compo_);
       const double dist_value = dist + dist_increment;
-      const double value = get_field_profile_at_point(dist_value, field, 0);
+      // const double value = get_field_profile_at_point(dist_value, field, 0);
+      const double value = get_field_profile_at_point(dist_value, field, field_weak_gradient, eulerian_field,
+                                                      temp_bool, weak_gradient_variable, interp_eulerian_);
       const double velocity = get_velocity_weighting(dist, dir, vel);
       discrete_values(value_counter) = value * surface * velocity;
       value_counter++;
@@ -3153,51 +3572,73 @@ double IJK_One_Dimensional_Subproblem::get_velocity_weighting(const double& dist
     return 1.;
 }
 
-DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_at_point(const double& dist, const int& levels,
-                                                                                const int& dir, const DoubleVect& field,
+DoubleVect IJK_One_Dimensional_Subproblem::get_field_discrete_integral_at_point(const double& dist,
+                                                                                const int& levels,
+                                                                                const int& dir,
+                                                                                const DoubleVect& field,
+                                                                                const DoubleVect& field_weak_gradient,
                                                                                 const IJK_Field_double& eulerian_field,
-                                                                                const int temp_bool) const
+                                                                                const int temp_bool,
+                                                                                const int weak_gradient_variable) const
 {
-  return get_field_discrete_integral_velocity_weighting_at_point(dist, levels, dir, field, eulerian_field, temp_bool, 0);
+  return get_field_discrete_integral_velocity_weighting_at_point(dist, levels, dir,
+                                                                 field, field_weak_gradient,
+                                                                 eulerian_field,
+                                                                 temp_bool, weak_gradient_variable, 0);
 }
 
-DoubleVect IJK_One_Dimensional_Subproblem::get_field_times_velocity_discrete_integral_at_point(const double& dist, const int& levels,
-                                                                                               const int& dir, const DoubleVect& field,
+DoubleVect IJK_One_Dimensional_Subproblem::get_field_times_velocity_discrete_integral_at_point(const double& dist,
+                                                                                               const int& levels,
+                                                                                               const int& dir,
+                                                                                               const DoubleVect& field,
+                                                                                               const DoubleVect& field_weak_gradient,
                                                                                                const IJK_Field_double& eulerian_field) const
 {
-  return get_field_discrete_integral_velocity_weighting_at_point(dist, levels, dir, field, eulerian_field, 1, 1);
+  return get_field_discrete_integral_velocity_weighting_at_point(dist, levels, dir,
+                                                                 field, field_weak_gradient, eulerian_field,
+                                                                 1, 1, 1);
 }
 
 DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_profile_discrete_integral_at_point(const double& dist,
                                                                                               const int& levels,
                                                                                               const int& dir) const
 {
-  return get_field_discrete_integral_at_point(dist, levels, dir, temperature_solution_, *temperature_, 1);
+  return get_field_discrete_integral_at_point(dist, levels, dir, temperature_solution_, temperature_interp_, *temperature_, 1, 1);
 }
 
 DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_times_velocity_profile_discrete_integral_at_point(const double& dist,
                                                                                                              const int& levels,
                                                                                                              const int& dir) const
 {
-  return get_field_times_velocity_discrete_integral_at_point(dist, levels, dir, temperature_solution_, *temperature_);
+  return get_field_times_velocity_discrete_integral_at_point(dist, levels, dir, temperature_solution_, temperature_interp_, *temperature_);
 }
 
-DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_discrete_integral_at_point(const double& dist, const int& levels, const int& dir) const
+DoubleVect IJK_One_Dimensional_Subproblem::get_temperature_gradient_profile_discrete_integral_at_point(const double& dist,
+                                                                                                       const int& levels,
+                                                                                                       const int& dir) const
 {
   DoubleVect temperature_gradient;
   switch(dir)
     {
     case 0:
-      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir, temperature_x_gradient_solution_, (*grad_T_elem_)[0], 0);
+      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir,
+                                                                  temperature_x_gradient_solution_, grad_T_elem_interp_[0],
+                                                                  (*grad_T_elem_)[0], 0, 1);
       break;
     case 1:
-      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir, temperature_y_gradient_solution_, (*grad_T_elem_)[1], 0);
+      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir,
+                                                                  temperature_y_gradient_solution_, grad_T_elem_interp_[1],
+                                                                  (*grad_T_elem_)[1], 0, 1);
       break;
     case 2:
-      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir, temperature_z_gradient_solution_, (*grad_T_elem_)[2], 0);
+      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir,
+                                                                  temperature_z_gradient_solution_, grad_T_elem_interp_[2],
+                                                                  (*grad_T_elem_)[2], 0, 1);
       break;
     default:
-      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir, temperature_x_gradient_solution_, (*grad_T_elem_)[0], 0);
+      temperature_gradient = get_field_discrete_integral_at_point(dist, levels, dir,
+                                                                  temperature_x_gradient_solution_, grad_T_elem_interp_[0],
+                                                                  (*grad_T_elem_)[0], 0, 1);
       break;
     }
   return temperature_gradient;

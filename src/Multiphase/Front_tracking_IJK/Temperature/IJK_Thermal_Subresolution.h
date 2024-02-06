@@ -177,6 +177,13 @@ public :
     else
       return dummy_int_field_;
   }
+  const IJK_Field_double& get_probe_collision_debug_field() const override
+  {
+    if (debug_probe_collision_)
+      return probe_collision_debug_field_;
+    else
+      return dummy_double_field_;
+  }
   int get_disable_post_processing_probes_out_files() const override
   {
     return disable_post_processing_probes_out_files_;
@@ -210,8 +217,9 @@ protected :
   void pre_initialise_thermal_subproblems_matrices();
 
   void interpolate_indicator_on_probes();
-  void clear_problems_colliding_bubbles();
+  void clear_sort_problems_colliding_bubbles();
   void interpolate_project_velocities_on_probes();
+  void reajust_probes_length_collisions();
   void reajust_probes_length();
   void compute_radial_subresolution_convection_diffusion_operators();
   void compute_local_substep();
@@ -244,9 +252,11 @@ protected :
   void convert_into_sparse_matrix();
   void compute_md_vector();
   void retrieve_temperature_solution();
+  void store_previous_temperature_indicator_velocities();
   void check_wrong_values_rhs();
   void initialise_thermal_subproblems_list();
   void initialise_thermal_subproblems();
+  void detect_probe_collision();
   void solve_thermal_subproblems();
   void prepare_thermal_flux_correction();
   void compute_min_max_reachable_fluxes();
@@ -286,8 +296,15 @@ protected :
   double compute_rho_cp_u_mean(const IJK_Field_double& vx) override { return IJK_Thermal_base::compute_rho_cp_u_mean(vx); };
 
   int enable_probe_collision_detection_;
+  int enable_resize_probe_collision_;
+  int debug_probe_collision_;
+  IJK_Field_double probe_collision_debug_field_;
   int reference_gfm_on_probes_;
   int compute_normal_derivatives_on_reference_probes_;
+
+  int disable_probe_weak_gradient_;
+  int disable_probe_weak_gradient_gfm_;
+  int reconstruct_previous_probe_field_;
 
   int disable_spherical_diffusion_start_;
   int single_centred_bubble_;
@@ -301,8 +318,9 @@ protected :
   double nusselt_spherical_diffusion_;
   double nusselt_spherical_diffusion_liquid_;
   double heat_flux_spherical_;
-  enum temperature_ini_dict { local_criteria, integral_criteria, derivative_criteria };
+  enum temperature_ini_dict { local_criteria, integral_criteria, derivative_criteria, time_criteria };
   double mean_liquid_temperature_;
+  double time_ini_user_;
 
   int disable_mixed_cells_increment_;
   int enable_mixed_cells_increment_;
@@ -436,7 +454,7 @@ protected :
   int neighbours_distance_weighting_;
   int neighbours_colinearity_distance_weighting_;
   int smooth_temperature_field_;
-  int reajust_probe_length_from_vertices_;
+  int readjust_probe_length_from_vertices_;
   IJK_Field_double temperature_cell_neighbours_;
   IJK_Field_double temperature_cell_neighbours_debug_;
   IJK_Field_int neighbours_temperature_to_correct_;

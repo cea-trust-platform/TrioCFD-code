@@ -622,6 +622,7 @@ protected :
   Multigrille_Adrien poisson_solver_;
   // Simulation parameters
   int nb_timesteps_;
+  int max_simu_time_;
   double timestep_;
   double timestep_facsec_;
   double cfl_, fo_, oh_;

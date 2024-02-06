@@ -59,78 +59,92 @@ Implemente_instanciable_sans_constructeur(IJK_FT_double, "IJK_FT_double", Interp
 IJK_FT_double::IJK_FT_double():
   post_(IJK_FT_Post(*this))
 {
-	frozen_velocity_ = 0;
-  reprise_ = 0;
-  timestep_facsec_ = 0.;
   p_seuil_min_ = 0.;
-  cfl_ = 0.;
-  fo_ = 0.;
-  oh_ = 0.;
+  p_seuil_max_ = 0;
+
   vitesse_entree_ = 0.;
   vitesse_upstream_ = 0.;
   expression_vitesse_upstream_ = "??";
   upstream_dir_ = 0;
   upstream_stencil_ = 0;
   nb_diam_upstream_ = 0.;
+
   rho_liquide_ = 0.;
   rho_vapeur_ = 0.;
   rho_moyen_ = 0.;
   mu_liquide_ = 0.;
   mu_vapeur_ = 0.;
   sigma_ = 0.;
-  direction_gravite_ = 0;
+
   disable_solveur_poisson_ = 0;
-  resolution_fluctuations_ = 0;
   disable_diffusion_qdm_ = 0;
   disable_convection_qdm_ = 0;
   disable_source_interf_ = 0;
+  disable_diphasique_ = 0;
   frozen_velocity_ = 0;
+  resolution_fluctuations_ = 0;
   velocity_reset_ = 0;
+
   improved_initial_pressure_guess_ = 0;
   include_pressure_gradient_in_ustar_ = 0;
+
   use_inv_rho_for_mass_solver_and_calculer_rho_v_ = 0;
   use_inv_rho_in_poisson_solver_ = 0;
   use_inv_rho_ = 0;
+
   correction_bilan_qdm_ = 0;
   refuse_patch_conservation_QdM_RK3_source_interf_ = 0;
   test_etapes_et_bilan_ = 0;
   add_initial_field_ = 0;
+
   diffusion_alternative_ = 0;
   suppression_rejetons_ = 0;
-  disable_diphasique_ = 0;
+
   time_scheme_ = 0;
   store_RK3_source_acc_ = 0.;
   store_RK3_fac_sv_ = 0.;
+  rk_step_ = 0;
+
   modified_time_ini_ = 0.;
   current_time_ = 0.;
   current_time_at_rk3_step_ = 0.;
   tstep_ = 0;
   timestep_ = 0.;
-  sauvegarder_xyz_ = 0;
+  max_simu_time_ = (int) 1e6;
+  dt_sauvegarde_ = 0;
+  nb_timesteps_ = 0;
   timestep_reprise_vitesse_ = 0;
+
+  timestep_facsec_ = 0.;
+  cfl_ = 0.;
+  fo_ = 0.;
+  oh_ = 0.;
+  enable_dt_oh_ideal_length_factor_ = 0;
+
   ijk_splitting_ft_extension_ = 0;
+  thermal_probes_ghost_cells_ = 2;
+
   pression_ap_proj_ = 0.;
   check_divergence_ = 0;
   coef_force_time_n_ = 0;
   facteur_variable_source_ = 0;
   coef_ammortissement_ = 0;
-  dt_sauvegarde_ = 0;
-  nb_timesteps_ = 0;
-  vol_bulle_monodisperse_ = 0;
   coef_rayon_force_rappel_ = 0;
   terme_source_acceleration_ = 0;
   coef_mean_force_ = 0;
   coef_immobilisation_ = 0;
-  rk_step_ = 0;
-  p_seuil_max_ = 0;
+
+  vol_bulle_monodisperse_ = 0;
+
   compute_force_init_ = 0;
-  thermal_probes_ghost_cells_ = 2;
-  enable_dt_oh_ideal_length_factor_ = 0;
+  direction_gravite_ = 0;
+
+  sauvegarder_xyz_ = 0;
+  reprise_ = 0;
 }
 
 IJK_FT_double::IJK_FT_double(const IJK_FT_double& x):
-  Interprete(x),
-  post_(IJK_FT_Post(*this))
+  Interprete(x), post_(IJK_FT_Post(*this))
 {
   exit();
 }
@@ -497,6 +511,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("oh", &oh_); // XD_ADD_P floattant not_set
   param.ajouter_flag("enable_dt_oh_ideal_length_factor", &enable_dt_oh_ideal_length_factor_);
   param.ajouter("nb_pas_dt_max", &nb_timesteps_, Param::REQUIRED); // XD_ADD_P entier maximum limit for the number of timesteps
+  param.ajouter("max_simu_time", &max_simu_time_); // XD_ADD_P entier maximum limit for the number of timesteps
   param.ajouter("multigrid_solver", &poisson_solver_, Param::REQUIRED); // XD_ADD_P multigrid_solver not_set
   param.ajouter_flag("check_divergence", &check_divergence_); // XD_ADD_P rien Flag to compute and print the value of div(u) after each pressure-correction
   param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid viscosity
@@ -2985,6 +3000,8 @@ void IJK_FT_double::run()
           envoyer_broadcast(stop, 0);
         }
       if (tstep_ == nb_timesteps_ - 1)
+        stop = 1;
+      if (current_time_ >= max_simu_time_)
         stop = 1;
 
       if (tstep_ % dt_sauvegarde_ == dt_sauvegarde_ - 1 || stop)

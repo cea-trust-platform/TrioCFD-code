@@ -89,10 +89,21 @@ public :
                                        const FixedVector<IJK_Field_double, 3>& velocity,
                                        const FixedVector<IJK_Field_double, 3>& velocity_ft,
                                        const IJK_Field_double& pressure);
+  void store_previous_temperature_indicator_velocities();
+  void share_previous_temperature_indicator_velocities();
+  void retrieve_boundary_previous_values();
+  void share_boundary_previous_values();
+  void complete_boundary_previous_values();
+  int is_in_map_index_ijk(const std::map<int, std::map<int, std::map<int, int>>>& subproblem_to_ijk_indices,
+                          const int& index_i,
+                          const int& index_j,
+                          const int& index_k);
+  void set_effective_subproblems(const int& enable_probe_collision_detection);
   void interpolate_indicator_on_probes();
-  void clear_problems_colliding_bubbles();
+  void clear_sort_problems_colliding_bubbles();
   void interpolate_project_velocities_on_probes();
   void reajust_probes_length();
+  void reajust_probes_length(const int probe_length_condition);
   void compute_modified_probe_length(const int& probe_variations_enabled);
   void compute_radial_convection_diffusion_operators();
   void compute_source_terms_impose_boundary_conditions(const int& boundary_condition_interface,
@@ -193,11 +204,15 @@ public :
 
 
 protected :
+  std::vector<IJK_One_Dimensional_Subproblem*> one_dimensional_effective_subproblems_;
+  std::vector<IJK_One_Dimensional_Subproblem*> one_dimensional_disabled_subproblems_;
   int init_ = 1;
   int debug_ = 0;
   int max_subproblems_ = 0;
   int subproblems_counter_ = 0;
   int effective_subproblems_counter_ = 0;
+  int disabled_subproblems_counter_ = 0;
+  int effective_and_disabled_subproblems_counter_ = 0;
   int global_subproblems_counter_ = 0;
   int index_ini_=0;
   int index_end_=0;
@@ -206,7 +221,25 @@ protected :
   REF(IJK_FT_double) ref_ijk_ft_;
 
   FixedVector<ArrOfInt, 3> ijk_indices_to_subproblem_;
+  std::map<int, std::map<int, std::map<int, int>>> subproblem_to_ijk_indices_previous_;
   std::map<int, std::map<int, std::map<int, int>>> subproblem_to_ijk_indices_;
+  std::vector<DoubleVect> temperature_probes_previous_;
+  std::vector<double> indicator_probes_previous_;
+  std::vector<Vecteur3> velocities_probes_previous_;
+
+  int * points_per_thermal_subproblem_;
+  std::map<int, std::map<int, std::map<int, int>>> subproblem_to_ijk_indices_previous_global_;
+  std::map<int, std::map<int, std::map<int, int>>> subproblem_to_ijk_indices_global_;
+
+  FixedVector<std::vector<ArrOfInt>,2> index_ij_subproblems_local_perio_;
+  std::vector<std::vector<ArrOfDouble>> temperature_probes_previous_local_perio_;
+  std::vector<ArrOfDouble> indicator_probes_previous_local_perio_;
+  std::vector<std::vector<ArrOfDouble>> velocities_probes_previous_local_perio_;
+
+  FixedVector<std::vector<ArrOfInt>,2> index_ij_subproblems_global_;
+  std::vector<std::vector<ArrOfDouble>> temperature_probes_previous_global_;
+  std::vector<ArrOfDouble> indicator_probes_previous_global_;
+  std::vector<std::vector<ArrOfDouble>> velocities_probes_previous_global_;
 
   int reference_gfm_on_probes_ = 0;
   int pre_initialise_thermal_subproblems_list_ = 0;

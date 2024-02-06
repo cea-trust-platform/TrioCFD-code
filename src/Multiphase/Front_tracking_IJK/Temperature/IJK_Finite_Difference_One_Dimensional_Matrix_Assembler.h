@@ -115,15 +115,18 @@ public :
                                           const int& nb_subproblems,
                                           const int& use_sparse_matrix,
                                           FixedVector<ArrOfInt,6> * first_indices_sparse_matrix,
-                                          const int& first_initialisation);
+                                          const int& first_initialisation,
+                                          const int& keep_global_probes_discretisation);
   void reinitialise_sparse_matrix_subproblem(Matrice * matrix_subproblems,
                                              const Matrice * fd_operator,
                                              const int& nb_subproblems,
                                              FixedVector<ArrOfInt,6> * first_indices_sparse_matrix,
-                                             const int& first_initialisation);
+                                             const int& first_initialisation,
+                                             const int& keep_global_probes_discretisation);
   void reinitialise_matrix_subproblem(Matrice * matrix_subproblems,
                                       const Matrice * fd_operator,
-                                      const int& nb_subproblems);
+                                      const int& nb_subproblems,
+                                      const int& keep_global_probes_discretisation);
   void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
                         const DoubleVect& source_terms,
                         const int& index_start,

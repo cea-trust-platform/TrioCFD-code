@@ -805,19 +805,21 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_any_ma
                                                                                                 const int& nb_subproblems,
                                                                                                 const int& use_sparse_matrix,
                                                                                                 FixedVector<ArrOfInt,6> * first_indices_sparse_matrix,
-                                                                                                const int& first_initialisation)
+                                                                                                const int& first_initialisation,
+                                                                                                const int& keep_global_probes_discretisation)
 {
   if (use_sparse_matrix)
-    reinitialise_sparse_matrix_subproblem(matrix_subproblems, fd_operator, nb_subproblems, first_indices_sparse_matrix, first_initialisation);
+    reinitialise_sparse_matrix_subproblem(matrix_subproblems, fd_operator, nb_subproblems, first_indices_sparse_matrix, first_initialisation, keep_global_probes_discretisation);
   else
-    reinitialise_matrix_subproblem(matrix_subproblems, fd_operator, nb_subproblems);
+    reinitialise_matrix_subproblem(matrix_subproblems, fd_operator, nb_subproblems, keep_global_probes_discretisation);
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_sparse_matrix_subproblem(Matrice * matrix_subproblems,
                                                                                                    const Matrice * fd_operator,
                                                                                                    const int& nb_subproblems,
                                                                                                    FixedVector<ArrOfInt,6> * first_indices_sparse_matrix,
-                                                                                                   const int& first_initialisation)
+                                                                                                   const int& first_initialisation,
+                                                                                                   const int& keep_global_probes_discretisation)
 {
   Matrice_Morse& sparse_matrix_subproblems =ref_cast(Matrice_Morse, (*matrix_subproblems).valeur());
   IntVect& tab1 = sparse_matrix_subproblems.get_set_tab1();
@@ -841,48 +843,82 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_sparse
   int nb_columns_ini = sparse_matrix_subproblems.nb_colonnes();
   int nb_coeff_ini = sparse_matrix_subproblems.nb_coeff();
 
+  /*
+   * Re-write the entire matrix (can be usefull if probe discretisation changes)
+   */
   if (!nb_subproblems)
     {
-      nb_rows_ini = 0;
-      nb_columns_ini = 0;
-      nb_coeff_ini = 0;
+      if (!keep_global_probes_discretisation)
+        {
+          nb_rows_ini = 0;
+          nb_columns_ini = 0;
+          nb_coeff_ini = 0;
+        }
+      else
+        {
+          nb_rows_ini = (*first_indices_sparse_matrix)[4][nb_subproblems];
+          nb_columns_ini = (*first_indices_sparse_matrix)[2][nb_subproblems];
+          nb_coeff_ini = (*first_indices_sparse_matrix)[0][nb_subproblems];
+        }
     }
   else
     {
-      nb_rows += nb_rows_ini;
-      nb_columns += nb_columns_ini;
-      nb_coeff += nb_coeff_ini;
+      if (!keep_global_probes_discretisation)
+        {
+          nb_rows += nb_rows_ini;
+          nb_columns += nb_columns_ini;
+          nb_coeff += nb_coeff_ini;
+        }
+      else
+        {
+          nb_rows_ini = (*first_indices_sparse_matrix)[4][nb_subproblems];
+          nb_columns_ini = (*first_indices_sparse_matrix)[2][nb_subproblems];
+          nb_coeff_ini = (*first_indices_sparse_matrix)[0][nb_subproblems];
+          nb_rows = nb_rows_ini;
+          nb_columns = nb_columns_ini;
+          nb_coeff = nb_coeff_ini;
+        }
     }
-  sparse_matrix_subproblems.dimensionner(nb_rows, nb_columns, nb_coeff);
+
+  if (!keep_global_probes_discretisation)
+    sparse_matrix_subproblems.dimensionner(nb_rows, nb_columns, nb_coeff);
   assert(nb_rows>=nb_rows_ini && nb_columns>=nb_columns_ini && nb_rows>=nb_rows_ini);
+
+  if (first_initialisation && !keep_global_probes_discretisation)
+    {
+      (*first_indices_sparse_matrix)[0][nb_subproblems] = nb_coeff_ini;
+      (*first_indices_sparse_matrix)[1][nb_subproblems] = nb_coeff_operator;
+      (*first_indices_sparse_matrix)[2][nb_subproblems] = nb_columns_ini;
+      (*first_indices_sparse_matrix)[3][nb_subproblems] = nb_columns_operator;
+      (*first_indices_sparse_matrix)[4][nb_subproblems] = nb_rows_ini;
+      (*first_indices_sparse_matrix)[5][nb_subproblems] = nb_rows_operator;
+      // (*first_indices_sparse_matrix)[4][nb_subproblems] = nb_coeff_ini;
+    }
 
   const int coeff_offset = nb_coeff_ini;
   const int column_offset = nb_columns_ini;
   const int row_offset = nb_coeff_ini;
 
-  if (first_initialisation)
-    {
-      first_indices_sparse_matrix[0][nb_subproblems] = nb_coeff_ini;
-      first_indices_sparse_matrix[1][nb_subproblems] = nb_coeff_operator;
-      first_indices_sparse_matrix[2][nb_subproblems] = nb_columns_ini;
-      first_indices_sparse_matrix[3][nb_subproblems] = nb_columns_operator;
-      first_indices_sparse_matrix[4][nb_subproblems] = nb_coeff_ini;
-      first_indices_sparse_matrix[5][nb_subproblems] = nb_rows_operator;
-    }
-
   int i;
-  for (i=0; i<nb_coeff; i++)
+  if (!keep_global_probes_discretisation)
     {
-      tab2(i + coeff_offset) = tab2_operator(i) + column_offset;
-      coeff(i + coeff_offset) = coeff_operator(i);
+      for (i=0; i<nb_coeff_operator; i++)
+        {
+          tab2(i + coeff_offset) = tab2_operator(i) + column_offset;
+          coeff(i + coeff_offset) = coeff_operator(i);
+        }
+      for (i=1; i<=nb_rows_operator; i++)
+        tab1(i + row_offset) = tab1_operator(i) + coeff_offset;
     }
-  for (i=1; i<=nb_rows; i++)
-    tab1(i + row_offset) = tab1_operator(i) + coeff_offset;
+  else
+    for (i=0; i<nb_coeff_operator; i++)
+      coeff(i + coeff_offset) = coeff_operator(i);
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reinitialise_matrix_subproblem(Matrice * matrix_subproblems,
                                                                                             const Matrice * fd_operator,
-                                                                                            const int& nb_subproblems)
+                                                                                            const int& nb_subproblems,
+                                                                                            const int& keep_global_probes_discretisation)
 {
   Matrice_Bloc& block_matrix_subproblems =ref_cast(Matrice_Bloc, (*matrix_subproblems).valeur());
   Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(nb_subproblems,nb_subproblems).valeur());

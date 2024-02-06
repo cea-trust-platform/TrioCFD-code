@@ -104,6 +104,7 @@ public :
   inline const FixedVector<IJK_Field_double,3>& get_cell_faces_neighbours_corrected_diffusive() const { return valeur().get_cell_faces_neighbours_corrected_diffusive(); }
   inline const FixedVector<IJK_Field_double,3>& get_neighbours_faces_weighting_colinearity() const { return valeur().get_neighbours_faces_weighting_colinearity(); }
   inline const IJK_Field_int& get_cell_neighbours_corrected_trimmed() const { return valeur().get_cell_neighbours_corrected_trimmed(); }
+  inline const IJK_Field_double& get_probe_collision_debug_field() const { return valeur().get_probe_collision_debug_field(); };
 
   inline const double& get_E0() const { return valeur().get_E0(); };
 

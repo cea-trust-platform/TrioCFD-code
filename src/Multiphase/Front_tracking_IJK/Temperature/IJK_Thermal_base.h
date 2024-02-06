@@ -369,6 +369,10 @@ public:
   {
     return dummy_int_field_;
   }
+  virtual const IJK_Field_double& get_probe_collision_debug_field() const
+  {
+    return dummy_double_field_; //dummy
+  }
   virtual double get_modified_time();
   void get_rising_velocities_parameters(int& compute_rising_velocities,
                                         int& fill_rising_velocities);

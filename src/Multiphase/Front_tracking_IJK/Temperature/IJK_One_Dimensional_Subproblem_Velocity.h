@@ -14,38 +14,33 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : IJK_One_Dimensional_Subproblems_Geometry.h
+// File      : IJK_One_Dimensional_Subproblem_Velocity.h
 // Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/Temperature
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef IJK_One_Dimensional_Subproblems_Geometry_included
-#define IJK_One_Dimensional_Subproblems_Geometry_included
+#ifndef IJK_One_Dimensional_Subproblem_Velocity_included
+#define IJK_One_Dimensional_Subproblem_Velocity_included
 
-#include <IJK_One_Dimensional_Subproblem_Geometry.h>
-#include <TRUSTList.h>
-#include <TRUST_List.h>
+#include <Objet_U.h>
+
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class IJK_One_Dimensional_Subproblems_Geometry
+// .DESCRIPTION : class IJK_One_Dimensional_Subproblem_Velocity
 //
-// <Description of class IJK_One_Dimensional_Subproblems_Geometry>
+// <Description of class IJK_One_Dimensional_Subproblem_Velocity>
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class IJK_One_Dimensional_Subproblems_Geometry : public LIST(IJK_One_Dimensional_Subproblem_Geometry)
+class IJK_One_Dimensional_Subproblem_Velocity : public Objet_U
 {
 
-  Declare_instanciable( IJK_One_Dimensional_Subproblems_Geometry ) ;
-  friend class IJK_One_Dimensional_Subproblem;
+  Declare_instanciable( IJK_One_Dimensional_Subproblem_Velocity ) ;
 
 public :
 
-
 protected :
-
-
 
 };
 
-#endif /* IJK_One_Dimensional_Subproblems_Geometry_included */
+#endif /* IJK_One_Dimensional_Subproblem_Velocity_included */

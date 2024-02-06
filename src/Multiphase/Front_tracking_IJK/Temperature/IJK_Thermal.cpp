@@ -325,108 +325,6 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
     }
   oss.str("");
 
-  if (thermal_rank_ == 0)
-    {
-      /*
-       * DISTANCE
-       */
-      oss << "DISTANCE_" << lata_suffix << idx;
-      Nom nom_distance(oss.str().c_str());
-      if ((liste_post_instantanes.contient_("DISTANCE") || liste_post_instantanes.contient_(nom_distance)))
-        {
-          n++, dumplata_scalar(lata_name, nom_distance, get_eulerian_distance_ns(), latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_X
-       */
-      oss << "NORMAL_VECTOR_X_" << lata_suffix << idx;
-      Nom nom_normal_vector_x(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_X") || liste_post_instantanes.contient_(nom_normal_vector_x))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_x, get_normal_vector_ns()[0], latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_Y
-       */
-      oss << "NORMAL_VECTOR_Y_" << lata_suffix << idx;
-      Nom nom_normal_vector_y(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y") || liste_post_instantanes.contient_(nom_normal_vector_y))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_y, get_normal_vector_ns()[1], latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_Z
-       */
-      oss << "NORMAL_VECTOR_Z_" << lata_suffix << idx;
-      Nom nom_normal_vector_z(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z") || liste_post_instantanes.contient_(nom_normal_vector_z))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_z, get_normal_vector_ns()[2], latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_X_NORMED
-       */
-      oss << "NORMAL_VECTOR_X_NORMED_" << lata_suffix << idx;
-      Nom nom_normal_vector_x_normed(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_X_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_x_normed))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_x_normed, get_normal_vector_ns_normed()[0], latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_Y_NORMED
-       */
-      oss << "NORMAL_VECTOR_Y_NORMED_" << lata_suffix << idx;
-      Nom nom_normal_vector_y_normed(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_y_normed))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_y_normed, get_normal_vector_ns_normed()[1], latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_Z_NORMED
-       */
-      oss << "NORMAL_VECTOR_Z_NORMED_" << lata_suffix << idx;
-      Nom nom_normal_vector_z_normed(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_z_normed))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_z_normed, get_normal_vector_ns_normed()[2], latastep);
-        }
-      oss.str("");
-
-      /*
-       * CURVATURE
-       */
-      oss << "CURVATURE_" << lata_suffix << idx;
-      Nom nom_curvature(oss.str().c_str());
-      if ((liste_post_instantanes.contient_("CURVATURE") || liste_post_instantanes.contient_(nom_curvature)))
-        {
-          n++, dumplata_scalar(lata_name, nom_curvature, get_eulerian_curvature_ns(), latastep);
-        }
-      oss.str("");
-
-      /*
-       * INTERFACIAL AREA
-       */
-      oss << "INTERFACIAL_AREA_" << lata_suffix << idx;
-      Nom nom_interfacial_area(oss.str().c_str());
-      if ((liste_post_instantanes.contient_("INTERFACIAL_AREA") || liste_post_instantanes.contient_(nom_interfacial_area)))
-        {
-          n++, dumplata_scalar(lata_name, nom_interfacial_area, get_interfacial_area_ns(), latastep);
-        }
-      oss.str("");
-    }
-
   /*
    * GRAD_T_INTERFACE
    */
@@ -437,86 +335,6 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       n++, dumplata_scalar(lata_name, nom_grad_T_interface, get_grad_T_interface_ns(), latastep);
     }
   oss.str("");
-
-  if (thermal_rank_ == 0)
-    {
-      /*
-       * DISTANCE_FT
-       */
-      oss << "DISTANCE_FT_" << lata_suffix << idx;
-      Nom nom_distance_ft(oss.str().c_str());
-      if ((liste_post_instantanes.contient_("DISTANCE_FT") || liste_post_instantanes.contient_(nom_distance_ft)))
-        {
-          n++, dumplata_scalar(lata_name, nom_distance_ft, get_eulerian_distance_ft(), latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_X_FT
-       */
-      oss << "NORMAL_VECTOR_X_FT_" << lata_suffix << idx;
-      Nom nom_normal_vector_x_ft(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_X_FT") || liste_post_instantanes.contient_("NORMAL_VECTOR_X_FT") || liste_post_instantanes.contient_(nom_normal_vector_x_ft))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_x_ft, get_normal_vector_ft()[0], latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_Y_FT
-       */
-      oss << "NORMAL_VECTOR_Y_FT_" << lata_suffix << idx;
-      Nom nom_normal_vector_y_ft(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y_FT") || liste_post_instantanes.contient_("NORMAL_VECTOR_Y_FT") || liste_post_instantanes.contient_(nom_normal_vector_y_ft))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_y_ft, get_normal_vector_ft()[1], latastep);
-        }
-      oss.str("");
-
-      /*
-       * NORMAL_VECTOR_Z_FT
-       */
-      oss << "NORMAL_VECTOR_Z_FT_" << lata_suffix << idx;
-      Nom nom_normal_vector_z_ft(oss.str().c_str());
-      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z_FT") || liste_post_instantanes.contient_("NORMAL_VECTOR_Z_FT") || liste_post_instantanes.contient_(nom_normal_vector_z_ft))
-        {
-          n++, dumplata_scalar(lata_name, nom_normal_vector_z_ft, get_normal_vector_ft()[2], latastep);
-        }
-      oss.str("");
-
-      /*
-       * CURVATURE_FT
-       */
-      oss << "CURVATURE_FT_" << lata_suffix << idx;
-      Nom nom_curvature_ft(oss.str().c_str());
-      if ((liste_post_instantanes.contient_("CURVATURE_FT") || liste_post_instantanes.contient_(nom_curvature_ft)))
-        {
-          n++, dumplata_scalar(lata_name, nom_curvature_ft, get_eulerian_curvature_ft(), latastep);
-        }
-      oss.str("");
-
-      /*
-       * INTERFACIAL_AREA_FT
-       */
-      oss << "INTERFACIAL_AREA_FT_" << lata_suffix << idx;
-      Nom nom_interfacial_area_ft(oss.str().c_str());
-      if ((liste_post_instantanes.contient_("INTERFACIAL_AREA_FT") || liste_post_instantanes.contient_(nom_interfacial_area_ft)))
-        {
-          n++, dumplata_scalar(lata_name, nom_interfacial_area_ft, get_interfacial_area_ft(), latastep);
-        }
-      oss.str("");
-
-      /*
-       * INDICATOR_FT
-       */
-      oss << "INDICATOR_FT_" << lata_suffix << idx;
-      Nom nom_indicator_ft(oss.str().c_str());
-      if ((liste_post_instantanes.contient_("INDICATOR_FT") || liste_post_instantanes.contient_(nom_indicator_ft)))
-        {
-          n++, dumplata_scalar(lata_name, nom_indicator_ft, ref_ijk_ft_->itfce().I_ft(), latastep);
-        }
-      oss.str("");
-    }
 
   /*
    * GRAD_T_INTERFACE_FT
@@ -723,9 +541,202 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
   if (thermal_rank_ == 0)
     {
       /*
+       * DISTANCE
+       */
+      // oss << "DISTANCE_" << lata_suffix << idx;
+      oss << "DISTANCE";
+      Nom nom_distance(oss.str().c_str());
+      if ((liste_post_instantanes.contient_("DISTANCE") || liste_post_instantanes.contient_(nom_distance)))
+        {
+          n++, dumplata_scalar(lata_name, nom_distance, get_eulerian_distance_ns(), latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_X
+       */
+      // oss << "NORMAL_VECTOR_X_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_X";
+      Nom nom_normal_vector_x(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_X") || liste_post_instantanes.contient_(nom_normal_vector_x))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_x, get_normal_vector_ns()[0], latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_Y
+       */
+      // oss << "NORMAL_VECTOR_Y_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_Y";
+      Nom nom_normal_vector_y(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y") || liste_post_instantanes.contient_(nom_normal_vector_y))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_y, get_normal_vector_ns()[1], latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_Z
+       */
+      // oss << "NORMAL_VECTOR_Z_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_Z";
+      Nom nom_normal_vector_z(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z") || liste_post_instantanes.contient_(nom_normal_vector_z))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_z, get_normal_vector_ns()[2], latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_X_NORMED
+       */
+      // oss << "NORMAL_VECTOR_X_NORMED_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_X_NORMED";
+      Nom nom_normal_vector_x_normed(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_X_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_x_normed))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_x_normed, get_normal_vector_ns_normed()[0], latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_Y_NORMED
+       */
+      // oss << "NORMAL_VECTOR_Y_NORMED_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_Y_NORMED";
+      Nom nom_normal_vector_y_normed(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_y_normed))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_y_normed, get_normal_vector_ns_normed()[1], latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_Z_NORMED
+       */
+      // oss << "NORMAL_VECTOR_Z_NORMED_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_Z_NORMED";
+      Nom nom_normal_vector_z_normed(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z_NORMED") || liste_post_instantanes.contient_(nom_normal_vector_z_normed))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_z_normed, get_normal_vector_ns_normed()[2], latastep);
+        }
+      oss.str("");
+
+      /*
+       * CURVATURE
+       */
+      // oss << "CURVATURE_" << lata_suffix << idx;
+      oss << "CURVATURE";
+      Nom nom_curvature(oss.str().c_str());
+      if ((liste_post_instantanes.contient_("CURVATURE") || liste_post_instantanes.contient_(nom_curvature)))
+        {
+          n++, dumplata_scalar(lata_name, nom_curvature, get_eulerian_curvature_ns(), latastep);
+        }
+      oss.str("");
+
+      /*
+       * INTERFACIAL AREA
+       */
+      // oss << "INTERFACIAL_AREA_" << lata_suffix << idx;
+      oss << "INTERFACIAL_AREA";
+      Nom nom_interfacial_area(oss.str().c_str());
+      if ((liste_post_instantanes.contient_("INTERFACIAL_AREA") || liste_post_instantanes.contient_(nom_interfacial_area)))
+        {
+          n++, dumplata_scalar(lata_name, nom_interfacial_area, get_interfacial_area_ns(), latastep);
+        }
+      oss.str("");
+
+      /*
+       * DISTANCE_FT
+       */
+      // oss << "DISTANCE_FT_" << lata_suffix << idx;
+      oss << "DISTANCE_FT";
+      Nom nom_distance_ft(oss.str().c_str());
+      if ((liste_post_instantanes.contient_("DISTANCE_FT") || liste_post_instantanes.contient_(nom_distance_ft)))
+        {
+          n++, dumplata_scalar(lata_name, nom_distance_ft, get_eulerian_distance_ft(), latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_X_FT
+       */
+      // oss << "NORMAL_VECTOR_X_FT_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_X_FT";
+      Nom nom_normal_vector_x_ft(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_X_FT") || liste_post_instantanes.contient_("NORMAL_VECTOR_X_FT") || liste_post_instantanes.contient_(nom_normal_vector_x_ft))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_x_ft, get_normal_vector_ft()[0], latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_Y_FT
+       */
+      // oss << "NORMAL_VECTOR_Y_FT_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_Y_FT";
+      Nom nom_normal_vector_y_ft(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Y_FT") || liste_post_instantanes.contient_("NORMAL_VECTOR_Y_FT") || liste_post_instantanes.contient_(nom_normal_vector_y_ft))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_y_ft, get_normal_vector_ft()[1], latastep);
+        }
+      oss.str("");
+
+      /*
+       * NORMAL_VECTOR_Z_FT
+       */
+      // oss << "NORMAL_VECTOR_Z_FT_" << lata_suffix << idx;
+      oss << "NORMAL_VECTOR_Z_FT";
+      Nom nom_normal_vector_z_ft(oss.str().c_str());
+      if (liste_post_instantanes.contient_("NORMAL_VECTOR_Z_FT") || liste_post_instantanes.contient_("NORMAL_VECTOR_Z_FT") || liste_post_instantanes.contient_(nom_normal_vector_z_ft))
+        {
+          n++, dumplata_scalar(lata_name, nom_normal_vector_z_ft, get_normal_vector_ft()[2], latastep);
+        }
+      oss.str("");
+
+      /*
+       * CURVATURE_FT
+       */
+      // oss << "CURVATURE_FT_" << lata_suffix << idx;
+      oss << "CURVATURE_FT";
+      Nom nom_curvature_ft(oss.str().c_str());
+      if ((liste_post_instantanes.contient_("CURVATURE_FT") || liste_post_instantanes.contient_(nom_curvature_ft)))
+        {
+          n++, dumplata_scalar(lata_name, nom_curvature_ft, get_eulerian_curvature_ft(), latastep);
+        }
+      oss.str("");
+
+      /*
+       * INTERFACIAL_AREA_FT
+       */
+      // oss << "INTERFACIAL_AREA_FT_" << lata_suffix << idx;
+      oss << "INTERFACIAL_AREA_FT";
+      Nom nom_interfacial_area_ft(oss.str().c_str());
+      if ((liste_post_instantanes.contient_("INTERFACIAL_AREA_FT") || liste_post_instantanes.contient_(nom_interfacial_area_ft)))
+        {
+          n++, dumplata_scalar(lata_name, nom_interfacial_area_ft, get_interfacial_area_ft(), latastep);
+        }
+      oss.str("");
+
+      /*
+       * INDICATOR_FT
+       */
+      // oss << "INDICATOR_FT_" << lata_suffix << idx;
+      oss << "INDICATOR_FT";
+      Nom nom_indicator_ft(oss.str().c_str());
+      if ((liste_post_instantanes.contient_("INDICATOR_FT") || liste_post_instantanes.contient_(nom_indicator_ft)))
+        {
+          n++, dumplata_scalar(lata_name, nom_indicator_ft, ref_ijk_ft_->itfce().I_ft(), latastep);
+        }
+      oss.str("");
+
+      /*
        * BARY_X
        */
-      oss << "BARY_X_" << lata_suffix << idx;
+      // oss << "BARY_X_" << lata_suffix << idx;
+      oss << "BARY_X";
       Nom nom_bary_x(oss.str().c_str());
       if (liste_post_instantanes.contient_("BARY") || liste_post_instantanes.contient_("BARY_X") || liste_post_instantanes.contient_(nom_bary_x))
         {
@@ -736,7 +747,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * BARY_Y
        */
-      oss << "BARY_Y_" << lata_suffix << idx;
+      // oss << "BARY_Y_" << lata_suffix << idx;
+      oss << "BARY_Y";
       Nom nom_bary_y(oss.str().c_str());
       if (liste_post_instantanes.contient_("BARY") || liste_post_instantanes.contient_("BARY_Y") || liste_post_instantanes.contient_(nom_bary_y))
         {
@@ -747,7 +759,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * BARY_Z
        */
-      oss << "BARY_Z_" << lata_suffix << idx;
+      // oss << "BARY_Z_" << lata_suffix << idx;
+      oss << "BARY_Z";
       Nom nom_bary_z(oss.str().c_str());
       if (liste_post_instantanes.contient_("BARY") || liste_post_instantanes.contient_("BARY_Z") || liste_post_instantanes.contient_(nom_bary_z))
 
@@ -759,7 +772,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_FT
        */
-      oss << "EULERIAN_COMPO_FT_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_FT_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_FT";
       Nom nom_eulerian_compo_ft(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_FT") || liste_post_instantanes.contient_(nom_eulerian_compo_ft))
 
@@ -771,7 +785,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO
        */
-      oss << "EULERIAN_COMPO_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO";
       Nom nom_eulerian_compo(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO") || liste_post_instantanes.contient_(nom_eulerian_compo))
 
@@ -783,7 +798,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_GHOST_FT
        */
-      oss << "EULERIAN_COMPO_GHOST_FT_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_GHOST_FT_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_GHOST_FT";
       Nom nom_eulerian_compo_ghost_ft(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_GHOST_FT") || liste_post_instantanes.contient_(nom_eulerian_compo_ghost_ft))
 
@@ -795,7 +811,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_GHOST
        */
-      oss << "EULERIAN_COMPO_GHOST_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_GHOST_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_GHOST";
       Nom nom_eulerian_compo_ghost(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_GHOST") || liste_post_instantanes.contient_(nom_eulerian_compo_ghost))
 
@@ -807,7 +824,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_INTERFACE_FT
        */
-      oss << "EULERIAN_COMPO_INTERFACE_FT_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_INTERFACE_FT_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_INTERFACE_FT";
       Nom nom_eulerian_compo_from_interface_ft(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_INTERFACE_FT") || liste_post_instantanes.contient_(nom_eulerian_compo_from_interface_ft))
 
@@ -819,7 +837,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_INTERFACE_GHOST_FT
        */
-      oss << "EULERIAN_COMPO_INTERFACE_GHOST_FT_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_INTERFACE_GHOST_FT_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_INTERFACE_GHOST_FT";
       Nom nom_eulerian_compo_from_interface_ghost_ft(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_INTERFACE_GHOST_FT") || liste_post_instantanes.contient_(nom_eulerian_compo_from_interface_ghost_ft))
 
@@ -831,7 +850,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_INTERFACE_NS
        */
-      oss << "EULERIAN_COMPO_INTERFACE_NS_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_INTERFACE_NS_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_INTERFACE_NS";
       Nom nom_eulerian_compo_from_interface_ns(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_INTERFACE_NS") || liste_post_instantanes.contient_(nom_eulerian_compo_from_interface_ns))
 
@@ -843,7 +863,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_INTERFACE_GHOST_NS
        */
-      oss << "EULERIAN_COMPO_INTERFACE_GHOST_NS_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_INTERFACE_GHOST_NS_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_INTERFACE_GHOST_NS";
       Nom nom_eulerian_compo_from_interface_ghost_ns(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_INTERFACE_GHOST_NS") || liste_post_instantanes.contient_(nom_eulerian_compo_from_interface_ghost_ns))
 
@@ -855,7 +876,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_INTERFACE_INT
        */
-      oss << "EULERIAN_COMPO_INTERFACE_INT_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_INTERFACE_INT_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_INTERFACE_INT";
       Nom nom_eulerian_compo_from_interface_int(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_INTERFACE_INT") || liste_post_instantanes.contient_(nom_eulerian_compo_from_interface_int))
 
@@ -867,7 +889,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * EULERIAN_COMPO_INTERFACE_GHOST_INT
        */
-      oss << "EULERIAN_COMPO_INTERFACE_GHOST_INT_" << lata_suffix << idx;
+      // oss << "EULERIAN_COMPO_INTERFACE_GHOST_INT_" << lata_suffix << idx;
+      oss << "EULERIAN_COMPO_INTERFACE_GHOST_INT";
       Nom nom_eulerian_compo_from_interface_ghost_int(oss.str().c_str());
       if (liste_post_instantanes.contient_("EULERIAN_COMPO_INTERFACE_GHOST_INT") || liste_post_instantanes.contient_(nom_eulerian_compo_from_interface_ghost_int))
 
@@ -879,7 +902,8 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       /*
        * RISING_VELOCITIES
        */
-      oss << "RISING_VELOCITIES_" << lata_suffix << idx;
+      // oss << "RISING_VELOCITIES_" << lata_suffix << idx;
+      oss << "RISING_VELOCITIES";
       Nom nom_eulerian_rising_velocities(oss.str().c_str());
       if (liste_post_instantanes.contient_("RISING_VELOCITIES") || liste_post_instantanes.contient_(nom_eulerian_rising_velocities))
 
@@ -888,6 +912,7 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
         }
       oss.str("");
     }
+
 
   /*
    * DEBUG_LRS_CELLS
@@ -1210,6 +1235,20 @@ int IJK_Thermal::posttraiter_champs_instantanes_thermal(const Motcles& liste_pos
       n++, dumplata_scalar(lata_name, nom_cell_neighbours_corrected_trimmed, get_cell_neighbours_corrected_trimmed(), latastep);
     }
   oss.str("");
+
+  if (thermal_rank_ == 0)
+    {
+      /*
+       * PROBE_COLLISION_DEBUG
+       */
+      oss << "PROBE_COLLISION_DEBUG";
+      Nom nom_probe_collision_debug(oss.str().c_str());
+      if (liste_post_instantanes.contient_("PROBE_COLLISION_DEBUG") || liste_post_instantanes.contient_(nom_probe_collision_debug))
+        {
+          n++, dumplata_scalar(lata_name, nom_probe_collision_debug, get_probe_collision_debug_field(), latastep);
+        }
+      oss.str("");
+    }
 
   return n;
 }
