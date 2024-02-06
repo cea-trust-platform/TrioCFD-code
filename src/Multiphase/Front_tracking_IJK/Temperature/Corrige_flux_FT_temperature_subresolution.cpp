@@ -1637,11 +1637,6 @@ void Corrige_flux_FT_temperature_subresolution::replace_cell_neighbours_thermal_
                                                                                              const FixedVector<IJK_Field_double, 3>& cell_faces_neighbours_fluxes_corrected,
                                                                                              FixedVector<std::vector<ArrOfDouble>,3>& flux_xyz)
 {
-
-//	FixedVector<FixedVector<std::vector<ArrOfInt>,3>,2> index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_;
-//	FixedVector<FixedVector<std::vector<ArrOfDouble>,3>,2> convective_diffusive_flux_xyz_min_max_faces_sorted_;
-  // index_face_i_sorted[0] = &index_face_i_flux_x_neighbours_min_max_faces_sorted_;
-
   const int ni = cell_faces_neighbours_corrected_min_max_bool[0].ni();
   const int nj = cell_faces_neighbours_corrected_min_max_bool[0].nj();
   const int nk = cell_faces_neighbours_corrected_min_max_bool[0].nk();
@@ -1659,46 +1654,6 @@ void Corrige_flux_FT_temperature_subresolution::replace_cell_neighbours_thermal_
                 flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
                 index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(i);
                 index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(j);
-                /*
-                 * Handle the global periodicity
-                 * It works because we have performed an echange_espace_virtuel on fluxes
-                 */
-                //              const IJK_Splitting& splitting_ns = ref_ijk_ft_->itfce().I().get_splitting();
-                //							const int offset_i = splitting_ns.get_offset_local(0);
-                //							const int offset_j = splitting_ns.get_offset_local(1);
-                //							const int offset_k = splitting_ns.get_offset_local(2);
-                //							const int i_global = i + offset_i;
-                //							const int j_global = j + offset_j;
-                //							const int k_global = k + offset_k;
-                //              switch(c)
-                //                {
-                //                case 0:
-                //                  if (i_global == 0)
-                //                    {
-                //                      flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
-                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(ni);
-                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(j);
-                //                    }
-                //                  break;
-                //                case 1:
-                //                  if (j_global == 0)
-                //                    {
-                //                      flux_xyz[c][k].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
-                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][k].append_array(i);
-                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][k].append_array(nj);
-                //                    }
-                //                  break;
-                //                case 2:
-                //                  if (k_global == 0)
-                //                    {
-                //                      flux_xyz[c][nk].append_array(cell_faces_neighbours_fluxes_corrected[c](i,j,k));
-                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[0][c][nk].append_array(i);
-                //                      index_face_ij_flux_xyz_neighbours_min_max_faces_sorted_[1][c][nk].append_array(j);
-                //                    }
-                //                  break;
-                //                default:
-                //                  break;
-                //                }
               }
     }
 }
