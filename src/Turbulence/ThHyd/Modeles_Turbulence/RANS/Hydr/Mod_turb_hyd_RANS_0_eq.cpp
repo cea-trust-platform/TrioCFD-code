@@ -25,7 +25,7 @@
 #include <Motcle.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
-#include <EcrMED.h>
+#include <Ecrire_MED.h>
 #include <Domaine.h>
 #include <Schema_Temps_base.h>
 #include <stat_counters.h>
@@ -161,7 +161,7 @@ void Mod_turb_hyd_RANS_0_eq::completer()
     {
       // 1) on cree le fichier med et on postraite le domaine
       const Domaine& dom=mon_equation->domaine_dis().domaine();
-      EcrMED ecr_med(fichier_K_eps_sortie_.nom_me(me()), dom);
+      Ecrire_MED ecr_med(fichier_K_eps_sortie_.nom_me(me()), dom);
       ecr_med.ecrire_domaine(false);
       //2 on discretise le champ K_eps_pour_la_sortie
       const Discretisation_base& dis = mon_equation->discretisation();
@@ -248,7 +248,7 @@ void Mod_turb_hyd_RANS_0_eq::imprimer (Sortie& os )  const
         //Nom nom_dom_inc= dom.le_nom();
         Nom type_elem=dom.type_elem()->que_suis_je();
         assert(K_eps_sortie_.valeurs().dimension(0)==dom.nb_elem());
-        EcrMED ecr_med(fic, dom);
+        Ecrire_MED ecr_med(fic, dom);
         ecr_med.ecrire_champ("CHAMPMAILLE",nom_post,K_eps_sortie_.valeurs(),K_eps_sortie_->unites(),K_eps_sortie_->noms_compo(),type_elem,temps);
       }
   return Modele_turbulence_hyd_base::imprimer(os);
