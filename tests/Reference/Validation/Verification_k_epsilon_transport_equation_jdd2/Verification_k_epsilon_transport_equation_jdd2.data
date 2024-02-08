@@ -4,19 +4,19 @@ Pb_hydraulique_turbulent pb
 Domaine dom
 Mailler dom
 {
-  pave bloc
-  {
-    origine 0 0 0
-    longueurs 1 1 1
-    nombre_de_noeuds 101 101 101
+    pave bloc
+    {
+        origine 0 0 0
+        longueurs 1 1 1
+        nombre_de_noeuds 101 101 101
     }
     {
-    bord periox  X = 0  0 <= Y <= 1  0 <= Z <= 1
-    bord periox  X = 1  0 <= Y <= 1  0 <= Z <= 1
-    bord perioy  Y = 0  0 <= X <= 1  0 <= Z <= 1
-    bord perioy  Y = 1  0 <= X <= 1  0 <= Z <= 1
-    bord perioz  Z = 0  0 <= X <= 1  0 <= Y <= 1
-    bord perioz  Z = 1  0 <= X <= 1  0 <= Y <= 1
+        bord periox  X = 0  0 <= Y <= 1  0 <= Z <= 1
+        bord periox  X = 1  0 <= Y <= 1  0 <= Z <= 1
+        bord perioy  Y = 0  0 <= X <= 1  0 <= Z <= 1
+        bord perioy  Y = 1  0 <= X <= 1  0 <= Z <= 1
+        bord perioz  Z = 0  0 <= X <= 1  0 <= Y <= 1
+        bord perioz  Z = 1  0 <= X <= 1  0 <= Y <= 1
     }
 }
 
@@ -25,7 +25,7 @@ VDF dis
 Schema_Euler_explicite sch
 Lire sch
 {
-  tinit 0
+    tinit 0
 	nb_pas_dt_max 0
 }
 
@@ -37,82 +37,82 @@ Discretiser pb dis
 
 Lire pb
 {
-   
-   fluide_incompressible {
-      mu champ_uniforme 1 0.001
-      rho champ_uniforme 1 1000
-   }
-   
-     Navier_Stokes_turbulent
-  {
-    equation_non_resolue  (t>0)
-    solveur_pression  GCP { precond_nul seuil 1e-10 }
-    convection    { centre }
-    diffusion    { }
-    conditions_initiales  { vitesse champ_fonc_xyz dom 3 -2*cos(2*pi*x)*sin(2*pi*y)*sin(2*pi*z) sin(2*pi*x)*cos(2*pi*y)*sin(2*pi*z) sin(2*pi*x)*sin(2*pi*y)*cos(2*pi*z) }
-    conditions_limites  {
-          periox  periodique
-          perioy  periodique
-          perioz  periodique
-          }
-    modele_turbulence k_epsilon_realisable
-          {
-          transport_k_epsilon_realisable 
+
+    fluide_incompressible {
+        mu champ_uniforme 1 0.001
+        rho champ_uniforme 1 1000
+    }
+
+    Navier_Stokes_turbulent
+    {
+        equation_non_resolue  (t>0)
+        solveur_pression  GCP { precond_nul seuil 1e-10 }
+        convection    { centre }
+        diffusion    { }
+        conditions_initiales  { vitesse champ_fonc_xyz dom 3 -2*cos(2*pi*x)*sin(2*pi*y)*sin(2*pi*z) sin(2*pi*x)*cos(2*pi*y)*sin(2*pi*z) sin(2*pi*x)*sin(2*pi*y)*cos(2*pi*z) }
+        conditions_limites  {
+            periox  periodique
+            perioy  periodique
+            perioz  periodique
+        }
+        modele_turbulence k_epsilon_realisable
+        {
+            transport_k_epsilon_realisable
             {
-            equation_non_resolue  (t>0)
-            convection    { centre }
-            diffusion    { }
-            conditions_initiales   { k_eps champ_fonc_xyz dom 2 cos(2*pi*y)+2 sin(2*pi*y)+2 }
-            conditions_limites  {
-                  periox  periodique
-                  perioy  periodique
-                  perioz  periodique
-                  }
-            sources { source_transport_k_eps_realisable { C2_eps 1.9 } }
+                equation_non_resolue  (t>0)
+                convection    { centre }
+                diffusion    { }
+                conditions_initiales   { k_eps champ_fonc_xyz dom 2 cos(2*pi*y)+2 sin(2*pi*y)+2 }
+                conditions_limites  {
+                    periox  periodique
+                    perioy  periodique
+                    perioz  periodique
+                }
+                sources { source_transport_k_eps_realisable { C2_eps 1.9 } }
             }
-          Prandtl_K 1
-          Prandtl_Eps 1.2
-          modele_fonc_realisable Shih_Zhu_Lumley { A0 4.04 }
-          turbulence_paroi negligeable
-          }
-  }
+            Prandtl_K 1
+            Prandtl_Eps 1.2
+            modele_fonc_realisable Shih_Zhu_Lumley { A0 4.04 }
+            turbulence_paroi negligeable
+        }
+    }
 
-  Postraitement
-  {
-    Definition_champs  {
-          sources_keps  operateur_eqn  {
-                  numero_source 0
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
-          diff_keps  operateur_eqn  {
-                  numero_op 0
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
-          conv_keps  operateur_eqn  {
-                  numero_op 1
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
-          }
-    sondes      {
-          vitesseX  nodes  vitesseX    periode 1 segment 100 0 0.005 0.005 0 0.995 0.005
-          vitesseY  nodes  vitesseY    periode 1 segment 101 0.005 0 0.005 0.005 1 0.005
-          vitesseZ  nodes  vitesseZ    periode 1 segment 100 0.005 0.005 0 0.005 0.995 0
+    Postraitement
+    {
+        Definition_champs  {
+            sources_keps  operateur_eqn  {
+                numero_source 0
+                sources { refChamp { pb_champ pb k_eps } }
+            }
+            diff_keps  operateur_eqn  {
+                numero_op 0
+                sources { refChamp { pb_champ pb k_eps } }
+            }
+            conv_keps  operateur_eqn  {
+                numero_op 1
+                sources { refChamp { pb_champ pb k_eps } }
+            }
+        }
+        sondes      {
+            vitesseX  nodes  vitesseX    periode 1 segment 100 0 0.005 0.005 0 0.995 0.005
+            vitesseY  nodes  vitesseY    periode 1 segment 101 0.005 0 0.005 0.005 1 0.005
+            vitesseZ  nodes  vitesseZ    periode 1 segment 100 0.005 0.005 0 0.005 0.995 0
 
-          keps    grav  k_eps      periode 1 segment 100 0.005 0.005 0.005 0.005 0.995 0.005
-          nut    grav   viscosite_turbulente  periode 1 position_like keps
+            keps    grav  k_eps      periode 1 segment 100 0.005 0.005 0.005 0.005 0.995 0.005
+            nut    grav   viscosite_turbulente  periode 1 position_like keps
 
-          sources_keps  grav  sources_keps    periode 1 position_like keps
-          diff_keps  grav  diff_keps    periode 1 position_like keps
-          conv_keps # grav #  conv_keps    periode 1 position_like keps
-          }
-    format lml
-    champs binaire dt_post 1e6
-          {
-          sources_keps elem
-          diff_keps elem
-          conv_keps elem
-          }
-  }
+            sources_keps  grav  sources_keps    periode 1 position_like keps
+            diff_keps  grav  diff_keps    periode 1 position_like keps
+            conv_keps # grav #  conv_keps    periode 1 position_like keps
+        }
+        format lml
+        champs binaire dt_post 1e6
+        {
+            sources_keps elem
+            diff_keps elem
+            conv_keps elem
+        }
+    }
 }
 
 EcritureLectureSpecial EcrFicPartageBin
@@ -120,4 +120,4 @@ EcritureLectureSpecial EcrFicPartageBin
 Resoudre pb
 
 Fin
- 
+
