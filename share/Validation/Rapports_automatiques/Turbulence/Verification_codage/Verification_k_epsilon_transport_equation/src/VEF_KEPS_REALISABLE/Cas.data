@@ -4,19 +4,19 @@ Pb_hydraulique_turbulent pb
 Domaine dom
 Mailler dom
 {
-  pave bloc
-  {
-    origine 0 0 0
-    longueurs 1 1 1
-    nombre_de_noeuds 26 26 26
+    pave bloc
+    {
+        origine 0 0 0
+        longueurs 1 1 1
+        nombre_de_noeuds 26 26 26
     }
     {
-    bord periox  X = 0  0 <= Y <= 1  0 <= Z <= 1
-    bord periox  X = 1  0 <= Y <= 1  0 <= Z <= 1
-    bord perioy  Y = 0  0 <= X <= 1  0 <= Z <= 1
-    bord perioy  Y = 1  0 <= X <= 1  0 <= Z <= 1
-    bord perioz  Z = 0  0 <= X <= 1  0 <= Y <= 1
-    bord perioz  Z = 1  0 <= X <= 1  0 <= Y <= 1
+        bord periox  X = 0  0 <= Y <= 1  0 <= Z <= 1
+        bord periox  X = 1  0 <= Y <= 1  0 <= Z <= 1
+        bord perioy  Y = 0  0 <= X <= 1  0 <= Z <= 1
+        bord perioy  Y = 1  0 <= X <= 1  0 <= Z <= 1
+        bord perioz  Z = 0  0 <= X <= 1  0 <= Y <= 1
+        bord perioz  Z = 1  0 <= X <= 1  0 <= Y <= 1
     }
 }
 
@@ -31,8 +31,8 @@ VEFPreP1b dis
 Schema_Euler_explicite sch
 Lire sch
 {
-  tinit 0
-  nb_pas_dt_max 0
+    tinit 0
+    nb_pas_dt_max 0
 }
 
 
@@ -43,104 +43,104 @@ Discretiser pb dis
 
 Lire pb
 {
-   
-   fluide_incompressible {
-      mu champ_uniforme 1 0.001
-      rho champ_uniforme 1 1000
-   }
-   
-     Navier_Stokes_turbulent
-  {
-    equation_non_resolue  (t>0)
-    solveur_pression  GCP { precond_nul seuil 1e-10 }
-    convection    { centre }
-    diffusion    { }
-    conditions_initiales  { vitesse champ_fonc_xyz dom 3 -2*cos(2*pi*x)*sin(2*pi*y)*sin(2*pi*z) sin(2*pi*x)*cos(2*pi*y)*sin(2*pi*z) sin(2*pi*x)*sin(2*pi*y)*cos(2*pi*z) }
-    conditions_limites  {
-          periox  periodique
-          perioy  periodique
-          perioz  periodique
-          }
-    modele_turbulence k_epsilon_realisable
-          {
-          transport_k_epsilon_realisable 
+
+    fluide_incompressible {
+        mu champ_uniforme 1 0.001
+        rho champ_uniforme 1 1000
+    }
+
+    Navier_Stokes_turbulent
+    {
+        equation_non_resolue  (t>0)
+        solveur_pression  GCP { precond_nul seuil 1e-10 }
+        convection    { centre }
+        diffusion    { }
+        conditions_initiales  { vitesse champ_fonc_xyz dom 3 -2*cos(2*pi*x)*sin(2*pi*y)*sin(2*pi*z) sin(2*pi*x)*cos(2*pi*y)*sin(2*pi*z) sin(2*pi*x)*sin(2*pi*y)*cos(2*pi*z) }
+        conditions_limites  {
+            periox  periodique
+            perioy  periodique
+            perioz  periodique
+        }
+        modele_turbulence k_epsilon_realisable
+        {
+            transport_k_epsilon_realisable
             {
-            equation_non_resolue  (t>0)
-            convection    { centre }
-            diffusion    { }
-            conditions_initiales   { k_eps champ_fonc_xyz dom 2 cos(2*pi*y)+2 sin(2*pi*y)+2 }
-            conditions_limites  {
-                  periox  periodique
-                  perioy  periodique
-                  perioz  periodique
-                  }
-            sources { source_transport_k_eps_realisable { C2_eps 1.9 } }
+                equation_non_resolue  (t>0)
+                convection    { centre }
+                diffusion    { }
+                conditions_initiales   { k_eps champ_fonc_xyz dom 2 cos(2*pi*y)+2 sin(2*pi*y)+2 }
+                conditions_limites  {
+                    periox  periodique
+                    perioy  periodique
+                    perioz  periodique
+                }
+                sources { source_transport_k_eps_realisable { C2_eps 1.9 } }
             }
-          Prandtl_K 1
-          Prandtl_Eps 1.2
-          modele_fonc_realisable Shih_Zhu_Lumley { A0 4.04 }
-          turbulence_paroi negligeable
-          }
-  }
+            Prandtl_K 1
+            Prandtl_Eps 1.2
+            modele_fonc_realisable Shih_Zhu_Lumley { A0 4.04 }
+            turbulence_paroi negligeable
+        }
+    }
 
-  Post_processing
-  {
-    Definition_champs  {
-          sources_keps  operateur_eqn  {
-                  numero_source 0
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
-          diff_keps  operateur_eqn  {
-                  numero_op 0
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
-          conv_keps  operateur_eqn  {
-                  numero_op 1
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
-          sources_keps_elem Interpolation  {
+    Post_processing
+    {
+        Definition_champs  {
+            sources_keps  operateur_eqn  {
+                numero_source 0
+                sources { refChamp { pb_champ pb k_eps } }
+            }
+            diff_keps  operateur_eqn  {
+                numero_op 0
+                sources { refChamp { pb_champ pb k_eps } }
+            }
+            conv_keps  operateur_eqn  {
+                numero_op 1
+                sources { refChamp { pb_champ pb k_eps } }
+            }
+            sources_keps_elem Interpolation  {
                 localisation elem
                 source  operateur_eqn {
-                  numero_source 0
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
+                    numero_source 0
+                    sources { refChamp { pb_champ pb k_eps } }
                 }
-          diff_keps_elem    Interpolation  {
+            }
+            diff_keps_elem    Interpolation  {
                 localisation elem
                 source  operateur_eqn {
-                  numero_op 0
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
+                    numero_op 0
+                    sources { refChamp { pb_champ pb k_eps } }
                 }
-          conv_keps_elem    Interpolation  {
+            }
+            conv_keps_elem    Interpolation  {
                 localisation elem
                 source  operateur_eqn {
-                  numero_op 1
-                  sources { refChamp { pb_champ pb k_eps } }
-                  }
+                    numero_op 1
+                    sources { refChamp { pb_champ pb k_eps } }
                 }
-          }
-    sondes      {
-          vitesseX  nodes  vitesseX    periode 1 segmentpoints 50 4.00000000e-02 1.33333333e-02 3.33333333e-02 4.00000000e-02 2.66666667e-02 3.33333333e-02 4.00000000e-02 5.33333333e-02 3.33333333e-02 4.00000000e-02 6.66666667e-02 3.33333333e-02 4.00000000e-02 9.33333333e-02 3.33333333e-02 4.00000000e-02 1.06666667e-01 3.33333333e-02 4.00000000e-02 1.33333333e-01 3.33333333e-02 4.00000000e-02 1.46666667e-01 3.33333333e-02 4.00000000e-02 1.73333333e-01 3.33333333e-02 4.00000000e-02 1.86666667e-01 3.33333333e-02 4.00000000e-02 2.13333333e-01 3.33333333e-02 4.00000000e-02 2.26666667e-01 3.33333333e-02 4.00000000e-02 2.53333333e-01 3.33333333e-02 4.00000000e-02 2.66666667e-01 3.33333333e-02 4.00000000e-02 2.93333333e-01 3.33333333e-02 4.00000000e-02 3.06666667e-01 3.33333333e-02 4.00000000e-02 3.33333333e-01 3.33333333e-02 4.00000000e-02 3.46666667e-01 3.33333333e-02 4.00000000e-02 3.73333333e-01 3.33333333e-02 4.00000000e-02 3.86666667e-01 3.33333333e-02 4.00000000e-02 4.13333333e-01 3.33333333e-02 4.00000000e-02 4.26666667e-01 3.33333333e-02 4.00000000e-02 4.53333333e-01 3.33333333e-02 4.00000000e-02 4.66666667e-01 3.33333333e-02 4.00000000e-02 4.93333333e-01 3.33333333e-02 4.00000000e-02 5.06666667e-01 3.33333333e-02 4.00000000e-02 5.33333333e-01 3.33333333e-02 4.00000000e-02 5.46666667e-01 3.33333333e-02 4.00000000e-02 5.73333333e-01 3.33333333e-02 4.00000000e-02 5.86666667e-01 3.33333333e-02 4.00000000e-02 6.13333333e-01 3.33333333e-02 4.00000000e-02 6.26666667e-01 3.33333333e-02 4.00000000e-02 6.53333333e-01 3.33333333e-02 4.00000000e-02 6.66666667e-01 3.33333333e-02 4.00000000e-02 6.93333333e-01 3.33333333e-02 4.00000000e-02 7.06666667e-01 3.33333333e-02 4.00000000e-02 7.33333333e-01 3.33333333e-02 4.00000000e-02 7.46666667e-01 3.33333333e-02 4.00000000e-02 7.73333333e-01 3.33333333e-02 4.00000000e-02 7.86666667e-01 3.33333333e-02 4.00000000e-02 8.13333333e-01 3.33333333e-02 4.00000000e-02 8.26666667e-01 3.33333333e-02 4.00000000e-02 8.53333333e-01 3.33333333e-02 4.00000000e-02 8.66666667e-01 3.33333333e-02 4.00000000e-02 8.93333333e-01 3.33333333e-02 4.00000000e-02 9.06666667e-01 3.33333333e-02 4.00000000e-02 9.33333333e-01 3.33333333e-02 4.00000000e-02 9.46666667e-01 3.33333333e-02 4.00000000e-02 9.73333333e-01 3.33333333e-02 4.00000000e-02 9.86666667e-01 3.33333333e-02
-          vitesseY  nodes  vitesseY    periode 1 position_like vitesseX
-          vitesseZ  nodes  vitesseZ    periode 1 position_like vitesseX
+            }
+        }
+        sondes      {
+            vitesseX  nodes  vitesseX    periode 1 segmentpoints 50 4.00000000e-02 1.33333333e-02 3.33333333e-02 4.00000000e-02 2.66666667e-02 3.33333333e-02 4.00000000e-02 5.33333333e-02 3.33333333e-02 4.00000000e-02 6.66666667e-02 3.33333333e-02 4.00000000e-02 9.33333333e-02 3.33333333e-02 4.00000000e-02 1.06666667e-01 3.33333333e-02 4.00000000e-02 1.33333333e-01 3.33333333e-02 4.00000000e-02 1.46666667e-01 3.33333333e-02 4.00000000e-02 1.73333333e-01 3.33333333e-02 4.00000000e-02 1.86666667e-01 3.33333333e-02 4.00000000e-02 2.13333333e-01 3.33333333e-02 4.00000000e-02 2.26666667e-01 3.33333333e-02 4.00000000e-02 2.53333333e-01 3.33333333e-02 4.00000000e-02 2.66666667e-01 3.33333333e-02 4.00000000e-02 2.93333333e-01 3.33333333e-02 4.00000000e-02 3.06666667e-01 3.33333333e-02 4.00000000e-02 3.33333333e-01 3.33333333e-02 4.00000000e-02 3.46666667e-01 3.33333333e-02 4.00000000e-02 3.73333333e-01 3.33333333e-02 4.00000000e-02 3.86666667e-01 3.33333333e-02 4.00000000e-02 4.13333333e-01 3.33333333e-02 4.00000000e-02 4.26666667e-01 3.33333333e-02 4.00000000e-02 4.53333333e-01 3.33333333e-02 4.00000000e-02 4.66666667e-01 3.33333333e-02 4.00000000e-02 4.93333333e-01 3.33333333e-02 4.00000000e-02 5.06666667e-01 3.33333333e-02 4.00000000e-02 5.33333333e-01 3.33333333e-02 4.00000000e-02 5.46666667e-01 3.33333333e-02 4.00000000e-02 5.73333333e-01 3.33333333e-02 4.00000000e-02 5.86666667e-01 3.33333333e-02 4.00000000e-02 6.13333333e-01 3.33333333e-02 4.00000000e-02 6.26666667e-01 3.33333333e-02 4.00000000e-02 6.53333333e-01 3.33333333e-02 4.00000000e-02 6.66666667e-01 3.33333333e-02 4.00000000e-02 6.93333333e-01 3.33333333e-02 4.00000000e-02 7.06666667e-01 3.33333333e-02 4.00000000e-02 7.33333333e-01 3.33333333e-02 4.00000000e-02 7.46666667e-01 3.33333333e-02 4.00000000e-02 7.73333333e-01 3.33333333e-02 4.00000000e-02 7.86666667e-01 3.33333333e-02 4.00000000e-02 8.13333333e-01 3.33333333e-02 4.00000000e-02 8.26666667e-01 3.33333333e-02 4.00000000e-02 8.53333333e-01 3.33333333e-02 4.00000000e-02 8.66666667e-01 3.33333333e-02 4.00000000e-02 8.93333333e-01 3.33333333e-02 4.00000000e-02 9.06666667e-01 3.33333333e-02 4.00000000e-02 9.33333333e-01 3.33333333e-02 4.00000000e-02 9.46666667e-01 3.33333333e-02 4.00000000e-02 9.73333333e-01 3.33333333e-02 4.00000000e-02 9.86666667e-01 3.33333333e-02
+            vitesseY  nodes  vitesseY    periode 1 position_like vitesseX
+            vitesseZ  nodes  vitesseZ    periode 1 position_like vitesseX
 
-          keps    nodes  k_eps      periode 1 position_like vitesseX
-          nut    grav  viscosite_turbulente  periode 1 segmentpoints 50 4.50000000e-02 1.50000000e-02 3.00000000e-02 4.50000000e-02 2.50000000e-02 3.00000000e-02 4.50000000e-02 5.50000000e-02 3.00000000e-02 4.50000000e-02 6.50000000e-02 3.00000000e-02 4.50000000e-02 9.50000000e-02 3.00000000e-02 4.50000000e-02 1.05000000e-01 3.00000000e-02 4.50000000e-02 1.35000000e-01 3.00000000e-02 4.50000000e-02 1.45000000e-01 3.00000000e-02 4.50000000e-02 1.75000000e-01 3.00000000e-02 4.50000000e-02 1.85000000e-01 3.00000000e-02 4.50000000e-02 2.15000000e-01 3.00000000e-02 4.50000000e-02 2.25000000e-01 3.00000000e-02 4.50000000e-02 2.55000000e-01 3.00000000e-02 4.50000000e-02 2.65000000e-01 3.00000000e-02 4.50000000e-02 2.95000000e-01 3.00000000e-02 4.50000000e-02 3.05000000e-01 3.00000000e-02 4.50000000e-02 3.35000000e-01 3.00000000e-02 4.50000000e-02 3.45000000e-01 3.00000000e-02 4.50000000e-02 3.75000000e-01 3.00000000e-02 4.50000000e-02 3.85000000e-01 3.00000000e-02 4.50000000e-02 4.15000000e-01 3.00000000e-02 4.50000000e-02 4.25000000e-01 3.00000000e-02 4.50000000e-02 4.55000000e-01 3.00000000e-02 4.50000000e-02 4.65000000e-01 3.00000000e-02 4.50000000e-02 4.95000000e-01 3.00000000e-02 4.50000000e-02 5.05000000e-01 3.00000000e-02 4.50000000e-02 5.35000000e-01 3.00000000e-02 4.50000000e-02 5.45000000e-01 3.00000000e-02 4.50000000e-02 5.75000000e-01 3.00000000e-02 4.50000000e-02 5.85000000e-01 3.00000000e-02 4.50000000e-02 6.15000000e-01 3.00000000e-02 4.50000000e-02 6.25000000e-01 3.00000000e-02 4.50000000e-02 6.55000000e-01 3.00000000e-02 4.50000000e-02 6.65000000e-01 3.00000000e-02 4.50000000e-02 6.95000000e-01 3.00000000e-02 4.50000000e-02 7.05000000e-01 3.00000000e-02 4.50000000e-02 7.35000000e-01 3.00000000e-02 4.50000000e-02 7.45000000e-01 3.00000000e-02 4.50000000e-02 7.75000000e-01 3.00000000e-02 4.50000000e-02 7.85000000e-01 3.00000000e-02 4.50000000e-02 8.15000000e-01 3.00000000e-02 4.50000000e-02 8.25000000e-01 3.00000000e-02 4.50000000e-02 8.55000000e-01 3.00000000e-02 4.50000000e-02 8.65000000e-01 3.00000000e-02 4.50000000e-02 8.95000000e-01 3.00000000e-02 4.50000000e-02 9.05000000e-01 3.00000000e-02 4.50000000e-02 9.35000000e-01 3.00000000e-02 4.50000000e-02 9.45000000e-01 3.00000000e-02 4.50000000e-02 9.75000000e-01 3.00000000e-02 4.50000000e-02 9.85000000e-01 3.00000000e-02
+            keps    nodes  k_eps      periode 1 position_like vitesseX
+            nut    grav  viscosite_turbulente  periode 1 segmentpoints 50 4.50000000e-02 1.50000000e-02 3.00000000e-02 4.50000000e-02 2.50000000e-02 3.00000000e-02 4.50000000e-02 5.50000000e-02 3.00000000e-02 4.50000000e-02 6.50000000e-02 3.00000000e-02 4.50000000e-02 9.50000000e-02 3.00000000e-02 4.50000000e-02 1.05000000e-01 3.00000000e-02 4.50000000e-02 1.35000000e-01 3.00000000e-02 4.50000000e-02 1.45000000e-01 3.00000000e-02 4.50000000e-02 1.75000000e-01 3.00000000e-02 4.50000000e-02 1.85000000e-01 3.00000000e-02 4.50000000e-02 2.15000000e-01 3.00000000e-02 4.50000000e-02 2.25000000e-01 3.00000000e-02 4.50000000e-02 2.55000000e-01 3.00000000e-02 4.50000000e-02 2.65000000e-01 3.00000000e-02 4.50000000e-02 2.95000000e-01 3.00000000e-02 4.50000000e-02 3.05000000e-01 3.00000000e-02 4.50000000e-02 3.35000000e-01 3.00000000e-02 4.50000000e-02 3.45000000e-01 3.00000000e-02 4.50000000e-02 3.75000000e-01 3.00000000e-02 4.50000000e-02 3.85000000e-01 3.00000000e-02 4.50000000e-02 4.15000000e-01 3.00000000e-02 4.50000000e-02 4.25000000e-01 3.00000000e-02 4.50000000e-02 4.55000000e-01 3.00000000e-02 4.50000000e-02 4.65000000e-01 3.00000000e-02 4.50000000e-02 4.95000000e-01 3.00000000e-02 4.50000000e-02 5.05000000e-01 3.00000000e-02 4.50000000e-02 5.35000000e-01 3.00000000e-02 4.50000000e-02 5.45000000e-01 3.00000000e-02 4.50000000e-02 5.75000000e-01 3.00000000e-02 4.50000000e-02 5.85000000e-01 3.00000000e-02 4.50000000e-02 6.15000000e-01 3.00000000e-02 4.50000000e-02 6.25000000e-01 3.00000000e-02 4.50000000e-02 6.55000000e-01 3.00000000e-02 4.50000000e-02 6.65000000e-01 3.00000000e-02 4.50000000e-02 6.95000000e-01 3.00000000e-02 4.50000000e-02 7.05000000e-01 3.00000000e-02 4.50000000e-02 7.35000000e-01 3.00000000e-02 4.50000000e-02 7.45000000e-01 3.00000000e-02 4.50000000e-02 7.75000000e-01 3.00000000e-02 4.50000000e-02 7.85000000e-01 3.00000000e-02 4.50000000e-02 8.15000000e-01 3.00000000e-02 4.50000000e-02 8.25000000e-01 3.00000000e-02 4.50000000e-02 8.55000000e-01 3.00000000e-02 4.50000000e-02 8.65000000e-01 3.00000000e-02 4.50000000e-02 8.95000000e-01 3.00000000e-02 4.50000000e-02 9.05000000e-01 3.00000000e-02 4.50000000e-02 9.35000000e-01 3.00000000e-02 4.50000000e-02 9.45000000e-01 3.00000000e-02 4.50000000e-02 9.75000000e-01 3.00000000e-02 4.50000000e-02 9.85000000e-01 3.00000000e-02
 
-          sources_keps  nodes  sources_keps    periode 1 position_like vitesseX
-          diff_keps  nodes  diff_keps    periode 1 position_like vitesseX
-          conv_keps  nodes  conv_keps    periode 1 position_like vitesseX
-          }
-    format lata
-    champs binaire dt_post 1e6
-          {
-          /* Attention : pour le lml, le post-traitement n'est pas fait aux faces mais aux elements par interpolation pour le VEF */
-          sources_keps_elem
-          diff_keps_elem
-          conv_keps_elem
-          }
-  }
+            sources_keps  nodes  sources_keps    periode 1 position_like vitesseX
+            diff_keps  nodes  diff_keps    periode 1 position_like vitesseX
+            conv_keps  nodes  conv_keps    periode 1 position_like vitesseX
+        }
+        format lata
+        champs binaire dt_post 1e6
+        {
+            /* Attention : pour le lml, le post-traitement n'est pas fait aux faces mais aux elements par interpolation pour le VEF */
+            sources_keps_elem
+            diff_keps_elem
+            conv_keps_elem
+        }
+    }
 }
 
 EcritureLectureSpecial EcrFicPartageBin
@@ -148,4 +148,4 @@ EcritureLectureSpecial EcrFicPartageBin
 Resoudre pb
 
 Fin
- 
+
