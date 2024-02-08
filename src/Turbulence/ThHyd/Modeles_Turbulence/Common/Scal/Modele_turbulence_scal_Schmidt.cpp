@@ -54,7 +54,9 @@ Sortie& Modele_turbulence_scal_Schmidt::printOn(Sortie& s ) const
  */
 Entree& Modele_turbulence_scal_Schmidt::readOn(Entree& is )
 {
-  return Mod_Turb_scal_diffturb_base::readOn(is);
+  Mod_Turb_scal_diffturb_base::readOn(is);
+  Cerr << "La valeur du nombre de Schmidt turbulent est de " << LeScturb << finl;
+  return is;
 }
 
 /*! @brief NE FAIT RIEN
@@ -66,7 +68,6 @@ Entree& Modele_turbulence_scal_Schmidt::readOn(Entree& is )
 void Modele_turbulence_scal_Schmidt::set_param(Param& param)
 {
   param.ajouter("ScTurb",&LeScturb);
-  Cerr << "La valeur du nombre de Schmidt turbulent est de " << LeScturb << finl;
   Modele_turbulence_scal_base::set_param(param);
 }
 
