@@ -32,7 +32,6 @@ Implemente_instanciable_sans_constructeur_ni_destructeur( Navier_Stokes_std_sens
 // XD Navier_Stokes_standard_sensibility navier_stokes_standard Navier_Stokes_standard_sensibility -1 Resolution of Navier-Stokes sensitivity problem
 // XD  attr state bloc_lecture state 0 Block to indicate the state problem. Between the braces, you must specify the key word 'pb_champ_evaluateur' then the name of the state problem and the velocity unknown  NL2 Example:  state { pb_champ_evaluateur pb_state  velocity }
 // XD  attr uncertain_variable bloc_lecture uncertain_variable 0 Block to indicate the name of the uncertain variable. Between the braces, you must specify the name of the unknown variable. Choice between velocity and mu.  NL2 Example: uncertain_variable { velocity }
-
 Navier_Stokes_std_sensibility::Navier_Stokes_std_sensibility() :  poly_chaos(0)
 {
 
