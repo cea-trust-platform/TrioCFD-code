@@ -50,6 +50,7 @@ Entree& Convection_Diffusion_Temperature_sensibility::readOn( Entree& is )
 void Convection_Diffusion_Temperature_sensibility::set_param(Param& param)
 {
 
+  poly_chaos= 0.;
   Convection_Diffusion_Temperature::set_param(param);
   param.ajouter_non_std("velocity_state",(this),Param::REQUIRED);
   param.ajouter_non_std("temperature_state",(this),Param::REQUIRED);
@@ -184,6 +185,14 @@ int Convection_Diffusion_Temperature_sensibility::lire_motcle_non_standard(const
         }
       return 1;
     }
+  else if (mot=="polynomial_chaos")
+    {
+      Cerr << "Reading and typing of the  option polynomial chaos: " << finl;
+      double value;
+      is >> value;
+      poly_chaos = value;
+      return 1;
+    }
   else
     return Convection_Diffusion_Temperature::lire_motcle_non_standard(mot, is);
 }
@@ -284,5 +293,10 @@ const Motcle& Convection_Diffusion_Temperature_sensibility::get_uncertain_variab
   return uncertain_var;
 }
 
+const double& Convection_Diffusion_Temperature_sensibility::get_poly_chaos_value() const
+{
+
+  return poly_chaos;
+}
 
 

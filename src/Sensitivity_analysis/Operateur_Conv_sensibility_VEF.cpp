@@ -129,6 +129,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const Champ_Inc_base& velocity_state = eq.get_velocity_state();
           const DoubleTab& temperature_state = eq.get_temperature_state_field();
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
+          const double& poly_chaos_value= eq.get_poly_chaos_value();
 
           DoubleTab& flux_b = flux_bords_;
           int nb_faces_bord=domaine_VEF.nb_faces_bord();
@@ -137,6 +138,15 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
 
           ajouter_conv_term(velocity_state,inco ,resu, flux_b);
           ajouter_conv_term(vitesse(), temperature_state,resu, flux_b);
+
+          if(poly_chaos_value !=0.)
+            {
+              double coeff= 2*poly_chaos_value;
+              DoubleTab inco_sigma = inco;
+              inco_sigma *=coeff;
+              ajouter_conv_term(vitesse(), inco_sigma, resu, flux_b);
+            }
+
           opConvVEFbase.modifier_flux(*this); // Multiplication by rhoCp
           if(uncertain_var=="LAMBDA")
             {
