@@ -55,6 +55,7 @@ void Convection_Diffusion_Temperature_sensibility::set_param(Param& param)
   param.ajouter_non_std("velocity_state",(this),Param::REQUIRED);
   param.ajouter_non_std("temperature_state",(this),Param::REQUIRED);
   param.ajouter_non_std("uncertain_variable",(this),Param::REQUIRED);
+  param.ajouter_non_std("polynomial_chaos",(this),Param::OPTIONAL);
 
 }
 
