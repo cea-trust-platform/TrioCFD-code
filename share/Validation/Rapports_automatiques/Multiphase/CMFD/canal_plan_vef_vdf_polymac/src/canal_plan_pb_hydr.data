@@ -1,7 +1,7 @@
 # PARALLEL OK #
 
 Dimension 2
-Pb_hydraulique_turbulent pb
+Pb_hydraulique pb
 
 Domaine dom
 # BEGIN MESH #
@@ -63,16 +63,28 @@ $method dis
 Schema_Euler_implicite sch
 Lire sch
 {
-	tinit 0
-	dt_impr 1e+6
-	facsec 20
-	facsec_max 20
-	nb_pas_dt_max $nb_pas_dt_max
-	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
-	seuil_statio 1e-30
-	tmax $tmax
+    tinit 0
+    dt_impr 1e-10
+    facsec 2
+    facsec_max 2
+    nb_pas_dt_max $nb_pas_dt_max
+    solveur implicite
+    {
+        solveur petsc cli
+        {
+            # -pc_type fgmres
+            -pc_type gasm
+            -pc_gasm_overlap 2
+            -sub_pc_type ilu
+            -sub_pc_factor_levels 1
+            -ksp_gmres_modifiedgramschmidt
+            -ksp_rtol 1e-5
+            -ksp_max_it 1000 #
+        }
+    }
+    seuil_statio 1e-8
+    tmax $tmax
 }
-
 
 Associer pb dom
 Associer pb sch
@@ -81,74 +93,99 @@ Discretiser pb dis
 
 Lire pb
 {
-   
-   fluide_incompressible {
-    	mu champ_uniforme 1 $mu
-    	rho champ_uniforme 1 $rho
-   }
-   
-   	Navier_Stokes_turbulent
-	{
-		Solveur_pression	PETSC Cholesky { }
-		Convection		{ amont }
-		Diffusion		{  }
-		Conditions_initiales	{ vitesse champ_uniforme 2 $inlet_velocity 0 }
-		Conditions_limites	{
-					bas paroi_fixe
-            				haut symetrie
-            				entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 $inlet_velocity 0
-            				sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
-					}
-		Modele_turbulence $modele_turb
-					{
-					$equation_hydr
-					{
-						convection		{ amont }
-						diffusion		{ }
-						conditions_initiales 	{ $turb champ_uniforme 2 $inlet_k $inlet_diss }
-						conditions_limites	{
-									entree	$CL_turb Champ_Front_Uniforme 2 $inlet_k $inlet_diss
-            								sortie	frontiere_ouverte $turb_ext Champ_Front_Uniforme 2 $inlet_k $inlet_diss
-									bas	paroi
-									haut	symetrie
-									}
-						$sources
-					}
-					turbulence_paroi loi_standard_hydr dt_impr_ustar  $tmax
-					}
-	}
 
-	Postraitement
+    fluide_incompressible
 	{
-		sondes			{
-					vitesse		vitesse		periode 1e8 segment $nb_points_prof    $x_prof $y_min_prof    $x_prof $y_max_prof
-					u		VitesseX		periode 1e8 position_like vitesse
-					k		k		periode 1e8 position_like vitesse
-					diss		$diss		periode 1e8 position_like vitesse
-					dist_paroi	Distance_paroi		periode 1e8 position_like vitesse
-					# y_plus		y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0 #
-					y_plus			y_plus			periode 1e8 segment $nb_points_prof	0 0.0	100 0.0
-					pression	pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
-					gradp		Gradient_pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
-					pression_io	pression		periode 1e8 segment 2    0.75 0    0.75 100
-					pression_i	pression		periode 1e8 segment 100     50 0	50 1
-					pression_o	pression		periode 1e8 segment 100     100 0	100 1
-					}
-		format lata
-		champs binaire dt_post 10
-					{
-					vitesse elem
-					k elem
-					$diss elem
-					y_plus elem
-					pression elem
-					}		
-	}
-	
+        mu champ_uniforme 1 $mu
+        rho champ_uniforme 1 $rho
+    }
+    correlations
+    {
+        loi_paroi adaptative { }
+    }
+
+    Navier_Stokes_standard
+    {
+        Solveur_pression	PETSC Cholesky { }
+        Convection		{ amont }
+        diffusion  { turbulente $diffusion { sigma 1 } }
+        Conditions_initiales	{ vitesse champ_uniforme 2 $inlet_velocity 0 }
+        Conditions_limites
+        {
+            bas Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
+            haut symetrie
+            entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_uniforme 2 $inlet_velocity 0
+            sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
+        }
+    }
+	$equation
+    {
+        diffusion { turbulente SGDH { sigma 0.5 } }
+        convection { amont }
+        initial_conditions { $diss Champ_Fonc_xyz dom 1 $IC_diss }
+        boundary_conditions
+        {
+            bas $CL_diss
+            haut symetrie
+            entree	frontiere_ouverte $diss_ext Champ_Front_Uniforme 1 $IC_diss
+            sortie	frontiere_ouverte $diss_ext Champ_Front_Uniforme 1 $IC_diss
+        }
+        sources
+        {
+            Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+            Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
+            Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+            $diffusion_sup
+        }
+    }
+    energie_cinetique_turbulente
+    {
+        diffusion { turbulente SGDH { sigma 0.67 } }
+        convection { amont }
+        initial_conditions { k champ_fonc_xyz dom 1 0.01 }
+        boundary_conditions
+        {
+            bas $CL_k
+            haut symetrie
+            entree	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+            sortie	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+        }
+        sources
+        {
+            Production_energie_cin_turb { } ,
+            Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+        }
+    }
+
+    Postraitement
+    {
+        sondes
+		{
+            vitesse	grav	vitesse		periode 1e8 segment $nb_points_prof    $x_prof $y_min_prof    $x_prof $y_max_prof
+            u		VitesseX		periode 1e8 position_like vitesse
+            k		k		periode 1e8 position_like vitesse
+            diss		$diss		periode 1e8 position_like vitesse
+            y_plus		y_plus			periode 1e8 segment $nb_points_yplus    $x_min_yplus $y_yplus    $x_max_yplus $y_yplus
+            pression	pression_pa		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
+            gradp		Gradient_pression		periode 1e8 segment $nb_points_prof	0 0.8	100 0.8
+            pression_io	pression_pa periode 1e8 segment 2    0.75 0    0.75 100
+            pression_i	pression_pa periode 1e8 segment 100     50 0	50 1
+            pression_o	pression_pa periode 1e8 segment 100     100 0	100 1
+        }
+        format lml
+        champs dt_post 10
+        {
+            vitesse elem
+            k elem
+            $diss elem
+            y_plus elem
+            pression_pa elem
+        }
+    }
 }
 
 
 Resoudre pb
 
 Fin
- 
+
