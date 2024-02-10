@@ -1,17 +1,17 @@
-# PARALLEL ONLY 4 #
+# PARALLEL OK #
 
 Dimension 2
-Pb_hydraulique_turbulent pb
+Pb_hydraulique pb
 
 Domaine dom
-# BEGIN MESH
+# BEGIN MESH #
 Mailler dom
 {
     pave bloc1
     {
         origine 0 0
         longueurs 100 0.2
-        nombre_de_noeuds 101 5
+        nombre_de_noeuds 51 3
     }
     {
         bord entree	 X = 0.            0. <= Y <= 0.2
@@ -22,7 +22,7 @@ Mailler dom
     {
         origine 0 0.2
         longueurs 100 0.2
-        nombre_de_noeuds 101 5
+        nombre_de_noeuds 51 3
     }
     {
         bord entree	 X = 0	            0.2 <= Y <= 0.4
@@ -32,7 +32,7 @@ Mailler dom
     {
         origine 0 0.4
         longueurs 100 0.6
-        nombre_de_noeuds 101 13
+        nombre_de_noeuds 51 7
     }
     {
         bord entree	 X = 0	            0.4 <= Y <= 1.0
@@ -41,7 +41,7 @@ Mailler dom
     }
 }
 
-END MESH #
+# END MESH #
 
 # BEGIN PARTITION
 Partition dom
@@ -54,25 +54,37 @@ Partition dom
 End
 END PARTITION #
 
-# BEGIN SCATTER #
+# BEGIN SCATTER
 Scatter DOM.Zones dom
-# END SCATTER #
+END SCATTER #
 
-VDF dis
+PolyMAC_P0 dis
 
 Schema_Euler_implicite sch
 Lire sch
 {
-	tinit 0
+    tinit 0
 	nb_pas_dt_max 3
-	dt_impr 1e+6
-	facsec 20
-	facsec_max 20
-	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
-	seuil_statio 1e-30
-	tmax 300
+    dt_impr 1e-10
+    facsec 2
+    facsec_max 2
+    solveur implicite
+    {
+        solveur petsc cli
+        {
+            # -pc_type fgmres
+            -pc_type gasm
+            -pc_gasm_overlap 2
+            -sub_pc_type ilu
+            -sub_pc_factor_levels 1
+            -ksp_gmres_modifiedgramschmidt
+            -ksp_rtol 1e-5
+            -ksp_max_it 1000 #
+        }
+    }
+    seuil_statio 1e-8
+    tmax 300
 }
-
 
 Associer pb dom
 Associer pb sch
@@ -81,74 +93,99 @@ Discretiser pb dis
 
 Lire pb
 {
-   
-   fluide_incompressible {
-    	mu champ_uniforme 1 0.02
-    	rho champ_uniforme 1 1000
-   }
-   
-   	Navier_Stokes_turbulent
-	{
-		Solveur_pression	PETSC Cholesky { }
-		Convection		{ amont }
-		Diffusion		{  }
-		Conditions_initiales	{ vitesse champ_uniforme 2 1 0 }
-		Conditions_limites	{
-					bas paroi_fixe
-            				haut symetrie
-            				entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 1 0
-            				sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 100000.0
-					}
-		Modele_turbulence k_epsilon
-					{
-					transport_k_epsilon
-					{
-						convection		{ amont }
-						diffusion		{ }
-						conditions_initiales 	{ k_eps champ_uniforme 2 0.01 0.005 }
-						conditions_limites	{
-									entree	frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 0.01 0.005
-            								sortie	frontiere_ouverte k_eps_ext Champ_Front_Uniforme 2 0.01 0.005
-									bas	paroi
-									haut	symetrie
-									}
-						sources			{ source_transport_k_eps { C1_eps 1.44 C2_eps 1.92 } }
-					}
-					turbulence_paroi loi_standard_hydr dt_impr_ustar  300
-					}
-	}
 
-	Postraitement
+    fluide_incompressible
 	{
-		sondes			{
-					vitesse		vitesse		periode 1e8 segment 20    95 0.025    95 0.975
-					u		VitesseX		periode 1e8 position_like vitesse
-					k		k		periode 1e8 position_like vitesse
-					diss		eps		periode 1e8 position_like vitesse
-					dist_paroi	Distance_paroi		periode 1e8 position_like vitesse
-					# y_plus		y_plus			periode 1e8 segment 20	0 0.0	100 0.0 #
-					y_plus			y_plus			periode 1e8 segment 20	0 0.0	100 0.0
-					pression	pression		periode 1e8 segment 20	0 0.8	100 0.8
-					gradp		Gradient_pression		periode 1e8 segment 20	0 0.8	100 0.8
-					pression_io	pression		periode 1e8 segment 2    0.75 0    0.75 100
-					pression_i	pression		periode 1e8 segment 100     50 0	50 1
-					pression_o	pression		periode 1e8 segment 100     100 0	100 1
-					}
-		format lml
-		champs binaire dt_post 10
-					{
-					vitesse elem
-					k elem
-					eps elem
-					y_plus elem
-					pression elem
-					}		
-	}
-	
+        mu champ_uniforme 1 0.02
+        rho champ_uniforme 1 1000.0
+    }
+    correlations
+    {
+        loi_paroi adaptative { }
+    }
+
+    Navier_Stokes_standard
+    {
+        Solveur_pression	PETSC Cholesky { }
+        Convection		{ amont }
+        diffusion  { turbulente k_omega { sigma 1 } }
+        Conditions_initiales	{ vitesse champ_uniforme 2 1 0 }
+        Conditions_limites
+        {
+            bas Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
+            haut symetrie
+            entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_uniforme 2 1 0
+            sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 100000.0
+        }
+    }
+	taux_dissipation_turbulent
+    {
+        diffusion { turbulente SGDH { sigma 0.5 } }
+        convection { amont }
+        initial_conditions { omega Champ_Fonc_xyz dom 1 0.5 }
+        boundary_conditions
+        {
+            bas Cond_lim_omega_demi { }  
+            haut symetrie
+            entree	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 0.5
+            sortie	frontiere_ouverte omega_ext Champ_Front_Uniforme 1 0.5
+        }
+        sources
+        {
+            Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+            Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
+            Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+             
+        }
+    }
+    energie_cinetique_turbulente
+    {
+        diffusion { turbulente SGDH { sigma 0.67 } }
+        convection { amont }
+        initial_conditions { k champ_fonc_xyz dom 1 0.01 }
+        boundary_conditions
+        {
+            bas Cond_lim_k_simple_flux_nul 
+            haut symetrie
+            entree	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+            sortie	frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.01
+        }
+        sources
+        {
+            Production_energie_cin_turb { } ,
+            Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+        }
+    }
+
+    Postraitement
+    {
+        sondes
+		{
+            vitesse	grav	vitesse		periode 1e8 segment 10    95 0.05    95 0.95
+            u		VitesseX		periode 1e8 position_like vitesse
+            k		k		periode 1e8 position_like vitesse
+            diss		omega		periode 1e8 position_like vitesse
+            y_plus		y_plus			periode 1e8 segment 40    1.25 0.05    98.75 0.05
+            pression	pression_pa		periode 1e8 segment 10	0 0.8	100 0.8
+            gradp		Gradient_pression		periode 1e8 segment 10	0 0.8	100 0.8
+            pression_io	pression_pa periode 1e8 segment 2    0.75 0    0.75 100
+            pression_i	pression_pa periode 1e8 segment 100     50 0	50 1
+            pression_o	pression_pa periode 1e8 segment 100     100 0	100 1
+        }
+        format lml
+        champs dt_post 10
+        {
+            vitesse elem
+            k elem
+            omega elem
+            y_plus elem
+            pression_pa elem
+        }
+    }
 }
 
 
 Resoudre pb
 
 Fin
- 
+
