@@ -65,10 +65,10 @@ Read sch
 {
     tinit 0
     tmax $tmax
-    dt_impr 1e-8
+    dt_impr 1e-10
     facsec $facsec
     facsec_max $facsec
-    seuil_statio 1e-10
+    seuil_statio 1e-8
     nb_pas_dt_max $nb_pas_dt_max
     solveur $solveur_temps
     {
@@ -111,14 +111,14 @@ Lire pb
         diffusion  { turbulente $diffusion { sigma 1 } }
         initial_conditions
         {
-            vitesse  champ_fonc_xyz dom 2 $inlet_velocity 0
-            pression Champ_Fonc_xyz dom 1 $outlet_pressure
+            vitesse  champ_uniforme 2 $inlet_velocity 0
+            pression champ_uniforme 1 $outlet_pressure
         }
         conditions_limites
         {
             bas Paroi_frottante_loi {  /*  y_p_prod_k 1 fac_prod_k 0 y_p_prod_k_grand 1 fac_prod_k_grand 0 */ }
             haut symetrie
-            entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 2 $inlet_velocity 0
+            entree frontiere_ouverte_vitesse_imposee_sortie Champ_front_uniforme 2 $inlet_velocity 0
             sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 $outlet_pressure
         }
     }
@@ -187,8 +187,9 @@ Lire pb
     }
     Postraitement
     {
-        sondes			{
-            k	    	k      		periode 1e8 segment $nb_points_prof    $x_prof $y_min_prof    $x_prof $y_max_prof
+        sondes
+        {
+            k	    grav	k      		periode 1e8 segment $nb_points_prof    $x_prof $y_min_prof    $x_prof $y_max_prof
             diss    	$diss      		periode 1e8 position_like k
             vitesse    	vitesse_liquide_eau	periode 1e8 position_like k
             # dist_paroi	Distance_paroi		periode 1e8 position_like k #
@@ -199,9 +200,9 @@ Lire pb
             pression_o		pression		periode 1e8 segment 100     100 0	100 1
             # tau_w	viscous_force		periode 1e8 segment 1001	0 0.0	100 0.0 #
         }
-        format lata
-		champs binaire dt_post 10.
-			{
+        format lml
+        champs dt_post 0
+        {
             k	    elem
             $diss    elem
             vitesse_liquide_eau	elem
