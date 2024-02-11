@@ -413,11 +413,13 @@ void IJK_One_Dimensional_Subproblems::store_previous_temperature_indicator_veloc
   temperature_probes_previous_.clear();
   indicator_probes_previous_.clear();
   velocities_probes_previous_.clear();
+  normal_vector_compo_probes_previous_.clear();
   for (int itr=0; itr < subproblems_counter_; itr++)
     {
       temperature_probes_previous_.push_back((*this)[itr].get_current_temperature_solution());
       indicator_probes_previous_.push_back((*this)[itr].get_current_indicator());
       velocities_probes_previous_.push_back((*this)[itr].get_current_cell_xyz_velocities());
+      normal_vector_compo_probes_previous_.push_back((*this)[itr].get_normal_vector_compo());
     }
   share_previous_temperature_indicator_velocities();
 }
@@ -433,12 +435,14 @@ void IJK_One_Dimensional_Subproblems::share_previous_temperature_indicator_veloc
       temperature_probes_previous_local_perio_.resize(nk_tot);
       indicator_probes_previous_local_perio_.resize(nk_tot);
       velocities_probes_previous_local_perio_.resize(nk_tot);
+      normal_vector_compo_probes_previous_local_perio_.resize(nk_tot);
 
       for (int ij = 0; ij<2; ij++)
         index_ij_subproblems_global_[ij].resize(nk_tot);
       temperature_probes_previous_global_.resize(nk_tot);
       indicator_probes_previous_global_.resize(nk_tot);
       velocities_probes_previous_global_.resize(nk_tot);
+      normal_vector_compo_probes_previous_global_.resize(nk_tot);
 
       for (int k=0; k<nk_tot; k++)
         {
@@ -449,9 +453,12 @@ void IJK_One_Dimensional_Subproblems::share_previous_temperature_indicator_veloc
             temperature_probes_previous_local_perio_[k][point].set_smart_resize(1);
           indicator_probes_previous_local_perio_[k].set_smart_resize(1);
           velocities_probes_previous_local_perio_[k].resize(3);
+          normal_vector_compo_probes_previous_local_perio_[k].resize(3);
           for (int compo=0; compo<3; compo++)
-            velocities_probes_previous_local_perio_[k][compo].set_smart_resize(1);
-
+            {
+              velocities_probes_previous_local_perio_[k][compo].set_smart_resize(1);
+              normal_vector_compo_probes_previous_local_perio_[k][compo].set_smart_resize(1);
+            }
           for (int ij = 0; ij<2; ij++)
             index_ij_subproblems_global_[ij][k].set_smart_resize(1);
           temperature_probes_previous_global_[k].resize(*points_per_thermal_subproblem_);
@@ -459,8 +466,12 @@ void IJK_One_Dimensional_Subproblems::share_previous_temperature_indicator_veloc
             temperature_probes_previous_global_[k][point].set_smart_resize(1);
           indicator_probes_previous_global_[k].set_smart_resize(1);
           velocities_probes_previous_global_[k].resize(3);
+          normal_vector_compo_probes_previous_global_[k].resize(3);
           for (int compo=0; compo<3; compo++)
-            velocities_probes_previous_global_[k][compo].set_smart_resize(1);
+            {
+              velocities_probes_previous_global_[k][compo].set_smart_resize(1);
+              normal_vector_compo_probes_previous_global_[k][compo].set_smart_resize(1);
+            }
         }
     }
   else
@@ -473,7 +484,10 @@ void IJK_One_Dimensional_Subproblems::share_previous_temperature_indicator_veloc
             temperature_probes_previous_local_perio_[k][point].reset();
           indicator_probes_previous_local_perio_[k].reset();
           for (int compo=0; compo<3; compo++)
-            velocities_probes_previous_local_perio_[k][compo].reset();
+            {
+              velocities_probes_previous_local_perio_[k][compo].reset();
+              normal_vector_compo_probes_previous_local_perio_[k][compo].reset();
+            }
 
           for (int ij = 0; ij<2; ij++)
             index_ij_subproblems_global_[ij][k].reset();
@@ -481,7 +495,10 @@ void IJK_One_Dimensional_Subproblems::share_previous_temperature_indicator_veloc
             temperature_probes_previous_global_[k][point].reset();
           indicator_probes_previous_global_[k].reset();
           for (int compo=0; compo<3; compo++)
-            velocities_probes_previous_global_[k][compo].reset();
+            {
+              velocities_probes_previous_global_[k][compo].reset();
+              normal_vector_compo_probes_previous_global_[k][compo].reset();
+            }
         }
     }
   retrieve_boundary_previous_values();
@@ -512,11 +529,15 @@ void IJK_One_Dimensional_Subproblems::retrieve_boundary_previous_values()
           index_ij_subproblems_local_perio_[1][k_global].append_array(j_global);
           DoubleVect& temperature_vect = temperature_probes_previous_[itr];
           Vecteur3& velocities_xyz = velocities_probes_previous_[itr];
+          Vecteur3& normal_vector_compo = normal_vector_compo_probes_previous_[itr];
           for (int point=0; point<(*points_per_thermal_subproblem_); point++)
-            temperature_probes_previous_local_perio_[k][point].append_array(temperature_vect[point]);
-          indicator_probes_previous_local_perio_[k].append_array(indicator_probes_previous_[itr]);
+            temperature_probes_previous_local_perio_[k_global][point].append_array(temperature_vect[point]);
+          indicator_probes_previous_local_perio_[k_global].append_array(indicator_probes_previous_[itr]);
           for (int compo=0; compo<3; compo++)
-            velocities_probes_previous_local_perio_[k][compo].append_array(velocities_xyz[compo]);
+            {
+              velocities_probes_previous_local_perio_[k_global][compo].append_array(velocities_xyz[compo]);
+              normal_vector_compo_probes_previous_local_perio_[k_global][compo].append_array(normal_vector_compo[compo]);
+            }
         }
     }
 }
@@ -574,7 +595,7 @@ void IJK_One_Dimensional_Subproblems::share_boundary_previous_values()
               ArrOfDouble& global_temperature = temperature_probes_previous_global_[k][point];
               global_temperature.resize(size_array_global);
               global_temperature *= 0.;
-              for (l=0; l<local_indices_i_tmp.size_array(); l++)
+              for (l=0; l<local_temperature.size_array(); l++)
                 global_temperature(start_indices(proc_num) + l) = local_temperature(l);
               mp_sum_for_each_item(global_temperature);
             }
@@ -582,12 +603,20 @@ void IJK_One_Dimensional_Subproblems::share_boundary_previous_values()
           for (int compo=0; compo<3; compo++)
             {
               const ArrOfDouble& local_velocity = velocities_probes_previous_local_perio_[k][compo];
+              const ArrOfDouble& local_normal_compo = normal_vector_compo_probes_previous_local_perio_[k][compo];
               ArrOfDouble& global_velocity = velocities_probes_previous_global_[k][compo];
+              ArrOfDouble& global_normal_compo = normal_vector_compo_probes_previous_global_[k][compo];
               global_velocity.resize(size_array_global);
+              global_normal_compo.resize(size_array_global);
               global_velocity *= 0.;
-              for (l=0; l<local_indices_i_tmp.size_array(); l++)
-                global_velocity(start_indices(proc_num) + l) = local_velocity(l);
+              global_normal_compo *= 0.;
+              for (l=0; l<local_velocity.size_array(); l++)
+                {
+                  global_velocity(start_indices(proc_num) + l) = local_velocity(l);
+                  global_normal_compo(start_indices(proc_num) + l) = local_normal_compo(l);
+                }
               mp_sum_for_each_item(global_velocity);
+              mp_sum_for_each_item(global_normal_compo);
             }
         }
     }
@@ -625,45 +654,49 @@ void IJK_One_Dimensional_Subproblems::complete_boundary_previous_values()
               int i = i_global - offset_i;
               int j = j_global - offset_j;
               int k = k_global - offset_k;
-              if (i_global == ni && offset_i==0)
+              if (i_global == ni_tot-1 && offset_i==0)
                 i = -1;
               if (i_global == 0 && (ni + offset_i==ni_tot))
                 i = ni;
-              if (j_global == nj && offset_j==0)
+              if (j_global == nj_tot-1 && offset_j==0)
                 j = -1;
               if (j_global == 0 && (nj + offset_j==nj_tot))
                 j = nj;
-              if (k_global == nk && offset_k==0)
+              if (k_global == nk_tot-1 && offset_k==0)
                 k = -1;
               if (k_global == 0 && (nk + offset_k==nk_tot))
                 k = nk;
               /*
                * Neighbours
                */
-              const int i_dir = (i==-1 && i==ni) && (0 <= j && j < nj) && (0 <= k && k < nk);
-              const int j_dir = (0 <= i && i < ni) && (j==-1 && j==nj) && (0 <= k && k < nk);
-              const int k_dir = (0 <= i && i < ni) && (0 <= j && j < nj) && (k==-1 && k==nk);
+              const int i_dir = (i==-1 || i==ni) && (0 <= j && j < nj) && (0 <= k && k < nk);
+              const int j_dir = (0 <= i && i < ni) && (j==-1 || j==nj) && (0 <= k && k < nk);
+              const int k_dir = (0 <= i && i < ni) && (0 <= j && j < nj) && (k==-1 || k==nk);
               if (i_dir || j_dir || k_dir)
-                {
-                  DoubleVect temperature_prev;
-                  temperature_prev.resize((*points_per_thermal_subproblem_));
-                  for (int point=0; point<(*points_per_thermal_subproblem_); point++)
-                    temperature_prev[point]	= temperature_probes_previous_global_[k_global][point][ival];
-                  temperature_probes_previous_.push_back(temperature_prev);
+                if (!is_in_map_index_ijk(subproblem_to_ijk_indices_, i, j, k))
+                  {
+                    subproblem_to_ijk_indices_[i][j][k] = counter_prev;
 
-                  indicator_probes_previous_.push_back(indicator_probes_previous_global_[k][ival]);
+                    DoubleVect temperature_prev;
+                    temperature_prev.resize((*points_per_thermal_subproblem_));
+                    for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+                      temperature_prev[point]	= temperature_probes_previous_global_[k_global][point][ival];
+                    temperature_probes_previous_.push_back(temperature_prev);
 
-                  Vecteur3 velocities_compo;
-                  for (int compo=0; compo<3; compo++)
-                    velocities_compo[compo] = velocities_probes_previous_local_perio_[k][compo][ival];
-                  velocities_probes_previous_.push_back(velocities_compo);
+                    indicator_probes_previous_.push_back(indicator_probes_previous_global_[k_global][ival]);
 
-                  if (!is_in_map_index_ijk(subproblem_to_ijk_indices_, i, j, k))
-                    {
-                      subproblem_to_ijk_indices_[i][j][k] = counter_prev;
-                      counter_prev++;
-                    }
-                }
+                    Vecteur3 velocities_compo;
+                    Vecteur3 normal_vector_compo;
+                    for (int compo=0; compo<3; compo++)
+                      {
+                        velocities_compo[compo] = velocities_probes_previous_global_[k_global][compo][ival];
+                        normal_vector_compo[compo] = normal_vector_compo_probes_previous_global_[k_global][compo][ival];
+                      }
+                    velocities_probes_previous_.push_back(velocities_compo);
+                    normal_vector_compo_probes_previous_.push_back(normal_vector_compo);
+
+                    counter_prev++;
+                  }
             }
         }
     }
@@ -693,26 +726,34 @@ void IJK_One_Dimensional_Subproblems::complete_boundary_previous_values()
                 k = 0;
               if (k == 0)
                 k = nk-1;
-              {
-                DoubleVect temperature_prev;
-                temperature_prev.resize((*points_per_thermal_subproblem_));
-                for (int point=0; point<(*points_per_thermal_subproblem_); point++)
-                  temperature_prev[point]	= temperature_probes_previous_local_perio_[k_global][point][ival];
-                temperature_probes_previous_.push_back(temperature_prev);
-
-                indicator_probes_previous_.push_back(indicator_probes_previous_local_perio_[k][ival]);
-
-                Vecteur3 velocities_compo;
-                for (int compo=0; compo<3; compo++)
-                  velocities_compo[compo] = velocities_probes_previous_local_perio_[k][compo][ival];
-                velocities_probes_previous_.push_back(velocities_compo);
-
+              const int i_dir = (i == ni-1 || i == 0);
+              const int j_dir = (j == nj-1 || j == 0);
+              const int k_dir = (k == nk-1 || k == 0);
+              if (i_dir || j_dir || k_dir)
                 if (!is_in_map_index_ijk(subproblem_to_ijk_indices_, i, j, k))
                   {
                     subproblem_to_ijk_indices_[i][j][k] = counter_prev;
+
+                    DoubleVect temperature_prev;
+                    temperature_prev.resize((*points_per_thermal_subproblem_));
+                    for (int point=0; point<(*points_per_thermal_subproblem_); point++)
+                      temperature_prev[point]	= temperature_probes_previous_local_perio_[k_global][point][ival];
+                    temperature_probes_previous_.push_back(temperature_prev);
+
+                    indicator_probes_previous_.push_back(indicator_probes_previous_local_perio_[k_global][ival]);
+
+                    Vecteur3 velocities_compo;
+                    Vecteur3 normal_vector_compo;
+                    for (int compo=0; compo<3; compo++)
+                      {
+                        velocities_compo[compo] = velocities_probes_previous_local_perio_[k_global][compo][ival];
+                        normal_vector_compo[compo] = normal_vector_compo_probes_previous_local_perio_[k_global][compo][ival];
+                      }
+                    velocities_probes_previous_.push_back(velocities_compo);
+                    normal_vector_compo_probes_previous_.push_back(normal_vector_compo);
+
                     counter_prev++;
                   }
-              }
             }
         }
     }
@@ -1067,8 +1108,9 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
                                                  "t1x", "t1y", "t1z", "t2x", "t2y", "t2z",
                                                  "s1x", "s1y", "s1z", "s2x", "s2y", "s2z",
                                                  "r_sph", "theta_sph", "phi_sph",
-                                                 "temperature_interp","temperature_sol","temperature_gradient", "temperature_gradient_sol",
-                                                 "temperature_double_deriv_sol",
+                                                 "temperature_interp","temperature_sol", "temperature_prev",
+                                                 "temperature_gradient", "temperature_gradient_sol",
+                                                 "temperature_double_deriv", "temperature_double_deriv_sol",
                                                  "temperature_gradient_tangential","temperature_gradient_tangential2",
                                                  "temperature_gradient_tangential_rise","temperature_gradient_azymuthal",
                                                  "temperature_diffusion_hessian_cartesian_trace",
@@ -1076,6 +1118,9 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs_parallel(con
                                                  "radial_temperature_diffusion",
                                                  "radial_temperature_diffusion_sol",
                                                  "tangential_temperature_diffusion",
+                                                 "radial_scale_factor_inerp", "radial_scale_factor_sol",
+                                                 "radial_convection_interp", "radial_convection_sol",
+                                                 "tangential_convection_first", "tangential_convection_second",
                                                  "surface","thermal_flux","lambda_liq","alpha_liq","prandtl_liq",
                                                  "nusselt_number","nusselt_number_liquid_temperature",
                                                  "nusselt_number_integrand","nusselt_number_liquid_temperature_integrand",
@@ -1181,9 +1226,9 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
   Nom probe_header = Nom("tstep\tthermal_rank\tpost_pro_index\tglobal_subproblem\tlocal_subproblem\ttime"
                          "\tnx\tny\tnz\tt1x\tt1y\tt2z\tt2x\tt2y\tt2z\ts1x\ts1y\ts1z\ts2x\ts2y\ts2z"
                          "\tr_sph\ttheta_sph\tphi_sph"
-                         "\ttemperature_interp\ttemperature_sol"
+                         "\ttemperature_interp\ttemperature_sol\ttemperature_prev"
                          "\ttemperature_gradient\ttemperature_gradient_sol"
-                         "\ttemperature_double_deriv_sol"
+                         "\ttemperature_double_deriv\ttemperature_double_deriv_sol"
                          "\ttemperature_gradient_tangential\ttemperature_gradient_tangential2"
                          "\ttemperature_gradient_tangential_rise\ttemperature_gradient_azymuthal"
                          "\ttemperature_diffusion_hessian_cartesian_trace"
@@ -1191,6 +1236,9 @@ void IJK_One_Dimensional_Subproblems::thermal_subresolution_outputs(const int& r
                          "\tradial_temperature_diffusion"
                          "\tradial_temperature_diffusion_sol"
                          "\ttangential_temperature_diffusion"
+                         "\tradial_scale_factor_interp\tradial_scale_factor_sol"
+                         "\tradial_convection_interp\tradial_convection_sol"
+                         "\ttangential_convection_first\ttangential_convection_second"
                          "\tsurface\tthermal_flux\tlambda_liq\talpha_liq\tprandtl_liq"
                          "\tnusselt_number\tnusselt_number_liquid_temperature"
                          "\tnusselt_number_integrand\tnusselt_number_liquid_temperature_integrand"

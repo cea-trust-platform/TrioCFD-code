@@ -166,6 +166,7 @@ public :
   void retrieve_variables_solution_gfm_on_probes();
   void retrieve_temperature_solution();
   void retrieve_radial_quantities();
+  void complete_tangential_source_terms_for_post_processings();
   void compute_integral_quantities_solution();
   void compute_local_temperature_gradient_solution();
   void compute_radial_convection_scale_factor_solution();
@@ -422,6 +423,10 @@ public :
   {
     return xyz_velocity_cell_;
   }
+  const Vecteur3& get_normal_vector_compo() const
+  {
+    return normal_vector_compo_;
+  }
 protected :
   void clear_vectors();
   void reset_counters();
@@ -536,7 +541,8 @@ protected :
                                                const std::map<int, std::map<int, std::map<int, int>>>& subproblem_to_ijk_indices_previous,
                                                const std::vector<DoubleVect>& temperature_probe_previous,
                                                const std::vector<double>& indicator_probes_previous,
-                                               const std::vector<Vecteur3>& velocities_probes_previous);
+                                               const std::vector<Vecteur3>& velocities_probes_previous,
+                                               const std::vector<Vecteur3>& normal_vector_compo_probes_previous);
   void associate_finite_difference_operators(const Matrice& radial_first_order_operator_raw,
                                              const Matrice& radial_second_order_operator_raw,
                                              const Matrice& radial_first_order_operator,
@@ -580,6 +586,14 @@ protected :
   void compute_integral_quantity_on_probe(DoubleVect& quantity, double& integrated_quantity);
   void compute_energy_from_temperature_interp();
   void retrieve_previous_temperature_on_probe();
+  void retrieve_previous_temperature_on_probe_type(const int computation_type,
+                                                   const int& previous_rank,
+                                                   const double& best_indicator_prev,
+                                                   const double& colinearity,
+                                                   const double& velocity_eval,
+                                                   DoubleVect& temperature_previous,
+                                                   DoubleVect& temperature_previous_options,
+                                                   double& averaging_weight);
   int is_in_map_index_ijk(const std::map<int, std::map<int, std::map<int, int>>>& subproblem_to_ijk_indices,
                           const int& index_i,
                           const int& index_j,
@@ -633,6 +647,7 @@ protected :
   const std::vector<DoubleVect> * temperature_probes_previous_;
   const std::vector<double> * indicator_probes_previous_;
   const std::vector<Vecteur3> * velocities_probes_previous_;
+  const std::vector<Vecteur3> * normal_vector_compo_probes_previous_;
 
   int reference_gfm_on_probes_ = 0;
   int compute_normal_derivative_on_reference_probes_ = 0;
@@ -866,7 +881,7 @@ protected :
                       tangential_conv_2D, tangential_conv_3D,
                       tangential_conv_2D_tangential_diffusion_3D, tangential_conv_3D_tangentual_diffusion_3D
                     };
-  DoubleVect normal_temperature_gradient_;
+  DoubleVect normal_temperature_gradient_interp_;
   DoubleVect tangential_temperature_gradient_first_;
   DoubleVect tangential_temperature_gradient_second_;
   DoubleVect tangential_temperature_gradient_first_from_rising_dir_;
@@ -910,7 +925,9 @@ protected :
   DoubleVect nusselt_number_integrand_;
   DoubleVect nusselt_number_liquid_temperature_integrand_;
 
+  DoubleVect radial_scale_factor_interp_;
   DoubleVect radial_scale_factor_solution_;
+  DoubleVect radial_convection_interp_;
   DoubleVect radial_convection_solution_;
 
   const double * delta_temperature_;

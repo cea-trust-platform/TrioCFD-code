@@ -226,6 +226,7 @@ protected :
   std::vector<DoubleVect> temperature_probes_previous_;
   std::vector<double> indicator_probes_previous_;
   std::vector<Vecteur3> velocities_probes_previous_;
+  std::vector<Vecteur3> normal_vector_compo_probes_previous_;
 
   int * points_per_thermal_subproblem_;
   std::map<int, std::map<int, std::map<int, int>>> subproblem_to_ijk_indices_previous_global_;
@@ -235,11 +236,13 @@ protected :
   std::vector<std::vector<ArrOfDouble>> temperature_probes_previous_local_perio_;
   std::vector<ArrOfDouble> indicator_probes_previous_local_perio_;
   std::vector<std::vector<ArrOfDouble>> velocities_probes_previous_local_perio_;
+  std::vector<std::vector<ArrOfDouble>> normal_vector_compo_probes_previous_local_perio_;
 
   FixedVector<std::vector<ArrOfInt>,2> index_ij_subproblems_global_;
   std::vector<std::vector<ArrOfDouble>> temperature_probes_previous_global_;
   std::vector<ArrOfDouble> indicator_probes_previous_global_;
   std::vector<std::vector<ArrOfDouble>> velocities_probes_previous_global_;
+  std::vector<std::vector<ArrOfDouble>> normal_vector_compo_probes_previous_global_;
 
   int reference_gfm_on_probes_ = 0;
   int pre_initialise_thermal_subproblems_list_ = 0;
