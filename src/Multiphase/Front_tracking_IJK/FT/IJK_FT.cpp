@@ -56,8 +56,6 @@
 //#define SMOOTHING_RHO
 
 Implemente_instanciable_sans_constructeur(IJK_FT_double, "IJK_FT_double", Interprete);
-//int IJK_FT_double::upstream_dir_ = DIRECTION_I;
-
 IJK_FT_double::IJK_FT_double():
   post_(IJK_FT_Post(*this))
 {
@@ -498,11 +496,11 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("multigrid_solver", &poisson_solver_, Param::REQUIRED); // XD_ADD_P multigrid_solver not_set
   param.ajouter_flag("check_divergence", &check_divergence_); // XD_ADD_P rien Flag to compute and print the value of div(u) after each pressure-correction
   param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid viscosity
-  param.ajouter("vitesse_entree", &vitesse_entree_); // XD_ADD_P chaine not_set
-  param.ajouter("vitesse_upstream", &vitesse_upstream_); // XD_ADD_P chaine not_set
-  param.ajouter("upstream_dir", &upstream_dir_); // XD_ADD_P chaine not_set
-  param.ajouter("upstream_stencil", &upstream_stencil_); // XD_ADD_P chaine not_set
-  param.ajouter("nb_diam_upstream", &nb_diam_upstream_); // XD_ADD_P chaine not_set
+  param.ajouter("vitesse_entree", &vitesse_entree_);
+  param.ajouter("vitesse_upstream", &vitesse_upstream_);
+  param.ajouter("upstream_dir", &upstream_dir_);
+  param.ajouter("upstream_stencil", &upstream_stencil_);
+  param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
   param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid density
   param.ajouter("check_stop_file", &check_stop_file_); // XD_ADD_P chaine stop file to check (if 1 inside this file, stop computation)
   param.ajouter("dt_sauvegarde", &dt_sauvegarde_); // XD_ADD_P entier saving frequency (writing files for computation restart)
@@ -550,9 +548,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
   param.ajouter("thermals", &thermals_);
-  //  thermal_problem_number_=0;
-//  param.ajouter("thermal_problem_number", &thermal_problem_number_); // XD_ADD_P floattant vapour viscosity
-
   param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED); // XD_ADD_P entier Number of element used to extend the computational domain at each side of periodic boundary to accommodate for bubble evolution.
 
   param.ajouter("fichier_post", &fichier_post_); // XD_ADD_P chaine name of the post-processing file (lata file)
@@ -597,9 +592,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("mu_vapeur", &mu_vapeur_); // XD_ADD_P floattant vapour viscosity
 
   param.ajouter_flag("first_step_interface_smoothing", &first_step_interface_smoothing_);
-
   post_.complete_interpreter(param, is);
-
 // XD attr check_stats rien check_stats 1 Flag to compute additional (xy)-plane averaged statistics
 // XD attr dt_post entier dt_post 1 Post-processing frequency (for lata output)
 // XD attr dt_post_stats_plans entier dt_post_stats_plans 1 Post-processing frequency for averaged statistical files (txt files containing averaged information on (xy) planes for each z-center) both instantaneous, or cumulated time-integration (see file header for variables list)
@@ -3752,26 +3745,6 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
               velocity_diffusion_op_.set_nu(unit_);
               velocity_diffusion_op_.ajouter(velocity_[0], velocity_[1], velocity_[2],
                                              laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
-//              if (type_velocity_diffusion_form_ == Nom("simple_arithmetic"))
-//                {
-//              	velocity_diffusion_op_simple_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-//              	                                                        unit_,
-//              	                                                        laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
-//                  velocity_diffusion_op_simple_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-//                                                        unit_,
-//                                                        laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
-//                }
-//              else if (type_velocity_diffusion_form_ == Nom("full_arithmetic"))
-//                {
-//                  velocity_diffusion_op_full_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-//                                                      unit_,
-//                                                      laplacien_velocity_[0], laplacien_velocity_[1], laplacien_velocity_[2]);
-//                }
-//              else
-//                {
-//                  Cerr << "Unknown velocity diffusion operator! " << finl;
-//                  Process::exit();
-//                }
               for (int dir2 = 0; dir2 < 3; dir2++)
                 {
                   const int kmax2 = d_velocity_[dir2].nk();
@@ -4020,7 +3993,6 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 {
   static Stat_Counter_Id euler_rk3_counter_ = statistiques().new_counter(2, "Mise a jour de la vitesse");
   statistiques().begin_count(euler_rk3_counter_);
-  //  if ((thermique_.size() > 0) || (energie_.size()))
   if (thermals_.size())
     {
       // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.

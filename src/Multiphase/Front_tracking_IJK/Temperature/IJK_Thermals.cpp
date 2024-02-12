@@ -75,7 +75,7 @@ void IJK_Thermals::associer_interface_intersections(const Intersection_Interface
 
 double IJK_Thermals::get_modified_time()
 {
-  double modified_time = 0;
+  double modified_time = ref_ijk_ft_->get_current_time();
   for (auto& itr : *this)
     modified_time = std::max(modified_time, itr.get_modified_time());
   return modified_time;
