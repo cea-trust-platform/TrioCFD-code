@@ -2676,8 +2676,17 @@ void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect * th
 
   if (implicit_solver_from_previous_probe_field_)
     {
+      /*
+       * Some tests !
+       */
       boundary_condition_end = implicit;
       end_boundary_condition_value_ = 0.;
+
+      boundary_condition_end = neumann;
+      end_boundary_condition_value_ = normal_temperature_gradient_interp_[(*points_per_thermal_subproblem_) - 1];
+      normal_temperature_gradient_previous_.resize(temperature_previous_.size());
+      (*finite_difference_assembler_).compute_operator(radial_first_order_operator_, temperature_previous_, normal_temperature_gradient_previous_);
+      // end_boundary_condition_value_ = normal_temperature_gradient_previous_[(*points_per_thermal_subproblem_) - 1];
     }
 
   /*
@@ -2746,9 +2755,9 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
                                                                         first_indices_sparse_matrix_,
                                                                         use_sparse_matrix_);
 
-  add_source_terms(boundary_condition_interface, boundary_condition_end);
+  add_source_terms(boundary_condition_interface_local, boundary_condition_end_local);
 
-  add_source_terms_temporal_tests(boundary_condition_interface, boundary_condition_end);
+  add_source_terms_temporal_tests(boundary_condition_interface_local, boundary_condition_end_local);
 
 }
 

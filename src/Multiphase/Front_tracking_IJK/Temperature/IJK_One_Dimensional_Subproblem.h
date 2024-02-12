@@ -835,6 +835,7 @@ protected :
   DoubleVect * second_tangential_velocity_solver_;
   DoubleVect radial_convection_prefactor_;
   DoubleVect temperature_previous_;
+  DoubleVect normal_temperature_gradient_previous_;
   DoubleVect temperature_interp_;
   DoubleVect temperature_time_increment_;
   DoubleVect temperature_time_increment_from_eulerian_;

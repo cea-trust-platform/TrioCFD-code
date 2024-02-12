@@ -1212,8 +1212,9 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
           {
             // Refill with first order finite difference coefficients
             const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
-            const int stencil_backward = non_zero_stencil_values(first_order_derivative_backward_);
-            int counter_fd_coeff = 0;
+            const int stencil_backward = first_order_derivative_backward_[precision_order_-1][1].size_array();
+            // const int stencil_backward = non_zero_stencil_values(first_order_derivative_backward_);
+            int counter_fd_coeff = stencil_backward - 1;
             for (int i=0; i < non_zero_elem_end; i++)
               {
                 const int index = i + nb_coeff - non_zero_elem_end;
@@ -1221,7 +1222,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
                   {
                     const double fd_coeff = first_order_derivative_backward_[precision_order_-1][1](counter_fd_coeff);
                     matrix_values[index] = fd_coeff * dr_inv;
-                    counter_fd_coeff++;
+                    counter_fd_coeff--;
                   }
                 else
                   matrix_values[index] = 0.;
@@ -1230,6 +1231,39 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
           }
           break;
         case implicit:
+          {
+            // Refill with first order finite difference coefficients
+            const int non_zero_elem_end = sparse_matrix.nb_vois(nb_lines - 1);
+            const int stencil_backward = first_order_derivative_backward_[precision_order_-1][1].size_array();
+            // const int stencil_backward = non_zero_stencil_values(first_order_derivative_backward_);
+            int counter_fd_coeff = stencil_backward - 1;
+            for (int i=0; i < non_zero_elem_end; i++)
+              {
+                const int index = i + nb_coeff - non_zero_elem_end;
+                if (index + stencil_backward >= nb_coeff)
+                  {
+                    const double fd_coeff = first_order_derivative_backward_[precision_order_-1][1](counter_fd_coeff);
+                    matrix_values[index] = fd_coeff * dr_inv;
+                    counter_fd_coeff--;
+                  }
+                else
+                  matrix_values[index] = 0.;
+              }
+            const int stencil_centred = first_order_derivative_centred_[precision_order_-1][1].size_array();
+            // const int stencil_centred = non_zero_stencil_values(first_order_derivative_centred_);
+            counter_fd_coeff = 0;
+            for (int i=0; i < non_zero_elem_end; i++)
+              {
+                const int index = i + nb_coeff - non_zero_elem_end;
+                if (index + stencil_centred >= nb_coeff)
+                  {
+                    const double fd_coeff = first_order_derivative_centred_[precision_order_-1][1](counter_fd_coeff);
+                    matrix_values[index] += - (fd_coeff * dr_inv);
+                    counter_fd_coeff++;
+                  }
+              }
+            modified_rhs[modified_rhs.size() - 1] = end_value;
+          }
           break;
         default:
           {
@@ -1379,6 +1413,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::add_source_terms(Do
     case flux_jump:
       break;
     case implicit:
+      // index_end--;
       break;
     default:
       index_end--;
