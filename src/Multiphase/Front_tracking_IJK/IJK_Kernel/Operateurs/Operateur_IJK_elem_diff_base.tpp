@@ -40,18 +40,15 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
   Simd_double uniform_lambda(1.);
   Simd_double avg_lambda(1.);
   if (is_uniform_ and uniform_lambda_!=0)
-    {
-      uniform_lambda = Simd_double(*uniform_lambda_);
-    }
+    uniform_lambda = Simd_double(*uniform_lambda_);
   /*
    *  M.G: lambda point toward the input field just to initialise *structural_model without error
    *  May not work in further configurations (may be handled in IJK_Thermal classes) when operators
    *  are cast.
    */
   if (is_uniform_)
-    {
-      lambda_=input_field_;
-    }
+    lambda_=input_field_;
+
 
   /*
    * Gives lambda field as a dummy field (Avoid the creation of a IJK_Field_local_double

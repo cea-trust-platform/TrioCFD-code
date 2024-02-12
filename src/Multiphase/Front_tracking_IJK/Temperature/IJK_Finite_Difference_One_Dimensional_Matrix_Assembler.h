@@ -95,8 +95,8 @@ public :
                                              const int& start_index,
                                              const FixedVector<ArrOfInt, 6> * first_indices_sparse_matrix,
                                              const int& use_sparse_matrix);
-  void sum_any_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B, const int& use_sparse_matrix);
-  void sum_sparse_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B);
+  void sum_any_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B, const int& use_sparse_matrix, const int& debug);
+  void sum_sparse_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B, const int& debug);
   void sum_matrices_subproblems(Matrice& matrix_A, Matrice& matrix_B);
   void sum_matrices(Matrice& matrix_A, Matrice& matrix_B);
   void initialise_sparse_matrix_subproblems(Matrice& matrix_subproblems,
@@ -128,6 +128,7 @@ public :
                                       const int& nb_subproblems,
                                       const int& keep_global_probes_discretisation);
   void add_source_terms(DoubleVect * thermal_subproblems_rhs_assembly,
+                        DoubleVect& rhs_assembly,
                         const DoubleVect& source_terms,
                         const int& index_start,
                         const int& boundary_condition_interface,
@@ -163,7 +164,7 @@ protected :
   enum Precision_Order_ { first_order, second_order };
   enum Derivative_Order_ { first, second };
   // enum Boundary_conditions { dirichlet, neumann, flux_jump };
-  enum Boundary_conditions { dirichlet, neumann, flux_jump };
+  enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump, implicit };
   /*
    *  -elim_coeff_nul=0, on ne supprime pas les coefficients nuls de la matrice
    *  -elim_coeff_nul=1, on supprime les coefficients nuls de la matrice

@@ -304,7 +304,9 @@ protected :
 
   int disable_probe_weak_gradient_;
   int disable_probe_weak_gradient_gfm_;
+
   int reconstruct_previous_probe_field_;
+  int implicit_solver_from_previous_probe_field_;
 
   int disable_spherical_diffusion_start_;
   int single_centred_bubble_;

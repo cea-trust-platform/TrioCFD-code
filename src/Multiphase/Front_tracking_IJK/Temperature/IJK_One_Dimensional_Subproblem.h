@@ -144,10 +144,10 @@ public :
   void prepare_temporal_schemes();
   void prepare_boundary_conditions(DoubleVect * thermal_subproblems_rhs_assembly,
                                    DoubleVect * thermal_subproblems_temperature_solution_ini,
-                                   const int& boundary_condition_interface,
+                                   int& boundary_condition_interface,
                                    const double& interfacial_boundary_condition_value,
                                    const int& impose_boundary_condition_interface_from_simulation,
-                                   const int& boundary_condition_end,
+                                   int& boundary_condition_end,
                                    const double& end_boundary_condition_value,
                                    const int& impose_user_boundary_condition_end_value);
   void compute_source_terms_impose_boundary_conditions(const int& boundary_condition_interface,
@@ -161,6 +161,7 @@ public :
   void compute_tangential_convection_source_terms_second();
   void compute_tangential_diffusion_source_terms();
   void add_source_terms(const int& boundary_condition_interface, const int& boundary_condition_end);
+  void add_source_terms_temporal_tests(const int& boundary_condition_interface, const int& boundary_condition_end);
   void compute_temporal_explicit_implicit_matrices();
   void approximate_temperature_increment_material_derivative();
   void retrieve_variables_solution_gfm_on_probes();
@@ -538,6 +539,7 @@ protected :
                                    const ArrOfDouble * bubbles_volume,
                                    const DoubleTab * rising_vectors);
   void associate_global_subproblems_parameters(const int& reconstruct_previous_probe_field,
+                                               const int& implicit_solver_from_previous_probe_field,
                                                const std::map<int, std::map<int, std::map<int, int>>>& subproblem_to_ijk_indices_previous,
                                                const std::vector<DoubleVect>& temperature_probe_previous,
                                                const std::vector<double>& indicator_probes_previous,
@@ -627,7 +629,7 @@ protected :
   void compute_temperature_integral_subproblem_probe();
   double compute_temperature_integral_subproblem(const double& distance);
 
-  enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump };
+  enum Boundary_conditions { default_bc=-1, dirichlet, neumann, flux_jump, implicit };
 
   int disable_probe_because_collision_;
   int disable_find_cell_centre_probe_tip_;
@@ -643,6 +645,8 @@ protected :
   int disable_probe_weak_gradient_local_;
 
   int reconstruct_previous_probe_field_;
+  int implicit_solver_from_previous_probe_field_;
+
   const std::map<int, std::map<int, std::map<int, int>>> * subproblem_to_ijk_indices_previous_;
   const std::vector<DoubleVect> * temperature_probes_previous_;
   const std::vector<double> * indicator_probes_previous_;

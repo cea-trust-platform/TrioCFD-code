@@ -263,11 +263,11 @@ void Corrige_flux_FT_temperature_subresolution::associate_indices_and_check_subp
 
 void Corrige_flux_FT_temperature_subresolution::clean()
 {
-  if (!distance_cell_faces_from_lrs_)
-    {
-      has_checked_consistency_=false;
-      intersection_ijk_cell_->set_pas_a_jour();
-    }
+  // if (!distance_cell_faces_from_lrs_)
+  {
+    has_checked_consistency_=false;
+    intersection_ijk_cell_->set_pas_a_jour();
+  }
 }
 
 
@@ -297,14 +297,14 @@ void Corrige_flux_FT_temperature_subresolution::compute_temperature_cell_centre(
         {
           intersection_ijk_cell_index = ijk_intersections_subproblems_indices_[i];
           dist = dist_interf(intersection_ijk_cell_index, 0);
-          temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist_sub_res);
+          temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist);
           ijk_indices_i = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 0);
           ijk_indices_j = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 1);
           ijk_indices_k = (*intersection_ijk_cell_)(intersection_ijk_cell_index, 2);
         }
       else
         {
-          temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist);
+          temperature_ghost = thermal_subproblems_->get_temperature_profile_at_point(i, dist_sub_res);
           thermal_subproblems_->get_subproblem_ijk_indices(ijk_indices_i, ijk_indices_j, ijk_indices_k, i);
         }
 

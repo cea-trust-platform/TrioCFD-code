@@ -49,6 +49,8 @@ IJK_One_Dimensional_Subproblem::IJK_One_Dimensional_Subproblem()
   disable_probe_weak_gradient_local_=0;
 
   reconstruct_previous_probe_field_ = 0;
+  implicit_solver_from_previous_probe_field_ = 0;
+
   subproblem_to_ijk_indices_previous_ = nullptr;
   temperature_probes_previous_ = nullptr;
   indicator_probes_previous_ = nullptr;
@@ -248,6 +250,7 @@ void IJK_One_Dimensional_Subproblem::associate_sub_problem_to_inputs(IJK_Thermal
                                   ref_thermal_subresolution.bubbles_volume_,
                                   ref_thermal_subresolution.rising_vectors_);
       associate_global_subproblems_parameters(ref_thermal_subresolution.reconstruct_previous_probe_field_,
+                                              ref_thermal_subresolution.implicit_solver_from_previous_probe_field_,
                                               ref_one_dimensional_subproblems.subproblem_to_ijk_indices_previous_,
                                               ref_one_dimensional_subproblems.temperature_probes_previous_,
                                               ref_one_dimensional_subproblems.indicator_probes_previous_,
@@ -595,6 +598,7 @@ void IJK_One_Dimensional_Subproblem::associate_bubble_parameters(const ArrOfDoub
 }
 
 void  IJK_One_Dimensional_Subproblem::associate_global_subproblems_parameters(const int& reconstruct_previous_probe_field,
+                                                                              const int& implicit_solver_from_previous_probe_field,
                                                                               const std::map<int, std::map<int, std::map<int, int>>>& subproblem_to_ijk_indices_previous,
                                                                               const std::vector<DoubleVect>& temperature_probe_previous,
                                                                               const std::vector<double>& indicator_probes_previous,
@@ -603,6 +607,7 @@ void  IJK_One_Dimensional_Subproblem::associate_global_subproblems_parameters(co
 
 {
   reconstruct_previous_probe_field_ = reconstruct_previous_probe_field;
+  implicit_solver_from_previous_probe_field_ = implicit_solver_from_previous_probe_field;
   subproblem_to_ijk_indices_previous_ = &subproblem_to_ijk_indices_previous;
   temperature_probes_previous_ = &temperature_probe_previous;
   indicator_probes_previous_ = &indicator_probes_previous;
@@ -2564,6 +2569,15 @@ void IJK_One_Dimensional_Subproblem::compute_radial_convection_diffusion_operato
 
 void IJK_One_Dimensional_Subproblem::prepare_temporal_schemes()
 {
+  if (implicit_solver_from_previous_probe_field_)
+    {
+      if (sub_problem_index_ == 0)
+        {
+          (*radial_convection_matrix_base_) *= (- (*alpha_) * global_time_step_);
+          (*radial_diffusion_matrix_base_) *= (- (*alpha_) * global_time_step_);
+        }
+    }
+
   if (*first_time_step_temporal_)
     {
       if (first_time_step_explicit_)
@@ -2583,14 +2597,16 @@ void IJK_One_Dimensional_Subproblem::prepare_temporal_schemes()
 
 void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect * thermal_subproblems_rhs_assembly,
                                                                  DoubleVect * thermal_subproblems_temperature_solution_ini,
-                                                                 const int& boundary_condition_interface,
+                                                                 int& boundary_condition_interface,
                                                                  const double& interfacial_boundary_condition_value,
                                                                  const int& impose_boundary_condition_interface_from_simulation,
-                                                                 const int& boundary_condition_end,
+                                                                 int& boundary_condition_end,
                                                                  const double& end_boundary_condition_value,
                                                                  const int& impose_user_boundary_condition_end_value)
 {
   interpolate_temperature_on_probe();
+  interpolate_temperature_gradient_on_probe();
+  project_temperature_gradient_on_probes();
 
   for (int i=0; i<temperature_interp_.size(); i++)
     if (fabs(temperature_interp_[i]) > INVALID_INTERP_TEST)
@@ -2603,11 +2619,50 @@ void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect * th
   if (!impose_boundary_condition_interface_from_simulation)
     interfacial_boundary_condition_value_ = interfacial_boundary_condition_value;
   else
-    interfacial_boundary_condition_value_ = temperature_interp_[0];
+    {
+      switch (boundary_condition_interface)
+        {
+        case default_bc:
+          interfacial_boundary_condition_value_ = temperature_interp_[0];
+          break;
+        case dirichlet:
+          interfacial_boundary_condition_value_ = temperature_interp_[0];
+          break;
+        case neumann:
+          interfacial_boundary_condition_value_ = normal_temperature_gradient_interp_[0];
+          break;
+        case flux_jump:
+          interfacial_boundary_condition_value_ = normal_temperature_gradient_interp_[0];
+          break;
+        default:
+          break;
+        }
+    }
+
+
   if (impose_user_boundary_condition_end_value)
     end_boundary_condition_value_ = end_boundary_condition_value;
   else
-    end_boundary_condition_value_ = temperature_interp_[temperature_interp_.size() -1];
+    {
+      switch (boundary_condition_end)
+        {
+        case default_bc:
+          end_boundary_condition_value_ = temperature_interp_[temperature_interp_.size() -1];
+          break;
+        case dirichlet:
+          end_boundary_condition_value_ = temperature_interp_[temperature_interp_.size() -1];
+          break;
+        case neumann:
+          end_boundary_condition_value_ = normal_temperature_gradient_interp_[temperature_interp_.size() -1];
+          break;
+        case flux_jump:
+          end_boundary_condition_value_ = normal_temperature_gradient_interp_[temperature_interp_.size() -1];
+          break;
+        default:
+          break;
+        }
+    }
+
 
   const int thermal_subproblems_rhs_size = (*thermal_subproblems_rhs_assembly_).size();
   if ((use_sparse_matrix_ || pre_initialise_thermal_subproblems_list_) && global_probes_characteristics_)
@@ -2619,16 +2674,27 @@ void IJK_One_Dimensional_Subproblem::prepare_boundary_conditions(DoubleVect * th
     }
   end_index_ = start_index_ + (*points_per_thermal_subproblem_);
 
+  if (implicit_solver_from_previous_probe_field_)
+    {
+      boundary_condition_end = implicit;
+      end_boundary_condition_value_ = 0.;
+    }
+
+  /*
+   * Some tests...
+   */
   if (*first_time_step_temporal_)
     {
       if (first_time_step_explicit_)
         if (!(pre_initialise_thermal_subproblems_list_ && global_probes_characteristics_))
           (*thermal_subproblems_temperature_solution_ini_).resize(thermal_subproblems_rhs_size + *points_per_thermal_subproblem_);
+
       temperature_ini_temporal_schemes_.resize(*points_per_thermal_subproblem_);
       if (boundary_condition_interface == dirichlet || boundary_condition_interface == default_bc)
         temperature_ini_temporal_schemes_[0] = interfacial_boundary_condition_value;
       else
         temperature_ini_temporal_schemes_[0] = temperature_interp_[0];
+
       double end_field_value_temporal=0.;
       if (boundary_condition_end == dirichlet || boundary_condition_end == default_bc)
         if (impose_user_boundary_condition_end_value)
@@ -2650,13 +2716,15 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
                                                                                      const double& end_boundary_condition_value,
                                                                                      const int& impose_user_boundary_condition_end_value)
 {
+  int boundary_condition_interface_local = boundary_condition_interface;
+  int boundary_condition_end_local = boundary_condition_end;
 
   prepare_boundary_conditions(thermal_subproblems_rhs_assembly_,
                               thermal_subproblems_temperature_solution_ini_,
-                              boundary_condition_interface,
+                              boundary_condition_interface_local,
                               interfacial_boundary_condition_value,
                               impose_boundary_condition_interface_from_simulation,
-                              boundary_condition_end,
+                              boundary_condition_end_local,
                               end_boundary_condition_value,
                               impose_user_boundary_condition_end_value);
 
@@ -2665,9 +2733,9 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
   (*finite_difference_assembler_).impose_boundary_conditions_subproblem(thermal_subproblems_matrix_assembly_,
                                                                         thermal_subproblems_rhs_assembly_,
                                                                         rhs_assembly_,
-                                                                        boundary_condition_interface,
+                                                                        boundary_condition_interface_local,
                                                                         interfacial_boundary_condition_value_,
-                                                                        boundary_condition_end,
+                                                                        boundary_condition_end_local,
                                                                         end_boundary_condition_value_,
                                                                         sub_problem_index_,
                                                                         dr_inv_,
@@ -2680,21 +2748,14 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms_impose_boundary_condit
 
   add_source_terms(boundary_condition_interface, boundary_condition_end);
 
-  if ((*first_time_step_temporal_) && first_time_step_explicit_)
-    (*finite_difference_assembler_).add_source_terms(thermal_subproblems_temperature_solution_ini_,
-                                                     temperature_ini_temporal_schemes_,
-                                                     start_index_,
-                                                     boundary_condition_interface,
-                                                     boundary_condition_end);
+  add_source_terms_temporal_tests(boundary_condition_interface, boundary_condition_end);
+
 }
 
 void IJK_One_Dimensional_Subproblem::compute_source_terms()
 {
   if (!pure_thermal_diffusion_ || !avoid_post_processing_all_terms_ || compute_tangential_variables_)
     {
-      interpolate_temperature_gradient_on_probe();
-      project_temperature_gradient_on_probes();
-
       //      if (source_terms_type_ == tangential_conv_2D_tangential_diffusion_3D ||
       //          source_terms_type_ == tangential_conv_3D_tangentual_diffusion_3D ||
       //          !avoid_post_processing_all_terms_)
@@ -2746,14 +2807,26 @@ void IJK_One_Dimensional_Subproblem::compute_source_terms()
           break;
         }
 
+      if (implicit_solver_from_previous_probe_field_)
+        {
+          source_terms_ *= (-1);
+          source_terms_ *= (global_time_step_ * (*alpha_));
+          source_terms_ += temperature_previous_;
+          // rhs_assembly_ = source_terms_;
+          // rhs_assembly_ += temperature_previous_;
+        }
+
       if (*first_time_step_temporal_)
         {
+          source_terms_ *= (-1);
           source_terms_ *= (local_time_step_overall_ * (*alpha_));
-          rhs_assembly_ = source_terms_;
           if (first_time_step_explicit_)
-            rhs_assembly_[0] = 0.;
+            {
+              rhs_assembly_ = source_terms_;
+              rhs_assembly_[0] = 0.;
+            }
           else
-            rhs_assembly_ += temperature_ini_temporal_schemes_;
+            source_terms_ += temperature_ini_temporal_schemes_;
         }
     }
 }
@@ -2791,10 +2864,32 @@ void IJK_One_Dimensional_Subproblem::add_source_terms(const int& boundary_condit
   if (!(*first_time_step_temporal_))
     if (!pure_thermal_diffusion_)
       (*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_,
+                                                       rhs_assembly_,
                                                        source_terms_,
                                                        start_index_,
                                                        boundary_condition_interface,
                                                        boundary_condition_end);
+}
+
+void IJK_One_Dimensional_Subproblem::add_source_terms_temporal_tests(const int& boundary_condition_interface, const int& boundary_condition_end)
+{
+  if ((*first_time_step_temporal_))
+    {
+      if (first_time_step_explicit_)
+        (*finite_difference_assembler_).add_source_terms(thermal_subproblems_temperature_solution_ini_,
+                                                         rhs_assembly_,
+                                                         temperature_ini_temporal_schemes_,
+                                                         start_index_,
+                                                         boundary_condition_interface,
+                                                         boundary_condition_end);
+      else
+        (*finite_difference_assembler_).add_source_terms(thermal_subproblems_rhs_assembly_,
+                                                         rhs_assembly_,
+                                                         source_terms_,
+                                                         start_index_,
+                                                         boundary_condition_interface,
+                                                         boundary_condition_end);
+    }
 }
 
 void IJK_One_Dimensional_Subproblem::approximate_temperature_increment_material_derivative()
@@ -2959,8 +3054,17 @@ void IJK_One_Dimensional_Subproblem::complete_tangential_source_terms_for_post_p
         case tangential_conv_3D_tangentual_diffusion_3D:
           break;
         default:
+          compute_tangential_convection_source_terms_first();
+          compute_tangential_convection_source_terms_second();
+          compute_tangential_diffusion_source_terms();
           break;
         }
+    }
+  else
+    {
+      tangential_convection_source_terms_first_.resize(*points_per_thermal_subproblem_);
+      tangential_convection_source_terms_second_.resize(*points_per_thermal_subproblem_);
+      tangential_diffusion_source_terms_.resize(*points_per_thermal_subproblem_);
     }
 }
 
@@ -3303,12 +3407,11 @@ double IJK_One_Dimensional_Subproblem::get_field_profile_at_point(const double& 
 {
   double field_value = INVALID_TEMPERATURE;
   const DoubleVect * field_ref = &field;
-  if (disable_probe_weak_gradient_local_)
+  if (disable_probe_weak_gradient_local_ && weak_gradient_variable)
     {
       if (temp_bool)
         return temperature_cell_;
-      if (disable_probe_weak_gradient_local_)
-        field_ref = &field_weak_gradient;
+      field_ref = &field_weak_gradient;
     }
   if (debug_ && temp_bool)
     {
