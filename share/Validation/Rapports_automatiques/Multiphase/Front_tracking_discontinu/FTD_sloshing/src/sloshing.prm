@@ -212,7 +212,7 @@ Chapter {
 }
 Chapter {
         Title "Conclusion - User recommendation"
-Description "We check the values of the maximas of the amplitudes. Figure 6.2 is helpful to compare computational results with experimental data."
+Description "We check the values of the maximas of the amplitudes. Figure 6.2 is helpful to compare computational results with experimental data. When droplets are ejected on the walls, they are not sufficiently resolved to get a sliding velocity. So the adherence to the wall occurs."
 }
 
 Chapter {
