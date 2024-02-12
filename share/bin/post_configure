@@ -28,6 +28,31 @@ function updateTRAD2_ajout0()
   done
 }
 
+# ---- Create an env_for_PyTools.sh
+function create_env_PyTools
+{
+   : > env_for_PyTools.sh
+   echo "#!/bin/bash" > env_for_PyTools.sh
+   echo "source $project_directory/$1/venv/bin/activate" >> env_for_PyTools.sh
+   echo "export PATH=${project_directory}/share/bin:$PATH" >> env_for_PyTools.sh
+   echo "export PYTHONPATH=${project_directory}/$1:$PYTHONPATH"  >> env_for_PyTools.sh
+}
+
+function fully_prepare_venv
+{
+   local path=$1
+   python -m venv ${project_directory}/$path/venv 
+   [ $? ] && source $project_directory/$path/venv/bin/activate \
+       && python -m pip install --upgrade pip \
+       && pip install -r $project_directory/$path/requirements.txt \
+       && deactivate
+   echo "Creating env_for_PyTools.sh in $PWD"
+   [ $? ] && create_env_PyTools $path
+   [ $? ] && echo "venv for PyTools successfully replaced" \
+          && echo "You can use PyTools after : source env_for_PyTools.sh" 
+   return 0 # ok
+}
+
 # ------------------------------------------------------------------------------ 
 # Beginnig of the script
 # ------------------------------------------------------------------------------ 
@@ -52,4 +77,46 @@ echo "export PATH=\${project_directory}/share/bin:\$PATH
 complete -F _trust triocfd" >> env_TrioCFD.sh
 echo "export PATH=\${project_directory}/share/bin:\$PATH
 complete -F _trust triocfd" >> full_env_TrioCFD.sh
+
+# --------------------------------
+# For PyTools in IJK : 
+# --------------------------------
+if [ -d "${project_directory}/share/PyTools" ]
+then
+  export project_directory=$PWD
+  for env in ${project_directory}/env_TrioCFD.sh
+  do
+     for path in share/PyTools
+     do
+         if [ -d ${project_directory}/$path ]; then
+             # test existence de l'environnement virtuel
+             if [ -d ${project_directory}/$path/venv ]; then
+                 python_version=`python --version | sed 's/ //g' | sed 's/Python//g'`
+                 venv_version=`grep ^version ${project_directory}/$path/venv/pyvenv.cfg | sed 's/version = //g'`
+                 echo "trust python version is : " $python_version
+                 echo "current venv python version is : " $venv_version
+                 if [ $python_version = $venv_version ]; then
+                      echo "venv for PyTools already set; you can use it after : source env_for_PyTools.sh"
+                 else
+                     rm -rf ${project_directory}/$path/venv && fully_prepare_venv $path
+                 fi
+             else
+                 echo "Creating venv for PyTools..." 
+                 fully_prepare_venv $path
+             fi
+         else
+             ls ${project_directory}/$path
+             echo ${project_directory}/$path
+             echo "Info : PyTools is not linked. You wont be able to run some fiches calling libraries from PyTools"
+         fi
+     done
+     echo "echo \"Optionnally: source ${project_directory}/env_for_PyTools.sh\"" >> $env
+     for path in share/bin
+     do
+        [ -d ${project_directory}/$path ] && grep "$path" $env 1>/dev/null 2>&1 || echo "export PATH=\${project_directory}/$path:\$PATH" >> $env
+     done
+  done
+fi
+
 exit 0
+

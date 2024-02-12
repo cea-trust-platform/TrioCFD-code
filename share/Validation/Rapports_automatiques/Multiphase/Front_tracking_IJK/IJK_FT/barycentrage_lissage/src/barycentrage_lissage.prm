@@ -1,4 +1,5 @@
-Parametres {
+Parametres
+{
 	Titre "Barycentrage et lissage front-tracking en IJK"
 	Description ""
 	Auteur "G.B."
@@ -8,6 +9,8 @@ Parametres {
 	CasTest . baryliss4.data 8
 	CasTest . bary6.data     8
 	CasTest . baryliss6.data 8
+
+        ExtraUsedFile init.lata.nodes init.lata.elem
 }
 
 Chapitre {

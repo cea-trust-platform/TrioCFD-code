@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2023, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,7 @@
 #include <Mod_turb_hyd_RANS_komega.h>
 
 Implemente_instanciable_sans_constructeur(Champ_Post_Operateur_Eqn,"Operateur_Eqn|Champ_Post_Operateur_Eqn",Champ_Generique_Operateur_base);
+// XD champ_post_operateur_eqn champ_post_de_champs_post operateur_eqn 1 Post-process equation operators/sources
 
 Sortie& Champ_Post_Operateur_Eqn::printOn(Sortie& s ) const
 {
@@ -50,11 +51,11 @@ Champ_Post_Operateur_Eqn::Champ_Post_Operateur_Eqn()
 void Champ_Post_Operateur_Eqn::set_param(Param& param)
 {
   Champ_Generique_Operateur_base::set_param(param);
-  param.ajouter("numero_source",&numero_source_);
-  param.ajouter("numero_op",&numero_op_);
-  param.ajouter("numero_masse",&numero_masse_);
-  param.ajouter_flag("sans_solveur_masse",&sans_solveur_masse_);
-  param.ajouter("compo",&compo_);
+  param.ajouter("numero_source",&numero_source_); // XD_ADD_P entier the source to be post-processed (its number). If you have only one source term, numero_source will correspond to 0 if you want to post-process that unique source
+  param.ajouter("numero_op",&numero_op_); // XD_ADD_P entier numero_op will be 0 (diffusive operator) or 1 (convective operator) or  2 (gradient operator) or 3 (divergence operator).
+  param.ajouter("numero_masse",&numero_masse_); // XD_ADD_P entier numero_masse will be 0 for the mass equation operator in Pb_multiphase.
+  param.ajouter_flag("sans_solveur_masse",&sans_solveur_masse_); // XD_ADD_P rien not_set
+  param.ajouter("compo",&compo_); // XD_ADD_P entier If you want to post-process only one component of a vector field, you can specify the number of the component after compo keyword. By default, it is set to -1 which means that all the components will be post-processed. This feature is not available in VDF disretization.
 }
 
 Entree& Champ_Post_Operateur_Eqn::readOn(Entree& s )
@@ -84,8 +85,7 @@ void Champ_Post_Operateur_Eqn::verification_cas_compo() const
       exit();
     }
   // Verifier qu'on n'est pas en VDF
-  const Domaine_dis_base& domaine_dis = ref_eq_.valeur().domaine_dis().valeur();
-  if ((domaine_dis.que_suis_je().debute_par("Domaine_VDF")) && (compo_ != -1 ))
+  if (ref_eq_->discretisation().is_vdf() && (compo_ != -1 ))
     {
       Cerr<<"Error in Champ_Post_Operateur_Eqn::verification_cas_compo()"<<finl;
       Cerr<<"The option compo is not available in case of VDF discretization"<<finl;
@@ -191,18 +191,18 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
   const Domaine_VF& zvf= ref_cast( Domaine_VF,ref_eq_.valeur().domaine_dis().valeur());
   if (md== zvf.face_sommets().get_md_vector())
     {
-      localisation_inco_=FACE;
+      localisation_inco_=Entity::FACE;
       ok=1;
     }
   if (md== zvf.domaine().les_elems().get_md_vector())
     {
-      localisation_inco_=ELEMENT;
+      localisation_inco_=Entity::ELEMENT;
       ok=1;
     }
   if (md == zvf.domaine().les_sommets().get_md_vector())
     {
       ok=1;
-      localisation_inco_=NODE;
+      localisation_inco_=Entity::NODE;
     }
   if (ok==0)
     {
@@ -229,13 +229,13 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ_compo_without_evaluation(C
 
   switch (localisation_inco_)
     {
-    case ELEMENT:
+    case Entity::ELEMENT:
       directive="CHAMP_ELEM";
       break;
-    case NODE:
+    case Entity::NODE:
       directive="CHAMP_SOMMETS";
       break;
-    case FACE:
+    case Entity::FACE:
       directive="CHAMP_FACE";
       break;
     default:

@@ -1,3 +1,4 @@
+# DISABLE_PARALLEL_RUN #
 Parametres {
 	Titre "Transport periodique front-tracking en IJK"
 	Description ""
@@ -6,6 +7,8 @@ Parametres {
 	CasTest . ijkft_ConvectionMultiSphere_reprise.data
 	CasTest . ijkft_ConvectionMultiSphere_par8.data 8
 	CasTest . ijkft_ConvectionMultiSphere_par8_reprise.data 8
+
+        ExtraUsedFile init.lata.nodes init.lata.elem
 }
 Chapitre {
 	Titre "Maillage genere par cree_multi_bulles.sh"

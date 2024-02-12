@@ -1,9 +1,9 @@
-#!/usr/bin/python                                        
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import numpy as np
 import os, glob, sys
-import DNSTools3 as dns
+import commons.DNSTools as dns
 
 cwd = dns.pwd()
 Lz=dns.getValue("uniform_domain_size_k", "model.data")
@@ -28,29 +28,29 @@ for cas in ["sphere", "hemisphere"]:
             for i,key in enumerate(lvar):
                icol=dvar[key]
                st="%sx_%s = m[:,%d]" %(cas[0],key,icol)
-               print "\tRunning "+st
-               exec st
+               print(("\tRunning "+st))
+               exec(st)
                st="mat[%d]=%sx_%s"%(i,cas[0],key)
-               print "\tRunning "+st
-               exec st
+               print(("\tRunning "+st))
+               exec(st)
                if icol!=0:
-                  exec "err = np.abs((%sx_%s - %s))" %(cas[0],key,key)
-		  exec "adim=np.abs(%s).max()" %(key)
-		  msg+="%10s\t%s\t%4s\t%5s\t%10.4f\t%10.4f"%(cas,translate,subfold.replace(".","SEQ"),key,err.max(),err.std())
-		  if (adim!=0):
-		     err_rel = 100.*err/adim
-		     msg +="\t%11.1f\t%11.1f\n"%(err_rel.max(),err_rel.std())
-		  else:
-		     msg +="            undef           undef\n"
-		     pass
-		  exec "err_rel = 100.*err/np.abs((1e-8+%s))" %(key)
-		  #msg+="%10s\t%s\t%4s\t%5s\t%10.4f\t%10.4f\t%11.1f\t%11.1f\n"%(cas,translate,subfold.replace(".","SEQ"),key,err.max(),err.std(),min(err_rel.max(),123456),min(err_rel.std(),123456))
+                  exec("err = np.abs((%sx_%s - %s))" %(cas[0],key,key))
+                  exec("adim=np.abs(%s).max()" %(key))
+                  msg+="%10s\t%s\t%4s\t%5s\t%10.4f\t%10.4f"%(cas,translate,subfold.replace(".","SEQ"),key,err.max(),err.std())
+                  if (adim!=0):
+                     err_rel = 100.*err/adim
+                     msg +="\t%11.1f\t%11.1f\n"%(err_rel.max(),err_rel.std())
+                  else:
+                     msg +="            undef           undef\n"
+                     pass
+                  exec("err_rel = 100.*err/np.abs((1e-8+%s))" %(key))
+                  #msg+="%10s\t%s\t%4s\t%5s\t%10.4f\t%10.4f\t%11.1f\t%11.1f\n"%(cas,translate,subfold.replace(".","SEQ"),key,err.max(),err.std(),min(err_rel.max(),123456),min(err_rel.std(),123456))
                   pass
                try:
-	          np.savetxt(os.path.join(fold,"%s.num"%cas), mat.T, header=svar.replace("coordonnee_K", "zc"))
-	       except:
-		  np.savetxt(os.path.join(fold,"%s.num"%cas), mat.T)
-		  pass
+                  np.savetxt(os.path.join(fold,"%s.num"%cas), mat.T, header=svar.replace("coordonnee_K", "zc"))
+               except:
+                  np.savetxt(os.path.join(fold,"%s.num"%cas), mat.T)
+                  pass
                pass
             pass
          pass
@@ -58,10 +58,10 @@ for cas in ["sphere", "hemisphere"]:
    pass
 
 
-print "*"*120
+print(("*"*120))
 #msg.replace("123456.0", "     NaN")
-print msg
-print "*"*120
+print(msg)
+print(("*"*120))
 f=open('resu.txt', 'w')
 f.write(msg)
 f.close()

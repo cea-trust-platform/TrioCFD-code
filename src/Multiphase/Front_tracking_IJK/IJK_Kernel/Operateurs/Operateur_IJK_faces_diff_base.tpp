@@ -132,8 +132,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_(IJK_Field_local_double& re
   // Velocity field
   ConstIJK_double_ptr vCOMPO_ptr(vCOMPO, 0, 0, k_layer);
   ConstIJK_double_ptr vDIR_ptr(vDIR, 0, 0, k_layer);
-
-  const IJK_Field_local_double dummy_field = vCOMPO;
+  const IJK_Field_local_double& dummy_field = vCOMPO;
 
 //  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_molecular_nu_tensor(_VCOMPO_, _DIR_) : get_molecular_nu(), 0, 0, k_layer);
 //  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_coeff_tensor(_VCOMPO_, _DIR_) : get_molecular_nu(), 0, 0, k_layer);
