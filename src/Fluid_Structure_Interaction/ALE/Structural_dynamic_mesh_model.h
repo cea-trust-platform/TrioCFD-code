@@ -54,7 +54,7 @@ public:
   inline double getDensity() ;
   inline double getYoungModulus() ; // Temporary for stability only
   inline double getDampingCoefficient() ;
-  inline void setMassElem(const double& mass) ;
+  inline void setMassElem(const double& elmass) ;
   inline const DoubleVect& getMeshPbPressure() const ;
   inline const DoubleVect& getMeshPbVonMises() const ;
   inline const DoubleTab& getMeshPbForceFace() const ;
@@ -266,9 +266,9 @@ inline double Structural_dynamic_mesh_model::getDampingCoefficient()
   return inertialDamping_ ;
 }
 
-inline void Structural_dynamic_mesh_model::setMassElem(const double& mass)
+inline void Structural_dynamic_mesh_model::setMassElem(const double& elmass)
 {
-  massElem_[iel_] = mass ;
+  massElem_[iel_] = elmass ;
 }
 
 inline const DoubleVect& Structural_dynamic_mesh_model::getMeshPbPressure() const
