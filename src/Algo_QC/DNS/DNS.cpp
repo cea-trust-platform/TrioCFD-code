@@ -9893,10 +9893,10 @@ void DNS_QC_double::run()
             {
               timestep_ = dt_regule;
             }
-          else // sinon on garde
-            {
-              timestep_= timestep_;
-            }
+          //else // sinon on garde
+          //  {
+          //    timestep_= timestep_;
+          //  }
 
           Cout << "T= " << current_time_
                << " dtconv= " << dt_conv
