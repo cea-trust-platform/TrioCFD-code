@@ -639,51 +639,51 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
           break ;
 
         case(1) : // Structural dynamics
+          {
+            // Tag nodes with imposed velocity
+            tag_nodes_bords = 0 ;
+            const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
+            const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+            for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
+              {
+                //for n_bord
+                const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
+                const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+                int num1 = le_bord.num_premiere_face();
+                int num2 = num1 + le_bord.nb_faces();
 
-          // Tag nodes with imposed velocity
-          tag_nodes_bords = 0 ;
-          const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
-          const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
-          for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
-            {
-              //for n_bord
-              const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-              int num1 = le_bord.num_premiere_face();
-              int num2 = num1 + le_bord.nb_faces();
+                for (int face=num1; face<num2; face++)
+                  {
+                    for(int isom=0; isom<dimension; isom++)
+                      {
+                        int som=domaine_VEF.face_sommets(face,isom);
+                        som=get_renum_som_perio(som);
+                        tag_nodes_bords[som] = 1 ;
+                      }
+                  }
+              }
 
-              for (int face=num1; face<num2; face++)
-                {
-                  int elem=domaine_VEF.face_voisins(face,0);
-                  for(int isom=0; isom<dimension; isom++)
-                    {
-                      int som=domaine_VEF.face_sommets(face,isom);
-                      som=get_renum_som_perio(som);
-                      tag_nodes_bords[som] = 1 ;
-                    }
-                }
-            }
+            tag_nodes_bords.echange_espace_virtuel() ;
 
-          tag_nodes_bords.echange_espace_virtuel() ;
+            // Initialize x with current coordinates
+            for (int i=0; i<nb_som(); i++)
+              {
+                for (int k=0; k<dimension; k++)
+                  str_mesh_model->x(i,k) = coord(i,k) ;
+              }
 
-          // Initialize x with current coordinates
-          for (int i=0; i<nb_som(); i++)
-            {
-              for (int k=0; k<dimension; k++)
-                str_mesh_model->x(i,k) = coord(i,k) ;
-            }
+            // Solve explicit dynamic problem giving mesh displacement and velocity at time "temps"
+            int nbSom = nb_som() ;
+            int nbElem = nb_elem() ;
+            int nbSomElem= nb_som_elem() ;
+            IntTab& sommets = les_elems() ;
+            int nbFace = domaine_VEF.nb_faces() ;
+            int nbSomFace = domaine_VEF.nb_som_face() ;
+            const IntTab& face_sommets = domaine_VEF.face_sommets() ;
 
-          // Solve explicit dynamic problem giving mesh displacement and velocity at time "temps"
-          int nbSom = nb_som() ;
-          int nbElem = nb_elem() ;
-          int nbSomElem= nb_som_elem() ;
-          IntTab& sommets = les_elems() ;
-          int nbFace = domaine_VEF.nb_faces() ;
-          int nbSomFace = domaine_VEF.nb_som_face() ;
-          const IntTab& face_sommets = domaine_VEF.face_sommets() ;
-
-          solveDynamicMeshProblem_(temps, vit_bords, tag_nodes_bords, vit_maillage, nbSom, nbElem, nbSomElem, sommets,
-                                   nbFace, nbSomFace, face_sommets) ;
+            solveDynamicMeshProblem_(temps, vit_bords, tag_nodes_bords, vit_maillage, nbSom, nbElem, nbSomElem, sommets,
+                                     nbFace, nbSomFace, face_sommets) ;
+          }
           break ;
 
         default :
@@ -1613,7 +1613,7 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       // Compute internal forces
       str_mesh_model->ff = 0. ;
       int nbn = str_mesh_model->getNbNodesPerElem() ;
-      int elnodes[nbn] ;
+      int elnodes[4] ;
       double volume ;
       double xlong ;
       double E ;
