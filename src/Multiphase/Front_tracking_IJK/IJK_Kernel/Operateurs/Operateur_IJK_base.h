@@ -93,9 +93,9 @@ public:
   virtual void compute_grad_z(IJK_Field_double& dx);
 protected:
   // The derived class must implement the computation of fluxes (3 fluxes, one per direction)
-  virtual void Operator_IJK_div_corr(const IJK_Field_local_double& flux_x, const IJK_Field_local_double& flux_y,
-                                     const IJK_Field_local_double& flux_zmin, const IJK_Field_local_double& flux_zmax,
-                                     IJK_Field_local_double& resu, int k_layer, bool add);
+  virtual void Operator_IJK_div(const IJK_Field_local_double& flux_x, const IJK_Field_local_double& flux_y,
+                                const IJK_Field_local_double& flux_zmin, const IJK_Field_local_double& flux_zmax,
+                                IJK_Field_local_double& resu, int k_layer, bool add);
   virtual void correct_flux(IJK_Field_local_double *const flux,	const int k_layer, const int dir) { ; };
   virtual void correct_flux_spherical(Simd_double& a, Simd_double& b, const int& i, const int& j, int k_layer, int dir) { ; };
 
