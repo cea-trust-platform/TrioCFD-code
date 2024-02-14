@@ -25,7 +25,7 @@
 #include <Param.h>
 
 Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_Bicephale,"Mod_turb_hyd_RANS_Bicephale",Modele_turbulence_hyd_base);
-// // XD mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
+// X_D mod_turb_hyd_rans_bicephale modele_turbulence_hyd_deriv mod_turb_hyd_rans_bicephale -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Mod_turb_hyd_RANS_Bicephale::Mod_turb_hyd_RANS_Bicephale()
 {
@@ -60,12 +60,12 @@ Entree& Mod_turb_hyd_RANS_Bicephale::readOn(Entree& is)
 void Mod_turb_hyd_RANS_Bicephale::set_param(Param& param)
 {
   Modele_turbulence_hyd_base::set_param(param);
-  param.ajouter("eps_min",&LeEPS_MIN); // // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
-  param.ajouter("eps_max",&LeEPS_MAX); // // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
-  param.ajouter("k_min",&LeK_MIN); // // XD_ADD_P double Lower limitation of k (default value 1.e-10).
-  param.ajouter_flag("quiet",&lquiet); // // XD_ADD_P flag To disable printing of information about k and epsilon.
-  param.ajouter("PRANDTL_K",&Prandtl_K); // // XD_ADD_P double Keyword to change the Prk value (default 1.0).
-  param.ajouter("PRANDTL_EPS",&Prandtl_Eps); // // XD_ADD_P double Keyword to change the Pre value (default 1.3)
+  param.ajouter("eps_min",&LeEPS_MIN); // // X_D_ADD_P double Lower limitation of epsilon (default value 1.e-10).
+  param.ajouter("eps_max",&LeEPS_MAX); // // X_D_ADD_P double Upper limitation of epsilon (default value 1.e+10).
+  param.ajouter("k_min",&LeK_MIN); // // X_D_ADD_P double Lower limitation of k (default value 1.e-10).
+  param.ajouter_flag("quiet",&lquiet); // // X_D_ADD_P flag To disable printing of information about k and epsilon.
+  param.ajouter("PRANDTL_K",&Prandtl_K); // // X_D_ADD_P double Keyword to change the Prk value (default 1.0).
+  param.ajouter("PRANDTL_EPS",&Prandtl_Eps); // // X_D_ADD_P double Keyword to change the Pre value (default 1.3)
 }
 
 
