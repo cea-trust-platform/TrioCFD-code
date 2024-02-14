@@ -37,17 +37,20 @@
 #include <FixedVector.h>
 #include <IJK_Field.h>
 #include <IJK_Splitting.h>
-#include <OpDiffTurbIJK.h>
-#include <OpCentre4IJK.h>
-#include <OpCentre2IJK.h>
+#include <Operateur_IJK_elem_diff_base.h>
+#include <Operateur_IJK_faces_diff.h>
+#include <Operateur_IJK_faces_conv.h>
+// #include <OpDiffTurbIJK.h>
+// #include <OpDiffTurbIJKScalar.h>
+#include <OpConvCentre4IJK.h>
+#include <OpConvCentre2IJK.h>
+#include <OpConvQuickIJKScalar.h>
+#include <OpConvQuickSharpIJK.h>
+#include <OpConvAmontIJK.h>
 #include <Multigrille_Adrien.h>
 #include <Interprete.h>
 #include <IJK_Lata_writer.h>
 #include <Linear_algebra_tools.h>
-#include <OpConvIJKQuickScalar.h>
-#include <OpConvIJKQuickSharp.h>
-#include <OpConvIJKAmont.h>
-#include <OpDiffTurbIJKScalar.h>
 #include <Parser.h>
 #include <Boundary_Conditions.h>
 #include <Statistiques_dns_qc_ijk.h>
@@ -356,15 +359,15 @@ protected:
   OpConvCentre4IJK_double velocity_convection_op_;
   OpConvCentre2IJK_double velocity_convection_op_centre_2_;
 
-  OpConvIJKQuickSharp_double velocity_convection_op_quicksharp_;
+  OpConvQuickSharpIJK_double velocity_convection_op_quicksharp_;
   OpConvAmontIJK_double velocity_convection_op_amont_;
 
-  OpConvIJKQuickScalar_double rho_convection_op_;
+  OpConvQuickIJKScalar_double rho_convection_op_;
   OpConvCentre2IJKScalar_double rho_convection_op_centre2_;
   OpConvCentre4IJK_double rho_convection_op_centre4_;
   OpConvAmontIJK_double rho_convection_op_amont_;
   OpDiffIJKScalar_double operateur_diffusion_temperature_;
-  OpDiffIJKScalarStructuralOnly_double operateur_diffusion_temperature_structural_;
+  OpDiffStructuralOnlyIJKScalar_double operateur_diffusion_temperature_structural_;
   Multigrille_Adrien poisson_solver_;
 
   // Simulation parameters

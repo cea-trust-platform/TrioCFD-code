@@ -13,18 +13,20 @@
 *
 *****************************************************************************/
 
-#ifndef OpCentre2IJK_H
-#define OpCentre2IJK_H
+#ifndef OpConvCentre2IJK_H
+#define OpConvCentre2IJK_H
 
-#include <OpConvIJKFacesCommon.h>
+#include <Operateur_IJK_faces_conv_base.h>
 #include <Boundary_Conditions.h>
 #include <Boundary_Conditions_Thermique.h>
 
-class OpConvCentre2IJK_double : public OpConvIJKFacesCommon_double
+class OpConvCentre2IJK_double : public Operateur_IJK_faces_conv_base_double
 {
+  Declare_instanciable(OpConvCentre2IJK_double);
 public:
-  void initialize(const IJK_Splitting& splitting, const Boundary_Conditions& bc);
-  void initialize(const IJK_Splitting& splitting, const Boundary_Conditions_Thermique& bc);
+  inline void set_bc(const Boundary_Conditions& bc) override { ref_bc_ = bc; };
+  inline void set_bc_thermique(const Boundary_Conditions_Thermique& bc_th) override { ref_bc_Thermique_ = bc_th; };
+  void initialize(const IJK_Splitting& splitting) override;
   void calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
                 const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
@@ -35,11 +37,11 @@ public:
   void calculer_avec_u_div_rhou(const IJK_Field_double& rhovx, const IJK_Field_double& rhovy, const IJK_Field_double& rhovz,
                                 const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                 IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz,
-                                IJK_Field_double& div_rho_u);
+                                IJK_Field_double& div_rho_u) override;
   void ajouter_avec_u_div_rhou(const IJK_Field_double& rhovx, const IJK_Field_double& rhovy, const IJK_Field_double& rhovz,
                                const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz,
-                               IJK_Field_double& div_rho_u);
+                               IJK_Field_double& div_rho_u) override;
 protected:
   inline void compute_flux_x_vx(IJK_Field_local_double& resu, const int k_layer) override
   {
@@ -124,5 +126,5 @@ private:
 
 };
 
-#include <OpCentre2IJK.tpp>
+#include <OpConvCentre2IJK.tpp>
 #endif

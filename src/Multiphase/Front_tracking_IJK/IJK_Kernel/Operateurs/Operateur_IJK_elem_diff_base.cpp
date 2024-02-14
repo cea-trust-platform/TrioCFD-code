@@ -87,7 +87,7 @@ void Operateur_IJK_elem_diff_base_double::calculer(const IJK_Field_double& field
   boundary_flux_kmax_ = &boundary_flux_kmax;
   compute_set(result);
   input_field_ = nullptr;
-  lambda_ = nullptr;
+  lambda_ = nullptr; // TODO: Why reset to nullptr? we could attribute it once only at initialize and never change it later. What was the reason?
   coeff_field_x_ = nullptr;
   coeff_field_y_ = nullptr;
   coeff_field_z_ = nullptr;

@@ -9437,17 +9437,20 @@ void DNS_QC_double::run()
   if (type_velocity_diffusion_ == Nom("simple"))
     {
       Cerr << "The diffusion is 'simple': the flux is 'molecular_mu * grad u'" << finl;
-      velocity_diffusion_op_simple_.initialize(splitting_, boundary_conditions_);
+      velocity_diffusion_op_simple_.set_bc(boundary_conditions_);
+      velocity_diffusion_op_simple_.initialize(splitting_);
     }
   else if (type_velocity_diffusion_ == Nom("simple_with_transpose"))
     {
       Cerr << "The diffusion is 'simple_with_transpose': the flux is 'molecular_mu * (grad u + grad^T u)'" << finl;
-      velocity_diffusion_op_simple_with_transpose_.initialize(splitting_, boundary_conditions_);
+      velocity_diffusion_op_simple_with_transpose_.set_bc(boundary_conditions_);
+      velocity_diffusion_op_simple_with_transpose_.initialize(splitting_);
     }
   else if (type_velocity_diffusion_ == Nom("full"))
     {
       Cerr << "The diffusion is 'full': the flux is 'molecular_mu * (grad u + grad^T u - 2/3 * div u * Id)'" << finl;
-      velocity_diffusion_op_full_.initialize(splitting_, boundary_conditions_);
+      velocity_diffusion_op_full_.set_bc(boundary_conditions_);
+      velocity_diffusion_op_full_.initialize(splitting_);
     }
   else if (type_velocity_diffusion_ == Nom("none"))
     {
@@ -9462,32 +9465,38 @@ void DNS_QC_double::run()
   if (type_velocity_turbulent_diffusion_ == Nom("simple"))
     {
       Cerr << "The velocity turbulent diffusion is 'simple': the flux is 'turbulent_mu * grad u'" << finl;
-      velocity_turbulent_diffusion_op_simple_.initialize(splitting_, boundary_conditions_);
+      velocity_turbulent_diffusion_op_simple_.set_bc(boundary_conditions_);
+      velocity_turbulent_diffusion_op_simple_.initialize(splitting_);
     }
   else if (type_velocity_turbulent_diffusion_ == Nom("simple_with_transpose"))
     {
       Cerr << "The velocity turbulent diffusion is 'simple_with_transpose': the flux is 'turbulent_mu * (grad u + grad^T u)'" << finl;
-      velocity_turbulent_diffusion_op_simple_with_transpose_.initialize(splitting_, boundary_conditions_);
+      velocity_turbulent_diffusion_op_simple_with_transpose_.set_bc(boundary_conditions_);
+      velocity_turbulent_diffusion_op_simple_with_transpose_.initialize(splitting_);
     }
   else if (type_velocity_turbulent_diffusion_ == Nom("full"))
     {
       Cerr << "The velocity turbulent diffusion is 'full': the flux is 'turbulent_mu * (grad u + grad^T u - 2/3 * div u * Id)'" << finl;
-      velocity_turbulent_diffusion_op_full_.initialize(splitting_, boundary_conditions_);
+      velocity_turbulent_diffusion_op_full_.set_bc(boundary_conditions_);
+      velocity_turbulent_diffusion_op_full_.initialize(splitting_);
     }
   else if (type_velocity_turbulent_diffusion_ == Nom("simple_anisotropic"))
     {
       Cerr << "The velocity turbulent diffusion is 'simple_anisotropic': the flux is 'turbulent_mu^a * grad^a u' where (grad^a)_i = Delta_i (grad)_i" << finl;
-      velocity_turbulent_diffusion_op_simple_anisotropic_.initialize(splitting_, boundary_conditions_);
+      velocity_turbulent_diffusion_op_simple_anisotropic_.set_bc(boundary_conditions_);
+      velocity_turbulent_diffusion_op_simple_anisotropic_.initialize(splitting_);
     }
   else if (type_velocity_turbulent_diffusion_ == Nom("simple_with_transpose_anisotropic"))
     {
       Cerr << "The velocity turbulent diffusion is 'simple_with_transpose_anisotropic': the flux is 'turbulent_mu^a * (grad^a u + grad^a^T u)' where (grad^a)_i = Delta_i (grad)_i" << finl;
-      velocity_turbulent_diffusion_op_simple_with_transpose_anisotropic_.initialize(splitting_, boundary_conditions_);
+      velocity_turbulent_diffusion_op_simple_with_transpose_anisotropic_.set_bc(boundary_conditions_);
+      velocity_turbulent_diffusion_op_simple_with_transpose_anisotropic_.initialize(splitting_);
     }
   else if (type_velocity_turbulent_diffusion_ == Nom("full_anisotropic"))
     {
       Cerr << "The velocity turbulent diffusion is 'full_anisotropic': the flux is 'turbulent_mu^a * (grad^a u + grad^a^T u - 2/3 * div^a u * Id)' where (grad^a)_i = Delta_i (grad)_i" << finl;
-      velocity_turbulent_diffusion_op_full_anisotropic_.initialize(splitting_, boundary_conditions_);
+      velocity_turbulent_diffusion_op_full_anisotropic_.set_bc(boundary_conditions_);
+      velocity_turbulent_diffusion_op_full_anisotropic_.initialize(splitting_);
     }
   else if (type_velocity_turbulent_diffusion_ == Nom("none"))
     {
@@ -9509,7 +9518,8 @@ void DNS_QC_double::run()
       Cerr << " yz: " << structural_uu_tensor_coefficients_[4];
       Cerr << " zz: " << structural_uu_tensor_coefficients_[5];
       Cerr << finl;
-      velocity_turbulent_diffusion_op_structural_.initialize(splitting_, boundary_conditions_);
+      velocity_turbulent_diffusion_op_structural_.set_bc(boundary_conditions_);
+      velocity_turbulent_diffusion_op_structural_.initialize(splitting_);
     }
 
   if (structural_uscalar_)
@@ -9629,12 +9639,14 @@ void DNS_QC_double::run()
     }
   else if (convection_velocity_centre2_)
     {
-      velocity_convection_op_centre_2_.initialize(splitting_, boundary_conditions_);
+      velocity_convection_op_centre_2_.initialize(splitting_);
+      velocity_convection_op_centre_2_.set_bc(boundary_conditions_);
     }
   else
     {
       // Schema centre4 (utilise par defaut)
-      velocity_convection_op_.initialize(splitting_, boundary_conditions_);
+      velocity_convection_op_.initialize(splitting_);
+      velocity_convection_op_.set_bc(boundary_conditions_);
     }
 
   if (convection_rho_centre2_)
@@ -9648,7 +9660,8 @@ void DNS_QC_double::run()
   else if (convection_rho_centre4_)
     {
       // ATTENTION le schema centre 4 OpCentre4IJK a ete modifie pour devenir un centre 2
-      rho_convection_op_centre4_.initialize(splitting_, boundary_conditions_);
+      rho_convection_op_centre4_.initialize(splitting_);
+      rho_convection_op_centre4_.set_bc(boundary_conditions_);
     }
   else
     {
@@ -10100,41 +10113,41 @@ void DNS_QC_double::run()
 }
 
 
-// int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax)
-// {
-//   const int kmin = temperature.get_splitting().get_offset_local(DIRECTION_K);
-//   const int nktot = temperature.get_splitting().get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_K);
-//   int k;
-//   // calcul l'indice k de la couche de mailles voisine du bord. Si je n'ai pas de bord, on met k = -1
-//   if (!bord_kmax)
-//     {
-//       // on veut le bord "k_global = 0"
-//       if (kmin == 0)
-//         {
-//           // ce bord est chez moi... et il est en k=0
-//           k = 0;
-//         }
-//       else
-//         {
-//           // ce bord n'est pas chez moi
-//           k = -1;
-//         }
-//     }
-//   else
-//     {
-//       // on veut le bord kmax
-//       if (kmin + temperature.nk() == nktot)
-//         {
-//           // ce bord est chez moi... et il est en k= truc...
-//           k = temperature.nk() - 1;
-//         }
-//       else
-//         {
-//           k = -1;
-//         }
-//     }
-//   return k;
-// }
+int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax)
+{
+  const int kmin = temperature.get_splitting().get_offset_local(DIRECTION_K);
+  const int nktot = temperature.get_splitting().get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_K);
+  int k;
+  // calcul l'indice k de la couche de mailles voisine du bord. Si je n'ai pas de bord, on met k = -1
+  if (!bord_kmax)
+    {
+      // on veut le bord "k_global = 0"
+      if (kmin == 0)
+        {
+          // ce bord est chez moi... et il est en k=0
+          k = 0;
+        }
+      else
+        {
+          // ce bord n'est pas chez moi
+          k = -1;
+        }
+    }
+  else
+    {
+      // on veut le bord kmax
+      if (kmin + temperature.nk() == nktot)
+        {
+          // ce bord est chez moi... et il est en k= truc...
+          k = temperature.nk() - 1;
+        }
+      else
+        {
+          k = -1;
+        }
+    }
+  return k;
+}
 
 // valeur de retour: indice local du plan de temperature voisin utilise,
 //  -1 si on n'a pas le bord sur ce processeur
@@ -10490,30 +10503,30 @@ void DNS_QC_double::calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_d
     {
       if (type_velocity_turbulent_diffusion_ == Nom("simple"))
         {
+          velocity_turbulent_diffusion_op_simple_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                  turbulent_mu_xy,
+                                                                  turbulent_mu_xz,
+                                                                  turbulent_mu_yx,
+                                                                  turbulent_mu_yy,
+                                                                  turbulent_mu_yz,
+                                                                  turbulent_mu_zx,
+                                                                  turbulent_mu_zy,
+                                                                  turbulent_mu_zz);
           velocity_turbulent_diffusion_op_simple_.calculer(velocity[0], velocity[1], velocity[2],
-                                                           turbulent_mu_xx,
-                                                           turbulent_mu_xy,
-                                                           turbulent_mu_xz,
-                                                           turbulent_mu_yx,
-                                                           turbulent_mu_yy,
-                                                           turbulent_mu_yz,
-                                                           turbulent_mu_zx,
-                                                           turbulent_mu_zy,
-                                                           turbulent_mu_zz,
                                                            d_velocity_tmp[0], d_velocity_tmp[1], d_velocity_tmp[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("simple_with_transpose"))
         {
+          velocity_turbulent_diffusion_op_simple_with_transpose_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                                 turbulent_mu_xy,
+                                                                                 turbulent_mu_xz,
+                                                                                 turbulent_mu_yx,
+                                                                                 turbulent_mu_yy,
+                                                                                 turbulent_mu_yz,
+                                                                                 turbulent_mu_zx,
+                                                                                 turbulent_mu_zy,
+                                                                                 turbulent_mu_zz);
           velocity_turbulent_diffusion_op_simple_with_transpose_.calculer(velocity[0], velocity[1], velocity[2],
-                                                                          turbulent_mu_xx,
-                                                                          turbulent_mu_xy,
-                                                                          turbulent_mu_xz,
-                                                                          turbulent_mu_yx,
-                                                                          turbulent_mu_yy,
-                                                                          turbulent_mu_yz,
-                                                                          turbulent_mu_zx,
-                                                                          turbulent_mu_zy,
-                                                                          turbulent_mu_zz,
                                                                           d_velocity_tmp[0], d_velocity_tmp[1], d_velocity_tmp[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("full"))
@@ -10523,45 +10536,45 @@ void DNS_QC_double::calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_d
           velocity[2].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/
           compute_divergence(velocity[0], velocity[1], velocity[2], divergence_);
           divergence_.echange_espace_virtuel(1);
+          velocity_turbulent_diffusion_op_full_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                turbulent_mu_xy,
+                                                                turbulent_mu_xz,
+                                                                turbulent_mu_yx,
+                                                                turbulent_mu_yy,
+                                                                turbulent_mu_yz,
+                                                                turbulent_mu_zx,
+                                                                turbulent_mu_zy,
+                                                                turbulent_mu_zz);
+          velocity_turbulent_diffusion_op_full_.set_divergence(divergence_);
           velocity_turbulent_diffusion_op_full_.calculer(velocity[0], velocity[1], velocity[2],
-                                                         turbulent_mu_xx,
-                                                         turbulent_mu_xy,
-                                                         turbulent_mu_xz,
-                                                         turbulent_mu_yx,
-                                                         turbulent_mu_yy,
-                                                         turbulent_mu_yz,
-                                                         turbulent_mu_zx,
-                                                         turbulent_mu_zy,
-                                                         turbulent_mu_zz,
-                                                         divergence_,
                                                          d_velocity_tmp[0], d_velocity_tmp[1], d_velocity_tmp[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("simple_anisotropic"))
         {
+          velocity_turbulent_diffusion_op_simple_anisotropic_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                              turbulent_mu_xy,
+                                                                              turbulent_mu_xz,
+                                                                              turbulent_mu_yx,
+                                                                              turbulent_mu_yy,
+                                                                              turbulent_mu_yz,
+                                                                              turbulent_mu_zx,
+                                                                              turbulent_mu_zy,
+                                                                              turbulent_mu_zz);
           velocity_turbulent_diffusion_op_simple_anisotropic_.calculer(velocity[0], velocity[1], velocity[2],
-                                                                       turbulent_mu_xx,
-                                                                       turbulent_mu_xy,
-                                                                       turbulent_mu_xz,
-                                                                       turbulent_mu_yx,
-                                                                       turbulent_mu_yy,
-                                                                       turbulent_mu_yz,
-                                                                       turbulent_mu_zx,
-                                                                       turbulent_mu_zy,
-                                                                       turbulent_mu_zz,
                                                                        d_velocity_tmp[0], d_velocity_tmp[1], d_velocity_tmp[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("simple_with_transpose_anisotropic"))
         {
+          velocity_turbulent_diffusion_op_simple_with_transpose_anisotropic_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                                             turbulent_mu_xy,
+                                                                                             turbulent_mu_xz,
+                                                                                             turbulent_mu_yx,
+                                                                                             turbulent_mu_yy,
+                                                                                             turbulent_mu_yz,
+                                                                                             turbulent_mu_zx,
+                                                                                             turbulent_mu_zy,
+                                                                                             turbulent_mu_zz);
           velocity_turbulent_diffusion_op_simple_with_transpose_anisotropic_.calculer(velocity[0], velocity[1], velocity[2],
-                                                                                      turbulent_mu_xx,
-                                                                                      turbulent_mu_xy,
-                                                                                      turbulent_mu_xz,
-                                                                                      turbulent_mu_yx,
-                                                                                      turbulent_mu_yy,
-                                                                                      turbulent_mu_yz,
-                                                                                      turbulent_mu_zx,
-                                                                                      turbulent_mu_zy,
-                                                                                      turbulent_mu_zz,
                                                                                       d_velocity_tmp[0], d_velocity_tmp[1], d_velocity_tmp[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("full_anisotropic"))
@@ -10571,17 +10584,17 @@ void DNS_QC_double::calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_d
           velocity[2].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/
           compute_divergence(velocity[0], velocity[1], velocity[2], divergence_);
           divergence_.echange_espace_virtuel(1);
+          velocity_turbulent_diffusion_op_full_anisotropic_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                            turbulent_mu_xy,
+                                                                            turbulent_mu_xz,
+                                                                            turbulent_mu_yx,
+                                                                            turbulent_mu_yy,
+                                                                            turbulent_mu_yz,
+                                                                            turbulent_mu_zx,
+                                                                            turbulent_mu_zy,
+                                                                            turbulent_mu_zz);
+          velocity_turbulent_diffusion_op_full_anisotropic_.set_divergence(divergence_);
           velocity_turbulent_diffusion_op_full_anisotropic_.calculer(velocity[0], velocity[1], velocity[2],
-                                                                     turbulent_mu_xx,
-                                                                     turbulent_mu_xy,
-                                                                     turbulent_mu_xz,
-                                                                     turbulent_mu_yx,
-                                                                     turbulent_mu_yy,
-                                                                     turbulent_mu_yz,
-                                                                     turbulent_mu_zx,
-                                                                     turbulent_mu_zy,
-                                                                     turbulent_mu_zz,
-                                                                     divergence_,
                                                                      d_velocity_tmp[0], d_velocity_tmp[1], d_velocity_tmp[2]);
         }
       else
@@ -10605,30 +10618,30 @@ void DNS_QC_double::calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_d
     {
       if (type_velocity_turbulent_diffusion_ == Nom("simple"))
         {
+          velocity_turbulent_diffusion_op_simple_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                  turbulent_mu_xy,
+                                                                  turbulent_mu_xz,
+                                                                  turbulent_mu_yx,
+                                                                  turbulent_mu_yy,
+                                                                  turbulent_mu_yz,
+                                                                  turbulent_mu_zx,
+                                                                  turbulent_mu_zy,
+                                                                  turbulent_mu_zz);
           velocity_turbulent_diffusion_op_simple_.ajouter(velocity[0], velocity[1], velocity[2],
-                                                          turbulent_mu_xx,
-                                                          turbulent_mu_xy,
-                                                          turbulent_mu_xz,
-                                                          turbulent_mu_yx,
-                                                          turbulent_mu_yy,
-                                                          turbulent_mu_yz,
-                                                          turbulent_mu_zx,
-                                                          turbulent_mu_zy,
-                                                          turbulent_mu_zz,
                                                           d_velocity[0], d_velocity[1], d_velocity[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("simple_with_transpose"))
         {
+          velocity_turbulent_diffusion_op_simple_with_transpose_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                                 turbulent_mu_xy,
+                                                                                 turbulent_mu_xz,
+                                                                                 turbulent_mu_yx,
+                                                                                 turbulent_mu_yy,
+                                                                                 turbulent_mu_yz,
+                                                                                 turbulent_mu_zx,
+                                                                                 turbulent_mu_zy,
+                                                                                 turbulent_mu_zz);
           velocity_turbulent_diffusion_op_simple_with_transpose_.ajouter(velocity[0], velocity[1], velocity[2],
-                                                                         turbulent_mu_xx,
-                                                                         turbulent_mu_xy,
-                                                                         turbulent_mu_xz,
-                                                                         turbulent_mu_yx,
-                                                                         turbulent_mu_yy,
-                                                                         turbulent_mu_yz,
-                                                                         turbulent_mu_zx,
-                                                                         turbulent_mu_zy,
-                                                                         turbulent_mu_zz,
                                                                          d_velocity[0], d_velocity[1], d_velocity[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("full"))
@@ -10638,45 +10651,45 @@ void DNS_QC_double::calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_d
           velocity[2].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/
           compute_divergence(velocity[0], velocity[1], velocity[2], divergence_);
           divergence_.echange_espace_virtuel(1);
+          velocity_turbulent_diffusion_op_full_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                turbulent_mu_xy,
+                                                                turbulent_mu_xz,
+                                                                turbulent_mu_yx,
+                                                                turbulent_mu_yy,
+                                                                turbulent_mu_yz,
+                                                                turbulent_mu_zx,
+                                                                turbulent_mu_zy,
+                                                                turbulent_mu_zz);
+          velocity_turbulent_diffusion_op_full_.set_divergence(divergence_);
           velocity_turbulent_diffusion_op_full_.ajouter(velocity[0], velocity[1], velocity[2],
-                                                        turbulent_mu_xx,
-                                                        turbulent_mu_xy,
-                                                        turbulent_mu_xz,
-                                                        turbulent_mu_yx,
-                                                        turbulent_mu_yy,
-                                                        turbulent_mu_yz,
-                                                        turbulent_mu_zx,
-                                                        turbulent_mu_zy,
-                                                        turbulent_mu_zz,
-                                                        divergence_,
                                                         d_velocity[0], d_velocity[1], d_velocity[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("simple_anisotropic"))
         {
+          velocity_turbulent_diffusion_op_simple_anisotropic_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                              turbulent_mu_xy,
+                                                                              turbulent_mu_xz,
+                                                                              turbulent_mu_yx,
+                                                                              turbulent_mu_yy,
+                                                                              turbulent_mu_yz,
+                                                                              turbulent_mu_zx,
+                                                                              turbulent_mu_zy,
+                                                                              turbulent_mu_zz);
           velocity_turbulent_diffusion_op_simple_anisotropic_.ajouter(velocity[0], velocity[1], velocity[2],
-                                                                      turbulent_mu_xx,
-                                                                      turbulent_mu_xy,
-                                                                      turbulent_mu_xz,
-                                                                      turbulent_mu_yx,
-                                                                      turbulent_mu_yy,
-                                                                      turbulent_mu_yz,
-                                                                      turbulent_mu_zx,
-                                                                      turbulent_mu_zy,
-                                                                      turbulent_mu_zz,
                                                                       d_velocity[0], d_velocity[1], d_velocity[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("simple_with_transpose_anisotropic"))
         {
+          velocity_turbulent_diffusion_op_simple_with_transpose_anisotropic_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                                             turbulent_mu_xy,
+                                                                                             turbulent_mu_xz,
+                                                                                             turbulent_mu_yx,
+                                                                                             turbulent_mu_yy,
+                                                                                             turbulent_mu_yz,
+                                                                                             turbulent_mu_zx,
+                                                                                             turbulent_mu_zy,
+                                                                                             turbulent_mu_zz);
           velocity_turbulent_diffusion_op_simple_with_transpose_anisotropic_.ajouter(velocity[0], velocity[1], velocity[2],
-                                                                                     turbulent_mu_xx,
-                                                                                     turbulent_mu_xy,
-                                                                                     turbulent_mu_xz,
-                                                                                     turbulent_mu_yx,
-                                                                                     turbulent_mu_yy,
-                                                                                     turbulent_mu_yz,
-                                                                                     turbulent_mu_zx,
-                                                                                     turbulent_mu_zy,
-                                                                                     turbulent_mu_zz,
                                                                                      d_velocity[0], d_velocity[1], d_velocity[2]);
         }
       else if (type_velocity_turbulent_diffusion_ == Nom("full_anisotropic"))
@@ -10686,17 +10699,17 @@ void DNS_QC_double::calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_d
           velocity[2].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/
           compute_divergence(velocity[0], velocity[1], velocity[2], divergence_);
           divergence_.echange_espace_virtuel(1);
+          velocity_turbulent_diffusion_op_full_anisotropic_.set_coeff_x_y_z(turbulent_mu_xx,
+                                                                            turbulent_mu_xy,
+                                                                            turbulent_mu_xz,
+                                                                            turbulent_mu_yx,
+                                                                            turbulent_mu_yy,
+                                                                            turbulent_mu_yz,
+                                                                            turbulent_mu_zx,
+                                                                            turbulent_mu_zy,
+                                                                            turbulent_mu_zz);
+          velocity_turbulent_diffusion_op_full_anisotropic_.set_divergence(divergence_);
           velocity_turbulent_diffusion_op_full_anisotropic_.ajouter(velocity[0], velocity[1], velocity[2],
-                                                                    turbulent_mu_xx,
-                                                                    turbulent_mu_xy,
-                                                                    turbulent_mu_xz,
-                                                                    turbulent_mu_yx,
-                                                                    turbulent_mu_yy,
-                                                                    turbulent_mu_yz,
-                                                                    turbulent_mu_zx,
-                                                                    turbulent_mu_zy,
-                                                                    turbulent_mu_zz,
-                                                                    divergence_,
                                                                     d_velocity[0], d_velocity[1], d_velocity[2]);
         }
       else
@@ -10733,16 +10746,16 @@ void DNS_QC_double::calculer_structural_diffusion_vitesse(FixedVector<IJK_Field_
   int ghost_size_d_velocity_tmp;
   if (flag_filtrage_structural_diffusion_qdm_)
     {
+      velocity_turbulent_diffusion_op_structural_.set_coeff_x_y_z(structural_uu_xx,
+                                                                  structural_uu_xy,
+                                                                  structural_uu_xz,
+                                                                  structural_uu_yx,
+                                                                  structural_uu_yy,
+                                                                  structural_uu_yz,
+                                                                  structural_uu_zx,
+                                                                  structural_uu_zy,
+                                                                  structural_uu_zz);
       velocity_turbulent_diffusion_op_structural_.calculer(velocity[0], velocity[1], velocity[2],
-                                                           structural_uu_xx,
-                                                           structural_uu_xy,
-                                                           structural_uu_xz,
-                                                           structural_uu_yx,
-                                                           structural_uu_yy,
-                                                           structural_uu_yz,
-                                                           structural_uu_zx,
-                                                           structural_uu_zy,
-                                                           structural_uu_zz,
                                                            d_velocity_tmp[0], d_velocity_tmp[1], d_velocity_tmp[2]);
 
       ghost_size_filter = 1 + kernel->ghost_size();
@@ -10758,16 +10771,16 @@ void DNS_QC_double::calculer_structural_diffusion_vitesse(FixedVector<IJK_Field_
     }
   else
     {
+      velocity_turbulent_diffusion_op_structural_.set_coeff_x_y_z(structural_uu_xx,
+                                                                  structural_uu_xy,
+                                                                  structural_uu_xz,
+                                                                  structural_uu_yx,
+                                                                  structural_uu_yy,
+                                                                  structural_uu_yz,
+                                                                  structural_uu_zx,
+                                                                  structural_uu_zy,
+                                                                  structural_uu_zz);
       velocity_turbulent_diffusion_op_structural_.ajouter(velocity[0], velocity[1], velocity[2],
-                                                          structural_uu_xx,
-                                                          structural_uu_xy,
-                                                          structural_uu_xz,
-                                                          structural_uu_yx,
-                                                          structural_uu_yy,
-                                                          structural_uu_yz,
-                                                          structural_uu_zx,
-                                                          structural_uu_zy,
-                                                          structural_uu_zz,
                                                           d_velocity[0], d_velocity[1], d_velocity[2]);
     }
 }
@@ -10782,19 +10795,19 @@ void DNS_QC_double::calculer_diffusion_scalar(const IJK_Field_double& rho,
 {
   if (type_scalar_turbulent_diffusion_ == Nom("normal"))
     {
+      operateur_diffusion_turbulent_scalar_.set_coeff_x_y_z(turbulent_kappa_x,
+                                                            turbulent_kappa_y,
+                                                            turbulent_kappa_z);
       operateur_diffusion_turbulent_scalar_.ajouter(rho,
-                                                    turbulent_kappa_x,
-                                                    turbulent_kappa_y,
-                                                    turbulent_kappa_z,
                                                     d_rho,
                                                     boundary_flux_kmin, boundary_flux_kmax);
     }
   else if (type_scalar_turbulent_diffusion_ == Nom("anisotropic"))
     {
+      operateur_diffusion_turbulent_scalar_anisotropic_.set_coeff_x_y_z(turbulent_kappa_x,
+                                                                        turbulent_kappa_y,
+                                                                        turbulent_kappa_z);
       operateur_diffusion_turbulent_scalar_anisotropic_.ajouter(rho,
-                                                                turbulent_kappa_x,
-                                                                turbulent_kappa_y,
-                                                                turbulent_kappa_z,
                                                                 d_rho,
                                                                 boundary_flux_kmin, boundary_flux_kmax);
     }
@@ -11044,11 +11057,10 @@ void DNS_QC_double::rk3_sub_step(const int rk_step, const double total_timestep)
           DebogIJK::verifier("structural_uscalar_x", structural_uscalar_vector_[0]);
           DebogIJK::verifier("structural_uscalar_y", structural_uscalar_vector_[1]);
           DebogIJK::verifier("structural_uscalar_z", structural_uscalar_vector_[2]);
-
+          operateur_diffusion_temperature_structural_.set_coeff_x_y_z(structural_uscalar_vector_[0],
+                                                                      structural_uscalar_vector_[1],
+                                                                      structural_uscalar_vector_[2]);
           operateur_diffusion_temperature_structural_.ajouter(rho_,
-                                                              structural_uscalar_vector_[0],
-                                                              structural_uscalar_vector_[1],
-                                                              structural_uscalar_vector_[2],
                                                               d_rho_,
                                                               boundary_flux_kmin_, boundary_flux_kmax_);
 
@@ -11261,14 +11273,14 @@ void DNS_QC_double::rk3_sub_step(const int rk_step, const double total_timestep)
     {
       if (type_velocity_diffusion_ == Nom("simple"))
         {
+          velocity_diffusion_op_simple_.set_nu(molecular_mu_);
           velocity_diffusion_op_simple_.calculer(velocity_[0], velocity_[1], velocity_[2],
-                                                 molecular_mu_,
                                                  d_velocity_[0], d_velocity_[1], d_velocity_[2]);
         }
       else if (type_velocity_diffusion_ == Nom("simple_with_transpose"))
         {
+          velocity_diffusion_op_simple_with_transpose_.set_nu(molecular_mu_);
           velocity_diffusion_op_simple_with_transpose_.calculer(velocity_[0], velocity_[1], velocity_[2],
-                                                                molecular_mu_,
                                                                 d_velocity_[0], d_velocity_[1], d_velocity_[2]);
         }
       else if (type_velocity_diffusion_ == Nom("full"))
@@ -11278,9 +11290,9 @@ void DNS_QC_double::rk3_sub_step(const int rk_step, const double total_timestep)
           velocity_[2].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/
           compute_divergence(velocity_[0], velocity_[1], velocity_[2], divergence_);
           divergence_.echange_espace_virtuel(1);
+          velocity_diffusion_op_full_.set_nu(molecular_mu_);
+          velocity_diffusion_op_full_.set_divergence(divergence_);
           velocity_diffusion_op_full_.calculer(velocity_[0], velocity_[1], velocity_[2],
-                                               molecular_mu_,
-                                               divergence_,
                                                d_velocity_[0], d_velocity_[1], d_velocity_[2]);
         }
       else if (type_velocity_diffusion_ == Nom("none"))
@@ -11783,8 +11795,8 @@ void DNS_QC_double::rk3_sub_step(const int rk_step, const double total_timestep)
     }
   else
     {
+      operateur_diffusion_temperature_.set_lambda(molecular_lambda_);
       operateur_diffusion_temperature_.calculer(temperature_,
-                                                molecular_lambda_,
                                                 div_lambda_grad_T_volume_,
                                                 boundary_flux_kmin_, boundary_flux_kmax_);
     }
@@ -11869,11 +11881,10 @@ void DNS_QC_double::rk3_sub_step(const int rk_step, const double total_timestep)
           DebogIJK::verifier("structural_uscalar_x", structural_uscalar_vector_[0]);
           DebogIJK::verifier("structural_uscalar_y", structural_uscalar_vector_[1]);
           DebogIJK::verifier("structural_uscalar_z", structural_uscalar_vector_[2]);
-
+          operateur_diffusion_temperature_structural_.set_coeff_x_y_z(structural_uscalar_vector_[0],
+                                                                      structural_uscalar_vector_[1],
+                                                                      structural_uscalar_vector_[2]);
           operateur_diffusion_temperature_structural_.ajouter(temperature_,
-                                                              structural_uscalar_vector_[0],
-                                                              structural_uscalar_vector_[1],
-                                                              structural_uscalar_vector_[2],
                                                               div_lambda_grad_T_volume_,
                                                               boundary_flux_kmin_, boundary_flux_kmax_);
 

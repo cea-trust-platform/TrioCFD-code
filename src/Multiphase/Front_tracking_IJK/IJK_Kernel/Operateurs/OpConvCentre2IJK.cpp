@@ -13,7 +13,24 @@
 *
 *****************************************************************************/
 
-#include <OpCentre2IJK.h>
+#include <OpConvCentre2IJK.h>
+Implemente_instanciable_sans_constructeur(OpConvCentre2IJK_double, "OpConvCentre2IJK_double", Operateur_IJK_faces_conv_base_double);
+
+OpConvCentre2IJK_double::OpConvCentre2IJK_double()
+{
+  div_rho_u_=nullptr;
+  last_computed_klayer_for_div_rhou_=0;
+}
+
+Sortie& OpConvCentre2IJK_double::printOn(Sortie& os) const
+{
+  return os;
+}
+
+Entree& OpConvCentre2IJK_double::readOn(Entree& is)
+{
+  return is;
+}
 
 inline void calcul_g(const double& dxam, const double& dx, const double& dxav, double& g1, double& g2, double& g3, double& g4)
 {
@@ -68,9 +85,9 @@ static void fill_g_compo(DoubleTab& g, int nb_values, int offset,
     }
 }
 
-void OpConvCentre2IJK_double::initialize(const IJK_Splitting& splitting, const Boundary_Conditions& bc)
+void OpConvCentre2IJK_double::initialize(const IJK_Splitting& splitting)
 {
-  OpConvIJKFacesCommon_double::initialize(splitting);
+  Operateur_IJK_faces_conv_base_double::initialize(splitting);
 
   // Fill 4-th order filtering coefficients for z direction:
   const int nb_xfaces = splitting.get_nb_faces_local(0 /* for component x */, 2 /* in direction z */);
@@ -91,45 +108,13 @@ void OpConvCentre2IJK_double::initialize(const IJK_Splitting& splitting, const B
   istart = channel_data_.first_global_k_layer_flux(2 /* compo */, 2 /* dir */) + 1;
   iend = channel_data_.last_global_k_layer_flux(2 /* compo */, 2 /* dir */) - 1;
   fill_g_compo(g_compo_z_dir_z_, nb_zfaces + 1, offset_to_global_k_layer, istart, iend, delta_z, true);
-
-  ref_bc_ = bc;
-
-}
-
-void OpConvCentre2IJK_double::initialize(const IJK_Splitting& splitting, const Boundary_Conditions_Thermique& bc)
-{
-  // Warning / TODO : This method shall be factorized with the previous one.
-  OpConvIJKFacesCommon_double::initialize(splitting);
-
-  // Fill 4-th order filtering coefficients for z direction:
-  const int nb_xfaces = splitting.get_nb_faces_local(0 /* for component x */, 2 /* in direction z */);
-  const int nb_zfaces = splitting.get_nb_faces_local(2 /* for component z */, 2 /* in direction z */);
-  // number of flux values computed on this processor in direction k
-  // equals the number of faces owned by the processor, plus 1
-
-  const int offset_to_global_k_layer = channel_data_.offset_to_global_k_layer();
-  const ArrOfDouble_with_ghost& delta_z = channel_data_.get_delta_z();
-
-  // first flux computed with 4th order is 1 layer after the first non zero flux, after the wall.
-  // SPECIFIC FOR CHANNEL WITH WALLS IN K DIRECTION !
-  int istart, iend;
-  istart = channel_data_.first_global_k_layer_flux(0 /* compo */, 2 /* dir */) + 1;
-  iend = channel_data_.last_global_k_layer_flux(0 /* compo */, 2 /* dir */) - 1;
-  fill_g_compo(g_compo_xy_dir_z_, nb_xfaces + 1, offset_to_global_k_layer, istart, iend, delta_z, false);
-
-  istart = channel_data_.first_global_k_layer_flux(2 /* compo */, 2 /* dir */) + 1;
-  iend = channel_data_.last_global_k_layer_flux(2 /* compo */, 2 /* dir */) - 1;
-  fill_g_compo(g_compo_z_dir_z_, nb_zfaces + 1, offset_to_global_k_layer, istart, iend, delta_z, true);
-
-  ref_bc_Thermique_ = bc;
-
 }
 
 void OpConvCentre2IJK_double::calculer(const IJK_Field_double& inputx, const IJK_Field_double& inputy, const IJK_Field_double& inputz,
                                        const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                        IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
-  OpConvIJKFacesCommon_double::calculer(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
+  Operateur_IJK_faces_conv_base_double::calculer(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
   div_rho_u_ = 0;
 
 
@@ -139,7 +124,7 @@ void OpConvCentre2IJK_double::ajouter(const IJK_Field_double& inputx, const IJK_
                                       const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz,
                                       IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz)
 {
-  OpConvIJKFacesCommon_double::ajouter(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
+  Operateur_IJK_faces_conv_base_double::ajouter(inputx, inputy, inputz, vx, vy, vz, dvx, dvy, dvz);
   div_rho_u_ = 0;
 }
 

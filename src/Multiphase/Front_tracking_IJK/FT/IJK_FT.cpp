@@ -52,7 +52,6 @@
 
 #define select(a,x,y,z) ((a==0)?(x):((a==1)?(y):(z)))
 
-#define get_velocity_convection_op(type) (((type)==0)?(velocity_convection_op_sharp_):(velocity_convection_op_centre_))
 //#define SMOOTHING_RHO
 
 Implemente_instanciable_sans_constructeur(IJK_FT_double, "IJK_FT_double", Interprete);
