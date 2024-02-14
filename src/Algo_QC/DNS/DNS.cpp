@@ -5738,7 +5738,7 @@ void calculer_structural_uscalar_similarity_comp(const double structural_uscalar
               double rho_vf_j = 0.;
               double rho_wf_k = 0.;
               double rho_scalarf_i = 0.;
-              double rho_scalarf_j = 0.;
+              //double rho_scalarf_j = 0.;
               double rho_scalarf_k = 0.;
               double rho_filtre = 0.;
               for (int ip = -shift_uniform; ip < size_uniform-shift_uniform; ip++)
@@ -5751,7 +5751,7 @@ void calculer_structural_uscalar_similarity_comp(const double structural_uscalar
                   rho_vf_j += aa_js(i+ip, 0, 0) * filter_coef_x;
                   rho_wf_k += aa_ks(i+ip, 0, 0) * filter_coef_x;
                   rho_scalarf_i += aaT_i(i+ip, 0, 0) * filter_coef_x;
-                  rho_scalarf_j += aaT_j(i+ip, 0, 0) * filter_coef_x;
+                  //rho_scalarf_j += aaT_j(i+ip, 0, 0) * filter_coef_x;
                   rho_scalarf_k += aaT_k(i+ip, 0, 0) * filter_coef_x;
                   rho_filtre += aa_rho_ijk_filtre(i+ip, 0, 0)* filter_coef_x;
                 }
@@ -9893,10 +9893,10 @@ void DNS_QC_double::run()
             {
               timestep_ = dt_regule;
             }
-          else // sinon on garde
-            {
-              timestep_= timestep_;
-            }
+          //else // sinon on garde
+          //  {
+          //    timestep_= timestep_;
+          //  }
 
           Cout << "T= " << current_time_
                << " dtconv= " << dt_conv
