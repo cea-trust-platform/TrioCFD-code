@@ -17,9 +17,9 @@ Read sch
 	dt_min 1.e-10
 	dt_max 0.005
 	dt_impr 0.2
-	dt_sauv 10.
+	dt_sauv 0.05
 	seuil_statio -1.e-8
-	facsec 1
+	facsec 0.75
 }
 
 Fluide_Incompressible eau
@@ -79,6 +79,7 @@ hydraulique
 	{
 		Haute	Sortie_libre_rho_variable champ_front_uniforme 1 0.
 		Paroi	paroi_fixe
+		Bas	paroi_fixe
 	}
 #	terme_gravite rho_g #
 }
@@ -89,7 +90,7 @@ interf
  y-0.05+((y-SQRT((x+0.001)*(x+0.001)+z*z))>(0.05-0.055))*(SQRT((x+0.001)*(x+0.001)+z*z)-0.055-y+0.05)+((y-SQRT((x+0.001)*(x+0.001)+z*z))>(0.2-0.055))*(-SQRT((x+0.001)*(x+0.001)+z*z)+0.055+y-0.2)
         }
 	methode_transport vitesse_interpolee hydraulique
-        iterations_correction_volume 0
+        iterations_correction_volume 1
         n_iterations_distance 2
 	remaillage {
                 pas 1.e-4
@@ -115,6 +116,7 @@ interf
 	{
 		Haute	Paroi_FT_disc symetrie
 		Paroi	Paroi_FT_disc symetrie
+		Bas	Paroi_FT_disc constant champ_front_fonc_xyz 1 75
 	}
 }
 postraitement {
@@ -171,6 +173,9 @@ liste_postraitements {
 }
 
 sauvegarde binaire Oscillation_bulle3.rep
+sauvegarde xyz sauv.xyz
+# Resume_Last_Time binaire sauv.xyz 
+Reprise binaire sauv.xyz #
 }
 
 Solve pb1
