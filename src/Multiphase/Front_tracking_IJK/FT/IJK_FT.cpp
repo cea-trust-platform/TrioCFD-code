@@ -495,11 +495,11 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("multigrid_solver", &poisson_solver_, Param::REQUIRED); // XD_ADD_P multigrid_solver not_set
   param.ajouter_flag("check_divergence", &check_divergence_); // XD_ADD_P rien Flag to compute and print the value of div(u) after each pressure-correction
   param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid viscosity
-  param.ajouter("vitesse_entree", &vitesse_entree_);
-  param.ajouter("vitesse_upstream", &vitesse_upstream_);
-  param.ajouter("upstream_dir", &upstream_dir_);
-  param.ajouter("upstream_stencil", &upstream_stencil_);
-  param.ajouter("nb_diam_upstream", &nb_diam_upstream_);
+  param.ajouter("vitesse_entree", &vitesse_entree_); // XD_ADD_P floattant Velocity to prescribe at inlet
+  param.ajouter("vitesse_upstream", &vitesse_upstream_); // XD_ADD_P floattant Velocity to prescribe at 'nb_diam_upstream_' before bubble 0.
+  param.ajouter("upstream_dir", &upstream_dir_); // XD_ADD_P entier Direction to prescribe the velocity
+  param.ajouter("upstream_stencil", &upstream_stencil_); // XD_ADD_P int Width on which the velocity is set
+  param.ajouter("nb_diam_upstream", &nb_diam_upstream_); // XD_ADD_P floattant Number of bubble diameters upstream of bubble 0 to prescribe the velocity.
   param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid density
   param.ajouter("check_stop_file", &check_stop_file_); // XD_ADD_P chaine stop file to check (if 1 inside this file, stop computation)
   param.ajouter("dt_sauvegarde", &dt_sauvegarde_); // XD_ADD_P entier saving frequency (writing files for computation restart)
@@ -541,12 +541,13 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("forcage", &forcage_);  // XD_ADD_P chaine not_set
   param.ajouter("corrections_qdm", &qdm_corrections_); // XD_ADD_P chaine not_set
   // Read list of thermic equations:
+  param.ajouter("thermals", &thermals_);
   /*
    * TODO: Change this block with DERIV CLASS IJK_Thermal
    */
   param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
-  param.ajouter("thermals", &thermals_);
+
   param.ajouter("ijk_splitting_ft_extension", &ijk_splitting_ft_extension_, Param::REQUIRED); // XD_ADD_P entier Number of element used to extend the computational domain at each side of periodic boundary to accommodate for bubble evolution.
 
   param.ajouter("fichier_post", &fichier_post_); // XD_ADD_P chaine name of the post-processing file (lata file)
@@ -873,7 +874,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
    */
   for (auto& itr : thermique_)
     itr.associer(*this);
-
   for (auto& itr : energie_)
     itr.associer(*this);
 
@@ -1240,7 +1240,6 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde)//  cons
       itr.sauvegarder_temperature(lata_name, idx);
       ++idx;
     }
-
   int idx2 =0;
   for (auto& itr : energie_)
     {
@@ -1615,7 +1614,7 @@ int IJK_FT_double::initialise()
 //          velocity_[2].data() += expression_vitesse_initiale_;
         }
 
-
+      velocity_.echange_espace_virtuel();
 #ifdef CONVERT_AT_READING_FROM_NURESAFE_TO_ADIM_TRYGGVASON_FOR_LIQUID_VELOCITY
       const double coef = 14.353432757182377;
       for (int dir=0; dir< 3; dir++)
