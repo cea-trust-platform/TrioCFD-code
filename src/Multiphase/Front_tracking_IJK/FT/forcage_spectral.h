@@ -27,10 +27,8 @@
 #include <Objet_U.h>
 #include <fftw3.h>
 #pragma GCC diagnostic push
-#if __GNUC__ > 5
-#pragma GCC diagnostic ignored "-Wsuggest-override"
-#endif
-#ifdef __APPLE__
+// Portability for mpich which do not honour -Wsuggest-override
+#if __GNUC__ > 5 || __clang_major__ > 10
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
 #include <fftw3-mpi.h>

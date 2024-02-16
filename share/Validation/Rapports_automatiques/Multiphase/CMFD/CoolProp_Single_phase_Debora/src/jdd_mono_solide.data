@@ -1,4 +1,4 @@
-# PARALLEL OK #
+# PARALLEL RUNS #
 
 Dimension 3
 
@@ -199,7 +199,7 @@ Lire pbm
         }
         sources
         {
-            Production_energie_cin_turb ,
+            Production_energie_cin_turb { } ,
             Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
         }
     }
