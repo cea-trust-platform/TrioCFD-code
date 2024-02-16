@@ -746,6 +746,11 @@ void IJK_Interfaces::associer(const IJK_FT_double& ijk_ft)
   // liste_post_instantanes_ = ijk_ft.post_.get_liste_post_instantanes();
 }
 
+void IJK_Interfaces::associer_switch(const Switch_FT_double& ijk_ft_switch)
+{
+  ref_ijk_ft_switch_ = ijk_ft_switch;
+}
+
 // Methode appelee lorsqu'on a mis "TOUS" dans la liste des champs a postraiter.
 // Elle ajoute a la liste tous les noms de champs postraitables par
 // IJK_Interfaces

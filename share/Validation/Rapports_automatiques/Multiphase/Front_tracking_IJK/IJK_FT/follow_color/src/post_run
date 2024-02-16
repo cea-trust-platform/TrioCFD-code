@@ -1,4 +1,4 @@
 #!/bin/bash
 [ -f $1.lml ] && gzip -f $1.lml
-tail -n2 ijkft_follow_colors_multi_seq_bulles_colors.out > suivi.txt
-head -n2 ijkft_follow_colors_multi_repr_seq_bulles_colors.out >> suivi.txt
+[ -f $1 == "ijkft_follow_colors_multi_seq" ] && tail -n2 ijkft_follow_colors_multi_seq_bulles_colors.out > suivi.txt
+[ -f $1 == "ijkft_follow_colors_multi_repr_seq" ] && head -n2 ijkft_follow_colors_multi_repr_seq_bulles_colors.out >> suivi.txt

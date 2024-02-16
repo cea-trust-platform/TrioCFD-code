@@ -57,7 +57,8 @@
 Implemente_instanciable_sans_constructeur(IJK_FT_double, "IJK_FT_double", Interprete);
 
 IJK_FT_double::IJK_FT_double():
-  post_(IJK_FT_Post(*this))
+  post_(IJK_FT_Post(*this)),
+  thermals_(IJK_Thermals(*this))
 {
   p_seuil_min_ = 0.;
   p_seuil_max_ = 0;
@@ -1417,7 +1418,8 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   interfaces_.set_reprise(1);
   Nom prefix = dirname(fichier_reprise);
   interfaces_.set_fichier_reprise(prefix + interfaces_.get_fichier_reprise());
-  thermals_.set_fichier_reprise(prefix + thermals_.get_fichier_reprise());
+  if (!thermals_.est_vide())
+    thermals_.set_fichier_reprise(prefix + thermals_.get_fichier_reprise());
   fichier_reprise_vitesse_=prefix+fichier_reprise_vitesse_;
 }
 
@@ -1763,9 +1765,13 @@ int IJK_FT_double::initialise()
    * Thermal problems
    */
   interfaces_.initialise_ijk_compo_connex_bubbles_params();
-  thermals_.initialize(splitting_, nalloc);
-  thermals_.get_rising_velocities_parameters(compute_rising_velocities_,
-                                             fill_rising_velocities_);
+
+  if (!thermals_.est_vide())
+    {
+      thermals_.initialize(splitting_, nalloc);
+      thermals_.get_rising_velocities_parameters(compute_rising_velocities_,
+                                                 fill_rising_velocities_);
+    }
   nalloc += interfaces_.associate_rising_velocities_parameters(splitting_,
                                                                compute_rising_velocities_,
                                                                fill_rising_velocities_);

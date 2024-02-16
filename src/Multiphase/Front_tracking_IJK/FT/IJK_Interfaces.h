@@ -40,6 +40,7 @@
 #include <IJK_Composantes_Connex.h>
 
 class IJK_FT_double;
+class Switch_FT_double;
 class Domaine_dis;
 
 #define VERIF_INDIC 0
@@ -66,6 +67,7 @@ public :
                  const bool compute_vint=true,
                  const bool is_switch=false);
   void associer(const IJK_FT_double& ijk_ft);
+  void associer_switch(const Switch_FT_double& ijk_ft_switch);
   void posttraiter_tous_champs(Motcles& liste) const;
   int posttraiter_champs_instantanes(const Motcles& liste_post_instantanes,
                                      const char *lata_name,
@@ -745,6 +747,7 @@ protected:
   REF(IJK_Splitting) ref_splitting_;
   REF(Domaine_dis) refdomaine_dis_;
   REF(IJK_FT_double) ref_ijk_ft_;
+  REF(Switch_FT_double) ref_ijk_ft_switch_;
   // Interdit le constructeur par copie (car constructeurs par copie interdits
   // pour parcours_ et autres
   IJK_Interfaces(const IJK_Interfaces& x) : Objet_U(x)

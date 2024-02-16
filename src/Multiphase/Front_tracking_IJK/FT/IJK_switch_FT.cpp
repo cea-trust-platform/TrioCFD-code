@@ -62,11 +62,12 @@ void Switch_FT_double::set_param(Param& param)
 
 void Switch_FT_double::prepare_run()
 {
-	Switch_double::prepare_run();
+  Switch_double::prepare_run();
   Nom prefix = dirname(nom_reprise_);
   interfaces_.set_fichier_reprise(prefix + interfaces_.get_fichier_reprise());
-  thermals_.set_fichier_reprise(prefix + thermals_.get_fichier_reprise());
-	fichier_old_vitesse_ = prefix + fichier_old_vitesse_;
+  if (!thermals_.est_vide())
+	  thermals_.set_fichier_reprise(prefix + thermals_.get_fichier_reprise());
+  fichier_old_vitesse_ = prefix + fichier_old_vitesse_;
 }
 
 
@@ -104,6 +105,7 @@ void Switch_FT_double::initialise()
 												 0,
 												 false,
 												 true);
+  //interfaces_.associer_switch(*this);
   interfaces_.set_reprise(1);
   interfaces_.lire_maillage_ft_dans_lata();
   
