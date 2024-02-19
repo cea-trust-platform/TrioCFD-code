@@ -36,7 +36,7 @@
 #include <Champ_Inc_P0_base.h>
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Bicephale,"Modele_turbulence_hyd_K_Epsilon_Bicephale",Mod_turb_hyd_RANS_Bicephale);
-// XD K_Epsilon_Bicephale mod_turb_hyd_rans K_Epsilon_Bicephale -1 Turbulence model (k-eps) en formalisation bicephale.
+// XD K_Epsilon_Bicephale mod_turb_hyd_rans_bicephale K_Epsilon_Bicephale -1 Turbulence model (k-eps) en formalisation bicephale.
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie.
  *

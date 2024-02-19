@@ -155,7 +155,6 @@ Read pb
 
 	Postraitement
 	{
-	        format lml
 		Sondes
 		{     					
 			sonde_U_x2h vitesse periode 0.1 segment 30  0.0762 -0.0381  0.0762 0.0762

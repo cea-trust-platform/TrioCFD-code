@@ -46,7 +46,7 @@ Read sch
     dt_min 0.1
     dt_max 0.1
     facsec 1000000000.0
-    nb_pas_dt_max 00
+    nb_pas_dt_max 0
   }
 
 vdf dis 

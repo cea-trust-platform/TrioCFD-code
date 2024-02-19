@@ -105,8 +105,10 @@ Read pb
 						debut_stat _T_DEB_
 						}
 					}
-		Sources			{ canal_perio { bord PerioX } }
-		Sources			{ source_Robin 2 Haut Bas # 0.005 # }
+		Sources			{
+		                          source_Robin 2 Haut Bas # 0.005 # ,
+		                          canal_perio { bord PerioX } 
+		                        }
 	}
 
 	Convection_diffusion_temperature_turbulent
@@ -125,8 +127,10 @@ Read pb
 					turbulence_paroi loi_standard_hydr_scalaire
 					dt_impr_nusselt 20
 					}
-		Sources			{ puissance_thermique champ_uniforme 1 1 }
-		Sources			{ source_Robin_scalaire 2 Haut _T1_ Bas _T0_ # 0.005 # }
+		Sources			{
+		                          source_Robin_scalaire 2 Haut _T1_ Bas _T0_ # 0.005 # ,
+		                          puissance_thermique champ_uniforme 1 1
+		                        }
 	}
 
 	Postraitement

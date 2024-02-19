@@ -66,9 +66,8 @@ Read pb
                                         }
                 convection { muscl }
                 diffusion  {  }
-                Sources
-                        {
-                        Canal_perio { bord periox }
+                Sources {
+                          Canal_perio { bord periox }
                         }
 		conditions_initiales
 			{

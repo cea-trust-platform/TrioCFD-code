@@ -44,7 +44,7 @@ Read sch
         dt_start dt_calc		
         dt_min 1.e-5
         dt_max 10.
-	dt_impr 100
+	# dt_impr 100 #
         dt_sauv 500
         dt_impr 1000.
         seuil_statio 1.e-8
