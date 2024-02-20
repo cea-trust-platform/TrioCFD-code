@@ -46,7 +46,7 @@ Read sch
 	dt_max 1e-1
 	dt_impr 1e-8
 	seuil_statio 1.e-8
-	nb_pas_dt_max 20
+	nb_pas_dt_max 30
 }
 
 
@@ -79,7 +79,7 @@ Read pb_etat
 	Navier_Stokes_standard
 	{
 
-		solveur_pression Cholesky { impr }
+		solveur_pression GCP { precond ssor { omega 1.651 } seuil 1.e-10 } 
 		convection { centre }
 		diffusion { }
 		sources { boussinesq_temperature { T0 338 } }
@@ -134,10 +134,10 @@ Read pb_sensibilite
         {       
                 uncertain_variable { vitesse }
 		state { pb_champ_evaluateur pb_etat  vitesse } 
-      		solveur_pression cholesky {  }  
+      		solveur_pression GCP { precond ssor { omega 1.651 } seuil 1.e-10 } 
                 convection { Sensibility { centre } } 
                 diffusion { }
-		sources { boussinesq_temperature { T0 338 verif_boussinesq 0 }  }
+		sources { boussinesq_temperature { T0 0. }  }
                 initial_conditions {
                         vitesse Champ_Uniforme 2 0. 0.
                         }
