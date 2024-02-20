@@ -1,14 +1,13 @@
 # Thermohydraulique 2D VEF Boussinesq #
 # PARALLEL OK #
 dimension 2
+
 Domaine dom
 # BEGIN MESH #
 Lire_MED { 
    domain dom 
    file FinerMeshSquare_T.med
 }
-
-# END MESH #
 
 
 # BEGIN PARTITION
@@ -25,7 +24,7 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 
-Pb_Thermohydraulique pb_etat
+Pb_Thermohydraulique pb_state
 Pb_Thermohydraulique_sensibility pb_sensibilite
 
 VEFPreP1B dis
@@ -35,8 +34,8 @@ Scheme_euler_explicit sch
 Read sch
 {
 	tinit 0.
-	tmax 5.
-	nb_pas_dt_max 100
+	tmax 15.
+	nb_pas_dt_max 20
 	dt_min 1e-8
 	# dt_max 1e-1 #
 	dt_impr 1e-8
@@ -45,35 +44,33 @@ Read sch
 }
 
 
-Associate pb_etat dom
+
+
+Associate pb_state dom
 Associate pb_sensibilite dom
 
 
 Probleme_Couple pbc
-Associate pbc pb_etat
+Associate pbc pb_state
 Associate pbc pb_sensibilite
 Associate pbc sch
 Discretize pbc dis
 
 
-Read pb_etat
+Read pb_state
 {
 
 	fluide_incompressible {
 		mu Champ_Uniforme 1 1.85e-5
 		rho Champ_Uniforme 1 1.17
-		lambda Champ_Uniforme 1 0.025938  
+		lambda Champ_Uniforme 1 0.0262
 		Cp Champ_Uniforme 1 1006
-		beta_th Champ_Uniforme 1 3.6e-3
+		beta_th Champ_Uniforme 1 3.564e-3
 		gravite champ_uniforme 2 0 -9.81
         	} 
-        	
 	Navier_Stokes_standard
-	{ 
-		solveur_pression GCP { 
-			precond ssor { omega 1.5 } 
-			seuil 1.e-16
-		}
+	{
+		solveur_pression PETSc Cholesky { } 
 		convection { amont }
 		diffusion { }
 		sources { boussinesq_temperature { T0 278.15 } }
@@ -105,33 +102,33 @@ Read pb_etat
 	{
 		Probes
 		{
-                        vitesse_etat_x_c  vitesse periode 0.001 segment 50 0. 0.005 0.01 0.005
-                        temperature_etat_x_c temperature periode 0.001 segment 50 0. 0.005 0.01 0.005
-                        pression_etat_x_c  pression periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        vitesse_state_x_c  vitesse periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        temperature_state_x_c temperature periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        pression_state_x_c  pression periode 0.001 segment 50 0. 0.005 0.01 0.005
                         
-                        vitesse_etat_x_h  vitesse periode 0.001 segment 50 0. 0.0075 0.01 0.0075
-                        temperature_etat_x_h  temperature periode 0.001 segment 50 0. 0.0075 0.01 0.0075
-                        pression_etat_x_h  pression periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        vitesse_state_x_h  vitesse periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        temperature_state_x_h  temperature periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        pression_state_x_h  pression periode 0.001 segment 50 0. 0.0075 0.01 0.0075
                         
-                        vitesse_etat_x_b  vitesse periode 0.001 segment 50 0. 0.0025 0.01 0.0025
-                        temperature_etat_x_b  temperature periode 0.001 segment 50 0. 0.0025 0.01 0.0025
-                        pression_etat_x_b  pression periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        vitesse_state_x_b  vitesse periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        temperature_state_x_b  temperature periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        pression_state_x_b  pression periode 0.001 segment 50 0. 0.0025 0.01 0.0025
                         
-                        vitesse_etat_y_c  vitesse periode 0.001 segment 50  0.005 0.  0.005 0.01
-                        temperature_etat_y_c  temperature periode 0.001 segment 50 0.005 0.  0.005 0.01
-                        pression_etat_y_c  pression periode 0.001 segment 50 0.005 0.  0.005 0.01
+                        vitesse_state_y_c  vitesse periode 0.001 segment 50  0.005 0.  0.005 0.01
+                        temperature_state_y_c  temperature periode 0.001 segment 50 0.005 0.  0.005 0.01
+                        pression_state_y_c  pression periode 0.001 segment 50 0.005 0.  0.005 0.01
                         
-                        vitesse_etat_y_d  vitesse periode 0.001 segment 50 0.0075 0. 0.0075 0.01
-                        temperature_etat_y_d  temperature periode 0.001 segment 50 0.0075 0. 0.0075 0.01
-                        pression_etat_y_d  pression periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        vitesse_state_y_d  vitesse periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        temperature_state_y_d  temperature periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        pression_state_y_d  pression periode 0.001 segment 50 0.0075 0. 0.0075 0.01
                         
-                        vitesse_etat_y_g  vitesse periode 0.001 segment 50 0.0025 0.  0.0025 0.01
-                        temperature_etat_y_g  temperature periode 0.001 segment 50  0.0025 0.  0.0025 0.01
-                        pression_etat_y_g  pression periode 0.001 segment 50  0.0025 0.  0.0025 0.01
+                        vitesse_state_y_g  vitesse periode 0.001 segment 50 0.0025 0.  0.0025 0.01
+                        temperature_state_y_g  temperature periode 0.001 segment 50  0.0025 0.  0.0025 0.01
+                        pression_state_y_g  pression periode 0.001 segment 50  0.0025 0.  0.0025 0.01
                         
 		}
-                fichier etat
-                format lml
+                fichier state
+                format lml # lata for VisIt tool #
 		fields dt_post 5.
 		{
 			pression som
@@ -139,28 +136,29 @@ Read pb_etat
 			temperature som
 		}
 	}
+
 }
 
 Read pb_sensibilite
 {
+
 	fluide_incompressible {
-       		 mu Champ_Uniforme 1 1.85e-5
-		 rho Champ_Uniforme 1 1.17
-        	 lambda Champ_Uniforme 1 0.026462 
-		 Cp Champ_Uniforme 1 1006
-		 beta_th Champ_Uniforme 1 3.6e-3
-		 gravite champ_uniforme 2 0 -9.81
-	}
+		mu Champ_Uniforme 1 1.85e-5
+		rho Champ_Uniforme 1 1.17
+		lambda Champ_Uniforme 1 0.0262
+		Cp Champ_Uniforme 1 1006
+		beta_th Champ_Uniforme 1 3.636e-3
+		gravite champ_uniforme 2 0 -9.81
+        	} 
         Navier_Stokes_standard_sensibility
         {       
                 uncertain_variable { vitesse }
-		state { pb_champ_evaluateur pb_etat  vitesse } 
-	        polynomial_chaos 0.000262
-      		solveur_pression gcp  { precond ssor { omega 1.5 } seuil 1.e-10 }  
-		# solveur_pression PETSc Cholesky { } #
+		state { pb_champ_evaluateur pb_state  vitesse } 
+	        polynomial_chaos 3.6e-5
+		solveur_pression PETSc Cholesky { } 
                 convection { Sensibility { amont } }
                 diffusion { }
-		sources { boussinesq_temperature { T0 0. } }
+		sources { boussinesq_temperature { T0 278.15  verif_boussinesq 0 } }
                 initial_conditions {
                         vitesse Champ_Uniforme 2 0. 0.
                         }
@@ -173,10 +171,10 @@ Read pb_sensibilite
         }
 	Convection_Diffusion_Temperature_sensibility
 	{
-                uncertain_variable { lambda }
-                velocity_state { pb_champ_evaluateur pb_etat  vitesse } 
-		temperature_state { pb_champ_evaluateur pb_etat  temperature } 
-		polynomial_chaos 0.000262
+                uncertain_variable { beta_th }
+                velocity_state { pb_champ_evaluateur pb_state  vitesse } 
+		temperature_state { pb_champ_evaluateur pb_state  temperature } 
+	        polynomial_chaos 3.6e-5
 		diffusion { }
 		convection { Sensibility { amont } }
 		boundary_conditions 
@@ -219,13 +217,13 @@ Read pb_sensibilite
 		}
 		# Fields #
 		fichier Vahl_Davis_poly_chaos
-                format lml 
-		fields dt_post 5. 
+                format lml # lata for VisIt tool #
+		fields dt_post 5.  # Note: Warning to memory space if dt_post too small #
 		{
 
 			pression som
 			vitesse som
-                       temperature som
+                        temperature som
 
 		}
 	}	
