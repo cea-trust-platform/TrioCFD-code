@@ -8,21 +8,23 @@ Lire_MED {
    domain dom 
    file FinerMeshSquare_T.med
 }
-
+# END MESH #
 
 # BEGIN PARTITION
 Partition dom
 {
-	Partition_tool metis { Nb_parts 2 kmetis }
+	Partition_tool metis { Nb_parts 2 }
 	Larg_joint 2
-	zones_name DOM
+	zones_name DOM1
 }
 End
 END PARTITION #
 
-# BEGIN SCATTER
-Scatter DOM.Zones dom
-END SCATTER #
+
+
+# BEGIN SCATTER #
+# Scatter DOM1.Zones dom #
+# END SCATTER #
 
 Pb_Thermohydraulique pb_state
 Pb_Thermohydraulique_sensibility pb_sensibilite
