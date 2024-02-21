@@ -150,14 +150,15 @@ void Paroi_frottante_simple::me_calculer()
           valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) * rho(!cr * e, n) : 1) * nu_visc(!cnu * e, n)/y_loc; // viscous case : if u_tau is small
           valeurs_coeff_grad_(f, n) = fac_coeff_grad_*(alp ? (*alp)(e, n) : 1) * 1./y_loc ; // dirichlet for calculation of gradient
         }
+
+      for (int k=1 ; k<N ; k++)
+        {
+          valeurs_coeff_(f, k) = (*alp)(e, k) > 0.5 ? 2. * ((*alp)(e, k)-.5) * rho(e, k) * u_tau(f_domaine, n)*u_tau(f_domaine, n)/norm_u_parallel : 0; // les phases non turbulentes sont non porteuses, sauf quand le taux de vide a la paroi depasse 0.5 ou transition vers frottement phase dispersee (a ameliorer): pas de contact paroi => des symmetries
+          valeurs_coeff_grad_(f, k) = 0; // les phases non turbulentes sont non porteuses, sauf quand le taux de vide a la paroi depasse 0.5 : pas de contact paroi => des symmetries
+        }
+
     }
 
-  for (n=1 ; n<N ; n++)
-    for (int f =0 ; f < nf ; f++)
-      {
-        valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
-        valeurs_coeff_grad_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
-      }
 
   valeurs_coeff_.echange_espace_virtuel();
   valeurs_coeff_grad_.echange_espace_virtuel();
