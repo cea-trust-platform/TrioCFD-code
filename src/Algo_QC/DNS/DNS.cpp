@@ -3448,8 +3448,8 @@ void calculer_turbulent_mu_scalar(const bool anisotropic,
   if (flag_turbulent_mu_filtre)
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
-      ghost_size_scalar = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
+      ghost_size_scalar = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -5039,7 +5039,7 @@ void calculer_structural_uu(const Nom& structural_uu_model,
                                       structural_uu_tmp_tensor);
 
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_structural_uu_tmp = max(2, ghost_size_filter);
+      ghost_size_structural_uu_tmp = max((int)2, ghost_size_filter);
       structural_uu_tmp_tensor[0].echange_espace_virtuel(ghost_size_structural_uu_tmp);
       structural_uu_tmp_tensor[1].echange_espace_virtuel(ghost_size_structural_uu_tmp);
       structural_uu_tmp_tensor[2].echange_espace_virtuel(ghost_size_structural_uu_tmp);
@@ -5090,7 +5090,7 @@ void calculer_structural_uu(const Nom& structural_uu_model,
                                         structural_uu_tmp_tensor);
 
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_structural_uu_tmp = max(2, ghost_size_filter);
+      ghost_size_structural_uu_tmp = max((int)2, ghost_size_filter);
       structural_uu_tmp_tensor[0].echange_espace_virtuel(ghost_size_structural_uu_tmp);
       structural_uu_tmp_tensor[1].echange_espace_virtuel(ghost_size_structural_uu_tmp);
       structural_uu_tmp_tensor[2].echange_espace_virtuel(ghost_size_structural_uu_tmp);
@@ -5109,7 +5109,7 @@ void calculer_structural_uu(const Nom& structural_uu_model,
   else if ( structural_uu_model == Nom("similarity") )
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -5133,7 +5133,7 @@ void calculer_structural_uu(const Nom& structural_uu_model,
   else if ( structural_uu_model == Nom("similarity_comp") )
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -5158,7 +5158,7 @@ void calculer_structural_uu(const Nom& structural_uu_model,
   else if ( structural_uu_model == Nom("similarity_streher") )
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -5186,7 +5186,7 @@ void calculer_structural_uu(const Nom& structural_uu_model,
   if (flag_structural_uu_filtre)
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -5218,7 +5218,7 @@ void calculer_structural_uu(const Nom& structural_uu_model,
                                           structural_uu_tmp_tensor);
 
           ghost_size_filter = 1 + kernel->ghost_size();
-          ghost_size_structural_uu_tmp = max(2, ghost_size_filter);
+          ghost_size_structural_uu_tmp = max((int)2, ghost_size_filter);
           structural_uu_tmp_tensor[0].echange_espace_virtuel(ghost_size_structural_uu_tmp);
           structural_uu_tmp_tensor[1].echange_espace_virtuel(ghost_size_structural_uu_tmp);
           structural_uu_tmp_tensor[2].echange_espace_virtuel(ghost_size_structural_uu_tmp);
@@ -5264,7 +5264,7 @@ void calculer_structural_uu(const Nom& structural_uu_model,
                                             structural_uu_tmp_tensor);
 
           ghost_size_filter = 1 + kernel->ghost_size();
-          ghost_size_structural_uu_tmp = max(2, ghost_size_filter);
+          ghost_size_structural_uu_tmp = max((int)2, ghost_size_filter);
           structural_uu_tmp_tensor[0].echange_espace_virtuel(ghost_size_structural_uu_tmp);
           structural_uu_tmp_tensor[1].echange_espace_virtuel(ghost_size_structural_uu_tmp);
           structural_uu_tmp_tensor[2].echange_espace_virtuel(ghost_size_structural_uu_tmp);
@@ -6151,7 +6151,7 @@ void calculer_structural_uscalar(const Nom& structural_uscalar_model,
                                            structural_uscalar_tmp_vector);
 
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_structural_uscalar_tmp = max(2, ghost_size_filter);
+      ghost_size_structural_uscalar_tmp = max((int)2, ghost_size_filter);
       structural_uscalar_tmp_vector[0].echange_espace_virtuel(ghost_size_structural_uscalar_tmp);
       structural_uscalar_tmp_vector[1].echange_espace_virtuel(ghost_size_structural_uscalar_tmp);
       structural_uscalar_tmp_vector[2].echange_espace_virtuel(ghost_size_structural_uscalar_tmp);
@@ -6164,8 +6164,8 @@ void calculer_structural_uscalar(const Nom& structural_uscalar_model,
   else if ( structural_uscalar_model == Nom("similarity") )
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
-      ghost_size_scalar = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
+      ghost_size_scalar = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -6193,8 +6193,8 @@ void calculer_structural_uscalar(const Nom& structural_uscalar_model,
   else if ( structural_uscalar_model == Nom("similarity_comp") )
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
-      ghost_size_scalar = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
+      ghost_size_scalar = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -6223,8 +6223,8 @@ void calculer_structural_uscalar(const Nom& structural_uscalar_model,
   else if ( structural_uscalar_model == Nom("similarity_streher") )
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
-      ghost_size_scalar = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
+      ghost_size_scalar = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -6256,8 +6256,8 @@ void calculer_structural_uscalar(const Nom& structural_uscalar_model,
   if (flag_structural_uscalar_filtre)
     {
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_velocity = max(2, ghost_size_filter);
-      ghost_size_scalar = max(2, ghost_size_filter);
+      ghost_size_velocity = max((int)2, ghost_size_filter);
+      ghost_size_scalar = max((int)2, ghost_size_filter);
       velocity[0].echange_espace_virtuel(ghost_size_velocity);
       velocity[1].echange_espace_virtuel(ghost_size_velocity);
       velocity[2].echange_espace_virtuel(ghost_size_velocity);
@@ -6291,7 +6291,7 @@ void calculer_structural_uscalar(const Nom& structural_uscalar_model,
                                                structural_uscalar_tmp_vector);
 
           ghost_size_filter = 1 + kernel->ghost_size();
-          ghost_size_structural_uscalar_tmp = max(2, ghost_size_filter);
+          ghost_size_structural_uscalar_tmp = max((int)2, ghost_size_filter);
           structural_uscalar_tmp_vector[0].echange_espace_virtuel(ghost_size_structural_uscalar_tmp);
           structural_uscalar_tmp_vector[1].echange_espace_virtuel(ghost_size_structural_uscalar_tmp);
           structural_uscalar_tmp_vector[2].echange_espace_virtuel(ghost_size_structural_uscalar_tmp);
@@ -6349,7 +6349,7 @@ void modification_modele_dynamic_uu_scalar(const bool anisotropic,
       if (turbulent_viscosity)
         {
           ghost_size_filter = 1 + kernel->ghost_size();
-          ghost_size_turbulent_mu = max(2, ghost_size_filter);
+          ghost_size_turbulent_mu = max((int)2, ghost_size_filter);
           turbulent_mu.echange_espace_virtuel(ghost_size_turbulent_mu);
           turbulent_mu_filtre.echange_espace_virtuel(2);
         }
@@ -6359,7 +6359,7 @@ void modification_modele_dynamic_uu_scalar(const bool anisotropic,
           for (int j=0 ; j<6 ; j++)
             {
               ghost_size_filter = 1 + kernel->ghost_size();
-              ghost_size_structural_uu = max(2, ghost_size_filter);
+              ghost_size_structural_uu = max((int)2, ghost_size_filter);
               structural_uu_tensor[j].echange_espace_virtuel(ghost_size_structural_uu);
               structural_uu_filtre_tensor[j].echange_espace_virtuel(2);
             }
@@ -6575,7 +6575,7 @@ void modification_modele_dynamic_uu_tensor(const bool anisotropic,
           for (int j=0 ; j<6 ; j++)
             {
               ghost_size_filter = 1 + kernel->ghost_size();
-              ghost_size_turbulent_mu = max(2, ghost_size_filter);
+              ghost_size_turbulent_mu = max((int)2, ghost_size_filter);
               turbulent_mu_tensor[j].echange_espace_virtuel(ghost_size_turbulent_mu);
               turbulent_mu_filtre_tensor[j].echange_espace_virtuel(2);
             }
@@ -6586,7 +6586,7 @@ void modification_modele_dynamic_uu_tensor(const bool anisotropic,
           for (int j=0 ; j<6 ; j++)
             {
               ghost_size_filter = 1 + kernel->ghost_size();
-              ghost_size_structural_uu = max(2, ghost_size_filter);
+              ghost_size_structural_uu = max((int)2, ghost_size_filter);
               structural_uu_tensor[j].echange_espace_virtuel(ghost_size_structural_uu);
               structural_uu_filtre_tensor[j].echange_espace_virtuel(2);
             }
@@ -6817,7 +6817,7 @@ void modification_modele_dynamic_uscalar_scalar(const bool anisotropic,
       if (turbulent_viscosity)
         {
           ghost_size_filter = 1 + kernel->ghost_size();
-          ghost_size_turbulent_mu = max(2, ghost_size_filter);
+          ghost_size_turbulent_mu = max((int)2, ghost_size_filter);
           turbulent_mu.echange_espace_virtuel(ghost_size_turbulent_mu);
           turbulent_mu_filtre.echange_espace_virtuel(2);
         }
@@ -6827,7 +6827,7 @@ void modification_modele_dynamic_uscalar_scalar(const bool anisotropic,
           for (int j=0 ; j<3 ; j++)
             {
               ghost_size_filter = 1 + kernel->ghost_size();
-              ghost_size_structural_uu = max(2, ghost_size_filter);
+              ghost_size_structural_uu = max((int)2, ghost_size_filter);
               structural_uscalar_vector[j].echange_espace_virtuel(ghost_size_structural_uu);
               structural_uscalar_filtre_vector[j].echange_espace_virtuel(2);
             }
@@ -7031,7 +7031,7 @@ void modification_modele_dynamic_uscalar_vector(const bool anisotropic,
           for (int j=0 ; j<3 ; j++)
             {
               ghost_size_filter = 1 + kernel->ghost_size();
-              ghost_size_turbulent_mu = max(2, ghost_size_filter);
+              ghost_size_turbulent_mu = max((int)2, ghost_size_filter);
               turbulent_mu_vector[j].echange_espace_virtuel(ghost_size_turbulent_mu);
               turbulent_mu_filtre_vector[j].echange_espace_virtuel(2);
             }
@@ -7042,7 +7042,7 @@ void modification_modele_dynamic_uscalar_vector(const bool anisotropic,
           for (int j=0 ; j<3 ; j++)
             {
               ghost_size_filter = 1 + kernel->ghost_size();
-              ghost_size_structural_uu = max(2, ghost_size_filter);
+              ghost_size_structural_uu = max((int)2, ghost_size_filter);
               structural_uscalar_vector[j].echange_espace_virtuel(ghost_size_structural_uu);
               structural_uscalar_filtre_vector[j].echange_espace_virtuel(2);
             }
@@ -8549,8 +8549,8 @@ void DNS_QC_double::ecrire_fichier_sauv(const char *fichier_sauvegarde, const ch
               << " p_thermo_init " << P_thermodynamique_ << "\n"
               << " fichier_reprise_vitesse " << lata_name << "\n";
       fichier << " fichier_reprise_rho " << lata_name << "\n"
-              << " timestep_reprise_vitesse " << 1 << "\n"
-              << " timestep_reprise_rho " << 1 << "\n";
+              << " timestep_reprise_vitesse " << (int)1 << "\n"
+              << " timestep_reprise_rho " << (int)1 << "\n";
       if (statistiques_.t_integration() > 0.)
         fichier << " statistiques " << statistiques_;
       fichier << "}\n";
@@ -9100,10 +9100,10 @@ void DNS_QC_double::run()
       ghost_size_filter = 1 + kernel_->ghost_size();
     }
 
-  int ghost_size_velocity = flag_u_filtre_ ? max(2, ghost_size_filter) : 2;
-  int ghost_size_rho = flag_rho_filtre_ ? max(2, ghost_size_filter) : 2;
-  int ghost_size_temperature = flag_temperature_filtre_ ? max(2, ghost_size_filter) : 2;
-  int ghost_size_pressure = (lecture_post_instantanes_filtrer_p_ || lecture_post_instantanes_filtrer_tous_) ? max(1, ghost_size_filter) : 1;
+  int ghost_size_velocity = flag_u_filtre_ ? max((int)2, ghost_size_filter) : 2;
+  int ghost_size_rho = flag_rho_filtre_ ? max((int)2, ghost_size_filter) : 2;
+  int ghost_size_temperature = flag_temperature_filtre_ ? max((int)2, ghost_size_filter) : 2;
+  int ghost_size_pressure = (lecture_post_instantanes_filtrer_p_ || lecture_post_instantanes_filtrer_tous_) ? max((int)1, ghost_size_filter) : 1;
 
   /* allocation des tableaux */
   allocate_velocity(velocity_, splitting_, ghost_size_velocity);
@@ -9234,7 +9234,7 @@ void DNS_QC_double::run()
   // DD,2017-04-27: diffusion modifie en vue de l'ajout de modeles
   if (turbulent_viscosity_)
     {
-      int ghost_size_turbulent_mu = flag_turbulent_mu_filtre_ ? max(2, ghost_size_filter) : 2;
+      int ghost_size_turbulent_mu = flag_turbulent_mu_filtre_ ? max((int)2, ghost_size_filter) : 2;
 
       if (flag_nu_tensorial_)
         {
@@ -9259,7 +9259,7 @@ void DNS_QC_double::run()
     }
   if (turbulent_diffusivity_)
     {
-      int ghost_size_turbulent_kappa = flag_turbulent_kappa_filtre_ ? max(2, ghost_size_filter) : 2;
+      int ghost_size_turbulent_kappa = flag_turbulent_kappa_filtre_ ? max((int)2, ghost_size_filter) : 2;
 
       if (flag_kappa_vectorial_)
         {
@@ -9286,7 +9286,7 @@ void DNS_QC_double::run()
     }
   if (structural_uu_)
     {
-      int ghost_size_structural_uu = flag_structural_uu_filtre_ ? max(2, ghost_size_filter) : 2;
+      int ghost_size_structural_uu = flag_structural_uu_filtre_ ? max((int)2, ghost_size_filter) : 2;
 
       structural_uu_tensor_[0].allocate(splitting_, IJK_Splitting::ELEM, ghost_size_structural_uu);
       structural_uu_tensor_[1].allocate(splitting_, IJK_Splitting::ELEM, ghost_size_structural_uu);
@@ -9314,7 +9314,7 @@ void DNS_QC_double::run()
     }
   if (structural_uscalar_)
     {
-      int ghost_size_structural_uscalar = flag_structural_uscalar_filtre_ ? max(2, ghost_size_filter) : 2;
+      int ghost_size_structural_uscalar = flag_structural_uscalar_filtre_ ? max((int)2, ghost_size_filter) : 2;
 
       structural_uscalar_vector_[0].allocate(splitting_, IJK_Splitting::ELEM, ghost_size_structural_uscalar);
       structural_uscalar_vector_[1].allocate(splitting_, IJK_Splitting::ELEM, ghost_size_structural_uscalar);
@@ -9392,7 +9392,7 @@ void DNS_QC_double::run()
 
   if (flag_structural_uu_tmp_)
     {
-      int ghost_size_structural_uu_tmp = flag_structural_uu_tmp_ ? max(2, ghost_size_filter) : 2;
+      int ghost_size_structural_uu_tmp = flag_structural_uu_tmp_ ? max((int)2, ghost_size_filter) : 2;
 
       structural_uu_tmp_tensor_[0].allocate(splitting_, IJK_Splitting::ELEM, ghost_size_structural_uu_tmp);
       structural_uu_tmp_tensor_[1].allocate(splitting_, IJK_Splitting::ELEM, ghost_size_structural_uu_tmp);
@@ -9409,7 +9409,7 @@ void DNS_QC_double::run()
     }
   if (flag_structural_uscalar_tmp_)
     {
-      int ghost_size_structural_uscalar_tmp = flag_structural_uscalar_tmp_ ? max(2, ghost_size_filter) : 2;
+      int ghost_size_structural_uscalar_tmp = flag_structural_uscalar_tmp_ ? max((int)2, ghost_size_filter) : 2;
 
       structural_uscalar_tmp_vector_[0].allocate(splitting_, IJK_Splitting::ELEM, ghost_size_structural_uscalar_tmp);
       structural_uscalar_tmp_vector_[1].allocate(splitting_, IJK_Splitting::ELEM, ghost_size_structural_uscalar_tmp);
@@ -9420,7 +9420,7 @@ void DNS_QC_double::run()
     }
   if (flag_d_velocity_tmp_)
     {
-      ghost_size_d_velocity_tmp = flag_d_velocity_tmp_ ? max(2, ghost_size_filter) : 2;
+      ghost_size_d_velocity_tmp = flag_d_velocity_tmp_ ? max((int)2, ghost_size_filter) : 2;
 
       allocate_velocity(d_velocity_tmp_, splitting_, ghost_size_d_velocity_tmp);
       d_velocity_tmp_[0].data() = 0.;
@@ -10363,7 +10363,7 @@ void DNS_QC_double::calculer_convection_vitesse(FixedVector<IJK_Field_double, 3>
           multiplier_champ_rho_face_k(false, u_div_rho_u, 1., 0., velocity[2], d_velocity_tmp[2]);
 
           ghost_size_filter = 1 + kernel->ghost_size();
-          ghost_size_d_velocity_tmp = max(2, ghost_size_filter);
+          ghost_size_d_velocity_tmp = max((int)2, ghost_size_filter);
           d_velocity_tmp[0].echange_espace_virtuel(ghost_size_d_velocity_tmp);
           d_velocity_tmp[1].echange_espace_virtuel(ghost_size_d_velocity_tmp);
           d_velocity_tmp[2].echange_espace_virtuel(ghost_size_d_velocity_tmp);
@@ -10420,7 +10420,7 @@ void DNS_QC_double::calculer_convection_vitesse(FixedVector<IJK_Field_double, 3>
             }
 
           ghost_size_filter = 1 + kernel->ghost_size();
-          ghost_size_d_velocity_tmp = max(2, ghost_size_filter);
+          ghost_size_d_velocity_tmp = max((int)2, ghost_size_filter);
           d_velocity_tmp[0].echange_espace_virtuel(ghost_size_d_velocity_tmp);
           d_velocity_tmp[1].echange_espace_virtuel(ghost_size_d_velocity_tmp);
           d_velocity_tmp[2].echange_espace_virtuel(ghost_size_d_velocity_tmp);
@@ -10591,7 +10591,7 @@ void DNS_QC_double::calculer_turbulent_diffusion_vitesse(FixedVector<IJK_Field_d
         }
 
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_d_velocity_tmp = max(2, ghost_size_filter);
+      ghost_size_d_velocity_tmp = max((int)2, ghost_size_filter);
       d_velocity_tmp[0].echange_espace_virtuel(ghost_size_d_velocity_tmp);
       d_velocity_tmp[1].echange_espace_virtuel(ghost_size_d_velocity_tmp);
       d_velocity_tmp[2].echange_espace_virtuel(ghost_size_d_velocity_tmp);
@@ -10746,7 +10746,7 @@ void DNS_QC_double::calculer_structural_diffusion_vitesse(FixedVector<IJK_Field_
                                                            d_velocity_tmp[0], d_velocity_tmp[1], d_velocity_tmp[2]);
 
       ghost_size_filter = 1 + kernel->ghost_size();
-      ghost_size_d_velocity_tmp = max(2, ghost_size_filter);
+      ghost_size_d_velocity_tmp = max((int)2, ghost_size_filter);
       d_velocity_tmp[0].echange_espace_virtuel(ghost_size_d_velocity_tmp);
       d_velocity_tmp[1].echange_espace_virtuel(ghost_size_d_velocity_tmp);
       d_velocity_tmp[2].echange_espace_virtuel(ghost_size_d_velocity_tmp);
