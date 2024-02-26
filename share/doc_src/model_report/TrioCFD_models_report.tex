@@ -10,7 +10,6 @@
 \usepackage{amsmath,amssymb,amsfonts,amsgen,amsbsy,textcomp,pifont}
 \usepackage{bbold,stackrel,dsfont,mathrsfs,soul,tcolorbox,verbatimbox}
 \usepackage{amsthm}
-\usepackage{textcomp}
 \usepackage{color}
 \usepackage{xcolor}
 \usepackage{colortbl}
@@ -94,6 +93,28 @@
 \def\green{\color{green}}
 \def\gray{\color{gray}}
 \def\white{\color{white}}
+% Commands for Algo_QC latex
+\DeclareMathOperator{\tr}{tr}
+\newcommand{\diff}{\mathrm{d}} % Define a command for the differential symbol
+\newcommand{\difffrac}[2]{\frac{\diff #1}{\diff #2}}
+\newcommand{\pfrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\der}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\dd}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\dtot}[2]{\frac{D #1}{D #2}}
+\newcommand{\ov}[1]{\overline{#1}}
+\newcommand{\f}[1]{\overline{#1}} % overbar
+\newcommand{\fa}[1]{\widetilde{#1}}
+\newcommand{\FA}[1]{\reallywidetilde{#1}}
+\newcommand{\ff}[1]{\widehat{#1}}
+\newcommand{\FF}[1]{\reallywidehat{#1}}
+\newcommand{\m}[1]{\overline{#1}} % overbar
+\newcommand{\ma}[1]{\widetilde{#1}}
+\newcommand{\MA}[1]{\reallywidetilde{#1}}
+\newcommand{\vv}[1]{\boldsymbol{#1}}
+\newcommand{\vt}[1]{\boldsymbol{#1}}
+\newcommand{\w}[1]{\widehat{#1}}
+\newcommand{\W}[1]{\reallywidehat{#1}}
+
 
 %%%%%   SENSITIVITY   %%%%%
 \def\b_u{\mathbf{u}}
@@ -372,7 +393,7 @@ v\codeVersion & \today & \includegraphics[scale=0.05]{../pictures/signTrioCFDMan
 \lhead{}
 \rhead{BIBLIOGRAPHIE}
 \bibliographystyle{plain}
-\bibliography{BibTeX_TrioCFD, 18-Stokes_bib, bibALE, bibCMFD, bibFTD, bibSENSITIVITY}
+\bibliography{BibTeX_TrioCFD, 18-Stokes_bib, bibALE, bibCMFD, bibFTD, bibSENSITIVITY, bibAlgo_QC.bib}
 
 \end{document}
 
