@@ -5766,7 +5766,7 @@ void calculer_structural_uscalar_similarity_comp(const double structural_uscalar
               Cerr << "-----------------------" << finl;
 
               const double c_is = (r_is)/rho_filtre - (rho_uf_i*rho_scalarf_i)/(rho_filtre*rho_filtre);
-              const double c_js = (r_js)/rho_filtre - (rho_vf_j*rho_scalarf_i)/(rho_filtre*rho_filtre);
+              const double c_js = (r_js)/rho_filtre - (rho_vf_j*rho_scalarf_j)/(rho_filtre*rho_filtre);
               const double c_ks = (r_ks)/rho_filtre - (rho_wf_k*rho_scalarf_k)/(rho_filtre*rho_filtre);
 
               structural_uscalar_x(i,j,k) = - coefficient_x * structural_uscalar_model_constant * c_is;
@@ -9908,7 +9908,7 @@ void DNS_QC_double::run()
             }
           else // sinon on garde
             {
-              timestep_= timestep_;
+              // Nothing to do
             }
 
           Cout << "T= " << current_time_
