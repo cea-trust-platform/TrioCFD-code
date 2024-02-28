@@ -209,6 +209,7 @@ void Operateur_IJK_faces_diff_base_double::calculer(const IJK_Field_double& vx, 
   vx_ = &vx;
   vy_ = &vy;
   vz_ = &vz;
+  compute_set(dvx, dvy, dvz);
   nu_ = nullptr;
   divergence_ = nullptr;
   coeff_tensor_xx_ = nullptr;
@@ -220,7 +221,6 @@ void Operateur_IJK_faces_diff_base_double::calculer(const IJK_Field_double& vx, 
   coeff_tensor_zx_ = nullptr;
   coeff_tensor_zy_ = nullptr;
   coeff_tensor_zz_ = nullptr;
-  compute_set(dvx, dvy, dvz);
   statistiques().end_count(diffusion_counter_);
 }
 
