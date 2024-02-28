@@ -67,10 +67,10 @@ Read pb1
    
            Navier_Stokes_standard
         {
-                solveur_pression GCP { 
+                # solveur_pression GCP { 
                         precond ssor { omega 1.5 }
                         seuil 1.e-07 
-                }
+                } #
 		solveur_pression petsc cholesky  { }
 		convection { amont }
                 diffusion { }

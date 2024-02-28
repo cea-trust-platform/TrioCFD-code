@@ -109,13 +109,13 @@ Read pb
 			sonde_temp temperature periode 1. segment 60 0. 0.501 4. 0.501
                         sonde_vite vitesse     periode 1. segment 60 0. 0.501 4. 0.501
 		}
+		format lml
 		Champs dt_post 400.0
 		{
 			pression 
-			vitesse  
+			vitesse 
+			vitesse elem 
 		}
-		format lml
-		Champs dt_post 400.  { vitesse elem }
 	}
 }
 

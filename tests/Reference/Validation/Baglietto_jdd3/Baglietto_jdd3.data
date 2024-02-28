@@ -188,7 +188,6 @@ Read pb
 
 	Postraitement
 	{
-	        format lml
 		Sondes
 		{     					
 			sonde_U_1 chsom vitesse periode 0.1 segment 30  2.667 -1. 2.667  2.

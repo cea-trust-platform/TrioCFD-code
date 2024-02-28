@@ -30,13 +30,13 @@
 #include <Param.h>
 
 Implemente_instanciable( Extraire_surface_ALE, "Extraire_surface_ALE", Extraire_surface ) ;
-//XD Extraire_surface_ALE interprete Extraire_surface_ALE -3 Extraire_surface_ALE in order to extract a surface on a mobile boundary (with ALE desciption). NL2 Keyword to specify that the extract surface is done on a mobile domain. The surface mesh is defined by one or two conditions. The first condition is about elements with Condition_elements. For example: Condition_elements x*x+y*y+z*z<1 NL2 Will define a surface mesh with external faces of the mesh elements inside the sphere of radius 1 located at (0,0,0). The second condition Condition_faces is useful to give a restriction.NL2 By default, the faces from the boundaries are not added to the surface mesh excepted if option avec_les_bords is given (all the boundaries are added), or if the option avec_certains_bords is used to add only some boundaries.
-//XD attr domaine ref_domaine domaine 0 Domain in which faces are saved
-//XD attr probleme ref_Pb_base probleme 0 Problem from which faces should be extracted
-//XD attr condition_elements chaine condition_elements 1 not_set
-//XD attr condition_faces chaine condition_faces 1 not_set
-//XD attr avec_les_bords rien avec_les_bords 1 not_set
-//XD attr avec_certains_bords listchaine avec_certains_bords 1 not_set
+// XD Extraire_surface_ALE interprete Extraire_surface_ALE -3 Extraire_surface_ALE in order to extract a surface on a mobile boundary (with ALE desciption). NL2 Keyword to specify that the extract surface is done on a mobile domain. The surface mesh is defined by one or two conditions. The first condition is about elements with Condition_elements. For example: Condition_elements x*x+y*y+z*z<1 NL2 Will define a surface mesh with external faces of the mesh elements inside the sphere of radius 1 located at (0,0,0). The second condition Condition_faces is useful to give a restriction.NL2 By default, the faces from the boundaries are not added to the surface mesh excepted if option avec_les_bords is given (all the boundaries are added), or if the option avec_certains_bords is used to add only some boundaries.
+// XD attr domaine ref_domaine domaine 0 Domain in which faces are saved
+// XD attr probleme ref_Pb_base probleme 0 Problem from which faces should be extracted
+// XD attr condition_elements chaine condition_elements 1 not_set
+// XD attr condition_faces chaine condition_faces 1 not_set
+// XD attr avec_les_bords rien avec_les_bords 1 not_set
+// XD attr avec_certains_bords listchaine avec_certains_bords 1 not_set
 Sortie& Extraire_surface_ALE::printOn( Sortie& os ) const
 {
   return Extraire_surface::printOn( os );

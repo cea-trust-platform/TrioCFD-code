@@ -57,7 +57,7 @@ Read pb
    
    	Navier_Stokes_standard
 	{
-		solveur_pression gcp { precond ssor { omega 1.6 } seuil 1e-6 }
+		# solveur_pression gcp { precond ssor { omega 1.6 } seuil 1e-6 } #
 		solveur_pression cholesky { }
 		convection { negligeable }
 		diffusion { negligeable  }

@@ -320,8 +320,10 @@ Fluide_Incompressible
                             } 
        convection { EF  defaut_bar }
        diffusion  { standard  defaut_bar }
-       Sources { Source_Qdm_lambdaup { lambda 2. } }
-       Sources { Canal_perio { bord perioz1 } }
+       Sources { 
+		Source_Qdm_lambdaup { lambda 2. } ,
+                Canal_perio { bord perioz1 } 
+	}
        conditions_initiales {  vitesse Champ_fonc_xyz dom01234 3  0. 0. 20.*(1.-(x*x+y*y)*(x*x+y*y)) }
        boundary_conditions { 
 perioz1 periodique 

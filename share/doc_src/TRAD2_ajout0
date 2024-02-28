@@ -22,11 +22,6 @@ loi_odvm turbulence_paroi_scalaire_base loi_odvm 1 Thermal wall-function based o
   attr check_files rien check_files 1 It gives for one boundary face a historical view of local instantaneous and filtered values, as well as the calculated variance profiles from the resolution of the equation. The printed values are into the file Suivi_ndeb.dat.
 loi_WW_scalaire turbulence_paroi_scalaire_base loi_WW_scalaire 0 not_set
 loi_puissance_hydr turbulence_paroi_base loi_puissance_hydr 1 A Loi_puissance_hydr law for wall turbulence for NAVIER STOKES equations.
-loi_odvm turbulence_paroi_scalaire_base loi_odvm 1 Thermal wall-function based on the simultaneous 1D resolution of a turbulent thermal boundary-layer and a variance transport equation, adapted to conjugate heat-transfer problems with fluid/solid thermal interaction (where a specific boundary condition should be used : Paroi_Echange_Contact_OVDM_VDF). This law is also available with isothermal walls.
-  attr n entier n 0 Number of points per face in the 1D uniform meshes. n should be choosen in order to have the first point situated near $\Delta$ y+=1/3.
-  attr gamma floattant gamma 0 Smoothing parameter of the signal between 10e-5 (no smoothing) and 10e-1 (high averaging).
-  attr stats floatfloat stats 1 value_t0 value_dt : Only for plane channel flow, it gives mean and root mean square profiles in the fine meshes, since value_t0 and every value_dt seconds. The values are printed into files named ODVM_fields*.dat.
-  attr check_files rien check_files 1 It gives for one boundary face a historical view of local instantaneous and filtered values, as well as the calculated variance profiles from the resolution of the equation. The printed values are into the file Suivi_ndeb.dat.
 loi_ww_hydr loi_standard_hydr loi_ww_hydr 1 laws have been qualified on channel calculation
 loi_ciofalo_hydr loi_standard_hydr loi_ciofalo_hydr -1 A Loi_ciofalo_hydr law for wall turbulence for NAVIER STOKES equations.
 paroi_echange_contact_odvm_vdf paroi_echange_contact_vdf paroi_echange_contact_odvm_vdf -1 not_set
@@ -73,10 +68,6 @@ mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RAN
   attr eps_max floattant eps_max 1 Upper limitation of epsilon (default value 1.e+10).
   attr k_min floattant k_min 1 Lower limitation of k (default value 1.e-10).
   attr quiet rien quiet 1 To disable printing of information about k and epsilon.
-k_epsilon mod_turb_hyd_rans k_epsilon -1 Turbulence model (k-eps).
-  attr cmu floattant cmu 1 Keyword to modify the Cmu constant of k-eps model : Nut=Cmu*k*k/eps Default value is 0.09
-  attr transport_k_epsilon transport_k_epsilon transport_k_epsilon 0 Keyword to define the (k-eps) transport equation.
-  attr modele_fonc_bas_reynolds modele_fonction_bas_reynolds_base modele_fonc_bas_reynolds 1 This keyword is used to set the bas Reynolds model used.
 loi_standard_hydr_old turbulence_paroi_base loi_standard_hydr_old 0 not_set
 loi_standard_hydr turbulence_paroi_base loi_standard_hydr 0 Keyword for the logarithmic wall law for a hydraulic problem. Loi_standard_hydr refers to first cell rank eddy-viscosity defined from continuous analytical functions, whereas Loi_standard_hydr_3couches from functions separataly defined for each sub-layer
 loi_expert_hydr loi_standard_hydr loi_expert_hydr 1 This keyword is similar to the previous keyword Loi_standard_hydr but has several additional options into brackets.
@@ -180,8 +171,6 @@ paroi_ft_disc_deriv objet_lecture paroi_ft_disc_deriv 0 not_set
 paroi_ft_disc_symetrie paroi_ft_disc_deriv symetrie 0 Symetrie condition in the case of two-phase flows
 paroi_ft_disc condlim_base paroi_ft_disc 0 Boundary condition for Front-Tracking problem in the discontinuous version.
   attr type paroi_ft_disc_deriv type 0 Symetrie condition.
-paroi_ft_disc_deriv objet_lecture paroi_ft_disc_deriv 0 not_set
-paroi_ft_disc_symetrie paroi_ft_disc_deriv symetrie 0 Symetrie condition in the case of two-phase flows
 paroi_ft_disc_constant paroi_ft_disc_deriv constant 0 condition contact angle fidex. The angle is measured between the wall and the interface in the phase 0.
   attr ch front_field_base ch 0 Boundary field type.
 paroi_echange_contact_vdf_ft paroi_echange_contact_vdf paroi_echange_contact_vdf_ft -1 This boundary condition is used between a conduction problem and a thermohydraulic problem with two phases flow (Front-Tracking method) to modelize heat exchange.
@@ -319,10 +308,6 @@ echange_contact_rayo_transp_vdf paroi_echange_contact_vdf echange_contact_rayo_t
 frontiere_ouverte_rayo_transp frontiere_ouverte frontiere_ouverte_rayo_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with transparent gas.
 frontiere_ouverte_rayo_transp_vdf frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vdf -1 doit disparaitre
 frontiere_ouverte_rayo_transp_vef frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vef -1 doit disparaitre
-paroi_contact_rayo condlim_base paroi_contact_rayo -1 Thermal condition between two domains.
-  attr autrepb ref_Pb_base autrepb 0 Name of other problem.
-  attr nameb chaine nameb 0 boundary name of the remote problem which should be the same than the local name
-  attr type chaine(into=["TRANSP","SEMI_TRANSP"]) type 0 not_set
 
 frontiere_ouverte_temperature_imposee_rayo_semi_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition for a radiation problem with semi transparent gas.
 paroi_echange_externe_impose_rayo_semi_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_semi_transp -1 External type exchange condition for a coupled problem with radiation in semi transparent gas.

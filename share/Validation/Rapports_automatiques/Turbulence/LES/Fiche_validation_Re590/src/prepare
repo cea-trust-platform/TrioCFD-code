@@ -1,10 +1,10 @@
-# Format américain de nombres (nécessaire pour printf)
+# Format americain de nombres (necessaire pour printf)
 #-----------------------------------------------------
 
 export LC_NUMERIC=C
 
 
-# Mettre la valeur choisie pour t_deb dans le post_run (où t_deb=100 par défaut)
+# Mettre la valeur choisie pour t_deb dans le post_run (ou t_deb=100 par defaut)
 #-------------------------------------------------------------------------------
 
 T_DEB=20
@@ -26,9 +26,9 @@ Ny_VEF=11
 Nz_VEF=9
 
 
-# Donner le facteur fact tel que delta est égal à la hauteur des mailles de bord divisée par fact : fact=3 correspond au centre de gravité des FACES de bord (donc à y1), fact=4 correspond au centre de gravité des ELEMENTS de bord
+# Donner le facteur fact tel que delta est egal a la hauteur des mailles de bord divisee par fact : fact=3 correspond au centre de gravite des FACES de bord (donc a y1), fact=4 correspond au centre de gravite des ELEMENTS de bord
 # ----------------------------------------------------------------------------------------------
-# (en vue de tests ultérieurs éventuels sur la valeur de delta)
+# (en vue de tests ulterieurs eventuels sur la valeur de delta)
 
 fact=3
 
@@ -52,7 +52,7 @@ cp post_run T0Q_VEF_Pironneau
 cp post_run T0Q_VEF_Pironneau_maillage_decale
 
 
-# Jeu de données VDF_T0Q
+# Jeu de donnees VDF_T0Q
 #-----------------------
 
 N=`echo "$Ny_VDF-1" | bc -l`
@@ -83,7 +83,7 @@ sed -e 's/_T_FIN_/'$T_FIN'/g'	tmp18 > T0Q_VDF/Cas.data
 rm -f tmp*
 
 
-# Jeu de données VEF_T0Q_Pironneau
+# Jeu de donnees VEF_T0Q_Pironneau
 #---------------------------------
 
 N=`echo "2*$Ny_VEF-1" | bc -l`
@@ -112,7 +112,7 @@ sed -e 's/_T_DEB_/'$T_DEB'/g'	tmp17 > tmp18
 sed -e 's/_T_FIN_/'$T_FIN'/g'	tmp18 > T0Q_VEF_Pironneau/Cas.data
 
 
-# Jeu de données VEF_T0Q
+# Jeu de donnees VEF_T0Q
 #-----------------------
 
 sed -e 's/_CLH_/paroi_fixe/g' tmp15 > tmp19
@@ -121,7 +121,7 @@ sed -e 's/_T_DEB_/'$T_DEB'/g' tmp20 > tmp21
 sed -e 's/_T_FIN_/'$T_FIN'/g' tmp21 > T0Q_VEF/Cas.data
 
 
-# Jeu de données VEF_T0Q_Pironneau_maillage_decale
+# Jeu de donnees VEF_T0Q_Pironneau_maillage_decale
 #-------------------------------------------------
 
 Yh=`echo "$Y_haut-$delta" | bc`
@@ -150,7 +150,7 @@ sed -e 's/_T_FIN_/'$T_FIN'/g'	tmp18 > T0Q_VEF_Pironneau_maillage_decale/Cas.data
 rm -f tmp*
 
 
-# Dimensionnement des données de DNS (Kawamura et Moser-Kim-Mansour)
+# Dimensionnement des donnees de DNS (Kawamura et Moser-Kim-Mansour)
 #-------------------------------------------------------------------
 
 Re_tau_MKM=587.19

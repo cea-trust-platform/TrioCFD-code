@@ -81,9 +81,8 @@ Read pb
                 convection { EF defaut_bar }
                 diffusion  { standard grad_Ubar 1 nu 1 nut 1 nu_transp 1 nut_transp 1 filtrer_resu 1 }
                              
-                Sources { Source_Qdm_lambdaup { lambda 2. } }
-                Sources
-                        {
+                Sources {
+			Source_Qdm_lambdaup { lambda 2. } ,
                         Canal_perio { bord periox }
                         }
 		initial_conditions

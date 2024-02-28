@@ -23,9 +23,9 @@
 #include <ALE_Neumann_BC_for_grid_problem.h>
 
 Implemente_instanciable(ALE_Neumann_BC_for_grid_problem, "ALE_Neumann_BC_for_grid_problem", Interprete_geometrique_base ) ;
-//XD  ALE_Neumann_BC_for_grid_problem interprete ALE_Neumann_BC_for_grid_problem 0 block to indicates the names of the boundary with Neumann BC for the grid problem. By default, in the ALE grid problem, we impose a homogeneous Dirichelt-type BC on the fix boundary. This option allows you to impose also Neumann-type BCs on certain boundary.
-//XD  attr dom ref_domaine dom 0 Name of domain.
-//XD attr bloc bloc_lecture bloc 0 between the braces, you must specify the numbers of the mobile borders then list these mobile borders.  NL2 Example:  ALE_Neumann_BC_for_grid_problem dom_name  { 1  boundary_name }
+// XD  ALE_Neumann_BC_for_grid_problem interprete ALE_Neumann_BC_for_grid_problem 0 block to indicates the names of the boundary with Neumann BC for the grid problem. By default, in the ALE grid problem, we impose a homogeneous Dirichelt-type BC on the fix boundary. This option allows you to impose also Neumann-type BCs on certain boundary.
+// XD  attr dom ref_domaine dom 0 Name of domain.
+// XD attr bloc bloc_lecture bloc 0 between the braces, you must specify the numbers of the mobile borders then list these mobile borders.  NL2 Example:  ALE_Neumann_BC_for_grid_problem dom_name  { 1  boundary_name }
 
 Sortie& ALE_Neumann_BC_for_grid_problem::printOn( Sortie& os ) const
 {

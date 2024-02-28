@@ -99,8 +99,8 @@ Read pb
 			{
 			vitesse elem
 			pression elem
+			Distance_paroi elem
 			}
-		Champs dt_post 5. { Distance_paroi elem }
 		}
 	}
 EcritureLectureSpecial 0

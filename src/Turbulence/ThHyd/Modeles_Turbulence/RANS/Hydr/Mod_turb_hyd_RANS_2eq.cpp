@@ -25,7 +25,7 @@
 #include <Param.h>
 
 Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_2eq, "Mod_turb_hyd_RANS_2eq", Modele_turbulence_hyd_base);
-// XD mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
+// X_D mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Mod_turb_hyd_RANS_2eq::Mod_turb_hyd_RANS_2eq()
 {

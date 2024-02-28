@@ -69,8 +69,11 @@ Fluide_incompressible
 		solveur_pression Petsc cholesky { }
 		convection { EF_stab { } }
 		diffusion { }
-		Sources { Boussinesq_temperature { T0 873. } }
-		Sources { Canal_perio { bord Periox } }
+		Sources
+		{
+			Boussinesq_temperature { T0 873. } ,
+			Canal_perio { bord Periox }
+		}
 		conditions_initiales { vitesse champ_uniforme 3 80. 0. 0. }
 		boundary_conditions
 		{

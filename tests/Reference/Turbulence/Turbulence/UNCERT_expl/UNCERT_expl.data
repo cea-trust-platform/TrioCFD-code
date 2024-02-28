@@ -16,7 +16,7 @@ VEFPreP1B dis
 Scheme_euler_explicit sch
 Read sch
 {
-	nb_pas_dt_max 1000000
+	# nb_pas_dt_max 1000000 #
 	nb_pas_dt_max 10
 	tinit 0.0001
 	tmax 20.

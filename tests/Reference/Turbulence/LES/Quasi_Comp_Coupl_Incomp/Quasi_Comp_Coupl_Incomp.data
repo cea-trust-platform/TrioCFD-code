@@ -122,8 +122,10 @@ Fluide_Incompressible
                                              seuil 1.e-7 }
      convection { EF defaut_bar }
      diffusion  { standard defaut_bar }
-     Sources { Canal_perio { bord periox } }
-     Sources { Source_qdm_lambdaup  { lambda 2. } }
+     Sources {
+              Canal_perio { bord periox } ,
+              Source_qdm_lambdaup  { lambda 2. }
+     }
      conditions_initiales {  vitesse champ_fonc_xyz dom_boite  3  3.73024 60.*(1.-rnd(1))  60.*(1.-rnd(1)) }
 
      boundary_conditions { 

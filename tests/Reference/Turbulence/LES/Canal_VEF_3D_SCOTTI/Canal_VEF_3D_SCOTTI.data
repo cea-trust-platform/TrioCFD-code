@@ -89,9 +89,8 @@ Lire pb
 
                 convection { EF defaut_bar }
                 diffusion  { standard  defaut_bar }
-                Sources { Source_Qdm_lambdaup { lambda 2. } }
-                Sources
-                        {
+                Sources { 
+			Source_Qdm_lambdaup { lambda 2. } ,
                         Canal_perio { bord periox }
                         }
 		conditions_initiales

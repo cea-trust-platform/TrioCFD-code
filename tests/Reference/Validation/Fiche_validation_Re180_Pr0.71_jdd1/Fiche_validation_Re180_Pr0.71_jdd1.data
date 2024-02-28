@@ -105,7 +105,9 @@ Read pb
 						debut_stat 600
 						}
 					}
-		Sources			{ canal_perio { bord PerioX } }
+		Sources			{
+		                          canal_perio { bord PerioX } 
+		                        }
 	}
 
 	Convection_diffusion_temperature_turbulent
@@ -124,7 +126,9 @@ Read pb
 					turbulence_paroi loi_standard_hydr_scalaire
 					dt_impr_nusselt 20
 					}
-		Sources			{ puissance_thermique champ_uniforme 1 1 }
+		Sources			{
+		                          puissance_thermique champ_uniforme 1 1
+		                        }
 	}
 
 	Postraitement
