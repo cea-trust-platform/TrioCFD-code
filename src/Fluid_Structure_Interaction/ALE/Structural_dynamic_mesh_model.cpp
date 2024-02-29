@@ -696,6 +696,11 @@ double Structural_dynamic_mesh_model::computeCriticalDt(const double Vol, const 
   double currDensity = massElem_(iel_) / Vol ;
 
   // Speed of sound
+  if (currDensity <= 0.)
+    {
+      Cerr << "Error: negative density in grid mesh motion" << finl ;
+      exit() ;
+    }
   double cSound = sqrt(E / currDensity) ;
 
   return Xlong / cSound ;

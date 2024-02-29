@@ -1577,6 +1577,7 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
   double tt = str_mesh_model->gridTime ;
   double t0 = tt ;
   bool loopOnGridProblem = true ;
+  int nstepCurr = 0 ;
 
   while (loopOnGridProblem)
     {
@@ -1682,7 +1683,8 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       str_mesh_model->gridNStep += 1 ;
       str_mesh_model->applyDtCoefficient() ;
       str_mesh_model->gridTime = tt ;
-      Cerr << "Grid dynamic problem, dt= " << Dt << ", dt_stab= " << str_mesh_model->gridDt << ", time= " << tt << ", target fluid time= " << temps << finl ;
+      nstepCurr += 1 ;
+      Cerr << "Grid dynamic problem, internal step: "<< nstepCurr << ", t= " << Dt << ", dt_stab= " << str_mesh_model->gridDt << ", time= " << tt << ", target fluid time= " << temps << finl ;
 
     } // End time loop on grid problem
 
