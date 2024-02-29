@@ -37,7 +37,7 @@ Sortie& Structural_dynamic_mesh_model::printOn(Sortie& os) const
 
 Entree& Structural_dynamic_mesh_model::readOn(Entree& is)
 {
-
+  return is;
 }
 
 Entree& Structural_dynamic_mesh_model::interpreter_(Entree& is)
@@ -111,14 +111,14 @@ void Structural_dynamic_mesh_model::initMfrontBehaviour()
           size_t vOffset = mgis::behaviour::getVariableOffset(mgisBehaviour_.esvs, esvs.name, hypothesis_);
           size_t vSize   = mgis::behaviour::getVariableSize(esvs, hypothesis_);
           Cerr << "    - " << esvs.name << ": " << vOffset << " -> " << vOffset + vSize << finl ;
-          sizeEvars_ += vSize ;
+          sizeEvars_ += static_cast<int> (vSize) ;
         }
 
       Cerr << "Warning: external variables ignored for mesh motion" << finl ;
     }
 
   // Check and fill material properties for Mfront behaviour
-  matpSize_                                 = mgis::behaviour::getArraySize(mgisBehaviour_.mps, hypothesis_);
+  matpSize_                                 = static_cast<int> (mgis::behaviour::getArraySize(mgisBehaviour_.mps, hypothesis_));
   double *s0MaterialProperties              = new double[matpSize_];
   double *s1MaterialProperties              = new double[matpSize_];
   mgisBehaviourData_.s0.material_properties = s0MaterialProperties;
@@ -358,7 +358,7 @@ void Structural_dynamic_mesh_model::computeInternalForces(double& Vol, double& X
 
   //  Next transformation gradient
 
-  double ftpdt[nSymSize_] ;
+  std::vector <double> ftpdt(nSymSize_) ;
   for (int i=0; i<nSymSize_; i++) { ftpdt[i] = 0 ; }
 
 #define _xikbjk(i,j) xl_(k,i)*B0l_(j,k)
@@ -384,20 +384,20 @@ void Structural_dynamic_mesh_model::computeInternalForces(double& Vol, double& X
 
   //  Integrate material behavior
 
-  double ft[nSymSize_] ;
+  std::vector <double> ft(nSymSize_) ;
   for (int i=0; i<nSymSize_; i++) { ft[i] = Ft_(iel_,i) ; }
 
-  double stress[symSize_] ;
+  std::vector <double> stress(symSize_) ;
   for (int i=0; i<symSize_; i++) { stress[i] = Stress_(iel_,i) ; }
 
-  double evars[sizeEvars_] ;
+  std::vector <double> evars(sizeEvars_) ;
   for (int i=0; i<sizeEvars_; i++) { evars[i] = mfrontEvars_(iel_,i) ; }
 
-  double voidInternalVars[0] ;
-  double K[stiffnessMatrixMinSize_] ;
+  double voidInternalVars[1] ; // 0 size forbidden
+  std::vector <double>  K(stiffnessMatrixMinSize_) ;
   K[0] = 0.; // Stiffness matrix not computed, see mfront/mgis convention
 
-  integrate_behaviour_(stress, voidInternalVars, evars, K, ft, ftpdt) ;
+  integrate_behaviour_(&stress[0], voidInternalVars, &evars[0], &K[0], &ft[0], &ftpdt[0]) ;
 
   // Update stress and transformation gradient
   for (int i=0; i<symSize_; i++) { Stress_(iel_,i) = stress[i] ; }
@@ -406,7 +406,7 @@ void Structural_dynamic_mesh_model::computeInternalForces(double& Vol, double& X
   //  Compute local forces
   aux = 1./sqrt(2.) ;
   fl_ = 0 ;
-  double cauchy[symSize_] ;
+  std::vector <double> cauchy(symSize_) ;
   switch (dimension)
     {
     case (2) :
@@ -538,7 +538,6 @@ void Structural_dynamic_mesh_model::setB0_(const DoubleTab& B)
 
   // Save B operator at initial step to compute transformation gradient with respect to initial configuration
 
-  int lb = nbn_ * dimension ;
   int pos = 0 ;
 
   for (int j=0; j < dimension; j++)
@@ -595,14 +594,14 @@ void Structural_dynamic_mesh_model::load_behaviour_(StressMeasureKind smk, Tange
   {getMgisStressMeasureKind(smk), getMgisTangentOperatorKind(tok)}, l_, f_, mgis::behaviour::fromString(h_));
 
   // internal variables
-  this->nbIvars_ = mgis::behaviour::getArraySize(mgisBehaviour_.isvs, hypothesis_);
+  this->nbIvars_ = static_cast<int> (mgis::behaviour::getArraySize(mgisBehaviour_.isvs, hypothesis_));
 
   // external variables
-  this->nbEvars_ = mgis::behaviour::getArraySize(mgisBehaviour_.esvs, hypothesis_);
+  this->nbEvars_ = static_cast<int> (mgis::behaviour::getArraySize(mgisBehaviour_.esvs, hypothesis_));
 
   // K
-  this->KSize_ = mgis::behaviour::getArraySize(mgisBehaviour_.gradients, hypothesis_) *
-                 mgis::behaviour::getArraySize(mgisBehaviour_.thermodynamic_forces, hypothesis_);
+  this->KSize_ = static_cast<int> (mgis::behaviour::getArraySize(mgisBehaviour_.gradients, hypothesis_) *
+                                   mgis::behaviour::getArraySize(mgisBehaviour_.thermodynamic_forces, hypothesis_));
 }
 
 void Structural_dynamic_mesh_model::integrate_behaviour_(double *const stress,                     // stress tensor
@@ -733,7 +732,7 @@ void Structural_dynamic_mesh_model::checkElemOrientation(int elnodes[4], const i
     {
       DoubleTab Jac(dimension, dimension) ;
       double Det, Vol, Xlong ;
-      int nbn ;
+      int nbn=0 ;
       DoubleTab xl ;
 
       switch (dimension)
