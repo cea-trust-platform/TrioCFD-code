@@ -37,12 +37,6 @@ public:
     Prdt[1]=Prandt_Eps;
   }
 
-  inline virtual void associer(const Champ_base& diffu) override
-  {
-    ref_diffusivite_ = diffu;
-    tab_diffusivite_.ref(ref_diffusivite_->valeurs());
-    is_var_ = sub_type(Champ_Uniforme, diffu) ? 0 : 1;
-  }
   inline void associer_diff_turb(const Champ_Fonc& diffu) { diffusivite_turbulente_ = diffu; }
   inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }
   inline void mettre_a_jour() override { dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs()); }
