@@ -25,6 +25,7 @@
 #include <TRUSTTab.h>
 #include <Viscosite_turbulente_base.h>
 #include <Correlation_base.h>
+#include <TRUST_Ref.h>
 
 /*! @brief classe Viscosite_turbulente_k_omega Viscosite turbulente pour un modele "k-omega" : nu_t = k / omega
  *
@@ -50,6 +51,7 @@ private:
   double beta_k_ = 0.09;
   int    gas_turb_ = 0 ; // Si 0, pas de turbulence dans la phase gazeuse ; si 1, il y en a
   OWN_PTR(Correlation_base) correlation_; //correlation donnant le coeff de masse ajoutee
+  bool has_been_completer = false;
 };
 
 #endif
