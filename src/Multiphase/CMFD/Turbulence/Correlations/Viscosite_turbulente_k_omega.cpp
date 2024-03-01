@@ -55,6 +55,7 @@ void Viscosite_turbulente_k_omega::completer()
   if ( (gas_turb_) && (!pb_->has_correlation("masse_ajoutee")) ) Process::exit(que_suis_je() + " : there must be an added mass correlation if you want gas phase turbulence !");
   if ( (gas_turb_) && (!int(pb_->has_champ("alpha"))) ) Process::exit(que_suis_je() + " : there must be void fraction if you want gas phase turbulence !");
   if (pb_->has_correlation("masse_ajoutee")) correlation_ = pb_->get_correlation("masse_ajoutee");
+  has_been_completer = true;
 }
 
 void Viscosite_turbulente_k_omega::eddy_viscosity(DoubleTab& nu_t) const
@@ -76,12 +77,12 @@ void Viscosite_turbulente_k_omega::eddy_viscosity(DoubleTab& nu_t) const
       //                   limiter_ * nu(i, n) )  ;
       nu_t(i, n) = (n<k.dimension(1)) ? sigma_ * ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(!cnu * i, n)): limiter_ * nu(!cnu * i, n) ) : 0. ;
 
-  if (gas_turb_)
+  if (gas_turb_ && has_been_completer)
     {
       DoubleTab coeff = DoubleTab(nu_t.dimension(1));
       for (int i = 0; i < nu_t.dimension(0); i++)
         {
-          const Masse_ajoutee_base& corr_ma_ = ref_cast(Masse_ajoutee_base, correlation_.valeur());
+          const Masse_ajoutee_base& corr_ma_ = ref_cast(Masse_ajoutee_base, correlation_.valeur().valeur());
           corr_ma_.coefficient( & (*alpha)(i,0), &rho(i,0), coeff);
           for (int n = k.dimension(1) ; n < nu_t.dimension(1) ; n++)
             nu_t(i, n) =  nu_t(i, 0.)  * (1. + coeff(n)* rho(i,0)/rho(i,n)) * std::min((*alpha)(i,n)*10, 1.) ;
