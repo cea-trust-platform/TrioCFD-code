@@ -152,17 +152,17 @@ void Pb_Hydraulique_Turbulent_ALE::associer_sch_tps_base(const Schema_Temps_base
   Probleme_base::associer_sch_tps_base(sch);
 
   // Verify that user choosed adapted time scheme/solver
-  if (sub_type(Schema_Euler_explicite,le_schema_en_temps.valeur()))
+  if (sub_type(Schema_Euler_explicite,le_schema_en_temps_.valeur()))
     {
-      if(!sub_type(Schema_Euler_explicite_ALE,le_schema_en_temps.valeur()))
+      if(!sub_type(Schema_Euler_explicite_ALE,le_schema_en_temps_.valeur()))
         {
           Cerr <<"Error: for Mobile domain (Domaine_ALE):  replace  " <<sch.que_suis_je()<<" with "<< sch.que_suis_je() <<"_ALE and restart!"<< finl;
           Process::exit();
         }
     }
-  else if (sub_type(Schema_Euler_Implicite,le_schema_en_temps.valeur()))
+  else if (sub_type(Schema_Euler_Implicite,le_schema_en_temps_.valeur()))
     {
-      Schema_Euler_Implicite& sch_imp = ref_cast(Schema_Euler_Implicite,le_schema_en_temps.valeur());
+      Schema_Euler_Implicite& sch_imp = ref_cast(Schema_Euler_Implicite,le_schema_en_temps_.valeur());
       if (!sub_type(Implicite_ALE,sch_imp.solveur().valeur()))
         {
           Cerr <<"Error: for Mobile domain (Domaine_ALE), you can only use Scheme_euler_implicit time scheme with solveur implicite_ALE "<<finl;
