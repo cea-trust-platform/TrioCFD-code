@@ -84,7 +84,7 @@ static inline void choix_filter_kernel(const int ghost_size,
   // Choose a filter_kernel to compute the filter.
   // Note: THE CALLER _MUdouble_ FREE THE MEMORY USING DELETE.
   // example of use :
-  //          Filter_kernel_base* filter_kernel = NULL;
+  //          Filter_kernel_base* filter_kernel = nullptr;
   //          choix_filter_kernel(ghost_size, filter_kernel_name, filter_kernel);
   //          /* do something with filter_kernel */
   //          delete filter_kernel;
@@ -196,7 +196,7 @@ static inline void choix_modele(const Nom& turbulent_viscosity_model,
   // Choose a model to compute the turbulent viscosity.
   // Note: THE CALLER _MUdouble_ FREE THE MEMORY USING DELETE.
   // example of use :
-  //          Turbulent_viscosity_base* model = NULL;
+  //          Turbulent_viscosity_base* model = nullptr;
   //          choix_modele(turbulent_viscosity_model, model);
   //          /* do something with model */
   //          delete model;
@@ -3433,7 +3433,7 @@ void calculer_turbulent_mu_scalar(const bool anisotropic,
                                   IJK_Field_double& turbulent_mu,
                                   const IJK_Splitting& splitting)
 {
-  Turbulent_viscosity_base* model = NULL;
+  Turbulent_viscosity_base* model = nullptr;
 
   choix_modele(turbulent_viscosity_model, model);
 
@@ -3521,7 +3521,7 @@ void calculer_turbulent_mu_tensor(const bool anisotropic,
                                   FixedVector<IJK_Field_double, 6>& turbulent_mu_tensor,
                                   const IJK_Splitting& splitting)
 {
-  Turbulent_viscosity_base* model = NULL;
+  Turbulent_viscosity_base* model = nullptr;
 
   const double& coefficient_xx = turbulent_viscosity_tensor_coefficients[0];
   const double& coefficient_xy = turbulent_viscosity_tensor_coefficients[1];
@@ -3621,7 +3621,7 @@ void calculer_turbulent_mu_vector(const bool anisotropic,
                                   FixedVector<IJK_Field_double, 3>& turbulent_mu_vector,
                                   const IJK_Splitting& splitting)
 {
-  Turbulent_viscosity_base* model = NULL;
+  Turbulent_viscosity_base* model = nullptr;
 
   const double& coefficient_x = turbulent_diffusivity_vector_coefficients[0];
   const double& coefficient_y = turbulent_diffusivity_vector_coefficients[1];
@@ -9084,7 +9084,7 @@ void DNS_QC_double::run()
   if(diff_temp_negligeable_)
     Cerr << " Attention la diffusion thermique est negligee " << finl;
 
-  kernel_ = NULL;
+  kernel_ = nullptr;
   int ghost_size_filter = 0, ghost_size_d_velocity_tmp;
   if (flag_turbulent_mu_filtre_ || flag_turbulent_kappa_filtre_
       || flag_structural_uu_filtre_ || flag_structural_uscalar_filtre_

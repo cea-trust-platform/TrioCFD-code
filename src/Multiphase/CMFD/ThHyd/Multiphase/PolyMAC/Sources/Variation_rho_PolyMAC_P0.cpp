@@ -43,7 +43,7 @@ Entree& Variation_rho::readOn(Entree& is)
 void Variation_rho::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Champ_base& ch_rho = equation().milieu().masse_volumique();
-  const Champ_Inc_base *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : NULL;
+  const Champ_Inc_base *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr;
 
   if (!(pch_rho)) return; //rien a faire : le terme est nul
 
@@ -73,7 +73,7 @@ void Variation_rho::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
 void Variation_rho::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Champ_base& ch_rho = equation().milieu().masse_volumique();
-  const Champ_Inc_base *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : NULL;
+  const Champ_Inc_base *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr;
 
   if (!(pch_rho)) return; //rien a faire : le terme est nul
 
@@ -89,9 +89,9 @@ void Variation_rho::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const 
   double pas_tps = equation().probleme().schema_temps().pas_de_temps();
   int N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), Np = equation().probleme().get_champ("pression").valeurs().line_size();
 
-  Matrice_Morse *Mp = matrices.count("pression")    ? matrices.at("pression")    : NULL,
-                 *Mt = matrices.count("temperature") ? matrices.at("temperature") : NULL,
-                  *Mai = matrices.count("interfacial_area") ? matrices.at("interfacial_area") : NULL;
+  Matrice_Morse *Mp = matrices.count("pression")    ? matrices.at("pression")    : nullptr,
+                 *Mt = matrices.count("temperature") ? matrices.at("temperature") : nullptr,
+                  *Mai = matrices.count("interfacial_area") ? matrices.at("interfacial_area") : nullptr;
 
   /* elements */
   int n_l = 0 ; // phase porteuse

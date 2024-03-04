@@ -1961,7 +1961,7 @@ int Maillage_FT_Disc::calculer_voisinage_facettes(IntTab& fa7Voisines,
 {
   Process::Journal()<<"Maillage_FT_Disc::calculer_voisinage_facettes"<<finl;
   int res = 1;
-  if (ief==NULL)
+  if (ief==nullptr)
     {
       ief = & intersections_elem_facettes_;
       assert(statut_ >= PARCOURU);

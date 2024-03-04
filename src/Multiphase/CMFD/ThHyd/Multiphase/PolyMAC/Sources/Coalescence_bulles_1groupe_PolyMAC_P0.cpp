@@ -45,7 +45,7 @@ Entree& Coalescence_bulles_1groupe_PolyMAC_P0::readOn(Entree& is)
   param.lire_avec_accolades_depuis(is);
 
 
-  const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : NULL;
+  const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
   for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
@@ -98,10 +98,10 @@ void Coalescence_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, D
                        &temp_p  = pbm.equation_energie().inconnue().passe(),
                         &rho_p   = equation().milieu().masse_volumique().passe(),
                          &nu_p = equation().probleme().get_champ("viscosite_cinematique").passe(),
-                          *tab_k_p = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").passe() : NULL,
-                           *tab_k = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").valeurs() : NULL,
-                            *tau = equation().probleme().has_champ("tau") ? &equation().probleme().get_champ("tau").valeurs() : NULL,
-                             *omega = equation().probleme().has_champ("omega") ? &equation().probleme().get_champ("omega").valeurs() : NULL ;
+                          *tab_k_p = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").passe() : nullptr,
+                           *tab_k = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").valeurs() : nullptr,
+                            *tau = equation().probleme().has_champ("tau") ? &equation().probleme().get_champ("tau").valeurs() : nullptr,
+                             *omega = equation().probleme().has_champ("omega") ? &equation().probleme().get_champ("omega").valeurs() : nullptr ;
 
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
   int N = pbm.nb_phases(), Nk = (tab_k) ? (*tab_k).line_size() : -1, Np = equation().probleme().get_champ("pression").valeurs().line_size();
@@ -116,11 +116,11 @@ void Coalescence_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, D
   visc_turb.eps(epsilon);  // Epsilon is in the past
   double limiter = visc_turb.limiteur(), dh = 0;
 
-  Matrice_Morse  *Ma = matrices.count("alpha") ? matrices.at("alpha") : NULL,
-                  *Mk = matrices.count("k") ? matrices.at("k") : NULL,
-                   *Mtau = matrices.count("tau") ? matrices.at("tau") : NULL,
-                    *Momega = matrices.count("omega") ? matrices.at("omega") : NULL,
-                     *Mai = matrices.count("interfacial_area") ? matrices.at("interfacial_area") : NULL;
+  Matrice_Morse  *Ma = matrices.count("alpha") ? matrices.at("alpha") : nullptr,
+                  *Mk = matrices.count("k") ? matrices.at("k") : nullptr,
+                   *Mtau = matrices.count("tau") ? matrices.at("tau") : nullptr,
+                    *Momega = matrices.count("omega") ? matrices.at("omega") : nullptr,
+                     *Mai = matrices.count("interfacial_area") ? matrices.at("interfacial_area") : nullptr;
 
   int cR = (rho_p.dimension_tot(0) == 1), cM = (nu_p.dimension_tot(0) == 1), n, k, e;
   DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), nu_l(N), sigma_l(N,N), dv(N, N), d_bulles_l(N), eps_l(Nk), k_l(Nk), coeff(N, N); //arguments pour coeff

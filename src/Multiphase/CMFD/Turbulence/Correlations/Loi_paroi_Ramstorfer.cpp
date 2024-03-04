@@ -54,7 +54,7 @@ void Loi_paroi_Ramstorfer::completer()
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : This is a two-phase wall law!");
 
-  DoubleTab const * d_bulles = (pb_.valeur().has_champ("diametre_bulles")) ? &pb_.valeur().get_champ("diametre_bulles").valeurs() : NULL ;
+  DoubleTab const * d_bulles = (pb_.valeur().has_champ("diametre_bulles")) ? &pb_.valeur().get_champ("diametre_bulles").valeurs() : nullptr ;
   if (!d_bulles) Process::exit(que_suis_je() + " : you must define a bubble diameter ! This is a two-phase wall law.");
 }
 

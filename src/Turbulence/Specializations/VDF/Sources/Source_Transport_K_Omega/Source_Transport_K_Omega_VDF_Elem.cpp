@@ -77,7 +77,7 @@ void Source_Transport_K_Omega_VDF_Elem::ajouter_blocs(matrices_t matrices, Doubl
   Source_Transport_K_Omega_VDF_Elem_base::ajouter_komega(secmem);
 
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
-  Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL;
+  Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
   if(!mat) return;
 
   const DoubleTab& val = equation().inconnue().valeurs();
