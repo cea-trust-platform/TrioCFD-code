@@ -29,3 +29,4 @@
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/test_sigma
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/tests_schemas_monophasique
 ./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/IJK_FT/transport_perio
+./share/Validation/Rapports_automatiques/Multiphase/Front_tracking_IJK/MULTIGRILLE/Multigrid-gcp-fallback
