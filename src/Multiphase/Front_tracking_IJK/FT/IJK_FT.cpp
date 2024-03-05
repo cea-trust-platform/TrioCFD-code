@@ -1644,7 +1644,10 @@ int IJK_FT_double::initialise()
 //          velocity_[2].data() += expression_vitesse_initiale_;
         }
 
-      velocity_.echange_espace_virtuel();
+     // shear_perio_bug
+      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+      velocity_[1].echange_espace_virtuel(2);
+      velocity_[2].echange_espace_virtuel(2);
 #ifdef CONVERT_AT_READING_FROM_NURESAFE_TO_ADIM_TRYGGVASON_FOR_LIQUID_VELOCITY
       const double coef = 14.353432757182377;
       for (int dir=0; dir< 3; dir++)
@@ -4479,6 +4482,9 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   //  Calculer vitesse_ft (etendue) a partir du champ de vitesse.
   static Stat_Counter_Id deplacement_interf_counter_ = statistiques().new_counter(1, "Deplacement de l'interface");
   statistiques().begin_count(deplacement_interf_counter_);
+// antoine shear bug ?
+  for (int dir = 0; dir < 3; dir++)
+    redistribute_to_splitting_ft_faces_[dir].redistribute(velocity_[dir], velocity_ft_[dir]);
 
   if (IJK_Splitting::defilement_ == 1)
     {
@@ -4486,8 +4492,6 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
       redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1], 0., 1);
       redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2], 0., 2);
     }
-  for (int dir = 0; dir < 3; dir++)
-    redistribute_to_splitting_ft_faces_[dir].redistribute(velocity_[dir], velocity_ft_[dir]);
 
   for (int dir=0; dir<3; dir++)
     {
