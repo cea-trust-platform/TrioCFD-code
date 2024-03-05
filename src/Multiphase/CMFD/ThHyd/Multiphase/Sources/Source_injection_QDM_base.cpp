@@ -14,28 +14,27 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Correction_Lubchenko_PolyMAC_P0.h
+// File:        Injection_QDM_nulle_PolyMAC_P0.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Injection_QDM_nulle_PolyMAC_P0_included
-#define Injection_QDM_nulle_PolyMAC_P0_included
 #include <Source_injection_QDM_base.h>
+#include <Param.h>
 
-/*! @brief classe Injection_QDM_nulle_PolyMAC_P0 Correction de la QDM d'un fluide de l'écoulement quand on en injecte
- *
- *         un par la paroi à QDM nulle via une CL de Neumann sur l'equation de masse
- *
- *
- *
- */
-class Injection_QDM_nulle_PolyMAC_P0: public Source_injection_QDM_base
+Implemente_base(Source_injection_QDM_base, "Source_injection_QDM_base", Source_base);
+// XD
+
+
+Sortie& Source_injection_QDM_base::printOn(Sortie& os) const { return os;}
+
+Entree& Source_injection_QDM_base::readOn(Entree& is)
 {
-  Declare_instanciable(Injection_QDM_nulle_PolyMAC_P0);
-public :
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-};
+  Param param(que_suis_je());
+  param.ajouter("beta", &beta_);
+  param.lire_avec_accolades_depuis(is);
 
-#endif
+  return is;
+}
+
