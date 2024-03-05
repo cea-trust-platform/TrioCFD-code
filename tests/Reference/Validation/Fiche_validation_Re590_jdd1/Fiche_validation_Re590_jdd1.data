@@ -102,7 +102,9 @@ Read pb
 						debut_stat 20
 						}
 					}
-		Sources			{ canal_perio { bord PerioX } }
+		Sources			{
+                                           canal_perio { bord PerioX } 
+		                         }
 	}
 
 	Postraitement

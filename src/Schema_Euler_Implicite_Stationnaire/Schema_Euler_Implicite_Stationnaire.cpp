@@ -32,7 +32,7 @@
 #include <Schema_Euler_Implicite_Stationnaire.h>
 
 Implemente_instanciable(Schema_Euler_Implicite_Stationnaire,"Schema_Euler_Implicite_Stationnaire|Implicit_Euler_Steady_Scheme",Schema_Euler_Implicite);
-//XD Implicit_Euler_Steady_Scheme schema_implicite_base schema_euler_implicite_stationnaire 1  This is the Implicit Euler scheme using a dual time step procedure (using local and global dt) for  steady problems. Remark: the only possible solver choice for this scheme is the  implicit_steady solver.
+// XD Implicit_Euler_Steady_Scheme schema_implicite_base schema_euler_implicite_stationnaire 1  This is the Implicit Euler scheme using a dual time step procedure (using local and global dt) for  steady problems. Remark: the only possible solver choice for this scheme is the  implicit_steady solver.
 
 
 Sortie& Schema_Euler_Implicite_Stationnaire::printOn(Sortie& s) const

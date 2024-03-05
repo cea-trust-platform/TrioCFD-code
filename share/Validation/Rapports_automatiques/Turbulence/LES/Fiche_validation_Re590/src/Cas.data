@@ -102,8 +102,10 @@ Read pb
 						debut_stat _T_DEB_
 						}
 					}
-		Sources			{ canal_perio { bord PerioX } }
-		Sources			{ source_Robin 2 Haut Bas # 0.0005 # }
+		Sources			{
+		                           source_Robin 2 Haut Bas # 0.0005 # ,
+                                           canal_perio { bord PerioX } 
+		                         }
 	}
 
 	Postraitement

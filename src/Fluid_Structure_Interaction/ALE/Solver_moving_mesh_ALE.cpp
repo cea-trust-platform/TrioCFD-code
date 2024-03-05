@@ -25,9 +25,9 @@
 
 
 Implemente_instanciable(Solver_moving_mesh_ALE,"Solver_moving_mesh_ALE",Interprete_geometrique_base);
-//XD Solver_moving_mesh_ALE  interprete  Solver_moving_mesh_ALE 0 Solver used to solve the system giving the  mesh velocity for the ALE (Arbitrary Lagrangian-Eulerian) framework.
-//XD attr  dom ref_domaine dom 0 Name of domain.
-//XD  attr bloc bloc_lecture bloc 0   Example:  { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-7 impr }  }
+// XD Solver_moving_mesh_ALE  interprete  Solver_moving_mesh_ALE 0 Solver used to solve the system giving the  mesh velocity for the ALE (Arbitrary Lagrangian-Eulerian) framework.
+// XD attr  dom ref_domaine dom 0 Name of domain.
+// XD  attr bloc bloc_lecture bloc 0   Example:  { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-7 impr }  }
 
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)

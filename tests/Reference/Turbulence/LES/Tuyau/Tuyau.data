@@ -186,9 +186,9 @@ Lire pb1
        diffusion  { standard defaut_bar }
        Sources
        {
-       Canal_perio { bord perioz }
+           Canal_perio { bord perioz } ,
+           Source_Qdm_lambdaup { lambda 2. }
        }
-       Sources { Source_Qdm_lambdaup { lambda 2. } }
        conditions_initiales {  vitesse Champ_fonc_xyz dom01234 3  0. 0. 2.*(1.-(x*x+y*y)*(x*x+y*y)) }
        boundary_conditions { 
 perioz periodique 

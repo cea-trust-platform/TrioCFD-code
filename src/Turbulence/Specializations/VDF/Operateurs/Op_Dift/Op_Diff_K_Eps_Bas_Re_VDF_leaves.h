@@ -67,6 +67,12 @@ public:
   inline void associer_diffusivite(const Champ_base& ch) override { associer_diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>(ch); }
   inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>(); }
   inline const Champ_base& diffusivite() const override { return diffusivite_impl<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>(); }
+  inline void completer() override
+  {
+    Op_Diff_K_Eps_Bas_Re_VDF_base::completer();
+    Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem& eval_diff_turb = static_cast<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem&>(iter->evaluateur());
+    eval_diff_turb.associer_pb(equation().probleme());
+  }
 };
 
 #endif /* Op_Diff_K_Eps_Bas_Re_VDF_leaves_included */

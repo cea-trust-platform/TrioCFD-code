@@ -69,8 +69,10 @@ Read pb
 		solveur_pression petsc cholesky { }
 		convection { muscl_new }
 		diffusion { }
-		Sources { Boussinesq_temperature { T0 873. } }
-		Sources { Canal_perio { bord Periox } }
+		Sources {
+			 Boussinesq_temperature { T0 873. } ,
+			Canal_perio { bord Periox } 
+		}
 		initial_conditions { vitesse champ_uniforme 3 80. 0. 0. }
 		boundary_conditions
 		{

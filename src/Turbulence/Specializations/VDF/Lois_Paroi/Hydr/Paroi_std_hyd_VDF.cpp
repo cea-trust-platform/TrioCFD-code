@@ -853,7 +853,7 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_visq(DoubleTab& nu_t, DoubleTab& k, 
 {
   // Dans la sous couche visqueuse: nu_t = k = 0
   nu_t(elem) = 0.;
-  k(elem) = 0.;
+  k(elem,0) = 0.;
   return 1;
 }
 
@@ -952,7 +952,7 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_tampon(DoubleTab& nu_t,DoubleTab& ta
 
   double k = x*x/sqrt(Cmu);
   double eps = (k*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
-  tab_k(elem) = k;
+  tab_k(elem,0) = k;
   nu_t(elem) = Cmu*k*k/eps;
   return 1;
 }
@@ -1058,7 +1058,7 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_log(DoubleTab& nu_t, DoubleTab& tab_
 
   double u_star = tab_u_star(face);
 
-  tab_k(elem) = u_star*u_star/sqrt(Cmu);
+  tab_k(elem,0) = u_star*u_star/sqrt(Cmu);
   nu_t(elem) = u_star*Kappa*dist;
 
   return 1;

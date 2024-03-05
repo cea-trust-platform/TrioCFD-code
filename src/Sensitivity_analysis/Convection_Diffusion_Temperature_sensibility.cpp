@@ -30,9 +30,9 @@
 
 Implemente_instanciable( Convection_Diffusion_Temperature_sensibility, "Convection_Diffusion_Temperature_sensibility", Convection_Diffusion_Temperature ) ;
 // XD Convection_Diffusion_Temperature_sensibility convection_diffusion_temperature  Convection_Diffusion_Temperature_sensibility -1 Energy sensitivity equation (temperature diffusion convection)
-//XD attr velocity_state bloc_lecture velocity_state 0 Block to indicate the state problem. Between the braces, you must specify the key word 'pb_champ_evaluateur' then the name of the state problem and the velocity unknown  NL2 Example:  velocity_state { pb_champ_evaluateur pb_state  velocity }
-//XD attr temperature_state bloc_lecture temperature_state 0 Block to indicate the state problem. Between the braces, you must specify the key word 'pb_champ_evaluateur' then the name of the state problem and the temperature unknown  NL2 Example:  velocity_state { pb_champ_evaluateur pb_state  temperature }
-//XD attr uncertain_variable bloc_lecture uncertain_variable 0 Block to indicate the name of the uncertain variable. Between the braces, you must specify the name of the unknown variable (choice between: temperature, beta_th, boussinesq_temperature, Cp and lambda .  NL2 Example: uncertain_variable { temperature }
+// XD attr velocity_state bloc_lecture velocity_state 0 Block to indicate the state problem. Between the braces, you must specify the key word 'pb_champ_evaluateur' then the name of the state problem and the velocity unknown  NL2 Example:  velocity_state { pb_champ_evaluateur pb_state  velocity }
+// XD attr temperature_state bloc_lecture temperature_state 0 Block to indicate the state problem. Between the braces, you must specify the key word 'pb_champ_evaluateur' then the name of the state problem and the temperature unknown  NL2 Example:  velocity_state { pb_champ_evaluateur pb_state  temperature }
+// XD attr uncertain_variable bloc_lecture uncertain_variable 0 Block to indicate the name of the uncertain variable. Between the braces, you must specify the name of the unknown variable (choice between: temperature, beta_th, boussinesq_temperature, Cp and lambda .  NL2 Example: uncertain_variable { temperature }
 // XD  attr convection_sensibility convection_deriv sensibility 1 Choice between: amont and muscl   NL2 Example: convection {  Sensibility { amont } }
 
 

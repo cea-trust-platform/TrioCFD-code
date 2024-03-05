@@ -43,7 +43,7 @@ Read sch
         seuil_convergence_solveur 1e-10
       }
     tinit 0.0
-	nb_pas_dt_max 00
+	nb_pas_dt_max 0
     dt_min 0.1
     dt_max 0.1
     facsec 1000000000.0

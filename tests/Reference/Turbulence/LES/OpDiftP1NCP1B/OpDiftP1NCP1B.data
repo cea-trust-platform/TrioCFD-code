@@ -62,8 +62,10 @@ Fluide_incompressible
 		solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-8 }
 		convection { EF_stab { } }
 		diffusion { P1B }
-		Sources { Boussinesq_temperature { T0 873. } }
-		Sources { Canal_perio { bord Periox } }
+		Sources { 
+			Boussinesq_temperature { T0 873. } ,
+			Canal_perio { bord Periox }
+		}
 		conditions_initiales { vitesse champ_uniforme 3 80. 0. 0. }
 		boundary_conditions
 		{

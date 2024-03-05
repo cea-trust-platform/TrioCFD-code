@@ -107,7 +107,7 @@ Entree& Traitement_particulier_NS_CEG::lire(Entree& is)
   param.ajouter("dt_post",&dt_post_); // XD_ADD_P double periode refers to the printing period, this value is expressed in seconds
   param.ajouter("haspi",&haspi_,Param::REQUIRED); // XD_ADD_P double The suction height  required to calculate AREVA's criterion
   param.ajouter("debug",&debug_); // XD_ADD_P int not_set
-  Param& param_areva=param.ajouter_param("AREVA"); //XD_ADD_P ceg_areva AREVA's criterion
+  Param& param_areva=param.ajouter_param("AREVA"); // XD_ADD_P ceg_areva AREVA's criterion
   // 2XD ceg_areva objet_lecture nul -1 not_set
   param_areva.ajouter("C",&C_);  // 2XD_ADD_P double not_set
   Param& param_cea_jaea =param.ajouter_param("CEA_JAEA"); // XD_ADD_P ceg_cea_jaea CEA_JAEA's criterion
