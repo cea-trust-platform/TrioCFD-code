@@ -20,36 +20,37 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Injection_QDM_nulle_PolyMAC_P0.h>
+#include <Injection_QDM_nulle_VDF.h>
 #include <Source_Flux_interfacial_base.h>
-#include <Champ_Face_PolyMAC_P0.h>
-#include <Champ_Elem_PolyMAC_P0.h>
-#include <Domaine_PolyMAC_P0.h>
 #include <Masse_ajoutee_base.h>
 #include <Milieu_composite.h>
 #include <Neumann_val_ext.h>
 #include <Saturation_base.h>
+#include <Champ_Face_VDF.h>
 #include <Neumann_paroi.h>
 #include <Pb_Multiphase.h>
+#include <Champ_P0_VDF.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
+#include <Domaine_VF.h>
 #include <Conds_lim.h>
+#include <cfloat>
 #include <math.h>
 
-Implemente_instanciable(Injection_QDM_nulle_PolyMAC_P0, "Injection_QDM_nulle_Face_PolyMAC_P0", Source_injection_QDM_base);
+Implemente_instanciable(Injection_QDM_nulle_VDF, "Injection_QDM_nulle_VDF_Face", Source_injection_QDM_base);
 // XD Injection_QDM_nulle source_base Injection_QDM_nulle 1 not_set
 
 
-Sortie& Injection_QDM_nulle_PolyMAC_P0::printOn(Sortie& os) const { return os; }
+Sortie& Injection_QDM_nulle_VDF::printOn(Sortie& os) const {  return os; }
 
-Entree& Injection_QDM_nulle_PolyMAC_P0::readOn(Entree& is) { return Source_injection_QDM_base::readOn(is);}
+Entree& Injection_QDM_nulle_VDF::readOn(Entree& is) { return Source_injection_QDM_base::readOn(is);}
 
-void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Injection_QDM_nulle_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
-  const Champ_Elem_PolyMAC_P0& cha= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().equation(1).inconnue().valeur()); // volume fraction
-  const Domaine_PolyMAC_P0&     domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  const Conds_lim&           clsa = cha.domaine_Cl_dis()->les_conditions_limites();
+  const Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF, equation().inconnue().valeur());
+  const Champ_P0_VDF& cha= ref_cast(Champ_P0_VDF, equation().probleme().equation(1).inconnue().valeur()); // volume fraction
+  const Domaine_VF&  domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Conds_lim&      clsa = cha.domaine_Cl_dis().les_conditions_limites();
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
   const IntTab&  fcl = ch.fcl(),
@@ -61,7 +62,7 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir();
 
   const DoubleTab& vit = ch.valeurs(),
-                   &rho   = equation().milieu().masse_volumique()->passe(), // passe car qdm
+                   &rho   = equation().milieu().masse_volumique().passe(), // passe car qdm
                     &alpha = cha.passe();
 
   Matrice_Morse *mat = matrices.count(ch.le_nom().getString()) ? matrices.at(ch.le_nom().getString()) : nullptr; // Derivee locale/QDM
@@ -69,16 +70,15 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
   const Masse_ajoutee_base *corr = pbm && pbm->has_correlation("masse_ajoutee") ? &ref_cast(Masse_ajoutee_base, pbm->get_correlation("masse_ajoutee").valeur()) : nullptr;
 
-  int N = vit.line_size(), D = dimension, nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot();
+  int N = vit.line_size(), nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot();
 
   // Cas adiabatique : injection de bulles a la paroi (manip de Gabillet et al.)
   for (int f = 0 ; f< nf_tot ; f ++)
     if (fcla(f, 0) == 4) // Neumann_paroi
       {
-        int e = f_e(f, 0) ;
+        int e = f_e(f, 0)>-1 ? f_e(f, 0) : f_e(f, 1) ;
         if (e>=0)
           {
-
             DoubleTrav f_a_masse(N, N) ;
             DoubleTrav f_a(1, N);
             for (int n = 0 ; n<N ; n++)
@@ -87,15 +87,6 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
                 f_a(0, n)       = ref_cast(Neumann_paroi, clsa[fcla(f, 1)].valeur()).flux_impose(fcla(f, 2), n) ;               // Pas de porosite ; unite : m/s
               }
             corr->ajouter_inj( &f_a(0,0) , &alpha(e, 0),   &rho(e, 0)    ,   f_a_masse   );
-
-            for (int d = 0; d<D ; d++)
-              for (int n = 0 ; n<N ; n++)
-                for (int m = 0 ; m<N ; m++)
-                  {
-                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m) * beta_;  // Force along -vit
-                    if (mat)
-                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) * beta_ ;
-                  }
 
             for (int i=0 ; i < e_f.line_size() ; i++)
               {
@@ -141,54 +132,46 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
             }
 
       for (int f = 0 ; f< nf_tot ; f ++)
-        if (f_e(f, 1)<= 0) // Si face de bord
-          {
-            int e = f_e(f, 0) ;
-            f_a_masse = 0;
-            f_a = 0;
-            double G=0;
+        if ( (f_e(f, 0)<= 0) || (f_e(f, 1)<= 0)) // Si face de bord
+          if ( fs(f) > DBL_MIN ) // Si pas dans le milieu d'un bidim_axi
+            {
+              int e = f_e(f, 0)>-1 ? f_e(f, 0) : f_e(f, 1) ;
+              f_a_masse = 0;
+              f_a = 0;
+              double G=0;
 
-            for (int k = 0; k < N; k++)
-              for (int l = k + 1; l < N; l++)
-                if (milc.has_saturation(k, l)) //flux phase k <-> phase l si saturation
-                  {
-                    const int i_sat = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+              for (int k = 0; k < N; k++)
+                for (int l = k + 1; l < N; l++)
+                  if (milc.has_saturation(k, l)) //flux phase k <-> phase l si saturation
+                    {
+                      const int i_sat = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
 
-                    G = qpi(e, k, l) / Lvap_tab(e, i_sat) ; // Flux de matiere de la phase k vers l ; attention : qpi est en W, donc G en kgs-1 : il n'est pas volumique !
+                      G = qpi(e, k, l) / Lvap_tab(e, i_sat) ; // Flux de matiere de la phase k vers l ; attention : qpi est en W, donc G en kgs-1 : il n'est pas volumique !
 
-                    f_a(0, k)       -= G/(fs(f)*rho(e, k)) ;
-                    f_a_masse(k, k) -= G/fs(f) ;
-                    f_a(0, l)       += G/(fs(f)*rho(e, l)) ;
-                    f_a_masse(l, l) += G/fs(f) ;
+                      f_a(0, k)       -= G/(fs(f)*rho(e, k)) ;
+                      f_a_masse(k, k) -= G/fs(f) ;
+                      f_a(0, l)       += G/(fs(f)*rho(e, l)) ;
+                      f_a_masse(l, l) += G/fs(f) ;
 
-                  }
+                    }
 
-            corr->ajouter_inj( &f_a(0,0) , &alpha(e, 0),   &rho(e, 0)    ,   f_a_masse   );
+              corr->ajouter_inj( &f_a(0,0) , &alpha(e, 0),   &rho(e, 0)    ,   f_a_masse   );
 
-            for (int d = 0; d<D ; d++)
-              for (int n = 0 ; n<N ; n++)
-                for (int m = 0 ; m<N ; m++)
-                  {
-                    secmem(nf_tot + D * e + d, n) -= fs(f) * f_a_masse(n, m)  * vit( nf_tot + D * e + d, m) * beta_ ;  // Force along -vit
-                    if (mat)
-                      (*mat)( N * (nf_tot + D*e + d) + n , N * (nf_tot + D*e + d) + m ) += fs(f) * f_a_masse(n, m) * beta_ ;
-                  }
-
-            for (int i=0 ; i < e_f.line_size() ; i++)
-              {
-                int f2 = e_f(e, i);
-                if ( (f2 >= 0) && (f2<nf) && (fcl(f2, 0) < 2)  ) // Si pas face de bord
-                  {
-                    int c = ( e == f_e(f2, 0) ) ? 0 : 1 ;
-                    for (int n = 0 ; n<N ; n++)
-                      for (int m = 0 ; m<N ; m++)
-                        {
-                          secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m) * beta_ ;
-                          if (mat)
-                            (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2) * beta_ ;
-                        }
-                  }
-              }
-          }
+              for (int i=0 ; i < e_f.line_size() ; i++)
+                {
+                  int f2 = e_f(e, i);
+                  if ( (f2 >= 0) && (f2<nf) && (fcl(f2, 0) < 2)  ) // Si pas face de bord
+                    {
+                      int c = ( e == f_e(f2, 0) ) ? 0 : 1 ;
+                      for (int n = 0 ; n<N ; n++)
+                        for (int m = 0 ; m<N ; m++)
+                          {
+                            secmem(f2, n) -= fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2)  * vit( f2, m) * beta_ ;
+                            if (mat)
+                              (*mat)( N * f2 + n , N * f2 + m ) += fs(f) * f_a_masse(n, m) * vf_dir(f2, c) / vf(f2) * beta_ ;
+                          }
+                    }
+                }
+            }
     }
 }

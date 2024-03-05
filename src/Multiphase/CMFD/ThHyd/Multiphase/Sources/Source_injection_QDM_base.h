@@ -20,22 +20,34 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Injection_QDM_nulle_PolyMAC_P0_included
-#define Injection_QDM_nulle_PolyMAC_P0_included
-#include <Source_injection_QDM_base.h>
+#ifndef Source_injection_QDM_base_included
+#define Source_injection_QDM_base_included
+#include <Source_base.h>
 
-/*! @brief classe Injection_QDM_nulle_PolyMAC_P0 Correction de la QDM d'un fluide de l'écoulement quand on en injecte
+/*! @brief classe Injection_QDM_nulle_VDF Correction de la QDM d'un fluide de l'écoulement quand on en injecte
  *
  *         un par la paroi à QDM nulle via une CL de Neumann sur l'equation de masse
  *
  *
  *
  */
-class Injection_QDM_nulle_PolyMAC_P0: public Source_injection_QDM_base
+class Source_injection_QDM_base: public Source_base
 {
-  Declare_instanciable(Injection_QDM_nulle_PolyMAC_P0);
+  Declare_base(Source_injection_QDM_base);
 public :
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  int has_interface_blocs() const override
+  {
+    return 1;
+  };
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } ;
+  void check_multiphase_compatibility() const override {}; //of course
+
+  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
+  void associer_pb(const Probleme_base& ) override { };
+  void mettre_a_jour(double temps) override { };
+
+protected:
+  double beta_=1.;
 };
 
 #endif

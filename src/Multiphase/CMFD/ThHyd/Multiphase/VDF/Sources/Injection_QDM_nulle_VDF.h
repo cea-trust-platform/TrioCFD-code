@@ -20,20 +20,20 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Injection_QDM_nulle_PolyMAC_P0_included
-#define Injection_QDM_nulle_PolyMAC_P0_included
+#ifndef Injection_QDM_nulle_VDF_included
+#define Injection_QDM_nulle_VDF_included
 #include <Source_injection_QDM_base.h>
 
-/*! @brief classe Injection_QDM_nulle_PolyMAC_P0 Correction de la QDM d'un fluide de l'écoulement quand on en injecte
+/*! @brief classe Injection_QDM_nulle_VDF Correction de la QDM d'un fluide de l'écoulement quand on en injecte
  *
  *         un par la paroi à QDM nulle via une CL de Neumann sur l'equation de masse
  *
  *
  *
  */
-class Injection_QDM_nulle_PolyMAC_P0: public Source_injection_QDM_base
+class Injection_QDM_nulle_VDF: public Source_injection_QDM_base
 {
-  Declare_instanciable(Injection_QDM_nulle_PolyMAC_P0);
+  Declare_instanciable(Injection_QDM_nulle_VDF);
 public :
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 };
