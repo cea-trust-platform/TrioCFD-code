@@ -44,11 +44,11 @@ class Maillage_FT_IJK : public Maillage_FT_Disc
 public:
   Maillage_FT_IJK(const Maillage_FT_IJK&) = default;
   void initialize(const IJK_Splitting&, const Domaine_dis&, const Parcours_interface&);
-  const ArrOfInt&   compo_connexe_facettes() const
+  const ArrOfInt& compo_connexe_facettes() const
   {
     return compo_connexe_facettes_;
   };
-  ArrOfInt&   compo_connexe_facettes_non_const()
+  ArrOfInt& compo_connexe_facettes_non_const()
   {
     return compo_connexe_facettes_;
   };

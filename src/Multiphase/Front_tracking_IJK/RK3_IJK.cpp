@@ -441,9 +441,16 @@ void IJK_problem_double::run()
   //fonction_levelset_.allocate(splitting_, IJK_Splitting::ELEM, 2);
   //d_fonction_levelset_.allocate(splitting_, IJK_Splitting::ELEM, 0);
 
-  velocity_diffusion_op_.initialize(splitting_, boundary_conditions_);
+  velocity_diffusion_op_.typer("OpDiffIJK_double");
+  velocity_diffusion_op_.set_bc(boundary_conditions_);
+  velocity_diffusion_op_.initialize(splitting_);
+
+  velocity_convection_op_.typer("OpConvIJKQuickSharp_double");
   velocity_convection_op_.initialize(splitting_);
+
+  velocity_convection_op_.typer("OpConvIJKQuickSharp_double");
   scalar_convection_op_.initialize(splitting_);
+
   poisson_solver_.initialize(splitting_);
 
   rho_field_.data() = 1.;
@@ -666,8 +673,8 @@ void IJK_problem_double::euler_time_step()
       // Calcul d_velocity
       //(les compteurs statistiques sont deja presents a l'interieur des fonctions ajouter/calculer)
       //statistiques().begin_count(diffusion_counter_);
+      velocity_diffusion_op_.set_nu(molecular_mu_);
       velocity_diffusion_op_.ajouter(velocity_tmp_[0], velocity_tmp_[1], velocity_tmp_[2],
-                                     molecular_mu_,
                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
       //statistiques().end_count(diffusion_counter_);
       statistiques().begin_count(source_counter_);
@@ -691,8 +698,8 @@ void IJK_problem_double::euler_time_step()
       // Calcul d_velocity
       //(les compteurs statistiques sont deja presents a l'interieur des fonctions ajouter/calculer)
       //statistiques().begin_count(diffusion_counter_);
+      velocity_diffusion_op_.set_nu(molecular_mu_);
       velocity_diffusion_op_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-                                     molecular_mu_,
                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
       //statistiques().end_count(diffusion_counter_);
       statistiques().begin_count(source_counter_);

@@ -140,7 +140,7 @@ Lire pb
 	{
 		solveur_pression petsc cholesky { }
 		convection { negligeable }
-		diffusion {  IJK }
+		diffusion { IJK }
 		conditions_initiales {                 
 				# acos(0.5)-pi/2 = -0.5235987755982987     et    acos(0.5)-pi/4 = 0.2617993877991496 #
 #				vitesse Champ_fonc_xyz dom 3 2.*0.001*cos(y*98.17477042468103-0.5235987755982987)

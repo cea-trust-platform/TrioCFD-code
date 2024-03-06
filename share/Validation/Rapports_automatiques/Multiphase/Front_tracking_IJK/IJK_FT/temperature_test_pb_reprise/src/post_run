@@ -2,18 +2,12 @@
 # Ce script est execute avant de lancer les cas tests
 [ -f $1.lml ] && gzip -f $1.lml
 
-# python ./ordre_cvg.py
-cas=`echo $1`
-# cd ..
-# ls | tail
-if [ $cas = "CANAL_TEMPERATURE_IMPOSEE_seq_desactvie" ] 
+if [ $1 = "CANAL_repr_par8" ] 
 then
-    ./$cas.sh
-    # cp $cas.sauv.* CANAL_TEMPERATURE_IMPOSEE_repr.sauv.*
-fi
-
-if [ $cas = "pre_run" ]
-then
-    cp pre_run.* CANAL_TEMPERATURE_IMPOSEE/
-    cp pre_run.* CANAL_FLUX_IMPOSE/
+	out=compare_lata.out
+	source $TRUST_ROOT/Validation/Outils/Genere_courbe/scripts/scripts_validation.sh
+	echo -n "Initial " > $out 
+	compare_lata CANAL_seq.lata CANAL_par8.lata && echo "ok" >> $out || echo "ko" >> $out 
+	echo -n "Reprise " >> $out 
+	compare_lata CANAL_repr.lata CANAL_repr_par8.lata && echo "ok" >> $out || echo "ko" >> $out
 fi

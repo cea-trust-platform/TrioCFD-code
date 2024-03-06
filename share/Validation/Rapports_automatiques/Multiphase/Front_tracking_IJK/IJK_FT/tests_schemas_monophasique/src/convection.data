@@ -28,7 +28,7 @@ IJK_FT_double
   ijk_splitting_ft_extension 0
   timestep .00128  # .00001  #
   # time_scheme RK3_FT  #
-  type_velocity_convection_op  Quick
+  velocity_convection_op  Quick
   timestep_facsec 1.e12 # 0.9 #
    Boundary_Conditions {
                 bctype_kmin Symetrie

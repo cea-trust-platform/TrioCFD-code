@@ -28,25 +28,21 @@
 #include <IJK_Splitting.h>
 #include <IJK_Field.h>
 #include <Parser.h>
-//#include <Interprete.h>
 #include <IJK_Lata_writer.h>
-#include <OpConvIJKQuickScalar.h>
-#include <OpConvIJKAmont.h>
-#include <OpCentre4IJK.h>
-#include <OpDiffTurbIJKScalar.h>
-#include <OpConvDiscIJKQuickScalar.h>
+#include <OpConvQuickIJKScalar.h>
 #include <OpConvCentre2IJKScalar.h>
 #include <Ouvrir_fichier.h>
 #include <Corrige_flux_FT.h>
 #include <TRUST_Ref.h>
-
-class IJK_FT_double;
-
+#include <Operateur_IJK_elem_diff_base.h>
+#include <OpConvAmontIJK.h>
+#include <OpConvDiscQuickIJKScalar.h>
+#include <OpConvCentre4IJK.h>
 
 /*
 #include <OpConvIJKQuickScalar.h>
 #include <OpDiffTurbIJK.h>
-#include <OpCentre4IJK.h>
+#include <OpConvCentre4IJK.h>
 #include <OpConvIJKQuickScalar.h>
 #include <OpDiffTurbIJKScalar.h>
 */
@@ -57,17 +53,6 @@ class IJK_FT_double;
  *
  *
  */
-int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax);
-int calculer_flux_thermique_bord(const IJK_Field_double& temperature,
-                                 const double lambda_de_t_paroi,
-                                 const double T_paroi_impose,
-                                 IJK_Field_local_double& flux_bord,
-                                 const bool bord_kmax);
-int imposer_flux_thermique_bord(const IJK_Field_double& temperature,
-                                const double flux_paroi_impose,
-                                IJK_Field_local_double& flux_bord,
-                                const bool bord_kmax);
-
 class IJK_FT_double;
 
 class IJK_Thermique : public Objet_U
@@ -82,7 +67,6 @@ public :
   int initialize(const IJK_Splitting& splitting, const int idx);
   void update_thermal_properties();
   double compute_timestep(const double timestep,
-                          const double rho_l, const double rho_v,
                           const double dxmin) const;
   void associer(const IJK_FT_double& ijk_ft);
   void euler_time_step(const double timestep);
@@ -91,6 +75,16 @@ public :
                     const double time  );
   void rk3_rustine_sub_step(const int rk_step, const double total_timestep,
                             const double fractionnal_timestep, const double time, const double dE);
+  int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax);
+  int calculer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                   const double lambda_de_t_paroi,
+                                   const double T_paroi_impose,
+                                   IJK_Field_local_double& flux_bord,
+                                   const bool bord_kmax);
+  int imposer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                  const double flux_paroi_impose,
+                                  IJK_Field_local_double& flux_bord,
+                                  const bool bord_kmax);
   const IJK_Field_double& get_temperature() const
   {
     // if (liste_post_instantanes_.contient_("TEMPERATURE_ADIM_BULLES"))
@@ -183,7 +177,7 @@ protected :
   // and heat flux field at the interface.
   void compute_interfacial_temperature2(
     ArrOfDouble& interfacial_temperature,
-    ArrOfDouble& flux_normal_interp) const ;
+    ArrOfDouble& flux_normal_interp); //const ;
 
   REF(IJK_FT_double) ref_ijk_ft_;
   int rang_;
@@ -199,24 +193,24 @@ protected :
   //MR: get field from IJK_FT_Post
   const IJK_Field_double& get_IJK_field(const Nom& nom) const;
 
-//  Nom fichier_sauvegarde_temperature_;
+// Nom fichier_sauvegarde_temperature_;
 // int timestep_sauvegarde_temperature_;
 
   int type_temperature_convection_op_; // 1 : Amont / 2 : Centre2 / 3 : Quick  / 4 : Centre
   OpConvAmontIJK_double temperature_convection_op_amont_;
   OpConvCentre2IJKScalar_double temperature_convection_op_centre2_;
-  OpConvIJKQuickScalar_double temperature_convection_op_quick_;
+  OpConvQuickIJKScalar_double temperature_convection_op_quick_;
   OpConvCentre4IJK_double temperature_convection_op_centre4_;
 
   OpDiffIJKScalar_double diffusion_temperature_op_;
 
-  OpConvDiscIJKQuickScalar_double rho_cp_convection_op_quick_;
+  OpConvDiscQuickIJKScalar_double rho_cp_convection_op_quick_;
 
   // Storage for operators & time scheme:
   int diff_temp_negligible_;
   int conv_temperature_negligible_;
 
-
+  Corrige_flux_FT corrige_flux_;
 
   //MR: lambda variable dans le terme source de Tryggvason
   int lambda_variable_;

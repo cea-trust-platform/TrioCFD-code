@@ -26,7 +26,7 @@
 #include <stat_counters.h>
 #include <IJK_FT.h>
 #include <Corrige_flux_FT.h>
-#include <OpConvDiscIJKQuickScalar.h>
+#include <OpConvDiscQuickIJKScalar.h>
 
 Implemente_instanciable( IJK_Thermique, "IJK_Thermique", Objet_U ) ;
 
@@ -239,21 +239,25 @@ int IJK_Thermique::initialize(const IJK_Splitting& splitting, const int idx)
       if (type_temperature_convection_form_ == 2)
         {
           rho_cp_convection_op_quick_.initialize(splitting);
+          rho_cp_convection_op_quick_.set_indicatrice(ref_ijk_ft_->itfce().I());
         }
       break;
     case 4:
-      temperature_convection_op_centre4_.initialize(splitting, boundary_conditions_);
+      temperature_convection_op_centre4_.set_bc_thermique(boundary_conditions_);
+      temperature_convection_op_centre4_.initialize(splitting);
       break;
     default:
       Cerr << "Undefined operator for the convection of the temperature. " << finl;
       Process::exit();
     }
 
+  corrige_flux_.typer("Corrige_flux_FT_temperature_conv");
+
   temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);
   cp_.allocate(splitting, IJK_Splitting::ELEM, 2);
   lambda_.allocate(splitting, IJK_Splitting::ELEM, 1);
   d_temperature_.allocate(splitting, IJK_Splitting::ELEM, 2);// 1
-  div_lambda_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);;
+  div_lambda_grad_T_volume_.allocate(splitting, IJK_Splitting::ELEM, 0);
   nalloc += 5;
 
   if ((ref_ijk_ft_.non_nul()) and (!ref_ijk_ft_->disable_diphasique_))
@@ -447,10 +451,11 @@ void IJK_Thermique::update_thermal_properties()
 // CFL value is not computed as it is the same as for the velocity equation.
 // The calculation should be stable if Fo <= 1.0 (thanks to the 0.5 in the formula below).
 double IJK_Thermique::compute_timestep(const double timestep,
-                                       const double rho_l, const double rho_v,
                                        const double dxmin) const
 {
   // alpha = lambda/(rho*cp)
+  double rho_l = ref_ijk_ft_->get_rho_l();
+  double rho_v = ref_ijk_ft_->get_rho_v();
   const double alpha_max = std::max(lambda_liquid_/(rho_l*cp_liquid_), lambda_vapor_/(rho_v*cp_vapor_));
   double dt_fo  = dxmin*dxmin/(alpha_max + 1.e-20) * fo_ * (1./6.); // Attention 0.125 vient du 3D. (1/6 au lieu de 1/8)
   if (diff_temp_negligible_) dt_fo = 1.e20;
@@ -459,7 +464,7 @@ double IJK_Thermique::compute_timestep(const double timestep,
 
 
 // From DNS_QC; Vectorize code later?
-int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax)
+int IJK_Thermique::calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax)
 {
   const int kmin = temperature.get_splitting().get_offset_local(DIRECTION_K);
   const int nktot = temperature.get_splitting().get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_K);
@@ -500,11 +505,11 @@ int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_km
 //  -1 si on n'a pas le bord sur ce processeur
 // Calcule l'integrale sur chaque face du bord demande du flux de chaleur a travers la face
 // positif si le flux va vers les k positifs.
-int calculer_flux_thermique_bord(const IJK_Field_double& temperature,
-                                 const double lambda_de_t_paroi,
-                                 const double T_paroi_impose,
-                                 IJK_Field_local_double& flux_bord,
-                                 const bool bord_kmax)
+int IJK_Thermique::calculer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                                const double lambda_de_t_paroi,
+                                                const double T_paroi_impose,
+                                                IJK_Field_local_double& flux_bord,
+                                                const bool bord_kmax)
 {
   const int kmin = temperature.get_splitting().get_offset_local(DIRECTION_K);
   int k = calculer_k_pour_bord(temperature, bord_kmax);
@@ -537,10 +542,10 @@ int calculer_flux_thermique_bord(const IJK_Field_double& temperature,
     }
   return k;
 }
-int imposer_flux_thermique_bord(const IJK_Field_double& temperature,
-                                const double flux_paroi_impose,
-                                IJK_Field_local_double& flux_bord,
-                                const bool bord_kmax)
+int IJK_Thermique::imposer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                               const double flux_paroi_impose,
+                                               IJK_Field_local_double& flux_bord,
+                                               const bool bord_kmax)
 {
   int k = calculer_k_pour_bord(temperature, bord_kmax);
   if (k == -1)
@@ -570,7 +575,6 @@ int imposer_flux_thermique_bord(const IJK_Field_double& temperature,
     }
   return k;
 }
-
 
 
 void IJK_Thermique::euler_time_step(const double timestep)
@@ -737,7 +741,10 @@ void IJK_Thermique::compute_temperature_convection_conservative(const FixedVecto
           Cerr << "Operateur centre non implemente" << finl;
           break;
         case 3:
-          rho_cp_convection_op_quick_.calculer(rho_cp_T_, velocity[0], ref_ijk_ft_->itfce().I(), velocity[1], velocity[2], div_rho_cp_T_);
+//          rho_cp_convection_op_quick_.calculer(rho_cp_T_, velocity[0], ref_ijk_ft_->itfce().I(), velocity[1], velocity[2], div_rho_cp_T_);
+          rho_cp_convection_op_quick_.set_indicatrice(ref_ijk_ft_->itfce().I());
+          rho_cp_convection_op_quick_.calculer(rho_cp_T_, velocity[0], velocity[1], velocity[2], div_rho_cp_T_);
+
           break;
         case 4:
           Cerr << "Operateur centre4 non implemente" << finl;
@@ -836,8 +843,8 @@ void IJK_Thermique::add_temperature_diffusion()
     }
   else
     {
+      diffusion_temperature_op_.set_lambda(lambda_);
       diffusion_temperature_op_.calculer(temperature_,
-                                         lambda_,
                                          div_lambda_grad_T_volume_,
                                          boundary_flux_kmin_, boundary_flux_kmax_);
     }
@@ -856,6 +863,7 @@ void IJK_Thermique::add_temperature_diffusion()
   const double rhocp_l = ref_ijk_ft_->rho_liquide_*cp_liquid_;
   const double rhocp_v = ref_ijk_ft_->rho_vapeur_*cp_vapor_;
   const bool geometric_mean = ((rho_cp_inv_) and (rhocp_l > DMINFLOAT) and (rhocp_v >DMINFLOAT));
+  double d_temp_sum=0.;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -885,9 +893,10 @@ void IJK_Thermique::add_temperature_diffusion()
               const double ope = div_lambda_grad_T_volume_(i,j,k);
               const double resu = ope/rhocpV;
               d_temperature_(i,j,k) +=resu ;
+              d_temp_sum += resu;
             }
         }
-
+  Cout << "Test d_temp_sum: " << d_temp_sum << finl;
   statistiques().end_count(cnt_diff_temp);
   DebogIJK::verifier("div_lambda_grad_T_volume", div_lambda_grad_T_volume_);
 // Cerr << "diff_temp" << " " <<  d_temperature_(1,1,1) << finl;
@@ -1610,8 +1619,7 @@ void IJK_Thermique::calculer_gradient_temperature(const IJK_Field_double& temper
       grad_T[dir].data() = 0.;
     }
 
-  add_gradient_temperature(temperature, 1. /*constant*/ ,  grad_T[0], grad_T[1], grad_T[2],boundary_conditions_, lambda_);
-
+  add_gradient_temperature(temperature, 1. /*constant*/ ,  grad_T[0], grad_T[1], grad_T[2], boundary_conditions_, lambda_);
 
   for (int dir = 0; dir < 3; dir++)
     {
@@ -1762,7 +1770,7 @@ void IJK_Thermique::compute_interfacial_temperature(
 
 void IJK_Thermique::compute_interfacial_temperature2(
   ArrOfDouble& interfacial_temperature,
-  ArrOfDouble& flux_normal_interp) const
+  ArrOfDouble& flux_normal_interp) // const
 {
   const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_geometry();
   const double dist = 1.52 * std::pow(std::pow(geom.get_constant_delta(0), 2.) +
@@ -1792,12 +1800,12 @@ void IJK_Thermique::compute_interfacial_temperature2(
   temp_vap.set_smart_resize(1);
   coo_liqu.set_smart_resize(1);
   coo_vap.set_smart_resize(1);
-  Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(temperature_ft_,
-                                                                      lambda_liquid_, lambda_vapor_, dist,
-                                                                      coord_facettes, normale_facettes,
-                                                                      interfacial_temperature, flux_normal_interp,
-                                                                      temp_liqu, temp_vap,
-                                                                      coo_liqu, coo_vap);
+  corrige_flux_.calcul_temperature_flux_interface(temperature_ft_,
+                                                  lambda_liquid_, lambda_vapor_, dist,
+                                                  coord_facettes, normale_facettes,
+                                                  interfacial_temperature, flux_normal_interp,
+                                                  temp_liqu, temp_vap,
+                                                  coo_liqu, coo_vap);
   for (int fa7=0; fa7 < nb_facettes; fa7++)
     {
       flux_normal_interp(fa7) *= surface_facettes(fa7);

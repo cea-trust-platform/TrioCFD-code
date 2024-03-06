@@ -35,7 +35,7 @@
 class ComputeValParCompoInCell
 {
 public:
-  ComputeValParCompoInCell() {}
+  ComputeValParCompoInCell() { mesh_ = nullptr;}
   ~ComputeValParCompoInCell() {}
   void initialize(const IJK_Splitting& splitting, const Maillage_FT_IJK& maillage_ft_ijk)
   {

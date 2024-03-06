@@ -32,7 +32,7 @@ IJK_FT_double
   timestep 0.9e-4
   # Shear-BC valide uniquement pour le RK3 #
   time_scheme RK3_FT # si euler_explicit RK3_FT diminuer le facsec #
-  type_velocity_convection_op Centre
+  velocity_convection_op Centre
   Boundary_Conditions {
     # BC de type Mixte_shear #
     bctype_kmin Mixte_shear

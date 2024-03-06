@@ -28,7 +28,7 @@ IJK_FT_double
   ijk_splitting_ft_extension 0 # To be checked.. #
   timestep 0.9e-4
   time_scheme euler_explicit  # RK3_FT #
-  type_velocity_convection_op Centre # Mixte shear only implemented for center 4-th order convection scheme #
+  velocity_convection_op Centre # Mixte shear only implemented for center 4-th order convection scheme #
   Boundary_Conditions {
     bctype_kmin Mixte_shear
     bctype_kmax Mixte_shear

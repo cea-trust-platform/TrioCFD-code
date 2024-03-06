@@ -32,17 +32,16 @@
 #include <IJK_Interfaces.h>
 #include <Multigrille_Adrien.h>
 
-
 class IJK_FT;
 class IJK_Splitting;
+
+/*
+ * TODO: Demander à Aymeric l'interet (obsolete ??)
+ */
 class IJK_Thermique;
 class IJK_Energie;
-class List_IJK_Thermique;
-class list_curseurIJK_Thermique;
-class const_list_curseurIJK_Thermique;
-class List_IJK_Energie;
-class list_curseurIJK_Energie;
-class const_list_curseurIJK_Energie;
+class IJK_Thermals;
+
 /**
  * All the post-processing stuff of IJK_FT delegated into this helper class:
  */
@@ -131,16 +130,27 @@ public:
   //                                              const double value_for_bad_points,const IJK_Field_double& indic);
   void compute_extended_pressures(const Maillage_FT_IJK& mesh);
   //IJK_Field_double& extended_p);
+  /*
+   * TODO:
+   */
   void posttraiter_tous_champs_thermique(Motcles& liste,  const int idx) const;
   void posttraiter_tous_champs_energie(Motcles& liste,  const int idx) const;
+  void posttraiter_tous_champs_thermal(Motcles& liste, const int idx) const;
+
+  /*
+   * TODO:
+   */
   int posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
                                                const char *lata_name,
                                                const int lata_step, const double current_time,
-                                               IJK_Thermique& ,  const int idx);
+                                               IJK_Thermique& itr, const int idx);
   int posttraiter_champs_instantanes_energie(const Motcles& liste_post_instantanes,
                                              const char *lata_name,
                                              const int lata_step, const double current_time,
-                                             IJK_Energie& ,  const int idx);
+                                             IJK_Energie& itr,  const int idx);
+  /*
+   * TODO:
+   */
   int posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes,
                                                             const char *lata_name,
                                                             const int lata_step, const double current_time,
@@ -149,6 +159,7 @@ public:
                                                           const char *lata_name,
                                                           const int lata_step, const double current_time,
                                                           IJK_Energie& ,  const int idx);
+
 //  void calculer_gradient_temperature(const IJK_Field_double& temperature, FixedVector<IJK_Field_double, 3>& grad_T);
 
   Motcles get_liste_post_instantanes() const
@@ -159,6 +170,7 @@ protected:
   void compute_phase_pressures_based_on_poisson(const int phase);
   Statistiques_dns_ijk_FT statistiques_FT_;
   int dt_post_;
+  int dt_post_thermals_probes_;
   int dt_post_stats_plans_; // intervalle de posttraitement des donnees par plan (pour les statistiques de canal)
   int dt_post_stats_bulles_; // intervalle de posttraitement des donnees par bulles
   Motcles liste_post_instantanes_; // liste des champs instantanes a postraiter
@@ -293,11 +305,11 @@ protected:
 
 
   int sondes_demande_;
-  Sondes_IJK les_sondes_;           // Sondes a traiter
+  Sondes_IJK les_sondes_;  // Sondes a traiter
 
-  //
-  // References to various members of IJK_FT_double that are heavily used in the post:
-  //
+  /*
+   * References to various members of IJK_FT_double that are heavily used in the post:
+   */
   IJK_FT_double& ref_ijk_ft_;
 
   const int& disable_diphasique_;    // yes a ref, not a const value.
@@ -313,13 +325,13 @@ protected:
   IJK_Splitting& splitting_ft_;
   LIST(IJK_Thermique)& thermique_;
   LIST(IJK_Energie)& energie_;
+  IJK_Thermals& thermals_;
+  int first_step_thermals_post_=0;
+
   /* IJK_Field_double temperature_ana_, ecart_t_ana_;
     Nom expression_T_ana_;
-
     IJK_Field_double source_temperature_ana_, ecart_source_t_ana_; */
-
-// FixedVector<IJK_Field_double, 3> grad_T_;
-
+  // FixedVector<IJK_Field_double, 3> grad_T_;
 
   Multigrille_Adrien poisson_solver_post_;
 };

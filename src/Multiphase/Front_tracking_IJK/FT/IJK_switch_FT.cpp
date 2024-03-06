@@ -30,6 +30,7 @@ Sortie & Switch_FT_double::printOn(Sortie&s) const
 {
   return s;
 }
+
 Entree & Switch_FT_double::readOn(Entree&s)
 {
   return s;
@@ -38,49 +39,73 @@ Entree & Switch_FT_double::readOn(Entree&s)
 void Switch_FT_double::set_param(Param& param)
 {
   Switch_double::set_param(param);
+
   // Parametres pour le FT:
   param.ajouter("interfaces", &interfaces_);
   param.ajouter("old_ijk_splitting_ft_extension", &old_ijk_splitting_ft_extension_);
-  // Parmetres pour la thermique:
+
+  // Parametres pour la thermique:
   param.ajouter("thermique", &thermique_);
-  // GAB : gabriel.ramirez@cea.fr
-  // Parametres pour le forcage spectral 
-  /* Voir reprendre probleme dans IJK_FT.cpp */
+  param.ajouter("thermals", &thermals_);
+
+  /*
+   * GAB : gabriel.ramirez@cea.fr
+   * Parametres pour le forcage spectral
+   * Voir reprendre probleme dans IJK_FT.cpp
+   */
   param.ajouter("forcage", &old_forcage_);
   // Parametres pour la correction de qdm 
   param.ajouter("corrections_qdm", &old_qdm_corrections_);
   param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_);
   param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_);
-  }
+}
+
+void Switch_FT_double::prepare_run()
+{
+  Switch_double::prepare_run();
+  Nom prefix = dirname(nom_reprise_);
+  interfaces_.set_fichier_reprise(prefix + interfaces_.get_fichier_reprise());
+  if (!thermals_.est_vide())
+	  thermals_.set_fichier_reprise(prefix + thermals_.get_fichier_reprise());
+  fichier_old_vitesse_ = prefix + fichier_old_vitesse_;
+}
+
 
 void Switch_FT_double::initialise()
 {
   Cout << que_suis_je() <<"::initialise() Pb of type IJK_FT detected." << finl;
 
-  // Probleme of type FT :
+  // Probleme of type FT:
   // old_mesh_ and new_mesh_ are acutally splittings...
   const IJK_Grid_Geometry& geom = old_mesh_.get_grid_geometry();
   const double dx = geom.get_constant_delta(DIRECTION_I);
   const double dy = geom.get_constant_delta(DIRECTION_J);
+
   const IJK_Grid_Geometry& geom_new = new_mesh_.get_grid_geometry();
   const double new_dx = geom_new.get_constant_delta(DIRECTION_I);
   const double new_dy = geom_new.get_constant_delta(DIRECTION_J);
   const Nom& vdf_name = geom_new.le_nom()+Nom("_VDF");
 
   const double old_to_new_ratio = std::min(dx/new_dx, dy/new_dy);
-  const int new_ijk_splitting_ft_extension = (int)std::lrint(std::ceil(old_ijk_splitting_ft_extension_* old_to_new_ratio));
+  const int new_ijk_splitting_ft_extension = (int) std::lrint(std::ceil(old_ijk_splitting_ft_extension_* old_to_new_ratio));
+
   Cerr << "Extended splitting dimensions. old = " << old_ijk_splitting_ft_extension_
-      << " new = " <<new_ijk_splitting_ft_extension << finl;
+       << " new = " << new_ijk_splitting_ft_extension << finl;
   Cerr << "Construction du domaine VDF..." << finl;
   IJK_Splitting splitting_ft;
   build_extended_splitting(new_mesh_, splitting_ft, new_ijk_splitting_ft_extension);
+
   // Le probleme ft disc qui porte le maillage vdf pour les algorithmes front-tracking
   Probleme_base& refprobleme_ft_disc = creer_domaine_vdf(splitting_ft, vdf_name);
   const Domaine_dis& domaine_dis = refprobleme_ft_disc.domaine_dis();
+
   interfaces_.initialize(splitting_ft /* splitting_FT */,
-      new_mesh_ /* splitting_Ns */,
-      domaine_dis, 
-      false);
+  											 new_mesh_ /* splitting_NS */,
+												 domaine_dis,
+												 0,
+												 false,
+												 true);
+  //interfaces_.associer_switch(*this);
   interfaces_.set_reprise(1);
   interfaces_.lire_maillage_ft_dans_lata();
   
@@ -118,29 +143,38 @@ void Switch_FT_double::initialise()
     */
 /////////////////////////////////////: gabriel.ramirez@cea.fr
 
-
 int Switch_FT_double::init_thermique()
 // The Thermique.initialize does both the allocate and the initialize:
 {
   int nb_allocated_arrays = 0;
-  
   int idx =0;
     for (auto& itr : thermique_)
     {
       Cout << "Reading the old temperature field from " << Nom(itr.get_fichier_sauvegarde())
-               << " to fill the thermique_ field."<< finl;
+           << " to fill the thermique_ field."<< finl;
       nb_allocated_arrays += itr.initialize(old_mesh_, idx);
       idx++;
     }
   return nb_allocated_arrays;
 }
 
+int Switch_FT_double::init_thermals()
+{
+	// init_thermals() does both the allocate and the initialize()
+	// thermals_.associer_switch(*this);
+  return thermals_.init_switch_thermals(old_mesh_);
+}
+
 void Switch_FT_double::prepare_thermique(const Nom lata_name)
 {
   for (auto& itr : thermique_)
-      itr.set_fichier_sauvegarde(lata_name);
+  	itr.set_fichier_sauvegarde(lata_name);
 }
 
+void Switch_FT_double::prepare_thermals(const Nom lata_name)
+{
+	thermals_.prepare_thermals(lata_name);
+}
 
 // flag and_lata to know if we also create the associated lata
 void Switch_FT_double::ecrire_fichier_reprise(const char *fichier_sauvegarde, const bool and_lata)
@@ -167,6 +201,7 @@ void Switch_FT_double::ecrire_fichier_reprise(const char *fichier_sauvegarde, co
       fichier << " interfaces " << interfaces_  << "\n";
       fichier <<  " forcage " << new_forcage_;
       fichier <<  " corrections_qdm " << new_qdm_corrections_;
+
       Cerr << "  potentially saving temperature fields... " << finl;
       int flag_list_not_empty = 0;
       if ((int) thermique_.size() > 0)
@@ -191,6 +226,8 @@ void Switch_FT_double::ecrire_fichier_reprise(const char *fichier_sauvegarde, co
       if (flag_list_not_empty)
         fichier << " } \n" ;
 
+      thermals_.ecrire_fichier_reprise(fichier, lata_name);
+
       fichier << "}\n";
     }
 
@@ -212,7 +249,6 @@ void Switch_FT_double::ecrire_header_lata(const Nom lata_name) // const
   // dans le fichier de sauvegarde des champs exrits pour la reprise. Ce n'est pas ce que l'on veut.
   // On avait pu se permettre cela pour l'interface car on ecrit directement celui qu'on a relu, meme
   // s'il n'a pas le bon support (le vieux geom).
-
 }
 
 void Switch_FT_double::set_param_reprise(Param& param)
@@ -220,7 +256,7 @@ void Switch_FT_double::set_param_reprise(Param& param)
   Switch_double::set_param_reprise(param);
   param.ajouter("interfaces", & interfaces_);
   param.ajouter("thermique", & thermique_);
-
+  param.ajouter("thermals", & thermals_);
   // GAB : gabriel.rmairez@cea.fr
   /* Voir reprendre probleme dans IJK_FT.cpp */
   param.ajouter("forcage", &new_forcage_);
@@ -228,16 +264,14 @@ void Switch_FT_double::set_param_reprise(Param& param)
   param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_);
   param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_);
   // fin GAB : gabriel.ramirez@cea.fr
-
 }
 
 void Switch_FT_double::compute_and_write_extra_fields(const Nom& lata_name,
-                                                    DoubleTab& coeff_i, IntTab Indice_i, 
-                                                    DoubleTab& coeff_j, IntTab Indice_j,
-                                                    DoubleTab& coeff_k, IntTab Indice_k)
+                                                      DoubleTab& coeff_i, IntTab Indice_i,
+                                                      DoubleTab& coeff_j, IntTab Indice_j,
+                                                      DoubleTab& coeff_k, IntTab Indice_k)
 {
-	
-	// GAB : gabriel.ramirez@cea.fr
+	 // GAB : gabriel.ramirez@cea.fr
   	/*Cout << "forcage2_.get_type_forcage() : " <<forcage2_.get_type_forcage() << finl;
   	if (forcage2_.get_type_forcage() > 0)
     {
@@ -253,8 +287,8 @@ void Switch_FT_double::compute_and_write_extra_fields(const Nom& lata_name,
       Cout << "AF compute_initial_chouippe" << finl;
     }*/
     // GAB : gabriel.ramirez@cea.fr
-  IJK_Field_double new_temperature;
 
+  IJK_Field_double new_temperature;
   if (thermique_.size() > 0)
     {
       calculer_coords_elem();
@@ -263,34 +297,39 @@ void Switch_FT_double::compute_and_write_extra_fields(const Nom& lata_name,
                      coeff_k,Indice_k);
       new_temperature.allocate(new_mesh_ /* it is in fact a splitting */, IJK_Splitting::ELEM, 0);
     }
-
   int idx = 0;
   for (auto& itr : thermique_)
     {
       const IJK_Field_double& old_temperature = itr.get_temperature();
-      //IJK_Field_double& new_temperature = curseur->set_temperature();
       switch_scalar_field(old_temperature, new_temperature,
                           coeff_i, Indice_i,
                           coeff_j ,Indice_j,
                           coeff_k ,Indice_k);
-
-      Cout << "Writing " <<Nom("TEMPERATURE_")+Nom(idx) << " into " << lata_name << finl;
-      // Process::exit();
-      //const int latastep = 0;
-      //      std::ostringstream oss;
-      //              oss << "TEMPERATURE_" << idx;
-      //            Nom nom_temp(oss.str().c_str());
-      dumplata_scalar(lata_name,Nom("TEMPERATURE_")+Nom(idx) , new_temperature, 0 /*we store a 0 */);
-      //              oss.str("");
+      Cout << "Writing " <<Nom("TEMPERATURE_") + Nom(idx) << " into " << lata_name << finl;
+      dumplata_scalar(lata_name,Nom("TEMPERATURE_") + Nom(idx) , new_temperature, 0 /*we store a 0 */);
       ++idx;
     }
+
+  /*
+   * IJK_Thermals (LIST)
+   */
+  thermals_.compute_new_thermal_field((*this),
+  																		new_mesh_,
+																			lata_name,
+																			coeff_i,
+																			Indice_i,
+																			coeff_j,
+																			Indice_j,
+																			coeff_k,
+																			Indice_k);
 }
 
 void Switch_FT_double::compute_and_write_extra_fields_direct(SFichier& file,
-                                                           DoubleTab& coeff_i, IntTab Indice_i, 
-                                                           DoubleTab& coeff_j, IntTab Indice_j,
-                                                           DoubleTab& coeff_k, IntTab Indice_k)
+																														 DoubleTab& coeff_i, IntTab Indice_i,
+																														 DoubleTab& coeff_j, IntTab Indice_j,
+																														 DoubleTab& coeff_k, IntTab Indice_k)
 {
+	// Use writing_direct = 0 instead...
 }
 
 

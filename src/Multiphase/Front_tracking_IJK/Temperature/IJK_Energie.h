@@ -42,11 +42,14 @@
 #include <IJK_Splitting.h>
 #include <MonofluidVar.h>
 #include <Objet_U.h>
-#include <OpConvIJKQuickScalar_interface.h>
-#include <OpDiffTurbIJKScalar.h>
+#include <OpConvQuickInterfaceOnefluidIJKScalar.h>
 #include <Ouvrir_fichier.h>
 #include <Parser.h>
 #include <TRUST_Ref.h>
+#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_temperature_conv.h>
+#include <Operateur_IJK_elem_diff_base.h>
+// #include <Corrige_flux_FT_temperature_conv.h>
 
 class IJK_FT_double;
 
@@ -63,6 +66,7 @@ class IJK_FT_double;
 class IJK_Energie : public Objet_U
 {
   friend class IJK_FT_Post;
+  friend class IJK_FT_double;
   Declare_instanciable(IJK_Energie);
 
 public:
@@ -72,7 +76,16 @@ public:
   void associer(const IJK_FT_double& ijk_ft);
   void euler_time_step(const FixedVector<IJK_Field_double, 3>& velocity);
   const IJK_Field_double& get_temperature() const { return temperature_; }
-
+  int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax);
+  int calculer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                   const double lambda_de_t_paroi,
+                                   const double T_paroi_impose,
+                                   IJK_Field_local_double& flux_bord,
+                                   const bool bord_kmax);
+  int imposer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                  const double flux_paroi_impose,
+                                  IJK_Field_local_double& flux_bord,
+                                  const bool bord_kmax);
   IJK_Field_double& set_temperature() { return temperature_; }
   FixedVector<IJK_Field_double, 3>& get_gradient_temperature()
   {
@@ -137,10 +150,10 @@ protected:
   //  Nom fichier_sauvegarde_temperature_;
   // int timestep_sauvegarde_temperature_;
 
-  Corrige_flux_FT_temperature_conv corrige_flux_temp_conv_;
+  Corrige_flux_FT corrige_flux_;
+//  Corrige_flux_FT_temperature_conv corrige_flux_temp_conv_;
 
-  OpConvIJKQuickScalarInterface_double
-  energy_convection_op_quick_interface_;
+  OpConvQuickInterfaceOnefluidIJKScalar_double energy_convection_op_quick_interface_;
   OpDiffIJKScalar_double diffusion_temperature_op_;
 
   int diff_temp_negligible_;

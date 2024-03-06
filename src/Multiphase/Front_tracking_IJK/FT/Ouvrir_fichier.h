@@ -25,7 +25,14 @@
 #include <SFichier.h>
 #include <Nom.h>
 
-SFichier Ouvrir_fichier(const Nom& sufix,
-                        const Nom& head, const int reset,
+SFichier Ouvrir_fichier(const Nom& suffix,
+                        const Nom& head,
+                        const int reset,
                         const int prec = 8) ;
+
+SFichier Open_file_folder(const Nom& folder,
+                          const Nom& suffix,
+                          const Nom& head,
+                          const int reset,
+                          const int prec = 8) ;
 #endif

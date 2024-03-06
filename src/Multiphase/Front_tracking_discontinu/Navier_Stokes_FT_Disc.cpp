@@ -4088,7 +4088,7 @@ const Champ_base *  Navier_Stokes_FT_Disc::get_delta_vitesse_interface() const
     return 0;
 }
 // Description : calcul de div(n) (la courbure discretisee sur le maillage volumique)
-//  Faudrait deplacer cette methode dans transport interfaces...
+// Faudrait deplacer cette methode dans transport interfaces...
 const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
 {
   REF(Transport_Interfaces_FT_Disc) & refeq_transport =  variables_internes().ref_eq_interf_proprietes_fluide;

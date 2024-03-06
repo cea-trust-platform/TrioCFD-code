@@ -19,7 +19,6 @@
 #include <IJK_Splitting.h>
 #include <FixedVector.h>
 #include <Interprete.h>
-
 #include <Linear_algebra_tools.h>
 #include <Param.h>
 #include <Interprete_bloc.h>
@@ -33,7 +32,7 @@
 #include <TRUSTList.h>
 
 
-/**
+/*
  * Interprete permettant d'interpoler vitesse et rho d'un maillage sur un autre
  */
 class Switch_double : public Interprete
@@ -62,8 +61,10 @@ protected:
                                                      DoubleTab& coeff_k, IntTab Indice_k) = 0;
 
   // overriden in FT - to be brought here at some point once merge with thermic BC is done ...
-  virtual int init_thermique()  { return 0; }
-  virtual void prepare_thermique(const Nom lata_name) {}
+  virtual int init_thermique()  { return 0; };
+  virtual void prepare_thermique(const Nom lata_name) {};
+  virtual int init_thermals()  { return 0; };
+  virtual void prepare_thermals(const Nom lata_name) {};
 
   void write_velocity(const Nom lata_name) const;
   void calculer_coords(const IJK_Splitting::Localisation loc);
@@ -76,19 +77,16 @@ protected:
   void switch_vit(DoubleTab coeff_i, IntTab Indice_i,
                   DoubleTab coeff_j ,IntTab Indice_j,
                   DoubleTab coeff_k ,IntTab Indice_k,
-                  const int dir);//faces
-
+                  const int dir); //faces
   void switch_scalar_field(const IJK_Field_double& oldf, IJK_Field_double& newf,
                            DoubleTab coeff_i, IntTab Indice_i,
                            DoubleTab coeff_j ,IntTab Indice_j,
                            DoubleTab coeff_k ,IntTab Indice_k) const;
-
   void switch_scalar_field_direct(SFichier& binary_file,
                                   const IJK_Field_double& fld,
                                   DoubleTab coeff_i, IntTab Indice_i,
                                   DoubleTab coeff_j ,IntTab Indice_j,
                                   DoubleTab coeff_k ,IntTab Indice_k);
-
 
   void switch_vit_direct(SFichier& binary_file);
 
@@ -102,6 +100,7 @@ protected:
   int direct_write_;
 
   int perio_k_;
+
   // vitesses
   FixedVector<IJK_Field_double, 3> new_velocity_;
   FixedVector<IJK_Field_double, 3> old_velocity_;
@@ -131,22 +130,23 @@ protected:
   Nom nom_sauvegarde_;
   Nom nom_reprise_;
 
+
+  // GAB : gabriel.ramirez@cea.fr
   /*
-  // GAB : gabriel.ramirez@cea.fr
-  init_forcage_THI forcage_;
-  double vap_velocity_tmoy_ = 0.;
-  double liq_velocity_tmoy_ = 0.;
-  double qdm_source_ = 0.;
-  double last_source_qdm_update_time_ = 0.;
-  int offset_list_index_ = 0.;
-  int size_listes_source_;
-  ArrOfDouble liste_instants_;
-  ArrOfDouble liste_vap_dl_;  // liste des v_v * dt
-  ArrOfDouble liste_liq_dl_;  // liste des v_l * dt
-  double reprise_v_target_ = 0.;
-  int list_index_ = 0.;
-  // GAB : gabriel.ramirez@cea.fr
+  	init_forcage_THI forcage_;
+  	double vap_velocity_tmoy_ = 0.;
+  	double liq_velocity_tmoy_ = 0.;
+  	double qdm_source_ = 0.;
+  	double last_source_qdm_update_time_ = 0.;
+  	int offset_list_index_ = 0.;
+  	int size_listes_source_;
+  	ArrOfDouble liste_instants_;
+  	ArrOfDouble liste_vap_dl_;  // liste des v_v * dt
+  	ArrOfDouble liste_liq_dl_;  // liste des v_l * dt
+  	double reprise_v_target_ = 0.;
+  	int list_index_ = 0.;
   */
+  // GAB : gabriel.ramirez@cea.fr
 
   // Le jeu de donnees doit fournir soit des fichiers de reprise: ..
   Nom fichier_old_vitesse_;

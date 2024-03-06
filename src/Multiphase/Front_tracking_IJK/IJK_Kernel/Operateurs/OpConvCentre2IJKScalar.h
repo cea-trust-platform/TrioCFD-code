@@ -13,15 +13,16 @@
 *
 *****************************************************************************/
 
-#ifndef OpConvCentre2IJKScalar_include
-#define OpConvCentre2IJKScalar_include
+#ifndef OpConvCentre2IJKScalar_included
+#define OpConvCentre2IJKScalar_included
 
-#include <OpConvIJKElemCommon.h>
+#include <Operateur_IJK_elem_conv_base.h>
 
-class OpConvCentre2IJKScalar_double : public OpConvIJKElemCommon_double
+class OpConvCentre2IJKScalar_double : public Operateur_IJK_elem_conv_base_double
 {
+  Declare_instanciable_sans_constructeur(OpConvCentre2IJKScalar_double);
 public:
-  OpConvCentre2IJKScalar_double() : OpConvIJKElemCommon_double() { }
+  OpConvCentre2IJKScalar_double() : Operateur_IJK_elem_conv_base_double() { }
 protected:
 
   inline void compute_flux_x(IJK_Field_local_double& resu, const int k_layer) override
@@ -45,4 +46,4 @@ private:
 
 #include <OpConvCentre2IJKScalar.tpp>
 
-#endif
+#endif /* OpConvCentre2IJKScalar_included */

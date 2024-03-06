@@ -23,14 +23,17 @@
 #include <FixedVector.h>
 #include <IJK_Field.h>
 #include <IJK_Splitting.h>
-#include <OpDiffTurbIJK.h>
-#include <OpConvIJKQuickSharp.h>
+#include <Operateur_IJK_faces_conv.h>
+#include <Operateur_IJK_faces_diff.h>
+#include <Operateur_IJK_elem_conv.h>
+//#include <OpDiffTurbIJK.h>
+//#include <OpConvIJKQuickSharp.h>
 #include <Multigrille_Adrien.h>
 #include <Interprete.h>
 #include <IJK_Lata_writer.h>
 #include <Linear_algebra_tools.h>
 #include <Couplage_Tubes_IBC.h>
-#include <OpConvIJKQuickScalar.h>
+#include <OpConvQuickIJKScalar.h>
 #include <Boundary_Conditions.h>
 
 
@@ -146,9 +149,12 @@ protected:
   // right hand side for pressure solver
   IJK_Field_double pressure_rhs_;
   // Operators and pressure solver
-  OpDiffIJK_double velocity_diffusion_op_;
-  OpConvIJKQuickSharp_double velocity_convection_op_;
-  OpConvIJKQuickScalar_double scalar_convection_op_;
+  Operateur_IJK_faces_diff velocity_diffusion_op_;
+  Operateur_IJK_faces_conv velocity_convection_op_;
+  Operateur_IJK_elem_conv scalar_convection_op_;
+//  OpDiffIJK_double velocity_diffusion_op_;
+//  OpConvIJKQuickSharp_double velocity_convection_op_;
+//  OpConvIJKQuickScalar_double scalar_convection_op_;
 
   Multigrille_Adrien poisson_solver_;
   // Simulation parameters

@@ -25,15 +25,14 @@
 #include <FixedVector.h>
 #include <IJK_Field.h>
 #include <IJK_Splitting.h>
-#include <OpDiffTurbIJK.h>
-#include <OpConvIJKQuickSharp.h>
-#include <OpCentre4IJK.h>
-#include <OpConvIJKAmont.h>
+#include <Operateur_IJK_faces_diff.h>
+#include <Operateur_IJK_faces_conv.h>
 #include <Multigrille_Adrien.h>
 #include <Interprete.h>
 #include <Linear_algebra_tools.h>
 #include <Boundary_Conditions.h>
 #include <IJK_Interfaces.h>
+#include <Intersection_Interface_ijk.h>
 #include <Redistribute_Field.h>
 #include <Parser.h>
 #include <IJK_FT_Post.h>
@@ -43,7 +42,9 @@
 #include <Force_sp.h>
 #include <TRUST_List.h>
 #include <IJK_Energie.h>
+#include <IJK_Thermals.h>
 #include <TRUST_Ref.h>
+#include <Objet_U.h>
 
 class Probleme_base;
 
@@ -74,11 +75,23 @@ public :
   const FixedVector<IJK_Field_double, 3>& get_velocity() const
   {
     return velocity_;
-  };
+  }
   const FixedVector<IJK_Field_double, 3>& get_velocity_ft() const
   {
     return velocity_ft_;
-  };
+  }
+  const IJK_Field_double& get_pressure() const
+  {
+    return pressure_;
+  }
+  const IJK_Field_double& get_pressure_ghost_cells() const
+  {
+    return pressure_ghost_cells_;
+  }
+  const IJK_Field_double& get_rho_field() const
+  {
+    return rho_field_;
+  }
   const double& get_current_time() const
   {
     return current_time_ ;
@@ -86,6 +99,10 @@ public :
   const double& get_timestep() const
   {
     return timestep_ ;
+  }
+  const int& get_nb_timesteps() const
+  {
+    return nb_timesteps_ ;
   }
   const int& get_splitting_extension() const
   {
@@ -117,6 +134,10 @@ public :
   {
     return reprise_;
   }
+  int get_tstep() const
+  {
+    return tstep_;
+  }
   double get_rho_l() const
   {
     return rho_liquide_;
@@ -125,12 +146,108 @@ public :
   {
     return rho_vapeur_;
   }
-//  const int& nb_thermal_equations() const
-//  {
-//      return thermique_.
-//    static int nb=1;
-//    return nb;
-//  }
+  double get_rho_field_ijk(int i, int j, int k) const
+  {
+    return rho_field_(i,j,k);
+  }
+  int get_disable_diphasique() const
+  {
+    return disable_diphasique_;
+  }
+  const Maillage_FT_IJK& get_maillage_ft_ijk() const
+  {
+    return interfaces_.maillage_ft_ijk();
+  }
+  const Remaillage_FT_IJK& get_remaillage_ft_ijk() const
+  {
+    return interfaces_.remaillage_ft_ijk();
+  }
+  int get_direction_gravite() const
+  {
+    return direction_gravite_;
+  }
+  const IJK_Interfaces& get_interface() const
+  {
+    return interfaces_;
+  }
+  const double& get_vitesse_upstream() const
+  {
+    return vitesse_upstream_;
+  }
+  const double& get_nb_diam_upstream() const
+  {
+    return nb_diam_upstream_;
+  }
+  const int& get_upstream_dir() const
+  {
+    return upstream_dir_;
+  }
+  const int& get_upstream_stencil() const
+  {
+    return upstream_stencil_;
+  }
+  const double& get_dt_cfl() const
+  {
+    return dt_cfl_;
+  }
+  const double& get_dt_fo() const
+  {
+    return dt_fo_;
+  }
+  const double& get_dt_oh() const
+  {
+    return dt_oh_;
+  }
+  const double& get_dt_cfl_liq() const
+  {
+    return dt_cfl_liq_;
+  }
+  const double& get_dt_cfl_vap_() const
+  {
+    return dt_cfl_vap_;
+  }
+  const double& get_dt_fo_liq() const
+  {
+    return dt_fo_liq_;
+  }
+  const double& get_dt_fo_vap_() const
+  {
+    return dt_fo_vap_;
+  }
+  const double& get_mu_liquid() const
+  {
+    return mu_liquide_;
+  }
+  const double& get_mu_vapour() const
+  {
+    return mu_vapeur_;
+  }
+  const int& get_disable_diffusion_qdm() const
+  {
+    return disable_diffusion_qdm_;
+  }
+  const int& get_disable_convection_qdm() const
+  {
+    return disable_convection_qdm_;
+  }
+  const int& get_compute_rising_velocities() const
+  {
+    return compute_rising_velocities_;
+  }
+  const int& get_fill_rising_velocities() const
+  {
+    return fill_rising_velocities_;
+  }
+  //  Intersection_Interface_ijk_cell& get_intersection_ijk_cell()
+  //  {
+  //    return intersection_ijk_cell_;
+  //  }
+  //  Intersection_Interface_ijk_face& get_intersection_ijk_face()
+  //  {
+  //    return intersection_ijk_face_;
+  //  }
+  //  const Intersection_Interface_ijk_cell& get_intersection_ijk_cell() const {return intersection_ijk_cell_;}
+  //  const Intersection_Interface_ijk_face& get_intersection_ijk_face() const {return intersection_ijk_face_;}
 
   void run();
   void euler_time_step(ArrOfDouble& var_volume_par_bulle);
@@ -149,6 +266,7 @@ public :
   //void compute_and_add_source_qdm_gr(const double threshold_0, const double threshold_1, const double threshold_2, const double threshold_3);
   void set_time_for_corrections();
   void compute_and_add_qdm_corrections();
+  void compute_var_volume_par_bulle(ArrOfDouble& var_volume_par_bulle);
 
   // SURCHARGE DES OPERATEURS : dans FixedVector, on ajoute le produit_scalaire
   //  mais il faut que les operateur * et += soient definis pour IJK_FT_double
@@ -175,6 +293,7 @@ public :
   // const IJK_Field_double& get_indicatrice_ft() const {return interfaces_.indicatrice_ft(); }
   // const IJK_Field_double& get_indicatrice_ft_next() const {return interfaces_.indicatrice_ft_next(); }
   const IJK_Interfaces& itfce() const {return interfaces_;}
+  IJK_Interfaces& get_set_interface() {return interfaces_;}
   int disable_diphasique() const {return disable_diphasique_;}
   // Redistribute_Field& redistrib_to_ft_elem() const {return redistribute_to_splitting_ft_elem_;}
   // FixedVector<Redistribute_Field, 3>& redistrib_to_ft_face() const {return redistribute_to_splitting_ft_faces_;}
@@ -201,6 +320,15 @@ public :
   }
   const IJK_FT_Post& get_post() const {return post_;}
 
+  void redistribute_to_splitting_ft_elem(const IJK_Field_double& input_field,
+                                         IJK_Field_double& output_field);
+
+  void redistribute_from_splitting_ft_elem(const IJK_Field_double& input_field,
+                                           IJK_Field_double& output_field);
+  void copy_field_values(IJK_Field_double& field, const IJK_Field_double& field_to_copy);
+  void update_indicator_field();
+  void update_twice_indicator_field();
+
 protected :
   // Interdit constructeur par copie et operateur copie
   IJK_FT_double(const IJK_FT_double& x);
@@ -217,20 +345,25 @@ protected :
   //ab-sauv/repr-deb
   void ecrire_donnees(const FixedVector<IJK_Field_double, 3>& f3compo, SFichier& le_fichier, const int compo, bool binary) const;
   void dumpxyz_vector(const FixedVector<IJK_Field_double, 3>& f3compo, const char * filename, bool binary) const;
-  void sauvegarder_probleme(const char *fichier_sauvegarde); //  const;
+  void sauvegarder_probleme(const char *fichier_sauvegarde,
+                            const int& stop); //  const;
   void reprendre_probleme(const char *fichier_reprise);
   //ab-sauv/repr-fin
 
   // These methods are static in order to make it clear that all data used and modified by the method are explicitely passed as arguments:
   static void force_entry_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz, double v_imposed);
   static void force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
-                                      double v_imposed,const IJK_Interfaces& interfaces, double nb_diam );
+                                      double v_imposed,const IJK_Interfaces& interfaces, double nb_diam,
+                                      int upstream_dir, int gravity_dir, int upstream_stencil);
   double find_timestep(const double max_timestep, const double cfl, const double fo, const double oh);
   void parcourir_maillage();
   void calculer_rho_mu_indicatrice(const bool parcourir = true);
   void maj_indicatrice_rho_mu(const bool parcourir = true);
   void ajout_dTrustine();
-  void deplacer_interfaces(const double timestep, const int rk_step, ArrOfDouble& var_volume_par_bulle);
+  void deplacer_interfaces(const double timestep,
+                           const int rk_step,
+                           ArrOfDouble& var_volume_par_bulle,
+                           const int first_step_interface_smoothing);
   void deplacer_interfaces_rk3(const double timestep, const int rk_step, ArrOfDouble& var_volume_par_bulle);
   void calculer_gradient_indicatrice_et_repul_ns(const IJK_Field_double& indic);
 
@@ -259,7 +392,7 @@ protected :
 
   // GAB, rotation
   int get_direction(const ArrOfDouble& vecteur);
-  //
+
   // GAB, qdm
   Vecteur3 calculer_inv_rho_grad_p_moyen(const IJK_Field_double& inv_rho, const IJK_Field_double& pression);
   void calculer_I_kappa_sigma(IJK_Field_double& kappa_ft,const IJK_Field_double& indic, double sigma);
@@ -267,37 +400,37 @@ protected :
   Vecteur3 calculer_grad_p_over_rho_moyen(const IJK_Field_double& pression);
   FixedVector<IJK_Field_double, 3> terme_convection_mass_solver_;
   FixedVector<IJK_Field_double, 3> terme_diffusion_mass_solver_;
-  FixedVector<IJK_Field_double, 3> rho_u_euler_av_prediction_champ;
-  FixedVector<IJK_Field_double, 3> rho_du_euler_ap_prediction_champ;
-  FixedVector<IJK_Field_double, 3> rho_u_euler_ap_projection_champ;
-  FixedVector<IJK_Field_double, 3> rho_du_euler_ap_projection_champ;
-  FixedVector<IJK_Field_double, 3> rho_u_euler_av_rho_mu_ind_champ;
-  FixedVector<IJK_Field_double, 3> rho_u_euler_ap_rho_mu_ind_champ;
-  FixedVector<IJK_Field_double, 3> terme_diffusion_local;
-  FixedVector<IJK_Field_double, 3> terme_pression_local;
-  FixedVector<IJK_Field_double, 3> terme_pression_in_ustar_local;
-  FixedVector<IJK_Field_double, 3> d_v_diff_et_conv;
-  Vecteur3 rho_u_euler_av_prediction;
-  Vecteur3 rho_du_euler_ap_prediction;
-  Vecteur3 rho_u_euler_ap_projection;
-  Vecteur3 rho_du_euler_ap_projection;
-  Vecteur3 rho_u_euler_av_rho_mu_ind;
-  Vecteur3 rho_u_euler_ap_rho_mu_ind;
-  Vecteur3 u_euler_ap_rho_mu_ind;
-  Vecteur3 terme_diffusion;
-  Vecteur3 terme_convection;
-  Vecteur3 terme_pression;
-  Vecteur3 terme_pression_bis;
-  Vecteur3 terme_pression_ter;
-  Vecteur3 terme_interfaces;
-  Vecteur3 terme_pression_in_ustar;
-  Vecteur3 terme_interfaces_bf_mass_solver;
-  Vecteur3 terme_interfaces_bf_mass_solver_bis;
-  Vecteur3 terme_interfaces_af_mass_solver;
-  Vecteur3 temre_intf_conv_diff_mass_solver;
+  FixedVector<IJK_Field_double, 3> rho_u_euler_av_prediction_champ_;
+  FixedVector<IJK_Field_double, 3> rho_du_euler_ap_prediction_champ_;
+  FixedVector<IJK_Field_double, 3> rho_u_euler_ap_projection_champ_;
+  FixedVector<IJK_Field_double, 3> rho_du_euler_ap_projection_champ_;
+  FixedVector<IJK_Field_double, 3> rho_u_euler_av_rho_mu_ind_champ_;
+  FixedVector<IJK_Field_double, 3> rho_u_euler_ap_rho_mu_ind_champ_;
+  FixedVector<IJK_Field_double, 3> terme_diffusion_local_;
+  FixedVector<IJK_Field_double, 3> terme_pression_local_;
+  FixedVector<IJK_Field_double, 3> terme_pression_in_ustar_local_;
+  FixedVector<IJK_Field_double, 3> d_v_diff_et_conv_;
+  Vecteur3 rho_u_euler_av_prediction_;
+  Vecteur3 rho_du_euler_ap_prediction_;
+  Vecteur3 rho_u_euler_ap_projection_;
+  Vecteur3 rho_du_euler_ap_projection_;
+  Vecteur3 rho_u_euler_av_rho_mu_ind_;
+  Vecteur3 rho_u_euler_ap_rho_mu_ind_;
+  Vecteur3 u_euler_ap_rho_mu_ind_;
+  Vecteur3 terme_diffusion_;
+  Vecteur3 terme_convection_;
+  Vecteur3 terme_pression_;
+  Vecteur3 terme_pression_bis_;
+  Vecteur3 terme_pression_ter_;
+  Vecteur3 terme_interfaces_;
+  Vecteur3 terme_pression_in_ustar_;
+  Vecteur3 terme_interfaces_bf_mass_solver_;
+  Vecteur3 terme_interfaces_bf_mass_solver_bis_;
+  Vecteur3 terme_interfaces_af_mass_solver_;
+  Vecteur3 terme_interfaces_conv_diff_mass_solver_;
   Vecteur3 terme_moyen_convection_mass_solver_;
   Vecteur3 terme_moyen_diffusion_mass_solver_;
-  double pression_ap_proj;
+  double pression_ap_proj_;
   //
   // GAB qdm patch a posteriori
   //TODO :  enum corrections_qdm::type_dict_ { GB, GR };
@@ -340,6 +473,7 @@ protected :
   Vecteur3 integrated_residu_;
   // terme source qdm pour pousser le fluide dans le canal (en m/s/s)
   double terme_source_acceleration_;
+  int compute_force_init_;
 
   // Vecteurs de taille 3 a lire dans le jeu de donnees :
   ArrOfDouble terme_source_correction_; // Valeur de la force de correction moyenne a appliquer
@@ -357,9 +491,9 @@ protected :
 
   IJK_Field_double potential_phi_;
 
-  //
-  // Post-processing helper class:
-  //
+  /*
+   * Post-processing helper class:
+   */
   friend class IJK_FT_Post;
   IJK_FT_Post post_;
 
@@ -441,6 +575,7 @@ protected :
 
   // Pour l'option alternative du calcul de la diffusion :
   IJK_Field_double unit_;
+  FixedVector<IJK_Field_double, 3> zero_field_ft_;
   FixedVector<IJK_Field_double, 3> laplacien_velocity_;
 
 #ifdef BIDOUILLE
@@ -455,6 +590,7 @@ protected :
 
   // Pressure field
   IJK_Field_double pressure_;
+  IJK_Field_double pressure_ghost_cells_;
   IJK_Field_double kappa_ft_;
   IJK_Field_double kappa_ft_ns_;
   IJK_Field_double I_ns_;
@@ -463,34 +599,39 @@ protected :
   // right hand side for pressure solver
   IJK_Field_double pressure_rhs_;
   // Operators and pressure solver
-  OpDiffIJK_double velocity_diffusion_op_simple_;
-  OpDiffStdWithLaminarTransposeIJK_double velocity_diffusion_op_full_;
-  Nom type_velocity_diffusion_form_; /* simple_arithmetic : div(mu grad(u))
-  	  	  	  	  	  	  	  	  	 * full_arithmetic    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
-  	  	  	  	  	  	  	  	  	 *                      mu : moyenne arithmetique
-  	  	  	  	  	  	  	  	  	 * full_adaptative    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
-  	  	  	  	  	  	  	  	  	 *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
-  	  	  	  	  	  	  	  	  	 */
-  OpConvIJKQuickSharp_double velocity_convection_op_sharp_;
-  OpConvCentre4IJK_double velocity_convection_op_centre_;
-  OpConvAmontIJK_double velocity_convection_op_amont_;
 
-  Nom type_velocity_convection_form_; /* non_conservative_simple : rho div(u u)
-  	  	  	  	  	  	  	  	  	 * non_conservative_rhou     : div(rho u u) - u div(rho u)
-  	  	  	  	  	  	  	  	  	 * conservative              : div(rho u u)
-  	  	  	  	  	  	  	  	  	 */
-  //OpConvAmontIJK_double velocity_convection_op_;
-  int type_velocity_convection_op_; // 0 : Quick  / 1 : Centre / 2 : Amont
+  /* Velocity diffusion operator:
+   * simple_arithmetic : div(mu grad(u))
+   * full_arithmetic    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
+   *                      mu : moyenne arithmetique
+   * full_adaptative    : Tenseur des contraintes complet : div[mu (grad(u)+grad^T(u))]
+   *     mu : switch from arithmetic to geometric mean depending on the direction (Not available yet)
+   */
+  Operateur_IJK_faces_diff velocity_diffusion_op_;
+  enum velocity_diffusion_options_ { simple_arithmetic, full_arithmetic, full_adaptative};
+
+  /*
+   * Velocity convection operator
+   * non_conservative_simple : rho div(u u)
+   * non_conservative_rhou   : div(rho u u) - u div(rho u)
+   * conservative            : div(rho u u)
+   */
+  Operateur_IJK_faces_conv velocity_convection_op_;
+  enum velocity_convection_options_ { non_conservative_simple, non_conservative_rhou, conservative};
 
   Multigrille_Adrien poisson_solver_;
   // Simulation parameters
   int nb_timesteps_;
+  int max_simu_time_;
   double timestep_;
   double timestep_facsec_;
   double cfl_, fo_, oh_;
 
   double vitesse_entree_;
   double vitesse_upstream_;
+  Nom expression_vitesse_upstream_;
+  int upstream_dir_; // static
+  int upstream_stencil_;
   double nb_diam_upstream_;
   double rho_liquide_;
   double rho_vapeur_;
@@ -522,7 +663,7 @@ protected :
   // travail en increment de pression pour aider le solveur :
   int include_pressure_gradient_in_ustar_;
   // Discretisation du champ (1/rho) et utilisation dans le calcul de rho*v*v, dans le mass_solver
-  //    et dans pressure_projection_with_inv_rho :
+  // et dans pressure_projection_with_inv_rho :
   int use_inv_rho_for_mass_solver_and_calculer_rho_v_;
   int use_inv_rho_in_poisson_solver_;
   int use_inv_rho_;
@@ -531,7 +672,7 @@ protected :
 
   int refuse_patch_conservation_QdM_RK3_source_interf_;
   // GAB, qdm
-  int test_etapes_et_bilan;
+  int test_etapes_et_bilan_;
   //
   // GAB, champ de reprise + champ initial
   int add_initial_field_;
@@ -540,12 +681,13 @@ protected :
   int suppression_rejetons_;
   // Supprime l'appel a quelques fonctions qui n'ont pas de sens en monophasique :
   // comme par exemple : deplacer_interfaces,
-  //    calculer_rho_mu_indicatrice, ecrire_statistiques_bulles
+  // calculer_rho_mu_indicatrice, ecrire_statistiques_bulles
   int disable_diphasique_;
 
   int time_scheme_;
   double store_RK3_source_acc_;
   double store_RK3_fac_sv_;
+  double modified_time_ini_;
   double current_time_;
   double current_time_at_rk3_step_;
   int tstep_; // The iteration number
@@ -571,7 +713,24 @@ protected :
   // Dealing with thermal aspects:
   LIST(IJK_Thermique) thermique_;
   LIST(IJK_Energie) energie_;
+  IJK_Thermals thermals_;
+  int thermal_probes_ghost_cells_;
 
+  double dt_cfl_ = 1.e20;
+  double dt_fo_ = 1.e20;
+  double dt_oh_ = 1.e20;
+  double dt_fo_liq_ = 1.e20;
+  double dt_fo_vap_ = 1.e20;
+  double dt_cfl_liq_ = 1.e20;
+  double dt_cfl_vap_ = 1.e20;
+
+  int enable_dt_oh_ideal_length_factor_;
+
+  int counter_first_iter_ = 2;
+  int first_step_interface_smoothing_ = 0;
+
+  int compute_rising_velocities_ = 0;
+  int fill_rising_velocities_ = 0;
 };
 
 #endif /* IJK_FT_included */

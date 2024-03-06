@@ -29,16 +29,18 @@
 #include <IJK_Splitting.h>
 #include <Process.h>    // Process::Journal()
 #include <stat_counters.h>
-
 #include <sstream>
+#include <IJK_Thermals.h>
 
-//Implemente_liste(IJK_Thermique);
 /*
  * Take as main parameter reference to FT to be able to use its members.
  */
 IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft) :
-  statistiques_FT_(ijk_ft), ref_ijk_ft_(ijk_ft), disable_diphasique_(ijk_ft.disable_diphasique_), interfaces_(ijk_ft.interfaces_), kappa_ft_(ijk_ft.kappa_ft_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
-  d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_), thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_)
+  statistiques_FT_(ijk_ft), ref_ijk_ft_(ijk_ft), disable_diphasique_(ijk_ft.disable_diphasique_),
+  interfaces_(ijk_ft.interfaces_), kappa_ft_(ijk_ft.kappa_ft_), pressure_(ijk_ft.pressure_), velocity_(ijk_ft.velocity_),
+  d_velocity_(ijk_ft.d_velocity_), splitting_(ijk_ft.splitting_), splitting_ft_(ijk_ft.splitting_ft_),
+  thermique_(ijk_ft.thermique_), energie_(ijk_ft.energie_),
+  thermals_(ijk_ft.thermals_)
 {
   groups_statistiques_FT_.dimensionner(0);
 }
@@ -55,6 +57,7 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
   fichier_reprise_integrated_timescale_ = "??"; // par defaut, invalide
   compteur_post_instantanes_ = 0;
   dt_post_ = 100;
+  dt_post_thermals_probes_ = 100;
   dt_post_stats_plans_ = 1;
   dt_post_stats_bulles_ = 1;
   //poisson_solver_post_ = xxxx;
@@ -62,6 +65,7 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
 
   param.ajouter_flag("check_stats", &check_stats_);
   param.ajouter("dt_post", &dt_post_);
+  param.ajouter("dt_post_thermals_probes", &dt_post_thermals_probes_);
   param.ajouter("dt_post_stats_plans", &dt_post_stats_plans_);
   param.ajouter("dt_post_stats_bulles", &dt_post_stats_bulles_);
   param.ajouter("champs_a_postraiter", &liste_post_instantanes_);
@@ -404,11 +408,11 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       interfaces_.posttraiter_tous_champs(liste_post_instantanes_);
 
       {
-        int idx_th = 0;
+        int idx_thermique = 0;
         for (auto&& itr = thermique_.begin(); itr != thermique_.end(); ++itr)
           {
-            posttraiter_tous_champs_thermique(liste_post_instantanes_, idx_th);
-            ++idx_th;
+            posttraiter_tous_champs_thermique(liste_post_instantanes_, idx_thermique);
+            ++idx_thermique;
           }
       }
       {
@@ -419,6 +423,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             ++idx_en;
           }
       }
+      thermals_.posttraiter_tous_champs_thermal(liste_post_instantanes_);
     }
   int n = liste_post_instantanes_.size();
   if (liste_post_instantanes_.contient_("CURL"))
@@ -906,17 +911,17 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     }
 
   {
-    int idx_th = 0;
+    int idx_therm = 0;
     for (auto &itr : thermique_)
       {
-        int nb = posttraiter_champs_instantanes_thermique(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_th);
+        int nb = posttraiter_champs_instantanes_thermique(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_therm);
         // Interfacial thermal fields :
         if (!disable_diphasique_)
-          nb += posttraiter_champs_instantanes_thermique_interfaciaux(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_th);
+          nb += posttraiter_champs_instantanes_thermique_interfaciaux(liste_post_instantanes_, lata_name, latastep, current_time, itr, idx_therm);
 
-        if (idx_th == 0)
+        if (idx_therm == 0)
           n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
-        ++idx_th;
+        ++idx_therm;
       }
     // TODO: finir post-traitement de l'energie, choisir a quel niveau le faire.
     int idx_en = 0;
@@ -931,7 +936,10 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           n -= nb; // On compte comme "un" tous les CHAMPS_N (ou N est la longueur de la liste)
         ++idx_en;
       }
-
+    /*
+     * TODO: Clean IJK_Thermique et IJK_Energie
+     */
+    thermals_.posttraiter_champs_instantanes_thermal(liste_post_instantanes_, lata_name, latastep, current_time, n);
     Cerr << "les champs postraites sont: " << liste_post_instantanes_ << finl;
   }
 
@@ -1746,6 +1754,7 @@ int IJK_FT_Post::alloc_fields()
   int nalloc = 0;
   rebuilt_indic_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
   potentiel_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
+  nalloc += 2;
   if ((!disable_diphasique_) && ((liste_post_instantanes_.contient_("AIRE_INTERF")) || (liste_post_instantanes_.contient_("TOUS")) || ((t_debut_statistiques_ < 1.e10))))
     {
       ai_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 0);
@@ -1974,10 +1983,16 @@ void IJK_FT_Post::postraiter_ci(const Nom& lata_name, const double current_time)
 
 void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, double timestep, const Nom& lata_name, const ArrOfDouble& gravite, const Nom& nom_cas)
 {
-  if (tstep % dt_post_ == dt_post_ - 1 || stop)
+  thermals_.set_first_step_thermals_post(first_step_thermals_post_);
+  if (tstep % dt_post_ == dt_post_ - 1 || stop || first_step_thermals_post_)
     {
       Cout << "tstep : " << tstep << finl;
       posttraiter_champs_instantanes(lata_name, current_time, tstep);
+    }
+  if (tstep % dt_post_thermals_probes_ == dt_post_thermals_probes_ - 1 || stop || first_step_thermals_post_)
+    {
+      Cout << "tstep : " << tstep << finl;
+      thermals_.thermal_subresolution_outputs(dt_post_thermals_probes_);
     }
   if (tstep % dt_post_stats_bulles_ == dt_post_stats_bulles_ - 1 || stop)
     {
@@ -2285,152 +2300,150 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   int errcount_pext = 0;
   // i,j,k are the indices if the cells in the extended domain, for each processor
   for (int k = 0; k < nk; k++)
-    {
-      for (int j = 0; j < nj; j++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
         {
-          for (int i = 0; i < ni; i++)
+          if ((interfaces_.In_ft()(i, j, k) > 1.e-6) && (1. - interfaces_.In_ft()(i, j, k) > 1.e-6))
             {
-              if ((interfaces_.In_ft()(i, j, k) > 1.e-6) && (1. - interfaces_.In_ft()(i, j, k) > 1.e-6))
+              // Cerr << "Indicatrice[" << i << ", " << j << ", " << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
+              //The normal may only be computed on the extended domain
+              // A relationship between the indices of the two meshes is defined
+              // Non sono piu necessari perche si lavora solo  una griglia, quella estesa
+              // const int n_ext = ref_ijk_ft_.get_splitting_extension();
+              // const int i_ft = i+ n_ext;
+              // const int j_ft = j+ n_ext;
+              // int k_ft = k;
+              // if (split.get_grid_geometry().get_periodic_flag(DIRECTION_K))
+              //   k_ft+= n_ext;
+              // const int elem = split_ft.convert_ijk_cell_to_packed(i, j, k);
+              // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element); //number of bubbles crossing the cell
+              Vecteur3 bary_facettes_dans_elem;
+              Vecteur3 normale;
+              double norm = 1.;
+              double dist = 0.;
+              // int num_compo;
+              // if ( nb_compo_traversantes == 0)
+              //   {
+              //     normale[0]=1.;
+              //     normale[1]=1.;
+              //     normale[2]=1.;
+              //     Cerr << "Error no compo traversante on proc. " << Process::me() << finl;
+              //     Cerr << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
+              //     Process::exit();
+              //   }
+              // else if ( nb_compo_traversantes == 1)
+              //   {
+
+              //     num_compo = liste_composantes_connexes_dans_element[0];
+              //     interfaces_.calculer_normale_et_bary_element_pour_compo(num_compo,
+              //                                                             elem,
+              //                                                             mesh,
+              //                                                             normale,
+              //                                                             bary_facettes_dans_elem);
+              //   }
+
+              // // If the same cell is crossed by several bubbles the image points coincide with the crossed cells
+              // // the interpolation function in these points will lead to invalid values.
+              // else
+              //   {
+              //     num_compo = liste_composantes_connexes_dans_element[1];
+              //     interfaces_.calculer_normale_et_bary_element_pour_compo(num_compo,
+              //                                                             elem,
+              //                                                             mesh,
+              //                                                             normale,
+              //                                                             bary_facettes_dans_elem);
+              //   }
+              for (int c = 0; c < 3; c++)
                 {
-                  // Cerr << "Indicatrice[" << i << ", " << j << ", " << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
-                  //The normal may only be computed on the extended domain
-                  // A relationship between the indices of the two meshes is defined
-                  // Non sono piu necessari perche si lavora solo  una griglia, quella estesa
-                  // const int n_ext = ref_ijk_ft_.get_splitting_extension();
-                  // const int i_ft = i+ n_ext;
-                  // const int j_ft = j+ n_ext;
-                  // int k_ft = k;
-                  // if (split.get_grid_geometry().get_periodic_flag(DIRECTION_K))
-                  //   k_ft+= n_ext;
-                  // const int elem = split_ft.convert_ijk_cell_to_packed(i, j, k);
-                  // const int nb_compo_traversantes = interfaces_.compute_list_compo_connex_in_element(mesh, elem, liste_composantes_connexes_dans_element); //number of bubbles crossing the cell
-                  Vecteur3 bary_facettes_dans_elem;
-                  Vecteur3 normale;
-                  double norm = 1.;
-                  double dist = 0.;
-                  // int num_compo;
-                  // if ( nb_compo_traversantes == 0)
-                  //   {
-                  //     normale[0]=1.;
-                  //     normale[1]=1.;
-                  //     normale[2]=1.;
-                  //     Cerr << "Error no compo traversante on proc. " << Process::me() << finl;
-                  //     Cerr << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k) << finl;
-                  //     Process::exit();
-                  //   }
-                  // else if ( nb_compo_traversantes == 1)
-                  //   {
-
-                  //     num_compo = liste_composantes_connexes_dans_element[0];
-                  //     interfaces_.calculer_normale_et_bary_element_pour_compo(num_compo,
-                  //                                                             elem,
-                  //                                                             mesh,
-                  //                                                             normale,
-                  //                                                             bary_facettes_dans_elem);
-                  //   }
-
-                  // // If the same cell is crossed by several bubbles the image points coincide with the crossed cells
-                  // // the interpolation function in these points will lead to invalid values.
-                  // else
-                  //   {
-                  //     num_compo = liste_composantes_connexes_dans_element[1];
-                  //     interfaces_.calculer_normale_et_bary_element_pour_compo(num_compo,
-                  //                                                             elem,
-                  //                                                             mesh,
-                  //                                                             normale,
-                  //                                                             bary_facettes_dans_elem);
-                  //   }
-                  for (int c = 0; c < 3; c++)
+                  normale[c] = interfaces_.get_norm_par_compo_itfc_in_cell_ft()[c](i, j, k);
+                  bary_facettes_dans_elem[c] = interfaces_.get_bary_par_compo_itfc_in_cell_ft()[c](i, j, k);
+                }
+              norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
+              //if (norm<0.95)
+              //    Process::Journal() << "[WARNING-NORM] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k)
+              //                       << " norm= " << norm << finl;
+              //  }
+              if (norm < 1.e-8)
+                {
+                  // Process::Journal() << " nb_compo_traversantes " << nb_compo_traversantes << finl;
+                  Process::Journal() << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
+                  Process::Journal() << "[WARNING-Extended-pressure] on Proc. " << Process::me() << "Floating Point Exception is barely avoided (" << " normale " << normale[0] << " " << normale[1]
+                                     << " " << normale[2] << " )" << finl;
+                  Process::Journal() << " But we have no distance to extrapolate the pressure" << finl;
+                  dist = 1.52 * sqrt(dx * dx + dy * dy + dz * dz) / 3.;
+                  if (interfaces_.In_ft()(i, j, k) * (1 - interfaces_.In_ft()(i, j, k)) > 1.e-6)
                     {
-                      normale[c] = interfaces_.get_norm_par_compo_itfc_in_cell_ft()[c](i, j, k);
-                      bary_facettes_dans_elem[c] = interfaces_.get_bary_par_compo_itfc_in_cell_ft()[c](i, j, k);
-                    }
-                  norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
-                  //if (norm<0.95)
-                  //    Process::Journal() << "[WARNING-NORM] " << "Indicatrice[" << i <<"," << j << "," << k << "] = " << interfaces_.In_ft()(i,j,k)
-                  //                       << " norm= " << norm << finl;
-                  //  }
-                  if (norm < 1.e-8)
-                    {
-                      // Process::Journal() << " nb_compo_traversantes " << nb_compo_traversantes << finl;
-                      Process::Journal() << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
-                      Process::Journal() << "[WARNING-Extended-pressure] on Proc. " << Process::me() << "Floating Point Exception is barely avoided (" << " normale " << normale[0] << " " << normale[1]
-                                         << " " << normale[2] << " )" << finl;
-                      Process::Journal() << " But we have no distance to extrapolate the pressure" << finl;
-                      dist = 1.52 * sqrt(dx * dx + dy * dy + dz * dz) / 3.;
-                      if (interfaces_.In_ft()(i, j, k) * (1 - interfaces_.In_ft()(i, j, k)) > 1.e-6)
+                      Process::Journal() << "[WARNING-Extended-pressure] " << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
+                      if (interfaces_.In_ft()(i, j, k) > 0.99)
                         {
-                          Process::Journal() << "[WARNING-Extended-pressure] " << "Indicatrice[" << i << "," << j << "," << k << "] = " << interfaces_.In_ft()(i, j, k) << finl;
-                          if (interfaces_.In_ft()(i, j, k) > 0.99)
-                            {
-                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_liq pressure_[" << i << "," << j << "," << k << "] = "
-                                                 << pressure_ft_(i, j, k) << finl;
-                              extended_pv_ft_(i, j, k) = 1.e20;
-                            }
-                          else
-                            {
-                              Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_vap pressure_[" << i << "," << j << "," << k << "] = "
-                                                 << pressure_ft_(i, j, k) << finl;
-                              extended_pl_ft_(i, j, k) = 1.e20;
-                            }
-                          continue; // This cell is not added to crossed cells.
+                          Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_liq pressure_[" << i << "," << j << "," << k << "] = "
+                                             << pressure_ft_(i, j, k) << finl;
+                          extended_pv_ft_(i, j, k) = 1.e20;
                         }
                       else
                         {
-                          // We still need a unit normal
-                          for (int dir = 0; dir < 3; dir++)
-                            if (normale[dir] != 0)
-                              normale[dir] = (normale[dir] > 0.) ? 1.0 : -1.0;
-
-                          norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
-                          if (std::fabs(norm) < 1.e-10)
-                            {
-                              Process::Journal() << "[WARNING-Extended-pressure] ||normal|| < 1.e-10" << finl;
-                            }
+                          Process::Journal() << "[WARNING-Extended-pressure] " << "Pressure_ft_ will be kept as an extension for p_vap pressure_[" << i << "," << j << "," << k << "] = "
+                                             << pressure_ft_(i, j, k) << finl;
+                          extended_pl_ft_(i, j, k) = 1.e20;
                         }
-                    }
-
-                  if (std::fabs(norm) < 1.e-10)
-                    {
-                      Process::Journal() << "[WARNING-Extended-pressure] Even with precaution, the normal truely is zero in compute_extended_pressures()... " << finl;
-                      Cerr << "We ignore the extrapolation and keep the local value... (hopefully rare enough)" << finl;
-                      dist = 0.;
-                      errcount_pext++;
+                      continue; // This cell is not added to crossed cells.
                     }
                   else
                     {
-                      dist = 1.52 * (std::fabs(dx * normale[0]) + std::fabs(dy * normale[1]) + std::fabs(dz * normale[2])) / norm;
-                      // 2020.04.15 : GB correction for non-isotropic meshes and closer extrapolation points:
-                      // The previous version was looking very far away in the direction where the mesh is fine (dz in channel flows).
-                      // Then, a lot of ghost would be required.
-                      // This new version still goes to the same value of dist when nx=1 or when nz=1, but is sin between
-                      // double eps = 1.e-20;
-                      // dist = 1.52*std::min(min(dx/(std::fabs(normale[0])+eps),dy/(std::fabs(normale[1])+eps)),dz/(std::fabs(normale[2])+eps));
+                      // We still need a unit normal
+                      for (int dir = 0; dir < 3; dir++)
+                        if (normale[dir] != 0)
+                          normale[dir] = (normale[dir] > 0.) ? 1.0 : -1.0;
+
+                      norm = sqrt(normale[0] * normale[0] + normale[1] * normale[1] + normale[2] * normale[2]);
+                      if (std::fabs(norm) < 1.e-10)
+                        {
+                          Process::Journal() << "[WARNING-Extended-pressure] ||normal|| < 1.e-10" << finl;
+                        }
                     }
+                }
 
-                  nbsom++;
-                  crossed_cells.resize(nbsom, 3, Array_base::COPY_INIT);
-                  positions_liq.resize(2 * nbsom, 3, Array_base::COPY_INIT);
-                  positions_vap.resize(2 * nbsom, 3, Array_base::COPY_INIT);
+              if (std::fabs(norm) < 1.e-10)
+                {
+                  Process::Journal() << "[WARNING-Extended-pressure] Even with precaution, the normal truely is zero in compute_extended_pressures()... " << finl;
+                  Cerr << "We ignore the extrapolation and keep the local value... (hopefully rare enough)" << finl;
+                  dist = 0.;
+                  errcount_pext++;
+                }
+              else
+                {
+                  dist = 1.52 * (std::fabs(dx * normale[0]) + std::fabs(dy * normale[1]) + std::fabs(dz * normale[2])) / norm;
+                  // 2020.04.15 : GB correction for non-isotropic meshes and closer extrapolation points:
+                  // The previous version was looking very far away in the direction where the mesh is fine (dz in channel flows).
+                  // Then, a lot of ghost would be required.
+                  // This new version still goes to the same value of dist when nx=1 or when nz=1, but is sin between
+                  // double eps = 1.e-20;
+                  // dist = 1.52*std::min(min(dx/(std::fabs(normale[0])+eps),dy/(std::fabs(normale[1])+eps)),dz/(std::fabs(normale[2])+eps));
+                }
 
-                  crossed_cells(nbsom - 1, 0) = i;
-                  crossed_cells(nbsom - 1, 1) = j;
-                  crossed_cells(nbsom - 1, 2) = k;
+              nbsom++;
+              crossed_cells.resize(nbsom, 3, Array_base::COPY_INIT);
+              positions_liq.resize(2 * nbsom, 3, Array_base::COPY_INIT);
+              positions_vap.resize(2 * nbsom, 3, Array_base::COPY_INIT);
 
-                  for (int dir = 0; dir < 3; dir++)
-                    {
-                      // Four image points are calculated, two on each side of the interface
-                      //liquid phase
-                      positions_liq(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] + dist * normale[dir]; // 1st point to be done...
-                      positions_liq(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] + 2 * dist * normale[dir]; // 2nd point to be done...
-                      //vapor_phase
-                      positions_vap(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] - dist * normale[dir]; // 1st point to be done...
-                      positions_vap(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] - 2 * dist * normale[dir]; // 2nd point to be done...
-                    }
+              crossed_cells(nbsom - 1, 0) = i;
+              crossed_cells(nbsom - 1, 1) = j;
+              crossed_cells(nbsom - 1, 2) = k;
+
+              for (int dir = 0; dir < 3; dir++)
+                {
+                  // Four image points are calculated, two on each side of the interface
+                  //liquid phase
+                  positions_liq(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] + dist * normale[dir]; // 1st point to be done...
+                  positions_liq(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] + 2 * dist * normale[dir]; // 2nd point to be done...
+                  //vapor_phase
+                  positions_vap(2 * nbsom - 2, dir) = bary_facettes_dans_elem[dir] - dist * normale[dir]; // 1st point to be done...
+                  positions_vap(2 * nbsom - 1, dir) = bary_facettes_dans_elem[dir] - 2 * dist * normale[dir]; // 2nd point to be done...
                 }
             }
         }
-    }
+
+
 
   errcount_pext = Process::mp_sum(errcount_pext);
   if ((Process::je_suis_maitre()) && (errcount_pext))
@@ -2641,6 +2654,11 @@ void IJK_FT_Post::compute_phase_pressures_based_on_poisson(const int phase)
 
 // Methode appelee lorsqu'on a mis "TOUS" dans la liste des champs a postraiter.
 // Elle ajoute a la liste tous les noms de champs postraitables par IJK_Interfaces
+
+/*
+ * TODO: Clean IJK_Thermique et IJK_Energie
+ */
+
 void IJK_FT_Post::posttraiter_tous_champs_thermique(Motcles& liste, const int idx) const
 {
   liste.add("TEMPERATURE");
@@ -2689,7 +2707,11 @@ void IJK_FT_Post::posttraiter_tous_champs_energie(Motcles& liste, const int idx)
 }
 
 // idx is the number of the temperature in the list
-int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes, const char *lata_name, const int latastep, const double current_time, IJK_Thermique& itr,
+int IJK_FT_Post::posttraiter_champs_instantanes_thermique(const Motcles& liste_post_instantanes,
+                                                          const char *lata_name,
+                                                          const int latastep,
+                                                          const double current_time,
+                                                          IJK_Thermique& itr,
                                                           const int idx)
 {
   Cerr << liste_post_instantanes << finl;
@@ -2873,7 +2895,11 @@ int IJK_FT_Post::posttraiter_champs_instantanes_energie(const Motcles& liste_pos
 }
 
 // idx is the number of the temperature in the list
-int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes, const char *lata_name, const int latastep, const double current_time, IJK_Thermique& itr,
+int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Motcles& liste_post_instantanes,
+                                                                       const char *lata_name,
+                                                                       const int latastep,
+                                                                       const double current_time,
+                                                                       IJK_Thermique& itr,
                                                                        const int idx)
 {
   Cerr << liste_post_instantanes << finl;
@@ -2916,7 +2942,11 @@ int IJK_FT_Post::posttraiter_champs_instantanes_thermique_interfaciaux(const Mot
 }
 
 // idx is the number of the temperature in the list
-int IJK_FT_Post::posttraiter_champs_instantanes_energie_interfaciaux(const Motcles& liste_post_instantanes, const char *lata_name, const int latastep, const double current_time, IJK_Energie& itr,
+int IJK_FT_Post::posttraiter_champs_instantanes_energie_interfaciaux(const Motcles& liste_post_instantanes,
+                                                                     const char *lata_name,
+                                                                     const int latastep,
+                                                                     const double current_time,
+                                                                     IJK_Energie& itr,
                                                                      const int idx)
 {
   Cerr << liste_post_instantanes << finl;

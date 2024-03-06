@@ -28,7 +28,7 @@ IJK_FT_double
   ijk_splitting_ft_extension 0 # To be checked.. #
   timestep 1.e-1
   time_scheme euler_explicit  # RK3_FT #
-  type_velocity_convection_op Centre 
+  velocity_convection_op Centre 
   Boundary_Conditions {
     bctype_kmin Mixte_shear
     bctype_kmax Mixte_shear

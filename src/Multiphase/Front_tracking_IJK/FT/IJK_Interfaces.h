@@ -36,8 +36,11 @@
 #include <SurfaceVapeurIJKComputation.h>
 #include <ComputeValParCompoInCell.h>
 #include <TRUST_Ref.h>
+#include <Intersection_Interface_ijk.h>
+#include <IJK_Composantes_Connex.h>
 
 class IJK_FT_double;
+class Switch_FT_double;
 class Domaine_dis;
 
 #define VERIF_INDIC 0
@@ -57,11 +60,14 @@ class IJK_Interfaces : public Objet_U
 
 public :
   IJK_Interfaces();
-  void initialize(const IJK_Splitting& splitting_FT,
-                  const IJK_Splitting& splitting_NS,
-                  const Domaine_dis& domaine_dis,
-                  const bool compute_vint=true);
+  int initialize(const IJK_Splitting& splitting_FT,
+                 const IJK_Splitting& splitting_NS,
+                 const Domaine_dis& domaine_dis,
+                 const int thermal_probes_ghost_cells=0,
+                 const bool compute_vint=true,
+                 const bool is_switch=false);
   void associer(const IJK_FT_double& ijk_ft);
+  void associer_switch(const Switch_FT_double& ijk_ft_switch);
   void posttraiter_tous_champs(Motcles& liste) const;
   int posttraiter_champs_instantanes(const Motcles& liste_post_instantanes,
                                      const char *lata_name,
@@ -73,7 +79,8 @@ public :
   void transporter_maillage(const double dt_tot,
                             ArrOfDouble& dvol,
                             const int rk_step,
-                            const double temps);
+                            const double temps,
+                            const int first_step_interface_smoothing = 0);
   void calculer_bounding_box_bulles(DoubleTab& bounding_box, int option_shear = 0) const;
   void preparer_duplicata_bulles(const DoubleTab& bounding_box_of_bubbles,
                                  const DoubleTab& bounding_box_offsetp,
@@ -128,6 +135,11 @@ public :
 
   int lire_motcle_non_standard(const Motcle& un_mot, Entree& is) override;
   // fin de methode pour bulles fixes
+  const Domaine_dis& get_domaine_dis() const
+  {
+    return refdomaine_dis_.valeur();
+  };
+
   int get_nb_bulles_reelles() const
   {
     return nb_bulles_reelles_;
@@ -256,6 +268,12 @@ public :
   {
     return maillage_ft_ijk_;
   }
+
+  const Remaillage_FT_IJK& remaillage_ft_ijk() const
+  {
+    return remaillage_ft_ijk_;
+  }
+
   const DoubleTab& RK3_G_store_vi() const
   {
     return  RK3_G_store_vi_;
@@ -265,6 +283,11 @@ public :
   {
     return num_compo_;
   }
+
+  const ArrOfInt& get_compo_to_group() const
+  {
+    return compo_to_group_;
+  };
 
   // Methode qui parcourt les facettes contenues dans la cellule num_elem
   // pour trouver la phase de sa cellule voisine
@@ -499,7 +522,6 @@ public :
   // }
 
   // Les composantes (dir) du vecteur normal moyen pour chaque compo comnnexe
-  // (c) de bulle dans le maille (compo = max_nb_of_compo_ * c + dir)
   const double& nI(const int compo, const int i, const int j, const int k) const
   {
     return normal_of_interf_ns_[old()][compo](i, j, k);
@@ -579,6 +601,66 @@ public :
   const int& nb_compo_traversantes(const int i, const int j, const int k) const
   {
     return nb_compo_traversante_[next()](i,j,k);
+  }
+
+  const Intersection_Interface_ijk_cell& get_intersection_ijk_cell() const
+  {
+    return intersection_ijk_cell_;
+  }
+  const Intersection_Interface_ijk_face& get_intersection_ijk_face() const
+  {
+    return intersection_ijk_face_;
+  }
+  Intersection_Interface_ijk_cell& get_set_intersection_ijk_cell()
+  {
+    return intersection_ijk_cell_;
+  }
+  Intersection_Interface_ijk_face& get_set_intersection_ijk_face()
+  {
+    return intersection_ijk_face_;
+  }
+  const IJK_Composantes_Connex& get_ijk_compo_connex() const
+  {
+    return ijk_compo_connex_;
+  }
+
+  void compute_compo_connex_from_bounding_box()
+  {
+    if (!is_diphasique_)
+      return;
+    ijk_compo_connex_.compute_bounding_box_fill_compo_connex();
+  }
+
+  void compute_compo_connex_from_interface()
+  {
+    if (!is_diphasique_)
+      return;
+    ijk_compo_connex_.compute_compo_connex_from_interface();
+  }
+
+  void initialise_ijk_compo_connex_bubbles_params()
+  {
+    if (!is_diphasique_)
+      return;
+    ijk_compo_connex_.initialise_bubbles_params();
+  }
+
+  int associate_rising_velocities_parameters(const IJK_Splitting& splitting,
+                                             const int& compute_rising_velocities,
+                                             const int& fill_rising_velocities)
+  {
+    if (!is_diphasique_)
+      return 0;
+    return ijk_compo_connex_.associate_rising_velocities_parameters(splitting,
+                                                                    compute_rising_velocities,
+                                                                    fill_rising_velocities);
+  }
+
+  void compute_rising_velocities_from_compo()
+  {
+    if (!is_diphasique_)
+      return;
+    ijk_compo_connex_.compute_rising_velocities();
   }
 
 protected:
@@ -665,6 +747,7 @@ protected:
   REF(IJK_Splitting) ref_splitting_;
   REF(Domaine_dis) refdomaine_dis_;
   REF(IJK_FT_double) ref_ijk_ft_;
+  REF(Switch_FT_double) ref_ijk_ft_switch_;
   // Interdit le constructeur par copie (car constructeurs par copie interdits
   // pour parcours_ et autres
   IJK_Interfaces(const IJK_Interfaces& x) : Objet_U(x)
@@ -831,6 +914,12 @@ protected:
   FixedVector<FixedVector<IJK_Field_double, max_authorized_nb_of_components_>, 2> repuls_par_compo_;
   FixedVector<FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>, 2> normale_par_compo_;
   FixedVector<FixedVector<IJK_Field_double, 3 * max_authorized_nb_of_components_>, 2> bary_par_compo_;
+
+  Intersection_Interface_ijk_cell intersection_ijk_cell_;
+  Intersection_Interface_ijk_face intersection_ijk_face_;
+
+  IJK_Composantes_Connex ijk_compo_connex_;
+
 };
 
 #endif /* IJK_Interfaces_included */
