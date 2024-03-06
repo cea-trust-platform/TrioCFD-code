@@ -862,6 +862,85 @@ Entree& IJK_FT_double::interpreter(Entree& is)
             }
         }
       redistribute_from_splitting_ft_elem_.initialize(splitting_ft_, splitting_, loc, map);
+
+      for (int dir2 = 0; dir2 < 3; dir2++)
+        {
+          const int ghost_a_redistribute = 2 ;
+          const int n = splitting_.get_nb_items_global(loc, dir2);
+          const int n_ft = splitting_ft_.get_nb_items_global(loc, dir2);
+          if(dir2==2)
+            {
+              // on ne redistribue les ghost que sur z pour le shear perio
+              map[dir2].resize(2,3);
+              // envoyer les rangees -2, -1, 0, 1 dans 0, 1, 2, 3
+              map[dir2](0,0) = n_ext-ghost_a_redistribute;  // source index
+              map[dir2](0,1) = 0; // dest index
+              map[dir2](0,2) = ghost_a_redistribute*2; // size
+              // envoyer les rangees n-2, n-1, n, n+1 dans 4, 5, 6, 7
+              map[dir2](1,0) = n_ft - n_ext - ghost_a_redistribute;  // source index
+              map[dir2](1,1) = 4; // dest index
+              map[dir2](1,2) = ghost_a_redistribute*2; // size
+            }
+          else
+            {
+              map[dir2].resize(1,3);
+              map[dir2](0,0) = n_ext;  // source index
+              map[dir2](0,1) = 0; // dest index
+              map[dir2](0,2) = n; // size
+            }
+
+        }
+      redistribute_from_splitting_ft_elem_ghostz_.initialize(splitting_ft_, splitting_, loc, map);
+
+      for (int dir2 = 0; dir2 < 3; dir2++)
+        {
+          const int ghost_a_redistribute = 2 ;
+          const int n = splitting_.get_nb_items_global(loc, dir2);
+          if(dir2==2)
+            {
+              // on ne redistribue les ghost que sur z pour le shear perio
+              map[dir2].resize(1,3);
+              // envoyer les rangees -2, -1, 0, 1 dans 0, 1, 2, 3
+              map[dir2](0,0) = n_ext-ghost_a_redistribute;  // source index
+              map[dir2](0,1) = 0; // dest index
+              map[dir2](0,2) = ghost_a_redistribute*2; // size
+            }
+          else
+            {
+              map[dir2].resize(1,3);
+              map[dir2](0,0) = n_ext;  // source index
+              map[dir2](0,1) = 0; // dest index
+              map[dir2](0,2) = n; // size
+            }
+
+        }
+      redistribute_from_splitting_ft_elem_ghostz_min_.initialize(splitting_ft_, splitting_, loc, map);
+
+      for (int dir2 = 0; dir2 < 3; dir2++)
+        {
+          const int ghost_a_redistribute = 2 ;
+          const int n = splitting_.get_nb_items_global(loc, dir2);
+          const int n_ft = splitting_ft_.get_nb_items_global(loc, dir2);
+          if(dir2==2)
+            {
+              // on ne redistribue les ghost que sur z pour le shear perio
+              map[dir2].resize(1,3);
+              // envoyer les rangees n-2, n-1, n, n+1 dans 4, 5, 6, 7
+              map[dir2](0,0) = n_ft - n_ext - ghost_a_redistribute;  // source index
+              map[dir2](0,1) = 4; // dest index
+              map[dir2](0,2) = ghost_a_redistribute*2; // size
+            }
+          else
+            {
+              map[dir2].resize(1,3);
+              map[dir2](0,0) = n_ext;  // source index
+              map[dir2](0,1) = 0; // dest index
+              map[dir2](0,2) = n; // size
+            }
+
+        }
+      redistribute_from_splitting_ft_elem_ghostz_max_.initialize(splitting_ft_, splitting_, loc, map);
+
     }
   }
 
@@ -1724,17 +1803,15 @@ int IJK_FT_double::initialise()
 
   if (!disable_diphasique_)
     {
-      interfaces_.calculer_kappa_ft(kappa_ft_);
-      if(boundary_conditions_.get_correction_interp_monofluide()==1)
-        {
-          calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-          pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-        }
-
-      rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
+      redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
+      rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
       if (use_inv_rho_)
-        inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-      rho_field_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+        {
+          inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+        }
     }
   else
     kappa_ft_.data() =0.;
@@ -1800,17 +1877,15 @@ int IJK_FT_double::initialise()
 
   if (!disable_diphasique_)
     {
-      interfaces_.calculer_kappa_ft(kappa_ft_);
-      if(boundary_conditions_.get_correction_interp_monofluide()==1)
-        {
-          calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-          pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-        }
-
-      rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
+      redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
+      rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
       if (use_inv_rho_)
-        inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-      rho_field_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+        {
+          inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+        }
     }
   else
     kappa_ft_.data() = 0.;
@@ -2268,6 +2343,7 @@ void IJK_FT_double::run()
   pressure_rhs_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   nalloc += 1;
   pressure_rhs_before_shear_.allocate(splitting_, IJK_Splitting::ELEM, 1);
+  I_ns_.allocate(splitting_, IJK_Splitting::ELEM, 2);
 
   if (!disable_diphasique_ && (boundary_conditions_.get_correction_interp_monofluide()==1 || boundary_conditions_.get_correction_interp_monofluide()==2))
     {
@@ -4647,16 +4723,16 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   // mise a jour de l'indicatrice pour les variables monofluides
   interfaces_.calculer_kappa_ft(kappa_ft_);
 
-  if(boundary_conditions_.get_correction_interp_monofluide()==1)
-    {
-      calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-      pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-    }
 
-  rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+  redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
+  redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
+  rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+  rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
   if (use_inv_rho_)
-    inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-  rho_field_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
+    {
+      inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+    }
 
   statistiques().end_count(deplacement_interf_counter_);
 }
@@ -4706,16 +4782,16 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   update_indicator_field();
   interfaces_.calculer_kappa_ft(kappa_ft_);
 
-  if(boundary_conditions_.get_correction_interp_monofluide()==1)
+  redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
+  redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
+  rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+  rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+  if (use_inv_rho_)
     {
-      calculer_I_kappa_sigma(kappa_ft_, interfaces_.I_ft(), sigma_);
-      pressure_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
+      inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
     }
 
-  rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-  if (use_inv_rho_)
-    inv_rho_field_.update_I_sigma_kappa(interfaces_.I_ft(), kappa_ft_, ijk_splitting_ft_extension_, sigma_);
-  rho_field_.relever_I_sigma_kappa_ns(kappa_ft_ns_);
 }
 
 //  Parcourir_maillage cree des noeuds et facettes virtuelles.

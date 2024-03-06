@@ -709,6 +709,9 @@ protected :
   FixedVector<Redistribute_Field, 3> redistribute_to_splitting_ft_faces_;
   FixedVector<Redistribute_Field, 3> redistribute_from_splitting_ft_faces_;
   Redistribute_Field redistribute_from_splitting_ft_elem_;
+  Redistribute_Field redistribute_from_splitting_ft_elem_ghostz_;
+  Redistribute_Field redistribute_from_splitting_ft_elem_ghostz_min_;
+  Redistribute_Field redistribute_from_splitting_ft_elem_ghostz_max_;
 
   // Champs volumiques sur le maillage FT (pour convection des interfaces, etc)
   FixedVector<IJK_Field_double, 3> velocity_ft_;
