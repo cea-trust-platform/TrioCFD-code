@@ -31,7 +31,7 @@ void ecrire_tableau(Sortie& os, const DoubleTab& tab)
   const int dim0 = tab.dimension(0);
   const int dimtot = Process::mp_sum(dim0);
   if (Process::je_suis_maitre())
-    os << dimtot << space << tab.dimension(1) << finl;
+    os << dimtot << tspace << tab.dimension(1) << finl;
   os.put(tab.addr(), tab.size_array());
   os.syncfile();
 }
@@ -41,7 +41,7 @@ void ecrire_tableau(Sortie& os, const IntTab& tab)
   const int dim0 = tab.dimension(0);
   const int dimtot = Process::mp_sum(dim0);
   if (Process::je_suis_maitre())
-    os << dimtot << space << tab.dimension(1) << finl;
+    os << dimtot << tspace << tab.dimension(1) << finl;
   os.put(tab.addr(), tab.size_array());
   os.syncfile();
 }
