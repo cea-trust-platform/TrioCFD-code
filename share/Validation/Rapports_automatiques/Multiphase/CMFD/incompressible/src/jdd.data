@@ -35,6 +35,7 @@ Read sch
     facsec 1e30
     nb_pas_dt_max $nb_pas_dt_max
     seuil_statio 1.e-3
+    dt_max 0.1
     solveur implicite
     {
         solveur petsc cli { }
@@ -56,6 +57,7 @@ Lire pb
         lambda  champ_uniforme 1 $lambda
         cp      champ_uniforme 1 $cp
         beta_th champ_uniforme 1 $beta
+        gravite champ_uniforme 3 0 0 -9.81
     }
 
     correlations
@@ -144,8 +146,8 @@ Lire pb
     Postraitement
 	{
 		sondes		{
-					temperature temperature_liquide_r134a periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
-					vitesse vitesse_liquide_r134a periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
+					temperature temperature periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
+					vitesse vitesse periode 1e8 segment 20 0.00023996344683753387  4.188577544948042e-06 4.485 0.00935857442666382 0.00016335452425297366  4.485 
 					}
 		format lata
 		champs binaire dt_post 1.e8
@@ -155,7 +157,7 @@ Lire pb
 					pression elem
                     k elem
                     omega elem
-                    viscosite_turbulente elem
+                    nu_turb elem
                     omega_residu elem
                     k_residu elem
                     vitesse_residu elem
