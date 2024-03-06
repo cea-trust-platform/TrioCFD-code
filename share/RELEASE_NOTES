@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.4 : Enhancements, modifications and corrected bugs since version 1.9.3 :
 --------------------------------------------------------------------------------------------------
+06/03/24 (TrioCFD) New feature : FT IJK - First implementation of a one-dimensional thermal sub-resolution technique in the vicinity of bubble's interfaces and exploration of various thermal coupling strategies with IJK discretisation. 
 
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.3 : Enhancements, modifications and corrected bugs since version 1.9.2 :
