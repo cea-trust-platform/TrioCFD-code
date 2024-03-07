@@ -4653,9 +4653,9 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
 
     if (IJK_Splitting::defilement_ == 1)
       {
-        velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), IJK_Splitting::FACES_I, ijk_splitting_ft_extension_);
-        velocity_ft_[1].redistribute_with_shear_domain_ft(velocity_[1], 0., IJK_Splitting::FACES_J, ijk_splitting_ft_extension_);
-        velocity_ft_[2].redistribute_with_shear_domain_ft(velocity_[2], 0., IJK_Splitting::FACES_K, ijk_splitting_ft_extension_ );
+        velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), ijk_splitting_ft_extension_);
+        velocity_ft_[1].redistribute_with_shear_domain_ft(velocity_[1], 0., ijk_splitting_ft_extension_);
+        velocity_ft_[2].redistribute_with_shear_domain_ft(velocity_[2], 0., ijk_splitting_ft_extension_ );
       }
 
     for (int dir = 0; dir < 3; dir++)
@@ -4746,11 +4746,12 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);
   redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);
   redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);
+
   if (IJK_Splitting::defilement_ == 1)
     {
-      velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), IJK_Splitting::FACES_I, ijk_splitting_ft_extension_);
-      velocity_ft_[1].redistribute_with_shear_domain_ft(velocity_[1], 0., IJK_Splitting::FACES_J, ijk_splitting_ft_extension_);
-      velocity_ft_[2].redistribute_with_shear_domain_ft(velocity_[2], 0., IJK_Splitting::FACES_K, ijk_splitting_ft_extension_);
+      velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), ijk_splitting_ft_extension_);
+      velocity_ft_[1].redistribute_with_shear_domain_ft(velocity_[1], 0., ijk_splitting_ft_extension_);
+      velocity_ft_[2].redistribute_with_shear_domain_ft(velocity_[2], 0., ijk_splitting_ft_extension_);
     }
 
 
