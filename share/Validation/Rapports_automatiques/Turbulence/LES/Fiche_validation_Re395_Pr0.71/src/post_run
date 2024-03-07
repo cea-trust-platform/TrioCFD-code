@@ -71,7 +71,7 @@ if [ "$type_LP" != "decale" ] ;
 	else Ly=$(grep Longueurs ../T0Q_VEF_Pironneau_maillage_decale/Cas.data | awk '{print $3}')
 fi
 
-Pth=$(grep puissance_thermique Cas.data | awk '{print $6}')
+Pth=$(grep puissance_thermique Cas.data | awk '{print $4}')
 qw=`echo "scale=5 ; $Pth*$Ly/2" | bc -l`
 T_tau=`echo "scale=5 ; $qw/($rho*$Cp*$u_tau_calc)" | bc -l`
 
