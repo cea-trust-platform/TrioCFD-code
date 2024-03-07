@@ -1791,6 +1791,8 @@ int IJK_FT_double::initialise()
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
       rho_field_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
+      molecular_mu_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      molecular_mu_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
       if (use_inv_rho_)
         {
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
@@ -1863,6 +1865,8 @@ int IJK_FT_double::initialise()
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
       rho_field_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
+      molecular_mu_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      molecular_mu_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
       if (use_inv_rho_)
         {
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
@@ -4728,6 +4732,8 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
       rho_field_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
+      molecular_mu_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      molecular_mu_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
       if (use_inv_rho_)
         {
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
@@ -4806,6 +4812,8 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
       rho_field_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
+      molecular_mu_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      molecular_mu_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
       if (use_inv_rho_)
         {
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
