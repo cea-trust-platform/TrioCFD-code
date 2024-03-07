@@ -1669,13 +1669,6 @@ int IJK_FT_double::initialise()
               // Cette methode parcours ni(), nj() et nk() et donc pas les ghost...
               set_field_data(velocity_[i], expression_vitesse_initiale_[i]);
             }
-          // duCluzeau
-          // advecter le champ de vitesse initiale par le champ de vitesse moyen cisaille
-          // si on commence le calcul a t !=0 avec un decallage
-
-          velocity_[0].change_to_sheared_reference_frame(1, 1);
-          velocity_[1].change_to_sheared_reference_frame(1, 2);
-          velocity_[2].change_to_sheared_reference_frame(1, 3);
 
           velocity_[0].echange_espace_virtuel(2);
           velocity_[1].echange_espace_virtuel(2);
@@ -4654,16 +4647,16 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
 
     // Il faut ajouter le cisaillement moyen au champ de vitesse_ft avant de convecter les marqueurs
 
+    redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);
+    redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);
+    redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);
+
     if (IJK_Splitting::defilement_ == 1)
       {
-        redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0],
-                                          boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
-        redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1], 0., 1);
-        redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2], 0., 2);
+        velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), IJK_Splitting::FACES_I, ijk_splitting_ft_extension_);
+        velocity_ft_[1].redistribute_with_shear_domain_ft(velocity_[1], 0., IJK_Splitting::FACES_J, ijk_splitting_ft_extension_);
+        velocity_ft_[2].redistribute_with_shear_domain_ft(velocity_[2], 0., IJK_Splitting::FACES_K, ijk_splitting_ft_extension_ );
       }
-    else
-      for (int dir = 0; dir < 3; dir++)
-        redistribute_to_splitting_ft_faces_[dir].redistribute(velocity_[dir], velocity_ft_[dir]);
 
     for (int dir = 0; dir < 3; dir++)
       {
@@ -4750,12 +4743,16 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   for (int dir = 0; dir < 3; dir++)
     redistribute_to_splitting_ft_faces_[dir].redistribute(velocity_[dir], velocity_ft_[dir]);
 
+  redistribute_to_splitting_ft_faces_[2].redistribute(velocity_[2], velocity_ft_[2]);
+  redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);
+  redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);
   if (IJK_Splitting::defilement_ == 1)
     {
-      redistribute_with_shear_domain_ft(velocity_[0], velocity_ft_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), 0);
-      redistribute_with_shear_domain_ft(velocity_[1], velocity_ft_[1], 0., 1);
-      redistribute_with_shear_domain_ft(velocity_[2], velocity_ft_[2], 0., 2);
+      velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), IJK_Splitting::FACES_I, ijk_splitting_ft_extension_);
+      velocity_ft_[1].redistribute_with_shear_domain_ft(velocity_[1], 0., IJK_Splitting::FACES_J, ijk_splitting_ft_extension_);
+      velocity_ft_[2].redistribute_with_shear_domain_ft(velocity_[2], 0., IJK_Splitting::FACES_K, ijk_splitting_ft_extension_);
     }
+
 
   for (int dir=0; dir<3; dir++)
     {
