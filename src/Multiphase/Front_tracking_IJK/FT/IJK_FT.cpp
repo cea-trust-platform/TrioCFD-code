@@ -898,7 +898,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
               map[dir2].resize(1,3);
               // envoyer les rangees n-2, n-1, n, n+1 dans 4, 5, 6, 7
               map[dir2](0,0) = n_ft - n_ext - ghost_a_redistribute;  // source index
-              map[dir2](0,1) = 4; // dest index
+              map[dir2](0,1) = n - 2*ghost_a_redistribute; // dest index
               map[dir2](0,2) = ghost_a_redistribute*2; // size
             }
           else
@@ -1790,11 +1790,11 @@ int IJK_FT_double::initialise()
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
       if (use_inv_rho_)
         {
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, inv_rho_field_.nk()-4);
         }
     }
   maj_indicatrice_rho_mu();
@@ -1862,11 +1862,11 @@ int IJK_FT_double::initialise()
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
       if (use_inv_rho_)
         {
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, inv_rho_field_.nk()-4);
         }
     }
   return nalloc;
@@ -2272,9 +2272,10 @@ void IJK_FT_double::run()
 
   if (IJK_Splitting::defilement_ == 1)
     {
-      if (splitting_.get_nb_elem_local(2) < 8 )
+      if (splitting_.get_nb_elem_local(2) < 4 )
         {
-          std::cout << "Nb of cells / proc in z-direction must be >=8 for shear periodic run" << std::endl;
+          std::cout << "Nb of cells / proc in z-direction must be >=4 for shear periodic run" << std::endl;
+          std::cout << "Nb of cells / proc in z-direction must be >=8 for shear periodic run if only one proc on z-direction" << std::endl;
           std::cout << "Or find an other way to stock indic_ghost_zmin and zmax than IJK_Field" << std::endl;
           Process::exit();
         }
@@ -4726,11 +4727,11 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
       if (use_inv_rho_)
         {
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, inv_rho_field_.nk()-4);
         }
     }
 
@@ -4804,11 +4805,11 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, rho_field_.nk()-4);
       if (use_inv_rho_)
         {
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, inv_rho_field_.nk()-4);
         }
     }
 
