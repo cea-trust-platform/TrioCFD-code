@@ -867,35 +867,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
         {
           const int ghost_a_redistribute = 2 ;
           const int n = splitting_.get_nb_items_global(loc, dir2);
-          const int n_ft = splitting_ft_.get_nb_items_global(loc, dir2);
-          if(dir2==2)
-            {
-              // on ne redistribue les ghost que sur z pour le shear perio
-              map[dir2].resize(2,3);
-              // envoyer les rangees -2, -1, 0, 1 dans 0, 1, 2, 3
-              map[dir2](0,0) = n_ext-ghost_a_redistribute;  // source index
-              map[dir2](0,1) = 0; // dest index
-              map[dir2](0,2) = ghost_a_redistribute*2; // size
-              // envoyer les rangees n-2, n-1, n, n+1 dans 4, 5, 6, 7
-              map[dir2](1,0) = n_ft - n_ext - ghost_a_redistribute;  // source index
-              map[dir2](1,1) = 4; // dest index
-              map[dir2](1,2) = ghost_a_redistribute*2; // size
-            }
-          else
-            {
-              map[dir2].resize(1,3);
-              map[dir2](0,0) = n_ext;  // source index
-              map[dir2](0,1) = 0; // dest index
-              map[dir2](0,2) = n; // size
-            }
-
-        }
-      redistribute_from_splitting_ft_elem_ghostz_.initialize(splitting_ft_, splitting_, loc, map);
-
-      for (int dir2 = 0; dir2 < 3; dir2++)
-        {
-          const int ghost_a_redistribute = 2 ;
-          const int n = splitting_.get_nb_items_global(loc, dir2);
           if(dir2==2)
             {
               // on ne redistribue les ghost que sur z pour le shear perio
@@ -940,7 +911,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 
         }
       redistribute_from_splitting_ft_elem_ghostz_max_.initialize(splitting_ft_, splitting_, loc, map);
-
     }
   }
 
@@ -1795,6 +1765,27 @@ int IJK_FT_double::initialise()
   update_twice_indicator_field();
 
   if (!disable_diphasique_)
+  for (int i=0; i<2; i++)
+    {
+      interfaces_.switch_indicatrice_next_old();
+      interfaces_.calculer_indicatrice_next(
+        post_.potentiel(),
+        gravite_,
+        delta_rho,
+        sigma_,
+        /*Pour post-traitement : post_.rebuilt_indic()
+        */
+#ifdef SMOOTHING_RHO
+        /* Pour le smoothing : */
+        rho_field_ft_,
+        rho_vapeur_,
+        smooth_density_,
+#endif
+        current_time_, tstep_
+      );
+    }
+
+  if (IJK_Splitting::defilement_ == 1)
     {
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
@@ -1806,8 +1797,6 @@ int IJK_FT_double::initialise()
           inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
         }
     }
-  else
-    kappa_ft_.data() =0.;
   maj_indicatrice_rho_mu();
 
   static Stat_Counter_Id calculer_thermique_prop_counter_= statistiques().new_counter(2, "Calcul des prop thermiques");
@@ -1868,7 +1857,7 @@ int IJK_FT_double::initialise()
       update_twice_indicator_field();
     }
 
-  if (!disable_diphasique_)
+  if (IJK_Splitting::defilement_ == 1)
     {
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
@@ -1880,8 +1869,6 @@ int IJK_FT_double::initialise()
           inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
         }
     }
-  else
-    kappa_ft_.data() = 0.;
   return nalloc;
 }
 /*
@@ -2276,12 +2263,28 @@ void IJK_FT_double::run()
   thermal_probes_ghost_cells_ = thermals_.get_probes_ghost_cells(thermal_probes_ghost_cells_);
   if (IJK_Splitting::defilement_ == 1)
   {
-  allocate_velocity(velocity_, splitting_, 2);
+  allocate_velocity(velocity_, splitting_, 2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
   }
   else
   {
   allocate_velocity(velocity_, splitting_, thermal_probes_ghost_cells_);
   }
+
+  if (IJK_Splitting::defilement_ == 1)
+    {
+      if (splitting_.get_nb_elem_local(2) < 8 )
+        {
+          std::cout << "Nb of cells / proc in z-direction must be >=8 for shear periodic run" << std::endl;
+          std::cout << "Or find an other way to stock indic_ghost_zmin and zmax than IJK_Field" << std::endl;
+          Process::exit();
+        }
+      if (splitting_.get_offset_local(0)!=0.)
+        {
+          std::cout << " Shear_periodic conditions works only without splitting in i-direction " << std::endl;
+          std::cout << "if splitting in i-direction --> get_neighbour_processor has to be changed" << std::endl;
+          Process::exit();
+        }
+    }
 
   allocate_velocity(d_velocity_, splitting_, 1);
   nalloc += 6;
@@ -2335,7 +2338,6 @@ void IJK_FT_double::run()
 
   pressure_rhs_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   nalloc += 1;
-  pressure_rhs_before_shear_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   I_ns_.allocate(splitting_, IJK_Splitting::ELEM, 2);
 
   if (!disable_diphasique_ && (boundary_conditions_.get_correction_interp_monofluide()==1 || boundary_conditions_.get_correction_interp_monofluide()==2))
@@ -2443,9 +2445,6 @@ void IJK_FT_double::run()
   //  allocate_velocity(velocity_ft_, splitting_ft_, 4);
   nalloc += 3;
 
-  // pour les conditions de shear-periodicite --> interpolation de la pression monofluide
-  kappa_ft_.allocate(splitting_ft_, IJK_Splitting::ELEM, 2);
-  kappa_ft_ns_.allocate(splitting_, IJK_Splitting::ELEM, 2);
   if (!disable_diphasique_)
     {
       allocate_velocity(terme_source_interfaces_ft_, splitting_ft_, 2);
@@ -2594,8 +2593,8 @@ void IJK_FT_double::run()
                 {
                   pressure_projection_with_inv_rho(inv_rho_field_,
                                                    velocity_[0], velocity_[1], velocity_[2], pressure_,
-                                                   1., pressure_rhs_, pressure_rhs_before_shear_, check_divergence_,
-                                                   poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                                   1., pressure_rhs_, check_divergence_,
+                                                   poisson_solver_);
 
                 }
               else
@@ -2605,7 +2604,7 @@ void IJK_FT_double::run()
 
                   pressure_projection_with_rho(rho_field_, velocity_[0],
                                                velocity_[1], velocity_[2], pressure_, 1.,
-                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                               pressure_rhs_, check_divergence_, poisson_solver_);
 
                 }
 
@@ -2614,8 +2613,8 @@ void IJK_FT_double::run()
             {
 
               pressure_projection(velocity_[0], velocity_[1], velocity_[2],
-                                  pressure_, 1., pressure_rhs_, pressure_rhs_before_shear_, check_divergence_,
-                                  poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                  pressure_, 1., pressure_rhs_, check_divergence_,
+                                  poisson_solver_);
             }
           copy_field_values(pressure_ghost_cells_, pressure_);
         }
@@ -3102,17 +3101,8 @@ void IJK_FT_double::run()
                     }
                   else
                     {
-                      if (dir==0)
-                        {
-
-                          velocity_[dir].echange_espace_virtuel(
-                            velocity_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-                        }
-                      else
-                        {
-                          velocity_[dir].echange_espace_virtuel(
-                            velocity_[dir].ghost());
-                        }
+                      velocity_[dir].echange_espace_virtuel(
+                        velocity_[dir].ghost());
                     }
 
 
@@ -3134,7 +3124,7 @@ void IJK_FT_double::run()
       current_time_ += timestep_;
       // stock dans le spliting le decallage periodique total avec condition de shear (current_time_) et celui du pas de temps (timestep_)
       IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
-      IJK_Splitting::shear_x_DT_ = boundary_conditions_.get_dU_perio()*timestep_;
+      //IJK_Splitting::shear_x_DT_ = boundary_conditions_.get_dU_perio()*timestep_;
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
@@ -3149,7 +3139,7 @@ void IJK_FT_double::run()
               // FA AT 16/07/2013 pensent que necessaire pour le calcul des derivees dans statistiques_.update_stat_k(...)
               // Je ne sais pas si c'est utile, mais j'assure...
               velocity_[0].echange_espace_virtuel(
-                2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_I*/);
               velocity_[1].echange_espace_virtuel(
                 2 /*, IJK_Field_ST::EXCHANGE_GET_AT_RIGHT_J*/);
               velocity_[2].echange_espace_virtuel(
@@ -4195,7 +4185,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
         {
           // Protection to make sure that even without the activation of the flag check_divergence_, the EV of velocity is correctly field.
           // This protection MAY be necessary if convection uses ghost velocity (but I'm not sure it actually does)
-          velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          velocity_[0].echange_espace_virtuel(2);
           velocity_[1].echange_espace_virtuel(2);
           velocity_[2].echange_espace_virtuel(2);
         }
@@ -4224,7 +4214,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
         }
       else
         {
-          velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          velocity_[0].echange_espace_virtuel(2);
           velocity_[1].echange_espace_virtuel(2);
           velocity_[2].echange_espace_virtuel(2);
         }
@@ -4253,13 +4243,13 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           if (!include_pressure_gradient_in_ustar_)
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           pressure_, 1.,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
+                                           pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_);
               // GAB --> C'est plutot ici que l(on ajoute le terme_pression !!)
             }
           else
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           d_pressure_, 1.,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio());
+                                           d_pressure_, 1.,  pressure_rhs_, check_divergence_, poisson_solver_);
 
               // Then update the pressure field :
               const int kmax = pressure_.nk();
@@ -4351,7 +4341,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
             {
 
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
-                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                               pressure_rhs_, check_divergence_, poisson_solver_);
 
             }
           else
@@ -4361,7 +4351,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 #else
 
               pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], d_pressure_, timestep_,
-                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_rhs_, check_divergence_, poisson_solver_);
 #endif
 
             }
@@ -4384,7 +4374,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
             {
 
               pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
-                                               pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                               pressure_rhs_, check_divergence_, poisson_solver_);
 
             }
           else
@@ -4393,7 +4383,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 #else
 
               pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_, timestep_,
-                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_rhs_, check_divergence_, poisson_solver_);
 
 #endif
             }
@@ -4461,7 +4451,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
         }
       else
         {
-          velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+          velocity_[0].echange_espace_virtuel(2);
           velocity_[1].echange_espace_virtuel(2);
           velocity_[2].echange_espace_virtuel(2);
         }
@@ -4477,12 +4467,12 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           if (include_pressure_gradient_in_ustar_)
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           d_pressure_,1. ,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           d_pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_);
             }
           else
             {
               pressure_projection_with_rho(rho_field_, d_velocity_[0], d_velocity_[1],  d_velocity_[2],
-                                           pressure_,1. ,  pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_,1. ,  pressure_rhs_, check_divergence_, poisson_solver_);
             }
         }
 #else
@@ -4555,7 +4545,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
 
           pressure_projection_with_inv_rho(inv_rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                            fractionnal_timestep,
-                                           pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                           pressure_rhs_, check_divergence_, poisson_solver_);
 
         }
       else
@@ -4567,7 +4557,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
 
           pressure_projection_with_rho(rho_field_, velocity_[0], velocity_[1],  velocity_[2], pressure_,
                                        fractionnal_timestep,
-                                       pressure_rhs_, pressure_rhs_before_shear_, check_divergence_, poisson_solver_, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+                                       pressure_rhs_, check_divergence_, poisson_solver_);
 
           // GAB TODO : cest a peu pres ici qu'il faudra travailler pour recuperer le
           // terme de pression
@@ -4653,18 +4643,15 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
 
     if (IJK_Splitting::defilement_ == 1)
       {
+        // after redistribute, velocity in ft domain must be shifted by the shear
         velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), ijk_splitting_ft_extension_);
         velocity_ft_[1].redistribute_with_shear_domain_ft(velocity_[1], 0., ijk_splitting_ft_extension_);
         velocity_ft_[2].redistribute_with_shear_domain_ft(velocity_[2], 0., ijk_splitting_ft_extension_ );
       }
 
     for (int dir = 0; dir < 3; dir++)
-      {
-        if (dir==DIRECTION_I)
-          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-        else
-          velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
-      }
+      velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
+
   }
 
   /*
@@ -4709,22 +4696,42 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   // On met a jour l'indicatrice du pas de temps d'apres.
   // On met aussi a jour le surf et bary des faces mouillees,
   // les valeurs moyennes en ijk, les val moy en ijkf, etc
+
   update_indicator_field();
 
   if (counter_first_iter_ && first_step_interface_smoothing_)
     thermals_.recompute_temperature_init();
   // mise a jour de l'indicatrice pour les variables monofluides
-  interfaces_.calculer_kappa_ft(kappa_ft_);
+  const double delta_rho = rho_liquide_ - rho_vapeur_;
+  interfaces_.switch_indicatrice_next_old();
+  interfaces_.calculer_indicatrice_next(
+    post_.potentiel(),
+    gravite_,
+    delta_rho,
+    sigma_,
+    /*Pour post-traitement : post_.rebuilt_indic()
+    */
+#ifdef SMOOTHING_RHO
+    /* Pour le smoothing : */
+    rho_field_ft_,
+    rho_vapeur_,
+    smooth_density_,
+#endif
+    current_time_, tstep_
+  );
 
-
-  redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
-  redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
-  rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-  rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
-  if (use_inv_rho_)
+  if (IJK_Splitting::defilement_ == 1)
     {
-      inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-      inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+      // mise a jour de l'indicatrice pour les variables monofluides
+      redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
+      redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
+      rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+      if (use_inv_rho_)
+        {
+          inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+        }
     }
 
   statistiques().end_count(deplacement_interf_counter_);
@@ -4749,19 +4756,16 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
 
   if (IJK_Splitting::defilement_ == 1)
     {
+      // after redistribute, velocity in ft domain must be shifted by the shear
       velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), ijk_splitting_ft_extension_);
       velocity_ft_[1].redistribute_with_shear_domain_ft(velocity_[1], 0., ijk_splitting_ft_extension_);
       velocity_ft_[2].redistribute_with_shear_domain_ft(velocity_[2], 0., ijk_splitting_ft_extension_);
     }
 
+  for (int dir = 0; dir < 3; dir++)
+    velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
 
-  for (int dir=0; dir<3; dir++)
-    {
-      if (dir==DIRECTION_I)
-        velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-      else
-        velocity_ft_[dir].echange_espace_virtuel(velocity_ft_[dir].ghost());
-    }
+
   // On conserve les duplicatas que l'on transporte comme le reste.
 
   // Normalement, transporter_maillage gere aussi les duplicatas...
@@ -4778,16 +4782,34 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   // vient de deplacer.
 
   update_indicator_field();
-  interfaces_.calculer_kappa_ft(kappa_ft_);
-
-  redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
-  redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
-  rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-  rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
-  if (use_inv_rho_)
+  const double delta_rho = rho_liquide_ - rho_vapeur_;
+  interfaces_.switch_indicatrice_next_old();
+  interfaces_.calculer_indicatrice_next(
+    post_.potentiel(),
+    gravite_,
+    delta_rho,
+    sigma_,
+    /*Pour post-traitement : post_.rebuilt_indic()
+    */
+#ifdef SMOOTHING_RHO
+    /* Pour le smoothing : */
+    rho_field_ft_,
+    rho_vapeur_,
+    smooth_density_,
+#endif
+    current_time_, rk_step
+  );
+  if (IJK_Splitting::defilement_ == 1)
     {
-      inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
-      inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+      redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
+      redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
+      rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+      rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+      if (use_inv_rho_)
+        {
+          inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
+          inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, 4);
+        }
     }
 
 }
@@ -5060,14 +5082,6 @@ Vecteur3 IJK_FT_double::calculer_inv_rho_grad_p_moyen(const IJK_Field_double& rh
   return resu;
 }
 
-
-void IJK_FT_double::calculer_I_kappa_sigma(IJK_Field_double& kappa_ft,const IJK_Field_double& indic, double sigma)
-{
-  for (int k = -2; k < kappa_ft.nk()+2; k++)
-    for (int j = -2; j < kappa_ft.nj()+2; j++)
-      for (int i = -2; i < kappa_ft.ni()+2; i++)
-        kappa_ft(i,j,k) *= indic(i,j,k)*sigma;
-}
 
 Vecteur3 IJK_FT_double::calculer_grad_p_moyen(const IJK_Field_double& pression)
 {

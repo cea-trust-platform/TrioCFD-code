@@ -40,7 +40,6 @@ IJK_FT_Post::IJK_FT_Post(IJK_FT_double& ijk_ft) :
   ref_ijk_ft_(ijk_ft),
   disable_diphasique_(ijk_ft.disable_diphasique_),
   interfaces_(ijk_ft.interfaces_),
-  kappa_ft_(ijk_ft.kappa_ft_),
   pressure_(ijk_ft.pressure_),
   velocity_(ijk_ft.velocity_),
   source_spectrale_(ijk_ft.forcage_.get_force_ph2()),
@@ -834,10 +833,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
 
   if (liste_post_instantanes_.contient_("PRESSURE"))
     n--, dumplata_scalar(lata_name, "PRESSURE", pressure_, latastep);
-  if (liste_post_instantanes_.contient_("KAPPA_FT"))
-    n--, dumplata_scalar(lata_name, "KAPPA_FT", kappa_ft_, latastep);
-  if (liste_post_instantanes_.contient_("KAPPA_FT_NS"))
-    n--, dumplata_scalar(lata_name, "KAPPA_FT_NS", ref_ijk_ft_.kappa_ft_ns_, latastep);
   if (liste_post_instantanes_.contient_("D_PRESSURE"))
     n--, dumplata_scalar(lata_name, "D_PRESSURE", ref_ijk_ft_.d_pressure_, latastep);
   if (liste_post_instantanes_.contient_("INDICATRICE"))
