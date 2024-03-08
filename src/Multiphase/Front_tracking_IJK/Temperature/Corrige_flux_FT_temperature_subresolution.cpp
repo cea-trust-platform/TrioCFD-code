@@ -2024,7 +2024,7 @@ DoubleVect Corrige_flux_FT_temperature_subresolution::compute_thermal_flux_face_
     }
 }
 
-void Corrige_flux_FT_temperature_subresolution::get_discrete_surface_at_level(const int& dir, const int& level)
+/* void Corrige_flux_FT_temperature_subresolution::get_discrete_surface_at_level(const int& dir, const int& level)
 {
   const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_splitting_ns().get_grid_geometry();
   const double dx = geom.get_constant_delta(DIRECTION_I);
@@ -2047,7 +2047,7 @@ void Corrige_flux_FT_temperature_subresolution::get_discrete_surface_at_level(co
       break;
     }
   surface /= pow(pow(2, level), 2);
-}
+} */
 
 void Corrige_flux_FT_temperature_subresolution::compute_min_max_ijk_reachable_fluxes(const FixedVector<IJK_Field_int, 3>& cell_faces_neighbours_corrected_all_bool,
                                                                                      const IJK_Field_int& neighbours_temperature_to_correct,
