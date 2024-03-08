@@ -48,12 +48,12 @@ public:
   inline void setDensity(const double& rho) ;
   inline void setInertialDamping(const double& D) ;
   inline void setDtSafetyCoefficient(const double& c) ;
-  inline void setYoungModulus(const double& E) ; // Temporary for stability only
+  inline void setGridDtMin(const double& dt) ;
   inline void addMaterialProperty(const std::string name, const std::vector<double> val) ;
   inline int getNbNodesPerElem() ;
   inline double getDensity() ;
-  inline double getYoungModulus() ; // Temporary for stability only
   inline double getDampingCoefficient() ;
+  inline double getGridDtMin() ;
   inline void setMassElem(const double& elmass) ;
   inline const DoubleVect& getMeshPbPressure() const ;
   inline const DoubleVect& getMeshPbVonMises() const ;
@@ -64,9 +64,9 @@ public:
   void initDynamicMeshProblem(const int nsom, const int nelem, const int nface, const MD_Vector& md, const MD_Vector& mde, const MD_Vector& mdf) ;
 
   void setLocalFields(const int elnodes[4], const int elem) ;
-  void computeInternalForces(double& volume, double& xlong, double& E, double& Pressure, double& VonMises) ;
+  void computeInternalForces(double& volume, double& xlong, double& cSound, double& Pressure, double& VonMises) ;
   void setGlobalFields(const int elnodes[4], const double Pressure, const double VonMises) ;
-  double computeCriticalDt(const double volume, const double xlong, const double E) ;
+  double computeCriticalDt(const double volume, const double xlong, const double cSound, const double dtMin, double& scaleMass) ;
   void computeForceFaces(const int nb_faces, const int nb_som_face, const IntTab& face_sommets) ;
   void checkElemOrientation(int elnodes[4], const int elem) ;
 
@@ -81,6 +81,7 @@ public:
   DoubleTab ff ;
 
   DoubleVect mass ;
+  DoubleVect nodalScaleMass ;
 
   // Public variables
   // ----------------
@@ -133,7 +134,8 @@ protected:
                             const double *const evar,                 // external variables
                             double *const stiff,                      // stiffness matrix
                             const double *const gradientOrStrain0,    // deformation gradient or strain at the beginning of the time step
-                            const double *const gradientOrStrain1     // deformation gradient or strain at the end of the time step
+                            const double *const gradientOrStrain1,    // deformation gradient or strain at the end of the time step
+                            double *const vsound                      // speed of sound variables
                            );
 
   // End Mfront behaviour
@@ -145,7 +147,7 @@ protected:
   double inertialDamping_ ;
   double density_  ;
   double dtSafetyCoefficient_ = 0.5 ;
-  double youngModulus_ ; // temporary for stability only
+  double gridDtMin_ = 0 ;
 
   int nSymSize_ ; // length of non-symetric tensor in Voigt notation
   int symSize_ ; // length of symetric tensor in Voigt notation
@@ -236,9 +238,9 @@ inline void Structural_dynamic_mesh_model::setDtSafetyCoefficient(const double& 
   dtSafetyCoefficient_ = c ;
 }
 
-inline void Structural_dynamic_mesh_model::setYoungModulus(const double& E)
+inline void Structural_dynamic_mesh_model::setGridDtMin(const double& dt)
 {
-  youngModulus_ = E ;
+  gridDtMin_ = dt ;
 }
 
 inline void Structural_dynamic_mesh_model::addMaterialProperty(const std::string name, const std::vector<double> val)
@@ -254,11 +256,6 @@ inline int Structural_dynamic_mesh_model::getNbNodesPerElem()
 inline double Structural_dynamic_mesh_model::getDensity()
 {
   return density_ ;
-}
-
-inline double Structural_dynamic_mesh_model::getYoungModulus()
-{
-  return youngModulus_ ;
 }
 
 inline double Structural_dynamic_mesh_model::getDampingCoefficient()
@@ -289,6 +286,11 @@ inline const DoubleTab& Structural_dynamic_mesh_model::getMeshPbForceFace() cons
 inline void Structural_dynamic_mesh_model::applyDtCoefficient()
 {
   gridDt *= dtSafetyCoefficient_ ;
+}
+
+inline double Structural_dynamic_mesh_model::getGridDtMin()
+{
+  return gridDtMin_ ;
 }
 
 #endif

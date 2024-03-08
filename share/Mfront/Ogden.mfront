@@ -1,0 +1,169 @@
+@DSL DefaultFiniteStrain;
+@Behaviour Ogden;
+@Author Thomas Helfer;
+@Date 20/12/2016;
+@Description{
+}
+
+/*@Parameter alpha =     28.8;
+// 2*0.4e6/28.8
+@Parameter mu    =    27778;
+// 2*0.4e6/28.8*2.5e3
+@Parameter K     = 69444444;*/
+@MaterialProperty real alpha ;
+@MaterialProperty real mu ;
+@MaterialProperty stress K ;
+alpha.setEntryName("Ogden_alpha") ;
+mu.setEntryName("Ogden_mu") ;
+K.setEntryName("Ogden_K") ;
+
+@LocalVariable StiffnessTensor dS_dC;
+@LocalVariable real Cstiff;
+@LocalVariable real jac;
+
+@Integrator{
+  const auto a   = alpha/2;
+  const auto id  = Stensor::Id();
+  const auto J   = det(F1);
+  const auto C   = computeRightCauchyGreenTensor(F1);
+  /* invariants and derivatives */
+  const auto C2       = square(C);
+  const auto I1       = trace(C);
+  const auto I2       = (I1*I1-trace(C2))/2;
+  const auto I3       = J*J;
+  const auto dI3_dC   = C2-I1*C+I2*id;
+  /* volumetric part */
+  // Pv = K*(J-1)*(J-1)/2
+  const auto dPv_dJ   = K*(J-1);
+  const StressStensor Sv = dPv_dJ/J*dI3_dC;
+  /* iscochoric part */
+  // I1b = J^{-2/3}*I1 = I1/(sqrt[3]{I3})     = I1*iJb
+  // I2b = J^{-4/9}*I2 = I2/(sqrt[3]{I3})^{2} = I2*iJb*iJb
+  const auto iJb        =  1/cbrt(I3);
+  const auto iJb2       =  power<2>(iJb);
+  const auto iJb4       =  iJb2*iJb2;
+  const auto iJb7       =  iJb4*power<3>(iJb);
+  const auto c          = pow(iJb,a-2);
+  // derivatives
+  const auto diJb_dI3   = -iJb4/3;
+  const auto diJb_dC    = diJb_dI3*dI3_dC;
+  // eigen values
+  tvector<3u,real> vp;
+  tmatrix<3u,3u,real> m;
+  std::tie(vp,m) = C.computeEigenVectors();
+  const tvector<3u,real> pwv  = {pow(vp(0),a-2),pow(vp(1),a-2),pow(vp(2),a-2)};
+  const tvector<3u,real> dfv  = {a*vp(0)*pwv(0),a*vp(1)*pwv(1),a*vp(2)*pwv(2)};
+  const auto fv    = vp(0)*vp(0)*pwv(0)+vp(1)*vp(1)*pwv(1)+vp(2)*vp(2)*pwv(2);
+  const auto df_dC = Stensor::computeIsotropicFunction(dfv,m);
+  const StressStensor Si = mu*c*iJb*((fv*diJb_dC+(iJb/a)*df_dC));
+  // The Cauchy Stress
+  sig = convertSecondPiolaKirchhoffStressToCauchyStress(Sv+Si,F1);
+  if(computeTangentOperator_){
+    const auto d2I3_dC2   = computeDeterminantSecondDerivative(C);
+    /* volumetric part */
+    const auto d2Pv_dJ2 = K;
+    dS_dC = ((d2Pv_dJ2-dPv_dJ/J)/(2*I3)*(dI3_dC^dI3_dC)+
+	     dPv_dJ/J*d2I3_dC2);
+    /* isochoric part */
+    // second derivative of f
+    const tvector<3u,real> d2fv = {a*(a-1)*pwv(0),a*(a-1)*pwv(1),a*(a-1)*pwv(2)};
+    const auto d2f_dC2 =
+      Stensor::computeIsotropicFunctionDerivative(dfv,d2fv,vp,m,1.e-12);
+    // computation of dSi_dC
+    const auto d2iJb_dI32 = 4*iJb7/9;
+    const auto d2iJb_dC2  =
+      d2iJb_dI32*(dI3_dC^dI3_dC)+ diJb_dI3*d2I3_dC2;
+    dS_dC += mu*c*((a-1)*fv*(diJb_dC^diJb_dC)+
+		   iJb*(fv*d2iJb_dC2+
+			((diJb_dC^df_dC)+(df_dC^diJb_dC))+
+			iJb/a*d2f_dC2));
+  }
+  // Computations for speed of sound evaluation 
+  // (taken from EPX implementation using principal stretches computed above)
+  // 1. Principal stretches and principal strains
+  const auto tole = 1.e-10; // tolerance for small values... not great
+  const tvector<3u,real> lambda = {sqrt(vp(0)),sqrt(vp(1)),sqrt(vp(2))};
+  // There is an issue to sort for the principal strains: 
+  // EPX says prstr(i) = ln(lambda(i)), but finite strain theory says prstr(i)=lambda(i)-1
+  // We keep the latter for now
+  const tvector<3u,real> prstr  = {lambda(0)-1,lambda(1)-1,lambda(2)-1};
+  // 2. Transformation into "lambda_star"
+  jac = lambda(0)*lambda(1)*lambda(2);
+  const auto t   = 1/cbrt(jac);
+  const tvector<3u,real> lambda_star = {lambda(0)*t,lambda(1)*t,lambda(2)*t};
+  // 3. Principal stresses
+  real tt;
+  const tvector<3u,real> lpow = {pow(lambda_star(0),alpha),pow(lambda_star(1),alpha),pow(lambda_star(2),alpha)};
+  const auto s = lpow(0)+lpow(1)+lpow(2);
+  tvector<3u,real> sig_pri;
+  for (unsigned short i=0;i!=3;++i){
+     tt = lpow(i);
+     sig_pri(i) = mu/jac*(tt-s/3)+K*(jac-1)/jac;
+  }
+  // 4. Computation of elastic tensor and first stiffness computation
+  const tvector<3u,real> w1 = {mu*pow(lambda_star(0),alpha-1),
+                               mu*pow(lambda_star(1),alpha-1),
+                               mu*pow(lambda_star(2),alpha-1)};
+  const tvector<3u,real> w2 = {mu*(alpha-1)*pow(lambda_star(0),alpha-2),
+                               mu*(alpha-1)*pow(lambda_star(1),alpha-2),
+                               mu*(alpha-1)*pow(lambda_star(2),alpha-2)};
+  real a0 = 0 ;
+  real a02 ;
+  real a021 ;
+  real a022 ;
+  real tt2 ;
+  const tvector<3u,real> lambda_star2 = {lambda_star(0)*lambda_star(0),
+                                         lambda_star(1)*lambda_star(1),
+                                         lambda_star(2)*lambda_star(2)};
+  for (unsigned short i=0;i!=3;++i){
+     for (unsigned short j=0;j!=3;++j){
+        a021 = 0 ;
+        a022 = 0 ;
+        if (i != j) {
+           if (abs(lambda_star(i)-lambda_star(j)) < tole ||
+               abs(lambda_star2(i)-lambda_star2(j)) < tole) {
+              // lambda_star(i) = lambda_star(j)
+              tt   = 0.5 * lambda_star(i);
+              tt2  = lambda_star(i)*w2(i);
+              a021 = tt*(tt2+w1(i));
+              a022 = tt*(tt2-w1(i));
+           }
+           else{
+              tt   = lambda_star(i)/(lambda_star2(i)-lambda_star2(j));
+              a021 = tt*lambda_star(i)*(lambda_star(i)*w1(i)-lambda_star(j)*w1(j));
+              a022 = tt*lambda_star(j)*(lambda_star(j)*w1(i)-lambda_star(i)*w1(j));
+          }
+        }
+        a02 = max(abs(a021),abs(a022)) ;
+        a0  = max(a0,a02) ; 
+     }
+  }
+  const auto Cstiff0 = a0;
+  // 5. Second stiffness computation
+  real Cstiff1 = 0;
+  if ((abs(prstr(0)) < tole && abs(prstr(1)) < tole && abs(prstr(2)) < tole) ||
+      (abs(sig_pri(0)) < tole && abs(sig_pri(1)) < tole && abs(sig_pri(2)) < tole)){
+     // very small strain, ignore this contribution
+     Cstiff1 = 0;
+  }
+  else {
+     unsigned short dir = 0 ;
+     real max_str = abs(prstr(0)) ;
+     for (unsigned short i=1;i!=3;++i){
+        if (abs(prstr(i)) > max_str) {
+           dir = i;
+           max_str = abs(prstr(i));
+        }
+     }
+     Cstiff1 = abs(sig_pri(dir)/prstr(dir));
+  }
+  Cstiff=max(Cstiff0,Cstiff1);
+}
+
+@TangentOperator<DS_DC>{
+  Dt = dS_dC;
+}
+
+@SpeedOfSound{
+  v_sound=sqrt(abs(Cstiff)/(rho_m0*jac));
+}

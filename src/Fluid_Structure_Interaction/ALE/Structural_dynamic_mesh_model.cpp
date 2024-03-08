@@ -16,7 +16,6 @@ Structural_dynamic_mesh_model::Structural_dynamic_mesh_model()
 
   density_ = 0. ;
   inertialDamping_ = 0. ;
-  youngModulus_ = 0. ;
 
   gridNStep = 0 ;
   gridTime = 0. ;
@@ -149,6 +148,10 @@ void Structural_dynamic_mesh_model::initMfrontBehaviour()
           exit();
         }
     }
+  double *rho = new double[1];
+  mgisBehaviourData_.s0.mass_density = rho;
+  mgisBehaviourData_.s1.mass_density = rho;
+  rho[0] = density_ ;
 
 }
 
@@ -201,6 +204,7 @@ void Structural_dynamic_mesh_model::initDynamicMeshProblem(const int nsom, const
   ff.resize(nsom,dimension) ;
 
   mass.resize(nsom) ;
+  if (getGridDtMin() > 0.) nodalScaleMass.resize(nsom) ;
 
   B0_.resize(nelem,dimension*nbn_) ;
   Ft_.resize(nelem, nSymSize_) ;
@@ -219,6 +223,7 @@ void Structural_dynamic_mesh_model::initDynamicMeshProblem(const int nsom, const
   // Only ff and mass need to be built as distributed arrays
   MD_Vector_tools::creer_tableau_distribue(md, ff) ;
   MD_Vector_tools::creer_tableau_distribue(md, mass) ;
+  if (getGridDtMin() > 0.) MD_Vector_tools::creer_tableau_distribue(md, nodalScaleMass) ;
 
   u=0 ;
   v=0 ;
@@ -226,6 +231,7 @@ void Structural_dynamic_mesh_model::initDynamicMeshProblem(const int nsom, const
   a=0 ;
   ff=0 ;
   mass=0. ;
+  nodalScaleMass=0. ;
 
   B0_ = 0. ;
   Stress_ = 0. ;
@@ -280,7 +286,7 @@ void Structural_dynamic_mesh_model::initDynamicMeshProblem(const int nsom, const
 
 }
 
-void Structural_dynamic_mesh_model::computeInternalForces(double& Vol, double& Xlong, double& E, double& Pressure, double& VonMises)
+void Structural_dynamic_mesh_model::computeInternalForces(double& Vol, double& Xlong, double& cSound, double& Pressure, double& VonMises)
 {
 
   // Integration with 1 single gauss point on triangular (dimension=2) or tetrahedral (dimension=3) finite element
@@ -395,9 +401,22 @@ void Structural_dynamic_mesh_model::computeInternalForces(double& Vol, double& X
 
   double voidInternalVars[1] ; // 0 size forbidden
   std::vector <double>  K(stiffnessMatrixMinSize_) ;
-  K[0] = 0.; // Stiffness matrix not computed, see mfront/mgis convention
+  K[0] = 100; // Stiffness matrix not computed, see mfront/mgis convention
+  // Value >= 50: compute speed of sound
 
-  integrate_behaviour_(&stress[0], voidInternalVars, &evars[0], &K[0], &ft[0], &ftpdt[0]) ;
+  double speedOfSound[1] ;
+
+  integrate_behaviour_(&stress[0], voidInternalVars, &evars[0], &K[0], &ft[0], &ftpdt[0], speedOfSound) ;
+
+  if (speedOfSound[0] <= 0.)
+    {
+      Cerr << "Error (mesh motion): speed of sound not computed in provided Mfront behaviour" << finl ;
+      exit();
+    }
+  else
+    {
+      cSound = speedOfSound[0];
+    }
 
   // Update stress and transformation gradient
   for (int i=0; i<symSize_; i++) { Stress_(iel_,i) = stress[i] ; }
@@ -451,9 +470,6 @@ void Structural_dynamic_mesh_model::computeInternalForces(double& Vol, double& X
 
       break ;
     }
-
-  // Temporary export of Young Modulus
-  E = youngModulus_ ;
 
 }
 
@@ -609,7 +625,8 @@ void Structural_dynamic_mesh_model::integrate_behaviour_(double *const stress,  
                                                          const double *const evar,                 // external variables
                                                          double *const stiff,                      // stiffness matrix
                                                          const double *const gradientOrStrain0,    // deformation gradient or strain at the beginning of the time step
-                                                         const double *const gradientOrStrain1     // deformation gradient or strain at the end of the time step
+                                                         const double *const gradientOrStrain1,    // deformation gradient or strain at the end of the time step
+                                                         double *const vsound                      // speed of sound variables
                                                         )
 {
   mgisBehaviourData_.s0.gradients = const_cast<double *>(gradientOrStrain0);
@@ -625,6 +642,8 @@ void Structural_dynamic_mesh_model::integrate_behaviour_(double *const stress,  
   mgisBehaviourData_.s1.external_state_variables = const_cast<double *>(evar);
 
   mgisBehaviourData_.K = stiff;
+
+  mgisBehaviourData_.speed_of_sound = vsound;
 
   int ierr = mgis::behaviour::integrate(mgisBehaviourData_, mgisBehaviour_);
 
@@ -688,7 +707,7 @@ void Structural_dynamic_mesh_model::setGlobalFields(const int elnodes[4], const 
 
 }
 
-double Structural_dynamic_mesh_model::computeCriticalDt(const double Vol, const double Xlong, const double E)
+double Structural_dynamic_mesh_model::computeCriticalDt(const double Vol, const double Xlong, const double cSound, const double dtMin, double& scaleMass)
 {
 
   // Current density
@@ -700,9 +719,21 @@ double Structural_dynamic_mesh_model::computeCriticalDt(const double Vol, const 
       Cerr << "Error: negative density in grid mesh motion" << finl ;
       exit() ;
     }
-  double cSound = sqrt(E / currDensity) ;
 
-  return Xlong / cSound ;
+  double cc = cSound ;
+  scaleMass = 0. ;
+  if (dtMin > 0.)
+    {
+      double dtc = Xlong / cc ;
+      if (dtc < dtMin)
+        {
+          cc = Xlong / dtMin ;
+          double newDensity = currDensity * pow(cSound,2) / pow(cc,2) ;
+          scaleMass = (newDensity - currDensity) * Vol ;
+        }
+    }
+
+  return Xlong / cc ;
 
 }
 

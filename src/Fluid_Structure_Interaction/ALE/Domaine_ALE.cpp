@@ -1525,13 +1525,6 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
           str_mesh_model->addMaterialProperty(nom_prop, val_prop) ;
           continue ;
         }
-      // Temporary: YoungModulus is needed only for stability, it should be extracted back from Mfront in some way
-      if(motlu=="YoungModulus")
-        {
-          is >> var_double;
-          str_mesh_model->setYoungModulus(var_double) ;
-          continue ;
-        }
       if(motlu=="Density")
         {
           is >> var_double;
@@ -1550,6 +1543,12 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
           str_mesh_model->setDtSafetyCoefficient(var_double) ;
           continue ;
         }
+      if(motlu=="Grid_Dt_Min")
+        {
+          is >> var_double;
+          str_mesh_model->setGridDtMin(var_double) ;
+          continue ;
+        }
       if (motlu == accolade_fermee)
         break;
     }
@@ -1557,12 +1556,6 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
   if(str_mesh_model->getDensity() == 0.)
     {
       Cerr << "Error: density not provided" << finl;
-      exit();
-    }
-  // Temporary: YoungModulus is needed only for stability, it should be extracted back from Mfront in some way
-  if(str_mesh_model->getYoungModulus() == 0.)
-    {
-      Cerr << "Error: Young modulus not provided" << finl;
       exit();
     }
 
@@ -1617,14 +1610,19 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       int elnodes[4] ;
       double volume ;
       double xlong ;
-      double E ;
+      double cSound ;
       double density = str_mesh_model->getDensity() ;
+      double dtm = str_mesh_model->getGridDtMin() ;
       double dts ;
+      double scaleMass ;
+      double totalScaleMass = 0 ;
       double dtmin ;
       double pressure ;
       double vonmises ;
+      double mm = 0 ;
 
       dtmin = 1.E12 ; // Initialize dtmin at <huge>
+      if (dtm > 0.) str_mesh_model->nodalScaleMass = 0. ; // Initialize nodal additional masses if needed
 
       for (int elem=0; elem<nbElem; elem++)
         {
@@ -1637,7 +1635,7 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
 
           str_mesh_model->setLocalFields(elnodes, elem) ; // x, u, B0 global to local + elem id
 
-          str_mesh_model->computeInternalForces(volume, xlong, E, pressure, vonmises) ; // local force computation on element elem
+          str_mesh_model->computeInternalForces(volume, xlong, cSound, pressure, vonmises) ; // local force computation on element elem
 
           str_mesh_model->setGlobalFields(elnodes, pressure, vonmises) ; // ff back to global + store elem pressure and vonmises for postprocessing
 
@@ -1652,8 +1650,19 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
             }
 
           // Set next time step
-          dts = str_mesh_model->computeCriticalDt(volume, xlong, E) ;
+          dts = str_mesh_model->computeCriticalDt(volume, xlong, cSound, dtm, scaleMass) ;
           dtmin = std::min(dtmin, dts) ;
+
+          if (scaleMass > 0.)
+            {
+              Cerr << "scaleMass: " << scaleMass << finl ;
+              totalScaleMass += scaleMass ;
+              for (int i=0; i< nbn; i++)
+                {
+                  int ii = elnodes[i] ;
+                  str_mesh_model->nodalScaleMass[ii] += scaleMass / nbn ;
+                }
+            }
         }
 
       str_mesh_model->gridDt = mp_min(dtmin) ;
@@ -1665,16 +1674,23 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
           str_mesh_model->isMassBuilt = true ;
         }
 
+      if (dtm > 0.)
+        {
+          totalScaleMass = mp_sum(totalScaleMass) ;
+          if (totalScaleMass > 0.) MD_Vector_tools::echange_espace_virtuel(str_mesh_model->nodalScaleMass, MD_Vector_tools::EV_SOMME_ECHANGE) ;
+        }
+
       // Compute accelerations and full step velocities
       double rhs ;
       double den ;
       double d = str_mesh_model->getDampingCoefficient() ;
       for (int i=0; i<nbSom; i++)
         {
+          mm = str_mesh_model->mass[i] + str_mesh_model->nodalScaleMass[i] ;
           for (int j=0; j<dimension; j++)
             {
-              rhs = -str_mesh_model->ff(i,j) - d * str_mesh_model->mass[i] * str_mesh_model->vp(i,j) ;
-              den = str_mesh_model->mass[i] * (1. + 0.5 * d * Dt) ;
+              rhs = -str_mesh_model->ff(i,j) - d * mm * str_mesh_model->vp(i,j) ;
+              den = mm * (1. + 0.5 * d * Dt) ;
               str_mesh_model->a(i,j) = rhs / den ;
               str_mesh_model->v(i,j) = str_mesh_model->vp(i,j) + 0.5 * Dt * str_mesh_model->a(i,j) ;
             }
@@ -1684,7 +1700,14 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       str_mesh_model->applyDtCoefficient() ;
       str_mesh_model->gridTime = tt ;
       nstepCurr += 1 ;
-      Cerr << "Grid dynamic problem, internal step: "<< nstepCurr << ", t= " << Dt << ", dt_stab= " << str_mesh_model->gridDt << ", time= " << tt << ", target fluid time= " << temps << finl ;
+      if (dtm > 0.)
+        {
+          Cerr << "Grid dynamic problem, internal step: "<< nstepCurr << ", dt= " << Dt << ", dt_stab= " << str_mesh_model->gridDt << ", [mass scaling] added_mass= "<< totalScaleMass << ", time= " << tt << ", target fluid time= " << temps << finl ;
+        }
+      else
+        {
+          Cerr << "Grid dynamic problem, internal step: "<< nstepCurr << ", dt= " << Dt << ", dt_stab= " << str_mesh_model->gridDt << ", time= " << tt << ", target fluid time= " << temps << finl ;
+        }
 
     } // End time loop on grid problem
 
