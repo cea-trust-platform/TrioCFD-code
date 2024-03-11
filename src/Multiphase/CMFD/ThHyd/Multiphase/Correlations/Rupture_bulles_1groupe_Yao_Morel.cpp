@@ -41,7 +41,7 @@ void Rupture_bulles_1groupe_Yao_Morel::coefficient(const DoubleTab& alpha, const
                                                    const DoubleTab& eps, const DoubleTab& k_turb,
                                                    DoubleTab& coeff) const
 {
-  int N = alpha.dimension(1);
+  int N = alpha.dimension(0);
 
   for (int k = 0 ; k<N ; k++)
     if (k != n_l) //phase gazeuse

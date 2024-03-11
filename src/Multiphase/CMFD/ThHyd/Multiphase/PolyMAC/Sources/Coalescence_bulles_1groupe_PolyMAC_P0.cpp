@@ -31,7 +31,7 @@
 #include <Coalescence_bulles_1groupe_base.h>
 #include <math.h>
 
-Implemente_instanciable(Coalescence_bulles_1groupe_PolyMAC_P0, "Coalescence_bulles_1groupe_PolyMAC_P0", Source_base);
+Implemente_instanciable(Coalescence_bulles_1groupe_PolyMAC_P0, "Coalescence_bulles_1groupe_elem_PolyMAC_P0", Source_base);
 
 Sortie& Coalescence_bulles_1groupe_PolyMAC_P0::printOn(Sortie& os) const
 {
