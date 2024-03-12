@@ -290,7 +290,6 @@ public :
   void compute_thermal_diffusive_fluxes_face_centre_discrete_integral();
   void compute_thermal_fluxes_face_centre_discrete_integral(DoubleVect& fluxes, const int fluxes_type);
   DoubleVect compute_thermal_flux_face_centre_discrete_integral(const int fluxes_type, const int& index_subproblem, const double& dist, const int& dir);
-  //void get_discrete_surface_at_level(const int& dir, const int& level);
   void clean() override;
   void compute_ijk_pure_faces_indices() override;
   void sort_ijk_intersections_subproblems_indices_by_k_layers() override;
