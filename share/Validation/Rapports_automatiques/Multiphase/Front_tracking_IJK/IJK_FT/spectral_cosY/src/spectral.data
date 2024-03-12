@@ -30,7 +30,7 @@ IJK_FT_double
   ijk_splitting_ft_extension 0 # 8  approximativement (Rb/Delta)+3 #
   timestep 1 # e-7 #
   time_scheme RK3_FT # RK3_FT si euler_explicit diminuer le facsec #
-  type_velocity_convection_op Centre
+  velocity_convection_op Centre
   Boundary_Conditions {
                 bctype_kmin perio
                 bctype_kmax perio

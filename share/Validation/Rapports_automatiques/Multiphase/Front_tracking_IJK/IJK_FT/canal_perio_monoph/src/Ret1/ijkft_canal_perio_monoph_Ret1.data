@@ -27,7 +27,7 @@ IJK_FT_double
   ijk_splitting_ft_extension 0
   timestep 0.3 # 0.01 #
   # time_scheme RK3_FT #
-  # type_velocity_convection_op Centre # 
+  # velocity_convection_op Centre # 
   Boundary_Conditions {
                 bctype_kmin Paroi
                 bctype_kmax Paroi
