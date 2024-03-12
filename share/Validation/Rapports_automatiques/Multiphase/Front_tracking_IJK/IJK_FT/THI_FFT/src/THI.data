@@ -31,7 +31,7 @@ IJK_FT_double
   ijk_splitting_ft_extension 10 # To be checked.. #
   timestep 1e-4
   time_scheme euler_explicit # si euler_explicit diminuer le facsec #
-  type_velocity_convection_op Centre
+  velocity_convection_op Centre
   Boundary_Conditions {
     bctype_kmin perio
     bctype_kmax perio
