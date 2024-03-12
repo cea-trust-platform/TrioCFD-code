@@ -1,0 +1,18 @@
+Ce cas test correspond \`a la diffusion d'une temp\'erature de paroi impos\'ee \`a vitesse nulle. Il a pour but le test de l'impl\'ementation d'un diffusivit\'e turbulente dans la formulation 'Favre'.
+
+\subsection{Solution analytique}
+
+La condition initiale est
+\begin{equation}
+T\left(x,y,z\right) = 400.
+\end{equation}
+On impose une temp\'erature de 293 K sur la paroi basse et de 586 K sur la paroi haute.
+On d\'esactive la conduction de la temp\'erature mais on active un mod\`ele sous-maille de diffusivit\'e turbulente qui, dans la formulation 'Favre' ajoute un terme diffusif \`a l'\'equation de conservation de l'\'energie.
+Le mod\`ele est choisit dans le cadre de ce cas test pour avoir une diffusivit\'e turbulente constante.
+Au bout d'un temps assez long, ces conditions doivent conduire \`a un profil de temp\'erature lin\'eaire dans le canal.
+
+\subsection{V\'erification des r\'esultats de la simulation}
+
+On compare le r\'esultat de la simulation {\textsf simu\_t} \`a la solution analytique d\'ecrite pr\'ec\'edemment {\textsf ana\_t}. La diff\'erence entre les deux est \textsf{error\_t}. Si tout se passe bien, les r\'esultats de la simulation sont proches de la solution analytique et l'erreur est tr\'es faible devant la valeur totale.
+
+

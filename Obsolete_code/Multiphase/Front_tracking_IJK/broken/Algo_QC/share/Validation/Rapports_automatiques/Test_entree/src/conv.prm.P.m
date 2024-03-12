@@ -1,0 +1,128 @@
+Parametres {
+	Titre "Convergence du calcul "
+
+#Pset(_listresol_ %list% )
+#Pset(_listcas_ %cas% )
+#Pset(_listfacsec_ %facsecs% )
+#Pset(_listextfacsec_ %extfacsecs% )
+
+#Pforeach _resol_ (_listresol_)	#Pforeach _cas_ (cas)	#Pforeach _facsec_ (_listfacsec_)	
+	  Castest  "_cas__resol___facsec_" "cas.data" #Pif(("_cas_"=="amont")and("_resol_"=="20")) jdd en annexe #Pendif
+ #Pendforeach(_facsec_) #Pendforeach(_cas_) #Pendforeach(_resol_)
+#Pforeach _resol_ (_listresol_)	#Pforeach _cas_ (cas-rk3)	#Pforeach _facsec_ (_listextfacsec_)	
+	  Castest  "_cas__resol___facsec_" "cas.data" #Pif(("_cas_"=="amont")and("_resol_"=="20")) jdd en annexe #Pendif
+ #Pendforeach(_facsec_) #Pendforeach(_cas_) #Pendforeach(_resol_)
+
+	Auteur "GF our MC"
+	InclureData 2
+# Prerequis "./extract_convergence"
+
+Description "Cas test paroi defilante, pour tester convergence en maillage des opérateurs de convection"
+}
+
+Chapitre {
+titre euler_explicite
+#Pforeach _resol_ (_listresol_)	
+#Pforeach _cas_ (cas)
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps resol _resol_ "
+	#Pforeach _facsec_ (_listfacsec_)
+		courbe {
+			Legende facsec _facsec_
+		fichier _cas__resol___facsec_/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ #Pendforeach(_facsec_)
+
+}
+#Pendforeach(_cas_)
+#Pendforeach(_resol_) 
+			
+	
+
+} 
+Chapitre {
+titre euler_explicite convergence en maillage 
+
+#Pforeach _cas_ (cas)
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	#Pforeach _facsec_ (0.001)	
+	titre "convergence de la vitesse en maillage facsec _facsec_"
+
+	
+	#Pforeach _resol_ (_listresol_)	
+		courbe {
+			Legende N _resol_
+		fichier _cas__resol___facsec_/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+	#Pendforeach(_resol_) 
+	#Pendforeach(_facsec_)
+}
+#Pendforeach(_cas_)
+			
+} 
+
+Chapitre {
+titre rk3b
+#Pforeach _resol_ (_listresol_)	
+#Pforeach _cas_ (cas-rk3)
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	titre "convergence de la vitesse en temps RK3 resol _resol_ "
+	#Pforeach _facsec_ (_listextfacsec_)
+		courbe {
+			Legende facsec _facsec_
+			fichier _cas__resol___facsec_/cas_MAX_ERREUR_MASSE.son
+			  style lines
+			}
+	 #Pendforeach(_facsec_)
+
+}
+#Pendforeach(_cas_)
+#Pendforeach(_resol_) 
+}
+
+ 
+Chapitre {
+titre rk3b convergence en maillage 
+
+#Pforeach _cas_ (cas-rk3)
+	Figure {
+	labelx t
+	labely erreur max 
+	
+	  incluredesccourbes 0
+	  width 12cm
+	#Pforeach _facsec_ (0.001)	
+	titre "convergence de la vitesse en maillage facsec _facsec_"
+
+	
+	#Pforeach _resol_ (_listresol_)	
+		courbe {
+			Legende N _resol_
+		fichier _cas__resol___facsec_/cas_MAX_ERREUR_MASSE.son
+		  style lines
+		}
+ 
+	#Pendforeach(_resol_) 
+	#Pendforeach(_facsec_)
+}
+#Pendforeach(_cas_)
+			
+} 

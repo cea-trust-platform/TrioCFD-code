@@ -1,0 +1,4 @@
+ cat cas40_*/conv | awk '{print $3, $1}' | sort -n  >dt1; python regression.py dt1 
+ cat cas80_*/conv | awk '{print $3, $1}' | sort -n  >dt; python regression.py dt 
+ cat cas[1-9]*_0.01/conv | awk '{print $2, $1}' | sort -n  >N1; python regression.py N1 
+ cat cas[1-9]*_0.001/conv | awk '{print $2, $1}' | sort -n  >N; python regression.py N 

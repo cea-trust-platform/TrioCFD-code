@@ -1,0 +1,99 @@
+Ce cas test correspond \`a la diffusion d'un produit de sinus sur une des composantes de la vitesse. Il a pour but le test du mod\`ele de Smagorinsky anisotrope pour le terme sous-maille $\partial_j\left(\overline{U_i U_j} - \overline{U}_i\overline{U}_j\right)$ de l'\'equation de conservation de la quantit\'e de mouvement dans la formulation 'Favre'.
+
+\section{Solution analytique}
+
+Soit
+\begin{equation}
+\tau_{ij} = \overline{U_i U_j} - \overline{U}_i\overline{U}_j
+\end{equation}
+Le mod\`ele de Smagorinsky correspond au mod\`ele
+\begin{equation}
+\tau_{ij} = - 2 \left(C_s \Delta\right)^2 \left|S\right| S_{ij}
+\end{equation}
+avec
+\begin{equation}
+S^a_{ij} = \frac{1}{2 \Delta}\left(\frac{\partial U_i}{\partial x_j} \Delta_j + \frac{U_j}{\partial x_i} \Delta_i\right)
+\end{equation}
+et
+\begin{equation}
+\left|S^a\right| = \sqrt{2 S_{ij}^a S_{ij}^a}
+\end{equation}
+
+On note
+\begin{equation}
+D_i = \frac{1}{\rho} \frac{\partial \rho \tau_{ij}}{\partial x_j}.
+\end{equation}
+Dans la formulation 'Favre', le mod\`ele est impl\'ement\'e comme
+\begin{equation}
+\frac{\partial U_{i}}{\partial t} = NS^* + D_i
+\end{equation}
+
+Notons par ailleurs, $V_0 = 0.001$ et $\tau=2\pi$. On choisit $C_s=0.16$ et $\Delta$ la racine cubique du volume de la maille.
+
+On va donn\'e les solutions analytiques pour $D_i$ selon diff\'erents cas.
+Lors de la validation, on notera {\textsf simu\_dv\_i} le r\'esultat de la
+simulation pour $D_i$, et {\textsf ana\_dv\_i} la solution analytique.
+La diff\'erence entre les deux sera not\'e \textsf{error\_dv\_i}. Si tout se passe bien, les r\'esultats de la simulation sont proches de la solution analytique et l'erreur est tr\'es faible devant la valeur totale.
+
+
+
+\subsection{Cas VX\_DIRX}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 2 V_0 \sin(\tau x) \sin(2 \tau z) \\
+V_y ={}& 0 \\
+V_z ={}& 0
+\end{align*}
+
+\subsection{Cas VX\_DIRY}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 2 V_0 \sin(\tau y) \sin(2 \tau z) \\
+V_y ={}& 0 \\
+V_z ={}& 0
+\end{align*}
+
+\subsection{Cas VY\_DIRX}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 0 \\
+V_y ={}& 2 V_0 \sin(\tau x) \sin(2 \tau z) \\
+V_z ={}& 0
+\end{align*}
+
+\subsection{Cas VY\_DIRY}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 0 \\
+V_y ={}& 2 V_0 \sin(\tau y) \sin(2 \tau z) \\
+V_z ={}& 0
+\end{align*}
+
+\subsection{Cas VZ\_DIRX}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 0 \\
+V_y ={}& 0 \\
+V_z ={}& 2 V_0 \sin(\tau x) \sin(2 \tau z)
+\end{align*}
+
+\subsection{Cas VZ\_DIRY}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 0 \\
+V_y ={}& 0 \\
+V_z ={}& 2 V_0 \sin(\tau y) \sin(2 \tau z)
+\end{align*}
+

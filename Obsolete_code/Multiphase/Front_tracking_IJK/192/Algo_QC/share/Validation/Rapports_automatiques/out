@@ -1,0 +1,2286 @@
+TRUST v1.9.2 support : trust@cea.fr
+Loading personal configuration /home/yanis/.perso_TRUST.env
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+Error! Convert conv.prm.P to UTF-8 format.
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the cas data file in the cas10_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas10_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas10_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas10_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas20_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas20_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas20_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas40_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas40_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas40_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas80_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas80_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas80_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk310_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk310_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk310_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk320_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk320_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk320_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk340_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk340_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk340_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.1 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.1/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.1 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.01 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.01/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.01 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+
+-> Running the calculation of the cas data file in the cas-rk380_0.001 directory ...
+-> Calculation cas produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build/cas-rk380_0.001/cas.err file.
+grep: cas.TU: No such file or directory
+grep: cas.TU: No such file or directory
+-> Running the post_run script in the cas-rk380_0.001 directory ...
+tail: cannot open 'cas_MAX_ERREUR_MASSE.son' for reading: No such file or directory
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: warning: Cannot find or open file "cas10_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic000.plot" line 9: No data in plot
+
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: warning: Cannot find or open file "cas20_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic001.plot" line 9: No data in plot
+
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: warning: Cannot find or open file "cas40_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic002.plot" line 9: No data in plot
+
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: warning: Cannot find or open file "cas80_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic003.plot" line 9: No data in plot
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas10_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas20_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas40_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "cas80_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic004.plot" line 9: No data in plot
+
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: warning: Cannot find or open file "cas-rk310_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic005.plot" line 9: No data in plot
+
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: warning: Cannot find or open file "cas-rk320_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic006.plot" line 9: No data in plot
+
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: warning: Cannot find or open file "cas-rk340_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic007.plot" line 9: No data in plot
+
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.1/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.01/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: warning: Cannot find or open file "cas-rk380_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic008.plot" line 9: No data in plot
+
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk310_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk320_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk340_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: warning: Cannot find or open file "cas-rk380_0.001/cas_MAX_ERREUR_MASSE.son"
+"./.tmp/fic009.plot" line 9: No data in plot
+
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./fic.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-01-21>
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)))
+(/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
+(/usr/share/texlive/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref-langpatches.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg))
+Writing index file fic.idx
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./fic.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty))
+(./fic.out) (./fic.out) (./corps.tex [1{/var/lib/texmf/fonts/map/pdftex/updmap/
+pdftex.map}]
+!pdfTeX error: pdflatex (file ../.tmp/fic000.png): reading image file failed
+ ==> Fatal error occurred, no output PDF file produced!
+
+-> File cas-rk380_0.001/cas.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/Test_entree/build
+-> PDF generation failed. The PDF report is deleted.  rapport.pdf
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 526, in genererRapport
+    raise Exception("Generation failed!")
+Exception: Generation failed!
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the canal_turbulent_anisotherme_leger data file in the . directory ...
+-> Running the post_run script in the . directory ...
+moyenne_spatiale_0.009527.txt  non ouvrable
+PB moyenne_spatiale_0.009527.txt
+statistiques_0.009527.txt  non ouvrable
+PB statistiques_0.009527.txt
+==============================
+-> Building PDF report file...
+==============================
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/canal_turbulent_anisotherme_leger/build
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/canal_turbulent_anisotherme_leger/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the canal_turbulent_anisotherme_leger data file in the . directory ...
+-> Running the post_run script in the . directory ...
+moyenne_spatiale_0.000430.txt  non ouvrable
+PB moyenne_spatiale_0.000430.txt
+statistiques_0.000430.txt  non ouvrable
+PB statistiques_0.000430.txt
+==============================
+-> Building PDF report file...
+==============================
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/canal_turbulent_anisotherme_leger_avec_modele/build
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/canal_turbulent_anisotherme_leger_avec_modele/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+Bad format detected for src/dns_qc_difference_vdf_ijk.prm:
+src/dns_qc_difference_vdf_ijk.prm: ISO-8859 text
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+doing prerun
+Creation d une condition initiale
+./pre_run: line 14: lata2dx: command not found
+cp: cannot stat 'reprise_ijk.lata': No such file or directory
+sed: can't read reprise_ijk.lata.orig: No such file or directory
+tail: cannot open 'evol_glob' for reading: No such file or directory
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+awk: cannot open jdd_ijk.out (No such file or directory)
+awk: cannot open jdd_ijk.out (No such file or directory)
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 268, in genererGraphe
+    FileAccumulator.AppendVisuComplex(plot[1], plot[2], plot[3], plot[4], self.cycles)  # file / domaine / field / localisation
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 194, in AppendVisuComplex
+    cls.AppendVisuMesh(file, dom)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 159, in AppendVisuMesh
+    with open(file) as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'jdd_ijk.sauv.lata'
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+.prm and .ipynb files found in /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_ijk : None
+There should be ONE .prm (OR ONE .ipynb) file in the 'src' (current) directory.
+For help, run: Run_fiche -help
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+Bad format detected for src/turbulent_flux_impose.prm:
+src/turbulent_flux_impose.prm: ISO-8859 text
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the instationnaire_flux_impose_t_imposee data file in the . directory ...
+-> Calculation instationnaire_flux_impose_t_imposee produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/instationnaire_flux_impose_t_imposee/build/instationnaire_flux_impose_t_imposee.err file.
+grep: instationnaire_flux_impose_t_imposee.TU: No such file or directory
+grep: instationnaire_flux_impose_t_imposee.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+ls: cannot access 'Moyennes_spatiales_Temp_*': No such file or directory
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: No data in plot
+
+"./.tmp/fic001.plot" line 10: warning: Cannot find or open file "instationnaire_flux_impose_t_imposee_pb_Debit.out"
+"./.tmp/fic001.plot" line 10: No data in plot
+
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./fic.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-01-21>
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)))
+(/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
+(/usr/share/texlive/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref-langpatches.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg))
+Writing index file fic.idx
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./fic.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty))
+(./fic.out) (./fic.out) (./corps.tex
+!pdfTeX error: pdflatex (file ../.tmp/fic000.png): reading image file failed
+ ==> Fatal error occurred, no output PDF file produced!
+
+-> File ./instationnaire_flux_impose_t_imposee.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/instationnaire_flux_impose_t_imposee/build
+-> PDF generation failed. The PDF report is deleted.  rapport.pdf
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 526, in genererRapport
+    raise Exception("Generation failed!")
+Exception: Generation failed!
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+Bad format detected for src/laminaire_flux_impose.prm:
+src/laminaire_flux_impose.prm: ISO-8859 text, with very long lines (504)
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the laminaire_flux_impose data file in the . directory ...
+-> Calculation laminaire_flux_impose produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/laminaire_flux_impose/build/laminaire_flux_impose.err file.
+grep: laminaire_flux_impose.TU: No such file or directory
+grep: laminaire_flux_impose.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+ls: cannot access 'Moyennes_spatiales_Temp_*': No such file or directory
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+-> File ./laminaire_flux_impose.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/laminaire_flux_impose/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+Bad format detected for src/source_volumique.prm:
+src/source_volumique.prm: ISO-8859 text
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the source_volumique data file in the . directory ...
+-> Calculation source_volumique produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/source_volumique/build/source_volumique.err file.
+grep: source_volumique.TU: No such file or directory
+grep: source_volumique.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+awk: cannot open evol_glob (No such file or directory)
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 10: warning: Skipping data file with no valid points
+-> File ./source_volumique.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/source_volumique/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_conduction data file in the test_conduction directory ...
+-> Running the post_run script in the test_conduction directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_div_lambda_grad_t.py
+Running: cli3.3.2 -nowin -s instructions_ana_div_lambda_grad_t.py
+Running: cli3.3.2 -nowin -s instructions_error_div_lambda_grad_t.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_div_lambda_grad_t
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_convection_masse data file in the test_convection_masse directory ...
+-> Running the post_run script in the test_convection_masse directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_d_rho.py
+==============================
+-> Building PDF report file...
+==============================
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./fic.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-01-21>
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)))
+(/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
+(/usr/share/texlive/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref-langpatches.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg))
+Writing index file fic.idx
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./fic.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty))
+(./fic.out) (./fic.out) (./corps.tex
+Overfull \hbox (6.96954pt too wide) in paragraph at lines 5--6
+\OT1/cmr/m/n/10 Info pour com-pleter un prm: fire-fox \TS1/cmr/m/n/10 $\OT1/cmr
+/m/n/10 TRUST[]ROOT/Validation/Outils/Genere[]courbe/doc/manuel.xhtml 
+(../description_cas.tex)
+
+! Package Listings Error: File `../test_convection_masse/integrale_d_rho(.txt)'
+ not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: txt)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.24 ...test_convection_masse/integrale_d_rho.txt}
+                                                  ^^M
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on fic.log.
+
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_convection_masse/build
+in prm, incluce_text_file can't read data file : test_convection_masse/integrale_d_rho.txt
+-> PDF generation failed. The PDF report is deleted.  rapport.pdf
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 526, in genererRapport
+    raise Exception("Generation failed!")
+Exception: Generation failed!
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion/build/VX_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion/build/VY_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion/build/VZ_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion/build/VX_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion/build/VY_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion/build/VZ_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_dv_x
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient/build/VX_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient/build/VY_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient/build/VZ_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient/build/VX_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient/build/VY_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient/build/VZ_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_dv_x
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient_velocity/build/VX_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.pyRunning: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient_velocity/build/VY_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient_velocity/build/VZ_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient_velocity/build/VX_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient_velocity/build/VY_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_gradient_velocity/build/VZ_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_dv_x
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_similarity_box/build/VX_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_similarity_box/build/VY_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_similarity_box/build/VZ_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_similarity_box/build/VX_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.pyRunning: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_similarity_box/build/VY_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_similarity_box/build/VZ_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.pyRunning: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_dv_x
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky/build/VX_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky/build/VY_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky/build/VZ_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky/build/VX_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.pyRunning: cli3.3.2 -nowin -s instructions_error_dv_x.py
+
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.pyRunning: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky/build/VY_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky/build/VZ_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_dv_x
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_anisotrope/build/VX_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.pyRunning: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_anisotrope/build/VY_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.pyRunning: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_anisotrope/build/VZ_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_anisotrope/build/VX_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_anisotrope/build/VY_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_anisotrope/build/VZ_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.pyRunning: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_dv_x
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_velocity/build/VX_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_velocity/build/VY_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_velocity/build/VZ_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_velocity/build/VX_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_velocity/build/VY_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_velocity/build/VZ_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_dv_x
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run prepare script in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_su_laplacien_u/build/VX_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_su_laplacien_u/build/VY_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRX directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_su_laplacien_u/build/VZ_DIRX/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRX directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+
+-> Running the calculation of the test_diffusion data file in the VX_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_su_laplacien_u/build/VX_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VX_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+
+-> Running the calculation of the test_diffusion data file in the VY_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_su_laplacien_u/build/VY_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VY_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.py
+
+-> Running the calculation of the test_diffusion data file in the VZ_DIRY directory ...
+-> Calculation test_diffusion produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_su_laplacien_u/build/VZ_DIRY/test_diffusion.err file.
+grep: test_diffusion.TU: No such file or directory
+grep: test_diffusion.TU: No such file or directory
+-> Running the post_run script in the VZ_DIRY directory ...
+Running: cli3.3.2 -nowin -s instructions_error_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_x.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_y.pyRunning: cli3.3.2 -nowin -s instructions_simu_dv_y.py
+
+Running: cli3.3.2 -nowin -s instructions_error_dv_y.py
+Running: cli3.3.2 -nowin -s instructions_error_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_ana_dv_z.py
+Running: cli3.3.2 -nowin -s instructions_simu_dv_z.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_dv_x
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion_turbulente_schema_temps data file in the test_diffusion_turbulente_schema_temps directory ...
+-> Calculation test_diffusion_turbulente_schema_temps produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_turbulente_schema_temps/build/test_diffusion_turbulente_schema_temps/test_diffusion_turbulente_schema_temps.err file.
+grep: test_diffusion_turbulente_schema_temps.TU: No such file or directory
+grep: test_diffusion_turbulente_schema_temps.TU: No such file or directory
+-> Running the post_run script in the test_diffusion_turbulente_schema_temps directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_vz.py
+Running: cli3.3.2 -nowin -s instructions_error_vz.py
+Running: cli3.3.2 -nowin -s instructions_ana_vz_tfinal.py
+Running: cli3.3.2 -nowin -s instructions_ana_vz_tinit.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_vz
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusion_turbulente_schema_temps data file in the test_diffusion_turbulente_schema_temps directory ...
+-> Calculation test_diffusion_turbulente_schema_temps produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusion_turbulente_schema_temps_velocity/build/test_diffusion_turbulente_schema_temps/test_diffusion_turbulente_schema_temps.err file.
+grep: test_diffusion_turbulente_schema_temps.TU: No such file or directory
+grep: test_diffusion_turbulente_schema_temps.TU: No such file or directory
+-> Running the post_run script in the test_diffusion_turbulente_schema_temps directory ...
+Running: cli3.3.2 -nowin -s instructions_error_vz.py
+Running: cli3.3.2 -nowin -s instructions_ana_vz_tinit.py
+Running: cli3.3.2 -nowin -s instructions_simu_vz.py
+Running: cli3.3.2 -nowin -s instructions_ana_vz_tfinal.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_vz
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusivite_turbulente data file in the test_diffusivite_turbulente directory ...
+-> Running the post_run script in the test_diffusivite_turbulente directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_t.py
+Running: cli3.3.2 -nowin -s instructions_ana_t.py
+Running: cli3.3.2 -nowin -s instructions_error_t.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_t
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusivite_turbulente data file in the test_diffusivite_turbulente directory ...
+-> Running the post_run script in the test_diffusivite_turbulente directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_unst.py
+Running: cli3.3.2 -nowin -s instructions_ana_unst.py
+Running: cli3.3.2 -nowin -s instructions_error_unst.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_unst
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusivite_turbulente data file in the test_diffusivite_turbulente directory ...
+-> Calculation test_diffusivite_turbulente produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusivite_turbulente_gradient/build/test_diffusivite_turbulente/test_diffusivite_turbulente.err file.
+grep: test_diffusivite_turbulente.TU: No such file or directory
+grep: test_diffusivite_turbulente.TU: No such file or directory
+-> Running the post_run script in the test_diffusivite_turbulente directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_div_lambda_grad_t.py
+Running: cli3.3.2 -nowin -s instructions_ana_div_lambda_grad_t.py
+Running: cli3.3.2 -nowin -s instructions_error_div_lambda_grad_t.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_div_lambda_grad_t
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusivite_turbulente data file in the test_diffusivite_turbulente directory ...
+-> Calculation test_diffusivite_turbulente produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/test_diffusivite_turbulente_gradient_velocity/build/test_diffusivite_turbulente/test_diffusivite_turbulente.err file.
+grep: test_diffusivite_turbulente.TU: No such file or directory
+grep: test_diffusivite_turbulente.TU: No such file or directory
+-> Running the post_run script in the test_diffusivite_turbulente directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_d_rho.py
+Running: cli3.3.2 -nowin -s instructions_ana_d_rho.py
+Running: cli3.3.2 -nowin -s instructions_error_d_rho.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_d_rho
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusivite_turbulente data file in the test_diffusivite_turbulente directory ...
+-> Running the post_run script in the test_diffusivite_turbulente directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_div_lambda_grad_t.py
+Running: cli3.3.2 -nowin -s instructions_ana_div_lambda_grad_t.py
+Running: cli3.3.2 -nowin -s instructions_error_div_lambda_grad_t.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_div_lambda_grad_t
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusivite_turbulente data file in the test_diffusivite_turbulente directory ...
+-> Running the post_run script in the test_diffusivite_turbulente directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_d_rho.py
+Running: cli3.3.2 -nowin -s instructions_ana_d_rho.py
+Running: cli3.3.2 -nowin -s instructions_error_d_rho.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_d_rho
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+Bad format detected for src/turbulent_flux_impose.prm:
+src/turbulent_flux_impose.prm: ISO-8859 text
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the turbulent_flux_impose data file in the . directory ...
+-> Calculation turbulent_flux_impose produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/turbulent_flux_impose/build/turbulent_flux_impose.err file.
+grep: turbulent_flux_impose.TU: No such file or directory
+grep: turbulent_flux_impose.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+ls: cannot access 'Moyennes_spatiales_Temp_*': No such file or directory
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+"./.tmp/fic000.plot" line 10: No data in plot
+
+"./.tmp/fic001.plot" line 10: warning: Cannot find or open file "turbulent_flux_impose_pb_Debit.out"
+"./.tmp/fic001.plot" line 10: No data in plot
+
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./fic.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-01-21>
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def))
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)))
+(/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty))
+(/usr/share/texlive/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref-langpatches.def)
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/etexcmds/etexcmds.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg))
+Writing index file fic.idx
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
+(./fic.aux) (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty))
+(./fic.out) (./fic.out) (./corps.tex
+!pdfTeX error: pdflatex (file ../.tmp/fic000.png): reading image file failed
+ ==> Fatal error occurred, no output PDF file produced!
+
+-> File ./turbulent_flux_impose.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/turbulent_flux_impose/build
+-> PDF generation failed. The PDF report is deleted.  rapport.pdf
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 526, in genererRapport
+    raise Exception("Generation failed!")
+Exception: Generation failed!
+Error, see Run.log
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques
+done

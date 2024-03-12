@@ -1,0 +1,11 @@
+LATA_V2.1
+titi
+Trio_U
+Format LITTLE_ENDIAN,C_INDEXING,C_ORDERING,F_MARKERS_NO,INT32,REAL32
+Geom grid_geom2 type_elem=HEXAEDRE
+Champ SOMMETS_IJK_I test_convection_masse_lata_0.sauv.lata.grid_geom2.coordx geometrie=grid_geom2 size=73 composantes=1
+Champ SOMMETS_IJK_J test_convection_masse_lata_0.sauv.lata.grid_geom2.coordy geometrie=grid_geom2 size=73 composantes=1
+Champ SOMMETS_IJK_K test_convection_masse_lata_0.sauv.lata.grid_geom2.coordz geometrie=grid_geom2 size=69 composantes=1
+TEMPS 0
+Champ TEMPERATURE test_convection_masse_lata_0.sauv.lata.0.TEMPERATURE geometrie=grid_geom2 size=352512 localisation=ELEM composantes=1
+Champ DRHO_DT test_convection_masse_lata_0.sauv.lata.0.DRHO_DT geometrie=grid_geom2 size=352512 localisation=ELEM composantes=1

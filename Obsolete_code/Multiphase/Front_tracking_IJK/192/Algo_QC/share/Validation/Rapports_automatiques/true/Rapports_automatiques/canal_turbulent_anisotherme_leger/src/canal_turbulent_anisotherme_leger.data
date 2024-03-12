@@ -1,0 +1,85 @@
+ # Canal turbulent anisotherme #
+# PARALLEL NOT #
+
+IJK_Grid_Geometry grid_geom
+Lire grid_geom
+{
+  nbelem_i 72
+  nbelem_j 48
+  uniform_domain_size_i 0.093764
+  uniform_domain_size_j 0.062509
+  file_coord_k          coord_k_0.txt
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_Splitting post_splitting
+Lire post_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+dns_qc_double 
+{
+  ijk_splitting grid_splitting
+  timestep 1
+  nb_pas_dt_max 250
+
+/* tinit 0. */
+  multigrid_solver
+  {
+    coarsen_operators 5
+    Coarsen_Operator_K { file_z_coord coord_k_1.txt } 
+    Coarsen_Operator_K { file_z_coord coord_k_2.txt }
+    Coarsen_Operator_Uniform {  }
+    Coarsen_Operator_Uniform {  }
+    Coarsen_Operator_Uniform {  }
+    
+    ghost_size 3
+    pre_smooth_steps 5 5 5 5 8 8 
+    smooth_steps     5 5 5 5 8 8  
+    
+    relax_jacobi 5 0.69 0.69 0.69 0.65 0.65
+    solveur_grossier GCP { seuil  0.5e-9 precond ssor { omega 1.5 } }
+    check_residu 0
+    seuil 2.5e-8
+    nb_full_mg_steps 2 3 1
+    solver_precision mixed
+    /* impr */
+  }
+  timestep_facsec 1.
+sauvegarde_post_instantanes   
+  tinit 0.
+  
+  expression_t_init   293.+293/0.029846*z
+  expression_vx_init  3.339*z*(0.029846-z)*4/(0.029846*0.029846)
+  expression_vy_init  0.
+  expression_vz_init  (sin((x-0.093764)/0.093764*6.28318530717959)*sin(y/0.062509*6.28318530717959)+sin((x-0.093764)/0.093764*6.28318530717959*6)*sin(y/0.062509*6.28318530717959*4)+sin((x-0.093764)/0.093764*6.28318530717959*2)*sin(y/0.062509*6.28318530717959*8))*z*(0.029846-z)*4/(0.029846*0.029846) 
+
+  dt_post             2500
+# spectral_splitting  post_splitting
+  dt_post_spectral    10000 # 
+  dt_sauvegarde       10000
+
+  nom_sauvegarde      dns_1.sauv
+  check_stop_file     stop_file
+
+  t_paroi_impose_kmin 293.0
+  t_paroi_impose_kmax 586.0
+  p_thermo_init       1.5e5
+  cp                  1005.0
+  gamma               1.4 
+  debit_massique      0.007406252649
+}

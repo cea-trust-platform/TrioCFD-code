@@ -1,0 +1,73 @@
+Parameters {
+	Title "Validation de l'operateur de conduction"
+	Author "Dorian Dupuy"
+	VersionTrio_U 1.7.4
+ 	TestCase test_conduction test_conduction.data
+	Description "Info pour completer un prm: firefox \$TRUST_ROOT/Validation/Outils/Genere_courbe/doc/manuel.xhtml "
+}
+
+Chapter {
+ 
+  	Title "Cas test_conduction" 
+
+Description "\latex_(\input{../description_cas.tex}\latex_)"
+
+	visu {
+		nb_img_without_newline 2
+		Description "simu_div_lambda_grad_t"
+		cycles -1
+		Instruction_visit execfile("test_conduction/instructions.py")
+                origine instruction
+
+		pseudocolor test_conduction/test_conduction_lata_1.sauv.lata simu_div_lambda_grad_t 
+		Operator Slice2D_Y 0.5 0.5 0.5
+		Width 7cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "ana_div_lambda_grad_t"
+		cycles -1
+		Instruction_visit execfile("test_conduction/instructions.py")
+                origine instruction
+
+		pseudocolor test_conduction/test_conduction_lata_1.sauv.lata ana_div_lambda_grad_t 
+		Operator Slice2D_Y 0.5 0.5 0.5
+		Width 7cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "error_div_lambda_grad_t"
+		cycles -1
+		Instruction_visit execfile("test_conduction/instructions.py")
+                origine instruction
+
+		pseudocolor test_conduction/test_conduction_lata_1.sauv.lata error_div_lambda_grad_t 
+		Operator Slice2D_Y 0.5 0.5 0.5
+		Width 7cm
+	}
+
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.5"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "div_lambda_grad_t"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_div_lambda_grad_t"
+			file test_conduction/simu_div_lambda_grad_t0000.curve
+		}
+		Curve {
+			legend "ana_div_lambda_grad_t"
+			file test_conduction/ana_div_lambda_grad_t0000.curve
+		}
+		Curve {
+			legend "error_div_lambda_grad_t"
+			file test_conduction/error_div_lambda_grad_t0000.curve
+		}
+		Width 14cm
+	}
+
+}
+

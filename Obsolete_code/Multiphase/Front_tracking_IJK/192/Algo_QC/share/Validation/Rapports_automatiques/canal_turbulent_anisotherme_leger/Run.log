@@ -1,0 +1,72 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the canal_turbulent_anisotherme_leger data file in the . directory ...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the canal_turbulent_anisotherme_leger data file in the . directory ...
+-> Running the post_run script in the . directory ...
+moyenne_spatiale_0.009527.txt  non ouvrable
+PB moyenne_spatiale_0.009527.txt
+statistiques_0.009527.txt  non ouvrable
+PB statistiques_0.009527.txt
+==============================
+-> Building PDF report file...
+==============================
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/canal_turbulent_anisotherme_leger/build
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/canal_turbulent_anisotherme_leger/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the canal_turbulent_anisotherme_leger data file in the . directory ...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the canal_turbulent_anisotherme_leger data file in the . directory ...
+-> Running the post_run script in the . directory ...
+moyenne_spatiale_0.009527.txt  non ouvrable
+PB moyenne_spatiale_0.009527.txt
+statistiques_0.009527.txt  non ouvrable
+PB statistiques_0.009527.txt
+==============================
+-> Building PDF report file...
+==============================
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/canal_turbulent_anisotherme_leger/build
+/home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/canal_turbulent_anisotherme_leger/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.

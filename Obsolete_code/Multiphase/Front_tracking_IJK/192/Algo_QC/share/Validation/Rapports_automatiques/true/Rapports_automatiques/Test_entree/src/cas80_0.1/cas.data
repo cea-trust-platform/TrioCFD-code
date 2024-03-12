@@ -1,0 +1,215 @@
+# Test dirchlet entree #
+# PARALLEL OK 8 #
+
+dimension 2
+Domaine dom_canal
+
+# DEBUT MAILLAGE #
+Mailler dom_canal
+        {
+        Pave Cavite
+                {
+                Origine 0. 0.
+		 /* Nombre_de_Noeuds  79 79 */  
+		 Nombre_de_Noeuds  81 81 
+		Longueurs  6.28318530717959 6.28318530717959
+		}
+
+                {
+		Bord entree   X = 0.                      0. <= Y <= 6.28318530717959
+                Bord sortie   X = 6.28318530717959        0. <= Y <= 6.28318530717959    
+                Bord perioy   Y = 0.            	  0. <= X <= 6.28318530717959  
+                Bord perioy   Y = 6.28318530717959        0. <= X <= 6.28318530717959     
+
+                }
+        }
+
+# FIN MAILLAGE #
+# DEBUT DECOUPAGE
+
+Decouper dom_canal
+{
+        Partitionneur tranche { tranches 2 2 }
+        Larg_joint 2
+        Nom_Zones DOM
+	Periodique 1 perioy
+}
+Fin
+FIN DECOUPAGE #
+
+
+# DEBUT LECTURE 
+Scatter DOM.Zones dom_canal
+ FIN LECTURE #
+
+Pb_Thermohydraulique_turbulent_QC pb_canal
+
+VDF dis
+
+# Schéma en temps #
+
+
+  # Runge_Kutta_ordre_3_qc  #
+schema_euler_explicite    sch_qc   
+lire sch_qc
+
+{
+        tinit 0
+        tmax 6.28318530717959
+tmax 9.4247779607693847
+tmax 3.1415926
+tmax 1.57
+
+        dt_min 1.e-11
+         /* dt_max 0.032 
+        dt_impr 1.e-7 
+        dt_start dt_fixe 0.00000000002 */
+        
+        seuil_statio 1.e-12
+        facsec 0.1 
+        diffusion_implicite 0
+        nb_pas_dt_max 400000
+}
+
+
+# fluide  #
+Fluide_Quasi_Compressible fuilde_canal
+Lire fuilde_canal
+{
+        mu Champ_uniforme 1 1.461e-6
+        pression 100000.
+        lambda Champ_uniforme  1  2.06803521126761000000e-3
+        loi_etat gaz_parfait 	{
+                		Prandtl 0.71
+                		Cp 1005
+                		gamma 1.4
+        			}
+
+	  traitement_pth constant       
+
+}
+
+Option_VDF
+{
+   traitement_coins oui
+}
+
+# Association #
+Associer pb_canal dom_canal
+Associer pb_canal fuilde_canal
+Associer pb_canal sch_qc
+Discretiser pb_canal dis
+
+# definition problème 2 #
+Lire pb_canal
+{ 
+	# Navier Stokes #
+        Navier_Stokes_turbulent_QC
+        {
+        	# Résolution de la pression #
+		solveur_pression  GCP { precond ssor { omega 1.5 } seuil 1.e-14   }
+                projection_initiale 0								
+
+               # Modèle de turbulence #
+		modele_turbulence sous_maille_WALE { turbulence_paroi negligeable Cw 0. }
+
+		# schéma de calcul #
+		convection { amont }
+	convection { quick }
+	    diffusion { negligeable }
+    	Sources { }		
+
+		#  #
+
+		conditions_initiales 
+		{   vitesse champ_fonc_xyz dom_canal 	2  0.1*sin(x-y)+1 0.1*sin(x-y) }
+                                                                                                                                             
+
+                conditions_limites 
+
+				{
+                        entree  frontiere_ouverte_vitesse_imposee Champ_front_fonc_txyz 2  0.1*sin(x-y-t)+1 0.1*sin(x-y-t) 	
+			sortie	frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.		                       
+			perioy periodique
+                }
+	}
+
+	# Thermique #				
+        Convection_Diffusion_Chaleur_turbulent_QC
+        {
+        	# Modèles thermique tubulent #
+			Modele_Turbulence Prandtl { turbulence_paroi negligeable_scalaire }
+			# mode_calcul_convection DIVRHOUT_MOINS_TDIVRHOU  #
+
+			# Schémas de calcul #
+			diffusion { negligeable }
+		
+			convection { centre4 }
+			convection { amont }
+			convection { quick }
+			Sources { }	
+
+			conditions_initiales { Temperature Champ_Fonc_xyz dom_canal 1  100000/(287.1428571428*(1+0.1*sin(x-y))) } 
+
+			conditions_limites 
+
+            {
+
+                 	entree entree_temperature_imposee_H Champ_front_Fonc_txyz 1 100000/(287.1428571428*(1+0.1*sin(x-y-t)))  
+					sortie Frontiere_ouverte T_ext Champ_Front_Uniforme 1 293.
+					perioy periodique
+			}
+
+        }
+
+	Postraitement
+        	{
+	definition_champs 
+{
+erreur_masse	champ_post_transformation  {
+ methode formule expression 1 abs(masse_volumique_natif_dom_canal-(1+0.1*sin(x-y-t)))
+sources {  champ_post_refchamp { pb_champ pb_canal masse_volumique }  }
+}
+max_erreur_masse champ_post_reduction_0D {
+ methode max
+ source_reference erreur_masse 
+}
+
+	}
+
+        	 		format lata
+                	Champs dt_post 1
+                	{
+                         masse_volumique elem
+			vitesse elem
+			
+                        }
+        	
+        	Sondes          # Taille d'une face : 0.0805536578        taille d'une demi face :   0.0402768289  #
+        		{ 
+			   				
+		max_erreur_masse max_erreur_masse periode 1e-7 numero_elem_sur_maitre 0	
+				seg_rho_m grav masse_volumique periode 0.0001 points 1 3.18186948 3.18186948
+        				
+			   			       				
+			
+				seg_rho_s grav masse_volumique periode 0.0001 points 1 6.24290848 3.18186948
+        				
+			}
+        	
+        	        	
+        	
+        	
+        	
+        	
+           	
+		}
+
+
+}
+
+
+
+
+Resoudre pb_canal
+fin

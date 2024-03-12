@@ -1,0 +1,31 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the test_diffusivite_turbulente data file in the test_diffusivite_turbulente directory ...
+-> Running the post_run script in the test_diffusivite_turbulente directory ...
+Running: cli3.3.2 -nowin -s instructions_simu_d_rho.py
+Running: cli3.3.2 -nowin -s instructions_ana_d_rho.py
+Running: cli3.3.2 -nowin -s instructions_error_d_rho.py
+==============================
+-> Building PDF report file...
+==============================
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 263, in genererGraphe
+    field, loc, dom = FileAccumulator.ParseDirectName(plot[2])
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 123, in ParseDirectName
+    raise ValueError("Invalid field name: %s" % name)
+ValueError: Invalid field name: simu_d_rho

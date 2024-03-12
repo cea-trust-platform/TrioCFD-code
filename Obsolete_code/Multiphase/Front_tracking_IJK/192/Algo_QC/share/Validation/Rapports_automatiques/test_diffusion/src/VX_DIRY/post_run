@@ -1,0 +1,25 @@
+#!/bin/sh
+
+sed 's/__EXPRESSION_TO_PLOT__/simu_dv_x/g' instructions2.py > instructions_simu_dv_x.py
+sed 's/__EXPRESSION_TO_PLOT__/ana_dv_x/g' instructions2.py  > instructions_ana_dv_x.py
+sed 's/__EXPRESSION_TO_PLOT__/error_dv_x/g' instructions2.py  > instructions_error_dv_x.py
+
+rm -f simu_dv_x????.curve && visit -nowin -cli -s instructions_simu_dv_x.py 
+rm -f ana_dv_x????.curve && visit -nowin -cli -s instructions_ana_dv_x.py 
+rm -f error_dv_x????.curve && visit -nowin -cli -s instructions_error_dv_x.py 
+
+sed 's/__EXPRESSION_TO_PLOT__/simu_dv_y/g' instructions2.py > instructions_simu_dv_y.py
+sed 's/__EXPRESSION_TO_PLOT__/ana_dv_y/g' instructions2.py  > instructions_ana_dv_y.py
+sed 's/__EXPRESSION_TO_PLOT__/error_dv_y/g' instructions2.py  > instructions_error_dv_y.py
+
+rm -f simu_dv_y????.curve && visit -nowin -cli -s instructions_simu_dv_y.py 
+rm -f ana_dv_y????.curve && visit -nowin -cli -s instructions_ana_dv_y.py 
+rm -f error_dv_y????.curve && visit -nowin -cli -s instructions_error_dv_y.py 
+
+sed 's/__EXPRESSION_TO_PLOT__/simu_dv_z/g' instructions2.py > instructions_simu_dv_z.py
+sed 's/__EXPRESSION_TO_PLOT__/ana_dv_z/g' instructions2.py  > instructions_ana_dv_z.py
+sed 's/__EXPRESSION_TO_PLOT__/error_dv_z/g' instructions2.py  > instructions_error_dv_z.py
+
+rm -f simu_dv_z????.curve && visit -nowin -cli -s instructions_simu_dv_z.py 
+rm -f ana_dv_z????.curve && visit -nowin -cli -s instructions_ana_dv_z.py 
+rm -f error_dv_z????.curve && visit -nowin -cli -s instructions_error_dv_z.py 

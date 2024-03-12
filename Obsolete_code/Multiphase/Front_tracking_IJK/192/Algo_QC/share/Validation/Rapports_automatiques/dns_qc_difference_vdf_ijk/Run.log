@@ -1,0 +1,991 @@
+Bad format detected for src/dns_qc_difference_vdf_ijk.prm:
+src/dns_qc_difference_vdf_ijk.prm: ISO-8859 text
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+doing prerun
+Creation d une condition initiale
+./pre_run: line 14: lata2dx: command not found
+cp: cannot stat 'reprise_ijk.lata': No such file or directory
+sed: can't read reprise_ijk.lata.orig: No such file or directory
+tail: cannot open 'evol_glob' for reading: No such file or directory
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+awk: cannot open jdd_ijk.out (No such file or directory)
+awk: cannot open jdd_ijk.out (No such file or directory)
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 268, in genererGraphe
+    FileAccumulator.AppendVisuComplex(plot[1], plot[2], plot[3], plot[4], self.cycles)  # file / domaine / field / localisation
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 194, in AppendVisuComplex
+    cls.AppendVisuMesh(file, dom)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 159, in AppendVisuMesh
+    with open(file) as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'jdd_ijk.sauv.lata'
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 268, in genererGraphe
+    FileAccumulator.AppendVisuComplex(plot[1], plot[2], plot[3], plot[4], self.cycles)  # file / domaine / field / localisation
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 194, in AppendVisuComplex
+    cls.AppendVisuMesh(file, dom)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 159, in AppendVisuMesh
+    with open(file) as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'jdd_ijk.sauv.lata'
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 268, in genererGraphe
+    FileAccumulator.AppendVisuComplex(plot[1], plot[2], plot[3], plot[4], self.cycles)  # file / domaine / field / localisation
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 194, in AppendVisuComplex
+    cls.AppendVisuMesh(file, dom)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 159, in AppendVisuMesh
+    with open(file) as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'jdd_vdf.lata'
+Bad format detected for src/dns_qc_difference_vdf_ijk.prm:
+src/dns_qc_difference_vdf_ijk.prm: ISO-8859 text
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 268, in genererGraphe
+    FileAccumulator.AppendVisuComplex(plot[1], plot[2], plot[3], plot[4], self.cycles)  # file / domaine / field / localisation
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 194, in AppendVisuComplex
+    cls.AppendVisuMesh(file, dom)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 159, in AppendVisuMesh
+    with open(file) as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'jdd_vdf.lata'
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 268, in genererGraphe
+    FileAccumulator.AppendVisuComplex(plot[1], plot[2], plot[3], plot[4], self.cycles)  # file / domaine / field / localisation
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 194, in AppendVisuComplex
+    cls.AppendVisuMesh(file, dom)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 159, in AppendVisuMesh
+    with open(file) as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'jdd_vdf.lata'
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Traceback (most recent call last):
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 676, in <module>
+    app.genererRapport(debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 480, in genererRapport
+    indice = chapitre.genererGraphes(destTMP, indice,debug_figure, self.novisit)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/GenericSection.py", line 65, in genererGraphes
+    figure.genererGraphe(dest, indice,debug_figure)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Visu.py", line 268, in genererGraphe
+    FileAccumulator.AppendVisuComplex(plot[1], plot[2], plot[3], plot[4], self.cycles)  # file / domaine / field / localisation
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 194, in AppendVisuComplex
+    cls.AppendVisuMesh(file, dom)
+  File "/home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/filelist.py", line 159, in AppendVisuMesh
+    with open(file) as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'jdd_vdf.lata'
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_007.py -nowin -noconfig
+slice2d_y
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+ERROR : Error, graphic file ./.tmp/fic_005_0.png is not generated 
+ERROR  :  Localisation = fonction verifie_existance_fichier (fichier /home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Write_tex.py, ligne 92) : 
+	objet.gestMsg.ecrire(GestionMessages._ERR, 'Error, graphic file %s is not generated ' % (nom_fichier))
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_007.py -nowin -noconfig
+slice2d_y
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+ERROR : Error, graphic file ./.tmp/fic_005_0.png is not generated 
+ERROR  :  Localisation = fonction verifie_existance_fichier (fichier /home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Write_tex.py, ligne 92) : 
+	objet.gestMsg.ecrire(GestionMessages._ERR, 'Error, graphic file %s is not generated ' % (nom_fichier))
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_007.py -nowin -noconfig
+slice2d_y
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+ERROR : Error, graphic file ./.tmp/fic_005_0.png is not generated 
+ERROR  :  Localisation = fonction verifie_existance_fichier (fichier /home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Write_tex.py, ligne 92) : 
+	objet.gestMsg.ecrire(GestionMessages._ERR, 'Error, graphic file %s is not generated ' % (nom_fichier))
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_007.py -nowin -noconfig
+slice2d_y
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+ERROR : Error, graphic file ./.tmp/fic_005_0.png is not generated 
+ERROR  :  Localisation = fonction verifie_existance_fichier (fichier /home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Write_tex.py, ligne 92) : 
+	objet.gestMsg.ecrire(GestionMessages._ERR, 'Error, graphic file %s is not generated ' % (nom_fichier))
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_007.py -nowin -noconfig
+slice2d_y
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+ERROR : Error, graphic file ./.tmp/fic_005_0.png is not generated 
+ERROR  :  Localisation = fonction verifie_existance_fichier (fichier /home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Write_tex.py, ligne 92) : 
+	objet.gestMsg.ecrire(GestionMessages._ERR, 'Error, graphic file %s is not generated ' % (nom_fichier))
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the jdd_vdf data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_vdf produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_vdf.err file.
+grep: jdd_vdf.TU: No such file or directory
+grep: jdd_vdf.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+
+-> Running the calculation of the jdd_ijk data file in the . directory ...
+-> Running the pre_run script in the . directory ...
+pre_run already done
+-> Calculation jdd_ijk produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build/jdd_ijk.err file.
+grep: jdd_ijk.TU: No such file or directory
+grep: jdd_ijk.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic000.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($2) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($2) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic000.plot" line 9: x range is invalid
+
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic001.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($3) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($3) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic001.plot" line 9: x range is invalid
+
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic002.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($4) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($4) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic002.plot" line 9: x range is invalid
+
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+"./.tmp/fic003.plot" line 9: warning: Skipping data file with no valid points
+
+plot "pas_de_temps_vdf.txt" using ($1):($5) title "timestep vdf" with points, "pas_de_temps_ijk.txt" using ($1):($5) title "timestep ijk" with points
+                                                                                                                                                     ^
+"./.tmp/fic003.plot" line 9: x range is invalid
+
+"./.tmp/fic004.plot" line 9: warning: Cannot find or open file "evol_glob"
+"./.tmp/fic004.plot" line 9: warning: Skipping data file with no valid points
+
+plot "evol_glob" using ($1):($4) title "vdf" with points, "pthermo_ijk.txt" using ($1):($2) title "ijk" with points
+                                                                                                                   ^
+"./.tmp/fic004.plot" line 9: x range is invalid
+
+Running: cli3.3.2 -s ./.tmp/visit_005.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_006.py -nowin -noconfig
+WARNING: Expected keyword FIN at end of file jdd_ijk.sauv.lata -- found 'Champ'
+slice2d_y
+Running: cli3.3.2 -s ./.tmp/visit_007.py -nowin -noconfig
+slice2d_y
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+DEBOG : Search file ./.tmp/fic_005_0.png from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/dns_qc_difference_vdf_ijk/build
+ERROR : Error, graphic file ./.tmp/fic_005_0.png is not generated 
+ERROR  :  Localisation = fonction verifie_existance_fichier (fichier /home/yanis/triou/TRUST/Validation/Outils/Genere_courbe/src/Write_tex.py, ligne 92) : 
+	objet.gestMsg.ecrire(GestionMessages._ERR, 'Error, graphic file %s is not generated ' % (nom_fichier))

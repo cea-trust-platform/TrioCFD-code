@@ -1,0 +1,86 @@
+ # 
+Test diffusion turbulente (schema en temps)
+ #
+
+IJK_Grid_Geometry grid_geom2
+Lire grid_geom2
+{
+  nbelem_i 101
+  nbelem_j 101
+  uniform_domain_size_i 1.
+  uniform_domain_size_j 1.
+  file_coord_k          coord_k_0.txt
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting2
+Lire grid_splitting2
+{
+  ijk_grid_geometry grid_geom2
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+dns_qc_double 
+{
+  ijk_splitting grid_splitting2
+  timestep 1
+  nb_pas_dt_max 15
+  multigrid_solver
+  {
+    coarsen_operators 3
+    Coarsen_Operator_K { file_z_coord coord_k_1.txt }
+    Coarsen_Operator_Uniform {  }
+    Coarsen_Operator_Uniform {  }
+    
+    ghost_size 3
+    pre_smooth_steps 5 5 5 5 8 8 
+    smooth_steps     5 5 5 5 8 8  
+    
+    relax_jacobi 5 0.69 0.69 0.69 0.65 0.65
+    solveur_grossier GCP { seuil  0.5e-9 precond ssor { omega 1.5 } }
+    check_residu 0
+    seuil 2.5e-9
+    nb_full_mg_steps 2 3 1
+    solver_precision mixed
+    /* impr */
+  }
+  timestep_facsec 1.
+  
+  tinit 0.
+  
+  convection_qdm_negligeable
+  convection_rho_negligeable
+  disable_solveur_poisson
+  expression_t_init   293.
+  expression_vx_init  2.*0.001*cos(X*6.28318530717958647*8.)*cos(z*6.28318530717958647*8.)
+  expression_vy_init  0.
+  expression_vz_init  2.*0.001*sin(X*6.28318530717958647*8.)*sin(z*6.28318530717958647*8.)
+
+  dt_post             15
+  dt_sauvegarde       15
+
+  nom_sauvegarde      dns_32.sauv
+  check_stop_file     stop_file
+
+  type_velocity_diffusion none
+
+  turbulent_viscosity
+  type_velocity_turbulent_diffusion simple
+  turbulent_viscosity_model constant
+  turbulent_viscosity_model_constant 1e-5
+
+  large_eddy_simulation_formulation favre
+
+  sauvegarde_post_instantanes
+  champs_a_postraiter 1 TOUS
+
+  t_paroi_impose_kmin 293.0
+  t_paroi_impose_kmax 293.0
+  p_thermo_init       1.5e5
+  cp                  1005.0
+  gamma               1.4 
+  debit_massique      0.
+}

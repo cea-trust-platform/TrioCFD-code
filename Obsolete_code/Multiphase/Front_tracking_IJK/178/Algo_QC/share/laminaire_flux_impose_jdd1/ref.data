@@ -1,0 +1,159 @@
+dimension 2
+Pb_Thermohydraulique_Turbulent_QC pb
+
+Domaine dom
+
+# DEBUT MAILLAGE #
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 
+		Nombre_de_Noeuds 10 20 
+		Longueurs  0.09 0.03
+		}
+		{
+		Bord periox   X = 0.          0. <= Y <= 0.03 
+		Bord periox   X = 0.09	    0. <= Y <= 0.03  
+		Bord bas      Y = 0.          0. <= X <= 0.09 
+		Bord haut     Y = 0.03    0. <= X <= 0.09 
+		}
+	}
+# FIN MAILLAGE #
+
+# DEBUT DECOUPAGE 
+Decouper dom
+{
+	partitionneur Tranche  { tranches 1 2 1 }
+	Larg_joint 2
+	Nom_Zones canalQCdt20K
+	Periodique 2 periox perioz
+}
+Fin
+ FIN DECOUPAGE #
+
+# DEBUT LECTURE 
+Scatter canalQCdt20K.Zones dom
+ FIN LECTURE #
+
+VDF dis
+
+Runge_Kutta_ordre_3 sch
+Lire sch
+{
+        tinit 0.
+	nb_pas_dt_max  20
+        tmax 50.
+        dt_min 1.e-11
+        dt_max 10.
+        dt_impr 1.e-7
+        dt_sauv 1
+        seuil_statio 1.e-8
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu Champ_Fonc_Fonction 1 temperature 2.e-5
+        lambda Champ_Fonc_Fonction 1 temperature 3.e-2
+        pression 100000.
+        loi_etat gaz_parfait 	{
+                		Prandtl 0.76
+                		Cp 1005
+                		gamma 1.4
+        			}
+	traitement_pth conservation_masse
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+        Navier_Stokes_Turbulent_QC
+        {
+                solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-7 impr }
+                convection { centre }
+                diffusion { }
+                Sources 
+		{ 
+		}
+		conditions_initiales 
+		{
+                        vitesse champ_uniforme 2 0. 0.
+                }
+                conditions_limites 
+		{
+                        periox   periodique
+			haut     paroi_fixe
+			bas      paroi_fixe
+                }
+		Modele_turbulence sous_maille_wale
+		{
+			turbulence_paroi negligeable
+			cw 0.5
+		} 
+		Traitement_particulier
+                    		{
+                                Canal
+                            			{
+                                                dt_impr_moy_spat .4
+                                                dt_impr_moy_temp 10.
+						debut_stat 10.
+						fin_stat 50.
+						}
+                                } 
+  
+	}
+				
+        Convection_Diffusion_Chaleur_Turbulent_QC
+        {
+                diffusion { }
+		mode_calcul_convection DIVRHOUT_MOINS_TDIVRHOU
+                convection { quick }
+		Sources { }	
+		conditions_initiales { Temperature Champ_Uniforme 1 348.2621717629 }
+		conditions_limites 
+                {
+                 	periox periodique
+ 		        haut paroi_flux_impose Champ_Front_Uniforme 1  200.
+			bas paroi_flux_impose Champ_Front_Uniforme 1  -200.
+		}
+    Modele_turbulence Prandtl
+		{ 
+ 		turbulence_paroi negligeable_scalaire 
+		}
+        }
+
+        Postraitement
+         { 
+
+	
+			
+			format lml
+			Champs dt_post 2.
+			{
+      				vitesse elem
+      				masse_volumique elem
+				pression elem
+				temperature elem
+				temperature_qc elem
+      				viscosite_turbulente elem
+         		}
+        	 Statistiques dt_post 2.
+		 {
+			t_deb 10. t_fin 20.
+			moyenne vitesse
+			moyenne temperature
+			}															        
+        }
+	sauvegarde formatte laminaire_flux_impose.sauv
+}
+
+EcritureLectureSpecial 0
+Resoudre pb
+
+Fin

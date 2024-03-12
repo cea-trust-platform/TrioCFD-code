@@ -1,0 +1,9 @@
+{
+ tinit 0.00000000000000000e+00
+ terme_acceleration_init 0.00000000000000000e+00
+ p_thermo_init 1.50000000000000000e+05
+ fichier_reprise_vitesse test_convection_masse_lata_0.sauv.lata
+ fichier_reprise_rho test_convection_masse_lata_0.sauv.lata
+ timestep_reprise_vitesse 1
+ timestep_reprise_rho 1
+}

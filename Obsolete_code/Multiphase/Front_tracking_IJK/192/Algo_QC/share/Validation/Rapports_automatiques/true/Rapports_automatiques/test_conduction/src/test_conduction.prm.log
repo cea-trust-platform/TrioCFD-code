@@ -1,0 +1,5 @@
+DEBOG : Search file ./.tmp/fic_000_0.png from /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/share/Validation/Rapports_automatiques/test_conduction/src
+DEBOG : Search file ./.tmp/fic_000_0.png from /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/share/Validation/Rapports_automatiques/test_conduction/src
+ERROR : Error, graphic file ./.tmp/fic_000_0.png is not generated 
+ERROR  :  Localisation = fonction verifie_existance_fichier (fichier /opt/shared/triou/178/TRUST-1.7.8/Validation/Outils/Genere_courbe/src/Write_tex.py, ligne 91) : 
+	objet.gestMsg.ecrire(GestionMessages._ERR, 'Error, graphic file %s is not generated ' % (nom_fichier))

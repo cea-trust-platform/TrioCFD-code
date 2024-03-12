@@ -1,0 +1,43 @@
+Ce cas test correspond \`a la diffusion d'une gaussienne pour la temp\'erature avec une vitesse non nulle correspondant \`a un produit de sinus. Il a pour but le test du mod\`ele de Smagorinsky pour le terme sous maille $\partial_j\left(\overline{\rho} \overline{U_j/\rho} - \overline{U}_j/\overline{\rho}\right)$ de l'\'equation de conservation de l'\'energie.
+
+\subsection{Solution analytique}
+
+La condition initiale sur la temp\'erature est
+\begin{equation}
+T\left(x,y,z\right) = 293 \left[1 + e^{-\left(\frac{x-x_0}{s_0}\right)^2-\left(\frac{y-y_0}{s_0}\right)^2-\left(\frac{z-z_0}{s_0}\right)^2}\right].
+\end{equation}
+La condition initiale sur la vitesse est :
+\begin{align*}
+V_x ={}& 2 V_0 \sin(\tau x) \sin(2 \tau z) \\
+V_y ={}& 0 \\
+V_z ={}& 0
+\end{align*}
+
+Soit
+\begin{equation}
+\pi_{j} = \overline{U_j/\rho} - \overline{U}_j/\overline{\rho}
+\end{equation}
+Le mod\`ele de Smagorinsky correspond au mod\`ele
+\begin{equation}
+\pi_{j} = - \left(C_s \Delta\right)^2 \left|S\right| \frac{\partial 1/\rho}{\partial x_j}
+\end{equation}
+avec
+\begin{equation}
+S_{ij} = \frac{1}{2}\left(\frac{\partial U_i}{\partial x_j} + \frac{U_j}{\partial x_i}\right)
+\end{equation}
+et
+\begin{equation}
+\left|S\right| = \sqrt{2 S_{ij} S_{ij}}
+\end{equation}
+
+On note
+\begin{equation}
+D_i = \frac{\partial \rho \pi_{j}}{\partial x_j}.
+\end{equation}
+Dans la formulation 'Favre', le mod\`ele est impl\'ement\'e comme
+\begin{equation}
+\frac{\partial U_{j}}{\partial x_j} = NS^* + D_i
+\end{equation}
+
+Notons par ailleurs, $V_0 = 0.001$ et $\tau=2\pi$. On choisit $C_s=0.16$ et $\Delta$ la racine cubique du volume de la maille.
+

@@ -1,0 +1,65 @@
+parametres {
+	titre "Test 3 d'un nouvel algorithme pour le QC : canal périodique turbulent à flux imposé"
+	auteur "Adrien"
+	description "Etude des différents transferts de chaleur."
+	casTest . turbulent_flux_impose.data  en annexe
+}
+Chapitre {
+
+	Figure
+	{
+	labelx y
+	labely W/m2
+	
+
+	Titre "Bilan thermique"
+	Description "On compare les différents transferts thermiques et on vérifie que la somme de tous ces flux (flux total) est constante suivant y (direction perpendiculaire aux parois)."
+	legende bottom
+	inclureDesccourbes 0
+	courbe {
+	fichier Moyennes_spatiales_Temp
+	colonnes $1 $10*1005
+	legende flux convectif
+	style lines
+	}
+	courbe {
+	fichier Moyennes_spatiales_Temp
+	colonnes $1 $22
+	legende flux conductif
+	style lines
+	}
+	courbe {
+	fichier Moyennes_spatiales_Temp
+	colonnes $1 $23
+	legende flux sous-maille
+	style lines
+	}
+	courbe {
+	fichier Moyennes_spatiales_Temp
+	colonnes $1 $10*1005+$22+$23
+	legende flux total
+	style lines
+	}
+	}	
+	
+}
+Chapitre {
+
+	Figure
+	{
+	labelx Temps (s)
+	labely int_S(rho*u*n)dS
+	
+
+	Titre "Conservation de la masse"
+	Description "On vérifie que la conservation globale de la masse est assurée."
+	legende bottom
+	inclureDesccourbes 0
+	courbe {
+	fichier turbulent_flux_impose_pb_Debit.out
+	colonnes $1 $6
+	legende flux total de matière
+	style lines
+	}
+	}
+}

@@ -1,0 +1,132 @@
+ 
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * *     
+ *  _________  _______             _______  _________  *     
+ *  \__   __/ (  ____ ) |\     /| (  ____ \ \__   __/  * 
+ *     ) (    | (    )| | )   ( | | (    \/    ) (     *    
+ *     | |    | (____)| | |   | | | (_____     | |     *     
+ *     | |    |     __) | |   | | (_____  )    | |     *     
+ *     | |    | (\ (    | |   | |       ) |    | |     *    
+ *     | |    | ) \ \__ | (___) | /\____) |    | |     *  
+ *     )_(    |/   \__/ (_______) \_______)    )_(     *   
+ *                                                     *     
+ *                  version : 1.9.2               *     
+ *                       CEA - DES                     *     
+ *                                                     *     
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Champ_Face_VDF_bis.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Champ_Generique_Morceau_Equation.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Champ_P1NC_bis.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Champ_Post_Operateur_Eqn.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Convection_Diffusion_Espece_Multi_QC.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Domaine_VEF_PreP1b.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Domaine_VEF_PreP1b.h modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Iterateur_VDF_Elem_FT_TCL.tpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Operateur_Diff.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Operateur_Diff_base.h modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Schema_Comm_Vecteurs.h modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Terme_Source_Qdm_VEF_Face.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/VEFPreP1B.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/VEFPreP1B.h modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Y_plus_Champ_Face.cpp modified the standard version 
+ /home/yanis/Baltiks/Algo_QC_corrected_convection/build/src/Y_plus_Champ_P1NC.cpp modified the standard version 
+
+ 16 file(s) modified 
+
+
+ 1165 file(s) created 
+
+ 
+  Vous traitez le cas test_convection_masse
+ 
+Reading data file 
+
+DNS_QC_double::initialise()
+precision de sortie du out et du err modifier
+ Cp_gaz = 1.00500000000000000000e+03
+ constante_specifique_gaz = 2.87142857142857110375e+02
+ T_paroi_impose_kmin_ = 2.93000000000000000000e+02
+ T_paroi_impose_kmax_ = 5.86000000000000000000e+02
+ lambda_de_t_paroi_kmin = 2.39370741504436913838e-02
+ lambda_de_t_paroi_kmax = 3.93563768340509448351e-02
+ Volume total domaine = 5.24793421949631662751e-04
+Initialisation temperature, expression = 293.+293/0.029846*z
+Initialisation vitesse 
+vx = 3.339*z*(0.029846-z)*4/(0.029846*0.029846)
+vy = 0.
+vz = (sin((x-0.187528)/0.187528*6.28318530717959)*sin(y/0.093764*6.28318530717959)+sin((x-0.187528)/0.187528*6.28318530717959*6)*sin(y/0.093764*6.28318530717959*4)+sin((x-0.187528)/0.187528*6.28318530717959*2)*sin(y/0.093764*6.28318530717959*8))*z*(0.029846-z)*4/(0.029846*0.029846)
+Initialisation des statistiques. T_debut_statistiques=0.00000000000000000000e+00
+T= 0.00000000000000000000e+00 dtconv= 1.91401649174459338775e-04 dtdiff_t= 7.66542168418603547114e-04 dtdiff_v= 7.66542168418603547114e-04 theorique_dt= 1.53158705659513786268e-04 dt_limited 1.53158705659513786268e-04 timestep= 1.53158705659513786268e-04
+T= 0.00000000000000000000e+00 debit cible= 1.11093849999999993994e-02 debit actuel= 7.57816147200644860821e-03 acceleration= 4.94324927706648031744e+03 da/dt= 4.94324927706648031744e+03
+calcul_p_thermo iter 2 flux k=0: -4.18783814435693813039e+00 flux k=kmax: -6.60872459732024708501e+00 P_th: 1.50000094203374814242e+05 dP_th/dt= 1.84521097384917993622e+03
+
+Final residue: 4.60341717848816981363e-10 ( 9.54240486728792481990e-11 )
+ Convergence in 54 iterations for ??
+
+Final residue: 2.93442402393802750682e-10 ( 2.76772179326050562114e-09 )
+ Convergence in 49 iterations for ??
+
+Final residue: 3.96923772395214324851e-10 ( 5.42451396385575867928e-08 )
+ Convergence in 44 iterations for ??
+
+Final residue: 3.95150831261935369996e-10 ( 1.09655558556219963520e-06 )
+ Convergence in 40 iterations for ??
+
+Final residue: 2.37121484258214362221e-10 ( 1.00861700081137706432e-05 )
+ Convergence in 39 iterations for ??
+
+Final residue: 4.78292369354409334321e-10 ( 4.05573376065462029658e-04 )
+ Convergence in 27 iterations for ??
+
+Final residue: 2.77955860306196623612e-10 ( 3.76452093127144140489e-03 )
+ Convergence in 12 iterations for ??
+
+Final residue: 3.70153395910366998090e-10 ( 8.94587500114470551837e-02 )
+ Convergence in 2 iterations for ??
+reference_pression= 8.12807123238516027186e+00
+calcul_p_thermo iter 2 flux k=0: -4.06085589586716189103e+00 flux k=kmax: -7.01780879986120620373e+00 P_th: 1.50000238032375113107e+05 dP_th/dt= 2.25380332932438659554e+03
+
+Final residue: 4.35504450620585965361e-10 ( 6.30005887835802935316e-09 )
+ Convergence in 49 iterations for ??
+
+Final residue: 3.27519166973246769745e-10 ( 2.05351039682585688870e-07 )
+ Convergence in 43 iterations for ??
+
+Final residue: 4.80192485760820336799e-10 ( 4.52064964732121243093e-06 )
+ Convergence in 35 iterations for ??
+
+Final residue: 4.42887345512513682893e-10 ( 8.58332437944104979267e-05 )
+ Convergence in 29 iterations for ??
+
+Final residue: 4.83266429830349647012e-10 ( 1.41834525003892326922e-03 )
+ Convergence in 14 iterations for ??
+
+Final residue: 4.94030675468637218887e-10 ( 3.17296151133781359488e-02 )
+ Convergence in 3 iterations for ??
+reference_pression= -2.65141399777214847866e-01
+calcul_p_thermo iter 2 flux k=0: -4.16299022016180941819e+00 flux k=kmax: -6.63511489150794453451e+00 P_th: 1.50000310180271626450e+05 dP_th/dt= 1.88426498347641449982e+03
+
+Final residue: 2.01586107598966037803e-10 ( 1.65326528012006721424e-09 )
+ Convergence in 50 iterations for ??
+
+Final residue: 4.14516329735541848703e-10 ( 9.02006689926557530649e-08 )
+ Convergence in 43 iterations for ??
+
+Final residue: 4.32701380754246712761e-10 ( 1.49046740079033983766e-06 )
+ Convergence in 40 iterations for ??
+
+Final residue: 2.64162383561091997576e-10 ( 1.64218219670275681764e-05 )
+ Convergence in 34 iterations for ??
+
+Final residue: 4.18647031190838575949e-10 ( 4.40716622641589830453e-04 )
+ Convergence in 32 iterations for ??
+
+Final residue: 2.83751397721790229708e-10 ( 5.52482269327520762042e-03 )
+ Convergence in 6 iterations for ??
+reference_pression= -7.47538767245955249052e-01
+Ecriture des donnees statistiques pour reprise: t_integration=1.53158705659513786268e-04
+Ecriture des donnees statistiques pour reprise: t_integration=1.53158705659513786268e-04
+38 MBytes of RAM taken by the calculation (max on a rank: 38 MB).
+
+--------------------------------------------
+clock: Total execution: 2.69765599999999983183e+00 s

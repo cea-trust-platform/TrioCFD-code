@@ -1,0 +1,138 @@
+# ThermoHydraulique 3D : canal quasi compressible gaz parfait VDF turbulent #
+# PARALLEL OK #
+dimension 3
+Pb_Thermohydraulique_QC pb
+
+Domaine dom
+
+MaillerParallel
+{
+	domain dom
+	nb_nodes 3  33 9 17
+	splitting 3 1 1 1
+	ghost_thickness 2
+	perio_x
+	perio_y
+	function_coord_x 0.187528*x 
+	function_coord_y 0.046882*y
+	function_coord_z 0.029846*z
+	boundary_xmin periox
+	boundary_xmax periox
+	boundary_ymin perioy
+	boundary_ymax perioy
+	boundary_zmin bas
+	boundary_zmax haut
+}
+
+VDF dis
+
+Runge_Kutta_ordre_3_QC sch
+Lire sch
+{
+	tinit 0.
+        tmax  20
+        dt_min 1.e-11
+        dt_max 1.
+        dt_impr 1.e-7
+        dt_sauv 100
+	seuil_statio 1.e-8
+	nb_pas_dt_max 50
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu Champ_Fonc_Fonction 1 temperature_qc (1.461e-6*(val^1.5)/(val+111.))
+        lambda Champ_Fonc_Fonction 1 temperature_qc (1.93198026315789000e-3*val^1.5)/(val+111.)
+        pression 214072
+        loi_etat gaz_parfait { Prandtl 0.71 Cp 1005 gamma 1.4 }
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+IJK_discretization vdf_to_ijk
+
+Lire vdf_to_ijk
+{
+        vdf_problem pb
+        splitting 3 1 1 1
+        perio_i
+        perio_j
+}
+
+Lire pb
+{
+	Navier_Stokes_QC
+	{
+		solveur_pression multigrille_adrien 
+		{
+				coarsen_operators 2
+	Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+	Coarsen_Operator_Uniform {  }
+				
+				
+			ghost_size 1
+                        pre_smooth_steps 1 5
+                        smooth_steps 1 5
+                        relax_jacobi 1 0.65
+                        solveur_grossier GCP { seuil  0.5e-18 precond ssor { omega 1.5 } }
+                        check_residu 0
+                        seuil 2.5e-18
+                        nb_full_mg_steps 2 4 1 
+
+			solver_precision mixed
+	
+       	}
+		convection { centre4 }
+		diffusion { }
+		conditions_initiales 
+		{
+                        vitesse champ_fonc_xyz dom 3 
+SIN(z*3.14159265358979/0.029846)*0.01+SIN(2*z*3.14159265358979/0.029846)*0.005
+SIN(z*3.14159265358979/0.029846)*SIN(2*x*3.14159265358979/0.187528)*SIN(4*y*3.14159265358979/0.046882)*0.005
+SIN(z*3.14159265358979/0.029846)*SIN(4*x*3.14159265358979/0.187528)*SIN(2*y*3.14159265358979/0.046882)*0.005
+		}
+                conditions_limites 
+		{
+                        periox   periodique 
+			perioy   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+                }
+	}				
+        Convection_Diffusion_Chaleur_QC
+        {
+                diffusion { }
+                convection { quick }
+		Sources {	}	
+		conditions_initiales { Temperature Champ_fonc_xyz dom 1 273+(600-273)*(z/0.029846) } 
+		conditions_limites 
+                {
+                 	periox periodique 
+					perioy periodique 
+					haut paroi_echange_externe_impose T_ext	Champ_Front_Uniforme 1 600 H_imp Champ_Front_Uniforme 1  1.e14
+					bas  paroi_echange_externe_impose T_ext	Champ_Front_Uniforme 1 273 H_imp Champ_Front_Uniforme 1  1.e14
+ 		}
+        }
+
+         Postraitement
+         { 
+         		
+			format lata
+			Champs dt_post 0.0001
+			{
+      				vitesse faces
+				temperature_qc elem
+				masse_volumique elem
+         		}
+    	 }	
+	reprise binaire cond_initial.sauv
+}
+
+Resoudre pb
+Fin
+

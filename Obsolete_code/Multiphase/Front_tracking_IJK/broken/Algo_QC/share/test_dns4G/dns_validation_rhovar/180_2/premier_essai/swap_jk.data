@@ -1,0 +1,62 @@
+# Fichier de donnees TrioU pour lire les lata de jade, inverser les directions j et k 
+  et reecrire des fichiers lata #
+
+# Maillage destination #
+
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{             
+  nbelem_i 192
+  nbelem_j 288
+  uniform_domain_size_i 0.187528
+  uniform_domain_size_j 0.093764
+  file_coord_k          coord_k_level0.txt
+  perio_i                                 
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+# Maillage source #
+
+IJK_Grid_Geometry grid_geom2
+Lire grid_geom2
+{
+  nbelem_i 192
+  nbelem_k 288
+  uniform_domain_size_i 0.187528
+  uniform_domain_size_k 0.093764
+  file_coord_j          coord_k_level0.txt
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting2
+Lire grid_splitting2
+{
+  ijk_grid_geometry grid_geom2
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+# Conversion #
+
+IJK_Lata_Swap_JK
+{
+        ijk_splitting_source grid_splitting2
+        ijk_splitting_dest   grid_splitting
+        fichier_reprise_vitesse 180-2_ijk.lata
+        timestep_reprise_vitesse 1
+        fichier_sortie_vitesse 180-2_ijk_swapped.lata
+}
+
+

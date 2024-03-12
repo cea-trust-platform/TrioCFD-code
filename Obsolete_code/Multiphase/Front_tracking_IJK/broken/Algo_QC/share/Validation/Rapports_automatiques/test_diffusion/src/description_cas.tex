@@ -1,0 +1,130 @@
+Ce cas test correspond \`a la diffusion d'un produit de sinus sur une des composantes de la vitesse. Il a pour but le test du terme visqueux de l'\'equation de conservation de la quantit\'e de mouvement.
+
+\section{Solution analytique}
+
+Soit
+\begin{equation}
+\varSigma_{ij} = \mu \left(\frac{\partial U_i}{\partial x_j} + \frac{\partial U_j}{\partial x_i} -\frac{2}{3} \frac{\partial U_k}{\partial x_k} \delta_{ij}\right).
+\end{equation}
+On note
+\begin{equation}
+D_i = \frac{\partial \varSigma_{ij}}{\partial x_j}.
+\end{equation}
+
+Notons par ailleurs, $V_0 = 0.001$, $\tau=2\pi$, et $\mu=1.8101668014267859\cdot 10^{-5}$.
+
+On va donn\'e les solutions analytiques pour $D_i$ selon diff\'erents cas.
+Lors de la validation, on notera {\textsf simu\_dv\_i} le r\'esultat de la
+simulation pour $D_i$, et {\textsf ana\_dv\_i} la solution analytique.
+La diff\'erence entre les deux sera not\'e \textsf{error\_dv\_i}. Si tout se passe bien, les r\'esultats de la simulation sont proches de la solution analytique et l'erreur est tr\'es faible devant la valeur totale.
+
+
+
+\subsection{Cas VX\_DIRX}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 2 V_0 \sin(\tau x) \sin(2 \tau z) \\
+V_y ={}& 0 \\
+V_z ={}& 0
+\end{align*}
+
+La solution analytique sur la diffusion est :
+
+\begin{align*}
+D_x ={}& -(16/3) \mu \tau^2 V_x \\
+D_y ={}& 0 \\
+D_z ={}& (2/3) \mu \tau^2 * (2Vo \cos(\tau x) \cos(2 \tau z))
+\end{align*}
+
+\subsection{Cas VX\_DIRY}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 2 V_0 \sin(\tau y) \sin(2 \tau z) \\
+V_y ={}& 0 \\
+V_z ={}& 0
+\end{align*}
+
+La solution analytique sur la diffusion est :
+
+\begin{align*}
+D_x ={}& -5 \mu \tau^2 V_x \\
+D_y ={}& 0 \\
+D_z ={}& 0
+\end{align*}
+
+\subsection{Cas VY\_DIRX}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 0 \\
+V_y ={}& 2 V_0 \sin(\tau x) \sin(2 \tau z) \\
+V_z ={}& 0
+\end{align*}
+
+La solution analytique sur la diffusion est :
+
+\begin{align*}
+D_x ={}& 0 \\
+D_y ={}& -5 \mu \tau^2 V_y \\
+D_z ={}& 0
+\end{align*}
+
+\subsection{Cas VY\_DIRY}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 0 \\
+V_y ={}& 2 V_0 \sin(\tau y) \sin(2 \tau z) \\
+V_z ={}& 0
+\end{align*}
+
+La solution analytique sur la diffusion est :
+
+\begin{align*}
+D_x ={}& 0 \\
+D_y ={}& -(16/3) \mu \tau^2 V_y \\
+D_z ={}& (2/3) \mu \tau^2 (2V_0 \cos(\tau y) \cos(2 \tau z)) ;
+\end{align*}
+
+\subsection{Cas VZ\_DIRX}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 0 \\
+V_y ={}& 0 \\
+V_z ={}& 2 V_0 \sin(\tau x) \sin(2 \tau z)
+\end{align*}
+
+La solution analytique sur la diffusion est :
+
+\begin{align*}
+D_x ={}& (2/3) \mu \tau^2 (2Vo \cos(\tau x) \cos(2 \tau x)) \\
+D_y ={}& 0 \\
+D_z ={}& -(19/3) \mu \tau^2 V_z
+\end{align*}
+
+\subsection{Cas VZ\_DIRY}
+
+La condition initiale sur la vitesse est :
+
+\begin{align*}
+V_x ={}& 0 \\
+V_y ={}& 0 \\
+V_z ={}& 2 V_0 \sin(\tau y) \sin(2 \tau z)
+\end{align*}
+
+La solution analytique sur la diffusion est :
+
+\begin{align*}
+D_x ={}& 0 \\
+D_y ={}& (2/3) \mu \tau^2 (2Vo \cos(\tau y) \cos(2 \tau y)) \\
+D_z ={}& -(19/3) \mu \tau^2 V_z
+\end{align*}
+

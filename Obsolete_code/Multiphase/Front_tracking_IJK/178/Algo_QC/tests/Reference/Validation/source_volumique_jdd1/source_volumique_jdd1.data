@@ -1,0 +1,140 @@
+dimension 2
+Pb_Thermohydraulique_QC pb
+
+Domaine dom
+
+# DEBUT MAILLAGE #
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0.
+		Nombre_de_Noeuds 2 21
+		Longueurs  1 20
+		}
+		{
+		Bord bas   Y = 0.     0. <= X <=    1. 
+		Bord haut  Y = 20    0. <= X <=     1.
+		Bord cote  X = 0.     0. <= Y <=    20.
+		Bord cote  X = 1.     0. <= Y <=    20.
+		}
+	}
+# FIN MAILLAGE #
+
+# DEBUT DECOUPAGE 
+Decouper dom
+{
+	partitionneur Tranche  { tranches 1 2 1 }
+	Larg_joint 2
+	Nom_Zones canalQCdt20K
+	Periodique 2 periox perioz
+}
+Fin
+ FIN DECOUPAGE #
+
+# DEBUT LECTURE 
+Scatter canalQCdt20K.Zones dom
+ FIN LECTURE #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Runge_Kutta_ordre_3_QC sch0
+Lire sch
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 12.
+        dt_min 1.e-11
+        dt_max 1.
+	dt_start dt_fixe 1.e-11
+        dt_impr 1.e-7
+        dt_sauv 1.
+        seuil_statio 1.e-8
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu Champ_Fonc_Fonction 1 temperature 2.e-5
+        lambda Champ_Fonc_Fonction 1 temperature 3.e-2
+        pression 100000.
+        loi_etat gaz_parfait 	{
+                		Prandtl 0.76
+                		Cp 1005
+                		gamma 1.4
+        			}
+	traitement_pth constant
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+        Navier_Stokes_QC
+        {
+                solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1.e-12 impr }
+                convection { centre }
+                diffusion { negligeable }
+                Sources 
+		{ 
+		}
+		conditions_initiales 
+		{
+                        vitesse champ_uniforme 2 0. 0.
+                }
+                conditions_limites 
+		{
+			haut     frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+			bas      paroi_fixe
+			cote	 symetrie
+                }
+		
+		
+  
+	}
+				
+        Convection_Diffusion_Chaleur_QC
+        {
+                diffusion { negligeable }
+		mode_calcul_convection DIVRHOUT_MOINS_TDIVRHOU
+                convection { quick }
+		Sources { Puissance_thermique Champ_Uniforme_Morceaux dom 1 { Defaut 1000. } }
+		conditions_initiales { Temperature Champ_Uniforme 1 350. }
+		conditions_limites 
+                {
+ 		        haut frontiere_ouverte T_ext Champ_Front_Uniforme 1  350.
+			bas paroi_adiabatique
+			cote symetrie
+		}
+    
+        }
+
+        Postraitement
+         { 
+
+		Sondes {
+Sonde_P pression periode 1 segment 20 0.5 0.5 0.5 19.5
+}
+
+			
+			format lml
+			Champs dt_post 1.
+			{
+      				vitesse elem
+      				masse_volumique elem
+				pression elem
+				temperature elem
+      				
+         		}
+        															        
+        }
+
+}
+EcritureLectureSpecial 0
+Resoudre pb
+Fin

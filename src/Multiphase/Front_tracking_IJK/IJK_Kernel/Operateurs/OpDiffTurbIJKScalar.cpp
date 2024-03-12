@@ -155,6 +155,27 @@ void OpDiffVectorialIJKScalar_double::calculer(const IJK_Field_double& field,
 }
 
 
+void OpDiffVectorialIJKScalar_double::ajouter(const IJK_Field_double& field,
+                                              const IJK_Field_double& lambda_vector_x,
+                                              const IJK_Field_double& lambda_vector_y,
+                                              const IJK_Field_double& lambda_vector_z,
+                                              IJK_Field_double& result,
+                                              const IJK_Field_local_double& boundary_flux_kmin,
+                                              const IJK_Field_local_double& boundary_flux_kmax)
+{
+  input_field_ = &field;
+  lambda_vector_x_ = &lambda_vector_x;
+  lambda_vector_y_ = &lambda_vector_y;
+  lambda_vector_z_ = &lambda_vector_z;
+  boundary_flux_kmin_ = &boundary_flux_kmin;
+  boundary_flux_kmax_ = &boundary_flux_kmax;
+  compute_add(result);
+  input_field_ = 0;
+  lambda_vector_x_ = 0;
+  lambda_vector_y_ = 0;
+  lambda_vector_z_ = 0;
+  boundary_flux_kmin_ = boundary_flux_kmax_ = 0;
+}
 
 void OpDiffVectorialAnisotropicIJKScalar_double::calculer(const IJK_Field_double& field,
                                                           const IJK_Field_double& lambda_vector_x,

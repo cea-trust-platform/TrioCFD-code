@@ -1,0 +1,8 @@
+#!/bin/sh
+# Commande pour generer le bon fichier evol_glob (une ligne sur 8)
+ 
+
+awk 'BEGIN {t="#"}{ if ($1==t) {ligne=$0} else {print ligne;t=$1 }} END {print ligne}' evol_glob  >evol_glob_net
+
+grep -v Tps evol_glob_net | awk 'BEGIN { s=0 } { d=$3-0.995025*exp(-0.00285714*$1);s=s+d*d } END {print sqrt(s)/FNR}'    > erreur
+

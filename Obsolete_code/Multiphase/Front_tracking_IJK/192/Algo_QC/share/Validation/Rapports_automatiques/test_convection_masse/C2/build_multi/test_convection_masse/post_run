@@ -1,0 +1,5 @@
+#!/bin/sh
+
+sed 's/__EXPRESSION_TO_PLOT__/simu_d_rho/g' instructions2.py > instructions_simu_d_rho.py
+
+rm -f simu_d_rho????.curve && visit -nowin -cli -s instructions_simu_d_rho.py 

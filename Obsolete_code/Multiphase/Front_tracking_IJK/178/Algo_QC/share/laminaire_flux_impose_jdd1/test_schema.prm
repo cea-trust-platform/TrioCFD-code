@@ -1,0 +1,34 @@
+parametres {
+	titre "Test des schémas en temps"
+	auteur "Adrien"
+	description "Temperature linéaire ?"
+	casTest . laminaire_flux_impose.data  en annexe
+}
+Chapitre {
+
+	Figure
+	{
+	labelx y
+	labely °
+	
+
+	Titre "Tempertaure"
+	Description " titi"
+	legende bottom
+	inclureDesccourbes 0
+	courbe {
+	fichier Moyennes_spatiales_Temp
+
+	legende calcul
+	style linespoints
+	}
+	courbe {
+
+	fonction 6666.667*x+257.778
+	legende analytique
+	style lines
+	}
+	}	
+
+	
+}

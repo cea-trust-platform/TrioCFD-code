@@ -1,0 +1,28 @@
+Bad format detected for src/laminaire_flux_impose.prm:
+src/laminaire_flux_impose.prm: ISO-8859 text, with very long lines (504)
+Converting to UTF-8...
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+
+-> Binary and version used:
+-> /home/yanis/Baltiks/Algo_QC_1.9.2/Algo_QC_1.9.2_opt
+-> 1.9.2
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the laminaire_flux_impose data file in the . directory ...
+-> Calculation laminaire_flux_impose produced an error !
+-> Look at the /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/laminaire_flux_impose/build/laminaire_flux_impose.err file.
+grep: laminaire_flux_impose.TU: No such file or directory
+grep: laminaire_flux_impose.TU: No such file or directory
+-> Running the post_run script in the . directory ...
+ls: cannot access 'Moyennes_spatiales_Temp_*': No such file or directory
+==============================
+-> Building PDF report file...
+==============================
+"./.tmp/fic000.plot" line 10: warning: Cannot find or open file "Moyennes_spatiales_Temp"
+-> File ./laminaire_flux_impose.data is included in the PDF report from /home/yanis/Baltiks/Algo_QC_1.9.2/share/Validation/Rapports_automatiques/laminaire_flux_impose/build
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.

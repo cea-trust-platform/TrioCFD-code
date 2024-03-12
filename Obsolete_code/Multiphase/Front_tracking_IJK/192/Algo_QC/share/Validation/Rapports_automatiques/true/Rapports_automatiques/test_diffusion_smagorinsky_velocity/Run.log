@@ -1,0 +1,24 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run script prepare in the build directory...
+===============================================
+  File "/opt/shared/triou/178/TRUST-1.7.8/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 95
+    print "codage manquant pour "+str(opt)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(...)?
+
+-> Binary and version used:
+-> /scratch/yanis/Baltiks/Atelier_MD_velocity_ELEM_XYZ_phirms_choixOpConvmasse_qdmc4_tau_Bard_pi_Bard_varvar2_amd_comp_nv_sim_comp/Algo_QC/New_algo_qc_opt
+-> 1.7.8
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+==============================
+-> Building PDF report file...
+==============================
+  File "/opt/shared/triou/178/TRUST-1.7.8/Validation/Outils/Genere_courbe/src/genererCourbes.py", line 95
+    print "codage manquant pour "+str(opt)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(...)?

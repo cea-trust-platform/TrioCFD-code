@@ -1,0 +1,9 @@
+#!/bin/sh
+
+sed 's/__EXPRESSION_TO_PLOT__/simu_t/g' instructions2.py > instructions_simu_t.py
+sed 's/__EXPRESSION_TO_PLOT__/ana_t/g' instructions2.py  > instructions_ana_t.py
+sed 's/__EXPRESSION_TO_PLOT__/error_t/g' instructions2.py  > instructions_error_t.py
+
+rm -f simu_t????.curve && visit -nowin -cli -s instructions_simu_t.py 
+rm -f ana_t_tinit????.curve && visit -nowin -cli -s instructions_ana_t.py 
+rm -f error_t????.curve && visit -nowin -cli -s instructions_error_t.py 

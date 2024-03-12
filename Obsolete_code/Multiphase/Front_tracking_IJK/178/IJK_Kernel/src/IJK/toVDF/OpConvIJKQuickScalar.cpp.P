@@ -1,0 +1,317 @@
+/****************************************************************************
+* Copyright (c) 2015 - 2016, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : OpConvIJKQuickScalar.cpp
+// Directory : $IJK_ROOT/src/IJK/OpVDF
+//
+/////////////////////////////////////////////////////////////////////////////
+#include <OpConvIJKQuickScalar.h>
+#include <IJK_Field_simd_tools.h>
+
+#Pinclude(IJ_LOOP_P)
+
+#Pmacro DEFMACRO(ST)
+// Copy curv_fram values from layers 1 and 3 to layers 0 and 2
+// (called at end of the computation of fluxes in z direction to keep the values
+//  for the next layer).
+static void shift_curv_fram(IJK_Field_local_ST & tmp_curv_fram)
+{
+  const int ni = tmp_curv_fram.ni();
+  const int nj = tmp_curv_fram.nj();
+  int i, j;
+
+  for (j = 0; j < nj; j++)
+    for (i = 0; i < ni; i++) 
+      tmp_curv_fram(i,j,0) = tmp_curv_fram(i,j,1);
+
+  for (j = 0; j < nj; j++)
+    for (i = 0; i < ni; i++) 
+      tmp_curv_fram(i,j,2) = tmp_curv_fram(i,j,3);
+
+}
+
+inline Simd_double operator/(const Simd_double & x, const Simd_double & y)
+{
+  return SimdDivideMed(x, y);
+}
+#Pendmacro(DEFMACRO)
+#Pusemacro(DEFMACRO)(double)
+
+
+#Pmacro DEFMACRO(ST,CASE,_OP_NAME_)
+
+void _OP_NAME__ST::initialize(const IJK_Splitting & splitting)
+{
+  channel_data_.initialize(splitting);
+  input_field_ = 0;
+  input_velocity_x_ = 0;
+  input_velocity_y_ = 0;
+  input_velocity_z_ = 0;
+}
+
+void _OP_NAME__ST::calculer(const IJK_Field_ST & field,
+                                       const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz,
+                                       IJK_Field_ST & result)
+{
+  // Si ce test plante, c'est qu'on a oublie d'appeler la methode initialize() !!!
+  assert(channel_data_.get_delta_z().size() == field.nk());
+
+  input_velocity_x_ = &vx;
+  input_velocity_y_ = &vy;
+  input_velocity_z_ = &vz;
+  input_field_ = &field;
+  stored_curv_fram_layer_z_ = -1000; // put a non-existant layer index: curv_fram will be computed at first call
+  // Storage for curvature and fram limiter. We need 1 ghost layer:
+  //  flux at left of the leftmost field data requires curv and fram on the element at left
+  //  flux at the right of the rightmost field data requires on the element at right
+  // We need 4 layers of temporary storage: curv and fram, and, for each, two consecutive layers in z
+  const int ni = field.ni();
+  const int nj = field.nj();
+  tmp_curv_fram_.allocate(ni, nj, 4, 1);
+  compute_set(result);
+  input_field_ = 0;
+  input_velocity_x_ = 0;
+  input_velocity_y_ = 0;
+  input_velocity_z_ = 0;
+
+}
+
+void _OP_NAME__ST::ajouter(const IJK_Field_ST & field,
+                           const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz,
+                           IJK_Field_ST & result)
+{
+  // Si ce test plante, c'est qu'on a oublie d'appeler la methode initialize() !!!
+  assert(channel_data_.get_delta_z().size() == field.nk());
+
+  input_velocity_x_ = &vx;
+  input_velocity_y_ = &vy;
+  input_velocity_z_ = &vz;
+  input_field_ = &field;
+  stored_curv_fram_layer_z_ = -1000; // put a non-existant layer index: curv_fram will be computed at first call
+  // Storage for curvature and fram limiter. We need 1 ghost layer:
+  //  flux at left of the leftmost field data requires curv and fram on the element at left
+  //  flux at the right of the rightmost field data requires on the element at right
+  // We need 4 layers of temporary storage: curv and fram, and, for each, two consecutive layers in z
+  const int ni = field.ni();
+  const int nj = field.nj();
+  tmp_curv_fram_.allocate(ni, nj, 4, 1);
+  compute_add(result);
+  input_field_ = 0;
+  input_velocity_x_ = 0;
+  input_velocity_y_ = 0;
+  input_velocity_z_ = 0;
+
+}
+
+
+#Pforeach DIR(x y z)
+
+// compute the "curv" value and part of the fram limiter (in the Fram routine from Eval_Quick_VDF_Elem.h) for 3 adjacent T values
+// store result in tmp_curv_fram_, z layer=1 (curv) and z layer=3 (fram)
+void _OP_NAME__ST::compute_curv_fram_DIR(int k_layer)
+{  
+
+#Pmacro KERNEL(__TYPE__)
+  __TYPE__ t0, t1, t2;
+  input_field.get_left_center_right_DIR(i, t0, t1, t2);
+  __TYPE__ curv = (t2 - t1) * factor12 - (t1 - t0) * factor01;
+  curv_values.put_val(i, curv);
+  __TYPE__ smin = min(t0, t2);
+  __TYPE__ smax = max(t0, t2);
+  // Compared to original code (Eval_Quick_VDF_Elem.h), we first compute the 4th power,
+  // then take the max (dabs is then useless)
+  #Pif ("__TYPE__"=="Simd_double")
+    __TYPE__ dsabs = SimdSelect(0, smax - smin, smax - smin, smin - smax);
+    __TYPE__ ds = SimdSelect(dsabs, DMINFLOAT, 1., smax - smin);
+    __TYPE__ sr = SimdSelect(dsabs, DMINFLOAT, 0., ((t1 - smin) / ds - 0.5) * 2.);
+  #Pelse
+    __TYPE__ sr = dabs(smax - smin)<DMINFLOAT ? 0. : ((t1 - smin) / (smax - smin) - 0.5) * 2.;
+  #Pendif
+  sr *= sr;
+  sr *= sr;
+  sr = min(sr, 1.);
+  fram_values.put_val(i, sr);
+#Pendmacro(KERNEL)
+#Pmacro KERNEL_NEXTJ()
+  input_field.next_j();
+  curv_values.next_j();
+  fram_values.next_j();
+#Pendmacro(KERNEL_NEXTJ)
+#Pif ("DIR"=="y")
+  ConstIJK_ST_ptr input_field(*input_field_, 0, -1, k_layer);
+  // Where to store result:
+  IJK_ST_ptr curv_values(tmp_curv_fram_, 0, -1, 1);
+  IJK_ST_ptr fram_values(tmp_curv_fram_, 0, -1, 3);
+#Pelse
+  ConstIJK_ST_ptr input_field(*input_field_, 0, 0, k_layer);
+  // Where to store result:
+  IJK_ST_ptr curv_values(tmp_curv_fram_, 0, 0, 1);
+  IJK_ST_ptr fram_values(tmp_curv_fram_, 0, 0, 3);
+#Pendif
+  const int ni = tmp_curv_fram_.ni();
+  const int nj = tmp_curv_fram_.nj();
+
+#Pif ("DIR"=="z")
+  // Are we on the wall ?
+  const int global_k_layer = k_layer + channel_data_.offset_to_global_k_layer();
+  // global index of the layer of flux of the wall
+  //  (assume one walls at zmin and zmax)
+  const int first_global_k_layer = 0;
+  const int last_global_k_layer = channel_data_.nb_elem_k_tot();
+
+  if (global_k_layer == first_global_k_layer || global_k_layer == last_global_k_layer) {
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        tmp_curv_fram_(i, j, 1) = 0.;
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        tmp_curv_fram_(i, j, 3) = 1.; // fram = 1 => upwind scheme on first layer of cells in z direction.
+   
+    return;
+  }
+#Pendif
+
+  // Compute invd1 and invd2 factors:
+#Pif ("DIR"=="x")
+  const ST inv_dx = 1./channel_data_.get_delta_x();
+  const ST factor01 = inv_dx * inv_dx;
+  const ST factor12 = factor01;
+#Pusemacro(IJ_LOOP_MINMAX)(ST,-1,0,ni+1,nj,KERNEL,KERNEL_NEXTJ)
+#Pelif ("DIR"=="y")
+  const ST inv_dy = 1. / channel_data_.get_delta_y();
+  const ST factor01 = inv_dy * inv_dy;
+  const ST factor12 = factor01;
+#Pusemacro(IJ_LOOP_MINMAX)(ST,0,-1,ni,nj+1,KERNEL,KERNEL_NEXTJ)
+#Pelse
+  const ST dz0 = channel_data_.get_delta_z()[k_layer-1];
+  const ST dz1 = channel_data_.get_delta_z()[k_layer];
+  const ST dz2 = channel_data_.get_delta_z()[k_layer+1];
+  const ST factor01 = 1. / (dz1 * (dz0 + dz1) * 0.5);
+  const ST factor12 = 1. / (dz1 * (dz1 + dz2) * 0.5);
+#Pusemacro(IJ_LOOP_MINMAX)(ST,0,0,ni,nj,KERNEL,KERNEL_NEXTJ)
+#Pendif
+}
+
+
+void _OP_NAME__ST::compute_flux_DIR(IJK_Field_local_ST & resu, const int k_layer)
+{
+#Pif ("CASE"=="No_Centre2")
+#Pif ("DIR"=="x" or "DIR"=="y")
+  compute_curv_fram_DIR(k_layer);
+#Pelse
+  // The previous layer of curv and fram values might have been computed already
+  if (stored_curv_fram_layer_z_ != k_layer-1) {
+    compute_curv_fram_DIR(k_layer-1);
+    shift_curv_fram(tmp_curv_fram_);
+  }
+  compute_curv_fram_DIR(k_layer);
+#Pendif
+#Pendif
+
+  ConstIJK_ST_ptr velocity_DIR(*input_velocity_DIR_, 0, 0, k_layer);
+  ConstIJK_ST_ptr input_field(*input_field_, 0, 0, k_layer);
+#Pif ("CASE"=="No_Centre2")
+  ConstIJK_ST_ptr curv_values(tmp_curv_fram_, 0, 0, 1); /* if z direction, "left" will be in layer 0 */
+  ConstIJK_ST_ptr fram_values(tmp_curv_fram_, 0, 0, 3); /* if z direction, "left" is in layer 2 */ 
+#Pendif
+  IJK_ST_ptr resu_ptr(resu, 0, 0, 0);
+#Pif ("DIR"=="x")
+  const int nx = input_field_->ni() + 1;
+  const int ny = input_field_->nj();
+#Pif ("CASE"=="No_Centre2")
+  const ST dx = channel_data_.get_delta_x();
+#Pendif
+  const ST surface = channel_data_.get_delta_y() * channel_data_.get_delta_z()[k_layer];
+#Pelif ("DIR"=="y")
+  const int nx = input_field_->ni();
+  const int ny = input_field_->nj() + 1;
+#Pif ("CASE"=="No_Centre2")
+  const ST dx = channel_data_.get_delta_y();
+#Pendif
+  const ST surface = channel_data_.get_delta_x() * channel_data_.get_delta_z()[k_layer];
+#Pelif ("DIR"=="z")
+  const int nx = input_field_->ni();
+  const int ny = input_field_->nj();
+#Pif ("CASE"=="No_Centre2")
+  const ST dx = (channel_data_.get_delta_z()[k_layer-1] + channel_data_.get_delta_z()[k_layer]) * 0.5;
+#Pendif
+  const ST surface = channel_data_.get_delta_x() * channel_data_.get_delta_y();
+#Pendif
+
+#Pif ("DIR"=="z")
+  // Are we on the wall ?
+  const int global_k_layer = k_layer + channel_data_.offset_to_global_k_layer();
+  // global index of the layer of flux of the wall
+  //  (assume one walls at zmin and zmax)
+  const int first_global_k_layer = 0;
+  const int last_global_k_layer = channel_data_.nb_elem_k_tot();
+
+  if (global_k_layer == first_global_k_layer || global_k_layer == last_global_k_layer) {
+    // We are on the wall, zero flux
+    putzero(resu);
+    return;
+  }
+#Pendif
+
+#Pif ("CASE"=="No_Centre2")
+  const ST dx_squared_over_8 = dx * dx * 0.125;
+#Pendif
+#Pmacro KERNEL_FLUX(__TYPE__)
+  __TYPE__ velocity;
+  velocity_DIR.get_center(i, velocity);
+  __TYPE__ T0, T1; // scalar value at left and at right of the computed flux
+#Pif ("CASE"=="No_Centre2")
+  __TYPE__ fram0, fram1;
+  __TYPE__ curv0, curv1;
+#Pendif
+  input_field.get_left_center_DIR(i, T0, T1);
+#Pif ("CASE"=="No_Centre2")
+  fram_values.get_left_center_DIR(i, fram0, fram1);
+  curv_values.get_left_center_DIR(i, curv0, curv1);
+  __TYPE__ fram = max(fram0, fram1);
+  __TYPE__ curv    = select_ST(velocity, 0., curv1, curv0);
+  __TYPE__ T_amont = select_ST(velocity, 0., T1 /* if velocity < 0 */, T0 /* if velocity > 0 */);
+  __TYPE__ flux = (T0 + T1) * 0.5 - dx_squared_over_8 * curv;
+  flux = ((1. - fram) * flux + fram * T_amont) * velocity * surface;
+#Pelif ("CASE"=="Yes_Centre2")
+  __TYPE__ flux = (T0 + T1) * 0.5;
+  flux = flux * velocity * surface;
+#Pendif
+
+  resu_ptr.put_val(i, flux);
+#Pendmacro(KERNEL_FLUX)
+#Pmacro KERNEL_FLUX_NEXTJ()
+  input_field.next_j();
+  velocity_DIR.next_j();
+#Pif ("CASE"=="No_Centre2")
+  fram_values.next_j();
+  curv_values.next_j();
+#Pendif
+  resu_ptr.next_j();
+#Pendmacro(KERNEL_FLUX_NEXTJ)
+#Pusemacro(IJ_LOOP)(ST,nx,ny,KERNEL_FLUX,KERNEL_FLUX_NEXTJ)
+
+#Pif ("DIR"=="z")
+  // store curv and fram for next layer of fluxes in z direction
+  shift_curv_fram(tmp_curv_fram_);
+  stored_curv_fram_layer_z_ = k_layer;
+#Pendif
+}
+#Pendforeach(DIR)
+#Pendmacro(DEFMACRO)
+
+#Pusemacro(DEFMACRO)(double,No_Centre2,OpConvIJKQuickScalar)
+#Pusemacro(DEFMACRO)(double,Yes_Centre2,OpConvCentre2IJKScalar)
