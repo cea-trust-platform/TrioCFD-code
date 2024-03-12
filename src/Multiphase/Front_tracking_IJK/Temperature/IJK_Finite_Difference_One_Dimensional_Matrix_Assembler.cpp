@@ -572,7 +572,7 @@ int IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::build_with_unknown_p
     non_zero_coeff_per_line[last_column + 1] = non_zero_values_counter + FORTRAN_INDEX_INI;
   }
 
-  sparse_matrix.compacte(remove);
+  sparse_matrix.compacte(REMOVE);
 
   return non_zero_elem;
 }
@@ -655,7 +655,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::pre_initialise_matr
             block_matrix_subproblems.get_bloc(i,j).typer("Matrice_Morse");
             Matrice_Morse& sparse_matrix_zeros  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,j).valeur());
             sparse_matrix_zeros.dimensionner(fd_operator_sparse.nb_lignes(), fd_operator_sparse.nb_colonnes(), fd_operator_sparse.nb_coeff());
-            sparse_matrix_zeros.compacte(remove);
+            sparse_matrix_zeros.compacte(REMOVE);
           }
       block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Morse");
       Matrice_Morse& sparse_matrix  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,i).valeur());
@@ -800,7 +800,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_matrix_s
             block_matrix_subproblems.get_bloc(i,j).typer("Matrice_Morse");
             Matrice_Morse& sparse_matrix_zeros  = ref_cast(Matrice_Morse, block_matrix_subproblems.get_bloc(i,j).valeur());
             sparse_matrix_zeros.dimensionner(fd_operator_sparse.nb_lignes(), fd_operator_sparse.nb_colonnes(), fd_operator_sparse.nb_coeff());
-            sparse_matrix_zeros.compacte(remove);
+            sparse_matrix_zeros.compacte(REMOVE);
           }
       block_matrix_subproblems.get_bloc(i,i).typer("Matrice_Morse");
       if (!first_time_step_varying_probes)
@@ -953,7 +953,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_by_vec
     }
   sparse_matrix *= vector_tmp;
   if (!known_pattern_)
-    sparse_matrix.compacte(remove);
+    sparse_matrix.compacte(REMOVE);
 }
 
 void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::scale_matrix_subproblem_by_vector(Matrice * matrix,
@@ -1281,7 +1281,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::impose_boundary_con
     Cerr << "First iteration is done with Euler implicit or explicit" << finl;
   // TODO: Maybe remove this one
   if (!known_pattern_)
-    sparse_matrix.compacte(remove);
+    sparse_matrix.compacte(REMOVE);
 
   // sparse_matrix.sort_stencil();
   if (!(first_time_step_temporal && first_time_step_explicit))
@@ -1364,7 +1364,7 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::modify_rhs_for_bc(M
 
   // TODO: Maybe remove this one
   if (!known_pattern_)
-    sparse_matrix.compacte(remove);
+    sparse_matrix.compacte(REMOVE);
 
 
 // sparse_matrix.sort_stencil();
