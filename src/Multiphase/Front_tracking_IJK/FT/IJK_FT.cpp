@@ -1798,11 +1798,14 @@ int IJK_FT_double::initialise()
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
           inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, inv_rho_field_.nk()-4);
         }
-      interfaces_.calculer_kappa_ft(kappa_ft_);
-      redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(kappa_ft_, kappa_ns_);
-      redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(kappa_ft_, kappa_ns_);
-      pressure_.set_I_sig_kappa_zmin_(I_ns_, kappa_ns_, sigma_, 0);
-      pressure_.set_I_sig_kappa_zmax_(I_ns_, kappa_ns_, sigma_, pressure_.nk()-4);
+      if(boundary_conditions_.get_correction_interp_monofluide()==1)
+        {
+          interfaces_.calculer_kappa_ft(kappa_ft_);
+          redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(kappa_ft_, kappa_ns_);
+          redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(kappa_ft_, kappa_ns_);
+          pressure_.set_I_sig_kappa_zmin_(I_ns_, kappa_ns_, sigma_, 0);
+          pressure_.set_I_sig_kappa_zmax_(I_ns_, kappa_ns_, sigma_, pressure_.nk()-4);
+        }
     }
   maj_indicatrice_rho_mu();
 
@@ -1877,11 +1880,14 @@ int IJK_FT_double::initialise()
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
           inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, inv_rho_field_.nk()-4);
         }
-      interfaces_.calculer_kappa_ft(kappa_ft_);
-      redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(kappa_ft_, kappa_ns_);
-      redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(kappa_ft_, kappa_ns_);
-      pressure_.set_I_sig_kappa_zmin_(I_ns_, kappa_ns_, sigma_, 0);
-      pressure_.set_I_sig_kappa_zmax_(I_ns_, kappa_ns_, sigma_, pressure_.nk()-4);
+      if(boundary_conditions_.get_correction_interp_monofluide()==1)
+        {
+          interfaces_.calculer_kappa_ft(kappa_ft_);
+          redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(kappa_ft_, kappa_ns_);
+          redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(kappa_ft_, kappa_ns_);
+          pressure_.set_I_sig_kappa_zmin_(I_ns_, kappa_ns_, sigma_, 0);
+          pressure_.set_I_sig_kappa_zmax_(I_ns_, kappa_ns_, sigma_, pressure_.nk()-4);
+        }
     }
   return nalloc;
 }
@@ -4751,11 +4757,14 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
           inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, inv_rho_field_.nk()-4);
         }
-      interfaces_.calculer_kappa_ft(kappa_ft_);
-      redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(kappa_ft_, kappa_ns_);
-      redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(kappa_ft_, kappa_ns_);
-      pressure_.set_I_sig_kappa_zmin_(I_ns_, kappa_ns_, sigma_, 0);
-      pressure_.set_I_sig_kappa_zmax_(I_ns_, kappa_ns_, sigma_, pressure_.nk()-4);
+      if(boundary_conditions_.get_correction_interp_monofluide()==1)
+        {
+          interfaces_.calculer_kappa_ft(kappa_ft_);
+          redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(kappa_ft_, kappa_ns_);
+          redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(kappa_ft_, kappa_ns_);
+          pressure_.set_I_sig_kappa_zmin_(I_ns_, kappa_ns_, sigma_, 0);
+          pressure_.set_I_sig_kappa_zmax_(I_ns_, kappa_ns_, sigma_, pressure_.nk()-4);
+        }
     }
 
   statistiques().end_count(deplacement_interf_counter_);
@@ -4836,11 +4845,14 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
           inv_rho_field_.set_indicatrice_ghost_zmin_(I_ns_, 0);
           inv_rho_field_.set_indicatrice_ghost_zmax_(I_ns_, inv_rho_field_.nk()-4);
         }
-      interfaces_.calculer_kappa_ft(kappa_ft_);
-      redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(kappa_ft_, kappa_ns_);
-      redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(kappa_ft_, kappa_ns_);
-      pressure_.set_I_sig_kappa_zmin_(I_ns_, kappa_ns_, sigma_, 0);
-      pressure_.set_I_sig_kappa_zmax_(I_ns_, kappa_ns_, sigma_, pressure_.nk()-4);
+      if(boundary_conditions_.get_correction_interp_monofluide()==1)
+        {
+          interfaces_.calculer_kappa_ft(kappa_ft_);
+          redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(kappa_ft_, kappa_ns_);
+          redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(kappa_ft_, kappa_ns_);
+          pressure_.set_I_sig_kappa_zmin_(I_ns_, kappa_ns_, sigma_, 0);
+          pressure_.set_I_sig_kappa_zmax_(I_ns_, kappa_ns_, sigma_, pressure_.nk()-4);
+        }
     }
 
 }
