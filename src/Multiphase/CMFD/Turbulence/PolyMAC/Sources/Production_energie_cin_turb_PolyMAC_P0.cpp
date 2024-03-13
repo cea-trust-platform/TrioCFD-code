@@ -55,21 +55,16 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
   int e, n;
 
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),
-                   &palp = equation().probleme().get_champ("alpha").passe(),
+                   &tab_grad = pb.get_champ("gradient_vitesse").passe(),
                     &k = equation().probleme().get_champ("k").valeurs(),
-                     &pk = semi_impl.count("k")  ? semi_impl.at("k") : equation().probleme().get_champ("k").passe(),
-                      &tab_grad = pb.get_champ("gradient_vitesse").passe(),
-                       *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
-                        *pdiss = semi_impl.count(Type_diss) ? &semi_impl.at(Type_diss) : (equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr );
-  const int cnu = nu.dimension(0) == 1;
+                     *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
+                      *pdiss = semi_impl.count(Type_diss) ? &semi_impl.at(Type_diss) : (equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr );
 
   if (Type_diss == "")
     {
       DoubleTrav nut(0, Nph);
       MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression().valeurs().get_md_vector(), nut); //Necessary to compare size in eddy_viscosity()
       visc_turb.eddy_viscosity(nut);
-
-      Matrice_Morse *mat = matrices.count("k") ? matrices.at("k") : nullptr;
 
       for( e = 0 ; e < nb_elem ; e++)
         for( n = 0; n<N ; n++)
@@ -78,11 +73,9 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
                 secmem_en += ( tab_grad(nf_tot + d_U + e * D , D * n + d_X) + tab_grad(nf_tot + d_X + e * D , D * n + d_U) ) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-            secmem_en *= pe(e) * ve(e) * (palp ? (*palp)(e, n) : 1.0) * tab_rho(e, n) * nut(e, n) ;
+            secmem_en *= pe(e) * ve(e) * tab_rho(e, n) * nut(e, n) ;
 
-            secmem(e, n) += std::max(secmem_en, 0.);//  secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
-
-            if (mat) (*mat)(N * e + n, N * e + n) -= 0.;//fac_(e, n, 1) * std::max(secmem_en, 0.);
+            secmem(e, n) += std::max(secmem_en, 0.);
           }
     }
 
@@ -110,12 +103,12 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
               }
             else if (Type_diss == "omega")
               {
-                secmem(e, n) += fac * pk(e, n) / ((*diss)(e, n)) ;
+                secmem(e, n) += fac * k(e, n) / (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
                 for (auto &&i_m : matrices)
                   {
                     Matrice_Morse& mat = *i_m.second;
-                    if (i_m.first == "omega")     mat(N * e + n,  N * e + n) += fac * pk(e,n) / ((*diss)(e, n)*(*diss)(e, n));
-                    if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * 1./ ((*diss)(e, n))*0. ;
+                    if (i_m.first == "omega")     mat(N * e + n,  N * e + n) += fac * k(e,n) / ((*pdiss)(e, n)*(*pdiss)(e, n));
+                    if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * 1./ (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
                   }
               }
           }
