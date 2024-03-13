@@ -58,28 +58,20 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
       else if sub_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
     }
 
-  int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = domaine.nb_elem(), D = dimension ;
-  int N = equation().inconnue()->valeurs().line_size(),
-      Np = equation().probleme().get_champ("pression").valeurs().line_size(),
-      Nt = equation().probleme().get_champ("temperature").valeurs().line_size(),
-      Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
-  int e, n, mp;
+  int Nph = pb.get_champ("vitesse").valeurs().line_size(), nb_elem = domaine.nb_elem(), D = dimension ;
+  int N = equation().inconnue()->valeurs().line_size();
+  int e, n;
 
   double limiter_ = visc_turb.limiteur();
   double nut_l = -10000., fac;
 
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),
                    &palp = equation().probleme().get_champ("alpha").passe(),
-                    &alp = equation().probleme().get_champ("alpha").valeurs(),
-                     &nu =  equation().probleme().get_champ("viscosite_cinematique").passe(),
-                      &k = equation().probleme().get_champ("k").valeurs(),
-                       &tab_grad = equation().probleme().get_champ("gradient_vitesse").passe(),
-                        *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
-                         *pdiss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr;
-
-  const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).equation_masse().champ_conserve() : equation().milieu().masse_volumique().valeur();
-//  const DoubleTab&       alpha_rho = ch_alpha_rho.valeurs();
-  const tabs_t&      der_alpha_rho = ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
+                    &nu =  equation().probleme().get_champ("viscosite_cinematique").passe(),
+                     &k = equation().probleme().get_champ("k").valeurs(),
+                      &tab_grad = equation().probleme().get_champ("gradient_vitesse").passe(),
+                       *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
+                        *pdiss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr;
 
   if (Type_diss == "")
     {
@@ -87,63 +79,50 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
       MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), nut); //Necessary to compare size in eddy_viscosity()
       visc_turb.eddy_viscosity(nut);
 
-      Matrice_Morse *mat = matrices.count("k") ? matrices.at("k") : nullptr;
-
       for( e = 0 ; e < nb_elem ; e++)
         for( n = 0; n<N ; n++)
           {
             double secmem_en = 0.;
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
-                secmem_en += ( tab_grad( e, N * ( D*d_U+d_X ) + n) + tab_grad( e,  N * ( D*d_X+d_U ) + n) ) * tab_grad( e,  N * ( D*d_U+d_X ) + n) ;
+                secmem_en += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
             secmem_en *= pe(e) * ve(e) * palp(e, n) * tab_rho(e, n) * nut(e, n) ;
 
-            secmem(e, n) += std::max(secmem_en, 0.);//  secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
-
-            if (mat) (*mat)(N * e + n, N * e + n) -= 0.;//fac_(e, n, 1) * std::max(secmem_en, 0.);
+            secmem(e, n) += std::max(secmem_en, 0.);
           }
     }
 
   else
     {
       for( e = 0 ; e < nb_elem ; e++)
-        for(n = 0, mp = 0; n<N ; n++, mp += (Np > 1))
+        for(n = 0; n<N ; n++)
           {
             double grad_grad = 0.;
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
-                grad_grad += ( tab_grad( e, N * ( D*d_U+d_X ) + n) + tab_grad( e,  N * ( D*d_X+d_U ) + n) ) * tab_grad( e,  N * ( D*d_U+d_X ) + n) ;
+                grad_grad += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e, Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e, Nph * ( D*d_U+d_X ) + n) ;
 
             fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
 
             if      (Type_diss == "tau")   nut_l =  k(e, n) * (*diss)(e, n) + limiter_ * nu(e, n);
-            else if (Type_diss == "omega") nut_l = ( ((*pdiss)(e,n) > 0.) ? std::max(k(e, n) / (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)), limiter_ * nu(e, n)) : limiter_ * nu(e, n) );
-//            else if (Type_diss == "omega") nut_l = k(e, n) / std::max((*pdiss)(e, n), omega_min_) ;
+            else if (Type_diss == "omega") nut_l =  k(e, n) / (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
             else Process::exit(que_suis_je() + " : ajouter_blocs : probleme !!!") ;
 
-            secmem(e, n) += fac * nut_l * alp(e,n); // *alpha pour reduire la production de KTE a haut taux de vide
-            for (auto &&i_m : matrices)
-              {
-                Matrice_Morse& mat = *i_m.second;
-                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("alpha") ?       der_alpha_rho.at("alpha")(e, n) : 0 );			      // derivee par rapport au taux de vide
-                if (i_m.first == "alpha") 	    mat(N * e + n, Na * e + n) -= fac * nut_l ;			      // derivee par rapport au taux de vide
-                if (i_m.first == "temperature") mat(N * e + n, Nt * e + n) -= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, n) : 0 );// derivee par rapport a la temperature
-                if (i_m.first == "pression")    mat(N * e + n, Np * e + mp)-= 0.*fac * nut_l * alp(e,n) * (der_alpha_rho.count("pression") ?    der_alpha_rho.at("pression")(e, mp) : 0 );		  // derivee par rapport a la pression
-              }
+            secmem(e, n) += fac * nut_l ;
 
             if (Type_diss == "tau")
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;
-                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alp(e,n) *(*diss)(e,n);
-                  if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * alp(e,n) * k(e,n);
+                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * (*diss)(e,n);
+                  if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * k(e,n);
                 }
-            if ( (Type_diss == "omega") && ((*pdiss)(e,n) > 0.) && ((k(e, n)/(*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) > (limiter_*nu(e, n))) ) )
+            if (Type_diss == "omega")
               for (auto &&i_m : matrices)
                 {
                   Matrice_Morse& mat = *i_m.second;
-                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * alp(e,n) * 1./(*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
-                  if (i_m.first == "omega")     mat(N * e + n,  N * e + n) -= fac * alp(e,n) * -k(e,n)/((*pdiss)(e, n)*(*pdiss)(e, n)) ;
+                  if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * 1./(*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
+                  if (i_m.first == "omega")     mat(N * e + n,  N * e + n) -= fac * -k(e,n)/((*pdiss)(e, n)*(*pdiss)(e, n)) ;
                 }
           }
     }

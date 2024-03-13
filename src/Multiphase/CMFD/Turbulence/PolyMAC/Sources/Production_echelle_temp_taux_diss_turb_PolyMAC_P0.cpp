@@ -41,12 +41,10 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
   const DoubleTab&                     tab_diss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).valeurs(); // tau ou omega selon l'equation
   const DoubleTab&                    tab_pdiss = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()).passe(); // tau ou omega selon l'equation
   const DoubleTab&                     tab_grad = equation().probleme().get_champ("gradient_vitesse").passe();
-  const DoubleTab*                          alp = sub_type(Pb_Multiphase,equation().probleme()) ? &equation().probleme().get_champ("alpha").valeurs() : nullptr;
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   int nf_tot = domaine.nb_faces_tot(), ne = domaine.nb_elem(), D = dimension ;
   int N = equation().inconnue()->valeurs().line_size();
-  int Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
   int e, n;
 
   std::string Type_diss = ""; // omega or tau dissipation
@@ -67,18 +65,10 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
 
         if (Type_diss == "tau")
           {
-            secmem(e, n) -= fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) * (alp ? (*alp)(e,n) : 1.0); // tau has negative production
+            secmem(e, n) -= fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) ; // tau has negative production
             for (auto &&i_m : matrices)
-              {
-                if (i_m.first == "tau")    (*i_m.second)(N*e+n, N*e+n) += fac *  2 * tab_pdiss(e, n) * (alp ? (*alp)(e,n) : 1.0) ;
-                if (i_m.first == "alpha")  (*i_m.second)(N*e+n, Na*e+n) += fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) ;
-              }
+              if (i_m.first == "tau")    (*i_m.second)(N*e+n, N*e+n) += fac *  2 * tab_pdiss(e, n) ;
           }
-        else if (Type_diss == "omega")
-          {
-            secmem(e, n) +=   fac * (alp ? (*alp)(e,n) : 1.0);
-            for (auto &&i_m : matrices)
-              if (i_m.first == "alpha")  (*i_m.second)(N*e+n, Na*e+n) += fac ;
-          }
+        else if (Type_diss == "omega")  secmem(e, n) +=   fac ;
       }
 }
