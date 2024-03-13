@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.4 : Enhancements, modifications and corrected bugs since version 1.9.3 :
 --------------------------------------------------------------------------------------------------
+13/03/24 (TrioCFD) New feature : FT IJK - Implementation of a spectral forcing method for FT IJK compatible with a bubble swarm
 12/02/24 (TrioCFD) New feature : Algo_QC - New feature 'Algo_QC' added 
 
 
