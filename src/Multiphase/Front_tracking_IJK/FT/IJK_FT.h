@@ -592,6 +592,10 @@ protected :
   // Pressure field
   IJK_Field_double pressure_;
   IJK_Field_double pressure_ghost_cells_;
+
+  IJK_Field_double kappa_ft_;
+  IJK_Field_double kappa_ns_;
+
   IJK_Field_double I_ns_;
   // Molecular diffusivity (see diffusion operator)
   IJK_Field_double molecular_mu_;
