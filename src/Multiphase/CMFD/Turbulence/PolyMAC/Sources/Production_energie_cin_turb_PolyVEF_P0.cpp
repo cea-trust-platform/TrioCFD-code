@@ -74,20 +74,16 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
       MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), nut); //Necessary to compare size in eddy_viscosity()
       visc_turb.eddy_viscosity(nut);
 
-      Matrice_Morse *mat = matrices.count("k") ? matrices.at("k") : nullptr;
-
       for( e = 0 ; e < nb_elem ; e++)
         for( n = 0; n<N ; n++)
           {
             double secmem_en = 0.;
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
-                secmem_en += ( tab_grad( e, N * ( D*d_U+d_X ) + n) + tab_grad( e,  N * ( D*d_X+d_U ) + n) ) * tab_grad( e,  N * ( D*d_U+d_X ) + n) ;
+                secmem_en += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
             secmem_en *= pe(e) * ve(e) * palp(e, n) * tab_rho(e, n) * nut(e, n) ;
 
-            secmem(e, n) += std::max(secmem_en, 0.);//  secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
-
-            if (mat) (*mat)(N * e + n, N * e + n) -= 0.;//fac_(e, n, 1) * std::max(secmem_en, 0.);
+            secmem(e, n) += std::max(secmem_en, 0.);
           }
     }
 
@@ -99,7 +95,7 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
             double grad_grad = 0.;
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
-                grad_grad += ( tab_grad( e, N * ( D*d_U+d_X ) + n) + tab_grad( e,  N * ( D*d_X+d_U ) + n) ) * tab_grad( e,  N * ( D*d_U+d_X ) + n) ;
+                grad_grad += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
             double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
 
             double utau = 0., yloc = 0., nut_p=0;
@@ -112,28 +108,26 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
 
             fac += 0.5 * std::pow(utau,4)/(nut_p*nut_p) * pe(e) * ve(e) * std::tanh( std::pow(1./80. * utau*yloc/nu(e,n), 3) ) ;
 
-
             if (Type_diss == "tau")
               {
                 secmem(e, n) += fac * k(e, n) * (*diss)(e, n) ;
                 for (auto &&i_m : matrices)
                   {
                     Matrice_Morse& mat = *i_m.second;
-                    if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * (*diss)(e,n) + (*pdiss)(e,n)-(*pdiss)(e,n);
+                    if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * (*diss)(e,n) ;
                     if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * k(e,n);
                   }
               }
             else if (Type_diss == "omega")
               {
-                secmem(e, n) += fac * pk(e, n) / ((*diss)(e, n)) ;
+                secmem(e, n) += fac * k(e, n) / (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
                 for (auto &&i_m : matrices)
                   {
                     Matrice_Morse& mat = *i_m.second;
-                    if (i_m.first == "omega")     mat(N * e + n,  N * e + n) += fac * pk(e,n) / ((*diss)(e, n)*(*diss)(e, n));
-                    if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * 1./ ((*diss)(e, n))*0. ;
+                    if (i_m.first == "omega")     mat(N * e + n,  N * e + n) += fac * k(e,n) / ((*pdiss)(e, n)*(*pdiss)(e, n));
+                    if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * 1./ (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
                   }
               }
-
           }
     }
 }
