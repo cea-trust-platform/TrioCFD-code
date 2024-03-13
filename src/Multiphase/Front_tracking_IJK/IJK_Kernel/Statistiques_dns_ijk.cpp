@@ -2152,7 +2152,34 @@ void Statistiques_dns_ijk::compute_and_store_gradU_cell(const IJK_Field_double& 
   return;
 }
 
+IJK_Field_double Statistiques_dns_ijk::compute_and_store_scalar_product_face_to_face(
+  const IJK_Field_double& v1_i, const IJK_Field_double& v1_j, const IJK_Field_double& v1_k,
+  const IJK_Field_double& v2_i,const IJK_Field_double& v2_j,const IJK_Field_double& v2_k)
+{
+  // champ scalaire qui accueuille le resultat
+  IJK_Field_double v1v2 = v1_i;
+  v1v2.data()=0;
 
+  const IJK_Splitting& splitting = v1_i.get_splitting();
+  // Nombre total de mailles en K
+  //const int nktot = splitting.get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_K);
+  // Nombre local de mailles :
+  const int imax = splitting.get_nb_items_local(IJK_Splitting::ELEM, 0);
+  const int jmax = splitting.get_nb_items_local(IJK_Splitting::ELEM, 1);
+  const int kmax = splitting.get_nb_items_local(IJK_Splitting::ELEM, 2);
+
+  //const int offset = splitting.get_offset_local(DIRECTION_K);
+
+  for (int k = 0; k < kmax; k++)
+    for (int j = 0; j < jmax; j++)
+      for (int i = 0; i < imax; i++)
+        {
+          v1v2(i,j,k) += v1_i(i,j,k)*v2_i(i,j,k);
+          v1v2(i,j,k) += v1_j(i,j,k)*v2_j(i,j,k);
+          v1v2(i,j,k) += v1_k(i,j,k)*v2_k(i,j,k);
+        }
+  return v1v2;
+}
 
 // Fonction pour calculer le gradient d'un champs aux elems
 // Le champ retourne est aussi aux elems.
@@ -2348,5 +2375,41 @@ double Statistiques_dns_ijk::calculer_vraie_dissipation(const double& pseudo_dis
                        + dujdx*duidy + dujdy*dujdy + dujdz*dukdy
                        + dukdx*duidz + dukdy*dujdz + dukdz*dukdz;
   return(true_dissip);
+}
+
+double Statistiques_dns_ijk::calculer_produit_scalaire_faces_to_center(
+  const IJK_Field_double& ui, const IJK_Field_double& uj, const IJK_Field_double& uk,
+  const IJK_Field_double& vi, const IJK_Field_double& vj, const IJK_Field_double& vk,
+  const int i, const int j, const int k)
+{
+  // Retourne le resultat u.v pour u et v des vecteurs aux faces.
+  // Le resultat se situe au centre de l'element
+  double produit_scalaire = (
+                              (ui(i,j,k)*vi(i,j,k) + ui(i+1,j,k)*vi(i+1,j,k))*0.5 +
+                              (uk(i,j,k)*vk(i,j,k) + uk(i,j,k+1)*vj(i,j,k+1))*0.5 +
+                              (uk(i,j,k)*vk(i,j,k) + uk(i,j,k+1)*vj(i,j,k+1))*0.5
+                            );
+
+  return produit_scalaire;
+}
+
+void Statistiques_dns_ijk::compute_vecA_minus_vecB_in_vecA(FixedVector<IJK_Field_double, 3>& vecA, const FixedVector<IJK_Field_double, 3>& vecB)
+{
+  const IJK_Splitting& splitting = vecA.get_splitting();
+  // Nombre total de mailles en K
+  //const int nktot = splitting.get_nb_items_global(IJK_Splitting::ELEM, DIRECTION_K);
+  // Nombre local de mailles :
+  const int imax = splitting.get_nb_items_local(IJK_Splitting::ELEM, 0);
+  const int jmax = splitting.get_nb_items_local(IJK_Splitting::ELEM, 1);
+  const int kmax = splitting.get_nb_items_local(IJK_Splitting::ELEM, 2);
+
+  //const int offset = splitting.get_offset_local(DIRECTION_K);
+  for (int k = 0; k < kmax; k++)
+    for (int j = 0; j < jmax; j++)
+      for (int i = 0; i < imax; i++)
+        for (int dir = 0; dir < 3; ++dir)
+          {
+            vecA[dir](i,j,k) -= vecB[dir](i,j,k);
+          }
 }
 

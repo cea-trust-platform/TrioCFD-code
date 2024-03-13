@@ -2,7 +2,9 @@ Parametres {
 	Titre "Transport periodique front-tracking en IJK"
 	Description ""
 	Auteur "G.B."
+	CasTest . prepare.data
 	CasTest . test_sigma_seq.data
+	CasTest . test_sigma_drho_seq.data
 	CasTest . test_sigma_par8.data 8
 	ExtraUsedFile init.lata*
 }
@@ -76,8 +78,15 @@ Chapitre {
                 pseudocolor test_sigma_seq.lata DOM_EXT_dual SOURCE_QDM_INTERF_Y FACES
                 Operator_to_all Slice2D_z 0 0 0.17
 	}
+	visu {
+		Cycles  1
+		titre "dt=  1"
+		instruction_visit DefineScalarExpression("delta_ELEM_dom","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh test_sigma_seq.lata INTERFACES
+                pseudocolor test_sigma_seq.lata DOM delta ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
 }
-
 
 
 Chapitre {
@@ -119,8 +128,15 @@ Chapitre {
                 pseudocolor test_sigma_seq.lata DOM_EXT_dual SOURCE_QDM_INTERF_Y FACES
                 Operator_to_all Slice2D_z 0 0 0.17
 	}
+	visu {
+		Cycles  -1
+		titre "dt=  -1"
+		instruction_visit DefineScalarExpression("delta_ELEM_dom","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh test_sigma_seq.lata INTERFACES
+                pseudocolor test_sigma_seq.lata DOM delta ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
 }
-
 
 
 Chapitre {
@@ -162,8 +178,15 @@ Chapitre {
                 pseudocolor test_sigma_par8.lata DOM_EXT_dual SOURCE_QDM_INTERF_Y FACES
                 Operator_to_all Slice2D_z 0 0 0.17
 	}
+	visu {
+		Cycles  1
+		titre "dt=  1"
+		instruction_visit DefineScalarExpression("delta_ELEM_dom","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh test_sigma_par8.lata INTERFACES
+                pseudocolor test_sigma_par8.lata DOM delta ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
 }
-
 
 
 Chapitre {
@@ -205,7 +228,36 @@ Chapitre {
                 pseudocolor test_sigma_par8.lata DOM_EXT_dual SOURCE_QDM_INTERF_Y FACES
                 Operator_to_all Slice2D_z 0 0 0.17
 	}
+	visu {
+		Cycles  -1
+		titre "dt=  -1"
+		instruction_visit DefineScalarExpression("delta_ELEM_dom","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh test_sigma_par8.lata INTERFACES
+                pseudocolor test_sigma_par8.lata DOM delta ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
 }
 
 
 
+Chapitre {
+	Titre "Comparison of source term when rhov differs from rhol"
+	Description "Calcul rho constant."
+	visu {
+		Cycles 1
+		titre "dt= 1 rhov==rhol"
+		instruction_visit DefineScalarExpression("delta_ELEM_dom","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh test_sigma_seq.lata INTERFACES
+                pseudocolor test_sigma_seq.lata DOM delta ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
+	Description "Calcul rho variable"
+	visu {
+		Cycles 1
+		titre "dt= 1 rhov!=rhol"
+		instruction_visit DefineScalarExpression("delta_ELEM_dom","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh test_sigma_seq.lata INTERFACES
+                pseudocolor test_sigma_seq.lata DOM delta ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
+}

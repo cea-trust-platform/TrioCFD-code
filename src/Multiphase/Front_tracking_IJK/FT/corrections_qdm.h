@@ -376,8 +376,11 @@ public :
   int is_type_gb() const;
   int is_type_gr() const;
   int is_type_none() const;
+
+  int write_me() const;
 protected :
   int type_;
+  int write_me_;
   correction_one_direction correction_x_;
   correction_one_direction correction_y_;
   correction_one_direction correction_z_;

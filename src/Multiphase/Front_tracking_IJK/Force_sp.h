@@ -66,6 +66,8 @@ public:
   void compute_door_rope();
   void compute_door_cube();
   void compute_force_kappa();
+  void compute_diracs_for_cos_squarred();
+  void compute_diracs_for_t_times_cos_squarred(double time);
   void write(std::string nom_fichier_sortie, double time);
   void write_separate(std::string nom_fichier_sortie, double t);
   void compute_energie();

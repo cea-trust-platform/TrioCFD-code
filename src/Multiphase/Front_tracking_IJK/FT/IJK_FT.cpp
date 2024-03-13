@@ -597,7 +597,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter_flag("use_inv_rho_in_poisson_solver", &use_inv_rho_in_poisson_solver_); // XD_ADD_P chaine not_set
   param.ajouter_flag("diffusion_alternative", &diffusion_alternative_); // XD_ADD_P chaine not_set
   param.ajouter_flag("suppression_rejetons", &suppression_rejetons_); // XD_ADD_P chaine not_set
-  param.ajouter("correction_bilan_qdm", &correction_bilan_qdm_); // XD_ADD_P chaine not_set
+  // param.ajouter("correction_bilan_qdm", &correction_bilan_qdm_); // XD_ADD_P chaine not_set
   param.ajouter_flag("refuse_patch_conservation_QdM_RK3_source_interf", &refuse_patch_conservation_QdM_RK3_source_interf_); // XD_ADD_P rien experimental Keyword, not for use
   // GAB; qdm
   param.ajouter_flag("test_etapes_et_bilan", &test_etapes_et_bilan_); // XD_ADD_P chaine not_set
@@ -698,14 +698,14 @@ Entree& IJK_FT_double::interpreter(Entree& is)
       Process::exit();
     }
 
-  if ((correction_bilan_qdm_<0) || (correction_bilan_qdm_>4))
-    {
-      Cerr << "Invalid value of correction_bilan_qdm : " << correction_bilan_qdm_  << ". " << finl;
-      Cerr << "Please use 0, 1, or 2 for no_correction, geometric_mean or arithmetic_mean respectively" << finl;
-      Cerr << "Or 3 to anhilate the residual deviation... " << finl;
-      Cerr << "Or 4 to anhilate the residual deviation (except along z)... " << finl;
-      Process::exit();
-    }
+//  if ((correction_bilan_qdm_<0) || (correction_bilan_qdm_>4))
+//    {
+//      Cerr << "Invalid value of correction_bilan_qdm : " << correction_bilan_qdm_  << ". " << finl;
+//      Cerr << "Please use 0, 1, or 2 for no_correction, geometric_mean or arithmetic_mean respectively" << finl;
+//      Cerr << "Or 3 to anhilate the residual deviation... " << finl;
+//      Cerr << "Or 4 to anhilate the residual deviation (except along z)... " << finl;
+//      Process::exit();
+//    }
 
   // Si on utilise un seul groupe et qu'on impose un volume unique a toutes les bulles,
   if (vol_bulle_monodisperse_>=0.)
@@ -1981,11 +1981,8 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
    *  o Si le parametre source_qdm_gr vaut 0, la source est determinee par :
    *          temre_force_init         --> temre_source_acceleration et par
    *          expression_derivee_force --> expression_derivee_acceleration
-   * REMARQUE : la correction pour source_qdm_gr = 1 suit le meme esprit que la correction orthogonale a g
-   *            appliquee pour patch_qdm_gr=1.
    * REMARQUE II : On peut envisager de faire une correction qui n'a pas besoin qu'on lui donne vx_terminale en
-   *               entree. C'est ce qui a ete legerment explore, mais qui n'a pas aboutit. La valeur a mettre est 8
-   *               desormais.
+   *               entree. C'est ce qui a ete explore, mais qui n'a pas aboutit.
    *  */
   statistiques().begin_count(source_counter_);
   double new_time = time;
@@ -2067,12 +2064,15 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
 
       if (qdm_corrections_.is_type_gb())
         {
-          // Cout << "get_time_scheme" << get_time_scheme() << finl;
+          // calcul de terme_source_acceleration_ et de terme_source_acceleration_
+
           // ON NE VEUT PAS METTRE A JOUR TERME_SOURCE_ACCELERATION_ AVEC CETTE METHODE
           if ( get_time_scheme() == EULER_EXPLICITE)
             {
               terme_source_acceleration_ += derivee_acceleration * timestep;
+              //terme_source_acceleration_ += 0;//derivee_acceleration * timestep;
               facteur_variable_source_ += derivee_facteur_sv * timestep;
+              //facteur_variable_source_ += 0;//derivee_facteur_sv * timestep;
               new_time += timestep;
             }
           else if ( get_time_scheme() == RK3_FT )
@@ -2080,9 +2080,12 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
               const double intermediate_dt = compute_fractionnal_timestep_rk3( timestep, rk_step);
               runge_kutta3_update_for_float(derivee_acceleration, store_RK3_source_acc_,
                                             terme_source_acceleration_, rk_step, timestep);
-
+              Cout << "terme_source_acceleration_" << terme_source_acceleration_ << finl;
+              //terme_source_acceleration_ += 0;
               runge_kutta3_update_for_float(derivee_facteur_sv, store_RK3_fac_sv_,
                                             facteur_variable_source_, rk_step, timestep);
+              Cout << "facteur_variable_source_" << facteur_variable_source_ << finl;
+              //facteur_variable_source_ += 0;
               new_time += intermediate_dt;
             }
         }
@@ -2098,15 +2101,47 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
         }
     }
   envoyer_broadcast(terme_source_acceleration_, 0);
-
+  // -----------------------------------------------------------
+  // Force interface (:"force sigma") seloon x,y,z et u.Force_interface
+  double fs0(0),fs1(0),fs2(0),psn(0);
+  if (!disable_diphasique_)
+    {
+      // FORCE INTERFACIALE : on veut un terme homogene a [rho.g]=[N.m^{-3}]
+      // terme_source_interfaces_ns_       est homogene a [du/dt]=[m.s^{-2}]
+      //   -> in calculer_dv : "~ velocity_ += force_interf * dt ~"
+      //   --> force_interf a bien eu un mass_solver_with_rho plus haut
+      fs0=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[0],0));
+      fs1=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[1],1));
+      fs2=calculer_v_moyen(scalar_fields_product(rho_field_,terme_source_interfaces_ns_[2],2));
+      psn=calculer_v_moyen(scalar_product(velocity_,scalar_times_vector(rho_field_,terme_source_interfaces_ns_)));
+    }
+  // energie cinetique (monophasique) et diphasique
+  double uu(calculer_v_moyen(scalar_product(velocity_,velocity_)));
+  double uru(calculer_v_moyen(scalar_product(velocity_,scalar_times_vector(rho_field_,velocity_))));
+  // Force exterieur (:"force thi") selon x,y,z et acceleration_thi.acceleration_thi, force_thi.foce_thi, u.Force_THI
+  double ft0(0),ft1(0),ft2(0),atat(0),ftft(0),ptn(0);
+  if (forcage_.get_type_forcage() > 0)
+    {
+      // FORCE IMPOSEE : on veut un terme homogene a [rho.g]=[N.m^{-3}]
+      // forcage_.get_force_ph2()     est homogene a [du/dt]=[m.s^{-2}]
+      //   -> in compute_add_THI_force_sur_d_velocity : "~ d_velocity += forcage_.get_force_ph2() ~"
+      ft0 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[0],0));
+      ft1 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[1],1));
+      ft2 = calculer_v_moyen(scalar_fields_product(rho_field_,forcage_.get_force_ph2()[2],2));
+      atat = calculer_v_moyen(scalar_product(forcage_.get_force_ph2(),forcage_.get_force_ph2()));
+      ftft = calculer_v_moyen(scalar_product(scalar_times_vector(rho_field_,forcage_.get_force_ph2()),scalar_times_vector(rho_field_,forcage_.get_force_ph2())));
+      ptn = calculer_v_moyen(scalar_product(velocity_,scalar_times_vector(rho_field_,forcage_.get_force_ph2())));
+    }
+  // -----------------------------------------------------------
   // Impression dans le fichier _acceleration.out
   if (Process::je_suis_maitre())
     {
       // GR : 07.01.22 : ce serai pas mal de mettre une condition if (tstep % dt_post_stats_acc_ == dt_post_stats_acc_ - 1 || stop)
       //      pour alleger le dossier OUT. Voir avec GB et AB.
+      // double ff=0.;
       int reset = (!reprise_) && (tstep_==0);
       SFichier fic=Ouvrir_fichier("_acceleration.out",
-                                  "tstep\ttime\tVx\trhoVx\ttauw\tda/dt\tNewT\tacceleration\tfac_var_source\tqdm_source\tvap_velocity_tmoy_\tliq_velocity_tmoy_\tqdm_patch_correction_[0]\tqdm_patch_correction_[1]\tqdm_patch_correction_[2]",
+                                  "1.tstep\t2.time\t3.Vx\t4.rhoVx\t5.tauw\t6.da/dt\t7.NewT\t8.acceleration\t9.fac_var_source\t10.qdm_source\t11.vap_velocity_tmoy_\t12.liq_velocity_tmoy_\t13.qdm_patch_correction_[0]\t14.qdm_patch_correction_[1]\t15.qdm_patch_correction_[2]\t16.F_sigma_moyen[0]\t17.F_sigma_moyen[1]\t18.F_sigma_moyen[2]\t19.y.F_sigma\t20.u.u\t21.F_THI[0]\t22.F_THI[1]\t23.F_THI[2]\t24.A_THI.A_THI\t25.F_THI.F_THI\t26.u.F_THI\t27.u.rho.u",
                                   reset);
       // la derivee_acceleration n'est connue que sur le maitre
       fic<< tstep_<<" "<< time<<" "<<v_moy<<" "<<rhov_moy <<" "<<tauw ;
@@ -2122,16 +2157,33 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       for (int dir = 0; dir < 3; dir++)
         fic <<" "<< 0.; //qdm_patch_correction_[dir];
 
+      // Force interfaciale et puissance du travail des forces interfaciales
+      // rho*terme_source_interfaces_ns_
+      fic <<" "<< fs0; // F_sigma_moyen[0]
+      fic <<" "<< fs1; // F_sigma_moyen[1]
+      fic <<" "<< fs2; // F_sigma_moyen[2]
+      // u.rho*terme_source_interfaces_ns_
+      fic <<" "<< psn; // velocity.F_sigma
+
+      // Energie cinetique (double)
+      // u.u (qui est aussi accessible par les .txt)
+      fic <<" "<< uu;
+
+      // Force imposee et puissance du traveil de la force imposee
+      // rho*F_THI
+      fic <<" "<< ft0; // F_THI[0]
+      fic <<" "<< ft1; // F_THI[1]
+      fic <<" "<< ft2; // F_THI[2]
+      fic <<" "<< atat; // A_THI.A_THI
+      fic <<" "<< ftft; // F_THI.F_THI
+      // u.rho*F_THI
+      fic <<" "<< ptn; // velocity.F_THI
+      // Energie cinetique en diphasiqeu (double)
+      // u.rho.u (qui est aussi accessible par les .txt)
+      fic <<" "<< uru;
+
       fic<<finl;
       fic.close();
-      //    Cout << "T= " << time
-      //	 << " Vx_moyen= " << v_moy
-      //	 << " rhoVx_moyen= " << rhov_moy
-      //	 << " tauw= " << tauw;
-      //    Cout << " da/dt= " << derivee_acceleration
-      //	 << " NewT= " << new_time
-      //	 << " acceleration= " << terme_source_acceleration_
-      //	 << finl;
     }
   statistiques().end_count(source_counter_);
 }
@@ -2306,8 +2358,10 @@ void IJK_FT_double::run()
   if (!disable_diphasique_)
     {
       allocate_velocity(terme_source_interfaces_ft_, splitting_ft_, 2);
+      allocate_velocity(backup_terme_source_interfaces_ft_, splitting_, 2);
       // Seulement pour le calcul du bilan de forces :
       allocate_velocity(terme_source_interfaces_ns_, splitting_, 1);
+      allocate_velocity(backup_terme_source_interfaces_ns_, splitting_, 1);
       // Seulement pour le calcul des statistiques :
       allocate_velocity(terme_repulsion_interfaces_ns_, splitting_, 1);
       allocate_velocity(terme_repulsion_interfaces_ft_, splitting_ft_, 1);
@@ -2526,7 +2580,8 @@ void IJK_FT_double::run()
   if ((!disable_diphasique_) && (post_.get_liste_post_instantanes().contient_("VI")
                                  || post_.get_liste_post_instantanes().contient_("TOUS")))
     interfaces_.compute_vinterp();
-// Preparer le fichier de postraitement et postraiter la condition initiale:
+
+  // Preparer le fichier de postraitement et postraiter la condition initiale:
   Nom lata_name = nom_du_cas();
   if (fichier_post_ != "??")
     {
@@ -2729,13 +2784,6 @@ void IJK_FT_double::run()
                     }
                 }
             }
-          if (!disable_diphasique_ && !(qdm_corrections_.is_type_none()))
-            {
-              set_time_for_corrections();
-              compute_and_add_qdm_corrections();
-              //compute_and_add_source_qdm_gr(0.6,0.2, 0.6, 0.1);
-            }
-
         }
       else if (get_time_scheme() == RK3_FT)
         {
@@ -2805,12 +2853,8 @@ void IJK_FT_double::run()
                 }
               // Calcul du terme source force acceleration :
               // GAB, rotation
-              // calculer_terme_source_acceleration(velocity_[0],
-              // /!\ On laisse ce calcul du temre_source_aceleration car il ecrit aussi le fichier acceleration.out qui nous est chere
-              Cout << "BF : calculer_terme_source_acceleration" <<finl;
               calculer_terme_source_acceleration(velocity_[direction_gravite_],
                                                  current_time_at_rk3_step, timestep_ /*total*/, rk_step_);
-              Cout << "AF : calculer_terme_source_acceleration" <<finl;
 
 
               current_time_at_rk3_step += fractionnal_timestep;
@@ -2855,11 +2899,6 @@ void IJK_FT_double::run()
                   u_euler_ap_rho_mu_ind_[dir] = calculer_v_moyen(velocity_[dir]);
                 }
             }
-          if (!disable_diphasique_ && !(qdm_corrections_.is_type_none()) )
-            {
-              set_time_for_corrections();
-              compute_and_add_qdm_corrections();
-            }
         }
       else
         {
@@ -2867,6 +2906,28 @@ void IJK_FT_double::run()
                << " inconnu!" << finl;
           Process::exit();
         }
+      // ------------------------------------------------------------------
+      // CORRECTION DE QUANTITE DE MOUVEMENT
+      // ------------------------------------------------------------------
+      // Correction de QdM : permet de controler la QdM globale, dans chaque direction
+      if (!(qdm_corrections_.is_type_none()) )
+        {
+          set_time_for_corrections();
+          if (disable_diphasique_)
+            compute_and_add_qdm_corrections_monophasic();
+          else
+            compute_and_add_qdm_corrections();
+        }
+      else
+        {
+          Cout << "qdm_corrections_.is_type_none() : " << qdm_corrections_.is_type_none() << finl;
+          Cout << "terme_source_acceleration_" << terme_source_acceleration_ << finl;
+        }
+      if (qdm_corrections_.write_me())
+        {write_qdm_corrections_information();}
+      else
+        {;}
+      // ------------------------------------------------------------------
 
       //ab-forcage-control-ecoulement-deb
       // Quel que soit le schema en temps, on corrige le bilan de qdm par le residu integre :
@@ -2876,89 +2937,9 @@ void IJK_FT_double::run()
       // Attention, en entree du solveur mass, il faut qqch homogene a rho*u*volume_cell...
       // On rempli donc psi_velocity avec vol * integrated_residu_
 
-      static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
-      statistiques().begin_count(bilanQdM_counter_);
-      if ((correction_bilan_qdm_ == 3) || (correction_bilan_qdm_ == 4))
-        {
-
-#ifndef VARIABLE_DZ
-          double volume = 1.;
-          for (int i = 0; i < 3; i++)
-            volume *= splitting_.get_grid_geometry().get_constant_delta(i);
-#endif
-
-          for (int dir = 0; dir < 3; dir++)
-            {
-              if ((dir == 2) && (correction_bilan_qdm_ == 4))
-                {
-                  // passe, on ne traite pas z...
-                }
-              else
-                {
-#ifndef VARIABLE_DZ
-                  const double x = volume * integrated_residu_[dir];
-                  psi_velocity_[dir].data() = x;
-#endif
-                  const int kmax = psi_velocity_[dir].nk();
-                  for (int k = 0; k < kmax; k++)
-                    {
-#ifdef VARIABLE_DZ
-                      const double volume = get_channel_control_volume(psi_velocity_[dir], k, delta_z_local_);
-                      const double x = volume*integrated_residu_[dir];
-                      psi_velocity_[dir].data() = x;
-#endif
-                      if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
-                        {
-                          Cerr
-                              << "Verifier que inv_rho_field soit valide et a jour ici ... "
-                              << finl;
-                          Process::exit();
-                          mass_solver_with_inv_rho(psi_velocity_[dir],
-                                                   inv_rho_field_, delta_z_local_, k);
-                        }
-                      else
-                        {
-                          mass_solver_with_rho(psi_velocity_[dir], rho_field_,
-                                               delta_z_local_, k);
-                        }
-                      const int imax = velocity_[dir].ni();
-                      const int jmax = velocity_[dir].nj();
-                      for (int j = 0; j < jmax; j++)
-                        {
-                          for (int i = 0; i < imax; i++)
-                            {
-                              velocity_[dir](i, j, k) -= psi_velocity_[dir](i,
-                                                                            j, k);
-                            }
-                        }
-                    }
-                  if (dir==0)
-                    {
-                      velocity_[dir].echange_espace_virtuel(
-                        velocity_[dir].ghost(), boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-                      //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());}
-                    }
-                  else
-                    {
-                      velocity_[dir].echange_espace_virtuel(
-                        velocity_[dir].ghost());
-                      //	  psi_velocity_[dir].echange_espace_virtuel(psi_velocity_[dir].ghost());
-                    }
-
-
-                }
-            }
-          // Ces operations ont modifie le store_rhov_moy_ qu'il faut donc updater :
-          for (int dir = 0; dir < 3; dir++)
-            {
-              store_rhov_moy_[dir] -= integrated_residu_[dir];
-            }
-
-          // Remise a zero du residu integre puisqu'il a ete corrige :
-          integrated_residu_ = 0.;
-
-        }
-      statistiques().end_count(bilanQdM_counter_);
+      // static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
+      // statistiques().begin_count(bilanQdM_counter_);
+      // statistiques().end_count(bilanQdM_counter_);
 
       //ab-forcage-control-ecoulement-fin
       current_time_ += timestep_;
@@ -3220,7 +3201,7 @@ void IJK_FT_double::compute_correction_for_momentum_balance(const int rk_step)
     {
       int reset = (!reprise_) && (tstep_==0);
       SFichier fic=Ouvrir_fichier("_bilan_qdm.out",
-                                  "tstep\ttime\tFs_theo\tFtot\trhov\ttauw\tS\tacceleration\tres\tcumul_res\tCorrFs\n# Forces have 3 components.",
+                                  "tstep\ttime\tFs_theo\tFtot\trhov\ttauw\tS\tacceleration\tres\tcumul_res\tCorrFs\nConvection\tDiffusion\tPression\n# Forces have 3 components.",
                                   reset, 20/*prec*/);
 
       fic << tstep_<<" "<< current_time_<<" "
@@ -3511,6 +3492,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
     }
 
   // Calcul du terme source aux interfaces pour l'ajouter a dv :
+  // ATTENZIONE : Questa è una bugia. I termini di interfaccia vengono aggiunti direttamente a velocity_!
   if (!disable_diphasique_)
     {
       for (int dir = 0; dir < 3; dir++)
@@ -3542,81 +3524,119 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                 }
             }
 
-          {
-            for (int dir = 0; dir < 3; dir++)
-              {
-                redistribute_from_splitting_ft_faces_[dir].redistribute(terme_source_interfaces_ft_[dir],
-                                                                        terme_source_interfaces_ns_[dir]);
-                // GAB, qdm : les forces d'interface sont directement ajoutees a velocity... aucun effet sur d_velocity normalement
-                //            Donc terme_interfaces_bf_mass_solver_bis est nul. C'EST A VERIFIER !!
-//                if (rk_step==-1 || rk_step==0) // euler ou premier pdt de rk3
-                if (test_etapes_et_bilan_)
-                  {
-                    terme_interfaces_bf_mass_solver_[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-                    terme_interfaces_bf_mass_solver_bis_[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection_[dir] - terme_diffusion_[dir];
-                  }
-//                else
-//                  {
-//                    terme_interfaces_bf_mass_solver[dir] += calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-//                    terme_interfaces_bf_mass_solver_bis[dir] += calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection[dir] - terme_diffusion[dir];
-//                  }
-              }
-            //statistiques().end_count(cnt_SourceInterf);
-            // Computing force_tot (Attention, il faut le faire avant d'appliquer le solver mass a terme_source_interfaces_ns_) :
-            compute_correction_for_momentum_balance(rk_step);
-            for (int dir = 0; dir < 3; dir++)
-              {
-                if ((!refuse_patch_conservation_QdM_RK3_source_interf_) && (rk_step>=0) )
-                  {
-                    // On est en RK3 et on utilise le patch de conservation de la QdM (comportement par defaut du RK3)
-                    // Utilisation directe du terme source interf pour l'ajouter a velocity_.
-                    // On ne le met plus dans d_velocity_ car ce n'est pas conservatif globalement... (test quand sigm et drho)
-                    const int kmax = terme_source_interfaces_ns_[dir].nk();
-                    for (int k = 0; k < kmax; k++)
-                      {
-                        // division par le produit (volume * rho_face)
-                        if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
-                          {
-                            Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
-                            Process::exit();
-                            // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
-                          }
-                        else
-                          mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
-
-                        // puis
-                        // comme euler_explicit_update mais avec un pas de temps partiel :
-                        const double delta_t = compute_fractionnal_timestep_rk3(timestep_ /* total*/, rk_step);
-                        const int imax = terme_source_interfaces_ns_[dir].ni();
-                        const int jmax = terme_source_interfaces_ns_[dir].nj();
-                        for (int j = 0; j < jmax; j++)
+          for (int dir = 0; dir < 3; dir++)
+            {
+              redistribute_from_splitting_ft_faces_[dir].redistribute(terme_source_interfaces_ft_[dir],
+                                                                      terme_source_interfaces_ns_[dir]);
+              // GAB, qdm : les forces d'interface sont directement ajoutees a velocity... aucun effet sur d_velocity normalement
+              //            Donc terme_interfaces_bf_mass_solver_bis est nul. C'EST A VERIFIER !!
+              if (test_etapes_et_bilan_)
+                {
+                  terme_interfaces_bf_mass_solver_[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
+                  terme_interfaces_bf_mass_solver_bis_[dir] = calculer_v_moyen(d_velocity_[dir])/volume_cell_uniforme - terme_convection_[dir] - terme_diffusion_[dir];
+                }
+            }
+          post_.fill_surface_force(terme_source_interfaces_ns_);
+          // Computing force_tot (Attention, il faut le faire avant d'appliquer le solver mass a terme_source_interfaces_ns_) :
+          compute_correction_for_momentum_balance(rk_step);
+          for (int dir = 0; dir < 3; dir++)
+            {
+              // On est en RK3 et on utilise le patch de conservation de la QdM (comportement par defaut du RK3)
+              // Utilisation directe du terme source interf pour l'ajouter a velocity_.
+              // On ne le met plus dans d_velocity_ car ce n'est pas conservatif globalement... (test quand sigm et drho)
+              if (post_.get_liste_post_instantanes().contient_("REPULSION_FT") ||
+                  post_.get_liste_post_instantanes().contient_("CELL_REPULSION_FT")    )
+                {
+                  redistribute_from_splitting_ft_faces_[dir].redistribute(
+                    terme_repulsion_interfaces_ft_[dir],
+                    terme_repulsion_interfaces_ns_[dir]);
+                }
+              const int kmax = terme_source_interfaces_ns_[dir].nk();
+              for (int k = 0; k < kmax; k++)
+                {
+                  // division par le produit (volume * rho_face)
+                  if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
+                    {
+                      Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
+                      Process::exit();
+                      // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
+                    }
+                  else
+                    {
+                      // Division de terme_source_interfaces_ns_ par rho_field et par volume cellule
+                      //cout << " code Delta : "<<terme_repulsion_interfaces_ns_[0](6,9,10);
+                      //cout << " code Delta : "<<backup_terme_source_interfaces_ns_[0](6,9,10);
+                      //cout << " code Delta : "<<post_.get_rho_Ssigma()[2](6,11,11);
+                      //cout << endl;
+                      mass_solver_with_rho(terme_source_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                      //cout << " code Nabla : "<<terme_repulsion_interfaces_ns_[0](6,9,10);
+                      //cout << " code Nabla : "<<backup_terme_source_interfaces_ns_[0](6,9,10);
+                      //cout << " code Nabla : "<<post_.get_rho_Ssigma()[2](6,11,11);
+                      //cout << endl;
+                      //if (k==10)
+                      //  {
+                      //    cout << "code 2211 " << rho_field_(5,9,10) << " & " << rho_field_(6,9,10) << " & " << rho_field_(7,9,10)<<endl;
+                      //    cout << "code Z,611 " << post_.get_rho_Ssigma()[2](6,11,11);
+                      //    cout << ", code Z,611 " << backup_terme_source_interfaces_ns_[2](6,11,11);
+                      //    cout << ", code Z,611 " << terme_source_interfaces_ns_[2](6,11,11)<<endl;
+                      //    cout << "code X,6910 " << post_.get_rho_Ssigma()[0](6,9,10);
+                      //    cout << ", code X,6910 " << backup_terme_source_interfaces_ns_[0](6,9,10);
+                      //    cout << ", code X,6910 " << terme_source_interfaces_ns_[0](6,9,10)<<endl;
+                      //  }
+                      if (post_.get_liste_post_instantanes().contient_("REPULSION_FT") ||
+                          post_.get_liste_post_instantanes().contient_("CELL_REPULSION_FT")    )
+                        {
+                          // Division de terme_repulsion_interfaces_ns_ par rho_field_ et par volume cellule
+                          mass_solver_with_rho(terme_repulsion_interfaces_ns_[dir], rho_field_, delta_z_local_, k);
+                          //terme_repulsion_interfaces_ns_[0](6,9,10)=50;
+                        }
+                      // Egalite aux dimensions :
+                      // [terme_source_interfaces_ns_]=[terme_repulsion_interfaces_ns_]=[du/dt / Vcell] = m/s^2/m^3
+                    }
+                  if ((!refuse_patch_conservation_QdM_RK3_source_interf_) && (rk_step>=0) )
+                    {
+                      // puis
+                      // comme euler_explicit_update mais avec un pas de temps partiel :
+                      const double delta_t = compute_fractionnal_timestep_rk3(timestep_ /* total*/, rk_step);
+                      const int imax = terme_source_interfaces_ns_[dir].ni();
+                      const int jmax = terme_source_interfaces_ns_[dir].nj();
+                      for (int j = 0; j < jmax; j++)
+                        {
                           for (int i = 0; i < imax; i++)
                             {
                               double x = terme_source_interfaces_ns_[dir](i,j,k);
                               velocity_[dir](i,j,k) += x * delta_t;
                             }
-                      }
-                    // On est dans une boucle sur les directions la, c ok
-                    // GAB, qdm  ATTENTION on ne va ici que si on est en rk3
-                    if (test_etapes_et_bilan_)
-                      {
-                        // Cout << "BF terme_interfaces_af_mass_solver" << finl;
-                        terme_interfaces_af_mass_solver_[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
-                        // Cout << "AF terme_interfaces_af_mass_solver" << finl;
-                      }
-                  }
-              }
-          }
+                        }
+                    }
+                  // On est dans une boucle sur les directions la, c ok
+                  // GAB, qdm  ATTENTION on ne va ici que si on est en rk3
+                  if (test_etapes_et_bilan_)
+                    {
+                      terme_interfaces_af_mass_solver_[dir] = calculer_v_moyen(terme_source_interfaces_ns_[dir]);
+                    }
+                }
+
+              //const int kmax = terme_source_interfaces_ns_[0].nk();
+              //for (int ii = 0; ii < kmax; ++ii)
+              //  {
+              //    for (int jj = 0; jj < kmax; ++jj)
+              //      {
+              //        for (int kk = 0; kk < kmax; ++kk)
+              //          {
+              //            if (backup_terme_source_interfaces_ns_[dir](ii,jj,kk) != terme_source_interfaces_ns_[dir](ii,jj,kk) )
+              //              {
+              //                cout << "change after mass solver for : dir,i,j,k = "<<dir<<", "<<ii<<", "<<jj<<", "<<kk<<endl;
+              //              }
+              //          }
+              //      }
+              //  }
+            }
         }
     }
 
   // On laisse l'ecriture de ce fichier de sortie A L'INTERIEUR de calculer_dv car on souhaite relever
   // la valeur des differents termes A CHAQUE sous-pas de temps du schema RK3. On peut en revanche,
-  // deplacer cette ecriture A LA FIN de calculer_dv.
-  Cout << "G bilan qdm " << finl;
-  if (test_etapes_et_bilan_)
-    write_check_etapes_et_termes(rk_step);
-  //
 
   fill_variable_source_and_potential_phi(time);
 
@@ -3762,6 +3782,11 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
     }
   // verifier si mon terme de thi est bon en integrale
   ///////////////////////////////////////////////////////
+  Cout << "G bilan qdm " << finl;
+  if (test_etapes_et_bilan_)
+    write_check_etapes_et_termes(rk_step);
+
+  //
 
 
   // Il est important de s'assurer a la fin que la derivee de la vitesse soit a zero sur les parois:
@@ -3808,10 +3833,13 @@ void IJK_FT_double::compute_add_external_forces(const int dir)
   return;
 }
 
-// GAB, THI /!\ REMPLACER PAR compute_add_THI_force_sur_d_velocity
+
+
+// -----------------------------------------------------------------------------------
+//  FORCAGE EXTERIEUR, DEFINI DANS L'ESPACE SPECTRAL
 void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>& vitesse,
                                           const int time_iteration,
-                                          const double dt, //tstep, /!\ ce dt est faux, je ne sais pas pk mais en comparan sa valeur avec celle du dt_ev, je vois que c'est faux
+                                          const double dt, //tstep, /!\ ce dt est faux, je ne sais pas pk mais en comparant sa valeur avec celle du dt_ev, je vois que c'est faux
                                           const double current_time,
                                           const IJK_Splitting& my_splitting
                                           // const int rk_step
@@ -3838,6 +3866,7 @@ void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>
   statistiques().end_count(m2_counter_);
 
   statistiques().begin_count(m3_counter_);
+
   const FixedVector<IJK_Field_double, 3>& force = forcage_.get_force_ph2();
   for(int dir=0; dir<3; dir++)
     {
@@ -3861,7 +3890,6 @@ void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>
   statistiques().end_count(m3_counter_);
 }
 
-// GAB, THI
 void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_Field_double, 3>& vitesse,
                                                          const int time_iteration,
                                                          const double dt, //tstep,  /!\ ce dt est faux, je ne sais pas pk mais en comparant sa valeur avec celle du dt_ev, je vois que c'est faux
@@ -3895,6 +3923,7 @@ void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_F
   statistiques().end_count(m2_counter_);
 
   statistiques().begin_count(m3_counter_);
+
   const FixedVector<IJK_Field_double, 3>& force = forcage_.get_force_ph2();
 
   for(int dir=0; dir<3; dir++)
@@ -3948,6 +3977,7 @@ void IJK_FT_double::compute_add_THI_force_sur_d_velocity(const FixedVector<IJK_F
   statistiques().end_count(m3_counter_);
   Cout << "end of from_spect_to_phys_opti2_advection" << finl;
 }
+// -----------------------------------------------------------------------------------
 
 void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 {
@@ -3985,7 +4015,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           for (int dir = 0; dir<3; dir++)
             rho_u_euler_av_prediction_[dir] = calculer_v_moyen(rho_u_euler_av_prediction_champ_[dir]);
         }
-      // GAB, remarque : calculer dv calcul dv, MAIS NE L'APPLIQUE PAS au champ de vitesse !!!
+      // GAB, remarque : calculer dv calcule dv, MAIS NE L'APPLIQUE PAS au champ de vitesse !!!
       //                 l'increment de vitesse est ajoute au champ de vitesse avec euler_explicit_update
       calculer_dv(timestep_, current_time_, -1 /*rk_step = -1 pour sch euler... */);
       // GAB, qdm calculer_dv ne fait que l'etape de prediction)
@@ -4896,6 +4926,8 @@ void IJK_FT_double::write_check_etapes_et_termes(int rk_step)
     }
 }
 
+// -----------------------------------------------------------------------------------
+//  CORRECTION DE QdM
 double IJK_FT_double::calculer_true_moyenne_de_phase_liq(const IJK_Field_double& vx)
 {
   /* Au 04.11.21 : Renvoi vx_liq */
@@ -5032,8 +5064,48 @@ void IJK_FT_double::compute_and_add_qdm_corrections()
        * plus de 10 doubles, sur un maillage a 40^3 mailles, une seule bulle... */
       if (qdm_corrections_.get_need_to_compute_correction_value_one_direction(dir))
         qdm_corrections_.compute_correction_value_one_direction(dir);
-      //TODO : coder le get_correction_value_one_direction(dir);
-      //double correction_value_one_direction = qdm_corrections_.get_correction_value_one_direction(dir);
+      for (int k=0; k<vel.nk(); ++k)
+        for (int j=0; j<vel.nj(); ++j)
+          for (int i=0; i<vel.ni(); ++i)
+            {
+              qdm_corrections_.compute_correct_velocity_one_direction(dir, vel(i,j,k));
+              velocity_[dir](i,j,k) = qdm_corrections_.get_correct_velocitiy_one_direction(dir);
+            }
+    }
+
+  Cout << "AF : compute_and_add_qdm_corrections" << finl;
+}
+
+void IJK_FT_double::compute_and_add_qdm_corrections_monophasic()
+{
+  /* For monophasic corrections only */
+  /*
+   * Corrections to comply with the momentum budget
+   * u_corrected = u - u_correction
+   * u_corrected and u_corrrection are computed in the qdm_corrections_ object.
+   * */
+  double alpha_l = 1.; // calculer_v_moyen(interfaces_.I())
+  double rho_moyen = rho_liquide_; // calculer_v_moyen(rho_field_)
+  qdm_corrections_.set_rho_moyen_alpha_l(rho_moyen,alpha_l);
+  qdm_corrections_.set_rho_liquide(rho_liquide_);
+  for (int dir=0; dir<3; dir++)
+    {
+      IJK_Field_double& vel = velocity_[dir];
+      double rho_vel_moyen = calculer_v_moyen(rho_v_[dir]);
+      qdm_corrections_.set_rho_vel_moyen(dir,rho_vel_moyen);
+      Cout << "qdm_corrections_.get_need_for_vitesse_relative("<<dir<<")" << qdm_corrections_.get_need_for_vitesse_relative(dir)<< finl;
+      if (qdm_corrections_.get_need_for_vitesse_relative(dir))
+        {
+          double vel_rel = calculer_true_moyenne_de_phase_liq(vel); // - calculer_true_moyenne_de_phase_vap(vel);
+          qdm_corrections_.set_vitesse_relative(dir, vel_rel);
+        }
+      // TODO : Demander de l'aide a Guillaume :
+      /* Pour moyenne glissante, je fais appel a des ArrOfDouble. En utilisation sequentielle, j'en
+       * suis satisfait disons. En utilisation parallele, je ne sais pas vraiment comment sont gerees
+       * mes listes. Sont-t-elles dupliquees ? Decoupees ? En tout cas la simu plante pour une liste
+       * plus de 10 doubles, sur un maillage a 40^3 mailles, une seule bulle... */
+      if (qdm_corrections_.get_need_to_compute_correction_value_one_direction(dir))
+        qdm_corrections_.compute_correction_value_one_direction(dir);
       for (int k=0; k<vel.nk(); k++)
         for (int j=0; j<vel.nj(); j++)
           for (int i=0; i<vel.ni(); i++)
@@ -5042,7 +5114,7 @@ void IJK_FT_double::compute_and_add_qdm_corrections()
               velocity_[dir](i,j,k) = qdm_corrections_.get_correct_velocitiy_one_direction(dir);
             }
     }
-  Cout << "AF : compute_and_add_qdm_corrections" << finl;
+  Cout << "AF : compute_and_add_qdm_corrections_monophasic" << finl;
 }
 
 void IJK_FT_double::compute_var_volume_par_bulle(ArrOfDouble& var_volume_par_bulle)
@@ -5123,4 +5195,130 @@ void IJK_FT_double::update_twice_indicator_field()
 {
   for(int i=0; i<2; i++)
     update_indicator_field();
+}
+
+void IJK_FT_double::write_qdm_corrections_information()
+{
+  // Impression dans le fichier qdm_correction.out
+  if (get_time_scheme() == RK3_FT) // && (rk3_sub_step!=0)
+    Cout << "in write_qdm_corrections_information, rk_step_ = "<<rk_step_<<finl;
+  Vecteur3 qdm_cible = qdm_corrections_.get_correction_values();
+  Vecteur3 velocity_correction = qdm_corrections_.get_velocity_corrections();
+  Vecteur3 rho_vel;
+  for (int dir=0; dir<3; ++dir) rho_vel[dir] =  calculer_v_moyen(scalar_fields_product(rho_field_,velocity_[dir],dir));
+
+  if (Process::je_suis_maitre())
+    {
+      int reset = (!reprise_) && (tstep_==0);
+      SFichier fic=Ouvrir_fichier("_qdm_correction.out",
+                                  "1.iteration\t2.time\t3.qdm_cible[0]\t4.qdm_cible[1]\t5.qdm_cible[2]\t6.velocity_correction[0]\t7.velocity_correction[1]\t8.velocity_correction[2]\t9.qdm[0]\t10.qdm[1]\t11.qdm[2]",
+                                  reset);
+      // temps
+      fic << tstep_ << " ";
+      fic << current_time_ << " ";
+      // CIBLE CONSTANE : qdm_cible = al.rl.u_cible
+      fic << qdm_cible[0] << " ";
+      fic << qdm_cible[1] << " ";
+      fic << qdm_cible[2] << " ";
+      // velocity_correction = (<r.u> - qdm_cible) / <r>
+      fic << velocity_correction[0] << " ";
+      fic << velocity_correction[1] << " ";
+      fic << velocity_correction[2] << " ";
+      // <r.u>
+      fic << rho_vel[0] << " ";
+      fic << rho_vel[1] << " ";
+      fic << rho_vel[2] << " ";
+      fic<<finl;
+      fic.close();
+      //	 << finl;
+    }
+}
+
+
+// -----------------------------------------------------------------------------------
+//  PRODUITS DE CHAMPS
+IJK_Field_double IJK_FT_double::scalar_product(const FixedVector<IJK_Field_double, 3>& V1, const FixedVector<IJK_Field_double, 3>& V2)
+{
+  /*
+   * * ATTENTION : valide pour un maillage cartesien, de maille cubiques uniquement !
+   */
+  IJK_Field_double resu;
+  resu.allocate(splitting_, IJK_Splitting::ELEM, 3);
+  int nk = V1[0].nk();
+  if (nk != V2[0].nk()) {Cerr << "scalar product of fields with different dimensions (nk)"<< finl;}
+  int nj = V1[0].nj();
+  if (nj != V2[0].nj()) {Cerr << "scalar product of fields with different dimensions (nj)"<< finl;}
+  int ni = V1[0].ni();
+  if (ni != V2[0].ni()) {Cerr << "scalar product of fields with different dimensions (ni)"<< finl;}
+
+  for (int k=0; k<nk; ++k)
+    for (int j=0; j<nj; ++j)
+      for (int i=0; i<ni; ++i)
+        {
+          resu(i,j,k) = 0.25*(
+                          (V1[0](i,j,k)+V1[0](i+1,j,k))*(V2[0](i,j,k)+V2[0](i+1,j,k))
+                          +(V1[1](i,j,k)+V1[1](i,j+1,k))*(V2[1](i,j,k)+V2[1](i,j+1,k))
+                          +(V1[2](i,j,k)+V1[2](i,j,k+1))*(V2[2](i,j,k)+V2[2](i,j,k+1))
+                        );
+        }
+  // Communication avec tous les process ?
+  return resu;
+}
+
+FixedVector<IJK_Field_double, 3> IJK_FT_double::scalar_times_vector(const IJK_Field_double& Sca, const FixedVector<IJK_Field_double, 3>& Vec)
+{
+  /*
+   * Produit d'un champ scalaire (Sca) par un champ de vecteur (Vec).
+   * Le champ scalaire est aux centre des elements, le champ de vecteur est aux faces
+   * Le resultat reste localise au meme endroit que le champ de vecteur passe en entree.
+   * ATTENTION : valide pour un maillage cartesien, de maille cubiques uniquement !
+   */
+
+  FixedVector<IJK_Field_double, 3> resu;
+  allocate_velocity(resu,splitting_,3); // j'ai besoin de mettre des cellules ghost ? non, je ne pense pas
+  int nk = Vec[0].nk();
+  if (nk != Sca.nk()) {Cerr << "scalar fields has different dimension from vector field  (nk)"<< finl;}
+  int nj = Vec[0].nj();
+  if (nj != Sca.nj()) {Cerr << "scalar fields has different dimension from vector field  (nj)"<< finl;}
+  int ni = Vec[0].ni();
+  if (ni != Sca.nk()) {Cerr << "scalar fields has different dimension from vector field  (ni)"<< finl;}
+
+  for (int k=0; k<nk; ++k)
+    for (int j=0; j<nj; ++j)
+      for (int i=0; i<ni; ++i)
+        {
+          resu[0](i,j,k) = 0.5*(Sca(i-1,j,k)+Sca(i,j,k))*Vec[0](i,j,k);
+          resu[1](i,j,k) = 0.5*(Sca(i,j-1,k)+Sca(i,j,k))*Vec[1](i,j,k);
+          resu[2](i,j,k) = 0.5*(Sca(i,j,k-1)+Sca(i,j,k))*Vec[2](i,j,k);
+        }
+  // Communication avec tous les process ?
+  return resu;
+}
+
+IJK_Field_double IJK_FT_double::scalar_fields_product(const IJK_Field_double& S1, const IJK_Field_double& S2, int dir)
+{
+  /*
+   * Produit d'un champ scalaire aux centres (S1) par une des composantes d'un champ de vecteur (S2).
+   * Le resultat est localise au meme endroit que le champ de vecteur dont est issu S2.
+   * ATTENTION : valide pour un maillage cartesien, de maille cubiques uniquement !
+   */
+  IJK_Field_double resu;
+  resu.allocate(splitting_, IJK_Splitting::ELEM, 3);
+  int nk = S1.nk();
+  if (nk != S2.nk()) {Cerr << "scalar fields have different dimensions for the product (nk)"<< finl;}
+  int nj = S1.nj();
+  if (nj != S2.nj()) {Cerr << "scalar fields have different dimensions for the product (nj)"<< finl;}
+  int ni = S1.ni();
+  if (ni != S2.ni()) {Cerr << "scalar fields have different dimensions for the product (ni)"<< finl;}
+
+  for (int k=0; k<nk; ++k)
+    for (int j=0; j<nj; ++j)
+      for (int i=0; i<ni; ++i)
+        {
+          if (dir==0) {resu(i,j,k) = 0.5*(S1(i-1,j,k)+S1(i,j,k))*S2(i,j,k);}
+          if (dir==1) {resu(i,j,k) = 0.5*(S1(i,j-1,k)+S1(i,j,k))*S2(i,j,k);}
+          if (dir==2) {resu(i,j,k) = 0.5*(S1(i,j,k-1)+S1(i,j,k))*S2(i,j,k);}
+        }
+  // Communication avec tous les process ?
+  return resu;
 }

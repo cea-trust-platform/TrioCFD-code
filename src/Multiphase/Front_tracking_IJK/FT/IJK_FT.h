@@ -266,8 +266,12 @@ public :
   //void compute_and_add_source_qdm_gr(const double threshold_0, const double threshold_1, const double threshold_2, const double threshold_3);
   void set_time_for_corrections();
   void compute_and_add_qdm_corrections();
+  void compute_and_add_qdm_corrections_monophasic();
   void compute_var_volume_par_bulle(ArrOfDouble& var_volume_par_bulle);
-
+  void write_qdm_corrections_information();
+  IJK_Field_double scalar_product(const FixedVector<IJK_Field_double, 3>& V1, const FixedVector<IJK_Field_double, 3>& V2);
+  FixedVector<IJK_Field_double, 3> scalar_times_vector(const IJK_Field_double& Sca, const FixedVector<IJK_Field_double, 3>& Vec);
+  IJK_Field_double scalar_fields_product(const IJK_Field_double& S1, const IJK_Field_double& S2, int dir);
   // SURCHARGE DES OPERATEURS : dans FixedVector, on ajoute le produit_scalaire
   //  mais il faut que les operateur * et += soient definis pour IJK_FT_double
   //  /!\ operator* est une fonction, pas une methode de la classe
@@ -433,10 +437,6 @@ protected :
   double pression_ap_proj_;
   //
   // GAB qdm patch a posteriori
-  //TODO :  enum corrections_qdm::type_dict_ { GB, GR };
-  //int patch_qdm_gr_;  // flag
-  //ArrOfDouble qdm_patch_correction_ = 0.; // correction value
-  //ArrOfDouble qdm_patch_correction_deux_;
   // GAB source qdm a posteriori
   /*
   int source_qdm_gr_;
@@ -569,7 +569,9 @@ protected :
   FixedVector<IJK_Field_double, 3> terme_abs_repulsion_interfaces_ft_;
 
   // Celui la est discretise sur le maillage ns:
-  FixedVector<IJK_Field_double, 3> terme_source_interfaces_ns_;
+  FixedVector<IJK_Field_double, 3> terme_source_interfaces_ns_; // [ dt (rho u )/dt = N/m^3 ]
+  FixedVector<IJK_Field_double, 3> backup_terme_source_interfaces_ns_; // [ dt (rho u )/dt = N/m^3 ]
+  FixedVector<IJK_Field_double, 3> backup_terme_source_interfaces_ft_; // [ dt (rho u )/dt = N/m^3 ]
   FixedVector<IJK_Field_double, 3> terme_repulsion_interfaces_ns_;
   FixedVector<IJK_Field_double, 3> terme_abs_repulsion_interfaces_ns_;
 
@@ -683,7 +685,6 @@ protected :
   // comme par exemple : deplacer_interfaces,
   // calculer_rho_mu_indicatrice, ecrire_statistiques_bulles
   int disable_diphasique_;
-
   int time_scheme_;
   double store_RK3_source_acc_;
   double store_RK3_fac_sv_;
@@ -697,6 +698,7 @@ protected :
   corrections_qdm qdm_corrections_;
   // Le maillage des interfaces:
   IJK_Interfaces interfaces_;
+
   // Maillage etendu pour les interfaces
   // Nombre de mailles etendues dans les directions periodiques
   int ijk_splitting_ft_extension_;

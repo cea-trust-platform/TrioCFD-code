@@ -14,4 +14,6 @@ EOF
 
 ./cree_multi_bulles.sh deplacements.txt init.lata
 
-triou prepare.data 1> prepare.out 2> prepare.err 
+sed -e "s/rho_liquide 1000./rho_liquide 1000.\n   rho_vapeur 500./" \
+    -e "s/nb_pas_dt_max .*/nb_pas_dt_max 10/" \
+    test_sigma_seq.data > test_sigma_drho_seq.data

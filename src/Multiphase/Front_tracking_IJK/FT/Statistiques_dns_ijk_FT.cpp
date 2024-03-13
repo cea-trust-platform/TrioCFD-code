@@ -877,6 +877,7 @@ Statistiques_dns_ijk_FT::Statistiques_dns_ijk_FT(IJK_FT_double& ijk_ft):
     "TRUE_DISSIP_MOY",
     "DISSIP_VAP_MOY",
     "TRUE_DISSIP_VAP_MOY",
+    "POWER_INTERF"
     //"IdP_LIQ_dx",
     //"IdP_LIQ_dy",
     //"IdP_LIQ_dz",
@@ -899,7 +900,7 @@ Statistiques_dns_ijk_FT::Statistiques_dns_ijk_FT(IJK_FT_double& ijk_ft):
   // FONCTIONNE
 //  nval_=502+196+27+6+9+25+29;//+6;
   // A VOIR
-  nval_=502+196+27+6+9+25+29+3;
+  nval_=502+196+27+6+9+25+29+3+1;
 
   noms_moyennes_.dimensionner_force(nval_);
   for (int i=0; i<nval_; i++)
@@ -975,8 +976,11 @@ double Calculer_valeur_seuil(double p_seuil, double pressionijk, double p_seuil_
 
 void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
 {
-
   FixedVector<IJK_Field_double, 3>& vitesse=cas.velocity_;
+  // GR262753 : travail des forces d'interfaces
+  FixedVector<IJK_Field_double, 3>& force_interfaces=cas.terme_source_interfaces_ft_;
+  const FixedVector<IJK_Field_double, 3>& repulsion_interfaces=cas.terme_repulsion_interfaces_ft_;
+  // ---
   IJK_Field_double& extended_pressure_liq= (cas.post_.extended_pressure_computed_) ? cas.post_.extended_pl_: cas.pressure_;
   IJK_Field_double& extended_pressure_vap= (cas.post_.extended_pressure_computed_) ? cas.post_.extended_pv_: cas.pressure_;
   IJK_Field_double& pression=cas.pressure_;
@@ -1046,6 +1050,28 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
   const IJK_Field_double& vitesse_i = vitesse[0];
   const IJK_Field_double& vitesse_j = vitesse[1];
   const IJK_Field_double& vitesse_k = vitesse[2];
+
+  // GR262753 : travail forces interfaces
+  if (!cas.disable_diphasique_)
+    compute_vecA_minus_vecB_in_vecA(force_interfaces, repulsion_interfaces);
+
+  /*
+  IJK_Field_double& force_interfaces_i = force_interfaces[0];
+  force_interfaces[0] -= repulsion_interfaces[0];
+  IJK_Field_double& force_interfaces_j = force_interfaces[1];
+  force_interfaces[1] -= repulsion_interfaces[1];
+  IJK_Field_double& force_interfaces_k = force_interfaces[2];
+  force_interfaces[2] -= repulsion_interfaces[2];
+  */
+
+  // Calcule le travail de la force sigma*courbure avec la vitesse.
+  // vitesse et force sont aux faces
+  // ON VA PLUTOT UTILISER LA BOUCLE D'EN DESSOUS ( c'est plus performant de faire comme ca ?)
+  // - const IJK_Field_double field_power_Finterf_velocity = compute_and_store_scalar_product(
+  // -     vitesse_i, vitesse_j, vitesse_k,
+  // -     force_interface_i,force_interface_j,force_interface_k)
+
+  // ---
 
   // Calcul le gradient de U aux cellules a partir de la vitesse aux faces :
   compute_and_store_gradU_cell(vitesse_i, vitesse_j, vitesse_k,
@@ -1156,6 +1182,16 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
                                                               dUdx, dUdy, dUdz,
                                                               dVdx, dVdy, dVdz,
                                                               dWdx, dWdy, dWdz);
+              double travail_Force_interfaces_vitesse = 0.;
+              if (!cas.disable_diphasique_)
+                {
+                  travail_Force_interfaces_vitesse = calculer_produit_scalaire_faces_to_center (
+                                                       vitesse_i, vitesse_j, vitesse_k,
+                                                       force_interfaces[0], force_interfaces[1], force_interfaces[2],
+                                                       i,j,k
+                                                     );
+                }
+
 
               // Pour verifier un peu les stats ou pour le post-traitement, on stocke (systematiquement) les grad de vitesse :
               //if ((check_stats_) || (postraitement des gradients demande?))
@@ -1801,6 +1837,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
               AJOUT(DISSIP_VAP_MOY,chiv*pseudo_dissip);
               AJOUT(TRUE_DISSIP_MOY,chi*true_dissip);
               AJOUT(TRUE_DISSIP_VAP_MOY,chiv*true_dissip);
+              AJOUT(POWER_INTERF,travail_Force_interfaces_vitesse);
               //
               // correlations 2 eme ordre vitesse (cote vapeur) :
               AJOUT(UUIv_MOY,u*u*chiv);
@@ -2562,7 +2599,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
             << L2_d_divU_dy << " "
             << L2_d_divU_dz << finl;
 #endif
-
+  Cout << "Statistiques_dns_ijk_FT::update_stat" << finl;
 }
 
 // This method is called only on master proc.

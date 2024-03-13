@@ -1,0 +1,184 @@
+IJK_Grid_Geometry DOM
+Lire DOM
+{
+  nbelem_i 64
+  nbelem_j 64
+  nbelem_k 64
+  uniform_domain_size_i 3.17e-02
+  uniform_domain_size_j 3.17e-02
+  uniform_domain_size_k 3.17e-02
+  origin_i -1.585e-02
+  origin_j -1.585e-02
+  origin_k -1.585e-02
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+
+  test_etapes_et_bilan  # Recuperation des termes du bilan de qdm #
+
+  vol_bulle_monodisperse .00000000052359877559
+
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 10 # 8  approximativement (Rb/Delta)+3 #
+  timestep 1 # e-7 #
+  time_scheme RK3_FT # RK3_FT si euler_explicit diminuer le facsec #
+  velocity_convection_op Centre
+  Boundary_Conditions {
+    bctype_kmin perio
+    bctype_kmax perio
+  }
+  timestep_facsec 1.0 # 0.25 -> For Euler only? #
+  cfl 1.0
+  fo  1.0
+  oh  1.0
+
+  dt_post 200
+  post_par_paires
+  dt_post_stats_bulles 50
+  dt_post_stats_plans 50
+  dt_sauvegarde 10
+  nb_pas_dt_max 10
+
+  t_debut_statistiques 0.0
+  champs_a_postraiter 7 CELL_VELOCITY CELL_GRAD_P CELL_FORCE_PH CELL_GRAD_P PRESSURE INDICATRICE LAMBDA2
+  check_stop_file stop.txt
+
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 1
+    Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 }
+    #   Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 }  #
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-10 precond ssor { omega 1.5 } }  # 8 # # 1.e-3 au premier pas de temps post switch, puis 1e-8 #
+    seuil 1e-8 # 7 # # 1.e-2 au premier pas de temps post switch, puis 1.e-7 #
+    nb_full_mg_steps 2 20 2
+    iterations_mixed_solver 10
+  }
+
+  interfaces {
+    fichier_reprise_interface init.lata
+    timestep_reprise_interface 1
+    remaillage_ft_ijk {
+      pas_remaillage 9.99999999999999955e-07
+      nb_iter_barycentrage 1
+      relax_barycentrage 1.00000000000000000e+00
+      critere_arete 3.49999999999999978e-01
+      seuil_dvolume_residuel 0.00000000000000000e+00
+      nb_iter_correction_volume 6
+      nb_iter_remaillage 6
+      facteur_longueur_ideale 7.50000000000000000e-01
+      equilateral 1
+      lissage_courbure_coeff -2.50000000000000014e-02
+      lissage_courbure_iterations_systematique 1
+      lissage_courbure_iterations_si_remaillage 10
+    }
+    terme_gravite rho_g
+  }
+
+  forcage { # 216 mailles : Re_l = 67.27; 864 mailles : Re_l = 169.5 ... #
+    type 3
+    # facteur 0:all, 1:chi, 2:rho... #
+    # random_fixed #
+    forced_advection 0   # -1 : advection with mean_u_liq, 1 : advection using advection_velocity, 0 : no advection #
+    advection_velocity 3
+    123 123 123 # Domaine de 4mm, adv de 20mm.s-1 : une structure parcourt le domaine en 0.005s #
+    stops_at_time_step -1
+    stops_at_time -1
+    minimal_forced_mode 1
+    maximal_forced_mode 3
+    amplitude 1e0
+    dissipation 0.0011125 # dissipation_F / 16 #
+    temps_grande_echelle .28
+    random_process {
+      semi_gen_et_modulo_reprise 2
+      1 1
+    }
+  }
+
+  disable_diphasique
+  check_divergence
+  gravite 3 0.0 0.0 0.0
+  # refuse_patch_conservation_QdM_RK3_source_interf #
+  # disable_convection_qdm #
+  # disable_diffusion_qdm  #
+  # disable_source_interf  #
+
+  /*
+  ('alv= ', 0.016754655999999996)
+  ('Ret= ', 0.0)
+  ('rhom ', 1153.14205778672)
+  ('beta ', 1131.2323586887724)
+  */
+
+  corrections_qdm {
+    type none
+    correction_x {
+      type_correction cible_constante
+      parametres_cible_constante {
+        vitesse_cible 0.0
+      }
+      parametres_moyenne_par_morceaux {
+        duree_morceau 0.1
+        v_init_guess -0.17
+      }
+      parametres_moyenne_glissante {
+        duree_intervalle 0.15
+        v_init_guess -0.15
+      }
+    }
+    correction_y {
+      type_correction cible_constante
+      parametres_cible_constante {
+        vitesse_cible -0.
+      }
+      parametres_moyenne_par_morceaux { }
+      parametres_moyenne_glissante { }
+    }
+    correction_z {
+      type_correction cible_constante
+      parametres_cible_constante {
+        vitesse_cible -0.
+      }
+      parametres_moyenne_par_morceaux { }
+      parametres_moyenne_glissante {
+        duree_intervalle 0.04
+        v_init_guess 0.
+      }
+    }
+  }
+
+  terme_force_init 0 # 11173.730658164664 # # rm = 1138.786 #
+  expression_derivee_force 0.
+
+  rho_liquide 1171.3
+  rho_vapeur 87.545
+  mu_liquide 3.73e-04
+  mu_vapeur 3.73e-04
+  sigma 0.018055
+
+  # nom_sauvegarde NEXT/DNS_thi.sauv #
+  # nom_reprise PREV/DNS_thi.sauv #
+
+  # ajout_init_a_reprise #
+  expression_vx_init 0.
+  expression_vy_init 0.
+  expression_vz_init 0.
+}
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+Fin

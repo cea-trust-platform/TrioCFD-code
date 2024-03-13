@@ -5523,7 +5523,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                       s2s1[0] = sommets_(s1,0) - sommets_(s2,0);
                       s2s1[1] = sommets_(s1,1) - sommets_(s2,1);
                       s2s1[2] = sommets_(s1,2) - sommets_(s2,2);
-                      // On calcul la courbure partout de la meme maniere
+                      // On calcule la courbure partout de la meme maniere
                       // meme si on est sur une ligne de contact (ie dans un premier temps, sans tenir compte de
                       // l'effet de la ligne de contact). On corrige l'effet de la ligne de contact par la suite...
                       d_surface(s0,0) += s2s1[1] * n[2] - s2s1[2] * n[1];
