@@ -33,7 +33,7 @@ class Tensors_Computation_VEF;
  *
  *     equations de Navier-Stokes.
  *
- * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_ss_maille_base
+ * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
 class Modele_turbulence_hyd_K_Omega: public Modele_turbulence_hyd_RANS_komega_base
 {

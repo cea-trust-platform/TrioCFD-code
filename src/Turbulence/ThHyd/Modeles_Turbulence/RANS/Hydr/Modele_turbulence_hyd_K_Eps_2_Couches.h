@@ -28,7 +28,7 @@
  *
  *     equations de Navier-Stokes.
  *
- * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_ss_maille_base
+ * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
 class Modele_turbulence_hyd_K_Eps_2_Couches : public Modele_turbulence_hyd_RANS_keps_base
 {

@@ -28,7 +28,7 @@
  *
  *     equations de Navier-Stokes ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
  *
- * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_ss_maille_base
+ * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
 class Modele_turbulence_hyd_K_Eps_Bicephale : public Modele_turbulence_hyd_RANS_Bicephale_base
 {
