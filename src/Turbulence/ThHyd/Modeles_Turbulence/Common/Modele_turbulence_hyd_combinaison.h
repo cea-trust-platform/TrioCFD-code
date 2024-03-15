@@ -22,11 +22,10 @@
 #ifndef Modele_turbulence_hyd_combinaison_included
 #define Modele_turbulence_hyd_combinaison_included
 
-#include <Modele_turbulence_hyd_base.h>
+#include <Modele_turbulence_hyd_0_eq_base.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Vector.h>
 #include <Parser_U.h>
-
 
 /*! @brief Classe Modele_turbulence_hyd_combinaison Classe representant un modele de turbulence exprime a partir d'une combinaison de champs
  *
@@ -47,46 +46,31 @@
  *    Choix d une loi de paroi (eventuellement negligeable) a preciser par l utilisateur
  *
  *
- * @sa Modele_turbulence_hyd_base
+ * @sa Modele_turbulence_hyd_0_eq_base
  */
-class Modele_turbulence_hyd_combinaison : public Modele_turbulence_hyd_base
+class Modele_turbulence_hyd_combinaison: public Modele_turbulence_hyd_0_eq_base
 {
   Declare_instanciable_sans_constructeur(Modele_turbulence_hyd_combinaison);
-
 public:
-
   Modele_turbulence_hyd_combinaison();
+
   void set_param(Param& param) override;
-  void discretiser() override;
   void completer() override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   int preparer_calcul() override;
-  virtual Champ_Fonc& calculer_viscosite_turbulente();
-  inline virtual Champ_Fonc& energie_cinetique_turbulente();
-  inline virtual const Champ_Fonc& energie_cinetique_turbulente() const;
-  inline int nombre_sources();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
+  void calculer_energie_cinetique_turb() override { /* Do nothing */ }
+  inline int nombre_sources() { return nb_var_; }
+
+  // sauter la classe mere
+  int reprendre(Entree& is) override { return Modele_turbulence_hyd_base::reprendre(is); }
+  void imprimer(Sortie& is) const override { return Modele_turbulence_hyd_base::imprimer(is); }
 
 protected:
-
-  Champ_Fonc energie_cinetique_turb_;
-
   Nom la_fct_; //Contient l expression de la combinaison
-  int nb_var_;
+  int nb_var_ = 0;
   Noms les_var;
   mutable VECT(Parser_U) fxyz_; //Parser utilise pour evaluer la valeur prise par la combinaison
 };
-inline int Modele_turbulence_hyd_combinaison::nombre_sources()
-{
-  return nb_var_;
-}
-inline Champ_Fonc& Modele_turbulence_hyd_combinaison::energie_cinetique_turbulente()
-{
-  return energie_cinetique_turb_;
-}
-
-inline const Champ_Fonc& Modele_turbulence_hyd_combinaison::energie_cinetique_turbulente() const
-{
-  return energie_cinetique_turb_;
-}
 
 #endif /* Modele_turbulence_hyd_combinaison_included */

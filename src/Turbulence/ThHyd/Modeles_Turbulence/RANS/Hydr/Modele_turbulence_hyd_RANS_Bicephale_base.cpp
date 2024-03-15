@@ -24,7 +24,7 @@
 #include <TRUSTTrav.h>
 #include <Param.h>
 
-Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_Bicephale_base,"Modele_turbulence_hyd_RANS_Bicephale_base",Modele_turbulence_hyd_base);
+Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_Bicephale_base,"Modele_turbulence_hyd_RANS_Bicephale_base",Modele_turbulence_hyd_2_eq_base);
 // XD mod_turb_hyd_rans_bicephale modele_turbulence_hyd_deriv mod_turb_hyd_rans_bicephale -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Modele_turbulence_hyd_RANS_Bicephale_base::Modele_turbulence_hyd_RANS_Bicephale_base()
