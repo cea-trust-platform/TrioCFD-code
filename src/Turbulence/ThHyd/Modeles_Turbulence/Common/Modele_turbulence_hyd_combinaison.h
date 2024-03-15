@@ -70,13 +70,10 @@ protected:
 
   Champ_Fonc energie_cinetique_turb_;
 
-  Nom la_fct; //Contient l expression de la combinaison
+  Nom la_fct_; //Contient l expression de la combinaison
   int nb_var_;
   Noms les_var;
-  mutable VECT(Parser_U) fxyz; //Parser utilise pour evaluer la valeur prise par la combinaison
-
-private :
-
+  mutable VECT(Parser_U) fxyz_; //Parser utilise pour evaluer la valeur prise par la combinaison
 };
 inline int Modele_turbulence_hyd_combinaison::nombre_sources()
 {

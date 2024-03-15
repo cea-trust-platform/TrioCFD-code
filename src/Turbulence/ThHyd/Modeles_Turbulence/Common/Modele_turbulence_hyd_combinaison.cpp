@@ -69,13 +69,13 @@ void Modele_turbulence_hyd_combinaison::set_param(Param& param)
 {
   Modele_turbulence_hyd_base::set_param(param);
   param.ajouter("nb_var",&les_var);
-  param.ajouter("fonction",&la_fct,Param::REQUIRED);
+  param.ajouter("fonction",&la_fct_,Param::REQUIRED);
 }
 
 void Modele_turbulence_hyd_combinaison::discretiser()
 {
   Modele_turbulence_hyd_base::discretiser();
-  discretiser_K(mon_equation->schema_temps(),mon_equation->domaine_dis(),energie_cinetique_turb_);
+  discretiser_K(mon_equation_->schema_temps(),mon_equation_->domaine_dis(),energie_cinetique_turb_);
 }
 
 // Precondition:
@@ -93,17 +93,17 @@ void Modele_turbulence_hyd_combinaison::discretiser()
 void Modele_turbulence_hyd_combinaison::completer()
 {
   nb_var_ = les_var.size();
-  fxyz.dimensionner(1);
-  fxyz[0].setNbVar(4+nb_var_);
-  fxyz[0].setString(la_fct);
-  fxyz[0].addVar("x");
-  fxyz[0].addVar("y");
-  fxyz[0].addVar("z");
-  fxyz[0].addVar("t");
+  fxyz_.dimensionner(1);
+  fxyz_[0].setNbVar(4+nb_var_);
+  fxyz_[0].setString(la_fct_);
+  fxyz_[0].addVar("x");
+  fxyz_[0].addVar("y");
+  fxyz_[0].addVar("z");
+  fxyz_[0].addVar("t");
   for (int i=0; i<nb_var_; i++)
-    fxyz[0].addVar(les_var[i]);
+    fxyz_[0].addVar(les_var[i]);
 
-  fxyz[0].parseString();
+  fxyz_[0].parseString();
 }
 
 int Modele_turbulence_hyd_combinaison::preparer_calcul()
@@ -117,10 +117,10 @@ void Modele_turbulence_hyd_combinaison::mettre_a_jour(double temps)
 {
   statistiques().begin_count(nut_counter_);
   calculer_viscosite_turbulente();
-  loipar->calculer_hyd(la_viscosite_turbulente,energie_cinetique_turbulente());
+  loipar_->calculer_hyd(la_viscosite_turbulente_,energie_cinetique_turbulente());
   limiter_viscosite_turbulente();
   if (equation().probleme().is_dilatable()) correction_nut_et_cisaillement_paroi_si_qc(*this);
-  la_viscosite_turbulente->valeurs().echange_espace_virtuel();
+  la_viscosite_turbulente_->valeurs().echange_espace_virtuel();
   statistiques().end_count(nut_counter_);
 }
 
@@ -128,7 +128,7 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
 {
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,equation().domaine_dis().valeur());
   const DoubleTab& xp = domaine_VF.xp();
-  DoubleTab& viscosite_valeurs =  la_viscosite_turbulente.valeurs();
+  DoubleTab& viscosite_valeurs =  la_viscosite_turbulente_.valeurs();
   const Probleme_base& mon_pb = equation().probleme();
   double temps = equation().inconnue().temps();
   int nb_ddl = domaine_VF.nb_elem();
@@ -210,10 +210,10 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
       if (dimension >2 )
         z = xp(i,2);
 
-      fxyz[0].setVar("x",x);
-      fxyz[0].setVar("y",y);
-      fxyz[0].setVar("z",z);
-      fxyz[0].setVar("t",temps);
+      fxyz_[0].setVar("x",x);
+      fxyz_[0].setVar("y",y);
+      fxyz_[0].setVar("z",z);
+      fxyz_[0].setVar("t",temps);
 
       double vale2;
       for (int so=0; so<nb_var_; so++)
@@ -224,12 +224,12 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
           if ( conv_to_elem(so) == 0) // champ elem
             {
               if ( nb_dim_so(so) == 1 || dim_2_so(so) == 1 )
-                fxyz[0].setVar(nom_source,source_so_val(i));
+                fxyz_[0].setVar(nom_source,source_so_val(i));
               else
                 {
                   vale2 = 0.;
                   for (int i2=0; i2<(dim_2_so(so)-1); i2++) vale2 += source_so_val(i,i2)*source_so_val(i,i2);
-                  fxyz[0].setVar(nom_source,sqrt(vale2));
+                  fxyz_[0].setVar(nom_source,sqrt(vale2));
                 }
             }
           else // not champ elem
@@ -247,12 +247,12 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
                       vale += sqrt(vale2)/nb_loop_contr;
                     }
                 }
-              fxyz[0].setVar(nom_source,vale);
+              fxyz_[0].setVar(nom_source,vale);
             }
         }
-      viscosite_valeurs(i) = fxyz[0].eval();
+      viscosite_valeurs(i) = fxyz_[0].eval();
     }
-  la_viscosite_turbulente.changer_temps(temps);
+  la_viscosite_turbulente_.changer_temps(temps);
 
-  return la_viscosite_turbulente;
+  return la_viscosite_turbulente_;
 }

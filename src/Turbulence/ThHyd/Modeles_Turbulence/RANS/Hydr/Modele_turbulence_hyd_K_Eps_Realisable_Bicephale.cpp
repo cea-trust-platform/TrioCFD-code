@@ -60,8 +60,8 @@ void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::set_param(Param& param)
   param.ajouter_non_std("Transport_K",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (k) transportation equation.
   param.ajouter_non_std("Transport_Epsilon",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (eps) transportation equation.
   param.ajouter_non_std("Modele_Fonc_Realisable",(this),Param::REQUIRED); // XD_ADD_P Modele_Fonc_Realisable_base This keyword is used to set the model used
-  param.ajouter("PRANDTL_K",&Prandtl_K,Param::REQUIRED); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
-  param.ajouter("PRANDTL_EPS",&Prandtl_Eps,Param::REQUIRED); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
+  param.ajouter("PRANDTL_K",&Prandtl_K_,Param::REQUIRED); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
+  param.ajouter("PRANDTL_EPS",&Prandtl_Eps_,Param::REQUIRED); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
 }
 
 int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -83,8 +83,8 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::lire_motcle_non_standard(c
   else if (mot=="Modele_Fonc_Realisable")
     {
       get_modele_fonction().associer_eqn(eqn_transp_K());
-      is >> mon_modele_fonc;
-      mon_modele_fonc.associer_eqn_2(eqn_transp_Eps());
+      is >> mon_modele_fonc_;
+      mon_modele_fonc_.associer_eqn_2(eqn_transp_Eps());
       get_modele_fonction().discretiser();
       Cerr << "Realizable Two-headed K_Epsilon model type " << get_modele_fonction().que_suis_je() << finl;
       return 1;
@@ -102,7 +102,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
   const DoubleTab& tab_Eps = chEps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente K",tab_K);
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente Epsilon",tab_Eps);
-  DoubleTab& visco_turb =  la_viscosite_turbulente.valeurs();
+  DoubleTab& visco_turb =  la_viscosite_turbulente_.valeurs();
 
   int n = tab_K.dimension(0);
 
@@ -145,7 +145,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
 
         }
 
-      la_viscosite_turbulente->affecter(visco_turb_au_format_K_eps_Rea.valeur());
+      la_viscosite_turbulente_->affecter(visco_turb_au_format_K_eps_Rea.valeur());
 
     }
   else
@@ -158,8 +158,8 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
             visco_turb[i] = Cmu(i)*tab_K(i)*tab_K(i)/tab_Eps(i);
         }
     }
-  la_viscosite_turbulente.changer_temps(temps);
-  return la_viscosite_turbulente;
+  la_viscosite_turbulente_.changer_temps(temps);
+  return la_viscosite_turbulente_;
 }
 
 int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::preparer_calcul()
@@ -185,7 +185,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::preparer_calcul()
   const Milieu_base& mil=equation().probleme().milieu();
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K.valeurs(),mil);
   diviser_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
-  loipar.calculer_hyd_BiK(ch_K,ch_Eps);
+  loipar_.calculer_hyd_BiK(ch_K,ch_Eps);
   eqn_transp_K().controler_variable();
   eqn_transp_Eps().controler_variable();
   calculer_viscosite_turbulente(K().temps());
@@ -197,7 +197,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::preparer_calcul()
       multiplier_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
       correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
-  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
+  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
   return 1;
 
 }
@@ -218,11 +218,11 @@ void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour(double temp
 
   statistiques().begin_count(nut_counter_);
   const Milieu_base& mil=equation().probleme().milieu();
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente_.valeurs());
   // on divise K_eps par rho en QC pour revenir a K et Eps
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K.valeurs(),mil);
   diviser_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
-  loipar.calculer_hyd_BiK(ch_K,ch_Eps);
+  loipar_.calculer_hyd_BiK(ch_K,ch_Eps);
   eqn_transp_K().controler_variable();
   eqn_transp_Eps().controler_variable();
   calculer_viscosite_turbulente(ch_K.temps());
@@ -234,14 +234,14 @@ void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour(double temp
       multiplier_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
       correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
-  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente",la_viscosite_turbulente.valeurs());
+  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente",la_viscosite_turbulente_.valeurs());
   statistiques().end_count(nut_counter_);
 }
 
 bool Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::initTimeStep(double dt)
 {
-  return ( eqn_transport_K_Rea.initTimeStep(dt) and eqn_transport_Eps_Rea.initTimeStep(dt) );
+  return ( eqn_transport_K_Rea_.initTimeStep(dt) and eqn_transport_Eps_Rea_.initTimeStep(dt) );
 }
 
 const Equation_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::equation_k_eps(int i) const
@@ -249,11 +249,11 @@ const Equation_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::equation_
   assert ((i==0)||(i==1));
   if (i==0)
     {
-      return eqn_transport_K_Rea;
+      return eqn_transport_K_Rea_;
     }
   else
     {
-      return eqn_transport_Eps_Rea;
+      return eqn_transport_Eps_Rea_;
     }
 }
 
@@ -267,11 +267,11 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_champ(co
     {
     }
 
-  if (mon_modele_fonc.non_nul())
+  if (mon_modele_fonc_.non_nul())
     {
       try
         {
-          return mon_modele_fonc->get_champ(nom);
+          return mon_modele_fonc_->get_champ(nom);
         }
       catch (Champs_compris_erreur)
         {
@@ -284,13 +284,13 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_champ(co
 void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
   Modele_turbulence_hyd_RANS_Bicephale_base::get_noms_champs_postraitables(nom,opt);
-  if (mon_modele_fonc.non_nul())
-    mon_modele_fonc->get_noms_champs_postraitables(nom,opt);
+  if (mon_modele_fonc_.non_nul())
+    mon_modele_fonc_->get_noms_champs_postraitables(nom,opt);
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::verifie_loi_paroi()
 {
-  Nom lp=loipar.valeur().que_suis_je();
+  Nom lp=loipar_.valeur().que_suis_je();
   if (lp=="negligeable_VEF" || lp=="negligeable_VDF")
     if (!associe_modele_fonction().non_nul())
       {

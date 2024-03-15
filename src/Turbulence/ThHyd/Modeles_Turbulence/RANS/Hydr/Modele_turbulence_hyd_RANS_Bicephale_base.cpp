@@ -29,12 +29,12 @@ Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_Bicephale_base,"Mod
 
 Modele_turbulence_hyd_RANS_Bicephale_base::Modele_turbulence_hyd_RANS_Bicephale_base()
 {
-  Prandtl_K = 1.;
-  Prandtl_Eps = 1.3;
-  LeEPS_MIN = 1.e-10  ;
-  LeEPS_MAX = 1.e+10;
-  LeK_MIN = 1.e-10;
-  lquiet = 0;
+  Prandtl_K_ = 1.;
+  Prandtl_Eps_ = 1.3;
+  LeEPS_MIN_ = 1.e-10  ;
+  LeEPS_MAX_ = 1.e+10;
+  LeK_MIN_ = 1.e-10;
+  lquiet_ = 0;
 }
 /*! @brief Simple appel a Modele_turbulence_hyd_base::printOn(Sortie&)
  *
@@ -60,12 +60,12 @@ Entree& Modele_turbulence_hyd_RANS_Bicephale_base::readOn(Entree& is)
 void Modele_turbulence_hyd_RANS_Bicephale_base::set_param(Param& param)
 {
   Modele_turbulence_hyd_base::set_param(param);
-  param.ajouter("eps_min",&LeEPS_MIN); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
-  param.ajouter("eps_max",&LeEPS_MAX); // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
-  param.ajouter("k_min",&LeK_MIN); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
-  param.ajouter_flag("quiet",&lquiet); // XD_ADD_P flag To disable printing of information about k and epsilon.
-  param.ajouter("PRANDTL_K",&Prandtl_K); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
-  param.ajouter("PRANDTL_EPS",&Prandtl_Eps); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
+  param.ajouter("eps_min",&LeEPS_MIN_); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
+  param.ajouter("eps_max",&LeEPS_MAX_); // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
+  param.ajouter("k_min",&LeK_MIN_); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
+  param.ajouter_flag("quiet",&lquiet_); // XD_ADD_P flag To disable printing of information about k and epsilon.
+  param.ajouter("PRANDTL_K",&Prandtl_K_); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
+  param.ajouter("PRANDTL_EPS",&Prandtl_Eps_); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
 }
 
 
@@ -81,7 +81,7 @@ void Modele_turbulence_hyd_RANS_Bicephale_base::completer()
 
 void Modele_turbulence_hyd_RANS_Bicephale_base::verifie_loi_paroi()
 {
-  Nom lp=loipar.valeur().que_suis_je();
+  Nom lp=loipar_.valeur().que_suis_je();
   if (lp=="negligeable_VEF" || lp=="negligeable_VDF")
     {
       Cerr<<"The turbulence model of type "<<que_suis_je()<<finl;
@@ -159,7 +159,7 @@ int Modele_turbulence_hyd_RANS_Bicephale_base::sauvegarder(Sortie& os) const
 int Modele_turbulence_hyd_RANS_Bicephale_base::reprendre(Entree& is)
 {
   Modele_turbulence_hyd_base::reprendre(is);
-  if (mon_equation.non_nul())
+  if (mon_equation_.non_nul())
     {
       return ( eqn_transp_K().reprendre(is) * eqn_transp_Eps().reprendre(is) );
     }
@@ -181,6 +181,6 @@ int Modele_turbulence_hyd_RANS_Bicephale_base::reprendre(Entree& is)
  */
 void Modele_turbulence_hyd_RANS_Bicephale_base::associer_seconde_eqn(const Equation_base& eqn)
 {
-  ma_seconde_equation = eqn;
+  ma_seconde_equation_ = eqn;
 }
 

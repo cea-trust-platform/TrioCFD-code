@@ -60,7 +60,7 @@ Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 {
   Modele_turbulence_hyd_RANS_komega_base::readOn(s);
 
-  if (model_variant == "SST")
+  if (model_variant_ == "SST")
     {
       Cerr << "SST model: initialize les distances paroi" << "\n";
       // equation().probleme().equation(0).creer_champ("distance_paroi_globale");
@@ -77,9 +77,9 @@ void Modele_turbulence_hyd_K_Omega::set_param(Param& param)
 {
   Modele_turbulence_hyd_RANS_komega_base::set_param(param);
   param.ajouter_non_std("Transport_K_Omega", (this), Param::REQUIRED); // XD_ADD_P transport_k_omega Keyword to define the (k-omega) transportation equation.
-  param.ajouter("PRANDTL_K", &Prandtl_K);
-  param.ajouter("PRANDTL_Omega", &Prandtl_Omega);
-  param.ajouter("model_variant", &model_variant, Param::OPTIONAL); // XD_ADD_P chaine Model variant for k-omega (default value STD)
+  param.ajouter("PRANDTL_K", &Prandtl_K_);
+  param.ajouter("PRANDTL_Omega", &Prandtl_Omega_);
+  param.ajouter("model_variant", &model_variant_, Param::OPTIONAL); // XD_ADD_P chaine Model variant for k-omega (default value STD)
 }
 
 int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -106,7 +106,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
   Nom type = chK_Omega.que_suis_je();
   // const Domaine_Cl_dis& la_domaine_Cl_dis = eqn_transp_K_Omega().domaine_Cl_dis();
   const DoubleTab& tab_K_Omega = chK_Omega.valeurs();
-  DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
 
   // K_Omega(i, 0) = K au noeud i
   // K_Omega(i, 1) = Omega au noeud i
@@ -125,7 +125,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
   // cAlan, le 20/01/2023 : sortir cette partie et en faire une fonction à part ?
   // dans le cas d'une domaine nulle on doit effectuer le dimensionnement
   double non_prepare = 1;
-  Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente before", la_viscosite_turbulente.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente before", la_viscosite_turbulente_.valeurs());
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente tab_K_Omega", tab_K_Omega);
   if (visco_turb.size() == n)
     non_prepare = 0.;
@@ -162,7 +162,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
       // On connait donc la viscosite turbulente au centre des faces de chaque element
       // On cherche maintenant a interpoler cette viscosite turbulente au centre des
       // elements.
-      la_viscosite_turbulente->affecter(visco_turb_au_format_K_Omega.valeur());
+      la_viscosite_turbulente_->affecter(visco_turb_au_format_K_Omega.valeur());
       Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente visco_turb_au_format_K_Omega", visco_turb_au_format_K_Omega.valeur());
     }
   else
@@ -170,9 +170,9 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
       fill_turbulent_viscosity_tab(tab_K_Omega, visco_turb);
     }
 
-  la_viscosite_turbulente.changer_temps(temps);
-  Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente after", la_viscosite_turbulente.valeurs());
-  return la_viscosite_turbulente;
+  la_viscosite_turbulente_.changer_temps(temps);
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente after", la_viscosite_turbulente_.valeurs());
+  return la_viscosite_turbulente_;
 }
 
 void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const DoubleTab& tab_K_Omega, DoubleTab& turbulent_viscosity)
@@ -180,11 +180,11 @@ void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const DoubleTab
   const int nb_elem = tab_K_Omega.dimension(0);
   for (int i = 0; i < nb_elem; ++i)
     {
-      if (tab_K_Omega(i, 1) <= OMEGA_MIN)
+      if (tab_K_Omega(i, 1) <= OMEGA_MIN_)
         turbulent_viscosity[i] = 0;
       else
         {
-          if (model_variant == "SST")
+          if (model_variant_ == "SST")
             {
               // SST variant from the TurbModel group formulation
               const double tmpmax = std::max(CST_A1*tab_K_Omega(i, 1),
@@ -323,16 +323,16 @@ void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
   Cerr << "K_Omega().valeurs().dimension(0) " << K_Omega().valeurs().dimension(0) << "\n";
   Cerr << "K_Omega().valeurs().dimension(1) " << K_Omega().valeurs().dimension(1) << "\n";
 
-  Cerr << "blenderF1.nb_dim()" << blenderF1.nb_dim() << "\n";
-  Cerr << "blenderF1.size()" << blenderF1.size() << "\n";
-  Cerr << "blenderF1.dimension(0) " << blenderF1.dimension(0) << "\n";
-  blenderF1.resize(n);
-  Cerr << "blenderF1.nb_dim()" << blenderF1.nb_dim() << "\n";
-  Cerr << "blenderF1.size()" << blenderF1.size() << "\n";
-  Cerr << "blenderF1.dimension(0) " << blenderF1.dimension(0) << "\n";
+  Cerr << "blenderF1.nb_dim()" << blenderF1_.nb_dim() << "\n";
+  Cerr << "blenderF1.size()" << blenderF1_.size() << "\n";
+  Cerr << "blenderF1.dimension(0) " << blenderF1_.dimension(0) << "\n";
+  blenderF1_.resize(n);
+  Cerr << "blenderF1.nb_dim()" << blenderF1_.nb_dim() << "\n";
+  Cerr << "blenderF1.size()" << blenderF1_.size() << "\n";
+  Cerr << "blenderF1.dimension(0) " << blenderF1_.dimension(0) << "\n";
 
-  fieldF2.resize(n);
-  enstrophy.resize(n);
+  fieldF2_.resize(n);
+  enstrophy_.resize(n);
 
   // le_champ_K_Omega.valeur().equation().domaine_dis().domaine().init_dist_paroi_globale
 }
@@ -352,7 +352,7 @@ int Modele_turbulence_hyd_K_Omega::preparer_calcul()
   if (equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
   imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 1);
-  loipar.calculer_hyd(ch_K_Omega);
+  loipar_.calculer_hyd(ch_K_Omega);
   eqn_transp_K_Omega().controler_K_Omega();
   calculer_viscosite_turbulente(ch_K_Omega.temps());
   limiter_viscosite_turbulente();
@@ -362,15 +362,15 @@ int Modele_turbulence_hyd_K_Omega::preparer_calcul()
       multiplier_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
       // correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
-  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
-  Debog::verifier("Modele_turbulence_hyd_K_Omega::preparer_calcul la_viscosite_turbulente", la_viscosite_turbulente.valeurs());
+  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::preparer_calcul la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
   imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 0);
   return 1;
 }
 
 bool Modele_turbulence_hyd_K_Omega::initTimeStep(double dt)
 {
-  return eqn_transport_K_Omega.initTimeStep(dt);
+  return eqn_transport_K_Omega_.initTimeStep(dt);
 }
 
 /*! @brief Effectue une mise a jour en temps du modele de turbulence.
@@ -395,13 +395,13 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
   statistiques().begin_count(nut_counter_);
   // cAlan : Mutualisable avec preparer ?
   const Milieu_base& mil = equation().probleme().milieu();
-  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente_.valeurs());
   // on divise K_Omega par rho en QC pour revenir a K et Omega
   if (equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(ch_K_Omega.valeurs(), mil);
   imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 1);
   Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour loiparoi before", (int)0);
-  loipar.calculer_hyd(ch_K_Omega);
+  loipar_.calculer_hyd(ch_K_Omega);
   Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour loiparoi after", (int)1);
   eqn_transp_K_Omega().controler_K_Omega();
 
@@ -413,8 +413,8 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
       multiplier_par_rho_si_dilatable(ch_K_Omega.valeurs(),mil);
       // correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
-  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
-  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente after", la_viscosite_turbulente.valeurs());
+  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente after", la_viscosite_turbulente_.valeurs());
   imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 0);
   statistiques().end_count(nut_counter_);
 }

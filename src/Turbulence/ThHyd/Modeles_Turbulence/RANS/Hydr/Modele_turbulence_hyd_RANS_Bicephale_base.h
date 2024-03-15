@@ -77,42 +77,42 @@ public:
 
 protected:
 
-  REF(Equation_base) ma_seconde_equation;
+  REF(Equation_base) ma_seconde_equation_;
 
-  double Prandtl_K, Prandtl_Eps;
-  double LeEPS_MIN, LeEPS_MAX, LeK_MIN;
-  int lquiet;
+  double Prandtl_K_, Prandtl_Eps_;
+  double LeEPS_MIN_, LeEPS_MAX_, LeK_MIN_;
+  int lquiet_;
 
 };
 
 inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_Prandtl_K() const
 {
-  return Prandtl_K;
+  return Prandtl_K_;
 }
 
 inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_Prandtl_Eps() const
 {
-  return Prandtl_Eps;
+  return Prandtl_Eps_;
 }
 
 inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_LeEPS_MIN() const
 {
-  return LeEPS_MIN;
+  return LeEPS_MIN_;
 }
 
 inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_LeEPS_MAX() const
 {
-  return LeEPS_MAX;
+  return LeEPS_MAX_;
 }
 
 inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_LeK_MIN() const
 {
-  return LeK_MIN;
+  return LeK_MIN_;
 }
 
 inline int Modele_turbulence_hyd_RANS_Bicephale_base::get_lquiet() const
 {
-  return lquiet;
+  return lquiet_;
 }
 
 /*! @brief Renvoie la seconde equation associee au modele de turbulence en formulation bicephale.
@@ -123,22 +123,22 @@ inline int Modele_turbulence_hyd_RANS_Bicephale_base::get_lquiet() const
  */
 inline Equation_base& Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation()
 {
-  if (ma_seconde_equation.non_nul()==0)
+  if (ma_seconde_equation_.non_nul()==0)
     {
       Cerr << "\nError in Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() : The equation is unknown !" << finl;
       Process::exit();
     }
-  return ma_seconde_equation.valeur();
+  return ma_seconde_equation_.valeur();
 }
 
 inline const Equation_base& Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() const
 {
-  if (ma_seconde_equation.non_nul()==0)
+  if (ma_seconde_equation_.non_nul()==0)
     {
       Cerr << "\nError in Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() : The equation is unknown !" << finl;
       Process::exit();
     }
-  return ma_seconde_equation.valeur();
+  return ma_seconde_equation_.valeur();
 }
 
 #endif /* Modele_turbulence_hyd_RANS_Bicephale_base_included */

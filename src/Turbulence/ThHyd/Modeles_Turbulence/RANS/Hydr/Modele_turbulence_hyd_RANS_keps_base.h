@@ -78,50 +78,50 @@ public:
       return false;
   };
 protected:
-  Modele_Fonc_Bas_Reynolds mon_modele_fonc;
-  double Prandtl_K, Prandtl_Eps;
-  double LeEPS_MIN, LeEPS_MAX, LeK_MIN;
-  int lquiet;
+  Modele_Fonc_Bas_Reynolds mon_modele_fonc_;
+  double Prandtl_K_, Prandtl_Eps_;
+  double LeEPS_MIN_, LeEPS_MAX_, LeK_MIN_;
+  int lquiet_;
 
 };
 
 inline double Modele_turbulence_hyd_RANS_keps_base::get_Prandtl_K() const
 {
-  return Prandtl_K;
+  return Prandtl_K_;
 }
 
 inline double Modele_turbulence_hyd_RANS_keps_base::get_Prandtl_Eps() const
 {
-  return Prandtl_Eps;
+  return Prandtl_Eps_;
 }
 
 inline double Modele_turbulence_hyd_RANS_keps_base::get_LeEPS_MIN() const
 {
-  return LeEPS_MIN;
+  return LeEPS_MIN_;
 }
 
 inline double Modele_turbulence_hyd_RANS_keps_base::get_LeEPS_MAX() const
 {
-  return LeEPS_MAX;
+  return LeEPS_MAX_;
 }
 
 inline double Modele_turbulence_hyd_RANS_keps_base::get_LeK_MIN() const
 {
-  return LeK_MIN;
+  return LeK_MIN_;
 }
 
 inline int Modele_turbulence_hyd_RANS_keps_base::get_lquiet() const
 {
-  return lquiet;
+  return lquiet_;
 }
 
 inline Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_RANS_keps_base::associe_modele_fonction()
 {
-  return mon_modele_fonc;
+  return mon_modele_fonc_;
 }
 
 inline const Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_RANS_keps_base::associe_modele_fonction() const
 {
-  return  mon_modele_fonc;
+  return  mon_modele_fonc_;
 }
 #endif /* Modele_turbulence_hyd_RANS_keps_base_included */

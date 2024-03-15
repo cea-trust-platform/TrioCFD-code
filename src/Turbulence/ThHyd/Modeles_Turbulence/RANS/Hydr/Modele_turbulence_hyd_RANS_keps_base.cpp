@@ -29,12 +29,12 @@ Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_keps_base,"Modele_t
 
 Modele_turbulence_hyd_RANS_keps_base::Modele_turbulence_hyd_RANS_keps_base()
 {
-  Prandtl_K = 1.;
-  Prandtl_Eps = 1.3;
-  LeEPS_MIN = 1.e-20  ;
-  LeEPS_MAX = 1.e+10;
-  LeK_MIN = 1.e-20;
-  lquiet = 0;
+  Prandtl_K_ = 1.;
+  Prandtl_Eps_ = 1.3;
+  LeEPS_MIN_ = 1.e-20  ;
+  LeEPS_MAX_ = 1.e+10;
+  LeK_MIN_ = 1.e-20;
+  lquiet_ = 0;
 }
 /*! @brief Simple appel a Modele_turbulence_hyd_base::printOn(Sortie&)
  *
@@ -60,10 +60,10 @@ Entree& Modele_turbulence_hyd_RANS_keps_base::readOn(Entree& is)
 void Modele_turbulence_hyd_RANS_keps_base::set_param(Param& param)
 {
   Modele_turbulence_hyd_base::set_param(param);
-  param.ajouter("eps_min",&LeEPS_MIN); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
-  param.ajouter("eps_max",&LeEPS_MAX); // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
-  param.ajouter("k_min",&LeK_MIN); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
-  param.ajouter_flag("quiet",&lquiet); // XD_ADD_P flag To disable printing of information about k and epsilon.
+  param.ajouter("eps_min",&LeEPS_MIN_); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
+  param.ajouter("eps_max",&LeEPS_MAX_); // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
+  param.ajouter("k_min",&LeK_MIN_); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
+  param.ajouter_flag("quiet",&lquiet_); // XD_ADD_P flag To disable printing of information about k and epsilon.
 }
 
 
@@ -78,7 +78,7 @@ void Modele_turbulence_hyd_RANS_keps_base::completer()
 
 void Modele_turbulence_hyd_RANS_keps_base::verifie_loi_paroi()
 {
-  Nom lp=loipar.valeur().que_suis_je();
+  Nom lp=loipar_.valeur().que_suis_je();
   if (lp=="negligeable_VEF" || lp=="negligeable_VDF")
     {
       Cerr<<"The turbulence model of type "<<que_suis_je()<<finl;
@@ -156,7 +156,7 @@ int Modele_turbulence_hyd_RANS_keps_base::sauvegarder(Sortie& os) const
 int Modele_turbulence_hyd_RANS_keps_base::reprendre(Entree& is)
 {
   Modele_turbulence_hyd_base::reprendre(is);
-  if (mon_equation.non_nul())
+  if (mon_equation_.non_nul())
     {
       return eqn_transp_K_Eps().reprendre(is);
     }

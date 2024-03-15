@@ -57,7 +57,7 @@ public:
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
 
 protected:
-  Transport_K_Eps  eqn_transport_K_Eps;
+  Transport_K_Eps  eqn_transport_K_Eps_;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
 };
@@ -73,7 +73,7 @@ protected:
  */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps() const
 {
-  return eqn_transport_K_Eps.inconnue();
+  return eqn_transport_K_Eps_.inconnue();
 }
 
 
@@ -86,7 +86,7 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps() const
  */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps()
 {
-  return eqn_transport_K_Eps.inconnue();
+  return eqn_transport_K_Eps_.inconnue();
 }
 
 /*! @brief Renvoie l'equation du modele de turbulence i.
@@ -97,7 +97,7 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps()
  */
 inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps()
 {
-  return eqn_transport_K_Eps;
+  return eqn_transport_K_Eps_;
 }
 
 /*! @brief Renvoie l'equation du modele de turbulence i.
@@ -109,7 +109,7 @@ inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps()
  */
 inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps() const
 {
-  return eqn_transport_K_Eps;
+  return eqn_transport_K_Eps_;
 }
 inline int Modele_turbulence_hyd_K_Eps::nombre_d_equations() const
 {

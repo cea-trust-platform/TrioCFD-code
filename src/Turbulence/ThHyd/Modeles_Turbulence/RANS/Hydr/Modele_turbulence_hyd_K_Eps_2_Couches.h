@@ -61,7 +61,7 @@ protected :
 
 private:
 
-  Transport_K_KEps  eqn_transport_K_Eps;
+  Transport_K_KEps  eqn_transport_K_Eps_;
   Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
 };
@@ -77,7 +77,7 @@ private:
  */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
 {
-  return eqn_transport_K_Eps.inconnue();
+  return eqn_transport_K_Eps_.inconnue();
 }
 
 
@@ -90,7 +90,7 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
  */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps()
 {
-  return eqn_transport_K_Eps.inconnue();
+  return eqn_transport_K_Eps_.inconnue();
 }
 
 
@@ -100,7 +100,7 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps()
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nbcouches() const
 {
-  return eqn_transport_K_Eps.get_nbcouches();
+  return eqn_transport_K_Eps_.get_nbcouches();
 }
 
 
@@ -112,7 +112,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nbcouches() const
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_yswitch() const
 {
-  return eqn_transport_K_Eps.get_yswitch();
+  return eqn_transport_K_Eps_.get_yswitch();
 }
 
 
@@ -124,7 +124,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_yswitch() const
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_switch() const
 {
-  return eqn_transport_K_Eps.get_switch();
+  return eqn_transport_K_Eps_.get_switch();
 }
 
 /*! @brief Renvoie la valeur de nut/nu qui delimite les deux couches.
@@ -135,7 +135,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_switch() const
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nutswitch() const
 {
-  return eqn_transport_K_Eps.get_nutswitch();
+  return eqn_transport_K_Eps_.get_nutswitch();
 }
 
 /*! @brief indique si on doit ecrire le domaine des 2 couches dans le .
@@ -146,7 +146,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nutswitch() const
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_impr() const
 {
-  return eqn_transport_K_Eps.get_impr();
+  return eqn_transport_K_Eps_.get_impr();
 }
 
 /*! @brief Renvoie l'equation.
@@ -157,7 +157,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_impr() const
  */
 inline const Transport_K_Eps_base&  Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps() const
 {
-  return eqn_transport_K_Eps;
+  return eqn_transport_K_Eps_;
 }
 
 /*! @brief Renvoie l'equation.
@@ -168,7 +168,7 @@ inline const Transport_K_Eps_base&  Modele_turbulence_hyd_K_Eps_2_Couches::eqn_t
  */
 inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps()
 {
-  return eqn_transport_K_Eps;
+  return eqn_transport_K_Eps_;
 }
 
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::nombre_d_equations() const

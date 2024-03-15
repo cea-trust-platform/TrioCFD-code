@@ -60,7 +60,7 @@ public:
 
   void imprimer(Sortie&) const override;
 private :
-  Transport_K_Eps_Bas_Reynolds  eqn_transport_K_Eps_Bas_Re;
+  Transport_K_Eps_Bas_Reynolds  eqn_transport_K_Eps_Bas_Re_;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
 };
@@ -71,22 +71,22 @@ private :
 
 inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::eqn_transp_K_Eps() const
 {
-  return eqn_transport_K_Eps_Bas_Re;
+  return eqn_transport_K_Eps_Bas_Re_;
 }
 
 inline  Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::eqn_transp_K_Eps()
 {
-  return eqn_transport_K_Eps_Bas_Re;
+  return eqn_transport_K_Eps_Bas_Re_;
 }
 
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::K_Eps() const
 {
-  return eqn_transport_K_Eps_Bas_Re.inconnue();
+  return eqn_transport_K_Eps_Bas_Re_.inconnue();
 }
 
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::K_Eps()
 {
-  return eqn_transport_K_Eps_Bas_Re.inconnue();
+  return eqn_transport_K_Eps_Bas_Re_.inconnue();
 }
 
 inline int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::nombre_d_equations() const

@@ -70,18 +70,18 @@ public:
   const Equation_base& equation_k_omega(int i) const override
   {
     assert ((i==0));
-    return eqn_transport_K_Omega;
+    return eqn_transport_K_Omega_;
   }
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt=NONE) const override;
 
 protected:
-  Transport_K_Omega eqn_transport_K_Omega;
+  Transport_K_Omega eqn_transport_K_Omega_;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
-  DoubleTab blenderF1; // Blending field for SST model
-  DoubleTab fieldF2; // for the turbulent viscosity in the SST model
-  DoubleTab enstrophy; // for the turbulent viscosity in the SST model
+  DoubleTab blenderF1_; // Blending field for SST model
+  DoubleTab fieldF2_; // for the turbulent viscosity in the SST model
+  DoubleTab enstrophy_; // for the turbulent viscosity in the SST model
 
 };
 
@@ -96,7 +96,7 @@ protected:
  */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Omega::K_Omega() const
 {
-  return eqn_transport_K_Omega.inconnue();
+  return eqn_transport_K_Omega_.inconnue();
 }
 
 
@@ -109,7 +109,7 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Omega::K_Omega() const
  */
 inline Champ_Inc& Modele_turbulence_hyd_K_Omega::K_Omega()
 {
-  return eqn_transport_K_Omega.inconnue();
+  return eqn_transport_K_Omega_.inconnue();
 }
 
 /*! @brief Renvoie l'equation du modele de turbulence i.
@@ -120,7 +120,7 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Omega::K_Omega()
  */
 inline Transport_K_Omega_base& Modele_turbulence_hyd_K_Omega::eqn_transp_K_Omega()
 {
-  return eqn_transport_K_Omega;
+  return eqn_transport_K_Omega_;
 }
 
 /*! @brief Renvoie l'equation du modele de turbulence i.
@@ -132,7 +132,7 @@ inline Transport_K_Omega_base& Modele_turbulence_hyd_K_Omega::eqn_transp_K_Omega
  */
 inline const Transport_K_Omega_base& Modele_turbulence_hyd_K_Omega::eqn_transp_K_Omega() const
 {
-  return eqn_transport_K_Omega;
+  return eqn_transport_K_Omega_;
 }
 
 /*! @brief Returns the blending field F1.
@@ -143,7 +143,7 @@ inline const Transport_K_Omega_base& Modele_turbulence_hyd_K_Omega::eqn_transp_K
  */
 inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1() const
 {
-  return blenderF1;
+  return blenderF1_;
 }
 
 /*! @brief Returns the blending field F1.
@@ -152,7 +152,7 @@ inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1() const
  */
 inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1()
 {
-  return blenderF1;
+  return blenderF1_;
 }
 
 /*! @brief Returns the field F2.
@@ -163,7 +163,7 @@ inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_blenderF1()
  */
 inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_fieldF2() const
 {
-  return fieldF2;
+  return fieldF2_;
 }
 
 /*! @brief Returns the field F2.
@@ -172,7 +172,7 @@ inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_fieldF2() const
  */
 inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_fieldF2()
 {
-  return fieldF2;
+  return fieldF2_;
 }
 
 /*! @brief Returns the field enstrophy.
@@ -183,7 +183,7 @@ inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_fieldF2()
  */
 inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_enstrophy() const
 {
-  return enstrophy;
+  return enstrophy_;
 }
 
 /*! @brief Returns the field F2.
@@ -192,7 +192,7 @@ inline const DoubleTab& Modele_turbulence_hyd_K_Omega::get_enstrophy() const
  */
 inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_enstrophy()
 {
-  return enstrophy;
+  return enstrophy_;
 }
 
 inline int Modele_turbulence_hyd_K_Omega::nombre_d_equations() const

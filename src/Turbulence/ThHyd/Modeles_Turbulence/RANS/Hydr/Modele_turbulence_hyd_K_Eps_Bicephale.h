@@ -62,9 +62,9 @@ public:
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
 protected:
-  Modele_Fonc_Bas_Reynolds mon_modele_fonc;
-  Transport_K_ou_Eps  eqn_transport_K;
-  Transport_K_ou_Eps  eqn_transport_Eps;
+  Modele_Fonc_Bas_Reynolds mon_modele_fonc_;
+  Transport_K_ou_Eps  eqn_transport_K_;
+  Transport_K_ou_Eps  eqn_transport_Eps_;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
 };
@@ -79,7 +79,7 @@ protected:
  */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K() const
 {
-  return eqn_transport_K.inconnue();
+  return eqn_transport_K_.inconnue();
 }
 
 
@@ -91,7 +91,7 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K() const
  */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K()
 {
-  return eqn_transport_K.inconnue();
+  return eqn_transport_K_.inconnue();
 }
 
 /*! @brief Renvoie le champ inconnue epsilon du modele de turbulence Cette inconnue est portee
@@ -103,7 +103,7 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K()
  */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps() const
 {
-  return eqn_transport_Eps.inconnue();
+  return eqn_transport_Eps_.inconnue();
 }
 
 
@@ -115,7 +115,7 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps() const
  */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps()
 {
-  return eqn_transport_Eps.inconnue();
+  return eqn_transport_Eps_.inconnue();
 }
 
 /*! @brief Renvoie l equation d evolution de K du modele de turbulence
@@ -124,7 +124,7 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps()
  */
 inline Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_transp_K()
 {
-  return eqn_transport_K;
+  return eqn_transport_K_;
 }
 
 /*! @brief Renvoie l equation d evolution de K du modele de turbulence (version const)
@@ -133,7 +133,7 @@ inline Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_trans
  */
 inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_transp_K() const
 {
-  return eqn_transport_K;
+  return eqn_transport_K_;
 }
 
 /*! @brief Renvoie l equation d evolution de epsilon du modele de turbulence
@@ -142,7 +142,7 @@ inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn
  */
 inline Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_transp_Eps()
 {
-  return eqn_transport_Eps;
+  return eqn_transport_Eps_;
 }
 
 /*! @brief Renvoie l equation d evolution de epsilon du modele de turbulence (version const)
@@ -151,19 +151,19 @@ inline Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_trans
  */
 inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_transp_Eps() const
 {
-  return eqn_transport_Eps;
+  return eqn_transport_Eps_;
 }
 
 
 
 inline Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_K_Eps_Bicephale::associe_modele_fonction()
 {
-  return mon_modele_fonc;
+  return mon_modele_fonc_;
 }
 
 inline const Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_K_Eps_Bicephale::associe_modele_fonction() const
 {
-  return  mon_modele_fonc;
+  return  mon_modele_fonc_;
 }
 inline int Modele_turbulence_hyd_K_Eps_Bicephale::nombre_d_equations() const
 {

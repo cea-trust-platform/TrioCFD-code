@@ -31,13 +31,13 @@ Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_komega_base,
 
 Modele_turbulence_hyd_RANS_komega_base::Modele_turbulence_hyd_RANS_komega_base()
 {
-  Prandtl_K = 2.; // cAlan: careful, it is the inverse of the classical definition for code purpose
-  Prandtl_Omega = 2.;
-  OMEGA_MIN = 1.e-20; // OMEGA_MIN cannot be too small?
-  OMEGA_MAX = 1.e+10;
-  K_MIN = 1.e-20;
-  model_variant = "SST";
-  lquiet = 0;
+  Prandtl_K_ = 2.; // cAlan: careful, it is the inverse of the classical definition for code purpose
+  Prandtl_Omega_ = 2.;
+  OMEGA_MIN_ = 1.e-20; // OMEGA_MIN cannot be too small?
+  OMEGA_MAX_ = 1.e+10;
+  K_MIN_ = 1.e-20;
+  model_variant_ = "SST";
+  lquiet_ = 0;
 }
 /*! @brief Simple appel a Modele_turbulence_hyd_base::printOn(Sortie&)
  *
@@ -64,10 +64,10 @@ Entree& Modele_turbulence_hyd_RANS_komega_base::readOn(Entree& is)
 void Modele_turbulence_hyd_RANS_komega_base::set_param(Param& param)
 {
   Modele_turbulence_hyd_base::set_param(param);
-  param.ajouter("omega_min", &OMEGA_MIN); // XD_ADD_P double Lower limitation of omega (default value 1.e-10).
-  param.ajouter("omega_max", &OMEGA_MAX); // XD_ADD_P double Upper limitation of omega (default value 1.e+10).
-  param.ajouter("k_min", &K_MIN); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
-  param.ajouter_flag("quiet", &lquiet); // XD_ADD_P flag To disable printing of information about k and omega.
+  param.ajouter("omega_min", &OMEGA_MIN_); // XD_ADD_P double Lower limitation of omega (default value 1.e-10).
+  param.ajouter("omega_max", &OMEGA_MAX_); // XD_ADD_P double Upper limitation of omega (default value 1.e+10).
+  param.ajouter("k_min", &K_MIN_); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
+  param.ajouter_flag("quiet", &lquiet_); // XD_ADD_P flag To disable printing of information about k and omega.
 }
 
 /*! @brief
@@ -81,7 +81,7 @@ void Modele_turbulence_hyd_RANS_komega_base::completer()
 
 void Modele_turbulence_hyd_RANS_komega_base::verifie_loi_paroi()
 {
-  Nom lp = loipar.valeur().que_suis_je();
+  Nom lp = loipar_.valeur().que_suis_je();
   if (lp == "negligeable_VEF" || lp == "negligeable_VDF")
     {
       Cerr << "The turbulence model of type " << que_suis_je() << finl;
@@ -150,7 +150,7 @@ int Modele_turbulence_hyd_RANS_komega_base::sauvegarder(Sortie& os) const
 int Modele_turbulence_hyd_RANS_komega_base::reprendre(Entree& is)
 {
   Modele_turbulence_hyd_base::reprendre(is);
-  if (mon_equation.non_nul())
+  if (mon_equation_.non_nul())
     {
       return eqn_transp_K_Omega().reprendre(is);
     }

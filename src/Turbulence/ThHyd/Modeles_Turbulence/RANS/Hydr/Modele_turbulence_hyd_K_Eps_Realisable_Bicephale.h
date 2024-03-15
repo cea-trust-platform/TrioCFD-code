@@ -72,9 +72,9 @@ public:
 
 private :
 
-  Modele_Fonc_Realisable mon_modele_fonc;
-  Transport_K_ou_Eps_Realisable  eqn_transport_K_Rea;
-  Transport_K_ou_Eps_Realisable  eqn_transport_Eps_Rea;
+  Modele_Fonc_Realisable mon_modele_fonc_;
+  Transport_K_ou_Eps_Realisable  eqn_transport_K_Rea_;
+  Transport_K_ou_Eps_Realisable  eqn_transport_Eps_Rea_;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
 };
@@ -85,62 +85,62 @@ private :
 
 inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::eqn_transp_K() const
 {
-  return eqn_transport_K_Rea;
+  return eqn_transport_K_Rea_;
 }
 
 inline  Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::eqn_transp_K()
 {
-  return eqn_transport_K_Rea;
+  return eqn_transport_K_Rea_;
 }
 
 inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::eqn_transp_Eps() const
 {
-  return eqn_transport_Eps_Rea;
+  return eqn_transport_Eps_Rea_;
 }
 
 inline  Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::eqn_transp_Eps()
 {
-  return eqn_transport_Eps_Rea;
+  return eqn_transport_Eps_Rea_;
 }
 
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::K() const
 {
-  return eqn_transport_K_Rea.inconnue();
+  return eqn_transport_K_Rea_.inconnue();
 }
 
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::K()
 {
-  return eqn_transport_K_Rea.inconnue();
+  return eqn_transport_K_Rea_.inconnue();
 }
 
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::Eps() const
 {
-  return eqn_transport_Eps_Rea.inconnue();
+  return eqn_transport_Eps_Rea_.inconnue();
 }
 
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::Eps()
 {
-  return eqn_transport_Eps_Rea.inconnue();
+  return eqn_transport_Eps_Rea_.inconnue();
 }
 
 inline Modele_Fonc_Realisable& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::associe_modele_fonction()
 {
-  return mon_modele_fonc;
+  return mon_modele_fonc_;
 }
 
 inline const Modele_Fonc_Realisable& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::associe_modele_fonction() const
 {
-  return  mon_modele_fonc;
+  return  mon_modele_fonc_;
 }
 
 inline Modele_Fonc_Realisable& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_modele_fonction()
 {
-  return mon_modele_fonc;
+  return mon_modele_fonc_;
 }
 
 inline const Modele_Fonc_Realisable& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_modele_fonction() const
 {
-  return  mon_modele_fonc;
+  return  mon_modele_fonc_;
 }
 
 inline int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::nombre_d_equations() const

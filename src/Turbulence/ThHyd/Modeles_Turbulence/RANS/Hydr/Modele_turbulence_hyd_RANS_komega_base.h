@@ -71,46 +71,46 @@ public:
   /////////////////////////////////////////////////////
 
 protected:
-  double Prandtl_K, Prandtl_Omega; // cAlan beware! rename and put in 2eq ?
-  double OMEGA_MIN, OMEGA_MAX, K_MIN;
-  int lquiet;
-  Motcle model_variant; // default model will be k-omega
+  double Prandtl_K_, Prandtl_Omega_; // cAlan beware! rename and put in 2eq ?
+  double OMEGA_MIN_, OMEGA_MAX_, K_MIN_;
+  int lquiet_;
+  Motcle model_variant_; // default model will be k-omega
   static constexpr double CST_A1 = 0.31;
 };
 
 inline const Motcle& Modele_turbulence_hyd_RANS_komega_base::get_model_variant() const
 {
-  return model_variant;
+  return model_variant_;
 }
 
 inline double Modele_turbulence_hyd_RANS_komega_base::get_Prandtl_K() const
 {
-  return Prandtl_K;
+  return Prandtl_K_;
 }
 
 inline double Modele_turbulence_hyd_RANS_komega_base::get_Prandtl_Omega() const
 {
-  return Prandtl_Omega;
+  return Prandtl_Omega_;
 }
 
 inline double Modele_turbulence_hyd_RANS_komega_base::get_OMEGA_MIN() const
 {
-  return OMEGA_MIN;
+  return OMEGA_MIN_;
 }
 
 inline double Modele_turbulence_hyd_RANS_komega_base::get_OMEGA_MAX() const
 {
-  return OMEGA_MAX;
+  return OMEGA_MAX_;
 }
 
 inline double Modele_turbulence_hyd_RANS_komega_base::get_K_MIN() const
 {
-  return K_MIN;
+  return K_MIN_;
 }
 
 inline int Modele_turbulence_hyd_RANS_komega_base::get_lquiet() const
 {
-  return lquiet;
+  return lquiet_;
 }
 
 #endif /* Modele_turbulence_hyd_RANS_komega_base_included */

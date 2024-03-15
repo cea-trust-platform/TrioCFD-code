@@ -61,8 +61,8 @@ void Modele_turbulence_hyd_K_Eps_Realisable::set_param(Param& param)
   Modele_turbulence_hyd_RANS_keps_base::set_param(param);
   param.ajouter_non_std("Transport_K_Epsilon_Realisable",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (k-eps) transportation equation.
   param.ajouter_non_std("Modele_Fonc_Realisable",(this),Param::REQUIRED); // XD_ADD_P Modele_Fonc_Realisable_base This keyword is used to set the model used
-  param.ajouter("PRANDTL_K",&Prandtl_K,Param::REQUIRED); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
-  param.ajouter("PRANDTL_EPS",&Prandtl_Eps,Param::REQUIRED); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
+  param.ajouter("PRANDTL_K",&Prandtl_K_,Param::REQUIRED); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
+  param.ajouter("PRANDTL_EPS",&Prandtl_Eps_,Param::REQUIRED); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
 }
 
 int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -77,7 +77,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcl
   else if (mot=="Modele_Fonc_Realisable")
     {
       get_modele_fonction().associer_eqn(eqn_transp_K_Eps());
-      is >> mon_modele_fonc;
+      is >> mon_modele_fonc_;
       get_modele_fonction().discretiser();
       Cerr << "Realizable K_Epsilon model type " << get_modele_fonction().que_suis_je() << finl;
       return 1;
@@ -92,7 +92,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
   Nom type=chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente K_Eps",tab_K_Eps);
-  DoubleTab& visco_turb =  la_viscosite_turbulente.valeurs();
+  DoubleTab& visco_turb =  la_viscosite_turbulente_.valeurs();
 
   int n = tab_K_Eps.dimension(0);
 
@@ -128,28 +128,28 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
 
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= LeEPS_MIN)
+          if (tab_K_Eps(i,1) <= LeEPS_MIN_)
             visco_turb_K_eps_Rea[i] = 0;
           else
             visco_turb_K_eps_Rea[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
 
         }
 
-      la_viscosite_turbulente->affecter(visco_turb_au_format_K_eps_Rea.valeur());
+      la_viscosite_turbulente_->affecter(visco_turb_au_format_K_eps_Rea.valeur());
 
     }
   else
     {
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= LeEPS_MIN)
+          if (tab_K_Eps(i,1) <= LeEPS_MIN_)
             visco_turb[i] = 0;
           else
             visco_turb[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
         }
     }
-  la_viscosite_turbulente.changer_temps(temps);
-  return la_viscosite_turbulente;
+  la_viscosite_turbulente_.changer_temps(temps);
+  return la_viscosite_turbulente_;
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(int avant) const
@@ -189,7 +189,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::imprimer_evolution_keps_realisable(
           const double k = tabKEps(n,0);
           const double eps = tabKEps(n,1);
           double nut = 0;
-          if (eps > 0) nut = LeCmu*k*k/eps;
+          if (eps > 0) nut = LeCmu_*k*k/eps;
           if (k < k_min)
             {
               k_min = k;
@@ -284,7 +284,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
   const Milieu_base& mil=equation().probleme().milieu();
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
   imprimer_evolution_keps_realisable(1);
-  loipar.calculer_hyd(ch_K_Eps);
+  loipar_.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(K_Eps().temps());
   limiter_viscosite_turbulente();
@@ -294,7 +294,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
       multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
       correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
-  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
+  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
   imprimer_evolution_keps_realisable(0);
   return 1;
 
@@ -312,11 +312,11 @@ void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
 
   statistiques().begin_count(nut_counter_);
   const Milieu_base& mil=equation().probleme().milieu();
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente_.valeurs());
   // on divise K_eps par rho en QC pour revenir a K et Eps
   if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
   imprimer_evolution_keps_realisable(1);
-  loipar.calculer_hyd(ch_K_Eps);
+  loipar_.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(ch_K_Eps.temps());
   limiter_viscosite_turbulente();
@@ -326,20 +326,20 @@ void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
       multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
       correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
-  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente",la_viscosite_turbulente.valeurs());
+  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente",la_viscosite_turbulente_.valeurs());
   statistiques().end_count(nut_counter_);
 }
 
 bool Modele_turbulence_hyd_K_Eps_Realisable::initTimeStep(double dt)
 {
-  return eqn_transport_K_Eps_Rea.initTimeStep(dt);
+  return eqn_transport_K_Eps_Rea_.initTimeStep(dt);
 }
 
 const Equation_base& Modele_turbulence_hyd_K_Eps_Realisable::equation_k_eps(int i) const
 {
   assert ((i==0));
-  return eqn_transport_K_Eps_Rea;
+  return eqn_transport_K_Eps_Rea_;
 }
 
 const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle& nom) const
@@ -352,11 +352,11 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle
     {
     }
 
-  if (mon_modele_fonc.non_nul())
+  if (mon_modele_fonc_.non_nul())
     {
       try
         {
-          return mon_modele_fonc->get_champ(nom);
+          return mon_modele_fonc_->get_champ(nom);
         }
       catch (Champs_compris_erreur)
         {
@@ -369,13 +369,13 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle
 void Modele_turbulence_hyd_K_Eps_Realisable::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
   Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(nom,opt);
-  if (mon_modele_fonc.non_nul())
-    mon_modele_fonc->get_noms_champs_postraitables(nom,opt);
+  if (mon_modele_fonc_.non_nul())
+    mon_modele_fonc_->get_noms_champs_postraitables(nom,opt);
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable::verifie_loi_paroi()
 {
-  Nom lp=loipar.valeur().que_suis_je();
+  Nom lp=loipar_.valeur().que_suis_je();
   if (lp=="negligeable_VEF" || lp=="negligeable_VDF")
     if (!associe_modele_fonction().non_nul())
       {

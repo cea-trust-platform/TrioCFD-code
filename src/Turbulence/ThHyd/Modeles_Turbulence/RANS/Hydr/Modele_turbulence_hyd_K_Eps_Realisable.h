@@ -68,8 +68,8 @@ public:
 
 private :
 
-  Modele_Fonc_Realisable mon_modele_fonc;
-  Transport_K_Eps_Realisable  eqn_transport_K_Eps_Rea;
+  Modele_Fonc_Realisable mon_modele_fonc_;
+  Transport_K_Eps_Realisable  eqn_transport_K_Eps_Rea_;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
   void imprimer_evolution_keps_realisable(int avant) const;
 
@@ -81,42 +81,42 @@ private :
 
 inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_Realisable::eqn_transp_K_Eps() const
 {
-  return eqn_transport_K_Eps_Rea;
+  return eqn_transport_K_Eps_Rea_;
 }
 
 inline  Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_Realisable::eqn_transp_K_Eps()
 {
-  return eqn_transport_K_Eps_Rea;
+  return eqn_transport_K_Eps_Rea_;
 }
 
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Realisable::K_Eps() const
 {
-  return eqn_transport_K_Eps_Rea.inconnue();
+  return eqn_transport_K_Eps_Rea_.inconnue();
 }
 
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Realisable::K_Eps()
 {
-  return eqn_transport_K_Eps_Rea.inconnue();
+  return eqn_transport_K_Eps_Rea_.inconnue();
 }
 
 inline Modele_Fonc_Realisable& Modele_turbulence_hyd_K_Eps_Realisable::associe_modele_fonction()
 {
-  return mon_modele_fonc;
+  return mon_modele_fonc_;
 }
 
 inline const Modele_Fonc_Realisable& Modele_turbulence_hyd_K_Eps_Realisable::associe_modele_fonction() const
 {
-  return  mon_modele_fonc;
+  return  mon_modele_fonc_;
 }
 
 inline Modele_Fonc_Realisable& Modele_turbulence_hyd_K_Eps_Realisable::get_modele_fonction()
 {
-  return mon_modele_fonc;
+  return mon_modele_fonc_;
 }
 
 inline const Modele_Fonc_Realisable& Modele_turbulence_hyd_K_Eps_Realisable::get_modele_fonction() const
 {
-  return  mon_modele_fonc;
+  return  mon_modele_fonc_;
 }
 
 inline int Modele_turbulence_hyd_K_Eps_Realisable::nombre_d_equations() const
