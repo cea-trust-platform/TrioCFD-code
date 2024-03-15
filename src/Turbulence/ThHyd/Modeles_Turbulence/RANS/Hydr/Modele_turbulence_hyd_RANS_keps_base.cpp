@@ -24,7 +24,7 @@
 #include <TRUSTTrav.h>
 #include <Param.h>
 
-Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_keps_base,"Modele_turbulence_hyd_RANS_keps_base",Modele_turbulence_hyd_RANS_2eq_base);
+Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_keps_base,"Modele_turbulence_hyd_RANS_keps_base",Modele_turbulence_hyd_2_eq_base);
 // XD mod_turb_hyd_rans_keps modele_turbulence_hyd_deriv mod_turb_hyd_rans_keps -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Modele_turbulence_hyd_RANS_keps_base::Modele_turbulence_hyd_RANS_keps_base()
@@ -43,7 +43,7 @@ Modele_turbulence_hyd_RANS_keps_base::Modele_turbulence_hyd_RANS_keps_base()
  */
 Sortie& Modele_turbulence_hyd_RANS_keps_base::printOn(Sortie& is) const
 {
-  return Modele_turbulence_hyd_RANS_2eq_base::printOn(is);
+  return Modele_turbulence_hyd_2_eq_base::printOn(is);
 }
 
 
@@ -54,7 +54,7 @@ Sortie& Modele_turbulence_hyd_RANS_keps_base::printOn(Sortie& is) const
  */
 Entree& Modele_turbulence_hyd_RANS_keps_base::readOn(Entree& is)
 {
-  Modele_turbulence_hyd_RANS_2eq_base::readOn(is);
+  Modele_turbulence_hyd_2_eq_base::readOn(is);
   return is;
 }
 void Modele_turbulence_hyd_RANS_keps_base::set_param(Param& param)

@@ -26,7 +26,7 @@
 
 Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_komega_base,
                                   "Modele_turbulence_hyd_RANS_komega_base",
-                                  Modele_turbulence_hyd_RANS_2eq_base);
+                                  Modele_turbulence_hyd_2_eq_base);
 // XD mod_turb_hyd_rans_komega modele_turbulence_hyd_deriv mod_turb_hyd_rans_komega -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Modele_turbulence_hyd_RANS_komega_base::Modele_turbulence_hyd_RANS_komega_base()
@@ -46,7 +46,7 @@ Modele_turbulence_hyd_RANS_komega_base::Modele_turbulence_hyd_RANS_komega_base()
  */
 Sortie& Modele_turbulence_hyd_RANS_komega_base::printOn(Sortie& is) const
 {
-  return Modele_turbulence_hyd_RANS_2eq_base::printOn(is);
+  return Modele_turbulence_hyd_2_eq_base::printOn(is);
 }
 
 
@@ -57,7 +57,7 @@ Sortie& Modele_turbulence_hyd_RANS_komega_base::printOn(Sortie& is) const
  */
 Entree& Modele_turbulence_hyd_RANS_komega_base::readOn(Entree& is)
 {
-  Modele_turbulence_hyd_RANS_2eq_base::readOn(is);
+  Modele_turbulence_hyd_2_eq_base::readOn(is);
   return is;
 }
 

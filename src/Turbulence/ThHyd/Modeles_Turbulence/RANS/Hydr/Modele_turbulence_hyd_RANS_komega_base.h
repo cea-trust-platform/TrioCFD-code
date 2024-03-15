@@ -24,7 +24,7 @@
 #define Modele_turbulence_hyd_RANS_komega_base_included
 
 #include <Motcle.h>
-#include <Modele_turbulence_hyd_RANS_2eq_base.h>
+#include <Modele_turbulence_hyd_2_eq_base.h>
 
 class Equation_base;
 class Transport_K_Omega_base;
@@ -33,7 +33,7 @@ class Transport_K_Omega_base;
  *
  * @sa Modele_turbulence_hyd_base
  */
-class Modele_turbulence_hyd_RANS_komega_base: public Modele_turbulence_hyd_RANS_2eq_base
+class Modele_turbulence_hyd_RANS_komega_base: public Modele_turbulence_hyd_2_eq_base
 {
 
   Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_komega_base);

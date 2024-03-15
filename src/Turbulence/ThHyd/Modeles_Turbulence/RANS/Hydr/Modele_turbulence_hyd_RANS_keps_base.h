@@ -23,7 +23,7 @@
 #ifndef Modele_turbulence_hyd_RANS_keps_base_included
 #define Modele_turbulence_hyd_RANS_keps_base_included
 
-#include <Modele_turbulence_hyd_RANS_2eq_base.h>
+#include <Modele_turbulence_hyd_2_eq_base.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
 class Equation_base;
 class Transport_K_Eps_base;
@@ -33,7 +33,7 @@ class Transport_K_Eps_base;
  *
  * @sa Modele_turbulence_hyd_base
  */
-class Modele_turbulence_hyd_RANS_keps_base : public Modele_turbulence_hyd_RANS_2eq_base
+class Modele_turbulence_hyd_RANS_keps_base : public Modele_turbulence_hyd_2_eq_base
 {
 
   Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_keps_base);
