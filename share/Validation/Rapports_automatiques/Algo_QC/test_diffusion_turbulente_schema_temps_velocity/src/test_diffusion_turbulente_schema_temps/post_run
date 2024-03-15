@@ -1,0 +1,13 @@
+#!/bin/sh
+
+sed 's/__EXPRESSION_TO_PLOT__/simu_vz/g' instructions2.py > instructions_simu_vz.py
+sed 's/__EXPRESSION_TO_PLOT__/ana_vz_tinit/g' instructions2.py  > instructions_ana_vz_tinit.py
+sed 's/__EXPRESSION_TO_PLOT__/ana_vz_tfinal/g' instructions2.py  > instructions_ana_vz_tfinal.py
+sed 's/__EXPRESSION_TO_PLOT__/error_vz/g' instructions2.py  > instructions_error_vz.py
+
+rm -f simu_vz????.curve && visit -nowin -cli -s instructions_simu_vz.py &
+rm -f ana_vz_tinit????.curve && visit -nowin -cli -s instructions_ana_vz_tinit.py &
+rm -f ana_vz_tfinal????.curve && visit -nowin -cli -s instructions_ana_vz_tfinal.py &
+rm -f error_vz????.curve && visit -nowin -cli -s instructions_error_vz.py &
+
+wait
