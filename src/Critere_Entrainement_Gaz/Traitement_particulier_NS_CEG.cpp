@@ -35,7 +35,7 @@
 #include <Statistiques.h>
 #include <stat_counters.h>
 #include <Fluide_Incompressible.h>
-#include <Mod_turb_hyd_RANS_keps.h>
+#include <Modele_turbulence_hyd_RANS_keps_base.h>
 #include <Pb_Hydraulique_Turbulent.h>
 #include <Champ_P1NC.h>
 #include <Postraitement.h>
@@ -163,7 +163,7 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
     }
   // KEps si critere AREVA
   if (calculer_critere_areva_)
-    if (!sub_type(Pb_Hydraulique_Turbulent,mon_equation->probleme()) || !sub_type(Mod_turb_hyd_RANS_keps,ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0)).modele_turbulence().valeur()))
+    if (!sub_type(Pb_Hydraulique_Turbulent,mon_equation->probleme()) || !sub_type(Modele_turbulence_hyd_RANS_keps_base,ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0)).modele_turbulence().valeur()))
       error("AREVA criterion can only be calculated with a RANS K-eps simulation.");
 
   // Vorticite dans le jeu de donnees si AREVA
@@ -199,7 +199,7 @@ void Traitement_particulier_NS_CEG::critere_areva()
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const DoubleTab& vorticite = mon_equation.valeur().get_champ("vorticite").valeurs();
   const Navier_Stokes_Turbulent& eqn = ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0));
-  const DoubleTab& KEps = ref_cast(Mod_turb_hyd_RANS_keps,eqn.modele_turbulence().valeur()).equation_k_eps(0).inconnue().valeurs();
+  const DoubleTab& KEps = ref_cast(Modele_turbulence_hyd_RANS_keps_base,eqn.modele_turbulence().valeur()).equation_k_eps(0).inconnue().valeurs();
 
   double gz = mon_equation->milieu().gravite()(0,2);
   double K_max_local=0;

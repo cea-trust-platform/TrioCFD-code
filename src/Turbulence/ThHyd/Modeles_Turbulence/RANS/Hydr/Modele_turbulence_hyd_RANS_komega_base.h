@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Mod_turb_hyd_RANS_komega.h
+// File:        Modele_turbulence_hyd_RANS_komega_base.h
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Mod_turb_hyd_RANS_komega_included
-#define Mod_turb_hyd_RANS_komega_included
+#ifndef Modele_turbulence_hyd_RANS_komega_base_included
+#define Modele_turbulence_hyd_RANS_komega_base_included
 
 #include <Motcle.h>
 #include <Modele_turbulence_hyd_RANS_2eq_base.h>
@@ -29,18 +29,18 @@
 class Equation_base;
 class Transport_K_Omega_base;
 
-/*! @brief Classe Mod_turb_hyd_RANS_komega Classe de base des modeles de type RANS_komega
+/*! @brief Classe Modele_turbulence_hyd_RANS_komega_base Classe de base des modeles de type RANS_komega
  *
  * @sa Modele_turbulence_hyd_base
  */
-class Mod_turb_hyd_RANS_komega: public Modele_turbulence_hyd_RANS_2eq_base
+class Modele_turbulence_hyd_RANS_komega_base: public Modele_turbulence_hyd_RANS_2eq_base
 {
 
-  Declare_base_sans_constructeur(Mod_turb_hyd_RANS_komega);
+  Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_komega_base);
 
 public:
 
-  Mod_turb_hyd_RANS_komega();
+  Modele_turbulence_hyd_RANS_komega_base();
   void set_param(Param& param) override;
   virtual int nombre_d_equations() const = 0;
   virtual Transport_K_Omega_base& eqn_transp_K_Omega() = 0;
@@ -78,39 +78,39 @@ protected:
   static constexpr double CST_A1 = 0.31;
 };
 
-inline const Motcle& Mod_turb_hyd_RANS_komega::get_model_variant() const
+inline const Motcle& Modele_turbulence_hyd_RANS_komega_base::get_model_variant() const
 {
   return model_variant;
 }
 
-inline double Mod_turb_hyd_RANS_komega::get_Prandtl_K() const
+inline double Modele_turbulence_hyd_RANS_komega_base::get_Prandtl_K() const
 {
   return Prandtl_K;
 }
 
-inline double Mod_turb_hyd_RANS_komega::get_Prandtl_Omega() const
+inline double Modele_turbulence_hyd_RANS_komega_base::get_Prandtl_Omega() const
 {
   return Prandtl_Omega;
 }
 
-inline double Mod_turb_hyd_RANS_komega::get_OMEGA_MIN() const
+inline double Modele_turbulence_hyd_RANS_komega_base::get_OMEGA_MIN() const
 {
   return OMEGA_MIN;
 }
 
-inline double Mod_turb_hyd_RANS_komega::get_OMEGA_MAX() const
+inline double Modele_turbulence_hyd_RANS_komega_base::get_OMEGA_MAX() const
 {
   return OMEGA_MAX;
 }
 
-inline double Mod_turb_hyd_RANS_komega::get_K_MIN() const
+inline double Modele_turbulence_hyd_RANS_komega_base::get_K_MIN() const
 {
   return K_MIN;
 }
 
-inline int Mod_turb_hyd_RANS_komega::get_lquiet() const
+inline int Modele_turbulence_hyd_RANS_komega_base::get_lquiet() const
 {
   return lquiet;
 }
 
-#endif
+#endif /* Modele_turbulence_hyd_RANS_komega_base_included */

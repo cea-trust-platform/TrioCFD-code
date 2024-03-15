@@ -14,12 +14,12 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Mod_turb_hyd_combin.cpp
+// File:        Modele_turbulence_hyd_combinaison.cpp
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/COMBINAISON/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Mod_turb_hyd_combin.h>
+#include <Modele_turbulence_hyd_combinaison.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
 #include <Domaine_VF.h>
@@ -35,9 +35,9 @@
 #include <Domaine_EF.h>
 #include <Domaine_VEF.h>
 
-Implemente_instanciable_sans_constructeur(Mod_turb_hyd_combin,"Modele_turbulence_hyd_combinaison",Modele_turbulence_hyd_base);
+Implemente_instanciable_sans_constructeur(Modele_turbulence_hyd_combinaison,"Modele_turbulence_hyd_combinaison",Modele_turbulence_hyd_base);
 
-Mod_turb_hyd_combin::Mod_turb_hyd_combin()
+Modele_turbulence_hyd_combinaison::Modele_turbulence_hyd_combinaison()
 {
   nb_var_=0;
   les_var.dimensionner(0);
@@ -48,7 +48,7 @@ Mod_turb_hyd_combin::Mod_turb_hyd_combin()
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
-Sortie& Mod_turb_hyd_combin::printOn(Sortie& is) const
+Sortie& Modele_turbulence_hyd_combinaison::printOn(Sortie& is) const
 {
   return Modele_turbulence_hyd_base::printOn(is);
 }
@@ -59,20 +59,20 @@ Sortie& Mod_turb_hyd_combin::printOn(Sortie& is) const
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
-Entree& Mod_turb_hyd_combin::readOn(Entree& is)
+Entree& Modele_turbulence_hyd_combinaison::readOn(Entree& is)
 {
   Modele_turbulence_hyd_base::readOn(is);
   return is;
 }
 
-void Mod_turb_hyd_combin::set_param(Param& param)
+void Modele_turbulence_hyd_combinaison::set_param(Param& param)
 {
   Modele_turbulence_hyd_base::set_param(param);
   param.ajouter("nb_var",&les_var);
   param.ajouter("fonction",&la_fct,Param::REQUIRED);
 }
 
-void Mod_turb_hyd_combin::discretiser()
+void Modele_turbulence_hyd_combinaison::discretiser()
 {
   Modele_turbulence_hyd_base::discretiser();
   discretiser_K(mon_equation->schema_temps(),mon_equation->domaine_dis(),energie_cinetique_turb_);
@@ -90,7 +90,7 @@ void Mod_turb_hyd_combin::discretiser()
 // Exception:
 // Effets de bord:
 // Postcondition:
-void Mod_turb_hyd_combin::completer()
+void Modele_turbulence_hyd_combinaison::completer()
 {
   nb_var_ = les_var.size();
   fxyz.dimensionner(1);
@@ -106,14 +106,14 @@ void Mod_turb_hyd_combin::completer()
   fxyz[0].parseString();
 }
 
-int Mod_turb_hyd_combin::preparer_calcul()
+int Modele_turbulence_hyd_combinaison::preparer_calcul()
 {
   Modele_turbulence_hyd_base::preparer_calcul();
   mettre_a_jour(0);
   return 1;
 }
 
-void Mod_turb_hyd_combin::mettre_a_jour(double temps)
+void Modele_turbulence_hyd_combinaison::mettre_a_jour(double temps)
 {
   statistiques().begin_count(nut_counter_);
   calculer_viscosite_turbulente();
@@ -124,7 +124,7 @@ void Mod_turb_hyd_combin::mettre_a_jour(double temps)
   statistiques().end_count(nut_counter_);
 }
 
-Champ_Fonc& Mod_turb_hyd_combin::calculer_viscosite_turbulente()
+Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
 {
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,equation().domaine_dis().valeur());
   const DoubleTab& xp = domaine_VF.xp();
@@ -166,25 +166,25 @@ Champ_Fonc& Mod_turb_hyd_combin::calculer_viscosite_turbulente()
         }
       else
         {
-          Cerr<<"Mod_turb_hyd_combin::calculer_viscosite_turbulente : error "<< les_var[so] <<" not Champ_P0_XX"<<finl;
+          Cerr<<"Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente : error "<< les_var[so] <<" not Champ_P0_XX"<<finl;
           exit();
         }
 
       if ( conv_to_elem(so) != 0 )
-        Cerr<<"Mod_turb_hyd_combin::calculer_viscosite_turbulente : " << les_var[so] <<" Conversion " << " => Champ_P0_XX"<<finl;
+        Cerr<<"Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente : " << les_var[so] <<" Conversion " << " => Champ_P0_XX"<<finl;
 
       // champ scalaire ? si non, dim seconde dimension ?
       nb_dim_so(so) = source_so_val.nb_dim();
       if (nb_dim_so(so) < 1 || nb_dim_so(so) > 2) // nb_dim in [1; 2] only
         {
-          Cerr<<"Mod_turb_hyd_combin::calculer_viscosite_turbulente : "<<les_var[so]<<" nb dimension = "<<source_so_val.nb_dim()<<" != 1 or 2 "<<finl;
+          Cerr<<"Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente : "<<les_var[so]<<" nb dimension = "<<source_so_val.nb_dim()<<" != 1 or 2 "<<finl;
           exit();
         }
       dim_2_so(so) = 0;
       if ( nb_dim_so(so) != 1)
         {
           dim_2_so(so) = source_so_val.dimension(1);
-          Cerr<<"Mod_turb_hyd_combin::calculer_viscosite_turbulente : "<<les_var[so]<<" nb dimension = "<<nb_dim_so(so)<<" and second dimension = "<<" "<<dim_2_so(so)<<finl;
+          Cerr<<"Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente : "<<les_var[so]<<" nb dimension = "<<nb_dim_so(so)<<" and second dimension = "<<" "<<dim_2_so(so)<<finl;
         }
 
     }

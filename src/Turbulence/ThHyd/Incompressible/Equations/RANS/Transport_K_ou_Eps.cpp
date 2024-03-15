@@ -174,7 +174,7 @@ int Transport_K_ou_Eps::lire_motcle_non_standard(const Motcle& mot, Entree& is)
  *
  * @param (Modele_turbulence_hyd_K_Eps& modele) le modele de turbulence K-epsilon a asoocier a l'equation
  */
-void Transport_K_ou_Eps::associer_modele_turbulence(const Mod_turb_hyd_RANS_Bicephale& modele)
+void Transport_K_ou_Eps::associer_modele_turbulence(const Modele_turbulence_hyd_RANS_Bicephale_base& modele)
 {
   const Equation_base& eqn_hydr = modele.equation();
   associer(eqn_hydr);

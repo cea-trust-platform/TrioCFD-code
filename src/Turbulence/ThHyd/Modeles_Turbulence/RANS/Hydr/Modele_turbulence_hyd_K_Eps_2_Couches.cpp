@@ -27,7 +27,7 @@
 #include <stat_counters.h>
 #include <Param.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches,"Modele_turbulence_hyd_K_Epsilon_2_Couches",Mod_turb_hyd_RANS_keps);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches,"Modele_turbulence_hyd_K_Epsilon_2_Couches",Modele_turbulence_hyd_RANS_keps_base);
 
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie.
@@ -41,19 +41,19 @@ Sortie& Modele_turbulence_hyd_K_Eps_2_Couches::printOn(Sortie& s ) const
 }
 
 
-/*! @brief Simple appel a Mod_turb_hyd_RANS_keps::readOn(Entree&)
+/*! @brief Simple appel a Modele_turbulence_hyd_RANS_keps_base::readOn(Entree&)
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
 Entree& Modele_turbulence_hyd_K_Eps_2_Couches::readOn(Entree& s )
 {
-  return Mod_turb_hyd_RANS_keps::readOn(s);
+  return Modele_turbulence_hyd_RANS_keps_base::readOn(s);
 }
 
 void Modele_turbulence_hyd_K_Eps_2_Couches::set_param(Param& param)
 {
-  Mod_turb_hyd_RANS_keps::set_param(param);
+  Modele_turbulence_hyd_RANS_keps_base::set_param(param);
   param.ajouter_non_std("Transport_K_KEpsilon",(this),Param::REQUIRED);
 }
 
@@ -67,7 +67,7 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::lire_motcle_non_standard(const Motcle
       return 1;
     }
   else
-    return Mod_turb_hyd_RANS_keps::lire_motcle_non_standard(mot,is);
+    return Modele_turbulence_hyd_RANS_keps_base::lire_motcle_non_standard(mot,is);
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.

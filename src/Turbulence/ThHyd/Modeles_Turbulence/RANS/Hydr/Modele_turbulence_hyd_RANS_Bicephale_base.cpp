@@ -14,20 +14,20 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Mod_turb_hyd_RANS_Bicephale.cpp
+// File:        Modele_turbulence_hyd_RANS_Bicephale_base.cpp
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Mod_turb_hyd_RANS_Bicephale.h>
+#include <Modele_turbulence_hyd_RANS_Bicephale_base.h>
 #include <Transport_K_ou_Eps_base.h>
 #include <TRUSTTrav.h>
 #include <Param.h>
 
-Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_Bicephale,"Mod_turb_hyd_RANS_Bicephale",Modele_turbulence_hyd_base);
+Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_Bicephale_base,"Modele_turbulence_hyd_RANS_Bicephale_base",Modele_turbulence_hyd_base);
 // XD mod_turb_hyd_rans_bicephale modele_turbulence_hyd_deriv mod_turb_hyd_rans_bicephale -1 Class for RANS turbulence model for Navier-Stokes equations.
 
-Mod_turb_hyd_RANS_Bicephale::Mod_turb_hyd_RANS_Bicephale()
+Modele_turbulence_hyd_RANS_Bicephale_base::Modele_turbulence_hyd_RANS_Bicephale_base()
 {
   Prandtl_K = 1.;
   Prandtl_Eps = 1.3;
@@ -41,7 +41,7 @@ Mod_turb_hyd_RANS_Bicephale::Mod_turb_hyd_RANS_Bicephale()
  * @param (Sortie& is) un flot de sortie
  * @return (Sortie&) le flot de sortie modifie
  */
-Sortie& Mod_turb_hyd_RANS_Bicephale::printOn(Sortie& is) const
+Sortie& Modele_turbulence_hyd_RANS_Bicephale_base::printOn(Sortie& is) const
 {
   return Modele_turbulence_hyd_base::printOn(is);
 }
@@ -52,12 +52,12 @@ Sortie& Mod_turb_hyd_RANS_Bicephale::printOn(Sortie& is) const
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
-Entree& Mod_turb_hyd_RANS_Bicephale::readOn(Entree& is)
+Entree& Modele_turbulence_hyd_RANS_Bicephale_base::readOn(Entree& is)
 {
   Modele_turbulence_hyd_base::readOn(is);
   return is;
 }
-void Mod_turb_hyd_RANS_Bicephale::set_param(Param& param)
+void Modele_turbulence_hyd_RANS_Bicephale_base::set_param(Param& param)
 {
   Modele_turbulence_hyd_base::set_param(param);
   param.ajouter("eps_min",&LeEPS_MIN); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
@@ -72,14 +72,14 @@ void Mod_turb_hyd_RANS_Bicephale::set_param(Param& param)
 /*! @brief
  *
  */
-void Mod_turb_hyd_RANS_Bicephale::completer()
+void Modele_turbulence_hyd_RANS_Bicephale_base::completer()
 {
   eqn_transp_K().completer();
   eqn_transp_Eps().completer();
   verifie_loi_paroi();
 }
 
-void Mod_turb_hyd_RANS_Bicephale::verifie_loi_paroi()
+void Modele_turbulence_hyd_RANS_Bicephale_base::verifie_loi_paroi()
 {
   Nom lp=loipar.valeur().que_suis_je();
   if (lp=="negligeable_VEF" || lp=="negligeable_VDF")
@@ -91,7 +91,7 @@ void Mod_turb_hyd_RANS_Bicephale::verifie_loi_paroi()
     }
 }
 
-const Champ_base& Mod_turb_hyd_RANS_Bicephale::get_champ(const Motcle& nom) const
+const Champ_base& Modele_turbulence_hyd_RANS_Bicephale_base::get_champ(const Motcle& nom) const
 {
 
   try
@@ -119,7 +119,7 @@ const Champ_base& Mod_turb_hyd_RANS_Bicephale::get_champ(const Motcle& nom) cons
 
   //return champs_compris_.get_champ(nom);
 }
-void Mod_turb_hyd_RANS_Bicephale::get_noms_champs_postraitables(Noms& nom,Option opt) const
+void Modele_turbulence_hyd_RANS_Bicephale_base::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
   Modele_turbulence_hyd_base::get_noms_champs_postraitables(nom,opt);
 
@@ -140,7 +140,7 @@ void Mod_turb_hyd_RANS_Bicephale::get_noms_champs_postraitables(Noms& nom,Option
  * @param (Sortie& os) un flot de sortie
  * @return (int) code de retour propage de: Transport_K_ou_Eps::sauvegarder(Sortie&)
  */
-int Mod_turb_hyd_RANS_Bicephale::sauvegarder(Sortie& os) const
+int Modele_turbulence_hyd_RANS_Bicephale_base::sauvegarder(Sortie& os) const
 {
 
   Modele_turbulence_hyd_base::sauvegarder(os);
@@ -156,7 +156,7 @@ int Mod_turb_hyd_RANS_Bicephale::sauvegarder(Sortie& os) const
  * @param (Entree& is) un flot d'entree
  * @return (int) code de retour propage de: Transport_K_ou_Eps::reprendre(Entree& is) ou 1 si la reprise est bidon.
  */
-int Mod_turb_hyd_RANS_Bicephale::reprendre(Entree& is)
+int Modele_turbulence_hyd_RANS_Bicephale_base::reprendre(Entree& is)
 {
   Modele_turbulence_hyd_base::reprendre(is);
   if (mon_equation.non_nul())
@@ -179,7 +179,7 @@ int Mod_turb_hyd_RANS_Bicephale::reprendre(Entree& is)
  *
  * @param (Equation_base& eqn) la seconde equation a laquelle l'objet s'associe
  */
-void Mod_turb_hyd_RANS_Bicephale::associer_seconde_eqn(const Equation_base& eqn)
+void Modele_turbulence_hyd_RANS_Bicephale_base::associer_seconde_eqn(const Equation_base& eqn)
 {
   ma_seconde_equation = eqn;
 }

@@ -52,7 +52,7 @@ public :
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void associer_milieu_base(const Milieu_base&) override;
-  void associer_modele_turbulence(const Mod_turb_hyd_RANS_keps&) override;
+  void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_keps_base&) override;
   inline int get_nbcouches() const;
   inline int get_yswitch() const;
   inline int get_switch() const;

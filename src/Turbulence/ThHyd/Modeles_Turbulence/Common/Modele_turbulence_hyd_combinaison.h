@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Mod_turb_hyd_combin.h
+// File:        Modele_turbulence_hyd_combinaison.h
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/COMBINAISON/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Mod_turb_hyd_combin_included
-#define Mod_turb_hyd_combin_included
+#ifndef Modele_turbulence_hyd_combinaison_included
+#define Modele_turbulence_hyd_combinaison_included
 
 #include <Modele_turbulence_hyd_base.h>
 #include <TRUSTTabs_forward.h>
@@ -28,7 +28,7 @@
 #include <Parser_U.h>
 
 
-/*! @brief Classe Mod_turb_hyd_combin Classe representant un modele de turbulence exprime a partir d'une combinaison de champs
+/*! @brief Classe Modele_turbulence_hyd_combinaison Classe representant un modele de turbulence exprime a partir d'une combinaison de champs
  *
  *     et (ou) des variables d espace et de temps pour l equation de Navier Stokes
  *     La syntaxe a respecter est la suivante :
@@ -49,13 +49,13 @@
  *
  * @sa Modele_turbulence_hyd_base
  */
-class Mod_turb_hyd_combin : public Modele_turbulence_hyd_base
+class Modele_turbulence_hyd_combinaison : public Modele_turbulence_hyd_base
 {
-  Declare_instanciable_sans_constructeur(Mod_turb_hyd_combin);
+  Declare_instanciable_sans_constructeur(Modele_turbulence_hyd_combinaison);
 
 public:
 
-  Mod_turb_hyd_combin();
+  Modele_turbulence_hyd_combinaison();
   void set_param(Param& param) override;
   void discretiser() override;
   void completer() override;
@@ -78,18 +78,18 @@ protected:
 private :
 
 };
-inline int Mod_turb_hyd_combin::nombre_sources()
+inline int Modele_turbulence_hyd_combinaison::nombre_sources()
 {
   return nb_var_;
 }
-inline Champ_Fonc& Mod_turb_hyd_combin::energie_cinetique_turbulente()
+inline Champ_Fonc& Modele_turbulence_hyd_combinaison::energie_cinetique_turbulente()
 {
   return energie_cinetique_turb_;
 }
 
-inline const Champ_Fonc& Mod_turb_hyd_combin::energie_cinetique_turbulente() const
+inline const Champ_Fonc& Modele_turbulence_hyd_combinaison::energie_cinetique_turbulente() const
 {
   return energie_cinetique_turb_;
 }
 
-#endif
+#endif /* Modele_turbulence_hyd_combinaison_included */

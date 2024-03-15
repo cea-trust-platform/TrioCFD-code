@@ -24,7 +24,7 @@
 #include <Verif_Cl.h>
 #include <Verif_Cl_Turb.h>
 #include <Les_mod_turb.h>
-#include <Mod_turb_hyd_RANS_keps.h>
+#include <Modele_turbulence_hyd_RANS_keps_base.h>
 #include <Schema_Implicite_base.h>
 #include <Implicite_ALE.h>
 #include <Schema_Euler_explicite.h>
@@ -136,9 +136,9 @@ int Pb_Hydraulique_Turbulent_ALE::verifier()
 {
   const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
 
-  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
+  if ( sub_type(Modele_turbulence_hyd_RANS_keps_base, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
-      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_keps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_keps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);

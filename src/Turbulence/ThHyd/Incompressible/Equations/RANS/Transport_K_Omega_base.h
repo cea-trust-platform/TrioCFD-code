@@ -23,11 +23,11 @@
 #ifndef Transport_K_Omega_base_included
 #define Transport_K_Omega_base_included
 
-#include <Mod_turb_hyd_RANS_komega.h>
+#include <Modele_turbulence_hyd_RANS_komega_base.h>
 #include <Transport_2eq_base.h>
 #include <TRUST_Ref.h>
 
-class Mod_turb_hyd_RANS_komega;
+class Modele_turbulence_hyd_RANS_komega_base;
 class Champ_Inc_base;
 class Milieu_base;
 class Champ_Inc;
@@ -43,7 +43,7 @@ class Transport_K_Omega_base: public Transport_2eq_base
 
 public:
 
-  virtual void associer_modele_turbulence(const Mod_turb_hyd_RANS_komega& )=0;
+  virtual void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_komega_base& )=0;
   void discretiser() override;
   void discretiser_K_Omega(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;
 
@@ -51,8 +51,8 @@ public:
   void valider_iteration() override;
   inline const Champ_Inc& inconnue() const override;
   inline Champ_Inc& inconnue() override;
-  inline const Mod_turb_hyd_RANS_komega& modele_turbulence() const;
-  inline Mod_turb_hyd_RANS_komega& modele_turbulence();
+  inline const Modele_turbulence_hyd_RANS_komega_base& modele_turbulence() const;
+  inline Modele_turbulence_hyd_RANS_komega_base& modele_turbulence();
 
   void get_position_cells(Nom&, int&);
   void get_position_faces(Nom&, int&);
@@ -61,7 +61,7 @@ public:
 protected:
 
   Champ_Inc le_champ_K_Omega;
-  REF(Mod_turb_hyd_RANS_komega) mon_modele;
+  REF(Modele_turbulence_hyd_RANS_komega_base) mon_modele;
 };
 
 /*! @brief Renvoie le champ inconnue de l'equation.
@@ -88,7 +88,7 @@ inline const Champ_Inc& Transport_K_Omega_base::inconnue() const { return le_cha
  *
  * @return (Modele_turbulence_hyd_K_Omega&) le modele de turbulence associe a l'equation
  */
-inline const Mod_turb_hyd_RANS_komega& Transport_K_Omega_base::modele_turbulence() const
+inline const Modele_turbulence_hyd_RANS_komega_base& Transport_K_Omega_base::modele_turbulence() const
 {
   assert(mon_modele.non_nul());
   return mon_modele.valeur();
@@ -98,7 +98,7 @@ inline const Mod_turb_hyd_RANS_komega& Transport_K_Omega_base::modele_turbulence
  *
  * @return (Modele_turbulence_hyd_K_Omega&) le modele de turbulence associe a l'equation
  */
-inline Mod_turb_hyd_RANS_komega& Transport_K_Omega_base::modele_turbulence()
+inline Modele_turbulence_hyd_RANS_komega_base& Transport_K_Omega_base::modele_turbulence()
 {
   assert(mon_modele.non_nul());
   return mon_modele.valeur();

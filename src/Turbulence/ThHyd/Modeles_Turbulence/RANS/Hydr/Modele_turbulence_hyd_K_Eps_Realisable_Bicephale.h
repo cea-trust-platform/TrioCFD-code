@@ -23,7 +23,7 @@
 #ifndef Modele_turbulence_hyd_K_Eps_Realisable_Bicephale_included
 #define Modele_turbulence_hyd_K_Eps_Realisable_Bicephale_included
 
-#include <Mod_turb_hyd_RANS_Bicephale.h>
+#include <Modele_turbulence_hyd_RANS_Bicephale_base.h>
 #include <Transport_K_ou_Eps_Realisable.h>
 #include <Modele_Fonc_Realisable.h>
 
@@ -31,7 +31,7 @@ class Domaine_dis;
 class Domaine_Cl_dis;
 
 
-class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale : public  Mod_turb_hyd_RANS_Bicephale
+class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale : public  Modele_turbulence_hyd_RANS_Bicephale_base
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale);
 

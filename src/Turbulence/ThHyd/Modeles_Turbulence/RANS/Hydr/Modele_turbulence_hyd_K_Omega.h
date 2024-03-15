@@ -35,7 +35,7 @@ class Tensors_Computation_VEF;
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_ss_maille_base
  */
-class Modele_turbulence_hyd_K_Omega: public Mod_turb_hyd_RANS_komega
+class Modele_turbulence_hyd_K_Omega: public Modele_turbulence_hyd_RANS_komega_base
 {
 
   Declare_instanciable(Modele_turbulence_hyd_K_Omega);

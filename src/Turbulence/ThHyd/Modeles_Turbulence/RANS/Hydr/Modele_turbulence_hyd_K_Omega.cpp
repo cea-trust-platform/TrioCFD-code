@@ -38,7 +38,7 @@
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Omega,
                         "Modele_turbulence_hyd_K_Omega",
-                        Mod_turb_hyd_RANS_komega);
+                        Modele_turbulence_hyd_RANS_komega_base);
 // XD k_omega mod_turb_hyd_rans k_omega -1 Turbulence model (k-omega).
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie.
@@ -51,14 +51,14 @@ Sortie& Modele_turbulence_hyd_K_Omega::printOn(Sortie& s ) const
   return s << que_suis_je() << " " << le_nom();
 }
 
-/*! @brief Simple appel a Mod_turb_hyd_RANS_komega::readOn(Entree&)
+/*! @brief Simple appel a Modele_turbulence_hyd_RANS_komega_base::readOn(Entree&)
  *
  * @param (Entree& is) un flot d'entree
  * @return (Entree&) le flot d'entree modifie
  */
 Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 {
-  Mod_turb_hyd_RANS_komega::readOn(s);
+  Modele_turbulence_hyd_RANS_komega_base::readOn(s);
 
   if (model_variant == "SST")
     {
@@ -75,7 +75,7 @@ Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 
 void Modele_turbulence_hyd_K_Omega::set_param(Param& param)
 {
-  Mod_turb_hyd_RANS_komega::set_param(param);
+  Modele_turbulence_hyd_RANS_komega_base::set_param(param);
   param.ajouter_non_std("Transport_K_Omega", (this), Param::REQUIRED); // XD_ADD_P transport_k_omega Keyword to define the (k-omega) transportation equation.
   param.ajouter("PRANDTL_K", &Prandtl_K);
   param.ajouter("PRANDTL_Omega", &Prandtl_Omega);
@@ -91,7 +91,7 @@ int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, E
       return 1;
     }
   else
-    return Mod_turb_hyd_RANS_komega::lire_motcle_non_standard(mot, is);
+    return Modele_turbulence_hyd_RANS_komega_base::lire_motcle_non_standard(mot, is);
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.
@@ -340,7 +340,7 @@ void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
 int Modele_turbulence_hyd_K_Omega::preparer_calcul()
 {
   eqn_transp_K_Omega().preparer_calcul();
-  Mod_turb_hyd_RANS_komega::preparer_calcul();
+  Modele_turbulence_hyd_RANS_komega_base::preparer_calcul();
 
   init_F1_F2_enstrophy();
 
@@ -431,7 +431,7 @@ const Champ_base& Modele_turbulence_hyd_K_Omega::get_champ(const Motcle& nom) co
 {
   try
     {
-      return Mod_turb_hyd_RANS_komega::get_champ(nom);
+      return Modele_turbulence_hyd_RANS_komega_base::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {
@@ -441,7 +441,7 @@ const Champ_base& Modele_turbulence_hyd_K_Omega::get_champ(const Motcle& nom) co
 
 void Modele_turbulence_hyd_K_Omega::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
-  Mod_turb_hyd_RANS_komega::get_noms_champs_postraitables(nom, opt);
+  Modele_turbulence_hyd_RANS_komega_base::get_noms_champs_postraitables(nom, opt);
 }
 
 void Modele_turbulence_hyd_K_Omega::verifie_loi_paroi()

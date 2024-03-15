@@ -14,39 +14,37 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Mod_turb_hyd_RANS_Bicephale.h
+// File:        Modele_turbulence_hyd_RANS_keps_base.h
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Mod_turb_hyd_RANS_Bicephale_included
-#define Mod_turb_hyd_RANS_Bicephale_included
+#ifndef Modele_turbulence_hyd_RANS_keps_base_included
+#define Modele_turbulence_hyd_RANS_keps_base_included
 
-#include <Modele_turbulence_hyd_base.h>
-
+#include <Modele_turbulence_hyd_RANS_2eq_base.h>
+#include <Modele_Fonc_Bas_Reynolds.h>
 class Equation_base;
-class Transport_K_ou_Eps_base;
+class Transport_K_Eps_base;
 
 
-/*! @brief Classe Mod_turb_hyd_RANS_Bicephale Classe de base des modeles de type RANS en formulation bicephale : les equations de k et epsilon sont gerees separement
+/*! @brief Classe Modele_turbulence_hyd_RANS_keps_base Classe de base des modeles de type RANS_keps
  *
  * @sa Modele_turbulence_hyd_base
  */
-class Mod_turb_hyd_RANS_Bicephale : public Modele_turbulence_hyd_base
+class Modele_turbulence_hyd_RANS_keps_base : public Modele_turbulence_hyd_RANS_2eq_base
 {
 
-  Declare_base_sans_constructeur(Mod_turb_hyd_RANS_Bicephale);
+  Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_keps_base);
 
 public:
 
-  Mod_turb_hyd_RANS_Bicephale();
+  Modele_turbulence_hyd_RANS_keps_base();
   void set_param(Param& param) override;
   virtual int nombre_d_equations() const=0;
-  virtual Transport_K_ou_Eps_base& eqn_transp_K()=0;
-  virtual Transport_K_ou_Eps_base& eqn_transp_Eps()=0;
-  virtual const Transport_K_ou_Eps_base& eqn_transp_K() const=0;
-  virtual const Transport_K_ou_Eps_base& eqn_transp_Eps() const=0;
+  virtual Transport_K_Eps_base& eqn_transp_K_Eps()=0;
+  virtual const Transport_K_Eps_base& eqn_transp_K_Eps() const=0;
   void completer() override;
 
   virtual void verifie_loi_paroi();
@@ -55,17 +53,12 @@ public:
 
   virtual const Equation_base& equation_k_eps(int) const=0 ;
 
-  void associer_seconde_eqn(const Equation_base& );
-
   inline double get_Prandtl_K() const;
   inline double get_Prandtl_Eps() const;
   inline double get_LeEPS_MIN() const;
   inline double get_LeEPS_MAX() const;
   inline double get_LeK_MIN() const;
   inline int get_lquiet() const;
-
-  inline Equation_base& seconde_equation();
-  inline const Equation_base& seconde_equation() const;
 
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
@@ -75,70 +68,60 @@ public:
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
+  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction();
+  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const;
+  bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const override
+  {
+    if (associe_modele_fonction().non_nul() && associe_modele_fonction().Calcul_is_Reynolds_stress_isotrope()==0)
+      return associe_modele_fonction().valeur().calcul_tenseur_Re(nu_turb, grad, Re);
+    else
+      return false;
+  };
 protected:
-
-  REF(Equation_base) ma_seconde_equation;
-
+  Modele_Fonc_Bas_Reynolds mon_modele_fonc;
   double Prandtl_K, Prandtl_Eps;
   double LeEPS_MIN, LeEPS_MAX, LeK_MIN;
   int lquiet;
 
 };
 
-inline double Mod_turb_hyd_RANS_Bicephale::get_Prandtl_K() const
+inline double Modele_turbulence_hyd_RANS_keps_base::get_Prandtl_K() const
 {
   return Prandtl_K;
 }
 
-inline double Mod_turb_hyd_RANS_Bicephale::get_Prandtl_Eps() const
+inline double Modele_turbulence_hyd_RANS_keps_base::get_Prandtl_Eps() const
 {
   return Prandtl_Eps;
 }
 
-inline double Mod_turb_hyd_RANS_Bicephale::get_LeEPS_MIN() const
+inline double Modele_turbulence_hyd_RANS_keps_base::get_LeEPS_MIN() const
 {
   return LeEPS_MIN;
 }
 
-inline double Mod_turb_hyd_RANS_Bicephale::get_LeEPS_MAX() const
+inline double Modele_turbulence_hyd_RANS_keps_base::get_LeEPS_MAX() const
 {
   return LeEPS_MAX;
 }
 
-inline double Mod_turb_hyd_RANS_Bicephale::get_LeK_MIN() const
+inline double Modele_turbulence_hyd_RANS_keps_base::get_LeK_MIN() const
 {
   return LeK_MIN;
 }
 
-inline int Mod_turb_hyd_RANS_Bicephale::get_lquiet() const
+inline int Modele_turbulence_hyd_RANS_keps_base::get_lquiet() const
 {
   return lquiet;
 }
 
-/*! @brief Renvoie la seconde equation associee au modele de turbulence en formulation bicephale.
- *
- * (c'est une equation du type Equation_base)
- *
- * @return (Equation_base&) la seconde equation associee au modele de turbulence en formulation bicephale
- */
-inline Equation_base& Mod_turb_hyd_RANS_Bicephale::seconde_equation()
+inline Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_RANS_keps_base::associe_modele_fonction()
 {
-  if (ma_seconde_equation.non_nul()==0)
-    {
-      Cerr << "\nError in Mod_turb_hyd_RANS_Bicephale::seconde_equation() : The equation is unknown !" << finl;
-      Process::exit();
-    }
-  return ma_seconde_equation.valeur();
+  return mon_modele_fonc;
 }
 
-inline const Equation_base& Mod_turb_hyd_RANS_Bicephale::seconde_equation() const
+inline const Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_RANS_keps_base::associe_modele_fonction() const
 {
-  if (ma_seconde_equation.non_nul()==0)
-    {
-      Cerr << "\nError in Mod_turb_hyd_RANS_Bicephale::seconde_equation() : The equation is unknown !" << finl;
-      Process::exit();
-    }
-  return ma_seconde_equation.valeur();
+  return  mon_modele_fonc;
 }
-
-#endif
+#endif /* Modele_turbulence_hyd_RANS_keps_base_included */

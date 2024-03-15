@@ -180,7 +180,7 @@ void Transport_K_Eps_Realisable::completer()
   Equation_base::completer();
 }
 
-void Transport_K_Eps_Realisable::associer_modele_turbulence(const Mod_turb_hyd_RANS_keps& modele)
+void Transport_K_Eps_Realisable::associer_modele_turbulence(const Modele_turbulence_hyd_RANS_keps_base& modele)
 {
   const Equation_base& eqn_hydr = modele.equation();
   associer(eqn_hydr);

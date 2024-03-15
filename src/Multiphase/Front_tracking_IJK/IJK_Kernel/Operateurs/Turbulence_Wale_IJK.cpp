@@ -19,7 +19,7 @@
 void Turbulence_Wale_IJK::compute(const IJK_Field_ST& vx, const IJK_Field_ST& vy, const IJK_Field_ST& vz,
                                   IJK_Field_ST& nu_t, IJK_Field_ST& k)
 {
-  // Reimplemented from Turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2
+  // Reimplemented from Modele_turbulence_hyd_sous_maille_Wale_VDF::calculer_OP1_OP2
   const int dimension = 3;
   // compute duidxj
   // here

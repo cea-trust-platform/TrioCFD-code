@@ -34,7 +34,7 @@
 #include <TRUSTTrav.h>
 #include <communications.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale,"Modele_turbulence_hyd_K_Epsilon_Realisable_Bicephale",Mod_turb_hyd_RANS_Bicephale);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale,"Modele_turbulence_hyd_K_Epsilon_Realisable_Bicephale",Modele_turbulence_hyd_RANS_Bicephale_base);
 
 // XD K_Epsilon_Realisable_Bicephale mod_turb_hyd_rans K_Epsilon_Realisable_Bicephale -1 Realizable Two-headed K-Epsilon Turbulence Model
 
@@ -46,17 +46,17 @@ Sortie& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::printOn(Sortie& s ) co
   return s << que_suis_je() << " " << le_nom();
 }
 
-/*! @brief Simple appel a Mod_turb_hyd_RANS_Bicephale::readOn(Entree&)
+/*! @brief Simple appel a Modele_turbulence_hyd_RANS_Bicephale_base::readOn(Entree&)
  *
  */
 Entree& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::readOn(Entree& is)
 {
-  return Mod_turb_hyd_RANS_Bicephale::readOn(is);
+  return Modele_turbulence_hyd_RANS_Bicephale_base::readOn(is);
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::set_param(Param& param)
 {
-  Mod_turb_hyd_RANS_Bicephale::set_param(param);
+  Modele_turbulence_hyd_RANS_Bicephale_base::set_param(param);
   param.ajouter_non_std("Transport_K",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (k) transportation equation.
   param.ajouter_non_std("Transport_Epsilon",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (eps) transportation equation.
   param.ajouter_non_std("Modele_Fonc_Realisable",(this),Param::REQUIRED); // XD_ADD_P Modele_Fonc_Realisable_base This keyword is used to set the model used
@@ -90,7 +90,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::lire_motcle_non_standard(c
       return 1;
     }
   else
-    return Mod_turb_hyd_RANS_Bicephale::lire_motcle_non_standard(mot,is);
+    return Modele_turbulence_hyd_RANS_Bicephale_base::lire_motcle_non_standard(mot,is);
 }
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente(double temps)
@@ -261,7 +261,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_champ(co
 {
   try
     {
-      return Mod_turb_hyd_RANS_Bicephale::get_champ(nom);
+      return Modele_turbulence_hyd_RANS_Bicephale_base::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {
@@ -283,7 +283,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_champ(co
 
 void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
-  Mod_turb_hyd_RANS_Bicephale::get_noms_champs_postraitables(nom,opt);
+  Modele_turbulence_hyd_RANS_Bicephale_base::get_noms_champs_postraitables(nom,opt);
   if (mon_modele_fonc.non_nul())
     mon_modele_fonc->get_noms_champs_postraitables(nom,opt);
 }

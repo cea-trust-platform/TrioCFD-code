@@ -30,7 +30,7 @@
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_ss_maille_base
  */
-class Modele_turbulence_hyd_K_Eps_Bicephale : public Mod_turb_hyd_RANS_Bicephale
+class Modele_turbulence_hyd_K_Eps_Bicephale : public Modele_turbulence_hyd_RANS_Bicephale_base
 {
 
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Bicephale);

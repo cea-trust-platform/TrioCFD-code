@@ -31,7 +31,7 @@ class Domaine_dis;
 class Domaine_Cl_dis;
 
 
-class Modele_turbulence_hyd_K_Eps_Realisable : public  Mod_turb_hyd_RANS_keps
+class Modele_turbulence_hyd_K_Eps_Realisable : public  Modele_turbulence_hyd_RANS_keps_base
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Realisable);
 
