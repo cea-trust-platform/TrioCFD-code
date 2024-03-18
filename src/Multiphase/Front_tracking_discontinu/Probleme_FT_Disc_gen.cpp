@@ -315,7 +315,7 @@ void Probleme_FT_Disc_gen::mettre_a_jour(double temps)
       for (int i=2; i<nb_eqn; i++)
         equation(i).mettre_a_jour(temps);
 
-      les_postraitements.mettre_a_jour(temps);
+      les_postraitements_.mettre_a_jour(temps);
     }
   else
     {

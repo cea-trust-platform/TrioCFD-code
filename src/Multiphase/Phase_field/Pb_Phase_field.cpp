@@ -149,7 +149,7 @@ void Pb_Phase_field::typer_lire_milieu(Entree& is)
   for (int i = 0; i < nombre_d_equations(); i++)
     {
       equation(i).associer_milieu_equation();
-      equation(i).milieu().discretiser((*this), la_discretisation.valeur());
+      equation(i).milieu().discretiser((*this), la_discretisation_.valeur());
     }
 }
 

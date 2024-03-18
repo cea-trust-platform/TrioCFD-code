@@ -94,7 +94,7 @@ public:
   int        facettes_voisines(int fa70, int fa71, int& iarete0, int& iarete1) const;
 
   int calculer_voisinage_facettes(IntTab& fa7Voisines,
-                                  const Intersections_Elem_Facettes* ief=NULL) const;
+                                  const Intersections_Elem_Facettes* ief=nullptr) const;
 
   void associer_equation_transport(const Equation_base& equation) override;
   void associer_domaine_dis_parcours(const Domaine_dis& domaine_dis, const Parcours_interface& parcours);

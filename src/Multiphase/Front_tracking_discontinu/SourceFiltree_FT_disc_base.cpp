@@ -28,7 +28,7 @@
 SourceFiltree_FT_disc_base::SourceFiltree_FT_disc_base()
 {
   dimension_ = Objet_U::dimension;
-  fI_xyz_t = NULL;
+  fI_xyz_t = nullptr;
   temps_ = 0.;
 }
 SourceFiltree_FT_disc_base::~SourceFiltree_FT_disc_base()

@@ -109,15 +109,15 @@ void Modele_rayo_semi_transp::validateTimeStep()
   double temps=probleme().presentTime();
   eq_rayo()->mettre_a_jour(temps);
   calculer_flux_radiatif();
-  les_postraitements.mettre_a_jour(temps);
+  les_postraitements_.mettre_a_jour(temps);
   schema_temps().mettre_a_jour();
 }
 
 
 void Modele_rayo_semi_transp::associer_sch_tps_base(const Schema_Temps_base& un_schema_en_temps)
 {
-  le_schema_en_temps=un_schema_en_temps;
-  le_schema_en_temps->associer_pb(*this);
+  le_schema_en_temps_ = un_schema_en_temps;
+  le_schema_en_temps_->associer_pb(*this);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -264,7 +264,7 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
 
   //  Probleme_base::discretiser(dis);
   associer();
-  la_discretisation=dis;
+  la_discretisation_ = dis;
   Cerr << "Discretisation du domaine associe au probleme " << le_nom() << finl;
   if (!le_domaine_.non_nul())
     Process::exit("ERROR: Discretize - You're trying to discretize a problem without having associated a Domain to it!!! Fix your dataset.");
@@ -272,9 +272,9 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
   le_domaine_->init_renum_perio();
 
   dis.associer_domaine(le_domaine_.valeur());
-  dis.discretiser(le_domaine_dis);
+  dis.discretiser(le_domaine_dis_);
   // Can not do this before, since the Domaine_dis is not typed yet:
-  le_domaine_dis->associer_domaine(le_domaine_);
+  le_domaine_dis_->associer_domaine(le_domaine_);
 
   Cerr << "Discretisation des equations" << finl;
   for(int i=0; i<nombre_d_equations(); i++)

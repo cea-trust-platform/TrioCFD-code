@@ -636,7 +636,7 @@ bool KerasModel::LoadModel(const std::string& filename) {
         unsigned int layer_type = 0;
         KASSERT(ReadUnsignedInt(&file, &layer_type), "Expected layer type");
 
-        KerasLayer* layer = NULL;
+        KerasLayer* layer = nullptr;
 
         switch (layer_type) {
         case kDense:

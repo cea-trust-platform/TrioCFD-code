@@ -135,7 +135,7 @@ void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
       Cerr<<"fin de construction dans "<<que_suis_je()<<finl;
       T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
       // on regarde qui est le pb fluide
-      const Equation_base* eqn=NULL;
+      const Equation_base* eqn = nullptr;
       const Equation_base& mon_eqn = domaine_Cl_dis().equation();
 
       const Champ_front_calc& chcal=ref_cast(Champ_front_calc,T_autre_pb().valeur());

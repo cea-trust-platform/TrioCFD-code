@@ -93,7 +93,7 @@ void Source_Transport_K_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& 
   Source_Transport_VDF_Elem_base::ajouter_keps(secmem);
 
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
-  Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL;
+  Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
   if(!mat) return;
 
   const DoubleTab& K   = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
