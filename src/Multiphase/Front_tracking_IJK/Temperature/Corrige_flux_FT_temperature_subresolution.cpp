@@ -2492,7 +2492,7 @@ void Corrige_flux_FT_temperature_subresolution::sort_ini_end_arrays(ArrOfInt& in
     {
       for (int l=0; l<2; l++)
         {
-          const int index_int_tmp = (*counters[l] < *size_references[l]) ? (*indices_references[l])(*counters[l]) : (int) 1e20;
+          const int index_int_tmp = (*counters[l] < *size_references[l]) ? (*indices_references[l])(*counters[l]) : std::numeric_limits<int>::max();
           index_tmp.push_back(index_int_tmp);
         }
       const int index_min = (int) std::distance(index_tmp.begin(), std::min_element(index_tmp.begin(), index_tmp.end()));
@@ -2602,7 +2602,6 @@ void Corrige_flux_FT_temperature_subresolution::remove_min_max_ijk_reachable_flu
   const int nk = cell_faces_neighbours_corrected_all_bool[0].nk();
 
   int i,j,k,c;
-  ArrOfInt neighbour_left_right(3);
   const int nb_ghost = 1;
 
   for (c = 0; c < 3; c++)
