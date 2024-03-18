@@ -363,7 +363,7 @@ void IJK_One_Dimensional_Subproblems::associate_sub_problem_to_inputs(IJK_Therma
   const double curvature = (*ref_thermal_subresolution.eulerian_curvature_ns_)(i, j ,k);
   const double interfacial_area = (*ref_thermal_subresolution.eulerian_interfacial_area_ns_)(i, j ,k);
 
-  IJK_Splitting splitting = (*ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_).get_splitting();
+  //IJK_Splitting splitting = (*ref_thermal_subresolution.eulerian_compo_connex_from_interface_int_ns_).get_splitting();
   const double bubble_rising_velocity = (*ref_thermal_subresolution.rising_velocities_)(compo_connex);
 
   for (int dir=0; dir < 3; dir++)
