@@ -33,8 +33,8 @@ IJK_FT_double
   timestep_facsec 0.4
   dt_post 10
   # champs_a_postraiter 1 tous #
-  champs_a_postraiter 10 INTERFACES COURBURE COMPO_CONNEXE VELOCITY PRESSURE
-  		        REPULSION_FT SOURCE_QDM_INTERF CELL_RHO_SOURCE_QDM_INTERF RHO CELL_SOURCE_QDM_INTERF
+  champs_a_postraiter 7 INTERFACES COURBURE COMPO_CONNEXE VELOCITY PRESSURE
+  		        REPULSION_FT SOURCE_QDM_INTERF
   check_stop_file stop.txt
   dt_sauvegarde 1000
   nb_pas_dt_max 1280
