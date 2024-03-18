@@ -170,7 +170,7 @@ protected :
    *  -elim_coeff_nul=1, on supprime les coefficients nuls de la matrice
    *  -elim_coeff_nul=2, on supprime les coefficients nuls et quasi-nuls de la matrice
    */
-  enum Remove_zero_coeff { keep, remove, remove_close_zero };
+  enum Remove_zero_coeff { keep, REMOVE, remove_close_zero };
   enum Equation_type { advection_diffusion, linear_diffusion };
 
   /*
