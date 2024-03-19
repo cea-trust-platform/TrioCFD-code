@@ -358,8 +358,7 @@ protected :
   // These methods are static in order to make it clear that all data used and modified by the method are explicitely passed as arguments:
   static void force_entry_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz, double v_imposed);
   static void force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
-                                      double v_imposed,const IJK_Interfaces& interfaces, double nb_diam,
-                                      int upstream_dir, int gravity_dir, int upstream_stencil);
+                                      double v_imposed,const IJK_Interfaces& interfaces, double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio = 0. );
   double find_timestep(const double max_timestep, const double cfl, const double fo, const double oh);
   void parcourir_maillage();
   void calculer_rho_mu_indicatrice(const bool parcourir = true);
@@ -637,6 +636,8 @@ protected :
   int upstream_dir_; // static
   int upstream_stencil_;
   double nb_diam_upstream_;
+  double nb_diam_ortho_shear_perio_;
+
   double rho_liquide_;
   double rho_vapeur_;
   // GAB, pour THI (23.08.21)
