@@ -60,7 +60,7 @@ void Source_Transport_K_Eps_Realisable_VEF_Face::fill_resu_real(const int num_fa
 {
   const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable, eqn_keps_Rea->modele_turbulence());
-  const double LeK_MIN = mod_turb.get_LeK_MIN(), LeEPS_MIN = mod_turb.get_LeEPS_MIN();
+  const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
 
   resu(num_face, 0) += (P(num_face) - K_eps_Rea(num_face, 1)) * vol_ent(num_face);
 
@@ -79,7 +79,7 @@ void Source_Transport_K_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
   Modele_Fonc_Realisable_base& mon_modele_fonc = mod_turb.associe_modele_fonction();
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const double epsilon_minimum = eqn_keps_Rea->modele_turbulence().get_LeEPS_MIN();
+  const double epsilon_minimum = eqn_keps_Rea->modele_turbulence().get_EPS_MIN();
   const Champ_Don& ch_visco_cin = ref_cast(Fluide_base,eqn_keps_Rea->milieu()).viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 
@@ -102,7 +102,7 @@ void Source_Transport_K_Eps_Realisable_VEF_Face::fill_coeff_matrice(const int fa
 {
   const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable, eqn_keps_Rea->modele_turbulence());
-  const double LeK_MIN = mod_turb.get_LeK_MIN(), LeEPS_MIN = mod_turb.get_LeEPS_MIN();
+  const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
 
   if ((K_eps_Rea(face, 0) >= LeK_MIN) && (K_eps_Rea(face, 1) >= LeEPS_MIN))
     {

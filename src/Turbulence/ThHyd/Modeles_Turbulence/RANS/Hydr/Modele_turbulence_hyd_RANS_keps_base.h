@@ -25,9 +25,8 @@
 
 #include <Modele_turbulence_hyd_2_eq_base.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
-class Equation_base;
-class Transport_K_Eps_base;
 
+class Transport_K_Eps_base;
 
 /*! @brief Classe Modele_turbulence_hyd_RANS_keps_base Classe de base des modeles de type RANS_keps
  *
@@ -35,41 +34,24 @@ class Transport_K_Eps_base;
  */
 class Modele_turbulence_hyd_RANS_keps_base : public Modele_turbulence_hyd_2_eq_base
 {
-
-  Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_keps_base);
-
+  Declare_base(Modele_turbulence_hyd_RANS_keps_base);
 public:
 
-  Modele_turbulence_hyd_RANS_keps_base();
   void set_param(Param& param) override;
-  virtual int nombre_d_equations() const=0;
-  virtual Transport_K_Eps_base& eqn_transp_K_Eps()=0;
-  virtual const Transport_K_Eps_base& eqn_transp_K_Eps() const=0;
   void completer() override;
-
-  virtual void verifie_loi_paroi();
   int sauvegarder(Sortie& os) const override;
   int reprendre(Entree& is) override;
 
-  virtual const Equation_base& equation_k_eps(int) const=0 ;
-
-  inline double get_Prandtl_K() const;
-  inline double get_Prandtl_Eps() const;
-  inline double get_LeEPS_MIN() const;
-  inline double get_LeEPS_MAX() const;
-  inline double get_LeK_MIN() const;
-  inline int get_lquiet() const;
-
-  //Methodes de l interface des champs postraitables
-  /////////////////////////////////////////////////////
-  //Methode creer_champ non codee a surcharger si necessaire
-  //virtual void creer_champ(const Motcle& motlu);
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
-  /////////////////////////////////////////////////////
 
-  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction();
-  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const;
+  virtual Transport_K_Eps_base& eqn_transp_K_Eps()=0;
+  virtual const Transport_K_Eps_base& eqn_transp_K_Eps() const=0;
+  virtual const Equation_base& equation_k_eps(int) const=0 ;
+
+  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction() { return mon_modele_fonc_; }
+  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const { return mon_modele_fonc_; }
+
   bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const override
   {
     if (associe_modele_fonction().non_nul() && associe_modele_fonction().Calcul_is_Reynolds_stress_isotrope()==0)
@@ -77,51 +59,9 @@ public:
     else
       return false;
   };
+
 protected:
   Modele_Fonc_Bas_Reynolds mon_modele_fonc_;
-  double Prandtl_K_, Prandtl_Eps_;
-  double LeEPS_MIN_, LeEPS_MAX_, LeK_MIN_;
-  int lquiet_;
-
 };
 
-inline double Modele_turbulence_hyd_RANS_keps_base::get_Prandtl_K() const
-{
-  return Prandtl_K_;
-}
-
-inline double Modele_turbulence_hyd_RANS_keps_base::get_Prandtl_Eps() const
-{
-  return Prandtl_Eps_;
-}
-
-inline double Modele_turbulence_hyd_RANS_keps_base::get_LeEPS_MIN() const
-{
-  return LeEPS_MIN_;
-}
-
-inline double Modele_turbulence_hyd_RANS_keps_base::get_LeEPS_MAX() const
-{
-  return LeEPS_MAX_;
-}
-
-inline double Modele_turbulence_hyd_RANS_keps_base::get_LeK_MIN() const
-{
-  return LeK_MIN_;
-}
-
-inline int Modele_turbulence_hyd_RANS_keps_base::get_lquiet() const
-{
-  return lquiet_;
-}
-
-inline Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_RANS_keps_base::associe_modele_fonction()
-{
-  return mon_modele_fonc_;
-}
-
-inline const Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_RANS_keps_base::associe_modele_fonction() const
-{
-  return  mon_modele_fonc_;
-}
 #endif /* Modele_turbulence_hyd_RANS_keps_base_included */

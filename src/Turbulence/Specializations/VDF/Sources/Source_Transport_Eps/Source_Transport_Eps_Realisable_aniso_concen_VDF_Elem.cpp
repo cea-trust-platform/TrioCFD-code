@@ -38,7 +38,7 @@ void Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem::fill_resu_concen(con
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   // C1 value is not a constant in Realizable K-Epsilon model but here, we take the default value of C1 used in standard K-Epsilon, as proposed by litterature
-  double C3_loc, C1_loc = C1__, LeK_MIN = eqn_k_Rea->modele_turbulence().get_LeK_MIN();
+  double C3_loc, C1_loc = C1__, LeK_MIN = eqn_k_Rea->modele_turbulence().get_K_MIN();
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
       if (K_Rea(elem) >= LeK_MIN)

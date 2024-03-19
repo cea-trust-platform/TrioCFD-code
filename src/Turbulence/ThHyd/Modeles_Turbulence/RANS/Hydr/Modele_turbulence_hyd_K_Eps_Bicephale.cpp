@@ -165,7 +165,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
           Cerr<< " On utilise un Cmu non constant "<< finl;
           const DoubleTab& vitesse = mon_equation_->inconnue().valeurs();
           mon_modele_fonc_.Calcul_Cmu_BiK(Cmu, le_dom_dis, le_dom_Cl_dis,
-                                          vitesse, tab_K, tab_Eps, LeEPS_MIN_);
+                                          vitesse, tab_K, tab_Eps, EPS_MIN_);
 
           /*Paroi*/
           Nom lp=eqn_transp_K().modele_turbulence().loi_paroi().valeur().que_suis_je();
@@ -177,7 +177,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
               const int idt =  mon_equation_->schema_temps().nb_pas_dt();
               const DoubleTab& tab_paroi = loi_paroi().valeur().Cisaillement_paroi();
               mon_modele_fonc_.Calcul_Cmu_Paroi_BiK(Cmu, le_dom_dis, le_dom_Cl_dis,visco_tab, visco_turb, tab_paroi, idt,
-                                                    vitesse, tab_K, tab_Eps, LeEPS_MIN_);
+                                                    vitesse, tab_K, tab_Eps, EPS_MIN_);
             }
         }
       else
@@ -221,7 +221,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
       // Debog::verifier("Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente visco_turb_K_eps before",visco_turb_K_eps);
       for (int i=0; i<n; i++)
         {
-          if (tab_Eps(i) <= LeEPS_MIN_)
+          if (tab_Eps(i) <= EPS_MIN_)
             visco_turb_K_eps[i] = 0;
           else
             {
@@ -249,7 +249,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
     {
       for (int i=0; i<n; i++)
         {
-          if (tab_Eps(i) <= LeEPS_MIN_)
+          if (tab_Eps(i) <= EPS_MIN_)
             {
               visco_turb[i] = 0;
             }

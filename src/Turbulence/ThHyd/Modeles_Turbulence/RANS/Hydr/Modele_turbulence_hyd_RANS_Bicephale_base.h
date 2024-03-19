@@ -19,101 +19,50 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Modele_turbulence_hyd_RANS_Bicephale_base_included
 #define Modele_turbulence_hyd_RANS_Bicephale_base_included
 
 #include <Modele_turbulence_hyd_2_eq_base.h>
 
-class Equation_base;
 class Transport_K_ou_Eps_base;
-
 
 /*! @brief Classe Modele_turbulence_hyd_RANS_Bicephale_base Classe de base des modeles de type RANS en formulation bicephale : les equations de k et epsilon sont gerees separement
  *
  * @sa Modele_turbulence_hyd_2_eq_base
  */
-class Modele_turbulence_hyd_RANS_Bicephale_base : public Modele_turbulence_hyd_2_eq_base
+class Modele_turbulence_hyd_RANS_Bicephale_base: public Modele_turbulence_hyd_2_eq_base
 {
-
   Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_Bicephale_base);
-
 public:
 
-  Modele_turbulence_hyd_RANS_Bicephale_base();
-  void set_param(Param& param) override;
-  virtual int nombre_d_equations() const=0;
-  virtual Transport_K_ou_Eps_base& eqn_transp_K()=0;
-  virtual Transport_K_ou_Eps_base& eqn_transp_Eps()=0;
-  virtual const Transport_K_ou_Eps_base& eqn_transp_K() const=0;
-  virtual const Transport_K_ou_Eps_base& eqn_transp_Eps() const=0;
-  void completer() override;
+  Modele_turbulence_hyd_RANS_Bicephale_base()
+  {
+    EPS_MIN_ = 1.e-10;
+    K_MIN_ = 1.e-10;
+  }
 
-  virtual void verifie_loi_paroi();
+  void set_param(Param& param) override;
+  void completer() override;
   int sauvegarder(Sortie& os) const override;
   int reprendre(Entree& is) override;
 
-  virtual const Equation_base& equation_k_eps(int) const=0 ;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
 
-  void associer_seconde_eqn(const Equation_base& );
+  virtual Transport_K_ou_Eps_base& eqn_transp_K()=0;
+  virtual Transport_K_ou_Eps_base& eqn_transp_Eps()=0;
+  virtual const Transport_K_ou_Eps_base& eqn_transp_K() const =0;
+  virtual const Transport_K_ou_Eps_base& eqn_transp_Eps() const =0;
+  virtual const Equation_base& equation_k_eps(int) const =0;
 
-  inline double get_Prandtl_K() const;
-  inline double get_Prandtl_Eps() const;
-  inline double get_LeEPS_MIN() const;
-  inline double get_LeEPS_MAX() const;
-  inline double get_LeK_MIN() const;
-  inline int get_lquiet() const;
+  void associer_seconde_eqn(const Equation_base&);
 
   inline Equation_base& seconde_equation();
   inline const Equation_base& seconde_equation() const;
 
-  //Methodes de l interface des champs postraitables
-  /////////////////////////////////////////////////////
-  //Methode creer_champ non codee a surcharger si necessaire
-  //virtual void creer_champ(const Motcle& motlu);
-  const Champ_base& get_champ(const Motcle& nom) const override;
-  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
-  /////////////////////////////////////////////////////
-
 protected:
-
   REF(Equation_base) ma_seconde_equation_;
-
-  double Prandtl_K_, Prandtl_Eps_;
-  double LeEPS_MIN_, LeEPS_MAX_, LeK_MIN_;
-  int lquiet_;
-
 };
-
-inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_Prandtl_K() const
-{
-  return Prandtl_K_;
-}
-
-inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_Prandtl_Eps() const
-{
-  return Prandtl_Eps_;
-}
-
-inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_LeEPS_MIN() const
-{
-  return LeEPS_MIN_;
-}
-
-inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_LeEPS_MAX() const
-{
-  return LeEPS_MAX_;
-}
-
-inline double Modele_turbulence_hyd_RANS_Bicephale_base::get_LeK_MIN() const
-{
-  return LeK_MIN_;
-}
-
-inline int Modele_turbulence_hyd_RANS_Bicephale_base::get_lquiet() const
-{
-  return lquiet_;
-}
 
 /*! @brief Renvoie la seconde equation associee au modele de turbulence en formulation bicephale.
  *
@@ -123,7 +72,7 @@ inline int Modele_turbulence_hyd_RANS_Bicephale_base::get_lquiet() const
  */
 inline Equation_base& Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation()
 {
-  if (ma_seconde_equation_.non_nul()==0)
+  if (ma_seconde_equation_.non_nul() == 0)
     {
       Cerr << "\nError in Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -133,7 +82,7 @@ inline Equation_base& Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equatio
 
 inline const Equation_base& Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() const
 {
-  if (ma_seconde_equation_.non_nul()==0)
+  if (ma_seconde_equation_.non_nul() == 0)
     {
       Cerr << "\nError in Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() : The equation is unknown !" << finl;
       Process::exit();

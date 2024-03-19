@@ -21,111 +21,57 @@
 
 #include <Modele_turbulence_hyd_RANS_keps_base.h>
 #include <Transport_K_Eps_base.h>
-#include <TRUSTTrav.h>
 #include <Param.h>
 
-Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_keps_base,"Modele_turbulence_hyd_RANS_keps_base",Modele_turbulence_hyd_2_eq_base);
+Implemente_base(Modele_turbulence_hyd_RANS_keps_base, "Modele_turbulence_hyd_RANS_keps_base", Modele_turbulence_hyd_2_eq_base);
 // XD mod_turb_hyd_rans_keps modele_turbulence_hyd_deriv mod_turb_hyd_rans_keps -1 Class for RANS turbulence model for Navier-Stokes equations.
 
-Modele_turbulence_hyd_RANS_keps_base::Modele_turbulence_hyd_RANS_keps_base()
-{
-  Prandtl_K_ = 1.;
-  Prandtl_Eps_ = 1.3;
-  LeEPS_MIN_ = 1.e-20  ;
-  LeEPS_MAX_ = 1.e+10;
-  LeK_MIN_ = 1.e-20;
-  lquiet_ = 0;
-}
-/*! @brief Simple appel a Modele_turbulence_hyd_base::printOn(Sortie&)
- *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
-Sortie& Modele_turbulence_hyd_RANS_keps_base::printOn(Sortie& is) const
-{
-  return Modele_turbulence_hyd_2_eq_base::printOn(is);
-}
+Sortie& Modele_turbulence_hyd_RANS_keps_base::printOn(Sortie& is) const { return Modele_turbulence_hyd_2_eq_base::printOn(is); }
 
+Entree& Modele_turbulence_hyd_RANS_keps_base::readOn(Entree& is) { return Modele_turbulence_hyd_2_eq_base::readOn(is); }
 
-/*! @brief Simple appel a Modele_turbulence_hyd_base::readOn(Entree&)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
-Entree& Modele_turbulence_hyd_RANS_keps_base::readOn(Entree& is)
-{
-  Modele_turbulence_hyd_2_eq_base::readOn(is);
-  return is;
-}
 void Modele_turbulence_hyd_RANS_keps_base::set_param(Param& param)
 {
-  Modele_turbulence_hyd_base::set_param(param);
-  param.ajouter("eps_min",&LeEPS_MIN_); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
-  param.ajouter("eps_max",&LeEPS_MAX_); // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
-  param.ajouter("k_min",&LeK_MIN_); // XD_ADD_P double Lower limitation of k (default value 1.e-10).
-  param.ajouter_flag("quiet",&lquiet_); // XD_ADD_P flag To disable printing of information about k and epsilon.
+  Modele_turbulence_hyd_2_eq_base::set_param(param);
+  param.ajouter("eps_min", &EPS_MIN_); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
+  param.ajouter("eps_max", &EPS_MAX_); // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
 }
 
-
-/*! @brief
- *
- */
 void Modele_turbulence_hyd_RANS_keps_base::completer()
 {
   eqn_transp_K_Eps().completer();
   verifie_loi_paroi();
 }
 
-void Modele_turbulence_hyd_RANS_keps_base::verifie_loi_paroi()
-{
-  Nom lp=loipar_.valeur().que_suis_je();
-  if (lp=="negligeable_VEF" || lp=="negligeable_VDF")
-    {
-      Cerr<<"The turbulence model of type "<<que_suis_je()<<finl;
-      Cerr<<"must not be used with a wall law of type negligeable."<<finl;
-      Cerr<<"Another wall law must be selected with this kind of turbulence model."<<finl;
-      exit();
-    }
-}
-
 const Champ_base& Modele_turbulence_hyd_RANS_keps_base::get_champ(const Motcle& nom) const
 {
-
   try
     {
       return Modele_turbulence_hyd_base::get_champ(nom);
     }
-  catch (Champs_compris_erreur)
+  catch (Champs_compris_erreur&)
     {
     }
-  int i;
-  int nb_eq = nombre_d_equations();
-  for (i=0; i<nb_eq; i++)
+
+  for (int i = 0; i < nombre_d_equations(); i++)
     {
       try
         {
           return equation_k_eps(i).get_champ(nom);
         }
-      catch (Champs_compris_erreur)
+      catch (Champs_compris_erreur&)
         {
         }
     }
   throw Champs_compris_erreur();
-  REF(Champ_base) ref_champ;
-  return ref_champ;
-
-  //return champs_compris_.get_champ(nom);
 }
-void Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(Noms& nom,Option opt) const
-{
-  Modele_turbulence_hyd_base::get_noms_champs_postraitables(nom,opt);
 
-  int i;
-  int nb_eq = nombre_d_equations();
-  for (i=0; i<nb_eq; i++)
-    {
-      equation_k_eps(i).get_noms_champs_postraitables(nom,opt);
-    }
+void Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(Noms& nom, Option opt) const
+{
+  Modele_turbulence_hyd_base::get_noms_champs_postraitables(nom, opt);
+
+  for (int i = 0; i < nombre_d_equations(); i++)
+    equation_k_eps(i).get_noms_champs_postraitables(nom, opt);
 }
 
 /*! @brief Sauvegarde le modele de turbulence sur un flot de sortie.
@@ -144,7 +90,6 @@ int Modele_turbulence_hyd_RANS_keps_base::sauvegarder(Sortie& os) const
   return eqn_transp_K_Eps().sauvegarder(os);
 }
 
-
 /*! @brief Reprise du modele a partir d'un flot d'entree.
  *
  * Si l'equation portee par l'objet est non nulle
@@ -157,17 +102,7 @@ int Modele_turbulence_hyd_RANS_keps_base::reprendre(Entree& is)
 {
   Modele_turbulence_hyd_base::reprendre(is);
   if (mon_equation_.non_nul())
-    {
-      return eqn_transp_K_Eps().reprendre(is);
-    }
+    return eqn_transp_K_Eps().reprendre(is);
   else
-    {
-      double dbidon;
-      Nom bidon;
-      DoubleTrav tab_bidon;
-      is >> bidon >> bidon;
-      is >> dbidon;
-      tab_bidon.jump(is);
-      return 1;
-    }
+    return reprendre_generique(is);
 }

@@ -23,10 +23,8 @@
 #ifndef Modele_turbulence_hyd_RANS_komega_base_included
 #define Modele_turbulence_hyd_RANS_komega_base_included
 
-#include <Motcle.h>
 #include <Modele_turbulence_hyd_2_eq_base.h>
 
-class Equation_base;
 class Transport_K_Omega_base;
 
 /*! @brief Classe Modele_turbulence_hyd_RANS_komega_base Classe de base des modeles de type RANS_komega
@@ -35,82 +33,32 @@ class Transport_K_Omega_base;
  */
 class Modele_turbulence_hyd_RANS_komega_base: public Modele_turbulence_hyd_2_eq_base
 {
-
   Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_komega_base);
-
 public:
 
-  Modele_turbulence_hyd_RANS_komega_base();
-  void set_param(Param& param) override;
-  virtual int nombre_d_equations() const = 0;
-  virtual Transport_K_Omega_base& eqn_transp_K_Omega() = 0;
-  virtual const Transport_K_Omega_base& eqn_transp_K_Omega() const = 0;
-  virtual const Equation_base& equation_k_omega(int) const=0 ;
-  void completer() override;
+  Modele_turbulence_hyd_RANS_komega_base()
+  {
+    Prandtl_K_ = 2.; // cAlan: careful, it is the inverse of the classical definition for code purpose
+    model_variant_ = "SST";
+  }
 
-  virtual void verifie_loi_paroi();
+  void set_param(Param& param) override;
+  void completer() override;
   int sauvegarder(Sortie& os) const override;
   int reprendre(Entree& is) override;
 
-  // virtual const Equation_base& equation_k_omega(int) const=0;
-
-  inline double get_Prandtl_K() const;
-  inline double get_Prandtl_Omega() const;
-  inline double get_OMEGA_MIN() const;
-  inline double get_OMEGA_MAX() const;
-  inline double get_K_MIN() const;
-  inline int get_lquiet() const;
-  inline const Motcle& get_model_variant() const;
-
-  //Methodes de l interface des champs postraitables
-  /////////////////////////////////////////////////////
-  //Methode creer_champ non codee a surcharger si necessaire
-  //virtual void creer_champ(const Motcle& motlu);
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
-  /////////////////////////////////////////////////////
+
+  virtual Transport_K_Omega_base& eqn_transp_K_Omega() = 0;
+  virtual const Transport_K_Omega_base& eqn_transp_K_Omega() const = 0;
+  virtual const Equation_base& equation_k_omega(int) const=0 ;
+
+  inline const Motcle& get_model_variant() const { return model_variant_; }
 
 protected:
-  double Prandtl_K_, Prandtl_Omega_; // cAlan beware! rename and put in 2eq ?
-  double OMEGA_MIN_, OMEGA_MAX_, K_MIN_;
-  int lquiet_;
   Motcle model_variant_; // default model will be k-omega
   static constexpr double CST_A1 = 0.31;
 };
-
-inline const Motcle& Modele_turbulence_hyd_RANS_komega_base::get_model_variant() const
-{
-  return model_variant_;
-}
-
-inline double Modele_turbulence_hyd_RANS_komega_base::get_Prandtl_K() const
-{
-  return Prandtl_K_;
-}
-
-inline double Modele_turbulence_hyd_RANS_komega_base::get_Prandtl_Omega() const
-{
-  return Prandtl_Omega_;
-}
-
-inline double Modele_turbulence_hyd_RANS_komega_base::get_OMEGA_MIN() const
-{
-  return OMEGA_MIN_;
-}
-
-inline double Modele_turbulence_hyd_RANS_komega_base::get_OMEGA_MAX() const
-{
-  return OMEGA_MAX_;
-}
-
-inline double Modele_turbulence_hyd_RANS_komega_base::get_K_MIN() const
-{
-  return K_MIN_;
-}
-
-inline int Modele_turbulence_hyd_RANS_komega_base::get_lquiet() const
-{
-  return lquiet_;
-}
 
 #endif /* Modele_turbulence_hyd_RANS_komega_base_included */

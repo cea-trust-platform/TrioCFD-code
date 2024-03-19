@@ -57,7 +57,7 @@ void Source_Transport_K_Realisable_VDF_Elem::ajouter_blocs(matrices_t matrices, 
 void Source_Transport_K_Realisable_VDF_Elem::mettre_a_jour(double temps)
 {
   const DoubleTab& K_Rea  = eqn_k_Rea->inconnue().valeurs(), &eps_Rea  = eqn_eps_Rea->inconnue().valeurs(), &vit  = eq_hydraulique->inconnue().valeurs();
-  const double epsilon_minimum = eqn_k_Rea->modele_turbulence().get_LeEPS_MIN();
+  const double epsilon_minimum = eqn_k_Rea->modele_turbulence().get_EPS_MIN();
   Modele_Fonc_Realisable_base& mon_modele_fonc = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale,eqn_k_Rea->modele_turbulence()).associe_modele_fonction();
   mon_modele_fonc.Contributions_Sources_BiK(eqn_k_Rea ->domaine_dis(),eqn_k_Rea->domaine_Cl_dis(),vit,K_Rea,eps_Rea,epsilon_minimum);
   Source_Transport_Realisable_VDF_Elem_base::mettre_a_jour(temps);

@@ -110,7 +110,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
         }
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= LeEPS_MIN_)
+          if (tab_K_Eps(i,1) <= EPS_MIN_)
             visco_turb_K_eps[i] = 0;
           else
             visco_turb_K_eps[i] = CMU*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
@@ -121,7 +121,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
     {
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= LeEPS_MIN_)
+          if (tab_K_Eps(i,1) <= EPS_MIN_)
             visco_turb[i] = 0;
           else
             visco_turb[i] = CMU*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);

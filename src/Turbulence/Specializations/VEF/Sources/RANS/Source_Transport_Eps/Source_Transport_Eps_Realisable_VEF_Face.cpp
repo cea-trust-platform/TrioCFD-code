@@ -62,7 +62,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::fill_resu_real(const int num_face
 {
   const Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, eqn_k_Rea->modele_turbulence());
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
-  const double LeK_MIN = mod_turb.get_LeK_MIN(), LeEPS_MIN = mod_turb.get_LeEPS_MIN();
+  const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
   if ((K_Rea(num_face) >= LeK_MIN) && (eps_Rea(num_face) >= LeEPS_MIN))
     resu(num_face) += eps_Rea(num_face) * (CC1(num_face) * S(num_face) - (C2 * eps_Rea(num_face) / (K_Rea(num_face) + sqrt(visco * eps_Rea(num_face))))) * vol_ent(num_face);
 }
@@ -78,7 +78,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
   Modele_Fonc_Realisable_base& mon_modele_fonc = mod_turb.associe_modele_fonction();
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const double epsilon_minimum = eqn_k_Rea->modele_turbulence().get_LeEPS_MIN();
+  const double epsilon_minimum = eqn_k_Rea->modele_turbulence().get_EPS_MIN();
   const Champ_Don& ch_visco_cin = ref_cast(Fluide_base,eqn_k_Rea->milieu()).viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 
@@ -101,7 +101,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::fill_coeff_matrice(const int face
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, eqn_k_Rea->modele_turbulence());
-  const double LeK_MIN = mod_turb.get_LeK_MIN(), LeEPS_MIN = mod_turb.get_LeEPS_MIN();
+  const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
 
   if ((K_Rea(face) >= LeK_MIN) && (eps_Rea(face) >= LeEPS_MIN))
     matrice(face, face) += C2 * eps_Rea(face) / (K_Rea(face) + sqrt(visco * eps_Rea(face))) * volumes_entrelaces(face) * porosite_face(face);
