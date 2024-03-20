@@ -22,53 +22,47 @@
 #ifndef Modele_turbulence_hyd_K_Eps_Bicephale_included
 #define Modele_turbulence_hyd_K_Eps_Bicephale_included
 
-#include <Transport_K_ou_Eps.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
+#include <Transport_K_ou_Eps.h>
+
 /*! @brief Classe Modele_turbulence_hyd_K_Eps_Bicephale Cette classe represente le modele de turbulence (k,eps) pour les
  *
  *     equations de Navier-Stokes ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps_Bicephale : public Modele_turbulence_hyd_RANS_Bicephale_base
+class Modele_turbulence_hyd_K_Eps_Bicephale: public Modele_turbulence_hyd_RANS_Bicephale_base
 {
-
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Bicephale);
-
 public:
-
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   int preparer_calcul() override;
   void verifie_loi_paroi() override;
   bool initTimeStep(double dt) override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   virtual inline Champ_Inc& K();
   virtual inline const Champ_Inc& K() const;
   virtual inline Champ_Inc& Eps();
   virtual inline const Champ_Inc& Eps() const;
 
-  inline int nombre_d_equations() const override;
   inline Transport_K_ou_Eps_base& eqn_transp_K() override;
   inline const Transport_K_ou_Eps_base& eqn_transp_K() const override;
   inline Transport_K_ou_Eps_base& eqn_transp_Eps() override;
   inline const Transport_K_ou_Eps_base& eqn_transp_Eps() const override;
-  const Equation_base& equation_k_eps(int) const override ;
+  const Equation_base& equation_k_eps(int) const override;
 
-
-  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction();
-  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const;
+  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction() { return mon_modele_fonc_; }
+  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const { return mon_modele_fonc_; }
 
   const Champ_base& get_champ(const Motcle& nom) const override;
-  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
+
 protected:
   Modele_Fonc_Bas_Reynolds mon_modele_fonc_;
-  Transport_K_ou_Eps  eqn_transport_K_;
-  Transport_K_ou_Eps  eqn_transport_Eps_;
+  Transport_K_ou_Eps eqn_transport_K_, eqn_transport_Eps_;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
-
 };
-
 
 /*! @brief Renvoie le champ inconnue K du modele de turbulence Cette inconnue est portee
  *
@@ -81,7 +75,6 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K() const
 {
   return eqn_transport_K_.inconnue();
 }
-
 
 /*! @brief Renvoie le champ inconnue K du modele de turbulence Cette inconnue est portee
  *
@@ -105,7 +98,6 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps() const
 {
   return eqn_transport_Eps_.inconnue();
 }
-
 
 /*! @brief Renvoie le champ inconnue epsilon du modele de turbulence Cette inconnue est portee
  *
@@ -154,19 +146,4 @@ inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn
   return eqn_transport_Eps_;
 }
 
-
-
-inline Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_K_Eps_Bicephale::associe_modele_fonction()
-{
-  return mon_modele_fonc_;
-}
-
-inline const Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_K_Eps_Bicephale::associe_modele_fonction() const
-{
-  return  mon_modele_fonc_;
-}
-inline int Modele_turbulence_hyd_K_Eps_Bicephale::nombre_d_equations() const
-{
-  return 2;
-}
 #endif

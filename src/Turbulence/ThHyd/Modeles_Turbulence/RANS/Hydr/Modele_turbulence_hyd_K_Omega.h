@@ -37,21 +37,17 @@ class Tensors_Computation_VEF;
  */
 class Modele_turbulence_hyd_K_Omega: public Modele_turbulence_hyd_RANS_komega_base
 {
-
   Declare_instanciable(Modele_turbulence_hyd_K_Omega);
-
 public:
-
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   int preparer_calcul() override;
   void verifie_loi_paroi() override;
   bool initTimeStep(double dt) override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   virtual inline Champ_Inc& K_Omega();
   virtual inline const Champ_Inc& K_Omega() const;
 
-  inline int nombre_d_equations() const override;
   inline Transport_K_Omega_base& eqn_transp_K_Omega() override;
   inline const Transport_K_Omega_base& eqn_transp_K_Omega() const override;
 
@@ -64,27 +60,21 @@ public:
   inline const DoubleTab& get_enstrophy() const;
   inline DoubleTab& get_enstrophy();
 
-  void fill_turbulent_viscosity_tab(const DoubleTab& tab_K_Omega,
-                                    DoubleTab& turbulent_viscosity);
+  void fill_turbulent_viscosity_tab(const DoubleTab& tab_K_Omega, DoubleTab& turbulent_viscosity);
 
   const Equation_base& equation_k_omega(int i) const override
   {
-    assert ((i==0));
+    assert((i == 0));
     return eqn_transport_K_Omega_;
   }
 
-  const Champ_base& get_champ(const Motcle& nom) const override;
-  void get_noms_champs_postraitables(Noms& nom, Option opt=NONE) const override;
-
 protected:
   Transport_K_Omega eqn_transport_K_Omega_;
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  virtual Champ_Fonc& calculer_viscosite_turbulente(double );
   DoubleTab blenderF1_; // Blending field for SST model
   DoubleTab fieldF2_; // for the turbulent viscosity in the SST model
   DoubleTab enstrophy_; // for the turbulent viscosity in the SST model
-
 };
-
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
@@ -195,8 +185,4 @@ inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_enstrophy()
   return enstrophy_;
 }
 
-inline int Modele_turbulence_hyd_K_Omega::nombre_d_equations() const
-{
-  return 1;
-}
 #endif

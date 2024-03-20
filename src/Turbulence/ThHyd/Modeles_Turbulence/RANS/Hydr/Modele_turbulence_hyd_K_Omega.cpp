@@ -19,10 +19,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Navier_Stokes_std.h>
 #include <Modifier_pour_fluide_dilatable.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
 #include <Modele_turbulence_scal_base.h>
+#include <Navier_Stokes_std.h>
 #include <Schema_Temps_base.h>
 #include <Champ_Inc_P0_base.h>
 #include <communications.h>
@@ -41,21 +41,11 @@ Implemente_instanciable(Modele_turbulence_hyd_K_Omega,
                         Modele_turbulence_hyd_RANS_komega_base);
 // XD k_omega mod_turb_hyd_rans k_omega -1 Turbulence model (k-omega).
 
-/*! @brief Ecrit le type de l'objet sur un flot de sortie.
- *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Modele_turbulence_hyd_K_Omega::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << " " << le_nom();
 }
 
-/*! @brief Simple appel a Modele_turbulence_hyd_RANS_komega_base::readOn(Entree&)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 {
   Modele_turbulence_hyd_RANS_komega_base::readOn(s);
@@ -417,31 +407,6 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
   Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente after", la_viscosite_turbulente_.valeurs());
   imprimer_evolution_komega(ch_K_Omega, eqn_transp_K_Omega().schema_temps(), 0);
   statistiques().end_count(nut_counter_);
-}
-
-// cAlan : fonction pour le bicephale
-// const Equation_base& Modele_turbulence_hyd_K_Omega::equation_k_omega(int i) const
-// {
-//   assert ((i==0));
-//   return eqn_transport_K_Omega;
-// }
-
-// cAlan : templatable avec K_Eps
-const Champ_base& Modele_turbulence_hyd_K_Omega::get_champ(const Motcle& nom) const
-{
-  try
-    {
-      return Modele_turbulence_hyd_RANS_komega_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
-  throw Champs_compris_erreur();
-}
-
-void Modele_turbulence_hyd_K_Omega::get_noms_champs_postraitables(Noms& nom, Option opt) const
-{
-  Modele_turbulence_hyd_RANS_komega_base::get_noms_champs_postraitables(nom, opt);
 }
 
 void Modele_turbulence_hyd_K_Omega::verifie_loi_paroi()

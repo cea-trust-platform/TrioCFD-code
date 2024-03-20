@@ -45,9 +45,12 @@ public:
   void completer() override;
   int sauvegarder(Sortie& os) const override;
   int reprendre(Entree& is) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
+
+  int nombre_d_equations() const override { return 2; }
 
   virtual Transport_K_ou_Eps_base& eqn_transp_K()=0;
   virtual Transport_K_ou_Eps_base& eqn_transp_Eps()=0;

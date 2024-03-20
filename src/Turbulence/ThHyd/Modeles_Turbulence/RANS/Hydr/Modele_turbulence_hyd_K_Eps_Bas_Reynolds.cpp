@@ -28,19 +28,13 @@
 #include <stat_counters.h>
 #include <Param.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,"Modele_turbulence_hyd_K_Epsilon_Bas_Reynolds",Modele_turbulence_hyd_RANS_keps_base);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, "Modele_turbulence_hyd_K_Epsilon_Bas_Reynolds", Modele_turbulence_hyd_RANS_keps_base);
 
-//
-// printOn et readOn
-
-Sortie& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::printOn(Sortie& s ) const
+Sortie& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::printOn(Sortie& s) const
 {
   return s << que_suis_je() << " " << le_nom();
 }
 
-/*! @brief Simple appel a Modele_turbulence_hyd_RANS_keps_base::readOn(Entree&)
- *
- */
 Entree& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::readOn(Entree& is)
 {
   return Modele_turbulence_hyd_RANS_keps_base::readOn(is);
@@ -49,20 +43,20 @@ Entree& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::readOn(Entree& is)
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::set_param(Param& param)
 {
   Modele_turbulence_hyd_RANS_keps_base::set_param(param);
-  param.ajouter_non_std("Transport_K_Epsilon_Bas_Reynolds",(this),Param::REQUIRED);
-  param.ajouter_non_std("Modele_Fonc_Bas_Reynolds",(this),Param::REQUIRED);
+  param.ajouter_non_std("Transport_K_Epsilon_Bas_Reynolds", (this), Param::REQUIRED);
+  param.ajouter_non_std("Modele_Fonc_Bas_Reynolds", (this), Param::REQUIRED);
 }
 
 int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  if (mot=="Transport_K_Epsilon_Bas_Reynolds")
+  if (mot == "Transport_K_Epsilon_Bas_Reynolds")
     {
       eqn_transp_K_Eps().associer_modele_turbulence(*this);
       is >> eqn_transp_K_Eps();
-      Cerr << "K_Epsilon equation type " <<  eqn_transp_K_Eps().que_suis_je() << finl;
+      Cerr << "K_Epsilon equation type " << eqn_transp_K_Eps().que_suis_je() << finl;
       return 1;
     }
-  else if (mot=="Modele_Fonc_Bas_Reynolds")
+  else if (mot == "Modele_Fonc_Bas_Reynolds")
     {
       mon_modele_fonc_.associer_eqn(eqn_transp_K_Eps());
       is >> mon_modele_fonc_;
@@ -71,44 +65,44 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::lire_motcle_non_standard(const Mot
       return 1;
     }
   else
-    return Modele_turbulence_hyd_RANS_keps_base::lire_motcle_non_standard(mot,is);
+    return Modele_turbulence_hyd_RANS_keps_base::lire_motcle_non_standard(mot, is);
 }
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente(double temps)
 {
 
-  const Champ_base& chK_Eps=eqn_transp_K_Eps().inconnue().valeur();
+  const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue().valeur();
   const Domaine_dis& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
   const Domaine_Cl_dis& le_dom_Cl_dis = eqn_transp_K_Eps().domaine_Cl_dis();
-  Nom type=chK_Eps.que_suis_je();
+  Nom type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente K_Eps",tab_K_Eps);
-  DoubleTab& visco_turb =  la_viscosite_turbulente_.valeurs();
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente K_Eps", tab_K_Eps);
+  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_transp_K_Eps().milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   //  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int n = tab_K_Eps.dimension(0);
   DoubleTab Fmu(n);
 
-  mon_modele_fonc_.Calcul_Fmu( Fmu,le_dom_dis,le_dom_Cl_dis,tab_K_Eps,ch_visco_cin);
+  mon_modele_fonc_.Calcul_Fmu(Fmu, le_dom_dis, le_dom_Cl_dis, tab_K_Eps, ch_visco_cin);
 
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente Fmu",Fmu);
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente Fmu", Fmu);
 
   //
   //  limiteur Durbin
   //
   //        double T_durbin, T_kolmo, T_ke;
   // dans le cas d'un domaine nul on doit effectuer le dimensionnement
-  double non_prepare=1;
+  double non_prepare = 1;
   if (visco_turb.size() == n)
-    non_prepare=0.;
-  non_prepare=mp_max(non_prepare);
+    non_prepare = 0.;
+  non_prepare = mp_max(non_prepare);
 
-  if (non_prepare==1)
+  if (non_prepare == 1)
     {
       Champ_Inc visco_turb_au_format_K_eps_Bas_Re;
       visco_turb_au_format_K_eps_Bas_Re.typer(type);
-      Champ_Inc_base& ch_visco_turb_K_eps_Bas_Re=visco_turb_au_format_K_eps_Bas_Re.valeur();
+      Champ_Inc_base& ch_visco_turb_K_eps_Bas_Re = visco_turb_au_format_K_eps_Bas_Re.valeur();
       ch_visco_turb_K_eps_Bas_Re.associer_domaine_dis_base(eqn_transp_K_Eps().domaine_dis().valeur());
       ch_visco_turb_K_eps_Bas_Re.nommer("diffusivite_turbulente");
       ch_visco_turb_K_eps_Bas_Re.fixer_nb_comp(1);
@@ -116,20 +110,19 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
       ch_visco_turb_K_eps_Bas_Re.fixer_unite("inconnue");
       ch_visco_turb_K_eps_Bas_Re.changer_temps(0.);
 
-      DoubleTab& visco_turb_K_eps_Bas_Re =  ch_visco_turb_K_eps_Bas_Re.valeurs();
-      if(visco_turb_K_eps_Bas_Re.size() != n)
+      DoubleTab& visco_turb_K_eps_Bas_Re = ch_visco_turb_K_eps_Bas_Re.valeurs();
+      if (visco_turb_K_eps_Bas_Re.size() != n)
         {
-          Cerr << "visco_turb_K_eps_Bas_Re size is " << visco_turb_K_eps_Bas_Re.size()
-               << " instead of " << n << finl;
+          Cerr << "visco_turb_K_eps_Bas_Re size is " << visco_turb_K_eps_Bas_Re.size() << " instead of " << n << finl;
           exit();
         }
 
-      for (int i=0; i<n; i++)
+      for (int i = 0; i < n; i++)
         {
-          if (tab_K_Eps(i,1) <= DMINFLOAT)
+          if (tab_K_Eps(i, 1) <= DMINFLOAT)
             visco_turb_K_eps_Bas_Re[i] = 0;
           else
-            visco_turb_K_eps_Bas_Re[i] = CMU*Fmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
+            visco_turb_K_eps_Bas_Re[i] = CMU * Fmu(i) * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
         }
 
       la_viscosite_turbulente_->affecter(visco_turb_au_format_K_eps_Bas_Re.valeur());
@@ -137,12 +130,12 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
     }
   else
     {
-      for (int i=0; i<n; i++)
+      for (int i = 0; i < n; i++)
         {
-          if (tab_K_Eps(i,1) <= DMINFLOAT)
+          if (tab_K_Eps(i, 1) <= DMINFLOAT)
             visco_turb[i] = 0;
           else
-            visco_turb[i] = CMU*Fmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
+            visco_turb[i] = CMU * Fmu(i) * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
         }
     }
   la_viscosite_turbulente_.changer_temps(temps);
@@ -155,11 +148,11 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::preparer_calcul()
   return 1;
   // provisoire
   /*
-  Modele_turbulence_hyd_RANS_keps_base::preparer_calcul();
-  calculer_viscosite_turbulente(K_Eps().temps());
-  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
-  return 1;
-  */
+   Modele_turbulence_hyd_RANS_keps_base::preparer_calcul();
+   calculer_viscosite_turbulente(K_Eps().temps());
+   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
+   return 1;
+   */
 }
 
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour(double temps)
@@ -176,7 +169,7 @@ void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour(double temps)
   calculer_viscosite_turbulente(ch_K_Eps.temps());
   limiter_viscosite_turbulente();
   la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente",la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
   statistiques().end_count(nut_counter_);
 }
 
@@ -185,14 +178,9 @@ bool Modele_turbulence_hyd_K_Eps_Bas_Reynolds::initTimeStep(double dt)
   return eqn_transport_K_Eps_Bas_Re_.initTimeStep(dt);
 }
 
-
-
-void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::imprimer(Sortie& os) const
-{
-}
 const Equation_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::equation_k_eps(int i) const
 {
-  assert ((i==0));
+  assert((i == 0));
   return eqn_transport_K_Eps_Bas_Re_;
 }
 
@@ -202,7 +190,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_champ(const Motc
     {
       return Modele_turbulence_hyd_RANS_keps_base::get_champ(nom);
     }
-  catch (Champs_compris_erreur)
+  catch (Champs_compris_erreur&)
     {
     }
 
@@ -212,7 +200,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_champ(const Motc
         {
           return mon_modele_fonc_->get_champ(nom);
         }
-      catch (Champs_compris_erreur)
+      catch (Champs_compris_erreur&)
         {
         }
     }
@@ -220,12 +208,12 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_champ(const Motc
   throw Champs_compris_erreur();
 }
 
-void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_noms_champs_postraitables(Noms& nom,Option opt) const
+void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
-  Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(nom,opt);
+  Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(nom, opt);
 
   if (mon_modele_fonc_.non_nul())
-    mon_modele_fonc_->get_noms_champs_postraitables(nom,opt);
+    mon_modele_fonc_->get_noms_champs_postraitables(nom, opt);
 
 }
 

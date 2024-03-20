@@ -39,6 +39,26 @@ void Modele_turbulence_hyd_RANS_Bicephale_base::set_param(Param& param)
   param.ajouter("PRANDTL_EPS", &Prandtl_Eps_); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
 }
 
+int Modele_turbulence_hyd_RANS_Bicephale_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+{
+  if (mot == "Transport_K")
+    {
+      eqn_transp_K().transporte_K();
+      eqn_transp_K().associer_modele_turbulence(*this);
+      is >> eqn_transp_K();
+      return 1;
+    }
+  else if (mot == "Transport_Epsilon")
+    {
+      eqn_transp_Eps().transporte_Eps();
+      eqn_transp_Eps().associer_modele_turbulence(*this);
+      is >> eqn_transp_Eps();
+      return 1;
+    }
+  else
+    return Modele_turbulence_hyd_2_eq_base::lire_motcle_non_standard(mot, is);
+}
+
 void Modele_turbulence_hyd_RANS_Bicephale_base::completer()
 {
   eqn_transp_K().completer();

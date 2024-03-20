@@ -30,11 +30,9 @@
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps : public Modele_turbulence_hyd_RANS_keps_base
+class Modele_turbulence_hyd_K_Eps: public Modele_turbulence_hyd_RANS_keps_base
 {
-
   Declare_instanciable(Modele_turbulence_hyd_K_Eps);
-
 public:
 
   void set_param(Param& param) override;
@@ -42,26 +40,21 @@ public:
   int preparer_calcul() override;
   void verifie_loi_paroi() override;
   bool initTimeStep(double dt) override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   virtual inline Champ_Inc& K_Eps();
   virtual inline const Champ_Inc& K_Eps() const;
 
-  inline int nombre_d_equations() const override;
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
-  const Equation_base& equation_k_eps(int) const override ;
-
-
+  const Equation_base& equation_k_eps(int) const override;
 
   const Champ_base& get_champ(const Motcle& nom) const override;
-  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
 
 protected:
-  Transport_K_Eps  eqn_transport_K_Eps_;
+  Transport_K_Eps eqn_transport_K_Eps_;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
-
 };
-
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
@@ -75,7 +68,6 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps() const
 {
   return eqn_transport_K_Eps_.inconnue();
 }
-
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
@@ -111,8 +103,5 @@ inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps
 {
   return eqn_transport_K_Eps_;
 }
-inline int Modele_turbulence_hyd_K_Eps::nombre_d_equations() const
-{
-  return 1;
-}
+
 #endif

@@ -27,26 +27,14 @@
 #include <stat_counters.h>
 #include <Param.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches,"Modele_turbulence_hyd_K_Epsilon_2_Couches",Modele_turbulence_hyd_RANS_keps_base);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches, "Modele_turbulence_hyd_K_Epsilon_2_Couches", Modele_turbulence_hyd_RANS_keps_base);
 
-
-/*! @brief Ecrit le type de l'objet sur un flot de sortie.
- *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
-Sortie& Modele_turbulence_hyd_K_Eps_2_Couches::printOn(Sortie& s ) const
+Sortie& Modele_turbulence_hyd_K_Eps_2_Couches::printOn(Sortie& s) const
 {
   return s << que_suis_je() << " " << le_nom();
 }
 
-
-/*! @brief Simple appel a Modele_turbulence_hyd_RANS_keps_base::readOn(Entree&)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
-Entree& Modele_turbulence_hyd_K_Eps_2_Couches::readOn(Entree& s )
+Entree& Modele_turbulence_hyd_K_Eps_2_Couches::readOn(Entree& s)
 {
   return Modele_turbulence_hyd_RANS_keps_base::readOn(s);
 }
@@ -54,20 +42,19 @@ Entree& Modele_turbulence_hyd_K_Eps_2_Couches::readOn(Entree& s )
 void Modele_turbulence_hyd_K_Eps_2_Couches::set_param(Param& param)
 {
   Modele_turbulence_hyd_RANS_keps_base::set_param(param);
-  param.ajouter_non_std("Transport_K_KEpsilon",(this),Param::REQUIRED);
+  param.ajouter_non_std("Transport_K_KEpsilon", (this), Param::REQUIRED);
 }
-
 
 int Modele_turbulence_hyd_K_Eps_2_Couches::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  if (mot=="Transport_K_KEpsilon")
+  if (mot == "Transport_K_KEpsilon")
     {
       eqn_transp_K_Eps().associer_modele_turbulence(*this);
       is >> eqn_transp_K_Eps();
       return 1;
     }
   else
-    return Modele_turbulence_hyd_RANS_keps_base::lire_motcle_non_standard(mot,is);
+    return Modele_turbulence_hyd_RANS_keps_base::lire_motcle_non_standard(mot, is);
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.
@@ -78,10 +65,10 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::lire_motcle_non_standard(const Motcle
  */
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente(double temps)
 {
-  const Champ_base& chK_Eps=eqn_transport_K_Eps_.inconnue().valeur();
-  Nom type=chK_Eps.que_suis_je();
+  const Champ_base& chK_Eps = eqn_transport_K_Eps_.inconnue().valeur();
+  Nom type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
-  DoubleTab& visco_turb =  la_viscosite_turbulente_.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
 
   // K_Eps(i,0) = K au noeud i
   // K_Eps(i,1) = Epsilon au noeud i
@@ -92,7 +79,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
       Champ_Inc visco_turb_au_format_K_eps;
 
       visco_turb_au_format_K_eps.typer(type);
-      Champ_Inc_base& ch_visco_turb_K_eps=visco_turb_au_format_K_eps.valeur();
+      Champ_Inc_base& ch_visco_turb_K_eps = visco_turb_au_format_K_eps.valeur();
       ch_visco_turb_K_eps.associer_domaine_dis_base(eqn_transport_K_Eps_.domaine_dis().valeur());
       ch_visco_turb_K_eps.nommer("diffusivite_turbulente");
       ch_visco_turb_K_eps.fixer_nb_comp(1);
@@ -100,31 +87,30 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
       ch_visco_turb_K_eps.fixer_unite("inconnue");
       ch_visco_turb_K_eps.changer_temps(0.);
 
-      DoubleTab& visco_turb_K_eps =  ch_visco_turb_K_eps.valeurs();
+      DoubleTab& visco_turb_K_eps = ch_visco_turb_K_eps.valeurs();
 
-      if(visco_turb_K_eps.size() != n)
+      if (visco_turb_K_eps.size() != n)
         {
-          Cerr << "visco_turb_K_eps size is " << visco_turb_K_eps.size()
-               << " instead of " << n << finl;
+          Cerr << "visco_turb_K_eps size is " << visco_turb_K_eps.size() << " instead of " << n << finl;
           exit();
         }
-      for (int i=0; i<n; i++)
+      for (int i = 0; i < n; i++)
         {
-          if (tab_K_Eps(i,1) <= EPS_MIN_)
+          if (tab_K_Eps(i, 1) <= EPS_MIN_)
             visco_turb_K_eps[i] = 0;
           else
-            visco_turb_K_eps[i] = CMU*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
+            visco_turb_K_eps[i] = CMU * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
         }
       la_viscosite_turbulente_->affecter(visco_turb_au_format_K_eps.valeur());
     }
   else
     {
-      for (int i=0; i<n; i++)
+      for (int i = 0; i < n; i++)
         {
-          if (tab_K_Eps(i,1) <= EPS_MIN_)
+          if (tab_K_Eps(i, 1) <= EPS_MIN_)
             visco_turb[i] = 0;
           else
-            visco_turb[i] = CMU*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
+            visco_turb[i] = CMU * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
         }
     }
   la_viscosite_turbulente_.changer_temps(temps);
@@ -156,7 +142,7 @@ bool Modele_turbulence_hyd_K_Eps_2_Couches::initTimeStep(double dt)
  */
 void Modele_turbulence_hyd_K_Eps_2_Couches::mettre_a_jour(double temps)
 {
-  DoubleTab& visco_turb =  la_viscosite_turbulente_.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
   Champ_Inc& ch_K_Eps = K_Eps();
   Schema_Temps_base& sch = eqn_transport_K_Eps_.schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
@@ -166,22 +152,22 @@ void Modele_turbulence_hyd_K_Eps_2_Couches::mettre_a_jour(double temps)
 
   statistiques().begin_count(nut_counter_);
   eqn_transport_K_Eps_.controler_K_Eps();
-  const Milieu_base& mil=equation().probleme().milieu();
+  const Milieu_base& mil = equation().probleme().milieu();
   // on divise K_eps par rho en QC pour revenir a K et Eps
-  if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+  if (equation().probleme().is_dilatable())
+    diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(), mil);
   calculer_viscosite_turbulente(ch_K_Eps.temps());
-  loipar_->calculer_hyd(visco_turb,ch_K_Eps.valeurs());
+  loipar_->calculer_hyd(visco_turb, ch_K_Eps.valeurs());
   limiter_viscosite_turbulente();
   // on remultiplie K_eps par rho
   if (equation().probleme().is_dilatable())
     {
-      multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+      multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(), mil);
       correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
   la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
   statistiques().end_count(nut_counter_);
 }
-
 
 /*! @brief Simple appel a Transport_K_Eps::completer()
  *
@@ -194,7 +180,7 @@ void Modele_turbulence_hyd_K_Eps_2_Couches::completer()
 
 const Equation_base& Modele_turbulence_hyd_K_Eps_2_Couches::equation_k_eps(int i) const
 {
-  assert ((i==0));
+  assert((i == 0));
   return eqn_transport_K_Eps_;
 
 }

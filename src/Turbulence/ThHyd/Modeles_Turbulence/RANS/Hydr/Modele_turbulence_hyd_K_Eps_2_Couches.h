@@ -30,11 +30,9 @@
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps_2_Couches : public Modele_turbulence_hyd_RANS_keps_base
+class Modele_turbulence_hyd_K_Eps_2_Couches: public Modele_turbulence_hyd_RANS_keps_base
 {
-
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches);
-
 public:
 
   void set_param(Param& param) override;
@@ -42,7 +40,7 @@ public:
   void completer() override;
   int preparer_calcul() override;
   bool initTimeStep(double dt) override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   inline Champ_Inc& K_Eps();
   inline const Champ_Inc& K_Eps() const;
   inline int get_nbcouches() const;
@@ -51,21 +49,14 @@ public:
   inline int get_switch() const;
   inline int get_impr() const;
 
-  inline int nombre_d_equations() const override;
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
   const Equation_base& equation_k_eps(int) const override;
 
-  //  void imprimer(Sortie& os) const;
-protected :
-
 private:
-
-  Transport_K_KEps  eqn_transport_K_Eps_;
+  Transport_K_KEps eqn_transport_K_Eps_;
   Champ_Fonc& calculer_viscosite_turbulente(double temps);
-
 };
-
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
@@ -80,7 +71,6 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
   return eqn_transport_K_Eps_.inconnue();
 }
 
-
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
  * e. : (K,Epsilon). Cette inconnue est portee
@@ -93,7 +83,6 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps()
   return eqn_transport_K_Eps_.inconnue();
 }
 
-
 /*! @brief Renvoie le nombre couches utilises pour les lois de paroi Ce nombre est porte par l'equation de transport K_K-eps.
  *
  * @return (int) le nombre de couches
@@ -102,7 +91,6 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nbcouches() const
 {
   return eqn_transport_K_Eps_.get_nbcouches();
 }
-
 
 /*! @brief Renvoie le y* de switch entre les deux couches pour le modele a deux couches.
  *
@@ -114,7 +102,6 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_yswitch() const
 {
   return eqn_transport_K_Eps_.get_yswitch();
 }
-
 
 /*! @brief Renvoie 0 si on choisit le switch par y*, 1 par nu_t.
  *
@@ -155,7 +142,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_impr() const
  *
  * @return (Trasnport_K_KEps)
  */
-inline const Transport_K_Eps_base&  Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps() const
+inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps() const
 {
   return eqn_transport_K_Eps_;
 }
@@ -169,11 +156,6 @@ inline const Transport_K_Eps_base&  Modele_turbulence_hyd_K_Eps_2_Couches::eqn_t
 inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps()
 {
   return eqn_transport_K_Eps_;
-}
-
-inline int Modele_turbulence_hyd_K_Eps_2_Couches::nombre_d_equations() const
-{
-  return 1;
 }
 
 #endif
