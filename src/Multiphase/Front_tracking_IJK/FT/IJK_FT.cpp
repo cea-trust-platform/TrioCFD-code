@@ -1045,14 +1045,11 @@ void IJK_FT_double::force_entry_velocity(IJK_Field_double& vx, IJK_Field_double&
   }
 }
 
-void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
-                                            double v_imposed,
-                                            const IJK_Interfaces& interfaces,
-                                            double nb_diam,
-                                            int upstream_dir,
-                                            int gravity_dir,
-                                            int upstream_stencil,
-											double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio)
+
+void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
+                                                        double v_imposed,
+                                                        const IJK_Interfaces& interfaces,
+                                                        double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio)
 {
   int dir = 0;
   if (upstream_dir == -1)
@@ -1071,7 +1068,7 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
   Cerr << "Upstream Velocity - Compute Bounding box" << finl;
   interfaces.calculer_bounding_box_bulles(bounding_box);
 
-  // Calcule la hauteur en x de la permiere bulle et la position de son cdg :
+  // Calcule la hauteur en x et z de la bulle et la position de son cdg :
   const double Dbx = bounding_box(0, 0, 1) - bounding_box(0, 0, 0);
   const double Dbz = bounding_box(0, 2, 1) - bounding_box(0, 2, 0);
   const double xb  = ( bounding_box(0, 0, 1) + bounding_box(0, 0, 0) ) / 2.;
@@ -1085,8 +1082,8 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
   double lz = geom.get_domain_length(DIRECTION_K) ;
   double z_min = zb - (Dbz * nb_diam_ortho_shear_perio) / 2. ;
   double z_max = zb + (Dbz * nb_diam_ortho_shear_perio) / 2. ;
-  double z_min_modulo = zb - (Dbz * nb_diam_ortho_shear_perio) / 2. ;
-  double z_max_modulo = zb + (Dbz * nb_diam_ortho_shear_perio) / 2. ;
+  double z_min_modulo = z_min ;
+  double z_max_modulo = z_max ;
 
   bool perio =  geom.get_periodic_flag(DIRECTION_K);
   if (perio)
@@ -1094,16 +1091,17 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
       z_min_modulo=std::fmod(std::fmod(z_min-origin_z,lz)+lz,lz)+origin_z;
       z_max_modulo=std::fmod(std::fmod(z_max-origin_z,lz)+lz,lz)+origin_z;
     }
-
+  // Calcule la hauteur du plan ou sera impose la vitesse par rapport a la bulle reelle
   double xobj = xb + nb_diam*Dbx;
-  // Calcule la hauteur en x de la permiere bulle shear periodique par le shear positif et la position de son cdg
+  // Calcule la hauteur du plan ou sera impose la vitesse par rapport a la bulle shear periodique par le shear positif
   double xb_offsetp  = xb +  std::fmod(std::fmod(IJK_Splitting::shear_x_time_, lx)+lx,lx) ;
   double xobj_offsetp = xb_offsetp + nb_diam*Dbx;
-  // Calcule la hauteur en x de la permiere bulle shear periodique par le shear positif et la position de son cdg
+  // Calcule la hauteur du plan ou sera impose la vitesse par rapport a la bulle shear periodique par le shear negatif
   double xb_offsetm  = xb -  std::fmod(std::fmod(IJK_Splitting::shear_x_time_, lx)+lx,lx) ;
   double xobj_offsetm = xb_offsetm + nb_diam*Dbx;
 
   perio =  geom.get_periodic_flag(DIRECTION_I);
+  // on s'assure que la position des plans en x reste dans le domaine physique
   if (perio)
     {
       xobj=std::fmod(std::fmod(xobj-origin_x,lx)+lx,lx)+origin_x;
@@ -1111,116 +1109,34 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
       xobj_offsetm=std::fmod(std::fmod(xobj_offsetm-origin_x,lx)+lx,lx)+origin_x;
     }
 
-  // On devrait avoir xobj dans le domaine, sinon, on a choisi nb_diam trop grand :
-  assert( ((xobj>=origin_x) && (xobj <= origin_x+lx) ));
-  assert( ((xobj_offsetp>=origin_x) && (xobj_offsetp <= origin_x+lx) ));
-  assert( ((xobj_offsetm>=origin_x) && (xobj_offsetm <= origin_x+lx) ));
-
-
   double dx = geom.get_constant_delta(DIRECTION_I);
-  //double dy = geom.get_constant_delta(DIRECTION_J);
   double dz = geom.get_constant_delta(DIRECTION_K);
   int offset_i = splitting.get_offset_local(DIRECTION_I);
-  //int offset_j = splitting.get_offset_local(DIRECTION_J);
   int offset_k = splitting.get_offset_local(DIRECTION_K);
 
+  // position des plans : conversion en indice du tableau NS
+  // en shear perio, pas de decoupage sur x. les index_i sont compris entre 0 et ni_tot
   double x2 = (xobj_offsetp-origin_x)/ dx;
-  int index_i_offsetp = (int)(floor(x2)) - offset_i; // C'est l'index local, donc potentiellement negatif...
+  int index_i_offsetp = (int)(floor(x2)) - offset_i;
   int ni = vy.ni();
   x2 = (xobj_offsetm-origin_x)/ dx;
-  int index_i_offsetm = (int)(floor(x2)) - offset_i; // C'est l'index local, donc potentiellement negatif...
+  int index_i_offsetm = (int)(floor(x2)) - offset_i;
   x2 = (xobj-origin_x)/ dx;
-  int index_i = (int)(floor(x2)) - offset_i; // C'est l'index local, donc potentiellement negatif...
-  //int index_j_min = (int)(floor((y_min-origin_y)/ dy)) - offset_j; // C'est l'index local, donc potentiellement negatif...
-  //int index_j_max = (int)(floor((y_max-origin_y)/ dy)) - offset_j; // C'est l'index local, donc potentiellement negatif...
-  int index_k_min = (int)(floor((z_min_modulo-origin_z)/ dz)) - offset_k; // C'est l'index local, donc potentiellement negatif...
-  int index_k_max = (int)(floor((z_max_modulo-origin_z)/ dz)) - offset_k; // C'est l'index local, donc potentiellement negatif...
+  int index_i = (int)(floor(x2)) - offset_i;
 
-  /*if ((index_i >=0) && (index_i<ni))
-    {
-      if (index_i+3 >= ni)
-        {
-          // On ne veut pas s'embeter sur 2 procs...
-          index_dir = ndir-upstream_stencil;
-        }
-    }
-  else
-    {
-      return;
-    }
+  // decoupage en z autorise. ATTENTION, indices locaux potentiellement negatifs
+  int index_k_min = (int)(floor((z_min_modulo-origin_z)/ dz)) - offset_k;
+  int index_k_max = (int)(floor((z_max_modulo-origin_z)/ dz)) - offset_k;
+
   {
-    double imposed[3] = {0., 0., 0.};
-    imposed[dir] = v_imposed;
     for (int direction = 0; direction < 3; direction++)
       {
         IJK_Field_double& velocity = select(direction, vx, vy, vz);
-        int imin;
-        int jmin;
-        int kmin;
-        int imax;
-        int jmax;
-        int kmax;
-        switch (dir)
+        for (int k = 0; k < velocity.nk(); k++)
           {
-          case 0:
-            imin = index_dir;
-            jmin = 0;
-            kmin = 0;
-            imax = imin+upstream_stencil;
-            jmax = velocity.nj();
-            kmax = velocity.nk();
-            break;
-          case 1:
-            imin = 0;
-            jmin = index_dir;
-            kmin = 0;
-            imax = velocity.ni();
-            jmax = jmin+upstream_stencil;
-            kmax = velocity.nk();
-            break;
-          case 2:
-            imin = 0;
-            jmin = 0;
-            kmin = index_dir;
-            imax = velocity.ni();
-            jmax = velocity.nj();
-            kmax = kmin+upstream_stencil;
-            break;
-          default:
-            imin = index_dir;
-            jmin = 0;
-            kmin = 0;
-            imax = imin+upstream_stencil;
-            jmax = velocity.nj();
-            kmax = velocity.nk();
-            break;
-=======
-    }*/
-
-  {
-    std::cout << "index_i = " << index_i << std::endl;
-    std::cout << "index_i_offsetp = " << index_i_offsetp << std::endl;
-    std::cout << "index_i_offsetm = " << index_i_offsetm << std::endl;
-    std::cout << "index_k_min = " << index_k_min << std::endl;
-    std::cout << "index_k_max = " << index_k_max << std::endl;
-    std::cout << "z_min_modulo = " << z_min_modulo << std::endl;
-    std::cout << "z_max_modulo = " << z_max_modulo << std::endl;
-    std::cout << "z_min = " << z_min << std::endl;
-    std::cout << "z_max = " << z_max << std::endl;
-    for (int direction = 0; direction < 3; direction++)
-      {
-        IJK_Field_double& velocity = select(direction, vx, vy, vz);
-        const int imin = 0;
-        const int jmin = 0;
-        const int kmin = 0;
-        const int imax = velocity.ni();
-        const int jmax = velocity.nj();
-        const int kmax = velocity.nk();
-        for (int k = kmin; k < kmax; k++)
-          {
-            for (int j = jmin; j < jmax; j++)
+            for (int j = 0; j < velocity.nj(); j++)
               {
-                for (int i = imin; i < imax; i++)
+                for (int i = 0; i < velocity.ni(); i++)
                   {
                     bool go_i = false;
                     bool go_k = false;
@@ -1229,18 +1145,23 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
                     // coord Z
                     if (z_min_modulo>z_max_modulo)
                       {
-                        // a cheval sur la frontiere z
+                        // la bulle est a cheval sur la frontiere z
+                    	// Il y donc deux plans distincts ou imposer la vitesse
+                    	// un pour la bulle "de droite" (k=nk), un pour la bulle "de gauche" (k=0).
                         if(z_min_modulo!=z_min)
                           {
-                            // on traverse en zmin
+                            // la bulle reelle (compo connex >0) va de la droite vers la gauche.
+                        	// la bulle fantome est soumise a un shear positif
                             if (k>index_k_min and index_k_min<kmax)
                               {
+                            	// indice i du plan pour la bulle fantome
                                 index_i_real = index_i_offsetp ;
                                 go_k = true ;
 
                               }
                             else if (k<index_k_max and index_k_max>=0)
                               {
+                            	// indice i du plan pour la bulle reelle
                                 index_i_real = index_i;
                                 go_k = true ;
 
@@ -1248,14 +1169,17 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
                           }
                         else if (z_max_modulo!=z_max)
                           {
-                            // on a traverse en zmax
-                            if (index_k_min<kmax and k>index_k_min)
+                        	// la bulle reelle (compo connex >0) va de la gauche vers la droite.
+                        	// la bulle fantome est soumise a un shear negatif
+                            if (k>index_k_min and index_k_min<kmax)
                               {
+                            	// indice i du plan pour la bulle reelle
                                 index_i_real =  index_i;
                                 go_k = true ;
                               }
                             else if (k<index_k_max and index_k_max>=0)
                               {
+                            	// indice i du plan pour la bulle fantome
                                 index_i_real = index_i_offsetm ;
                                 go_k = true ;
                               }
@@ -1263,7 +1187,8 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
                       }
                     else
                       {
-                        // dans le domaine z
+                        // la bulle ne traverse pas la frontiere z
+                    	// un seul plan defini pour la bulle reelle
                         if ((index_k_min<kmax and k>index_k_min) and (k<index_k_max and index_k_max>=0))
                           {
                             index_i_real = index_i;
@@ -1273,20 +1198,22 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
                       }
 
                     // coord X
-                    if ((index_i_real >=0) && (index_i_real<ni) && i == index_i_real)
+                    if (i == index_i_real)
                       {
-                        // On est sur le bon proc...
+                        // On est sur la ligne du plan ou imposer la vitesse
                         go_i = true;
                       }
 
                     if(go_i && go_k)
                       {
+                    	// on impose la vitesse sur une couche de 3 mailles
+                    	// U(z) = DU_perio * z / Lz
+                    	// V = W = 0
+                    	// ATTENTION : doit etre utilisee avec corrections_qdm pour eviter toute deviation
+                    	// ATTENTION : s assurer que la condition de corrections_qdm est compatible avec ce profil de vitesse
                         if(direction==0)
                           {
-                            std::cout << "index_i_real = " << index_i_real << "i = " << i << "k = " << k << std::endl;
                             double z=dz/2.+(k+offset_k)*dz;
-                            //IJK_Splitting::Localisation loc = vx.get_localisation();
-                            //Vecteur3 xyz=splitting.get_coords_of_dof(i, j, k, loc);
                             velocity(i,j,k)=bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
                             velocity((i+1)%ni,j,k)=bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
                             velocity((i+2)%ni,j,k)=bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
@@ -1310,6 +1237,84 @@ void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_doub
       }
   }
   Cerr << "Upstream Velocity has been forced" << finl;
+}
+
+void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
+                                            double v_imposed,
+                                            const IJK_Interfaces& interfaces,
+                                            double nb_diam)
+{
+  assert(interfaces.get_nb_bulles_reelles() == 1);
+  DoubleTab bounding_box;
+  interfaces.calculer_bounding_box_bulles(bounding_box);
+  // Calcule la hauteur en x de la permiere bulle et la position de son cdg :
+  const double Dbx = bounding_box(0, 0, 1) - bounding_box(0, 0, 0);
+  const double xb  = ( bounding_box(0, 0, 1) + bounding_box(0, 0, 0) ) / 2.;
+  double xobj = xb + nb_diam*Dbx;
+
+  const IJK_Splitting& splitting = vx.get_splitting();
+  const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
+  const double dx = geom.get_constant_delta(DIRECTION_I);
+  // L'origine est sur un noeud. Donc que la premiere face en I est sur get_origin(DIRECTION_I)
+  const double origin_x = geom.get_origin(DIRECTION_I) ;
+  const double lx = geom.get_domain_length(DIRECTION_I) ;
+  const int offset_i = splitting.get_offset_local(DIRECTION_I);
+
+  bool perio =  geom.get_periodic_flag(DIRECTION_I);
+  if (perio)
+    {
+      while (xobj<origin_x)
+        xobj+= lx;
+      while (xobj>origin_x+lx)
+        xobj -= lx;
+    }
+
+  // On devrait avoir xobj dans le domaine, sinon, on a choisi nb_diam trop grand :
+  assert( ((xobj>=origin_x) && (xobj <= origin_x+lx) ));
+
+  const double x2 = (xobj-origin_x)/ dx;
+  int index_i = (int)(floor(x2)) - offset_i; // C'est l'index local, donc potentiellement negatif...
+  const int ni = vy.ni();
+  Cerr << "index_i " << index_i << finl;
+
+  if ((index_i >=0) && (index_i<ni))
+    {
+      // On est sur le bon proc...
+      if (index_i+3 >= ni)
+        {
+          // On ne veut pas s'embeter sur 2 procs...
+          index_i = ni-3;
+        }
+    }
+  else
+    {
+      return;
+    }
+
+  {
+    double imposed[3] = {0., 0., 0.};
+    imposed[0] = v_imposed;
+    for (int direction = 0; direction < 3; direction++)
+      {
+        IJK_Field_double& velocity = select(direction, vx, vy, vz);
+        const int imin = index_i;
+        const int jmin = 0;
+        const int kmin = 0;
+        const int imax = imin+3;
+        const int jmax = velocity.nj();
+        const int kmax = velocity.nk();
+        for (int k = kmin; k < kmax; k++)
+          {
+            for (int j = jmin; j < jmax; j++)
+              {
+                for (int i = imin; i < imax; i++)
+                  {
+                    velocity(i,j,k) = imposed[direction];
+                  }
+              }
+          }
+      }
+  }
 }
 
 void IJK_FT_double::ecrire_donnees(const FixedVector<IJK_Field_double, 3>& f3compo, SFichier& le_fichier, const int compo, bool binary) const
@@ -4461,9 +4466,19 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
               vitesse_upstream_ = parser.eval();
             }
           Cerr << "Force upstream velocity" << finl;
-          force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
-                                  vitesse_upstream_, interfaces_, nb_diam_upstream_,
-                                  upstream_dir_, get_direction_gravite(), upstream_stencil_, boundary_conditions_, nb_diam_ortho_shear_perio_);
+
+          if (IJK_Splitting::defilement_ == 1)
+            {
+              force_upstream_velocity_shear_perio(velocity_[0], velocity_[1], velocity_[2],
+                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_);
+            }
+          else
+            {
+              force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
+                                      vitesse_upstream_, interfaces_, nb_diam_upstream_,
+                                      upstream_dir_, get_direction_gravite(), upstream_stencil_);
+            }
+
         }
     } // end of if ! frozen_velocity
 // static Stat_Counter_Id projection_counter_ = statistiques().new_counter(0, "projection");
@@ -4666,10 +4681,19 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
 
       // Forcage de la vitesse en amont de la bulle :
       if (vitesse_upstream_ > -1e20)
-        force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
-                                vitesse_upstream_, interfaces_, nb_diam_upstream_,
-                                upstream_dir_, get_direction_gravite(), upstream_stencil_,boundary_conditions_, nb_diam_ortho_shear_perio_);
-
+        {
+          if (IJK_Splitting::defilement_ == 1)
+            {
+              force_upstream_velocity_shear_perio(velocity_[0], velocity_[1], velocity_[2],
+                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_);
+            }
+          else
+            {
+              force_upstream_velocity(velocity_[0], velocity_[1], velocity_[2],
+                                      vitesse_upstream_, interfaces_, nb_diam_upstream_,
+                                      upstream_dir_, get_direction_gravite(), upstream_stencil_);
+            }
+        }
 
     } // end of if ! frozen_velocity
 //static Stat_Counter_Id projection_counter_ = statistiques().new_counter(0, "projection");

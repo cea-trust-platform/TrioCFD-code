@@ -2164,23 +2164,9 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int o
               // Idem donc pour la bulle ghost
               double decallage_bulle_reel_ext_domaine_reel = 1.*(position_xmax_compo[iconnex]-position_xmin_compo[iconnex]); // verifier si cest ca la valeur
               // assure une position entre db et Lx + db --> vrai que pour une bulle qui monte....
-              //double db = 1.*(position_xmax_compo[iconnex]-position_xmin_compo[iconnex]); // verifier si cest ca la valeur
+              // Si la bulle descend, risque de ne pas fonctionner --> il faudrait assurer une position entre -db et Lx+db ?
               double pos = std::fmod(std::fmod(pos_ref + offset - decallage_bulle_reel_ext_domaine_reel, Lx) + Lx, Lx) + decallage_bulle_reel_ext_domaine_reel;
               // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
-              // Si la bulle descend, risque de ne pas fonctionner --> il faudrait assurer une position entre -db et Lx+db ?
-              //double pos = 0.;
-              //if (pos_ref >= Lx / 2.)
-              //  {
-              // on parle alors d'une bulle qui va sortir par le haut du domaine en x
-              // il faut assurer une position entre db et Lx + db
-              //    pos = std::fmod(std::fmod(pos_ref + offset - db, Lx) + Lx, Lx) + db;
-              //  }
-              //else
-              //  {
-              // on parle alors d'une bulle qui va sortir par le bas du domaine en x
-              // il faut assurer une position entre -db et Lx-db
-              //    pos = std::fmod(std::fmod(pos_ref + offset + db, Lx) + Lx, Lx) - db;
-              //  }
               coord += (pos - pos_ref);
             }
 
@@ -2342,9 +2328,8 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
           double depl = decode * (bounding_box_NS(dir, 1) - bounding_box_NS(dir, 0));
           deplacement(i_sommet, dir) = depl;
           double pos_ref = 0 ;
-          double decallage_bulle_reel_ext_domaine_reel = 0.;
           double pos = 0;
-          //double db = 0.;
+          double decallage_bulle_reel_ext_domaine_reel = 0.;
           // si seulement on a traverser une frontiere shear periodique
           if (dir==2 && depl != 0. && IJK_Splitting::defilement_ == 1)
             {
@@ -2353,13 +2338,8 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
               // position du barycentre de la bulle de reference a laquelle appartient le sommet
               pos_ref = position(compo_bulle_reel,0);
               // on veut le barycentre de la bulle decallee dans le domaine reel
-              //db = 1.*(position_xmax_compo[compo_bulle_reel]-position_xmin_compo[compo_bulle_reel]); // verifier si cest ca la valeur
-
               decallage_bulle_reel_ext_domaine_reel = 1.*(position_xmax_compo[compo_bulle_reel]-position_xmin_compo[compo_bulle_reel]); // verifier si cest ca la valeur
               pos = std::fmod(std::fmod(deplacement(i_sommet, 0) + pos_ref + offset - decallage_bulle_reel_ext_domaine_reel, Lx) + Lx, Lx) + decallage_bulle_reel_ext_domaine_reel;
-
-              // probable modif a faire ici
-              //pos = std::fmod(std::fmod(deplacement(i_sommet, 0) + pos_ref + offset - db, Lx) + Lx, Lx) + db;
               // Tous les sommets d'une meme bulle deplaces de la meme maniere sur x
               deplacement(i_sommet, 0) += (pos - pos_ref);
             }
