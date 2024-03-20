@@ -38,7 +38,7 @@
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Omega,
                         "Modele_turbulence_hyd_K_Omega",
-                        Modele_turbulence_hyd_RANS_komega_base);
+                        Modele_turbulence_hyd_RANS_K_Omega_base);
 // XD k_omega mod_turb_hyd_rans k_omega -1 Turbulence model (k-omega).
 
 Sortie& Modele_turbulence_hyd_K_Omega::printOn(Sortie& s ) const
@@ -48,7 +48,7 @@ Sortie& Modele_turbulence_hyd_K_Omega::printOn(Sortie& s ) const
 
 Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 {
-  Modele_turbulence_hyd_RANS_komega_base::readOn(s);
+  Modele_turbulence_hyd_RANS_K_Omega_base::readOn(s);
 
   if (model_variant_ == "SST")
     {
@@ -65,7 +65,7 @@ Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 
 void Modele_turbulence_hyd_K_Omega::set_param(Param& param)
 {
-  Modele_turbulence_hyd_RANS_komega_base::set_param(param);
+  Modele_turbulence_hyd_RANS_K_Omega_base::set_param(param);
   param.ajouter_non_std("Transport_K_Omega", (this), Param::REQUIRED); // XD_ADD_P transport_k_omega Keyword to define the (k-omega) transportation equation.
   param.ajouter("PRANDTL_K", &Prandtl_K_);
   param.ajouter("PRANDTL_Omega", &Prandtl_Omega_);
@@ -81,7 +81,7 @@ int Modele_turbulence_hyd_K_Omega::lire_motcle_non_standard(const Motcle& mot, E
       return 1;
     }
   else
-    return Modele_turbulence_hyd_RANS_komega_base::lire_motcle_non_standard(mot, is);
+    return Modele_turbulence_hyd_RANS_K_Omega_base::lire_motcle_non_standard(mot, is);
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.
@@ -330,7 +330,7 @@ void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
 int Modele_turbulence_hyd_K_Omega::preparer_calcul()
 {
   eqn_transp_K_Omega().preparer_calcul();
-  Modele_turbulence_hyd_RANS_komega_base::preparer_calcul();
+  Modele_turbulence_hyd_RANS_K_Omega_base::preparer_calcul();
 
   init_F1_F2_enstrophy();
 

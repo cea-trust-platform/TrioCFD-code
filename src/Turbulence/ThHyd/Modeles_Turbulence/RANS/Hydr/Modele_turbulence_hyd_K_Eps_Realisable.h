@@ -29,7 +29,7 @@ class Domaine_dis;
  *  Cette classe represente le modele de turbulence (k,eps) realisable
  *
  */
-class Modele_turbulence_hyd_K_Eps_Realisable: public Modele_turbulence_hyd_RANS_keps_base
+class Modele_turbulence_hyd_K_Eps_Realisable: public Modele_turbulence_hyd_RANS_K_Eps_base
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Realisable);
 public:

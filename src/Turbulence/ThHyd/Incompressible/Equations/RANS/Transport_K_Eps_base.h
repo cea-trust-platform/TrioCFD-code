@@ -23,7 +23,7 @@
 #ifndef Transport_K_Eps_base_included
 #define Transport_K_Eps_base_included
 
-#include <Modele_turbulence_hyd_RANS_keps_base.h>
+#include <Modele_turbulence_hyd_RANS_K_Eps_base.h>
 #include <Transport_2eq_base.h>
 #include <TRUST_Ref.h>
 
@@ -43,7 +43,7 @@ class Transport_K_Eps_base: public Transport_2eq_base
 
 public:
 
-  virtual void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_keps_base& )=0;
+  virtual void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Eps_base& )=0;
   void discretiser() override;
   void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;
 
@@ -51,8 +51,8 @@ public:
   void valider_iteration() override;
   inline const Champ_Inc& inconnue() const override;
   inline Champ_Inc& inconnue() override;
-  inline const Modele_turbulence_hyd_RANS_keps_base& modele_turbulence() const;
-  inline Modele_turbulence_hyd_RANS_keps_base& modele_turbulence();
+  inline const Modele_turbulence_hyd_RANS_K_Eps_base& modele_turbulence() const;
+  inline Modele_turbulence_hyd_RANS_K_Eps_base& modele_turbulence();
 
   void get_position_cells(Nom&, int&);
   void get_position_faces(Nom&, int&);
@@ -61,7 +61,7 @@ public:
 protected:
 
   Champ_Inc le_champ_K_Eps;
-  REF(Modele_turbulence_hyd_RANS_keps_base) mon_modele;
+  REF(Modele_turbulence_hyd_RANS_K_Eps_base) mon_modele;
 
 };
 
@@ -89,7 +89,7 @@ inline const Champ_Inc& Transport_K_Eps_base::inconnue() const { return le_champ
  *
  * @return (Modele_turbulence_hyd_K_Eps&) le modele de turbulence associe a l'equation
  */
-inline const Modele_turbulence_hyd_RANS_keps_base& Transport_K_Eps_base::modele_turbulence() const
+inline const Modele_turbulence_hyd_RANS_K_Eps_base& Transport_K_Eps_base::modele_turbulence() const
 {
   assert(mon_modele.non_nul());
   return mon_modele.valeur();
@@ -99,7 +99,7 @@ inline const Modele_turbulence_hyd_RANS_keps_base& Transport_K_Eps_base::modele_
  *
  * @return (Modele_turbulence_hyd_K_Eps&) le modele de turbulence associe a l'equation
  */
-inline Modele_turbulence_hyd_RANS_keps_base& Transport_K_Eps_base::modele_turbulence()
+inline Modele_turbulence_hyd_RANS_K_Eps_base& Transport_K_Eps_base::modele_turbulence()
 {
   assert(mon_modele.non_nul());
   return mon_modele.valeur();

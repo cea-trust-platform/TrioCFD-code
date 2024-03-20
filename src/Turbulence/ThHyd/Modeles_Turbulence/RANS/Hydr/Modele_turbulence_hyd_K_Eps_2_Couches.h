@@ -30,7 +30,7 @@
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps_2_Couches: public Modele_turbulence_hyd_RANS_keps_base
+class Modele_turbulence_hyd_K_Eps_2_Couches: public Modele_turbulence_hyd_RANS_K_Eps_base
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches);
 public:

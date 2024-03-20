@@ -35,7 +35,7 @@
 #include <TRUSTTab_parts.h>
 #include <Champ_Inc_P0_base.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps, "Modele_turbulence_hyd_K_Epsilon", Modele_turbulence_hyd_RANS_keps_base);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps, "Modele_turbulence_hyd_K_Epsilon", Modele_turbulence_hyd_RANS_K_Eps_base);
 // XD k_epsilon mod_turb_hyd_rans k_epsilon -1 Turbulence model (k-eps).
 
 Sortie& Modele_turbulence_hyd_K_Eps::printOn(Sortie& s) const
@@ -45,12 +45,12 @@ Sortie& Modele_turbulence_hyd_K_Eps::printOn(Sortie& s) const
 
 Entree& Modele_turbulence_hyd_K_Eps::readOn(Entree& s)
 {
-  return Modele_turbulence_hyd_RANS_keps_base::readOn(s);
+  return Modele_turbulence_hyd_RANS_K_Eps_base::readOn(s);
 }
 
 void Modele_turbulence_hyd_K_Eps::set_param(Param& param)
 {
-  Modele_turbulence_hyd_RANS_keps_base::set_param(param);
+  Modele_turbulence_hyd_RANS_K_Eps_base::set_param(param);
   param.ajouter_non_std("Transport_K_Epsilon", (this), Param::REQUIRED); // XD_ADD_P transport_k_epsilon Keyword to define the (k-eps) transportation equation.
   param.ajouter_non_std("Modele_Fonc_Bas_Reynolds", (this)); // XD_ADD_P modele_fonction_bas_reynolds_base This keyword is used to set the bas Reynolds model used.
   param.ajouter("CMU", &LeCmu_); // XD_ADD_P double Keyword to modify the Cmu constant of k-eps model : Nut=Cmu*k*k/eps Default value is 0.09
@@ -78,7 +78,7 @@ int Modele_turbulence_hyd_K_Eps::lire_motcle_non_standard(const Motcle& mot, Ent
       return 1;
     }
   else
-    return Modele_turbulence_hyd_RANS_keps_base::lire_motcle_non_standard(mot, is);
+    return Modele_turbulence_hyd_RANS_K_Eps_base::lire_motcle_non_standard(mot, is);
 }
 
 /*! @brief Calcule la viscosite turbulente au temps demande.
@@ -375,7 +375,7 @@ void imprimer_evolution_keps(const Champ_Inc& le_champ_K_Eps, const Schema_Temps
 int Modele_turbulence_hyd_K_Eps::preparer_calcul()
 {
   eqn_transp_K_Eps().preparer_calcul();
-  Modele_turbulence_hyd_RANS_keps_base::preparer_calcul();
+  Modele_turbulence_hyd_RANS_K_Eps_base::preparer_calcul();
   // GF pour initialiser la loi de paroi thermique en TBLE
   if (equation().probleme().nombre_d_equations() > 1)
     {
@@ -467,7 +467,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps::get_champ(const Motcle& nom) cons
 
   try
     {
-      return Modele_turbulence_hyd_RANS_keps_base::get_champ(nom);
+      return Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(nom);
     }
   catch (Champs_compris_erreur&)
     {
@@ -487,7 +487,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps::get_champ(const Motcle& nom) cons
 }
 void Modele_turbulence_hyd_K_Eps::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
-  Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(nom, opt);
+  Modele_turbulence_hyd_RANS_K_Eps_base::get_noms_champs_postraitables(nom, opt);
   if (mon_modele_fonc_.non_nul())
     mon_modele_fonc_.valeur().get_noms_champs_postraitables(nom, opt);
 

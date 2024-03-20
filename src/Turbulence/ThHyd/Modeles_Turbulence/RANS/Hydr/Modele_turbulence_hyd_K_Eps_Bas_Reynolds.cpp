@@ -28,7 +28,7 @@
 #include <stat_counters.h>
 #include <Param.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, "Modele_turbulence_hyd_K_Epsilon_Bas_Reynolds", Modele_turbulence_hyd_RANS_keps_base);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, "Modele_turbulence_hyd_K_Epsilon_Bas_Reynolds", Modele_turbulence_hyd_RANS_K_Eps_base);
 
 Sortie& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::printOn(Sortie& s) const
 {
@@ -37,12 +37,12 @@ Sortie& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::printOn(Sortie& s) const
 
 Entree& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::readOn(Entree& is)
 {
-  return Modele_turbulence_hyd_RANS_keps_base::readOn(is);
+  return Modele_turbulence_hyd_RANS_K_Eps_base::readOn(is);
 }
 
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::set_param(Param& param)
 {
-  Modele_turbulence_hyd_RANS_keps_base::set_param(param);
+  Modele_turbulence_hyd_RANS_K_Eps_base::set_param(param);
   param.ajouter_non_std("Transport_K_Epsilon_Bas_Reynolds", (this), Param::REQUIRED);
   param.ajouter_non_std("Modele_Fonc_Bas_Reynolds", (this), Param::REQUIRED);
 }
@@ -65,7 +65,7 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::lire_motcle_non_standard(const Mot
       return 1;
     }
   else
-    return Modele_turbulence_hyd_RANS_keps_base::lire_motcle_non_standard(mot, is);
+    return Modele_turbulence_hyd_RANS_K_Eps_base::lire_motcle_non_standard(mot, is);
 }
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente(double temps)
@@ -148,7 +148,7 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::preparer_calcul()
   return 1;
   // provisoire
   /*
-   Modele_turbulence_hyd_RANS_keps_base::preparer_calcul();
+   Modele_turbulence_hyd_RANS_K_Eps_base::preparer_calcul();
    calculer_viscosite_turbulente(K_Eps().temps());
    la_viscosite_turbulente.valeurs().echange_espace_virtuel();
    return 1;
@@ -188,7 +188,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_champ(const Motc
 {
   try
     {
-      return Modele_turbulence_hyd_RANS_keps_base::get_champ(nom);
+      return Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(nom);
     }
   catch (Champs_compris_erreur&)
     {
@@ -210,7 +210,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_champ(const Motc
 
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
-  Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(nom, opt);
+  Modele_turbulence_hyd_RANS_K_Eps_base::get_noms_champs_postraitables(nom, opt);
 
   if (mon_modele_fonc_.non_nul())
     mon_modele_fonc_->get_noms_champs_postraitables(nom, opt);

@@ -14,36 +14,36 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modele_turbulence_hyd_RANS_keps_base.cpp
+// File:        Modele_turbulence_hyd_RANS_K_Eps_base.cpp
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Modele_turbulence_hyd_RANS_keps_base.h>
+#include <Modele_turbulence_hyd_RANS_K_Eps_base.h>
 #include <Transport_K_Eps_base.h>
 #include <Param.h>
 
-Implemente_base(Modele_turbulence_hyd_RANS_keps_base, "Modele_turbulence_hyd_RANS_keps_base", Modele_turbulence_hyd_2_eq_base);
+Implemente_base(Modele_turbulence_hyd_RANS_K_Eps_base, "Modele_turbulence_hyd_RANS_K_Eps_base", Modele_turbulence_hyd_2_eq_base);
 // XD mod_turb_hyd_rans_keps modele_turbulence_hyd_deriv mod_turb_hyd_rans_keps -1 Class for RANS turbulence model for Navier-Stokes equations.
 
-Sortie& Modele_turbulence_hyd_RANS_keps_base::printOn(Sortie& is) const { return Modele_turbulence_hyd_2_eq_base::printOn(is); }
+Sortie& Modele_turbulence_hyd_RANS_K_Eps_base::printOn(Sortie& is) const { return Modele_turbulence_hyd_2_eq_base::printOn(is); }
 
-Entree& Modele_turbulence_hyd_RANS_keps_base::readOn(Entree& is) { return Modele_turbulence_hyd_2_eq_base::readOn(is); }
+Entree& Modele_turbulence_hyd_RANS_K_Eps_base::readOn(Entree& is) { return Modele_turbulence_hyd_2_eq_base::readOn(is); }
 
-void Modele_turbulence_hyd_RANS_keps_base::set_param(Param& param)
+void Modele_turbulence_hyd_RANS_K_Eps_base::set_param(Param& param)
 {
   Modele_turbulence_hyd_2_eq_base::set_param(param);
   param.ajouter("eps_min", &EPS_MIN_); // XD_ADD_P double Lower limitation of epsilon (default value 1.e-10).
   param.ajouter("eps_max", &EPS_MAX_); // XD_ADD_P double Upper limitation of epsilon (default value 1.e+10).
 }
 
-void Modele_turbulence_hyd_RANS_keps_base::completer()
+void Modele_turbulence_hyd_RANS_K_Eps_base::completer()
 {
   eqn_transp_K_Eps().completer();
   verifie_loi_paroi();
 }
 
-const Champ_base& Modele_turbulence_hyd_RANS_keps_base::get_champ(const Motcle& nom) const
+const Champ_base& Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(const Motcle& nom) const
 {
   try
     {
@@ -66,7 +66,7 @@ const Champ_base& Modele_turbulence_hyd_RANS_keps_base::get_champ(const Motcle& 
   throw Champs_compris_erreur();
 }
 
-void Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(Noms& nom, Option opt) const
+void Modele_turbulence_hyd_RANS_K_Eps_base::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
   Modele_turbulence_hyd_base::get_noms_champs_postraitables(nom, opt);
 
@@ -83,7 +83,7 @@ void Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(Noms& n
  * @param (Sortie& os) un flot de sortie
  * @return (int) code de retour propage de: Transport_K_Eps::sauvegarder(Sortie&)
  */
-int Modele_turbulence_hyd_RANS_keps_base::sauvegarder(Sortie& os) const
+int Modele_turbulence_hyd_RANS_K_Eps_base::sauvegarder(Sortie& os) const
 {
 
   Modele_turbulence_hyd_base::sauvegarder(os);
@@ -98,7 +98,7 @@ int Modele_turbulence_hyd_RANS_keps_base::sauvegarder(Sortie& os) const
  * @param (Entree& is) un flot d'entree
  * @return (int) code de retour propage de: Transport_K_Eps::sauvegarder(Sortie&) ou 1 si la reprise est bidon.
  */
-int Modele_turbulence_hyd_RANS_keps_base::reprendre(Entree& is)
+int Modele_turbulence_hyd_RANS_K_Eps_base::reprendre(Entree& is)
 {
   Modele_turbulence_hyd_base::reprendre(is);
   if (mon_equation_.non_nul())

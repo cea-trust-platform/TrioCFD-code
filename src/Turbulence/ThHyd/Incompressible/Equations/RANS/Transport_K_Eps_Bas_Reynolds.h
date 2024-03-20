@@ -40,7 +40,7 @@ class Transport_K_Eps_Bas_Reynolds : public Transport_K_Eps_non_std
 public :
 
   void associer_milieu_base(const Milieu_base&) override;
-  void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_keps_base&) override;
+  void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Eps_base&) override;
   inline const Modele_Fonc_Bas_Reynolds& modele_fonc() const;
   inline  Modele_Fonc_Bas_Reynolds& modele_fonc();
   inline const Champ_Inc& vitesse_transportante();

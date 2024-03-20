@@ -14,27 +14,27 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modele_turbulence_hyd_RANS_keps_base.h
+// File:        Modele_turbulence_hyd_RANS_K_Eps_base.h
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Modele_turbulence_hyd_RANS_keps_base_included
-#define Modele_turbulence_hyd_RANS_keps_base_included
+#ifndef Modele_turbulence_hyd_RANS_K_Eps_base_included
+#define Modele_turbulence_hyd_RANS_K_Eps_base_included
 
 #include <Modele_turbulence_hyd_2_eq_base.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
 
 class Transport_K_Eps_base;
 
-/*! @brief Classe Modele_turbulence_hyd_RANS_keps_base Classe de base des modeles de type RANS_keps
+/*! @brief Classe Modele_turbulence_hyd_RANS_K_Eps_base Classe de base des modeles de type RANS_keps
  *
  * @sa Modele_turbulence_hyd_base
  */
-class Modele_turbulence_hyd_RANS_keps_base : public Modele_turbulence_hyd_2_eq_base
+class Modele_turbulence_hyd_RANS_K_Eps_base : public Modele_turbulence_hyd_2_eq_base
 {
-  Declare_base(Modele_turbulence_hyd_RANS_keps_base);
+  Declare_base(Modele_turbulence_hyd_RANS_K_Eps_base);
 public:
 
   void set_param(Param& param) override;
@@ -64,4 +64,4 @@ protected:
   Modele_Fonc_Bas_Reynolds mon_modele_fonc_;
 };
 
-#endif /* Modele_turbulence_hyd_RANS_keps_base_included */
+#endif /* Modele_turbulence_hyd_RANS_K_Eps_base_included */

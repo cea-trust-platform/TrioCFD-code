@@ -36,7 +36,7 @@
 #include <communications.h>
 #include <Champ_Inc_P0_base.h>
 
-Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable, "Modele_turbulence_hyd_K_Epsilon_Realisable", Modele_turbulence_hyd_RANS_keps_base);
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable, "Modele_turbulence_hyd_K_Epsilon_Realisable", Modele_turbulence_hyd_RANS_K_Eps_base);
 
 // XD K_Eps_Realisable mod_turb_hyd_rans K_Epsilon_Realisable -1 Realizable K-Epsilon Turbulence Model.
 
@@ -47,12 +47,12 @@ Sortie& Modele_turbulence_hyd_K_Eps_Realisable::printOn(Sortie& s) const
 
 Entree& Modele_turbulence_hyd_K_Eps_Realisable::readOn(Entree& is)
 {
-  return Modele_turbulence_hyd_RANS_keps_base::readOn(is);
+  return Modele_turbulence_hyd_RANS_K_Eps_base::readOn(is);
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable::set_param(Param& param)
 {
-  Modele_turbulence_hyd_RANS_keps_base::set_param(param);
+  Modele_turbulence_hyd_RANS_K_Eps_base::set_param(param);
   param.ajouter_non_std("Transport_K_Epsilon_Realisable", (this), Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (k-eps) transportation equation.
   param.ajouter_non_std("Modele_Fonc_Realisable", (this), Param::REQUIRED); // XD_ADD_P Modele_Fonc_Realisable_base This keyword is used to set the model used
   param.ajouter("PRANDTL_K", &Prandtl_K_, Param::REQUIRED); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
@@ -77,7 +77,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcl
       return 1;
     }
   else
-    return Modele_turbulence_hyd_RANS_keps_base::lire_motcle_non_standard(mot, is);
+    return Modele_turbulence_hyd_RANS_K_Eps_base::lire_motcle_non_standard(mot, is);
 }
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente(double temps)
@@ -348,7 +348,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle
 {
   try
     {
-      return Modele_turbulence_hyd_RANS_keps_base::get_champ(nom);
+      return Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(nom);
     }
   catch (Champs_compris_erreur&)
     {
@@ -370,7 +370,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle
 
 void Modele_turbulence_hyd_K_Eps_Realisable::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
-  Modele_turbulence_hyd_RANS_keps_base::get_noms_champs_postraitables(nom, opt);
+  Modele_turbulence_hyd_RANS_K_Eps_base::get_noms_champs_postraitables(nom, opt);
   if (mon_modele_fonc_.non_nul())
     mon_modele_fonc_->get_noms_champs_postraitables(nom, opt);
 }

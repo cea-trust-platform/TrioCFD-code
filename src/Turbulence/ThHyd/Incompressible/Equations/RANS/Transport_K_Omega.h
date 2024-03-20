@@ -49,7 +49,7 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline void associer_Champ_Inconnu(const Champ_Inc& );
 
-  void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_komega_base& ) override;
+  void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Omega_base& ) override;
 
   void completer() override;
 

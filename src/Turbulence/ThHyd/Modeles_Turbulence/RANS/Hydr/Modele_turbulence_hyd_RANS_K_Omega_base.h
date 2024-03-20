@@ -14,29 +14,29 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modele_turbulence_hyd_RANS_komega_base.h
+// File:        Modele_turbulence_hyd_RANS_K_Omega_base.h
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Modele_turbulence_hyd_RANS_komega_base_included
-#define Modele_turbulence_hyd_RANS_komega_base_included
+#ifndef Modele_turbulence_hyd_RANS_K_Omega_base_included
+#define Modele_turbulence_hyd_RANS_K_Omega_base_included
 
 #include <Modele_turbulence_hyd_2_eq_base.h>
 
 class Transport_K_Omega_base;
 
-/*! @brief Classe Modele_turbulence_hyd_RANS_komega_base Classe de base des modeles de type RANS_komega
+/*! @brief Classe Modele_turbulence_hyd_RANS_K_Omega_base Classe de base des modeles de type RANS_komega
  *
  * @sa Modele_turbulence_hyd_base
  */
-class Modele_turbulence_hyd_RANS_komega_base: public Modele_turbulence_hyd_2_eq_base
+class Modele_turbulence_hyd_RANS_K_Omega_base: public Modele_turbulence_hyd_2_eq_base
 {
-  Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_komega_base);
+  Declare_base_sans_constructeur(Modele_turbulence_hyd_RANS_K_Omega_base);
 public:
 
-  Modele_turbulence_hyd_RANS_komega_base()
+  Modele_turbulence_hyd_RANS_K_Omega_base()
   {
     Prandtl_K_ = 2.; // cAlan: careful, it is the inverse of the classical definition for code purpose
     model_variant_ = "SST";
@@ -61,4 +61,4 @@ protected:
   static constexpr double CST_A1 = 0.31;
 };
 
-#endif /* Modele_turbulence_hyd_RANS_komega_base_included */
+#endif /* Modele_turbulence_hyd_RANS_K_Omega_base_included */
