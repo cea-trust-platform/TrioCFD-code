@@ -2661,7 +2661,6 @@ void IJK_FT_double::run()
 
 // Variation de volume de chaque bulle integree au cours du pas de temps :
   ArrOfDouble var_volume_par_bulle;
-  var_volume_par_bulle.set_smart_resize(1);
   for (tstep_ = 0; tstep_ < nb_timesteps_ && stop == 0; tstep_++)
     {
       statistiques().begin_count(timestep_counter_);

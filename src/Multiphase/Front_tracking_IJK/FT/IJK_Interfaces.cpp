@@ -195,7 +195,6 @@ void runge_kutta3_update(const DoubleTab& dvi, DoubleTab& G, DoubleTab& l, const
   const int nbsom = maillage.nb_sommets();
 
   // Resize du tableau
-  //  G.set_smart_resize(1) ?
   G.resize(nbsom, 3);
 
   switch (step)
@@ -339,10 +338,6 @@ Entree& IJK_Interfaces::readOn(Entree& is)
   //active_repulsion_paroi_ = 0;      // La repulsion paroi est desactive par defaut,
   // meme si l'inter-bulles l'est
   //follow_colors_ = 0;
-  RK3_G_store_vi_.set_smart_resize(1);
-  vinterp_.set_smart_resize(1);
-  distance_autres_interfaces_.set_smart_resize(1);
-  ghost_compo_converter_.set_smart_resize(1);
   //nb_bulles_ghost_ = 0;
   nb_bulles_ghost_before_ = 0;
   //nb_bulles_reelles_ = 0;
@@ -2555,7 +2550,6 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
   // Troisieme iteration:
   //  2 -> direction 011
   ArrOfInt liste_bulles_crees;
-  liste_bulles_crees.set_smart_resize(1);
   const int nbulles = get_nb_bulles_reelles();
   int nbulles_crees = 0;
   for (int mon_numero_iteration = 1; ; mon_numero_iteration++)
@@ -2567,7 +2561,6 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
       // On determine aussi les composantes connexe dont on a plus besoin
       // et on les supprime...
       ArrOfInt liste_facettes_pour_suppression;
-      liste_facettes_pour_suppression.set_smart_resize(1);
       int reste_a_faire = 0;
 
 
@@ -3103,7 +3096,6 @@ void IJK_Interfaces::supprimer_duplicata_bulles()
   // On parcours toutes les facettes du maillage.
   // On marque celles dont la compo_connexe est negative:
   ArrOfInt liste_facettes_pour_suppression;
-  liste_facettes_pour_suppression.set_smart_resize(1);
   for (int iface = 0; iface < nbfacettes; iface++)
     {
       const int icompo = compo_connex[iface];
@@ -4389,7 +4381,6 @@ int IJK_Interfaces::compute_cell_phase_with_interface_normal(int num_elem, int d
                            split.get_grid_geometry().get_constant_delta(DIRECTION_K));
 
   ArrOfInt facettes_traversantes;
-  facettes_traversantes.set_smart_resize(1);
   intersections.get_liste_facettes_traversantes(num_elem, facettes_traversantes);
   const int N = facettes_traversantes.size_array();
 
@@ -4818,7 +4809,6 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe_octree(const DoubleT
                  ca n'a pas d'importance ici */);
 
   ArrOfInt liste_facettes;
-  liste_facettes.set_smart_resize(1);
   const ArrOfInt& compo_connexe_facettes = mesh.compo_connexe_facettes();
 
   const int nb_som = sommets_a_tester.dimension(0);
@@ -5045,10 +5035,6 @@ void IJK_Interfaces::recursive_calcul_distance_chez_voisin(DoubleTab& vinterp_tm
                                                            DoubleTab& vr_to_other, double distmax)
 {
   const IJK_Splitting& splitting = ref_splitting_.valeur();
-  coord_sommets.set_smart_resize(1);
-  compo_sommet.set_smart_resize(1);
-  distance.set_smart_resize(1);
-  vinterp_tmp.set_smart_resize(1);
   if (dir == 3)
     {
       if(!no_octree_method_)
@@ -5063,7 +5049,6 @@ void IJK_Interfaces::recursive_calcul_distance_chez_voisin(DoubleTab& vinterp_tm
       ArrOfInt pe_list;
       ArrOfInt flags(Process::nproc());
       flags = 0;
-      pe_list.set_smart_resize(1);
       double min_coord, max_coord;
       const int processor_at_left = splitting.get_neighbour_processor(0 /* previous */, dir);
       if (processor_at_left < 0)
@@ -5105,8 +5090,6 @@ void IJK_Interfaces::recursive_calcul_distance_chez_voisin(DoubleTab& vinterp_tm
       schema.begin_comm();
       ArrOfInt index_sent_to_left;
       ArrOfInt index_sent_to_right;
-      index_sent_to_left.set_smart_resize(1);
-      index_sent_to_right.set_smart_resize(1);
       if (processor_at_left >= 0 || processor_at_right >= 0)
         {
           // Bypass in sequential or if no splitting in this direction
@@ -5677,7 +5660,6 @@ void IJK_Interfaces::compute_external_forces_color_function(FixedVector<IJK_Fiel
   }
 #endif
   ArrOfInt list_continuous_phase;
-  list_continuous_phase.set_smart_resize(1);
   list_continuous_phase.resize_array(0);
   int phase_continue1=-1000;
   int phase_continue2=-1000;

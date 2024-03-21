@@ -52,10 +52,6 @@ void Corrige_flux_FT_temperature_conv::initialize(
   Corrige_flux_FT_base::initialize(splitting, field, interfaces, ijk_ft, intersection_ijk_face, intersection_ijk_cell);
 //  intersection_ijk_face_->initialize(splitting, interfaces);
 //  intersection_ijk_cell_->initialize(splitting, interfaces);
-  temp_interface_face_.set_smart_resize(1);
-  temp_interface_cell_.set_smart_resize(1);
-  temperature_barys_.set_smart_resize(1);
-  temperature_ghost_.set_smart_resize(1);
   temp_interface_face_.resize(2*intersection_ijk_face_->n());
   temp_interface_cell_.resize(intersection_ijk_cell_->n());
   temperature_barys_.resize(intersection_ijk_face_->n(), 2);
@@ -68,8 +64,6 @@ void Corrige_flux_FT_temperature_conv::update()
 {
 
   ArrOfDouble temp_vap, temp_liqu;
-  temp_vap.set_smart_resize(1);
-  temp_liqu.set_smart_resize(1);
 
   // On commence par calculer les temperatures aux faces mouillées
   intersection_ijk_face_->maj_interpolation_coo_on_interfaces();

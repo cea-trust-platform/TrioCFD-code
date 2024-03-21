@@ -181,8 +181,6 @@ int  Remailleur_Collision_FT_Thomas::mettre_a_jour_data(const Maillage_FT_Disc& 
   ArrOfInt elements_proches(nb_facettes_interface),elements_eloignes(3*nb_facettes_interface);
   ArrOfInt *elem_proches, *elem_eloignes; //eloignes = distance_(x+1)
 
-  elements_proches.set_smart_resize(1);
-  elements_eloignes.set_smart_resize(1);
   elements_proches.resize_array(0);
   elements_eloignes.resize_array(0);
 
@@ -623,7 +621,6 @@ int Remailleur_Collision_FT_Thomas::elements_voisins(const int elem,
   const IntTab& elem_sommets = domaine.les_elems();
 
 
-  liste_voisins.set_smart_resize(1);
   liste_voisins.resize_array(0);
 
   //Calcul du voisinage
@@ -1179,7 +1176,6 @@ void  Remailleur_Collision_FT_Thomas::tester_voisinage(const Maillage_FT_Disc& m
 
   int taille_liste_voisins_plus_proches = -1;
   ArrOfInt elem_voisins;
-  elem_voisins.set_smart_resize(1);
 
   for (int elem=0; elem<nb_elem_tot; elem++)
     {
@@ -1389,7 +1385,6 @@ void  Remailleur_Collision_FT_Thomas::tester_transport(const Maillage_FT_Disc& m
 
 
   ArrOfInt voisins_a_distance_plus_petite(100);
-  voisins_a_distance_plus_petite.set_smart_resize(1);
   voisins_a_distance_plus_petite.resize_array(0);
 
 
@@ -1601,7 +1596,6 @@ void  Remailleur_Collision_FT_Thomas::tester_transport_complet(const Maillage_FT
   //
 
   ArrOfInt voisins_a_distance_plus_petite(100);
-  voisins_a_distance_plus_petite.set_smart_resize(1);
 
   //  int distance_interface_elem_voisin = -2;
 

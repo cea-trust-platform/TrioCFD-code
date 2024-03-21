@@ -488,7 +488,6 @@ int Topologie_Maillage_FT::test_collision_facettes(const Maillage_FT_Disc& maill
   const ArrOfInt& index_facettes = intersection.index_facette();
   int collision_trouvee = 0;
 
-  liste_elements_collision.set_smart_resize(1);
   liste_elements_collision.resize_array(0);
 
   // Methode de recherche des intersections:

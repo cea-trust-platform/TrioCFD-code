@@ -524,8 +524,6 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
           ArrOfDouble& temps = variables_internes_->injection_interfaces_temps_;
           ArrOfInt& phase = variables_internes_->injection_interfaces_phase_;
           Noms& expr = variables_internes_->injection_interfaces_expressions_;
-          temps.set_smart_resize(1);
-          phase.set_smart_resize(1);
           Nom une_expr;
           while(1)
             {
@@ -6752,7 +6750,6 @@ void Transport_Interfaces_FT_Disc::test_suppression_interfaces_sous_domaine()
   const Sous_Domaine& sous_domaine = domaine_dis().domaine().ss_domaine(suppression_interfaces_sous_domaine_);
   // Construction de la liste des elements de la sous-domaine contenant la phase a supprimer
   ArrOfInt liste_elems_sous_domaine;
-  liste_elems_sous_domaine.set_smart_resize(1);
   int i;
   const double phase_continue = topologie_interface().get_phase_continue();
 

@@ -113,7 +113,6 @@ DoubleTab& Terme_Source_Constituant_Vortex_VEF_Face::ajouter(DoubleTab& tab) con
   // On doit de toutes facons creer un tableau temporaire pour pouvoir renormaliser la source.
   // tableau tmp de la bonne taille mais non initialise:
   DoubleTab tmp;
-  tmp.set_smart_resize(1);
   tmp.resize(n);
   calculer(tmp);
   for (int i = 0; i < n; i++)
@@ -143,7 +142,6 @@ void Terme_Source_Constituant_Vortex_VEF_Face::ajouter_terme_div_u(DoubleVect& s
   // GF mieux comme cela
   const int n = secmem_pression.size_totale();
   ArrOfDouble tmp;
-  tmp.set_smart_resize(1);
   tmp.resize_array(n);
   double integrale = 0.;
   const double omega = 4. / (rayon_spot_ * rayon_spot_);

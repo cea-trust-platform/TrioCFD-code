@@ -63,7 +63,6 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(m
       {
         Matrice_Morse mat;
         IntTrav stencil(0, 2);
-        stencil.set_smart_resize(1);
 
         for(int e = 0 ; e < ne ; e++)
           for (int n=0 ; n<N ; n++)

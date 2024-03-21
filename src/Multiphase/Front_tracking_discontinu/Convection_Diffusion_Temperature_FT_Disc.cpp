@@ -58,19 +58,12 @@ Convection_Diffusion_Temperature_FT_Disc::Convection_Diffusion_Temperature_FT_Di
   maintien_temperature_ = false;
   is_prescribed_mpoint_ = false;
   prescribed_mpoint_ = -1.e30;
-  mixed_elems_.set_smart_resize(1);
   mixed_elems_.resize_array(0);
-  lost_fluxes_.set_smart_resize(1);
   lost_fluxes_.resize_array(0);
-  derivee_energy_.set_smart_resize(1);
   derivee_energy_.resize_array(0);
-  mixed_elems_diffu_.set_smart_resize(1);
   mixed_elems_diffu_.resize_array(0);
-  lost_fluxes_diffu_.set_smart_resize(1);
   lost_fluxes_diffu_.resize_array(0);
-  mixed_elems_conv_.set_smart_resize(1);
   mixed_elems_conv_.resize_array(0);
-  lost_fluxes_conv_.set_smart_resize(1);
   lost_fluxes_conv_.resize_array(0);
   divergence_free_velocity_extension_=0; // Default set to historical behavior : velocity extension is NOT divergence-free
 }
@@ -1633,7 +1626,6 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall_at_face(const int num
 double Convection_Diffusion_Temperature_FT_Disc::get_Twall_at_elem(const int elem) const
 {
   //ArrOfInt num_faces;
-  // num_faces.set_smart_resize(1);
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const IntTab& faces_elem = domaine_vf.face_voisins();

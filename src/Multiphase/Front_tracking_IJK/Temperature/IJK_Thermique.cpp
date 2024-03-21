@@ -1796,10 +1796,6 @@ void IJK_Thermique::compute_interfacial_temperature2(
 
   DoubleTab coo_liqu, coo_vap;
   ArrOfDouble temp_liqu, temp_vap;
-  temp_liqu.set_smart_resize(1);
-  temp_vap.set_smart_resize(1);
-  coo_liqu.set_smart_resize(1);
-  coo_vap.set_smart_resize(1);
   corrige_flux_.calcul_temperature_flux_interface(temperature_ft_,
                                                   lambda_liquid_, lambda_vapor_, dist,
                                                   coord_facettes, normale_facettes,

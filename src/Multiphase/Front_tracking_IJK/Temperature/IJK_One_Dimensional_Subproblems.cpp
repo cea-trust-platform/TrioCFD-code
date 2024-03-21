@@ -30,73 +30,13 @@ Implemente_instanciable_sans_constructeur(IJK_One_Dimensional_Subproblems, "IJK_
 
 IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
 {
-  for (int dir=0; dir<3; dir++)
-    ijk_indices_to_subproblem_[dir].set_smart_resize(1);
   subproblem_to_ijk_indices_.clear();
 
-  interfacial_thermal_flux_per_bubble_.set_smart_resize(1);
-  interfacial_thermal_flux_per_bubble_gfm_.set_smart_resize(1);
-  interfacial_thermal_flux_per_bubble_spherical_.set_smart_resize(1);
-
-  total_surface_per_bubble_.set_smart_resize(1);
   bubbles_rising_velocities_ = nullptr;
   bubbles_rising_vectors_per_bubble_ = nullptr;
-  bubbles_rising_relative_velocities_.set_smart_resize(1);
-  bubbles_rising_relative_velocities_upstream_.set_smart_resize(1);
-  bubbles_reynolds_numbers_per_bubble_.set_smart_resize(1);
-  bubbles_reynolds_numbers_from_surface_per_bubble_.set_smart_resize(1);
-  bubbles_reynolds_numbers_from_surface_per_bubble_.set_smart_resize(1);
-  bubbles_reynolds_numbers_per_bubble_upstream_.set_smart_resize(1);
-  bubbles_reynolds_numbers_from_surface_per_bubble_upstream_.set_smart_resize(1);
-  bubbles_reynolds_numbers_from_surface_per_bubble_upstream_.set_smart_resize(1);
   total_rising_dir_compo_ = 0.;
   total_relative_rising_dir_compo_ = 0.;
   total_relative_rising_dir_compo_upstream_ =0.;
-  for (int dir=0; dir<3; dir++)
-    {
-      relative_rising_dir_compo_[dir].set_smart_resize(1);
-      relative_rising_dir_compo_upstream_[dir].set_smart_resize(1);
-    }
-
-  overall_nusselt_number_per_bubble_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_gfm_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_spherical_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_liquid_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_gfm_liquid_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_spherical_liquid_.set_smart_resize(1);
-
-  overall_shear_stress_per_bubble_.set_smart_resize(1);
-  overall_shear_force_per_bubble_.set_smart_resize(1);
-
-  radius_outputs_.set_smart_resize(1);
-  theta_outputs_.set_smart_resize(1);
-  phi_outputs_.set_smart_resize(1);
-
-  global_indices_post_processed_.set_smart_resize(1);
-
-  radius_from_surfaces_per_bubble_.set_smart_resize(1);
-  radius_from_volumes_per_bubble_.set_smart_resize(1);
-
-  caracteristic_length_from_surfaces_per_bubble_.set_smart_resize(1);
-  caracteristic_length_from_volumes_per_bubble_.set_smart_resize(1);
-
-  overall_nusselt_number_per_bubble_error_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_gfm_error_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_liquid_error_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_gfm_liquid_error_.set_smart_resize(1);
-
-  overall_nusselt_number_per_bubble_error_rel_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_gfm_error_rel_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_liquid_error_rel_.set_smart_resize(1);
-  overall_nusselt_number_per_bubble_gfm_liquid_error_rel_.set_smart_resize(1);
-
-  bubbles_peclet_numbers_per_bubble_.set_smart_resize(1);
-  bubbles_peclet_numbers_from_surface_per_bubble_.set_smart_resize(1);
-  bubbles_peclet_numbers_from_volume_per_bubble_.set_smart_resize(1);
-
-  bubbles_peclet_numbers_per_bubble_upstream_.set_smart_resize(1);
-  bubbles_peclet_numbers_from_surface_per_bubble_upstream_.set_smart_resize(1);
-  bubbles_peclet_numbers_from_volume_per_bubble_upstream_.set_smart_resize(1);
 
   liquid_velocity_ = nullptr;
   bubbles_volume_ = nullptr;
@@ -105,7 +45,6 @@ IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems()
 
   points_per_thermal_subproblem_ = nullptr;
 
-  collision_indices_.set_smart_resize(1);
 }
 
 IJK_One_Dimensional_Subproblems::IJK_One_Dimensional_Subproblems(const IJK_FT_double& ijk_ft) : IJK_One_Dimensional_Subproblems()
@@ -446,32 +385,12 @@ void IJK_One_Dimensional_Subproblems::share_previous_temperature_indicator_veloc
 
       for (int k=0; k<nk_tot; k++)
         {
-          for (int ij = 0; ij<2; ij++)
-            index_ij_subproblems_local_perio_[ij][k].set_smart_resize(1);
           temperature_probes_previous_local_perio_[k].resize(*points_per_thermal_subproblem_);
-          for (int point=0; point<(*points_per_thermal_subproblem_); point++)
-            temperature_probes_previous_local_perio_[k][point].set_smart_resize(1);
-          indicator_probes_previous_local_perio_[k].set_smart_resize(1);
           velocities_probes_previous_local_perio_[k].resize(3);
           normal_vector_compo_probes_previous_local_perio_[k].resize(3);
-          for (int compo=0; compo<3; compo++)
-            {
-              velocities_probes_previous_local_perio_[k][compo].set_smart_resize(1);
-              normal_vector_compo_probes_previous_local_perio_[k][compo].set_smart_resize(1);
-            }
-          for (int ij = 0; ij<2; ij++)
-            index_ij_subproblems_global_[ij][k].set_smart_resize(1);
           temperature_probes_previous_global_[k].resize(*points_per_thermal_subproblem_);
-          for (int point=0; point<(*points_per_thermal_subproblem_); point++)
-            temperature_probes_previous_global_[k][point].set_smart_resize(1);
-          indicator_probes_previous_global_[k].set_smart_resize(1);
           velocities_probes_previous_global_[k].resize(3);
           normal_vector_compo_probes_previous_global_[k].resize(3);
-          for (int compo=0; compo<3; compo++)
-            {
-              velocities_probes_previous_global_[k][compo].set_smart_resize(1);
-              normal_vector_compo_probes_previous_global_[k][compo].set_smart_resize(1);
-            }
         }
     }
   else
@@ -1459,8 +1378,6 @@ void IJK_One_Dimensional_Subproblems::sort_limited_probes_spherical_coords_post_
         nb_theta_even += 1;
       if (nb_phi_even % 2)
         nb_phi_even += 1;
-      theta_scope.set_smart_resize(1);
-      phi_scope.set_smart_resize(1);
       int i, j, k;
       for (i=0; i<subproblems_counter_; i++)
         {

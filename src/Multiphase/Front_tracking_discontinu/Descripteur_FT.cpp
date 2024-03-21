@@ -41,8 +41,6 @@ Descripteur_FT::Descripteur_FT() :
   pe_voisins_.resize_array(n_proc);
   pe_voisins_.resize_array(0);
   elements_.dimensionner(n_proc);
-  for (int i = 0; i < n_proc; i++)
-    elements_[i].set_smart_resize(1);
 }
 
 Descripteur_FT& Descripteur_FT::operator=(const Descripteur_FT& src)

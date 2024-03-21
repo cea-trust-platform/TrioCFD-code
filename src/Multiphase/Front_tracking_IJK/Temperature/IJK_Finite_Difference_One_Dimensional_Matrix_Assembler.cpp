@@ -710,10 +710,6 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_sparse_m
   if (first_initialisation)
     {
       matrix_subproblems.typer("Matrice_Morse");
-      if (initialise_sparse_indices)
-        for (int l=0; l<6; l++)
-          first_indices_sparse_matrix[l].set_smart_resize(1);
-
     }
   if (initialise_sparse_indices)
     {
