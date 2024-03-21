@@ -2,12 +2,14 @@ Parametres {
 	Titre "Transport periodique front-tracking en IJK"
 	Description ""
 	Auteur "G.B."
+	CasTest . prepare.data
 	CasTest . test_sigma_seq.data
+	CasTest . test_sigma_drho_seq.data
 	CasTest . test_sigma_par8.data 8
 }
 
 Chapitre {
-	Titre "Maillage généré par cree_multi_bulles.sh"
+	Titre "Maillage genere par cree_multi_bulles.sh"
 	visu {
 		titre "Etat initial genere par cree_multi_bulles.sh"
 		mesh init.lata FTMESH
@@ -76,11 +78,41 @@ Chapitre {
                 pseudocolor _FICHIER_ DOM_EXT_dual SOURCE_QDM_INTERF_Y FACES
                 Operator_to_all Slice2D_z 0 0 0.17
 	}
+	visu {
+		Cycles _TIMESTEP_
+		titre "dt= _TIMESTEP_"
+		instruction_visit DefineScalarExpression("DELTA_ELEM_DOM","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh _FICHIER_ INTERFACES
+                pseudocolor _FICHIER_ DOM DELTA ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
 }
 
-
 #Pendmacro(CHAPITRE)
-#Pusemacro(CHAPITRE)("calcul séquentiel",test_sigma_seq.lata, "séquentiel", 1)
-#Pusemacro(CHAPITRE)("calcul séquentiel",test_sigma_seq.lata, "séquentiel", -1)
+#Pusemacro(CHAPITRE)("calcul sequentiel",test_sigma_seq.lata, "sequentiel", 1)
+#Pusemacro(CHAPITRE)("calcul sequentiel",test_sigma_seq.lata, "sequentiel", -1)
 #Pusemacro(CHAPITRE)("calcul parallele",test_sigma_par8.lata, "parallele", 1)
 #Pusemacro(CHAPITRE)("calcul parallele",test_sigma_par8.lata, "parallele", -1)
+
+
+Chapitre {
+	Titre "Comparison of source term when rhov differs from rhol"
+	Description "Calcul rho constant."
+	visu {
+		Cycles 1
+		titre "dt= 1 rhov==rhol"
+		instruction_visit DefineScalarExpression("DELTA_ELEM_DOM","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh test_sigma_seq.lata INTERFACES
+                pseudocolor test_sigma_seq.lata DOM DELTA ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
+	Description "Calcul rho variable"
+	visu {
+		Cycles 1
+		titre "dt= 1 rhov!=rhol"
+		instruction_visit DefineScalarExpression("DELTA_ELEM_DOM","RHO_ELEM_DOM*CELL_SOURCE_QDM_INTERF_X_ELEM_DOM - CELL_RHO_SOURCE_QDM_INTERF_X_ELEM_DOM")
+		mesh test_sigma_seq.lata INTERFACES
+                pseudocolor test_sigma_seq.lata DOM DELTA ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
+}
