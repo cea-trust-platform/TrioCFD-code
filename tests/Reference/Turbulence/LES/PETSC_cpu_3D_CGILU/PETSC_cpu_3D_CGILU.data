@@ -74,7 +74,7 @@ Fluide_Incompressible
 		solveur_pression Petsc GCP { 
 			save_matrice
 			seuil 1.000000e-15 
-			precond pilut { level 20 epsilon 0.01 }
+			precond boomeramg { }
 			impr 
 		}
 		convection { quick }
