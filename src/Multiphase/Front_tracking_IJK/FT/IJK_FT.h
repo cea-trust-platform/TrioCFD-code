@@ -358,7 +358,8 @@ protected :
   // These methods are static in order to make it clear that all data used and modified by the method are explicitely passed as arguments:
   static void force_entry_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz, double v_imposed);
   static void force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
-                                      double v_imposed,const IJK_Interfaces& interfaces, double nb_diam);
+                                      double v_imposed,const IJK_Interfaces& interfaces, double nb_diam,
+                                      int upstream_dir, int gravity_dir, int upstream_stencil);
   static void force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                                   double v_imposed,
                                                   const IJK_Interfaces& interfaces,
@@ -604,7 +605,6 @@ protected :
   IJK_Field_double molecular_mu_;
   // right hand side for pressure solver
   IJK_Field_double pressure_rhs_;
-  IJK_Field_double pressure_rhs_before_shear_;
   // Operators and pressure solver
 
   /* Velocity diffusion operator:

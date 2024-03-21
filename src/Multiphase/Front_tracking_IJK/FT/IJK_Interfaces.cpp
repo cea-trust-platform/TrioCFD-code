@@ -2200,7 +2200,6 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int o
 // domaine NS et entrent dans le domaine geom_FT...
 void IJK_Interfaces::creer_duplicata_bulles()
 {
-  statistiques().begin_count(m1);
   // Evaluation du cube contenant chaque bulle :
   DoubleTab bounding_box;
   calculer_bounding_box_bulles(bounding_box);
@@ -2231,7 +2230,6 @@ void IJK_Interfaces::creer_duplicata_bulles()
 
   // Duplique et deplace les bulles de la liste :
   dupliquer_bulle_perio(masque_duplicata_pour_compo_reel);
-  statistiques().end_count(m1);
 }
 
 // Input :

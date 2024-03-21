@@ -417,9 +417,9 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   vitesse_entree_ = -1.1e20;
   vitesse_upstream_ = -1.1e20;
   expression_vitesse_upstream_ = "??";
+  nb_diam_upstream_ = 0.;
   upstream_dir_=-1;
   upstream_stencil_=3;
-  nb_diam_upstream_ = -1.1e20;
   nb_diam_ortho_shear_perio_ = -1.1e20;
   disable_solveur_poisson_ = 0;
   resolution_fluctuations_ = 0;
@@ -517,8 +517,8 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("multigrid_solver", &poisson_solver_, Param::REQUIRED); // XD_ADD_P multigrid_solver not_set
   param.ajouter_flag("check_divergence", &check_divergence_); // XD_ADD_P rien Flag to compute and print the value of div(u) after each pressure-correction
   param.ajouter("mu_liquide", &mu_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid viscosity
-  param.ajouter("vitesse_entree", &vitesse_entree_); // XD_ADD_P chaine not_set
-  param.ajouter("vitesse_upstream", &vitesse_upstream_); // XD_ADD_P chaine not_set
+  param.ajouter("vitesse_entree", &vitesse_entree_); // XD_ADD_P floattant Velocity to prescribe at inlet
+  param.ajouter("vitesse_upstream", &vitesse_upstream_); // XD_ADD_P floattant Velocity to prescribe at 'nb_diam_upstream_' before bubble 0.
   param.ajouter("upstream_dir", &upstream_dir_); // XD_ADD_P entier Direction to prescribe the velocity
   param.ajouter("expression_vitesse_upstream", &expression_vitesse_upstream_); // XD_ADD_P chaine Analytical expression to set the upstream velocity
   param.ajouter("upstream_stencil", &upstream_stencil_); // XD_ADD_P int Width on which the velocity is set
@@ -1051,18 +1051,6 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                                                         const IJK_Interfaces& interfaces,
                                                         double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio)
 {
-  int dir = 0;
-  if (upstream_dir == -1)
-    {
-      dir = gravity_dir;
-      if (dir == -1)
-        dir=0;
-    }
-  const IJK_Splitting& splitting = vx.get_splitting();
-  const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
-
-  bool perio = geom.get_periodic_flag(dir);
-
   assert(interfaces.get_nb_bulles_reelles() == 1);
   DoubleTab bounding_box;
   Cerr << "Upstream Velocity - Compute Bounding box" << finl;
@@ -1146,22 +1134,22 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                     if (z_min_modulo>z_max_modulo)
                       {
                         // la bulle est a cheval sur la frontiere z
-                    	// Il y donc deux plans distincts ou imposer la vitesse
-                    	// un pour la bulle "de droite" (k=nk), un pour la bulle "de gauche" (k=0).
+                        // Il y donc deux plans distincts ou imposer la vitesse
+                        // un pour la bulle "de droite" (k=nk), un pour la bulle "de gauche" (k=0).
                         if(z_min_modulo!=z_min)
                           {
                             // la bulle reelle (compo connex >0) va de la droite vers la gauche.
-                        	// la bulle fantome est soumise a un shear positif
-                            if (k>index_k_min and index_k_min<kmax)
+                            // la bulle fantome est soumise a un shear positif
+                            if (k>index_k_min and index_k_min<velocity.nk())
                               {
-                            	// indice i du plan pour la bulle fantome
+                                // indice i du plan pour la bulle fantome
                                 index_i_real = index_i_offsetp ;
                                 go_k = true ;
 
                               }
                             else if (k<index_k_max and index_k_max>=0)
                               {
-                            	// indice i du plan pour la bulle reelle
+                                // indice i du plan pour la bulle reelle
                                 index_i_real = index_i;
                                 go_k = true ;
 
@@ -1169,17 +1157,17 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                           }
                         else if (z_max_modulo!=z_max)
                           {
-                        	// la bulle reelle (compo connex >0) va de la gauche vers la droite.
-                        	// la bulle fantome est soumise a un shear negatif
-                            if (k>index_k_min and index_k_min<kmax)
+                            // la bulle reelle (compo connex >0) va de la gauche vers la droite.
+                            // la bulle fantome est soumise a un shear negatif
+                            if (k>index_k_min and index_k_min<velocity.nk())
                               {
-                            	// indice i du plan pour la bulle reelle
+                                // indice i du plan pour la bulle reelle
                                 index_i_real =  index_i;
                                 go_k = true ;
                               }
                             else if (k<index_k_max and index_k_max>=0)
                               {
-                            	// indice i du plan pour la bulle fantome
+                                // indice i du plan pour la bulle fantome
                                 index_i_real = index_i_offsetm ;
                                 go_k = true ;
                               }
@@ -1188,8 +1176,8 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                     else
                       {
                         // la bulle ne traverse pas la frontiere z
-                    	// un seul plan defini pour la bulle reelle
-                        if ((index_k_min<kmax and k>index_k_min) and (k<index_k_max and index_k_max>=0))
+                        // un seul plan defini pour la bulle reelle
+                        if ((index_k_min<velocity.nk() and k>index_k_min) and (k<index_k_max and index_k_max>=0))
                           {
                             index_i_real = index_i;
                             go_k = true ;
@@ -1206,11 +1194,11 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
 
                     if(go_i && go_k)
                       {
-                    	// on impose la vitesse sur une couche de 3 mailles
-                    	// U(z) = DU_perio * z / Lz
-                    	// V = W = 0
-                    	// ATTENTION : doit etre utilisee avec corrections_qdm pour eviter toute deviation
-                    	// ATTENTION : s assurer que la condition de corrections_qdm est compatible avec ce profil de vitesse
+                        // on impose la vitesse sur une couche de 3 mailles
+                        // U(z) = DU_perio * z / Lz
+                        // V = W = 0
+                        // ATTENTION : doit etre utilisee avec corrections_qdm pour eviter toute deviation
+                        // ATTENTION : s assurer que la condition de corrections_qdm est compatible avec ce profil de vitesse
                         if(direction==0)
                           {
                             double z=dz/2.+(k+offset_k)*dz;
@@ -1230,10 +1218,6 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                   }
               }
           }
-        for (int k = kmin; k < kmax; k++)
-          for (int j = jmin; j < jmax; j++)
-            for (int i = imin; i < imax; i++)
-              velocity(i,j,k) = imposed[direction];
       }
   }
   Cerr << "Upstream Velocity has been forced" << finl;
@@ -1242,79 +1226,138 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
 void IJK_FT_double::force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                             double v_imposed,
                                             const IJK_Interfaces& interfaces,
-                                            double nb_diam)
+                                            double nb_diam,
+                                            int upstream_dir,
+                                            int gravity_dir,
+                                            int upstream_stencil)
 {
-  assert(interfaces.get_nb_bulles_reelles() == 1);
-  DoubleTab bounding_box;
-  interfaces.calculer_bounding_box_bulles(bounding_box);
-  // Calcule la hauteur en x de la permiere bulle et la position de son cdg :
-  const double Dbx = bounding_box(0, 0, 1) - bounding_box(0, 0, 0);
-  const double xb  = ( bounding_box(0, 0, 1) + bounding_box(0, 0, 0) ) / 2.;
-  double xobj = xb + nb_diam*Dbx;
-
+  int dir = 0;
+  if (upstream_dir == -1)
+    {
+      dir = gravity_dir;
+      if (dir == -1)
+        dir=0;
+    }
   const IJK_Splitting& splitting = vx.get_splitting();
   const IJK_Grid_Geometry& geom = splitting.get_grid_geometry();
-  const double dx = geom.get_constant_delta(DIRECTION_I);
-  // L'origine est sur un noeud. Donc que la premiere face en I est sur get_origin(DIRECTION_I)
-  const double origin_x = geom.get_origin(DIRECTION_I) ;
-  const double lx = geom.get_domain_length(DIRECTION_I) ;
-  const int offset_i = splitting.get_offset_local(DIRECTION_I);
 
-  bool perio =  geom.get_periodic_flag(DIRECTION_I);
+  bool perio = geom.get_periodic_flag(dir);
+
+  assert(interfaces.get_nb_bulles_reelles() == 1);
+  DoubleTab bounding_box;
+  Cerr << "Upstream Velocity - Compute Bounding box" << finl;
+  interfaces.calculer_bounding_box_bulles(bounding_box);
+  // Calcule la hauteur en x de la permiere bulle et la position de son cdg :
+  const double Dbdir = bounding_box(0, dir, 1) - bounding_box(0, dir, 0);
+  const double dirb  = ( bounding_box(0, dir, 1) + bounding_box(0, dir, 0) ) / 2.;
+  const double ldir = geom.get_domain_length(dir) ;
+  if (nb_diam == 0.)
+    nb_diam = (ldir/Dbdir) / 2;
+  double dirobj = dirb + nb_diam * Dbdir;
+
+  // L'origine est sur un noeud. Donc que la premiere face en I est sur get_origin(DIRECTION_I)
+  const double ddir = geom.get_constant_delta(dir);
+  const double origin_dir = geom.get_origin(dir) ;
+  const int offset_dir = splitting.get_offset_local(dir);
+
+  // FIXME: If nb_diam is too large it will iterate a lot
   if (perio)
     {
-      while (xobj<origin_x)
-        xobj+= lx;
-      while (xobj>origin_x+lx)
-        xobj -= lx;
+      while (dirobj<origin_dir)
+        dirobj += ldir;
+      while (dirobj>origin_dir+ldir)
+        dirobj -= ldir;
     }
 
   // On devrait avoir xobj dans le domaine, sinon, on a choisi nb_diam trop grand :
-  assert( ((xobj>=origin_x) && (xobj <= origin_x+lx) ));
+  assert( ((dirobj>=origin_dir) && (dirobj <= origin_dir+ldir) ));
 
-  const double x2 = (xobj-origin_x)/ dx;
-  int index_i = (int)(floor(x2)) - offset_i; // C'est l'index local, donc potentiellement negatif...
-  const int ni = vy.ni();
-  Cerr << "index_i " << index_i << finl;
-
-  if ((index_i >=0) && (index_i<ni))
+  const double x2 = (dirobj - origin_dir)/ ddir;
+  int index_dir = (int)(floor(x2)) - offset_dir; // C'est l'index local, donc potentiellement negatif...
+  int ndir;
+  switch(dir)
+    {
+    case 0:
+      ndir = vx.ni();
+      break;
+    case 1:
+      ndir = vx.nj();
+      break;
+    case 2:
+      ndir = vx.nk();
+      break;
+    default:
+      ndir = vx.ni();
+      break;
+    }
+  // Cerr << "index_dir " << index_dir << finl;
+  if ((index_dir >=0) && (index_dir < ndir))
     {
       // On est sur le bon proc...
-      if (index_i+3 >= ni)
+      if (index_dir+upstream_stencil >= ndir)
         {
           // On ne veut pas s'embeter sur 2 procs...
-          index_i = ni-3;
+          index_dir = ndir-upstream_stencil;
         }
     }
   else
     {
       return;
     }
-
   {
     double imposed[3] = {0., 0., 0.};
-    imposed[0] = v_imposed;
+    imposed[dir] = v_imposed;
     for (int direction = 0; direction < 3; direction++)
       {
         IJK_Field_double& velocity = select(direction, vx, vy, vz);
-        const int imin = index_i;
-        const int jmin = 0;
-        const int kmin = 0;
-        const int imax = imin+3;
-        const int jmax = velocity.nj();
-        const int kmax = velocity.nk();
-        for (int k = kmin; k < kmax; k++)
+        int imin;
+        int jmin;
+        int kmin;
+        int imax;
+        int jmax;
+        int kmax;
+        switch (dir)
           {
-            for (int j = jmin; j < jmax; j++)
-              {
-                for (int i = imin; i < imax; i++)
-                  {
-                    velocity(i,j,k) = imposed[direction];
-                  }
-              }
+          case 0:
+            imin = index_dir;
+            jmin = 0;
+            kmin = 0;
+            imax = imin+upstream_stencil;
+            jmax = velocity.nj();
+            kmax = velocity.nk();
+            break;
+          case 1:
+            imin = 0;
+            jmin = index_dir;
+            kmin = 0;
+            imax = velocity.ni();
+            jmax = jmin+upstream_stencil;
+            kmax = velocity.nk();
+            break;
+          case 2:
+            imin = 0;
+            jmin = 0;
+            kmin = index_dir;
+            imax = velocity.ni();
+            jmax = velocity.nj();
+            kmax = kmin+upstream_stencil;
+            break;
+          default:
+            imin = index_dir;
+            jmin = 0;
+            kmin = 0;
+            imax = imin+upstream_stencil;
+            jmax = velocity.nj();
+            kmax = velocity.nk();
+            break;
           }
+        for (int k = kmin; k < kmax; k++)
+          for (int j = jmin; j < jmax; j++)
+            for (int i = imin; i < imax; i++)
+              velocity(i,j,k) = imposed[direction];
       }
   }
+  Cerr << "Upstream Velocity has been forced" << finl;
 }
 
 void IJK_FT_double::ecrire_donnees(const FixedVector<IJK_Field_double, 3>& f3compo, SFichier& le_fichier, const int compo, bool binary) const
@@ -1567,7 +1610,6 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   param.ajouter("tinit", &current_time_);
 
   param.ajouter("terme_acceleration_init", &terme_source_acceleration_);
-  // param.ajouter("force_init", &force_init_);
   param.ajouter("fichier_reprise_vitesse", &fichier_reprise_vitesse_);
   param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_);
   param.ajouter("interfaces", & interfaces_);
@@ -1824,7 +1866,7 @@ int IJK_FT_double::initialise()
 //          velocity_[2].data() += expression_vitesse_initiale_;
         }
 
-      velocity_[0].echange_espace_virtuel(2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+      velocity_[0].echange_espace_virtuel(2);
       velocity_[1].echange_espace_virtuel(2);
       velocity_[2].echange_espace_virtuel(2);
 #ifdef CONVERT_AT_READING_FROM_NURESAFE_TO_ADIM_TRYGGVASON_FOR_LIQUID_VELOCITY
@@ -1900,27 +1942,6 @@ int IJK_FT_double::initialise()
 
   // On la met a jour 2 fois, une fois next et une fois old
   update_twice_indicator_field();
-
-  if (!disable_diphasique_)
-  for (int i=0; i<2; i++)
-    {
-      interfaces_.switch_indicatrice_next_old();
-      interfaces_.calculer_indicatrice_next(
-        post_.potentiel(),
-        gravite_,
-        delta_rho,
-        sigma_,
-        /*Pour post-traitement : post_.rebuilt_indic()
-        */
-#ifdef SMOOTHING_RHO
-        /* Pour le smoothing : */
-        rho_field_ft_,
-        rho_vapeur_,
-        smooth_density_,
-#endif
-        current_time_, tstep_
-      );
-    }
 
   if (IJK_Splitting::defilement_ == 1)
     {
@@ -2283,6 +2304,7 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
           if ( get_time_scheme() == EULER_EXPLICITE)
             {
               terme_source_acceleration_ += derivee_acceleration * timestep;
+              //terme_source_acceleration_ += 0;//derivee_acceleration * timestep;
               facteur_variable_source_ += derivee_facteur_sv * timestep;
               //facteur_variable_source_ += 0;//derivee_facteur_sv * timestep;
               new_time += timestep;
@@ -2292,7 +2314,8 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
               const double intermediate_dt = compute_fractionnal_timestep_rk3( timestep, rk_step);
               runge_kutta3_update_for_float(derivee_acceleration, store_RK3_source_acc_,
                                             terme_source_acceleration_, rk_step, timestep);
-
+              Cout << "terme_source_acceleration_" << terme_source_acceleration_ << finl;
+              //terme_source_acceleration_ += 0;
               runge_kutta3_update_for_float(derivee_facteur_sv, store_RK3_fac_sv_,
                                             facteur_variable_source_, rk_step, timestep);
               Cout << "facteur_variable_source_" << facteur_variable_source_ << finl;
@@ -2345,8 +2368,6 @@ void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, con
       ptn = calculer_v_moyen(scalar_product(velocity_,scalar_times_vector(rho_field_,forcage_.get_force_ph2())));
     }
   // -----------------------------------------------------------
-
-  envoyer_broadcast(terme_source_acceleration_z_, 0);
 
   // Impression dans le fichier _acceleration.out
   if (Process::je_suis_maitre())
@@ -2419,13 +2440,13 @@ void IJK_FT_double::run()
   thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, thermal_probes_ghost_cells_);
   thermal_probes_ghost_cells_ = thermals_.get_probes_ghost_cells(thermal_probes_ghost_cells_);
   if (IJK_Splitting::defilement_ == 1)
-  {
-  allocate_velocity(velocity_, splitting_, 2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
-  }
+    {
+      allocate_velocity(velocity_, splitting_, 2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
+    }
   else
-  {
-  allocate_velocity(velocity_, splitting_, thermal_probes_ghost_cells_);
-  }
+    {
+      allocate_velocity(velocity_, splitting_, thermal_probes_ghost_cells_);
+    }
 
   if (IJK_Splitting::defilement_ == 1)
     {
@@ -2510,6 +2531,7 @@ void IJK_FT_double::run()
           inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, 1./rho_vapeur_, 1./rho_liquide_);
           IJK_Splitting::rho_vap_ref_for_poisson_=1./rho_vapeur_;
           IJK_Splitting::rho_liq_ref_for_poisson_=1./rho_liquide_;
+          nalloc += 1;
         }
     }
   else
@@ -3195,96 +3217,11 @@ void IJK_FT_double::run()
       // static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
       // statistiques().begin_count(bilanQdM_counter_);
       // statistiques().end_count(bilanQdM_counter_);
-      static Stat_Counter_Id bilanQdM_counter_ = statistiques().new_counter(2, "Bilan QdM & Corrections");
-      statistiques().begin_count(bilanQdM_counter_);
-      if ((correction_bilan_qdm_ == 3) || (correction_bilan_qdm_ == 4))
-        {
-
-#ifndef VARIABLE_DZ
-          double volume = 1.;
-          for (int i = 0; i < 3; i++)
-            volume *= splitting_.get_grid_geometry().get_constant_delta(i);
-#endif
-
-          for (int dir = 0; dir < 3; dir++)
-            {
-              if ((dir == 2) && (correction_bilan_qdm_ == 4))
-                {
-                  // passe, on ne traite pas z...
-                }
-              else
-                {
-#ifndef VARIABLE_DZ
-                  const double x = volume * integrated_residu_[dir];
-                  psi_velocity_[dir].data() = x;
-#endif
-                  const int kmax = psi_velocity_[dir].nk();
-                  for (int k = 0; k < kmax; k++)
-                    {
-#ifdef VARIABLE_DZ
-                      const double volume = get_channel_control_volume(psi_velocity_[dir], k, delta_z_local_);
-                      const double x = volume*integrated_residu_[dir];
-                      psi_velocity_[dir].data() = x;
-#endif
-                      if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
-                        {
-                          Cerr
-                              << "Verifier que inv_rho_field soit valide et a jour ici ... "
-                              << finl;
-                          Process::exit();
-                          mass_solver_with_inv_rho(psi_velocity_[dir],
-                                                   inv_rho_field_, delta_z_local_, k);
-                        }
-                      else
-                        {
-                          mass_solver_with_rho(psi_velocity_[dir], rho_field_,
-                                               delta_z_local_, k);
-                        }
-                      const int imax = velocity_[dir].ni();
-                      const int jmax = velocity_[dir].nj();
-                      for (int j = 0; j < jmax; j++)
-                        {
-                          for (int i = 0; i < imax; i++)
-                            {
-                              velocity_[dir](i, j, k) -= psi_velocity_[dir](i,
-                                                                            j, k);
-                            }
-                        }
-                    }
-
-
-                  if (boundary_conditions_.get_correction_conserv_qdm()==2)
-                    {
-                      update_rho_v();
-                      rho_field_.echange_espace_virtuel(rho_field_.ghost());
-                      update_v_ghost_from_rho_v();
-                    }
-                  else
-                    {
-                      velocity_[dir].echange_espace_virtuel(
-                        velocity_[dir].ghost());
-                    }
-
-
-                }
-            }
-          // Ces operations ont modifie le store_rhov_moy_ qu'il faut donc updater :
-          for (int dir = 0; dir < 3; dir++)
-            {
-              store_rhov_moy_[dir] -= integrated_residu_[dir];
-            }
-
-          // Remise a zero du residu integre puisqu'il a ete corrige :
-          integrated_residu_ = 0.;
-
-        }
-      statistiques().end_count(bilanQdM_counter_);
 
       //ab-forcage-control-ecoulement-fin
       current_time_ += timestep_;
       // stock dans le spliting le decallage periodique total avec condition de shear (current_time_) et celui du pas de temps (timestep_)
       IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
-      //IJK_Splitting::shear_x_DT_ = boundary_conditions_.get_dU_perio()*timestep_;
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
@@ -4186,7 +4123,6 @@ void IJK_FT_double::compute_add_external_forces(const int dir)
 
 // -----------------------------------------------------------------------------------
 //  FORCAGE EXTERIEUR, DEFINI DANS L'ESPACE SPECTRAL
-// GAB, THI /!\ REMPLACER PAR compute_add_THI_force_sur_d_velocity
 void IJK_FT_double::compute_add_THI_force(const FixedVector<IJK_Field_double, 3>& vitesse,
                                           const int time_iteration,
                                           const double dt, //tstep, /!\ ce dt est faux, je ne sais pas pk mais en comparant sa valeur avec celle du dt_ev, je vois que c'est faux
@@ -4882,23 +4818,6 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
   if (counter_first_iter_ && first_step_interface_smoothing_)
     thermals_.recompute_temperature_init();
   // mise a jour de l'indicatrice pour les variables monofluides
-  const double delta_rho = rho_liquide_ - rho_vapeur_;
-  interfaces_.switch_indicatrice_next_old();
-  interfaces_.calculer_indicatrice_next(
-    post_.potentiel(),
-    gravite_,
-    delta_rho,
-    sigma_,
-    /*Pour post-traitement : post_.rebuilt_indic()
-    */
-#ifdef SMOOTHING_RHO
-    /* Pour le smoothing : */
-    rho_field_ft_,
-    rho_vapeur_,
-    smooth_density_,
-#endif
-    current_time_, tstep_
-  );
 
   if (IJK_Splitting::defilement_ == 1)
     {
@@ -4972,23 +4891,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   // vient de deplacer.
 
   update_indicator_field();
-  const double delta_rho = rho_liquide_ - rho_vapeur_;
-  interfaces_.switch_indicatrice_next_old();
-  interfaces_.calculer_indicatrice_next(
-    post_.potentiel(),
-    gravite_,
-    delta_rho,
-    sigma_,
-    /*Pour post-traitement : post_.rebuilt_indic()
-    */
-#ifdef SMOOTHING_RHO
-    /* Pour le smoothing : */
-    rho_field_ft_,
-    rho_vapeur_,
-    smooth_density_,
-#endif
-    current_time_, rk_step
-  );
+
   if (IJK_Splitting::defilement_ == 1)
     {
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);

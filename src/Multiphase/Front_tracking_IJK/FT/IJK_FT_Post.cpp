@@ -433,7 +433,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       liste_post_instantanes_.add("RHO");
       liste_post_instantanes_.add("MU");
       liste_post_instantanes_.add("PRESSURE_RHS");
-      liste_post_instantanes_.add("PRESSURE_RHS_BEFORE_SHEAR");
       liste_post_instantanes_.add("INDICATRICE_NS");
       liste_post_instantanes_.add("VELOCITY_FT");
       liste_post_instantanes_.add("PRESSURE_LIQ");
@@ -845,8 +844,6 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
     n--, dumplata_scalar(lata_name, "RHO", ref_ijk_ft_.rho_field_, latastep);
   if (liste_post_instantanes_.contient_("PRESSURE_RHS"))
     n--, dumplata_scalar(lata_name, "PRESSURE_RHS", ref_ijk_ft_.pressure_rhs_, latastep);
-  if (liste_post_instantanes_.contient_("PRESSURE_RHS_BEFORE_SHEAR"))
-    n--, dumplata_scalar(lata_name, "PRESSURE_RHS_BEFORE_SHEAR", ref_ijk_ft_.pressure_rhs_before_shear_, latastep);
   if (liste_post_instantanes_.contient_("INDICATRICE_NS"))
     n--, dumplata_scalar(lata_name, "INDICATRICE_NS", ref_ijk_ft_.I_ns_, latastep);
   if (liste_post_instantanes_.contient_("VELOCITY_FT"))
