@@ -1483,9 +1483,9 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reduce_solver_matri
 //      tab1_reduced = tab1;
 //      tab2_reduced = tab2;
 //      coeff_reduced = coeff;
-//      tab1_reduced.resize(nb_rows, Array_base::COPY_NOINIT);
-//      tab2_reduced.resize(nb_coeff, Array_base::COPY_NOINIT);
-//      coeff_reduced.resize(nb_coeff, Array_base::COPY_NOINIT);
+//      tab1_reduced.resize(nb_rows, RESIZE_OPTIONS::COPY_NOINIT);
+//      tab2_reduced.resize(nb_coeff, RESIZE_OPTIONS::COPY_NOINIT);
+//      coeff_reduced.resize(nb_coeff, RESIZE_OPTIONS::COPY_NOINIT);
 
       int i;
       for (i=0; i<nb_rows; i++)

@@ -1929,15 +1929,15 @@ int Remailleur_Collision_FT_Thomas::initialiser_data(const Maillage_FT_Disc& mai
   nombre_de_voisins_plus_proches_.reset();
   surface_interface_elements_voisins_.reset();
   volume_perdu_.reset();
-  domaine.creer_tableau_elements(distance_interface_element_eulerien_, Array_base::NOCOPY_NOINIT);
+  domaine.creer_tableau_elements(distance_interface_element_eulerien_, RESIZE_OPTIONS::NOCOPY_NOINIT);
   distance_interface_element_eulerien_=-1;
   domaine.creer_tableau_elements(nombre_de_voisins_plus_proches_);
   domaine.creer_tableau_elements(surface_interface_elements_voisins_);
   domaine.creer_tableau_elements(volume_perdu_);
 
   //On dimensionne les donnees
-  voisinage_sommet_.resize(nb_som_tot, Array_base::NOCOPY_NOINIT);
-  next_elem_.resize(nb_elem_tot*nb_som_elem, Array_base::NOCOPY_NOINIT);
+  voisinage_sommet_.resize(nb_som_tot, RESIZE_OPTIONS::NOCOPY_NOINIT);
+  next_elem_.resize(nb_elem_tot*nb_som_elem, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
   //On leur attribue une valeur
   voisinage_sommet_ = -1;

@@ -625,7 +625,9 @@ double Topologie_Maillage_FT::suppression_interfaces(const IntVect& num_compo,
 
   const int nb_facettes = maillage.nb_facettes();
   ArrOfInt liste_facettes_a_supprimer;
-  array_smart_allocate(liste_facettes_a_supprimer, nb_facettes);
+  liste_facettes_a_supprimer.resize_array(nb_facettes, RESIZE_OPTIONS::NOCOPY_NOINIT); // get memory for the requested size
+  liste_facettes_a_supprimer.resize_array(0); // and set actual size to zero
+
 
   const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
   const ArrOfInt& index_elem = intersections.index_elem();

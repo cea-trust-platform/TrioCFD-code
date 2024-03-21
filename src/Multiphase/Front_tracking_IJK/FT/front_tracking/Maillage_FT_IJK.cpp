@@ -957,7 +957,7 @@ void Maillage_FT_IJK::calculer_compo_connexe_sommets(ArrOfIntFT& compo_connexe_s
 
   const int nb_fa7 = facettes_.dimension(0);
   const int nbsom = sommets().dimension(0);
-  compo_connexe_sommets.resize_array(nbsom, Array_base::NOCOPY_NOINIT); // tous les sommets, y compris virtuels.
+  compo_connexe_sommets.resize_array(nbsom, RESIZE_OPTIONS::NOCOPY_NOINIT); // tous les sommets, y compris virtuels.
   compo_connexe_sommets = -10000000; // Force une initialisation bidon.
   // On parcours toutes les facettes.
   for (int i = 0; i < nb_fa7; i++)
@@ -989,7 +989,7 @@ void Maillage_FT_IJK::recopie_force_compo(const Maillage_FT_IJK& source_mesh, co
   Process::exit();
   recopie(source_mesh, MINIMAL);
   const int nf = nb_facettes();
-  compo_connexe_facettes_.resize_array(nf, Array_base::NOCOPY_NOINIT); // tous les sommets, y compris virtuels.
+  compo_connexe_facettes_.resize_array(nf, RESIZE_OPTIONS::NOCOPY_NOINIT); // tous les sommets, y compris virtuels.
   for (int i_facette = 0; i_facette < nf; i_facette++)
     {
       compo_connexe_facettes_[i_facette] = icompo;

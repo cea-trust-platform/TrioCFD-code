@@ -3506,7 +3506,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
       //------- Calcul du nombre de fois qu'un rayon local (par direction) traverse l'IBC dans une cellule
       IntTab trav(nb_elem,dim) ;
       if( nb_elem < nb_elem_tot )
-        domaine_vf.domaine().creer_tableau_elements(trav, Array_base::NOCOPY_NOINIT) ;
+        domaine_vf.domaine().creer_tableau_elements(trav, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
       trav = 0 ;
 
       DoubleTab xe(dim) ;
@@ -4206,17 +4206,17 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
           // Distribution des tableaux (uniquement en parallele)
           if( nb_elem < nb_elem_tot )
             {
-              domaine_vf.domaine().creer_tableau_elements(Tab100, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.domaine().creer_tableau_elements(Tab101, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.domaine().creer_tableau_elements(Tab102, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.domaine().creer_tableau_elements(Tab103, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.domaine().creer_tableau_elements(Tab110, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.domaine().creer_tableau_elements(Tab111, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.domaine().creer_tableau_elements(Tab112, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.domaine().creer_tableau_elements(Tab12, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.domaine().creer_tableau_elements(CptFacette, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.creer_tableau_faces(Vertex, Array_base::NOCOPY_NOINIT) ;
-              domaine_vf.creer_tableau_faces(PPP, Array_base::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab100, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab101, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab102, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab103, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab110, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab111, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab112, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(Tab12, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.domaine().creer_tableau_elements(CptFacette, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.creer_tableau_faces(Vertex, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
+              domaine_vf.creer_tableau_faces(PPP, RESIZE_OPTIONS::NOCOPY_NOINIT) ;
             }
           CptFacette = 0 ;
           Tab100 = -1e+30 ;
@@ -6301,7 +6301,7 @@ void Transport_Interfaces_FT_Disc::calculer_vitesse_repere_local(const Maillage_
   // (il faudrait calculer les compo connexes sur les sommets, et ensuite passer aux faces
   //  ce serait plus simple, voire calculer les deux en meme temps)
   IntVect compo_sommets;
-  maillage.creer_tableau_sommets(compo_sommets, Array_base::NOCOPY_NOINIT);
+  maillage.creer_tableau_sommets(compo_sommets, RESIZE_OPTIONS::NOCOPY_NOINIT);
   compo_sommets = -1;
   {
     const int dim = deplacement.dimension(1);

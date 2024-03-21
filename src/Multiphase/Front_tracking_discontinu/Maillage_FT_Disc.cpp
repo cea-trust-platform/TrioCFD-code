@@ -1105,11 +1105,11 @@ void Maillage_FT_Disc::transporter(const DoubleTab& deplacement)
   // La taille est surestimee
   ArrOfInt liste_sommets;
   liste_sommets.set_smart_resize(1);
-  liste_sommets.resize_array(nb_som, Array_base::NOCOPY_NOINIT);
+  liste_sommets.resize_array(nb_som, RESIZE_OPTIONS::NOCOPY_NOINIT);
   // Le tableau de deplacement des sommets reels
   DoubleTab vecteur;
   vecteur.set_smart_resize(1);
-  vecteur.resize(nb_som, dim, Array_base::NOCOPY_NOINIT);
+  vecteur.resize(nb_som, dim, RESIZE_OPTIONS::NOCOPY_NOINIT);
   ArrOfIntFT liste_sommets_sortis;
   ArrOfIntFT numero_face_sortie;
 
@@ -6477,7 +6477,7 @@ int Maillage_FT_Disc::type_statut() const
 /*! @brief creation d'un tableau aux sommets du maillage Meme principe que Domaine::creer_tableau_sommets()
  *
  */
-void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, Array_base::Resize_Options opt) const
+void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, RESIZE_OPTIONS opt) const
 {
   const MD_Vector& md = desc_sommets().get_md_vector();
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);
@@ -6486,7 +6486,7 @@ void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, Array_base::Resize_O
 /*! @brief creation d'un tableau aux sommets du maillage Meme principe que Domaine::creer_tableau_elements()
  *
  */
-void Maillage_FT_Disc::creer_tableau_elements(Array_base& x, Array_base::Resize_Options opt) const
+void Maillage_FT_Disc::creer_tableau_elements(Array_base& x, RESIZE_OPTIONS opt) const
 {
   const MD_Vector& md = desc_facettes().get_md_vector();
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);

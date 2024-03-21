@@ -971,7 +971,7 @@ void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_
   // RHS for this pressure solveur : div(delta_u)
   // We need to create a table sized as temperature to store the rhs :
   DoubleTab& secmem = divergence_delta_U.valeurs();
-  //secmem.copy(inconnue().valeurs(), Array_base::NOCOPY_NOINIT);
+  //secmem.copy(inconnue().valeurs(), RESIZE_OPTIONS::NOCOPY_NOINIT);
   div_tmp->calculer(vitesse_convection_.valeurs(),secmem);
 
   // On ne conserve que la divergence des elements proches de l'interface, et supprime quand la distance est invalide

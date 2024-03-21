@@ -170,7 +170,7 @@ int Marching_Cubes::construire_iso(const DoubleVect& valeurs_sommets,
   // interne, sommet de bord et/ou sommet de joint.
   IntTab def_noeud;
   def_noeud.set_smart_resize(1);
-  def_noeud.resize(last_def_noeud_size * 2, 4, Array_base::NOCOPY_NOINIT);
+  def_noeud.resize(last_def_noeud_size * 2, 4, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
   maillage.reset();
 

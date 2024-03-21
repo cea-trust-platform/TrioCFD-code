@@ -2602,9 +2602,9 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                 }
 
               nbsom++;
-              crossed_cells.resize(nbsom, 3, Array_base::COPY_INIT);
-              positions_liq.resize(2 * nbsom, 3, Array_base::COPY_INIT);
-              positions_vap.resize(2 * nbsom, 3, Array_base::COPY_INIT);
+              crossed_cells.resize(nbsom, 3, RESIZE_OPTIONS::COPY_INIT);
+              positions_liq.resize(2 * nbsom, 3, RESIZE_OPTIONS::COPY_INIT);
+              positions_vap.resize(2 * nbsom, 3, RESIZE_OPTIONS::COPY_INIT);
 
               crossed_cells(nbsom - 1, 0) = i;
               crossed_cells(nbsom - 1, 1) = j;

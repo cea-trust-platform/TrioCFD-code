@@ -1109,7 +1109,7 @@ void IJK_Interfaces::calculer_surface_bulles(ArrOfDouble& surfaces) const
   const int n = mesh.nb_facettes();
   const int nbulles_reelles = get_nb_bulles_reelles();
   const int nbulles_ghost = get_nb_bulles_ghost();
-  surfaces.resize_array(nbulles_reelles + nbulles_ghost, Array_base::NOCOPY_NOINIT);
+  surfaces.resize_array(nbulles_reelles + nbulles_ghost, RESIZE_OPTIONS::NOCOPY_NOINIT);
   surfaces = 0.;
   const ArrOfDouble& surfaces_facettes = mesh.get_update_surface_facettes();
   const ArrOfInt& compo_facettes = mesh.compo_connexe_facettes();
@@ -1185,9 +1185,9 @@ void IJK_Interfaces::calculer_volume_bulles(ArrOfDouble& volumes, DoubleTab& cen
   const int nbulles_reelles = get_nb_bulles_reelles();
   const int nbulles_ghost = get_nb_bulles_ghost();
   const int nbulles_tot = nbulles_reelles + nbulles_ghost;
-  volumes.resize_array(nbulles_tot, Array_base::NOCOPY_NOINIT);
+  volumes.resize_array(nbulles_tot, RESIZE_OPTIONS::NOCOPY_NOINIT);
   volumes = 0.;
-  centre_gravite.resize(nbulles_tot, 3, Array_base::NOCOPY_NOINIT);
+  centre_gravite.resize(nbulles_tot, 3, RESIZE_OPTIONS::NOCOPY_NOINIT);
   centre_gravite = 0.;
   const ArrOfDouble& surfaces_facettes = mesh.get_update_surface_facettes();
   const DoubleTab& normales_facettes = mesh.get_update_normale_facettes();
@@ -1244,7 +1244,7 @@ void IJK_Interfaces::calculer_poussee_bulles(const ArrOfDouble& grav,
   const int nbulles_reelles = get_nb_bulles_reelles();
   const int nbulles_ghost = get_nb_bulles_ghost();
   const int nbulles_tot = nbulles_reelles + nbulles_ghost;
-  poussee.resize(nbulles_tot, 3, Array_base::NOCOPY_NOINIT);
+  poussee.resize(nbulles_tot, 3, RESIZE_OPTIONS::NOCOPY_NOINIT);
   poussee = 0.;
   const ArrOfDouble& surfaces_facettes = mesh.get_update_surface_facettes();
   const DoubleTab& normales_facettes = mesh.get_update_normale_facettes();
@@ -2124,8 +2124,8 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int o
   ArrOfDouble position_xmin_compo;
   if (option_shear != 0 && IJK_Splitting::defilement_ == 1)
     {
-      position_xmax_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
-      position_xmin_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
+      position_xmax_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
+      position_xmin_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
       position_xmax_compo = -10000.;
       position_xmin_compo = 10000.;
 
@@ -2285,8 +2285,8 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
   ArrOfDouble position_xmin_compo;
   if (IJK_Splitting::defilement_ == 1)
     {
-      position_xmax_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
-      position_xmin_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
+      position_xmax_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
+      position_xmin_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
       position_xmax_compo = -10000.;
       position_xmin_compo = 10000.;
 
@@ -2449,8 +2449,8 @@ static void calculer_deplacement_from_masque_in_array(const Maillage_FT_IJK& m,
   ArrOfDouble position_xmin_compo;
   if (IJK_Splitting::defilement_ == 1)
     {
-      position_xmax_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
-      position_xmin_compo.resize_array(nbulles, Array_base::NOCOPY_NOINIT);
+      position_xmax_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
+      position_xmin_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
       position_xmax_compo = -10000.;
       position_xmin_compo = 10000.;
 
@@ -4051,7 +4051,7 @@ void IJK_Interfaces::convert_to_IntVect(const ArrOfInt& in, IntVect& out) const
   assert(in.size_array() == out.size());
 
   // La copie veut un pointeur vers le md_vector non initialise.
-  //  out.copy(in, /*Array_base::Resize_Options opt*/ Array_base::COPY_INIT);
+  //  out.copy(in, /*RESIZE_OPTIONS opt*/ RESIZE_OPTIONS::COPY_INIT);
 
   // On utilise dont le inject_array
   // mais comment s'assurer qu'on a mis le tableau au bon endroit? et pas un peu
@@ -4822,9 +4822,9 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe_octree(const DoubleT
   const ArrOfInt& compo_connexe_facettes = mesh.compo_connexe_facettes();
 
   const int nb_som = sommets_a_tester.dimension(0);
-  distance.resize_array(nb_som, Array_base::NOCOPY_NOINIT);
+  distance.resize_array(nb_som, RESIZE_OPTIONS::NOCOPY_NOINIT);
   distance = distmax;
-  vr_to_other.resize(nb_som, 3, Array_base::NOCOPY_NOINIT);
+  vr_to_other.resize(nb_som, 3, RESIZE_OPTIONS::NOCOPY_NOINIT);
   vr_to_other = -1e5; // Invalid value
   assert(vinterp_tmp.dimension(0) == nb_som);
   for (int i = 0; i < nb_som; i++)
@@ -4940,9 +4940,9 @@ void IJK_Interfaces::calculer_distance_autres_compo_connexe_ijk(const DoubleTab&
   for(int dir=0; dir<3; dir++)
     nb_elem_loc[dir] = splitting.get_nb_elem_local(dir);
 
-  distance.resize_array(nb_som, Array_base::NOCOPY_NOINIT);
+  distance.resize_array(nb_som, RESIZE_OPTIONS::NOCOPY_NOINIT);
   distance = distmax;
-  vr_to_other.resize(nb_som, 3, Array_base::NOCOPY_NOINIT);
+  vr_to_other.resize(nb_som, 3, RESIZE_OPTIONS::NOCOPY_NOINIT);
   vr_to_other = -1e5; // Invalid value
   assert(vinterp_tmp.dimension(0) == nb_som);
 
@@ -5837,7 +5837,7 @@ void IJK_Interfaces::compute_external_forces_color_function(FixedVector<IJK_Fiel
   mp_sum_for_each_item(integration_cells_per_bubble);
   // Individual_forces has been used. It can be updated with the true value (weighted by the true volume where the force is applied).
 // individual_forces=integrated_forces;
-//  individual_forces.copy(integrated_forces, Array_base::COPY_INIT); // Return the integrated value in individual_forces.
+//  individual_forces.copy(integrated_forces, RESIZE_OPTIONS::COPY_INIT); // Return the integrated value in individual_forces.
 //
   for (int idir=0; idir < 3; idir++)
     for (int ib = 0; ib < nb_bulles_reelles_; ib++)

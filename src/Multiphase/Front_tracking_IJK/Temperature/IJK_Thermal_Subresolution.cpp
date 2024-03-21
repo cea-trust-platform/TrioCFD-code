@@ -2291,8 +2291,8 @@ void IJK_Thermal_Subresolution::compute_md_vector()
                                        pe_voisins_dummy, items_to_send_dummy,
                                        items_to_recv_dummy, blocs_to_recv_dummy);
   md_.copy(md_std);
-  MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_rhs_assembly_); //, Array_base::NOCOPY_NOINIT);
-  MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_temperature_solution_); //, Array_base::NOCOPY_NOINIT);
+  MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_rhs_assembly_); //, RESIZE_OPTIONS::NOCOPY_NOINIT);
+  MD_Vector_tools::creer_tableau_distribue(md_, thermal_subproblems_temperature_solution_); //, RESIZE_OPTIONS::NOCOPY_NOINIT);
 }
 
 void IJK_Thermal_Subresolution::retrieve_temperature_solution()
