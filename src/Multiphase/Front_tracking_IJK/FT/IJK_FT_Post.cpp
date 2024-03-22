@@ -1042,6 +1042,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
   ArrOfDouble volume;
   DoubleTab position;
   ArrOfDouble surface;
+  ArrOfDouble aspect_ratio;
   const int nbulles = interfaces_.get_nb_bulles_reelles();
   DoubleTab hauteurs_bulles(nbulles, 3);
   DoubleTab bounding_box;
@@ -1058,6 +1059,7 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
   // La methode calcule a present les volumes meme pour les bulles ghost.
   // Pour les enlever, il suffit simplement de reduire la taille du tableau :
   interfaces_.calculer_volume_bulles(volume, position);
+  interfaces_.calculer_aspect_ratio(aspect_ratio);
   volume.resize_array(nbulles);
   position.resize(nbulles, 3);
 
@@ -1252,6 +1254,19 @@ void IJK_FT_Post::ecrire_statistiques_bulles(int reset, const Nom& nom_cas, cons
       fic << endl;
       fic.close();
 
+      snprintf(s, 1000, "%s_bulles_aspect_ratio.out", nomcas);
+      fic.ouvrir(s, mode);
+      snprintf(s, 1000, "%.16e ", current_time);
+      fic << s;
+      for (int i = 0; i < n; i++)
+        {
+          snprintf(s, 1000, "%.16e ", aspect_ratio[i]);
+          fic << s;
+        }
+      fic << finl;
+      fic.close();
+
+
       if (interfaces_.follow_colors())
         {
           const ArrOfInt& colors = interfaces_.get_colors();
@@ -1303,6 +1318,9 @@ statistiques().end_count(postraitement_counter_);
 // les groupes a la fin). Sinon, les champs en ai, normale ou grad_I ne contiendront qu'un groupe.
 void IJK_FT_Post::update_stat_ft(const double dt)
 {
+  ArrOfDouble volume;
+  DoubleTab position;
+  interfaces_.calculer_volume_bulles(volume, position);
   static Stat_Counter_Id updtstat_counter_ = statistiques().new_counter(2, "update statistiques");
   statistiques().begin_count(updtstat_counter_);
   if (disable_diphasique_)

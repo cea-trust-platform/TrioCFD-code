@@ -1226,7 +1226,7 @@ void IJK_Interfaces::calculer_volume_bulles(ArrOfDouble& volumes, DoubleTab& cen
     }
   mp_sum_for_each_item(volumes);
   mp_sum_for_each_item(centre_gravite);
-  Cerr << "volumes : " << volumes << finl;
+  //Cerr << "volumes : " << volumes << finl;
   for (int i = 0; i < nbulles_tot; i++)
     {
       // const double x = 1./volumes[i];
@@ -1234,6 +1234,72 @@ void IJK_Interfaces::calculer_volume_bulles(ArrOfDouble& volumes, DoubleTab& cen
       centre_gravite(i, 0) *= x;
       centre_gravite(i, 1) *= x;
       centre_gravite(i, 2) *= x;
+    }
+}
+
+
+void IJK_Interfaces::calculer_aspect_ratio(ArrOfDouble& aspect_ratio) const
+{
+  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
+  const int n = mesh.nb_facettes();
+  const int nbulles_reelles = get_nb_bulles_reelles();
+  const int nbulles_ghost = get_nb_bulles_ghost();
+  const int nbulles_tot = nbulles_reelles + nbulles_ghost;
+  const IntTab& facettes = mesh.facettes();
+  const DoubleTab& sommets = mesh.sommets();
+  const ArrOfInt& compo_facettes = mesh.compo_connexe_facettes();
+  aspect_ratio.resize_array(nbulles_tot, Array_base::NOCOPY_NOINIT);
+
+  ArrOfDouble volumes;
+  DoubleTab centre_gravite;
+  this->calculer_volume_bulles(volumes,centre_gravite);
+
+  DoubleTab d_max(nbulles_tot);
+  d_max = -1;
+  DoubleTab d_min(nbulles_tot);
+  d_min = 300;
+
+  double d_imax;
+  double d_imin;
+
+  for (int i = 0; i < n; i++)
+    {
+      if (mesh.facette_virtuelle(i))
+        continue;
+      int compo = compo_facettes[i];
+      // les bulles dupliquees a la fin :
+      if (compo < 0)
+        {
+          // L'index de la bulle ghost est (entre -1 et -nbulles_ghost):
+          const int idx_ghost = get_ghost_number_from_compo(compo);
+          // On la place en fin de tableau :
+          compo = nbulles_reelles - 1 - idx_ghost;
+        }
+      // Calcul des distances entre sommet_i et le centre de gravite
+      const int i0 = facettes(i, 0);
+      const int i1 = facettes(i, 1);
+      const int i2 = facettes(i, 2);
+      const double d_i_0 = sqrt( (sommets(i0, 0)-centre_gravite(compo,0))*(sommets(i0, 0)-centre_gravite(compo,0)) + (sommets(i0, 1)-centre_gravite(compo,1))*(sommets(i0, 1)-centre_gravite(compo,1)) + (sommets(i0, 2)-centre_gravite(compo,2))*(sommets(i0, 2)-centre_gravite(compo,2)) );
+      const double d_i_1 = sqrt( (sommets(i1, 0)-centre_gravite(compo,0))*(sommets(i1, 0)-centre_gravite(compo,0)) + (sommets(i1, 1)-centre_gravite(compo,1))*(sommets(i1, 1)-centre_gravite(compo,1)) + (sommets(i1, 2)-centre_gravite(compo,2))*(sommets(i1, 2)-centre_gravite(compo,2)) );
+      const double d_i_2 = sqrt( (sommets(i2, 0)-centre_gravite(compo,0))*(sommets(i2, 0)-centre_gravite(compo,0)) + (sommets(i2, 1)-centre_gravite(compo,1))*(sommets(i2, 1)-centre_gravite(compo,1)) + (sommets(i2, 2)-centre_gravite(compo,2))*(sommets(i2, 2)-centre_gravite(compo,2)) );
+
+      // On rÃ©cupÃ¨re la plus grande distance et la plus petite distance parmi les 3 calculÃ©es
+      d_imax = std::max(d_i_0,std::max(d_i_1,d_i_2));
+      d_imin = std::min(d_i_0,std::min(d_i_1,d_i_2));
+
+      // On met Ã  jour le grand axe et le petit axe
+      if (d_imax > d_max[compo])
+        d_max[compo] = d_imax;
+
+      if (d_imin < d_min[compo])
+        d_min[compo] = d_imin;
+    }
+
+  mp_min_for_each_item(d_min);
+  mp_max_for_each_item(d_max);
+  for (int i = 0; i < nbulles_tot; i++)
+    {
+      aspect_ratio[i] = d_max[i]/d_min[i];
     }
 }
 
