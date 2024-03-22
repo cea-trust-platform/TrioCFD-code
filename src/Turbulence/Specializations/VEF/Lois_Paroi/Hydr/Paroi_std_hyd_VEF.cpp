@@ -31,7 +31,7 @@
 #include <Debog.h>
 #include <TRUSTList.h>
 #include <EcrFicPartage.h>
-#include <Modele_turbulence_hyd_0_eq_base.h>
+#include <Modele_turbulence_hyd_Longueur_Melange_base.h>
 #include <Neumann_sortie_libre.h>
 #include <Modele_turbulence_hyd_combinaison.h>
 #include <Param.h>
@@ -1585,7 +1585,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       coef_vit=nfac-1;
     }
 
-  bool LM   =(sub_type(Modele_turbulence_hyd_0_eq_base,mon_modele_turb_hyd.valeur()) ? 1 : 0); // Longueur de Melange
+  bool LM   =(sub_type(Modele_turbulence_hyd_Longueur_Melange_base,mon_modele_turb_hyd.valeur()) ? 1 : 0); // Longueur de Melange
   bool COMB =(sub_type(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur()) ? 1 : 0);  //Modele Combinaison (fonction analytique et (ou) dependance a des champs sources)
 
   // Loop on boundaries
