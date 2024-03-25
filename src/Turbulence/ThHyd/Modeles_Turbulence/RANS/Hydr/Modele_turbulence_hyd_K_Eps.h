@@ -51,7 +51,6 @@ public:
   {
     assert((i == 0));
     return eqn_transport_K_Eps_;
-
   }
 
   const Champ_base& get_champ(const Motcle& nom) const override;

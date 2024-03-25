@@ -87,7 +87,6 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Omega::K_Omega() const
   return eqn_transport_K_Omega_.inconnue();
 }
 
-
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
  * e. : (K, Omega). Cette inconnue est portee

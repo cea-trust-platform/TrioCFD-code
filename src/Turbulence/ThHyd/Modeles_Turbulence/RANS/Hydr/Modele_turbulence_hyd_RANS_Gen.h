@@ -181,28 +181,22 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
         {
           Cout << finl << "K_Eps/Omega evolution (" << (avant ? "before" : "after") << " law of the wall applies) at time " << le_champ_K_Eps_ou_Omega.temps() << ":" << finl;
           Cout << "std::min(k)=" << k_min;
-          if (Process::nproc() == 1)
-            Cout << " located at node " << loc_k_min;
+          if (Process::is_sequential()) Cout << " located at node " << loc_k_min;
           Cout << finl;
           Cout << "std::min(eps/omega)=" << eps_ou_omega_min;
-          if (Process::nproc() == 1)
-            Cout << " located at node " << loc_eps_ou_omega_min;
+          if (Process::is_sequential()) Cout << " located at node " << loc_eps_ou_omega_min;
           Cout << finl;
           Cout << "std::min(nut)=" << nut_min;
-          if (Process::nproc() == 1)
-            Cout << " located at node " << loc_nut_min;
+          if (Process::is_sequential()) Cout << " located at node " << loc_nut_min;
           Cout << finl;
           Cout << "std::max(k)=" << k_max;
-          if (Process::nproc() == 1)
-            Cout << " located at node " << loc_k_max;
+          if (Process::is_sequential()) Cout << " located at node " << loc_k_max;
           Cout << finl;
           Cout << "std::max(eps/omega)=" << eps_ou_omega_max;
-          if (Process::nproc() == 1)
-            Cout << " located at node " << loc_eps_ou_omega_max;
+          if (Process::is_sequential()) Cout << " located at node " << loc_eps_ou_omega_max;
           Cout << finl;
           Cout << "std::max(nut)=" << nut_max;
-          if (Process::nproc() == 1)
-            Cout << " located at node " << loc_nut_max;
+          if (Process::is_sequential()) Cout << " located at node " << loc_nut_max;
           Cout << finl;
         }
     }
