@@ -24,8 +24,8 @@ Lire grid_splitting
 IJK_FT_double
 {
   Boundary_Conditions {
-                bctype_kmin Symetrie
-                bctype_kmax Symetrie
+    bctype_kmin Symetrie
+    bctype_kmax Symetrie
   }
   ijk_splitting grid_splitting
   ijk_splitting_ft_extension 22
@@ -33,18 +33,17 @@ IJK_FT_double
   timestep_facsec 0.4
   dt_post 10
   # champs_a_postraiter 1 tous #
-  champs_a_postraiter 7 INTERFACES COURBURE COMPO_CONNEXE VELOCITY PRESSURE
-  		        REPULSION_FT SOURCE_QDM_INTERF
+  champs_a_postraiter 10 INTERFACES COURBURE COMPO_CONNEXE VELOCITY PRESSURE REPULSION_FT SOURCE_QDM_INTERF CELL_RHO_SOURCE_QDM_INTERF RHO CELL_SOURCE_QDM_INTERF
   check_stop_file stop.txt
   dt_sauvegarde 1000
   nb_pas_dt_max 1280
-  
+
   multigrid_solver {
     solver_precision double
     coarsen_operators 3
-      Coarsen_Operator_Uniform {  }
-      Coarsen_Operator_Uniform {  }
-      Coarsen_Operator_Uniform {  } 	
+    Coarsen_Operator_Uniform { }
+    Coarsen_Operator_Uniform { }
+    Coarsen_Operator_Uniform { }
     ghost_size 1
     pre_smooth_steps 1 7
     smooth_steps 1 7
@@ -55,7 +54,7 @@ IJK_FT_double
     impr
   }
   # LECTURE DES INTERFACES DANS UN FICHIER LATA #
-  interfaces 
+  interfaces
   {
     # Soit un fichier genere externe #
     # Choix1 #
@@ -65,11 +64,11 @@ IJK_FT_double
   }
   # FIN AJOUT #
   check_divergence
-  gravite 3 0. 0. 0. 
+  gravite 3 0. 0. 0.
   # vitesse_entree 0.01 #
-   rho_liquide 1000.
-   mu_liquide 1e-3
-   sigma 1.
+  rho_liquide 1000.
+  mu_liquide 1e-3
+  sigma 1.
   expression_vx_init 1.0*0.1
   expression_vy_init 1.2*0.1
   expression_vz_init 0.0
