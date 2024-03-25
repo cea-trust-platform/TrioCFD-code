@@ -22,15 +22,16 @@
 #ifndef Modele_turbulence_hyd_K_Eps_included
 #define Modele_turbulence_hyd_K_Eps_included
 
-#include <Transport_K_Eps.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
+#include <Transport_K_Eps.h>
+
 /*! @brief Classe Modele_turbulence_hyd_K_Eps Cette classe represente le modele de turbulence (k,eps) pour les
  *
  *     equations de Navier-Stokes.
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps: public Modele_turbulence_hyd_RANS_K_Eps_base
+class Modele_turbulence_hyd_K_Eps: public Modele_turbulence_hyd_RANS_K_Eps_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Eps>
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps);
 public:
@@ -46,14 +47,21 @@ public:
 
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
-  const Equation_base& equation_k_eps(int) const override;
+  const Equation_base& equation_k_eps(int i) const override
+  {
+    assert((i == 0));
+    return eqn_transport_K_Eps_;
+
+  }
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
+  void controler() { eqn_transport_K_Eps_.controler_K_Eps(); }
+  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
 protected:
   Transport_K_Eps eqn_transport_K_Eps_;
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  void fill_turbulent_viscosity_tab(const int , const DoubleTab&, const DoubleTab& , const DoubleTab& , const DoubleTab&  , DoubleTab& );
 };
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.

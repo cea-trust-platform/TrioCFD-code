@@ -25,9 +25,6 @@
 #include <TRUSTTabs_forward.h>
 #include <Transport_K_Omega.h>
 
-class Motcle;
-class Champ_Inc;
-class Tensors_Computation_VEF;
 
 /*! @brief Classe Modele_turbulence_hyd_K_Omega Cette classe represente le modele de turbulence (k, omega) pour les
  *
@@ -35,7 +32,7 @@ class Tensors_Computation_VEF;
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Omega: public Modele_turbulence_hyd_RANS_K_Omega_base
+class Modele_turbulence_hyd_K_Omega: public Modele_turbulence_hyd_RANS_K_Omega_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Omega>
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Omega);
 public:
@@ -60,17 +57,18 @@ public:
   inline const DoubleTab& get_enstrophy() const;
   inline DoubleTab& get_enstrophy();
 
-  void fill_turbulent_viscosity_tab(const DoubleTab& tab_K_Omega, DoubleTab& turbulent_viscosity);
-
   const Equation_base& equation_k_omega(int i) const override
   {
     assert((i == 0));
     return eqn_transport_K_Omega_;
   }
 
+  void controler() { eqn_transport_K_Omega_.controler_K_Omega(); }
+  virtual Champ_Fonc& calculer_viscosite_turbulente(double );
+
 protected:
   Transport_K_Omega eqn_transport_K_Omega_;
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double );
+  void fill_turbulent_viscosity_tab(const int n, const DoubleTab& , DoubleTab& );
   DoubleTab blenderF1_; // Blending field for SST model
   DoubleTab fieldF2_; // for the turbulent viscosity in the SST model
   DoubleTab enstrophy_; // for the turbulent viscosity in the SST model
