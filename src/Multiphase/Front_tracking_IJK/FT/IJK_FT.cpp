@@ -1213,7 +1213,7 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                       }
 
                     // coord X
-                    if (i == index_i_real)
+                    if (i == index_i_real%ni)
                       {
                         // On est sur la ligne du plan ou imposer la vitesse
                         go_i = true;
@@ -1229,13 +1229,13 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                         if(direction==0)
                           {
                             double z=dz/2.+(k+offset_k)*dz;
-                            velocity(i,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                            velocity(i%ni,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
                             velocity((i+1)%ni,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
                             velocity((i+2)%ni,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
                           }
                         else
                           {
-                            velocity(i,j,k)=0.;
+                            velocity(i%ni,j,k)=0.;
                             velocity((i+1)%ni,j,k)=0.;
                             velocity((i+2)%ni,j,k)=0.;
 

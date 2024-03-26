@@ -2,99 +2,56 @@
 Parametres {
 	Titre "Shear-periodicity condition (velocity jump at z-boundary + desynchronization of z-border) "
 	Auteur "A. du Cluzeau"
-	CasTest . perio_shear_defilant.data 
-	CasTest . mixte_shear_avec_bulle.data 
+	CasTest . mixte_shear_avec_bulle_et_upstream_velocity.data 9
 	CasTest . mixte_shear_avec_bulle_9proc.data 9
 	CasTest . mixte_shear_avec_bulle_9proc_reprise.data 9
 }
 
 
-
-
 Chapitre {
 
-Titre "Monophasique"
+	figure {
+		titre "Position des bulles en z"
+		incluredesccourbes 0
+		labelX  "t"
+		labelY "centre_z"
+				Courbe {
+		   fichier mixte_shear_avec_bulle_et_upstream_velocity_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "mixte_shear_avec_bulle_et_upstream_velocity"
+		}
+				Courbe {
+		   fichier mixte_shear_avec_bulle_9proc_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "mixte_shear_avec_bulle_9proc"
+		}
+				Courbe {
+		   fichier mixte_shear_avec_bulle_9proc_reprise_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "mixte_shear_avec_bulle_9proc_reprise"
+		}
+		}
 
-
-	visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor perio_shear_defilant.lata DOM_dual VELOCITY_X FACES
-	}
-		visu {
-		titre "Shear periodicity avec defilement : Etat final (PRESSURE)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor perio_shear_defilant.lata DOM PRESSURE ELEM
-	}
+			figure {
+		titre "Position des bulles en x"
+		incluredesccourbes 0
+		labelX  "t"
+		labelY "centre_x"
+				Courbe {
+		   fichier mixte_shear_avec_bulle_et_upstream_velocity_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "mixte_shear_avec_bulle_et_upstream_velocity"
+		}
+				Courbe {
+		   fichier mixte_shear_avec_bulle_9proc_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "mixte_shear_avec_bulle_9proc"
+		}
+				Courbe {
+		   fichier mixte_shear_avec_bulle_9proc_reprise_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "mixte_shear_avec_bulle_9proc_reprise"
+		}
+		}
 }
 
-
-Chapitre {
-
-Titre "Diphasique sequentiel"
-
-	visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle.lata DOM_dual VELOCITY_X FACES
-	}
-	
-		visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle.lata DOM PRESSURE ELEM
-	}
-
-}
-
-Chapitre {
-
-Titre "Diphasique parallele"
-
-	visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle_9proc.lata DOM_dual VELOCITY_X FACES
-	}
-	
-		visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle_9proc.lata DOM PRESSURE ELEM
-	}
-
-}
-
-Chapitre {
-
-Titre "Reprise"
-
-	visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle_9proc_reprise.lata DOM_dual VELOCITY_X FACES
-	}
-	
-		visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle_9proc_reprise.lata DOM PRESSURE ELEM
-	}
-
-}
