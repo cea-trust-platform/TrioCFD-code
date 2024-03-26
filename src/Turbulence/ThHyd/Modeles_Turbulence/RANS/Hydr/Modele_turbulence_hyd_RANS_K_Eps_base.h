@@ -59,7 +59,7 @@ public:
       return associe_modele_fonction().valeur().calcul_tenseur_Re(nu_turb, grad, Re);
     else
       return false;
-  };
+  }
 
 protected:
   Modele_Fonc_Bas_Reynolds mon_modele_fonc_;

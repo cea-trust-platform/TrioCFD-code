@@ -16,8 +16,8 @@
 #ifndef Modele_turbulence_hyd_K_Eps_Bas_Reynolds_included
 #define Modele_turbulence_hyd_K_Eps_Bas_Reynolds_included
 
-#include <Modele_turbulence_hyd_K_Eps.h>
 #include <Transport_K_Eps_Bas_Reynolds.h>
+#include <Modele_turbulence_hyd_K_Eps.h>
 
 class Domaine_Cl_dis;
 class Domaine_dis;
@@ -28,7 +28,7 @@ class Domaine_dis;
  *  Cette classe represente le modele de turbulence (k,eps) pour de faible nombre de Reynolds.
  *
  */
-class Modele_turbulence_hyd_K_Eps_Bas_Reynolds: public Modele_turbulence_hyd_RANS_K_Eps_base
+class Modele_turbulence_hyd_K_Eps_Bas_Reynolds: public Modele_turbulence_hyd_RANS_K_Eps_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Eps_Bas_Reynolds>
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Bas_Reynolds);
 public:
@@ -49,10 +49,12 @@ public:
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
 
   void imprimer(Sortie&) const override { /* Don nothing */ }
+  void controler() { eqn_transport_K_Eps_Bas_Re_.controler_K_Eps(); }
+  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
 private:
   Transport_K_Eps_Bas_Reynolds eqn_transport_K_Eps_Bas_Re_;
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  void fill_turbulent_viscosity_tab(const int , const DoubleTab&, const DoubleTab& , DoubleTab& );
 };
 
-#endif
+#endif /* Modele_turbulence_hyd_K_Eps_Bas_Reynolds_included */

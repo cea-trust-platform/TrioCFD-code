@@ -27,8 +27,9 @@
 #include <Champ_Inc_P0_base.h>
 #include <Equation_base.h>
 #include <Champ_Inc.h>
+#include <type_traits>
 
-enum class MODELE_TYPE { K_EPS , K_EPS_2_COUCHES , K_OMEGA };
+enum class MODELE_TYPE { K_EPS , K_EPS_2_COUCHES, K_EPS_BAS_REYNOLDS , K_EPS_REALISABLE, K_OMEGA };
 
 template <typename MODELE>
 class Modele_turbulence_hyd_RANS_Gen
@@ -40,9 +41,14 @@ private:
 public:
   DoubleTab& complete_viscosity_field(const int , const Domaine_dis_base& , Champ_Inc& );
 
-  template <MODELE_TYPE M_TYPE>
-  void calculate_limit_viscosity(Champ_Inc& , double );
+  template <MODELE_TYPE M_TYPE> std::enable_if_t<(M_TYPE !=  MODELE_TYPE::K_EPS_2_COUCHES && M_TYPE !=  MODELE_TYPE::K_EPS_BAS_REYNOLDS), void>
+  calculate_limit_viscosity(Champ_Inc& , double );
 
+  template <MODELE_TYPE M_TYPE> std::enable_if_t<M_TYPE ==  MODELE_TYPE::K_EPS_2_COUCHES, void>
+  calculate_limit_viscosity(Champ_Inc& , double );
+
+  template <MODELE_TYPE M_TYPE> std::enable_if_t<M_TYPE ==  MODELE_TYPE::K_EPS_BAS_REYNOLDS, void>
+  calculate_limit_viscosity(Champ_Inc& , double );
 };
 
 template <typename MODELE>
@@ -57,20 +63,13 @@ DoubleTab& Modele_turbulence_hyd_RANS_Gen<MODELE>::complete_viscosity_field(cons
   return visc->valeurs();
 }
 
-template <typename MODELE> template <MODELE_TYPE M_TYPE>
-void Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_K_Eps_ou_Omega, double LeCmu)
+template<typename MODELE> template<MODELE_TYPE M_TYPE>
+std::enable_if_t<(M_TYPE !=  MODELE_TYPE::K_EPS_2_COUCHES && M_TYPE !=  MODELE_TYPE::K_EPS_BAS_REYNOLDS), void>
+Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_K_Eps_ou_Omega, double LeCmu)
 {
-  static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA), IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES);
+  static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA);
   auto *z_class = static_cast<MODELE*>(this); // CRTP --> I love you :*
-
   const Milieu_base& mil = z_class->equation().probleme().milieu();
-
-  /*
-   * XXX Elie Saikali
-   * Attention a l'ordre ici ... je garde le comportement du code initial
-   */
-  if (IS_2_COUCHES) /* seulement si 2_couches on commence par ca ... sinon voir plus tard */
-    z_class->controler();
 
   // on divise par rho en QC pour revenir a K et Eps/Omega
   if (z_class->equation().probleme().is_dilatable())
@@ -78,17 +77,9 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc
 
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 1);
 
-  if (!IS_2_COUCHES) /* si pas 2_couches ... */
-    {
-      z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
-      z_class->controler();
-    }
-
+  z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
+  z_class->controler();
   z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
-
-  if (IS_2_COUCHES) /* si pas 2_couches ... */
-    z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
-
   z_class->limiter_viscosite_turbulente();
 
   // on remultiplie par rho
@@ -104,12 +95,51 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 0);
 }
 
+template<typename MODELE> template<MODELE_TYPE M_TYPE>
+std::enable_if_t<M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES, void>
+Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_K_Eps_ou_Omega, double LeCmu)
+{
+  auto *z_class = static_cast<MODELE*>(this); // CRTP --> I love you :*
+  const Milieu_base& mil = z_class->equation().probleme().milieu();
+
+  z_class->controler();
+
+  // on divise par rho en QC pour revenir a K et Eps/Omega
+  if (z_class->equation().probleme().is_dilatable())
+    diviser_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
+
+  z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
+  z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
+  z_class->limiter_viscosite_turbulente();
+
+  // on remultiplie par rho
+  if (z_class->equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*z_class);
+    }
+
+  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
+}
+
+template<typename MODELE> template<MODELE_TYPE M_TYPE>
+std::enable_if_t<M_TYPE == MODELE_TYPE::K_EPS_BAS_REYNOLDS, void>
+Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_K_Eps_ou_Omega, double LeCmu)
+{
+  auto *z_class = static_cast<MODELE*>(this); // CRTP --> I love you :*
+  z_class->controler();
+  z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
+  z_class->limiter_viscosite_turbulente();
+  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
+}
+
 template <typename MODELE> template <MODELE_TYPE M_TYPE>
 void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le_champ_K_Eps_ou_Omega, const Schema_Temps_base& sch, const double LeCmu, const int avant)
 {
-  static constexpr bool IS_K_EPS = (M_TYPE == MODELE_TYPE::K_EPS), IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES);
+  static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA), IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES),
+                        IS_BAS_REYNOLDS = (M_TYPE == MODELE_TYPE::K_EPS_BAS_REYNOLDS);
 
-  if (IS_2_COUCHES) return; /* Do nothing */
+  if (IS_2_COUCHES || IS_BAS_REYNOLDS) return; /* Do nothing */
 
   if (sch.nb_pas_dt() == 0 || sch.limpr())
     {
@@ -136,7 +166,7 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
           const double epsOuomega = K_Eps_ou_Omega(n, 1);
           double nut = 0;
 
-          const double num = IS_K_EPS ? LeCmu * k * k : k;
+          const double num = IS_K_OMEGA ? k : LeCmu * k * k;
 
           if (epsOuomega > 0)
             nut = num / epsOuomega;

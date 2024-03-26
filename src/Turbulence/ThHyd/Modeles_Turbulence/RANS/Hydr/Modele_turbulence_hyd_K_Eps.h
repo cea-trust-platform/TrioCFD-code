@@ -111,4 +111,4 @@ inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps
   return eqn_transport_K_Eps_;
 }
 
-#endif
+#endif /* Modele_turbulence_hyd_K_Eps_included */

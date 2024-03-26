@@ -29,7 +29,7 @@ class Domaine_dis;
  *  Cette classe represente le modele de turbulence (k,eps) realisable
  *
  */
-class Modele_turbulence_hyd_K_Eps_Realisable: public Modele_turbulence_hyd_RANS_K_Eps_base
+class Modele_turbulence_hyd_K_Eps_Realisable: public Modele_turbulence_hyd_RANS_K_Eps_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Eps_Realisable>
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Realisable);
 public:
@@ -53,12 +53,13 @@ public:
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
+  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  void controler() { eqn_transport_K_Eps_Rea_.controler_K_Eps(); }
 
 private:
   Modele_Fonc_Realisable mon_modele_fonc_;
   Transport_K_Eps_Realisable eqn_transport_K_Eps_Rea_;
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
-  void imprimer_evolution_keps_realisable(int avant) const;
+  void fill_turbulent_viscosity_tab(const int , const DoubleTab&, DoubleTab& );
 };
 
-#endif
+#endif /* Modele_turbulence_hyd_K_Eps_Realisable_included */

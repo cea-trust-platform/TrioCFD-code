@@ -85,27 +85,26 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
           Cerr << "visco_turb_K_eps size is " << visco_turb_K_eps.size() << " instead of " << n << finl;
           exit();
         }
-      for (int i = 0; i < n; i++)
-        {
-          if (tab_K_Eps(i, 1) <= EPS_MIN_)
-            visco_turb_K_eps[i] = 0;
-          else
-            visco_turb_K_eps[i] = CMU * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
-        }
+
+      fill_turbulent_viscosity_tab(n, tab_K_Eps, visco_turb_K_eps);
       la_viscosite_turbulente_->affecter(visco_turb_au_format_K_eps.valeur());
     }
   else
-    {
-      for (int i = 0; i < n; i++)
-        {
-          if (tab_K_Eps(i, 1) <= EPS_MIN_)
-            visco_turb[i] = 0;
-          else
-            visco_turb[i] = CMU * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
-        }
-    }
+    fill_turbulent_viscosity_tab(n, tab_K_Eps, visco_turb);
+
   la_viscosite_turbulente_.changer_temps(temps);
   return la_viscosite_turbulente_;
+}
+
+void Modele_turbulence_hyd_K_Eps_2_Couches::fill_turbulent_viscosity_tab(const int n, const DoubleTab& tab_K_Eps,  DoubleTab& turbulent_viscosity)
+{
+  for (int i = 0; i < n; i++)
+    {
+      if (tab_K_Eps(i, 1) <= EPS_MIN_)
+        turbulent_viscosity[i] = 0.;
+      else
+        turbulent_viscosity[i] = CMU * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
+    }
 }
 
 int Modele_turbulence_hyd_K_Eps_2_Couches::preparer_calcul()

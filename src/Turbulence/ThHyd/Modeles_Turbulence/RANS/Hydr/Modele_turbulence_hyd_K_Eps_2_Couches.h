@@ -63,6 +63,7 @@ public:
 
 private:
   Transport_K_KEps eqn_transport_K_Eps_;
+  void fill_turbulent_viscosity_tab(const int , const DoubleTab&, DoubleTab& );
 };
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
@@ -165,4 +166,4 @@ inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K
   return eqn_transport_K_Eps_;
 }
 
-#endif
+#endif /* Modele_turbulence_hyd_K_Eps_2_Couches_included */

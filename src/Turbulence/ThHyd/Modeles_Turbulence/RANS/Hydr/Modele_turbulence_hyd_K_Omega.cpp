@@ -232,6 +232,5 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
 
 void Modele_turbulence_hyd_K_Omega::verifie_loi_paroi()
 {
-  //Nom lp = loipar.valeur().que_suis_je();
   Cerr << "We should probably do something here... Should be negligeable, isn't it?" << finl;
 }

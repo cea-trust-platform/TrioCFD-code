@@ -182,4 +182,4 @@ inline DoubleTab& Modele_turbulence_hyd_K_Omega::get_enstrophy()
   return enstrophy_;
 }
 
-#endif
+#endif /* Modele_turbulence_hyd_K_Omega_included */

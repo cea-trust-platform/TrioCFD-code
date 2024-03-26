@@ -80,7 +80,6 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
   DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_transp_K_Eps().milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  //  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int n = tab_K_Eps.dimension(0);
   DoubleTab Fmu(n);
 
@@ -102,73 +101,50 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
     {
       Champ_Inc visco_turb_au_format_K_eps_Bas_Re;
       visco_turb_au_format_K_eps_Bas_Re.typer(type);
-      Champ_Inc_base& ch_visco_turb_K_eps_Bas_Re = visco_turb_au_format_K_eps_Bas_Re.valeur();
-      ch_visco_turb_K_eps_Bas_Re.associer_domaine_dis_base(eqn_transp_K_Eps().domaine_dis().valeur());
-      ch_visco_turb_K_eps_Bas_Re.nommer("diffusivite_turbulente");
-      ch_visco_turb_K_eps_Bas_Re.fixer_nb_comp(1);
-      ch_visco_turb_K_eps_Bas_Re.fixer_nb_valeurs_nodales(n);
-      ch_visco_turb_K_eps_Bas_Re.fixer_unite("inconnue");
-      ch_visco_turb_K_eps_Bas_Re.changer_temps(0.);
+      DoubleTab& visco_turb_K_eps_Bas_Re = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis().valeur(), visco_turb_au_format_K_eps_Bas_Re);
 
-      DoubleTab& visco_turb_K_eps_Bas_Re = ch_visco_turb_K_eps_Bas_Re.valeurs();
       if (visco_turb_K_eps_Bas_Re.size() != n)
         {
           Cerr << "visco_turb_K_eps_Bas_Re size is " << visco_turb_K_eps_Bas_Re.size() << " instead of " << n << finl;
           exit();
         }
 
-      for (int i = 0; i < n; i++)
-        {
-          if (tab_K_Eps(i, 1) <= DMINFLOAT)
-            visco_turb_K_eps_Bas_Re[i] = 0;
-          else
-            visco_turb_K_eps_Bas_Re[i] = CMU * Fmu(i) * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
-        }
+      fill_turbulent_viscosity_tab(n, tab_K_Eps, Fmu, visco_turb_K_eps_Bas_Re);
 
       la_viscosite_turbulente_->affecter(visco_turb_au_format_K_eps_Bas_Re.valeur());
-
     }
   else
-    {
-      for (int i = 0; i < n; i++)
-        {
-          if (tab_K_Eps(i, 1) <= DMINFLOAT)
-            visco_turb[i] = 0;
-          else
-            visco_turb[i] = CMU * Fmu(i) * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
-        }
-    }
+    fill_turbulent_viscosity_tab(n, tab_K_Eps, Fmu, visco_turb);
+
   la_viscosite_turbulente_.changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
+void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::fill_turbulent_viscosity_tab(const int n, const DoubleTab& tab_K_Eps, const DoubleTab& Fmu, DoubleTab& turbulent_viscosity)
+{
+  for (int i = 0; i < n; i++)
+    {
+      if (tab_K_Eps(i, 1) <= DMINFLOAT)
+        turbulent_viscosity[i] = 0.;
+      else
+        turbulent_viscosity[i] = LeCmu_ * Fmu(i) * tab_K_Eps(i, 0) * tab_K_Eps(i, 0) / tab_K_Eps(i, 1);
+    }
+}
+
 int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::preparer_calcul()
 {
-  eqn_transp_K_Eps().preparer_calcul();
-  return 1;
-  // provisoire
-  /*
-   Modele_turbulence_hyd_RANS_K_Eps_base::preparer_calcul();
-   calculer_viscosite_turbulente(K_Eps().temps());
-   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
-   return 1;
-   */
+  return eqn_transp_K_Eps().preparer_calcul();
 }
 
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour(double temps)
 {
-  Champ_Inc& ch_K_Eps = K_Eps();
   Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
-  // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
   eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
   sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
   eqn_transp_K_Eps().mettre_a_jour(temps);
 
   statistiques().begin_count(nut_counter_);
-  eqn_transp_K_Eps().controler_K_Eps();
-  calculer_viscosite_turbulente(ch_K_Eps.temps());
-  limiter_viscosite_turbulente();
-  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  calculate_limit_viscosity<MODELE_TYPE::K_EPS_BAS_REYNOLDS>(K_Eps(), -123. /* unused */);
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
   statistiques().end_count(nut_counter_);
 }
