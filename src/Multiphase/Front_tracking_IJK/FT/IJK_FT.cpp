@@ -1104,17 +1104,13 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
 
   // position des plans : conversion en indice du tableau NS
   // en shear perio, pas de decoupage sur x. les index_i sont compris entre 0 et ni_tot
-  double x2 = (xobj_offsetp-origin_x)/ dx;
-  int index_i_offsetp = (int)(floor(x2)) - offset_i;
   int ni = vy.ni();
-  x2 = (xobj_offsetm-origin_x)/ dx;
-  int index_i_offsetm = (int)(floor(x2)) - offset_i;
-  x2 = (xobj-origin_x)/ dx;
-  int index_i = (int)(floor(x2)) - offset_i;
-
+  int index_i_offsetp = (int)(round((xobj_offsetp-origin_x)/ dx)) - offset_i;
+  int index_i_offsetm = (int)(round((xobj_offsetm-origin_x)/ dx)) - offset_i;
+  int index_i =         (int)(round((xobj        -origin_x)/ dx)) - offset_i;
   // decoupage en z autorise. ATTENTION, indices locaux potentiellement negatifs
-  int index_k_min = (int)(floor((z_min_modulo-origin_z)/ dz)) - offset_k;
-  int index_k_max = (int)(floor((z_max_modulo-origin_z)/ dz)) - offset_k;
+  int index_k_min = (int)(round((z_min_modulo-origin_z)/ dz)) - offset_k;
+  int index_k_max = (int)(((z_max_modulo-origin_z)/ dz)) - offset_k;
 
   {
     for (int direction = 0; direction < 3; direction++)
@@ -1133,12 +1129,12 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                     // coord Z
                     if (z_min_modulo>z_max_modulo)
                       {
-                        // la bulle est a cheval sur la frontiere z
+                        // la plan est a cheval sur la frontiere z
                         // Il y donc deux plans distincts ou imposer la vitesse
                         // un pour la bulle "de droite" (k=nk), un pour la bulle "de gauche" (k=0).
-                        if(z_min_modulo!=z_min)
+                        if(z_min<origin_z)
                           {
-                            // la bulle reelle (compo connex >0) va de la droite vers la gauche.
+                            // la bulle reelle est en 0
                             // la bulle fantome est soumise a un shear positif
                             if (k>index_k_min and index_k_min<velocity.nk())
                               {
@@ -1155,9 +1151,9 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
 
                               }
                           }
-                        else if (z_max_modulo!=z_max)
+                        else if(z_max>lz+origin_z)
                           {
-                            // la bulle reelle (compo connex >0) va de la gauche vers la droite.
+                            // la bulle reelle est en nk
                             // la bulle fantome est soumise a un shear negatif
                             if (k>index_k_min and index_k_min<velocity.nk())
                               {
@@ -1175,13 +1171,43 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                       }
                     else
                       {
-                        // la bulle ne traverse pas la frontiere z
-                        // un seul plan defini pour la bulle reelle
-                        if ((index_k_min<velocity.nk() and k>index_k_min) and (k<index_k_max and index_k_max>=0))
+                        // le plan ne traverse pas la frontiere z
+                        // un seul plan defini pour la bulle entiere
+                        if (z_max_modulo!=z_max and z_min_modulo!=z_min)
                           {
-                            index_i_real = index_i;
-                            go_k = true ;
+                            // le plan est entierement contenu dans le domaine etendu
+                            // pas a cheval sur la frontiere dz
+                            // lechange de compo n a pas encore ete fait
+                            if (z_min<origin_z)
+                              {
+                                if ((index_k_min<velocity.nk() and k>index_k_min) and (k<index_k_max and index_k_max>=0))
+                                  {
+                                    index_i_real = index_i_offsetp;
+                                    go_k = true ;
+                                  }
+                              }
+                            else if (z_max>lz+origin_z)
+                              {
+                                if ((index_k_min<velocity.nk() and k>index_k_min) and (k<index_k_max and index_k_max>=0))
+                                  {
+                                    index_i_real = index_i_offsetm;
+                                    go_k = true ;
+                                  }
+                              }
+
+
                           }
+                        else
+                          {
+                            // la bulle reelle est entierement dans le domaine NS
+                            if ((index_k_min<velocity.nk() and k>index_k_min) and (k<index_k_max and index_k_max>=0))
+                              {
+                                index_i_real = index_i;
+                                go_k = true ;
+                              }
+                          }
+
+
 
                       }
 
