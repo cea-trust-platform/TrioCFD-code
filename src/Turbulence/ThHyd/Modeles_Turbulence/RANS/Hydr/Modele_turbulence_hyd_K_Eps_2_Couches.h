@@ -30,7 +30,7 @@
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps_2_Couches: public Modele_turbulence_hyd_RANS_K_Eps_base
+class Modele_turbulence_hyd_K_Eps_2_Couches: public Modele_turbulence_hyd_RANS_K_Eps_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Eps_2_Couches>
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches);
 public:
@@ -51,11 +51,18 @@ public:
 
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
-  const Equation_base& equation_k_eps(int) const override;
+  const Equation_base& equation_k_eps(int i) const override
+  {
+    assert((i == 0));
+    return eqn_transport_K_Eps_;
+  }
+
+  void controler() { eqn_transport_K_Eps_.controler_K_Eps(); }
+
+  Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
 private:
   Transport_K_KEps eqn_transport_K_Eps_;
-  Champ_Fonc& calculer_viscosite_turbulente(double temps);
 };
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.

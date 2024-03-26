@@ -28,7 +28,7 @@
 #include <Equation_base.h>
 #include <Champ_Inc.h>
 
-enum class MODELE_TYPE { K_EPS , K_OMEGA };
+enum class MODELE_TYPE { K_EPS , K_EPS_2_COUCHES , K_OMEGA };
 
 template <typename MODELE>
 class Modele_turbulence_hyd_RANS_Gen
@@ -60,37 +60,56 @@ DoubleTab& Modele_turbulence_hyd_RANS_Gen<MODELE>::complete_viscosity_field(cons
 template <typename MODELE> template <MODELE_TYPE M_TYPE>
 void Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_K_Eps_ou_Omega, double LeCmu)
 {
-  static constexpr bool IS_K_EPS = (M_TYPE == MODELE_TYPE::K_EPS);
+  static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA), IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES);
   auto *z_class = static_cast<MODELE*>(this); // CRTP --> I love you :*
 
   const Milieu_base& mil = z_class->equation().probleme().milieu();
+
+  /*
+   * XXX Elie Saikali
+   * Attention a l'ordre ici ... je garde le comportement du code initial
+   */
+  if (IS_2_COUCHES) /* seulement si 2_couches on commence par ca ... sinon voir plus tard */
+    z_class->controler();
 
   // on divise par rho en QC pour revenir a K et Eps/Omega
   if (z_class->equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
 
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 1);
-  z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
-  z_class->controler();
+
+  if (!IS_2_COUCHES) /* si pas 2_couches ... */
+    {
+      z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
+      z_class->controler();
+    }
 
   z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
+
+  if (IS_2_COUCHES) /* si pas 2_couches ... */
+    z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
+
   z_class->limiter_viscosite_turbulente();
 
   // on remultiplie par rho
-  if ( z_class->equation().probleme().is_dilatable())
+  if (z_class->equation().probleme().is_dilatable())
     {
       multiplier_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
-      if (IS_K_EPS) correction_nut_et_cisaillement_paroi_si_qc(*z_class);
+      if (!IS_K_OMEGA)
+        correction_nut_et_cisaillement_paroi_si_qc(*z_class);
     }
 
   z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
+
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 0);
 }
 
 template <typename MODELE> template <MODELE_TYPE M_TYPE>
 void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le_champ_K_Eps_ou_Omega, const Schema_Temps_base& sch, const double LeCmu, const int avant)
 {
-  static constexpr bool IS_K_EPS = (M_TYPE == MODELE_TYPE::K_EPS);
+  static constexpr bool IS_K_EPS = (M_TYPE == MODELE_TYPE::K_EPS), IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES);
+
+  if (IS_2_COUCHES) return; /* Do nothing */
 
   if (sch.nb_pas_dt() == 0 || sch.limpr())
     {

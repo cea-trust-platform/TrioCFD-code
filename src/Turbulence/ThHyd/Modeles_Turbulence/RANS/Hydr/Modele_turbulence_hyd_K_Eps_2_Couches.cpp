@@ -77,17 +77,8 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
   if (visco_turb.size() != n)
     {
       Champ_Inc visco_turb_au_format_K_eps;
-
       visco_turb_au_format_K_eps.typer(type);
-      Champ_Inc_base& ch_visco_turb_K_eps = visco_turb_au_format_K_eps.valeur();
-      ch_visco_turb_K_eps.associer_domaine_dis_base(eqn_transport_K_Eps_.domaine_dis().valeur());
-      ch_visco_turb_K_eps.nommer("diffusivite_turbulente");
-      ch_visco_turb_K_eps.fixer_nb_comp(1);
-      ch_visco_turb_K_eps.fixer_nb_valeurs_nodales(n);
-      ch_visco_turb_K_eps.fixer_unite("inconnue");
-      ch_visco_turb_K_eps.changer_temps(0.);
-
-      DoubleTab& visco_turb_K_eps = ch_visco_turb_K_eps.valeurs();
+      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transport_K_Eps_.domaine_dis().valeur(), visco_turb_au_format_K_eps);
 
       if (visco_turb_K_eps.size() != n)
         {
@@ -142,30 +133,13 @@ bool Modele_turbulence_hyd_K_Eps_2_Couches::initTimeStep(double dt)
  */
 void Modele_turbulence_hyd_K_Eps_2_Couches::mettre_a_jour(double temps)
 {
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
-  Champ_Inc& ch_K_Eps = K_Eps();
   Schema_Temps_base& sch = eqn_transport_K_Eps_.schema_temps();
-  // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
   eqn_transport_K_Eps_.domaine_Cl_dis().mettre_a_jour(temps);
   sch.faire_un_pas_de_temps_eqn_base(eqn_transport_K_Eps_);
   eqn_transport_K_Eps_.mettre_a_jour(temps);
 
   statistiques().begin_count(nut_counter_);
-  eqn_transport_K_Eps_.controler_K_Eps();
-  const Milieu_base& mil = equation().probleme().milieu();
-  // on divise K_eps par rho en QC pour revenir a K et Eps
-  if (equation().probleme().is_dilatable())
-    diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(), mil);
-  calculer_viscosite_turbulente(ch_K_Eps.temps());
-  loipar_->calculer_hyd(visco_turb, ch_K_Eps.valeurs());
-  limiter_viscosite_turbulente();
-  // on remultiplie K_eps par rho
-  if (equation().probleme().is_dilatable())
-    {
-      multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(), mil);
-      correction_nut_et_cisaillement_paroi_si_qc(*this);
-    }
-  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  calculate_limit_viscosity<MODELE_TYPE::K_EPS_2_COUCHES>(K_Eps(), LeCmu_);
   statistiques().end_count(nut_counter_);
 }
 
@@ -176,11 +150,4 @@ void Modele_turbulence_hyd_K_Eps_2_Couches::completer()
 {
   eqn_transp_K_Eps().completer();
   verifie_loi_paroi();
-}
-
-const Equation_base& Modele_turbulence_hyd_K_Eps_2_Couches::equation_k_eps(int i) const
-{
-  assert((i == 0));
-  return eqn_transport_K_Eps_;
-
 }
