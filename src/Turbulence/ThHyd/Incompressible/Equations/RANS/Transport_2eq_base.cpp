@@ -29,12 +29,8 @@
 #include <Param.h>
 #include <Debog.h>
 
-Implemente_base_sans_constructeur(Transport_2eq_base, "Transport_2eq_base", Equation_base);
+Implemente_base(Transport_2eq_base, "Transport_2eq_base", Equation_base);
 
-Transport_2eq_base::Transport_2eq_base()
-{
-  champs_compris_.ajoute_nom_compris("2eq_residu");
-}
 
 /*! @brief
  *

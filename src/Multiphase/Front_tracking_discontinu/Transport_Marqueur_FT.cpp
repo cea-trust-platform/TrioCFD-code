@@ -55,8 +55,6 @@ Transport_Marqueur_FT::Transport_Marqueur_FT()
   methode_couplage_ = SUIVI;
   phase_marquee_ = -1;
   contrib_one_way = 1;
-  champs_compris_.ajoute_nom_compris("densite_particules");
-  champs_compris_.ajoute_nom_compris("volume_particules");
 
 }
 
@@ -1219,6 +1217,17 @@ void Transport_Marqueur_FT::update_tableaux_apres_transport(Maillage_FT_Disc& ma
     }
 }
 
+void Transport_Marqueur_FT::get_noms_champs_postraitables(Noms& nom,Option opt) const
+{
+  Equation_base::get_noms_champs_postraitables(nom,opt);
+  Noms noms_compris = champs_compris_.liste_noms_compris();
+  noms_compris.add("densite_particules");
+  noms_compris.add("volume_particules");
+  if (opt==DESCRIPTION)
+    Cerr<<" Transport_Marqueur_FT : "<< noms_compris <<finl;
+  else
+    nom.add(noms_compris);
+}
 
 void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
 {

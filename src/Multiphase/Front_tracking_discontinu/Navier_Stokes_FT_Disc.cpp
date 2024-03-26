@@ -865,7 +865,7 @@ void Navier_Stokes_FT_Disc::discretiser()
   champs_compris.add(variables_internes().second_membre_projection_jump_.valeur());
   champs_compris_.ajoute_champ(variables_internes().second_membre_projection_jump_);
   dis.discretiser_champ("vitesse", mon_dom_dis,
-                        "gradient_pression", "",
+                        "gradient_pression_interne", "m/s2",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().gradient_pression);
   champs_compris.add(variables_internes().gradient_pression.valeur());

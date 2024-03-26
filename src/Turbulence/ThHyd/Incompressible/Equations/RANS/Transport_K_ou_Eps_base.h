@@ -39,11 +39,10 @@ class Champ_Inc_base;
 class Transport_K_ou_Eps_base: public Equation_base
 {
 
-  Declare_base_sans_constructeur(Transport_K_ou_Eps_base);
+  Declare_base(Transport_K_ou_Eps_base);
 
 public:
 
-  Transport_K_ou_Eps_base();
   void set_param(Param&) override;
   double calculer_pas_de_temps() const override;
   inline void associer_vitesse(const Champ_base& );

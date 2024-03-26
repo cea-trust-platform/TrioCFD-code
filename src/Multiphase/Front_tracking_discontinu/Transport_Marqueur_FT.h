@@ -153,6 +153,7 @@ public:
   //Methode creer_champ pas codee a surcharger si necessaire
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
   //methodes utilisees pour le post-traitement des quantites lagrangiennes

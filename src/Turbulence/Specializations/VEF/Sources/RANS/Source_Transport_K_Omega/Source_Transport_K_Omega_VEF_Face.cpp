@@ -40,9 +40,18 @@ Entree& Source_Transport_K_Omega_VEF_Face::readOn(Entree& is)
 {
   Source_Transport_K_Omega_VEF_Face_base::verifier_pb_komega(mon_equation->probleme(),que_suis_je());
   Source_Transport_K_Omega_VEF_Face_base::readOn(is);
-
-  champs_compris_.ajoute_nom_compris(Nom("grad_k_grad_omega"));
   return (is);
+}
+
+void Source_Transport_K_Omega_VEF_Face::get_noms_champs_postraitables(Noms& nom,Option opt) const
+{
+  Source_Transport_K_Omega_VEF_Face_base::get_noms_champs_postraitables(nom,opt);
+  Noms noms_compris = champs_compris_.liste_noms_compris();
+  noms_compris.add("grad_k_grad_omega");
+  if (opt==DESCRIPTION)
+    Cerr<<" Source_Transport_K_Omega_VEF_Face : "<< noms_compris <<finl;
+  else
+    nom.add(noms_compris);
 }
 
 void Source_Transport_K_Omega_VEF_Face::creer_champ(const Motcle& nom )

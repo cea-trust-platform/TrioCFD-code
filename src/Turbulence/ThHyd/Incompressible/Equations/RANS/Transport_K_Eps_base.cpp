@@ -29,19 +29,8 @@
 #include <Param.h>
 #include <Debog.h>
 
-Implemente_base_sans_constructeur(Transport_K_Eps_base, "Transport_K_Eps_base", Transport_2eq_base);
+Implemente_base(Transport_K_Eps_base, "Transport_K_Eps_base", Transport_2eq_base);
 
-Transport_K_Eps_base::Transport_K_Eps_base()
-{
-  champs_compris_.ajoute_nom_compris("K_Eps_residu");
-  /*
-    Noms& nom=champs_compris_.liste_noms_compris();
-    nom.dimensionner(3);
-    nom[0]="k";
-    nom[1]="eps";
-    nom[2]="k_eps";
-  */
-}
 
 /*! @brief
  *
