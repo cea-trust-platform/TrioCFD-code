@@ -20,19 +20,18 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Modele_turbulence_hyd_K_Eps_Realisable_Bicephale.h>
-#include <Probleme_base.h>
-#include <Schema_Temps_base.h>
-#include <Fluide_Incompressible.h>
-#include <Champ_Uniforme.h>
-#include <Schema_Temps.h>
-#include <Debog.h>
-#include <stat_counters.h>
-#include <Param.h>
-#include <Modele_Shih_Zhu_Lumley_VEF.h>
 #include <Modifier_pour_fluide_dilatable.h>
 #include <Modele_turbulence_scal_base.h>
+#include <Modele_Shih_Zhu_Lumley_VEF.h>
+#include <Fluide_Incompressible.h>
+#include <Schema_Temps_base.h>
+#include <Champ_Uniforme.h>
+#include <stat_counters.h>
+#include <Probleme_base.h>
+#include <Schema_Temps.h>
 #include <TRUSTTrav.h>
-#include <communications.h>
+#include <Param.h>
+#include <Debog.h>
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, "Modele_turbulence_hyd_K_Epsilon_Realisable_Bicephale", Modele_turbulence_hyd_RANS_Bicephale_base);
 
@@ -83,12 +82,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente K", tab_K);
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente Epsilon", tab_Eps);
   DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
-
   int n = tab_K.dimension(0);
-
-  const DoubleTab& Cmu = get_modele_fonction().get_Cmu(); // attention : il faut qu'il soit deja calcule!
-
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente Cmu", Cmu);
 
   // dans le cas d'un domaine nul on doit effectuer le dimensionnement
   double non_prepare = 1;
@@ -100,45 +94,36 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
     {
       Champ_Inc visco_turb_au_format_K_eps_Rea;
       visco_turb_au_format_K_eps_Rea.typer(type);
-      Champ_Inc_base& ch_visco_turb_K_eps_Rea = visco_turb_au_format_K_eps_Rea.valeur();
-      ch_visco_turb_K_eps_Rea.associer_domaine_dis_base(eqn_transp_K().domaine_dis().valeur());
-      ch_visco_turb_K_eps_Rea.nommer("diffusivite_turbulente");
-      ch_visco_turb_K_eps_Rea.fixer_nb_comp(1);
-      ch_visco_turb_K_eps_Rea.fixer_nb_valeurs_nodales(n);
-      ch_visco_turb_K_eps_Rea.fixer_unite("inconnue");
-      ch_visco_turb_K_eps_Rea.changer_temps(0.);
+      DoubleTab& visco_turb_K_eps_Rea = complete_viscosity_field(n, eqn_transp_K().domaine_dis().valeur(), visco_turb_au_format_K_eps_Rea);
 
-      DoubleTab& visco_turb_K_eps_Rea = ch_visco_turb_K_eps_Rea.valeurs();
       if (visco_turb_K_eps_Rea.size() != n)
         {
           Cerr << "visco_turb_K_eps_Rea size is " << visco_turb_K_eps_Rea.size() << " instead of " << n << finl;
           exit();
         }
 
-      for (int i = 0; i < n; i++)
-        {
-          if (tab_Eps(i, 1) <= DMINFLOAT)
-            visco_turb_K_eps_Rea[i] = 0;
-          else
-            visco_turb_K_eps_Rea[i] = Cmu(i) * tab_K(i) * tab_K(i) / tab_Eps(i);
-
-        }
-
+      fill_turbulent_viscosity_tab(n, tab_K, tab_Eps, visco_turb_K_eps_Rea);
       la_viscosite_turbulente_->affecter(visco_turb_au_format_K_eps_Rea.valeur());
-
     }
   else
-    {
-      for (int i = 0; i < n; i++)
-        {
-          if (tab_Eps(i, 1) <= DMINFLOAT)
-            visco_turb[i] = 0;
-          else
-            visco_turb[i] = Cmu(i) * tab_K(i) * tab_K(i) / tab_Eps(i);
-        }
-    }
+    fill_turbulent_viscosity_tab(n, tab_K, tab_Eps, visco_turb);
+
   la_viscosite_turbulente_.changer_temps(temps);
   return la_viscosite_turbulente_;
+}
+
+void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::fill_turbulent_viscosity_tab(const int n, const DoubleTab& tab_K, const DoubleTab& tab_Eps, DoubleTab& turbulent_viscosity)
+{
+  const DoubleTab& Cmu = get_modele_fonction().get_Cmu(); // attention : il faut qu'il soit deja calcule!
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente Cmu", Cmu);
+
+  for (int i = 0; i < n; i++)
+    {
+      if (tab_Eps(i, 1) <= DMINFLOAT)
+        turbulent_viscosity[i] = 0.;
+      else
+        turbulent_viscosity[i] = Cmu(i) * tab_K(i) * tab_K(i) / tab_Eps(i);
+    }
 }
 
 int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::preparer_calcul()
@@ -146,48 +131,14 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::preparer_calcul()
   eqn_transp_K().preparer_calcul();
   eqn_transp_Eps().preparer_calcul();
   Modele_turbulence_hyd_base::preparer_calcul();
-  // GF pour initialiser la loi de paroi thermique en TBLE
-//   if (equation().probleme().nombre_d_equations()>1)
-//     {
-//       const RefObjU& modele_turbulence = equation().probleme().equation(1).get_modele(TURBULENCE);
-//       if (sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
-//         {
-//           Turbulence_paroi_scal& loi_paroi_T = ref_cast_non_const(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi();
-//           loi_paroi_T.init_lois_paroi();
-//         }
-//     }
-  // GF quand on demarre un calcul il est bon d'utliser la ldp
-  // encore plus quand on fait une reprise !!!!!!!!
-  Champ_Inc& ch_K = K();
-  Champ_Inc& ch_Eps = Eps();
-
-  const Milieu_base& mil = equation().probleme().milieu();
-  if (equation().probleme().is_dilatable())
-    diviser_par_rho_si_dilatable(ch_K.valeurs(), mil);
-  diviser_par_rho_si_dilatable(ch_Eps.valeurs(), mil);
-  loipar_.calculer_hyd_BiK(ch_K, ch_Eps);
-  eqn_transp_K().controler_variable();
-  eqn_transp_Eps().controler_variable();
-  calculer_viscosite_turbulente(K().temps());
-  limiter_viscosite_turbulente();
-  // on remultiplie K et Eps par rho
-  if (equation().probleme().is_dilatable())
-    {
-      multiplier_par_rho_si_dilatable(ch_K.valeurs(), mil);
-      multiplier_par_rho_si_dilatable(ch_Eps.valeurs(), mil);
-      correction_nut_et_cisaillement_paroi_si_qc(*this);
-    }
-  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  calculate_limit_viscosity<MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE>(K(), Eps(), -123. /* unused */);
   return 1;
 
 }
 
 void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour(double temps)
 {
-  Champ_Inc& ch_K = K();
-  Champ_Inc& ch_Eps = Eps();
   Schema_Temps_base& sch = eqn_transp_K().schema_temps();
-  // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
   eqn_transp_K().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K());
@@ -197,25 +148,8 @@ void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour(double temp
   eqn_transp_Eps().mettre_a_jour(temps);
 
   statistiques().begin_count(nut_counter_);
-  const Milieu_base& mil = equation().probleme().milieu();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente_.valeurs());
-  // on divise K_eps par rho en QC pour revenir a K et Eps
-  if (equation().probleme().is_dilatable())
-    diviser_par_rho_si_dilatable(ch_K.valeurs(), mil);
-  diviser_par_rho_si_dilatable(ch_Eps.valeurs(), mil);
-  loipar_.calculer_hyd_BiK(ch_K, ch_Eps);
-  eqn_transp_K().controler_variable();
-  eqn_transp_Eps().controler_variable();
-  calculer_viscosite_turbulente(ch_K.temps());
-  limiter_viscosite_turbulente();
-  // on remultiplie K_eps par rho
-  if (equation().probleme().is_dilatable())
-    {
-      multiplier_par_rho_si_dilatable(ch_K.valeurs(), mil);
-      multiplier_par_rho_si_dilatable(ch_Eps.valeurs(), mil);
-      correction_nut_et_cisaillement_paroi_si_qc(*this);
-    }
-  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  calculate_limit_viscosity<MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE>(K(), Eps(), -123. /* unused */);
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
   statistiques().end_count(nut_counter_);
 }

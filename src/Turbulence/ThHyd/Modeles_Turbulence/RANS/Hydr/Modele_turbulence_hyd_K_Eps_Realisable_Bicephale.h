@@ -12,14 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/*! @brief class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
- *
- *  Decrire ici la classe Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
- *  Cette classe represente le modele de turbulence (k,eps) realisable ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
- *
- *
- *
- */
+
 #ifndef Modele_turbulence_hyd_K_Eps_Realisable_Bicephale_included
 #define Modele_turbulence_hyd_K_Eps_Realisable_Bicephale_included
 
@@ -30,7 +23,13 @@
 class Domaine_Cl_dis;
 class Domaine_dis;
 
-class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale: public Modele_turbulence_hyd_RANS_Bicephale_base
+/*! @brief class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
+ *
+ *  Decrire ici la classe Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
+ *  Cette classe represente le modele de turbulence (k,eps) realisable ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
+ *
+ */
+class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale: public Modele_turbulence_hyd_RANS_Bicephale_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Eps_Realisable_Bicephale>
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale);
 public:
@@ -60,10 +59,17 @@ public:
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
 
+  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  void controler()
+  {
+    eqn_transport_K_Rea_.controler_variable();
+    eqn_transport_Eps_Rea_.controler_variable();
+  }
+
 private:
   Modele_Fonc_Realisable mon_modele_fonc_;
   Transport_K_ou_Eps_Realisable eqn_transport_K_Rea_, eqn_transport_Eps_Rea_;
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  void fill_turbulent_viscosity_tab(const int , const DoubleTab&, const DoubleTab&, DoubleTab& );
 };
 
-#endif
+#endif /* Modele_turbulence_hyd_K_Eps_Realisable_Bicephale_included */

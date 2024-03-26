@@ -31,7 +31,7 @@
  *
  * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps_Bicephale: public Modele_turbulence_hyd_RANS_Bicephale_base
+class Modele_turbulence_hyd_K_Eps_Bicephale: public Modele_turbulence_hyd_RANS_Bicephale_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Eps_Bicephale>
 {
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_Bicephale);
 public:
@@ -57,11 +57,18 @@ public:
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
+  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+
+  void controler()
+  {
+    eqn_transport_K_.controler_variable();
+    eqn_transport_Eps_.controler_variable();
+  }
 
 protected:
   Modele_Fonc_Bas_Reynolds mon_modele_fonc_;
   Transport_K_ou_Eps eqn_transport_K_, eqn_transport_Eps_;
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  void fill_turbulent_viscosity_tab(const int , const DoubleTab&, const DoubleTab& , const DoubleTab& ,const DoubleTab& , const DoubleTab&  , DoubleTab& );
 };
 
 /*! @brief Renvoie le champ inconnue K du modele de turbulence Cette inconnue est portee
@@ -146,4 +153,4 @@ inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn
   return eqn_transport_Eps_;
 }
 
-#endif
+#endif /* Modele_turbulence_hyd_K_Eps_Bicephale_included */

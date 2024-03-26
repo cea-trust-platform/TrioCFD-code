@@ -29,19 +29,25 @@
 #include <Champ_Inc.h>
 #include <type_traits>
 
-enum class MODELE_TYPE { K_EPS , K_EPS_2_COUCHES, K_EPS_BAS_REYNOLDS , K_EPS_REALISABLE, K_OMEGA };
+enum class MODELE_TYPE
+{
+  K_EPS , K_EPS_2_COUCHES,
+  K_EPS_BAS_REYNOLDS , K_EPS_REALISABLE,
+  K_EPS_BICEPHALE,  K_EPS_REALISABLE_BICEPHALE,
+  K_OMEGA
+};
 
 template <typename MODELE>
 class Modele_turbulence_hyd_RANS_Gen
 {
 private:
   template <MODELE_TYPE M_TYPE>
-  void print_evolution(const Champ_Inc& , const Schema_Temps_base& , double , int );
+  void print_evolution(const Champ_Inc& , const Schema_Temps_base& , double , int , const Champ_Inc* = nullptr /* Seulement si Bicephale */);
 
 public:
   DoubleTab& complete_viscosity_field(const int , const Domaine_dis_base& , Champ_Inc& );
 
-  template <MODELE_TYPE M_TYPE> std::enable_if_t<(M_TYPE !=  MODELE_TYPE::K_EPS_2_COUCHES && M_TYPE !=  MODELE_TYPE::K_EPS_BAS_REYNOLDS), void>
+  template <MODELE_TYPE M_TYPE> std::enable_if_t<(M_TYPE ==  MODELE_TYPE::K_EPS || M_TYPE ==  MODELE_TYPE::K_EPS_REALISABLE || M_TYPE ==  MODELE_TYPE::K_OMEGA), void>
   calculate_limit_viscosity(Champ_Inc& , double );
 
   template <MODELE_TYPE M_TYPE> std::enable_if_t<M_TYPE ==  MODELE_TYPE::K_EPS_2_COUCHES, void>
@@ -49,6 +55,9 @@ public:
 
   template <MODELE_TYPE M_TYPE> std::enable_if_t<M_TYPE ==  MODELE_TYPE::K_EPS_BAS_REYNOLDS, void>
   calculate_limit_viscosity(Champ_Inc& , double );
+
+  template <MODELE_TYPE M_TYPE> std::enable_if_t<(M_TYPE ==  MODELE_TYPE::K_EPS_BICEPHALE || M_TYPE ==  MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE), void>
+  calculate_limit_viscosity(Champ_Inc&, Champ_Inc& , double );
 };
 
 template <typename MODELE>
@@ -64,7 +73,7 @@ DoubleTab& Modele_turbulence_hyd_RANS_Gen<MODELE>::complete_viscosity_field(cons
 }
 
 template<typename MODELE> template<MODELE_TYPE M_TYPE>
-std::enable_if_t<(M_TYPE !=  MODELE_TYPE::K_EPS_2_COUCHES && M_TYPE !=  MODELE_TYPE::K_EPS_BAS_REYNOLDS), void>
+std::enable_if_t<(M_TYPE ==  MODELE_TYPE::K_EPS || M_TYPE ==  MODELE_TYPE::K_EPS_REALISABLE || M_TYPE ==  MODELE_TYPE::K_OMEGA), void>
 Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_K_Eps_ou_Omega, double LeCmu)
 {
   static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA);
@@ -93,6 +102,44 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_
   z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
 
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 0);
+}
+
+template<typename MODELE> template<MODELE_TYPE M_TYPE>
+std::enable_if_t<(M_TYPE ==  MODELE_TYPE::K_EPS_BICEPHALE || M_TYPE ==  MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE), void>
+Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_K, Champ_Inc& ch_Eps, double LeCmu)
+{
+  static constexpr bool IS_K_EPS_REALISABLE_BICEPHALE = (M_TYPE == MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE);
+
+  auto *z_class = static_cast<MODELE*>(this); // CRTP --> I love you :*
+  const Milieu_base& mil = z_class->equation().probleme().milieu();
+
+  // on divise par rho en QC pour revenir a K et Eps/Omega
+  if (z_class->equation().probleme().is_dilatable())
+    {
+      diviser_par_rho_si_dilatable(ch_K.valeurs(), mil);
+      diviser_par_rho_si_dilatable(ch_Eps.valeurs(), mil);
+    }
+
+  if (!IS_K_EPS_REALISABLE_BICEPHALE)
+    print_evolution<M_TYPE>(ch_K, z_class->equation().schema_temps(), LeCmu, 1, &ch_Eps);
+
+  z_class->loi_paroi().calculer_hyd_BiK(ch_K, ch_Eps);
+  z_class->controler();
+  z_class->calculer_viscosite_turbulente(ch_K.temps());
+  z_class->limiter_viscosite_turbulente();
+
+  // on remultiplie par rho
+  if (z_class->equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K.valeurs(), mil);
+      multiplier_par_rho_si_dilatable(ch_Eps.valeurs(), mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*z_class);
+    }
+
+  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
+
+  if (!IS_K_EPS_REALISABLE_BICEPHALE)
+    print_evolution<M_TYPE>(ch_K, z_class->equation().schema_temps(), LeCmu, 0, &ch_Eps);
 }
 
 template<typename MODELE> template<MODELE_TYPE M_TYPE>
@@ -134,12 +181,16 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_
 }
 
 template <typename MODELE> template <MODELE_TYPE M_TYPE>
-void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le_champ_K_Eps_ou_Omega, const Schema_Temps_base& sch, const double LeCmu, const int avant)
+void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le_champ_K_Eps_ou_Omega, const Schema_Temps_base& sch, const double LeCmu, const int avant, const Champ_Inc* le_champ_Eps)
 {
-  static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA), IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES),
-                        IS_BAS_REYNOLDS = (M_TYPE == MODELE_TYPE::K_EPS_BAS_REYNOLDS);
 
-  if (IS_2_COUCHES || IS_BAS_REYNOLDS) return; /* Do nothing */
+  static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA), IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES),
+                        IS_BAS_REYNOLDS = (M_TYPE == MODELE_TYPE::K_EPS_BAS_REYNOLDS), IS_K_EPS_BICEPHALE = (M_TYPE == MODELE_TYPE::K_EPS_BICEPHALE),
+                        IS_K_EPS_REALISABLE_BICEPHALE = (M_TYPE == MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE);
+
+  assert (!IS_K_EPS_BICEPHALE || (IS_K_EPS_BICEPHALE && le_champ_Eps != nullptr));
+
+  if (IS_2_COUCHES || IS_BAS_REYNOLDS || IS_K_EPS_REALISABLE_BICEPHALE) return; /* Do nothing */
 
   if (sch.nb_pas_dt() == 0 || sch.limpr())
     {
@@ -157,13 +208,24 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
               Cerr << "Unsupported field in Modele_turbulence_hyd_RANS_Gen::imprimer_evolution()" << finl;
               Process::exit(-1);
             }
+
           size = le_champ_K_Eps_ou_Omega.valeur().equation().domaine_dis().domaine().nb_elem();
+
+          if (IS_K_EPS_BICEPHALE)
+            {
+              if (!sub_type(Champ_Inc_P0_base, (*le_champ_Eps).valeur()))
+                {
+                  Cerr << "Unsupported field in Modele_turbulence_hyd_RANS_Gen::imprimer_evolution()" << finl;
+                  Process::exit(-1);
+                }
+              assert (size == (*le_champ_Eps).valeur().equation().domaine_dis().domaine().nb_elem());
+            }
         }
 
       for (int n = 0; n < size; n++)
         {
-          const double k = K_Eps_ou_Omega(n, 0);
-          const double epsOuomega = K_Eps_ou_Omega(n, 1);
+          const double k = IS_K_EPS_BICEPHALE ? K_Eps_ou_Omega(n) : K_Eps_ou_Omega(n, 0);
+          const double epsOuomega = IS_K_EPS_BICEPHALE ? (*le_champ_Eps).valeurs()(n) : K_Eps_ou_Omega(n, 1);
           double nut = 0;
 
           const double num = IS_K_OMEGA ? k : LeCmu * k * k;

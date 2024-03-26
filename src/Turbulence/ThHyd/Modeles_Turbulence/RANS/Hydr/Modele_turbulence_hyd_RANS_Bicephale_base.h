@@ -23,6 +23,7 @@
 #define Modele_turbulence_hyd_RANS_Bicephale_base_included
 
 #include <Modele_turbulence_hyd_2_eq_base.h>
+#include <Modele_turbulence_hyd_RANS_Gen.h>
 
 class Transport_K_ou_Eps_base;
 
@@ -75,7 +76,7 @@ protected:
  */
 inline Equation_base& Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation()
 {
-  if (ma_seconde_equation_.non_nul() == 0)
+  if (ma_seconde_equation_.est_nul())
     {
       Cerr << "\nError in Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -85,7 +86,7 @@ inline Equation_base& Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equatio
 
 inline const Equation_base& Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() const
 {
-  if (ma_seconde_equation_.non_nul() == 0)
+  if (ma_seconde_equation_.est_nul())
     {
       Cerr << "\nError in Modele_turbulence_hyd_RANS_Bicephale_base::seconde_equation() : The equation is unknown !" << finl;
       Process::exit();

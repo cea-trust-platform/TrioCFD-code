@@ -188,7 +188,7 @@ void Modele_turbulence_hyd_K_Eps::fill_turbulent_viscosity_tab(const int n, cons
   for (int i = 0; i < n; i++)
     {
       if (tab_K_Eps(i, 1) <= EPS_MIN_)
-        turbulent_viscosity[i] = 0;
+        turbulent_viscosity[i] = 0.;
       else
         {
           if (mon_modele_fonc_.non_nul())
