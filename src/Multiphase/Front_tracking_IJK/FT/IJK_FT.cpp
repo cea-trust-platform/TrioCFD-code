@@ -524,6 +524,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("upstream_stencil", &upstream_stencil_); // XD_ADD_P int Width on which the velocity is set
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_); // XD_ADD_P floattant Number of bubble diameters upstream of bubble 0 to prescribe the velocity.
   param.ajouter("nb_diam_ortho_shear_perio", &nb_diam_ortho_shear_perio_); // XD_ADD_P chaine not_set
+  param.ajouter("Ux_origine_z_shear_perio", &Ux_origin_); // XD_ADD_P chaine not_set
   param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid density
   param.ajouter("check_stop_file", &check_stop_file_); // XD_ADD_P chaine stop file to check (if 1 inside this file, stop computation)
   param.ajouter("dt_sauvegarde", &dt_sauvegarde_); // XD_ADD_P entier saving frequency (writing files for computation restart)
@@ -1049,7 +1050,7 @@ void IJK_FT_double::force_entry_velocity(IJK_Field_double& vx, IJK_Field_double&
 void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                                         double v_imposed,
                                                         const IJK_Interfaces& interfaces,
-                                                        double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio)
+                                                        double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio, double Ux_origin)
 {
   assert(interfaces.get_nb_bulles_reelles() == 1);
   DoubleTab bounding_box;
@@ -1228,9 +1229,9 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                         if(direction==0)
                           {
                             double z=dz/2.+(k+offset_k)*dz;
-                            velocity(i,j,k)=bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
-                            velocity((i+1)%ni,j,k)=bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
-                            velocity((i+2)%ni,j,k)=bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                            velocity(i,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                            velocity((i+1)%ni,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                            velocity((i+2)%ni,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
                           }
                         else
                           {
@@ -4432,7 +4433,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
           if (IJK_Splitting::defilement_ == 1)
             {
               force_upstream_velocity_shear_perio(velocity_[0], velocity_[1], velocity_[2],
-                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_);
+                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_, Ux_origin_);
             }
           else
             {
@@ -4647,7 +4648,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
           if (IJK_Splitting::defilement_ == 1)
             {
               force_upstream_velocity_shear_perio(velocity_[0], velocity_[1], velocity_[2],
-                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_);
+                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_, Ux_origin_);
             }
           else
             {
