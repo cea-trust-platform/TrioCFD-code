@@ -610,9 +610,18 @@ int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
           // l'exterieur du domaine, on duplique) Cette domaine tient compte du stencil
           // des forces de tension superficielle et de repulsion
           //duCluz  : 2 cest mieux pour les echanges espaces virtuels pour la condition de shear-periodicite
-          const double duplicate_stencil_width =
-            std::max(2 * delta,
-                     portee_force_repulsion_); // GB2020.12.20 : avant c'etait 2. Est-ce
+          double duplicate_stencil_width ;
+
+          if(IJK_Splitting::defilement_ == 1)
+            duplicate_stencil_width =
+              std::max(2 * delta,
+                       portee_force_repulsion_);
+          else
+            duplicate_stencil_width =
+              std::max(delta,
+                       portee_force_repulsion_);
+
+          // GB2020.12.20 : avant c'etait 2. Est-ce
           // que la precaution etait necessaire? Elle
           // conduit a de plus gros cas tests comme
           // interfacial_temperature_and_flux
