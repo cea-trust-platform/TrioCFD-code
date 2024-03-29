@@ -32,7 +32,7 @@ public:
   inline double compute_dtstab_convection_local(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
   inline void compute_set(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
   inline void compute_add(IJK_Field_double& dvx, IJK_Field_double& dvy, IJK_Field_double& dvz);
-  inline void initialize(const IJK_Splitting& splitting);
+  inline void initialize(const IJK_Splitting& splitting, const int harmonic_nu);
   inline void compute_flux_x_vx(IJK_Field_local_double& resu, const int k_layer);
   inline void compute_flux_x_vy(IJK_Field_local_double& resu, const int k_layer);
   inline void compute_flux_x_vz(IJK_Field_local_double& resu, const int k_layer);
@@ -80,6 +80,7 @@ public:
   int get_diffusion_op_option_rank() { return diffusion_option_rank_; };
   Nom get_diffusion_op_option() { return diffusion_option_; };
   Nom get_diffusion_op() { return diffusion_op_; };
+  int harmonic_nu_;
   /*
    * Setters
    */
@@ -111,12 +112,13 @@ inline void Operateur_IJK_faces_diff::compute_add(IJK_Field_double& dvx, IJK_Fie
   valeur().compute_add(dvx, dvy, dvz);
 }
 
-inline void Operateur_IJK_faces_diff::initialize(const IJK_Splitting& splitting)
+inline void Operateur_IJK_faces_diff::initialize(const IJK_Splitting& splitting, const int harmonic_nu = 0)
 {
   if (!is_cast_)
     typer_diffusion_op("standard");
   // diffusion_option_ = diffusion_op_options_[0];
   valeur().initialize(splitting);
+  harmonic_nu_=harmonic_nu;
 }
 
 inline void Operateur_IJK_faces_diff::compute_flux_x_vx(IJK_Field_local_double& resu, const int k_layer)

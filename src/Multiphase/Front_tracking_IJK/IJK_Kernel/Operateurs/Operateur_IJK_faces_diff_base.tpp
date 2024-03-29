@@ -294,6 +294,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_different_dir_compo_(int i,
       molecular_nu.get_left_center_c1c2(_DIR_, _VCOMPO_, i, m_nu1, m_nu2, m_nu3, m_nu4);
       double mult_coeff = 0.25;
 
+//antoine_mu_harmonic
       // for wall boundary conditions
       if(bottom_wall && bc_type!=Boundary_Conditions::Mixte_shear)
         {
@@ -311,8 +312,16 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_different_dir_compo_(int i,
           mult_coeff = 0.5;
         }
       // recoding of Eval_Dift_VDF_var_Face::flux_arete_interne
-      Simd_double m_nu = (m_nu1 + m_nu2 + m_nu3 + m_nu4) * mult_coeff;
+      Simd_double m_nu;
 
+      if (harmonic_nu_)
+        {
+          m_nu = 4./(1./m_nu1 + 1./m_nu2 + 1./m_nu3 + 1./m_nu4) ;
+        }
+      else
+        {
+          m_nu = (m_nu1 + m_nu2 + m_nu3 + m_nu4) * mult_coeff;
+        }
       // gradient in direction DIR of component COMPO
       Simd_double v3, v4;
       vCOMPO_ptr.get_left_center(_DIR_, i, v3, v4);

@@ -643,6 +643,8 @@ protected :
   double nb_diam_ortho_shear_perio_;
   double Ux_origin_;
 
+  int harmonic_nu_in_diff_operator_;
+  int harmonic_nu_in_calc_with_indicatrice_;
   double rho_liquide_;
   double rho_vapeur_;
   // GAB, pour THI (23.08.21)

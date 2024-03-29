@@ -60,6 +60,7 @@ IJK_FT_double::IJK_FT_double():
   post_(IJK_FT_Post(*this)),
   thermals_(IJK_Thermals(*this))
 {
+
   p_seuil_min_ = 0.;
   p_seuil_max_ = 0;
 
@@ -142,6 +143,8 @@ IJK_FT_double::IJK_FT_double():
 
   sauvegarder_xyz_ = 0;
   reprise_ = 0;
+
+
 }
 
 IJK_FT_double::IJK_FT_double(const IJK_FT_double& x):
@@ -471,7 +474,8 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   expression_derivee_facteur_variable_source_ = "0";
   correction_force_.resize_array(3); // Par defaut, les flags d'activations sont a zero (ie inactif).
   correction_force_ = 0;
-
+  harmonic_nu_in_diff_operator_ = 0 ;
+  harmonic_nu_in_calc_with_indicatrice_ = 0 ;
   gravite_.resize_array(3);
   // GAB, rotation
   direction_gravite_ = 0;
@@ -606,7 +610,8 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter_flag("test_etapes_et_bilan", &test_etapes_et_bilan_); // XD_ADD_P chaine not_set
   // GAB, champ de reprise + champ initial
   param.ajouter_flag("ajout_init_a_reprise", &add_initial_field_); // XD_ADD_P chaine not_set
-
+  param.ajouter_flag("harmonic_nu_in_diff_operator", &harmonic_nu_in_diff_operator_); // XD_ADD_P rien Disable pressure poisson solver
+  param.ajouter_flag("harmonic_nu_in_calc_with_indicatrice", &harmonic_nu_in_calc_with_indicatrice_); // XD_ADD_P rien Disable pressure poisson solver
 
   param.ajouter("reprise_vap_velocity_tmoy", &vap_velocity_tmoy_); // XD_ADD_P chaine not_set
   param.ajouter("reprise_liq_velocity_tmoy", &liq_velocity_tmoy_); // XD_ADD_P chaine not_set
@@ -2682,7 +2687,7 @@ void IJK_FT_double::run()
     Cout << "Schema temps de type : euler_explicite" << finl;
 
 
-  velocity_diffusion_op_.initialize(splitting_);
+  velocity_diffusion_op_.initialize(splitting_, harmonic_nu_in_diff_operator_);
   velocity_diffusion_op_.set_bc(boundary_conditions_);
   velocity_convection_op_.initialize(splitting_);
 
@@ -3872,8 +3877,8 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
                   if (use_inv_rho_for_mass_solver_and_calculer_rho_v_)
                     {
                       Cerr << "Je ne sais pas si inv_rho_field_ est a jour ici. A Verifier avant de l'activer." << finl;
-                      Process::exit();
-                      // mass_solver_with_inv_rho(terme_source_interfaces_ns_[di], inv_rho_field_, delta_z_local_, k);
+                      //calculer_rho_harmonic_v(rho_field_, d_velocity_, d_velocity_);
+                      mass_solver_with_inv_rho(terme_source_interfaces_ns_[dir], inv_rho_field_, delta_z_local_, k);
                     }
                   else
                     {
@@ -5005,6 +5010,21 @@ void IJK_FT_double::maj_indicatrice_rho_mu(const bool parcourir)
   const int nx = interfaces_.I().ni();
   const int ny = interfaces_.I().nj();
   const int nz = interfaces_.I().nk();
+  for (int k=0; k < nz; k++)
+    for (int j=0; j < ny; j++)
+      for (int i=0; i < nx; i++)
+        {
+          double chi_l = interfaces_.I(i,j,k);
+          rho_field_(i,j,k)    = rho_liquide_ * chi_l + (1.- chi_l) * rho_vapeur_;
+          if(harmonic_nu_in_calc_with_indicatrice_==1 and chi_l!=0. and chi_l!=1.)
+            {
+              molecular_mu_(i,j,k) = 1. /  ( mu_liquide_/ chi_l + mu_vapeur_/(1.- chi_l) ) ;
+            }
+          else
+            {
+              molecular_mu_(i,j,k) = mu_liquide_ * chi_l + (1.- chi_l) * mu_vapeur_ ;
+            }
+        }
 
   if (use_inv_rho_)
     {
@@ -5013,20 +5033,7 @@ void IJK_FT_double::maj_indicatrice_rho_mu(const bool parcourir)
           for (int i=0; i < nx; i++)
             {
               double chi_l = interfaces_.I(i,j,k);
-              rho_field_(i,j,k)    = rho_liquide_ * chi_l + (1.- chi_l) * rho_vapeur_;
               inv_rho_field_(i,j,k) = 1./rho_liquide_ * chi_l + (1.- chi_l) * 1./rho_vapeur_;
-              molecular_mu_(i,j,k) = mu_liquide_ * chi_l + (1.- chi_l) * mu_vapeur_ ;
-            }
-    }
-  else
-    {
-      for (int k=0; k < nz; k++)
-        for (int j=0; j < ny; j++)
-          for (int i=0; i < nx; i++)
-            {
-              double chi_l = interfaces_.I(i,j,k);
-              rho_field_(i,j,k)    = rho_liquide_ * chi_l + (1.- chi_l) * rho_vapeur_;
-              molecular_mu_(i,j,k) = mu_liquide_ * chi_l + (1.- chi_l) * mu_vapeur_ ;
             }
     }
 
