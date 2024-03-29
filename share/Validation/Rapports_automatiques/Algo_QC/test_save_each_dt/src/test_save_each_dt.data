@@ -1,0 +1,69 @@
+IJK_Grid_Geometry grid_geom2
+Lire grid_geom2
+{
+  nbelem_i 16
+  nbelem_j 16
+  uniform_domain_size_i 1
+  uniform_domain_size_j 1
+  file_coord_k          coord_k_0.txt
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting2
+Lire grid_splitting2
+{
+  ijk_grid_geometry grid_geom2
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+dns_qc_double
+{
+  ijk_splitting grid_splitting2
+  timestep 1000000
+  nb_pas_dt_max 1000
+  multigrid_solver
+  {
+    coarsen_operators 2
+    Coarsen_Operator_K { file_z_coord coord_k_1.txt }
+    Coarsen_Operator_Uniform {  }
+
+    ghost_size 3
+    pre_smooth_steps 5 5 5 5 5 8
+    smooth_steps     5 5 5 5 5 8
+
+    relax_jacobi 5 0.69 0.69 0.69 0.69 0.65
+    solveur_grossier GCP { seuil  0.5e-9 precond ssor { omega 1.5 } }
+    check_residu 0
+    seuil 2.5e-9
+    nb_full_mg_steps 2 3 1
+    solver_precision mixed
+    /* impr */
+  }
+  timestep_facsec 1.
+
+  tinit 0.
+
+  expression_t_init   293.
+  expression_vx_init  0.
+  expression_vy_init  0.
+  expression_vz_init  0.
+
+  nom_sauvegarde      dns_1.sauv
+  check_stop_file     stop_file
+
+  dt_save_oscillating_cycle_raw_data 10 # 10 #
+
+  sauvegarde_post_instantanes
+  champs_a_postraiter 1 TEMPERATURE
+  compteur_post_instantanes 1
+
+  t_paroi_impose_kmin 293.0
+  t_paroi_impose_kmax 293.0
+  p_thermo_init       1.5e5
+  cp                  1005.0
+  gamma               1.4
+  debit_massique      1.0
+}
