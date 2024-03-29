@@ -146,6 +146,8 @@ protected:
   void reprendre_qc(const char *fichier_reprise);
   void calculer_velocity_elem();
   void posttraiter_champs_instantanes(const char * lata_name, double time);
+  void save_raw_data(const char *lata_name, double current_time);
+  void save_stats(double current_time);
 
   void fixer_reference_pression(double& reference_pression);
   void translation_pression(const double& reference_pression);
@@ -379,6 +381,11 @@ protected:
   int dt_post_;
   Motcles liste_post_instantanes_; // liste des champs instantanes a postraiter
   int dt_sauvegarde_;
+  int dt_raw_data_;
+  int dt_stats_;
+
+  double dt_save_oscillating_cycle_raw_data_; // saves raw_data every physical dt
+  double dt_save_cycle_;                      // incremented timestep for saving
   int postraiter_sous_pas_de_temps_; // drapeau 0 ou 1
   Nom nom_sauvegarde_;
   Nom nom_reprise_;
@@ -475,5 +482,8 @@ protected:
   double amplitude_oscillating_boundary_;
   double frequency_oscillating_boundary_;
   bool flag_oscillating_boundary;
+
+  // Saving each delta_t time
+  bool flag_save_each_delta_t_;
 };
 #endif
