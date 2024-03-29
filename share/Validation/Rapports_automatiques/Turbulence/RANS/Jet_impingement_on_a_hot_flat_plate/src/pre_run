@@ -6,8 +6,8 @@ cd ..
 
 cd Prepare
 trust Prepare 1>Prepare.out 2>Prepare.err || exit -1
-fichier_V=`ls -art | grep "pb_VITESSE_PERIO" | tail -1`
-fichier_K=`ls -art | grep "pb_K_EPS_PERIO"   | tail -1`
+fichier_V=`ls -art | grep -i "pb_VITESSE_PERIO" | tail -1`
+fichier_K=`ls -art | grep -i "pb_K_EPS_PERIO"   | tail -1`
 cp $fichier_V pb_VITESSE_PERIO.dat
 cp $fichier_K pb_K_EPS_PERIO.dat
 cd ../

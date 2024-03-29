@@ -213,7 +213,7 @@ read_file dom dom2D.geom" >> dom.geo
    # Construction d'un jeu de donnees prepare.data pour le pre_run
    ###############################################################
    sed "s/tmax /nb_pas_dt_max 1 tmax /g
-        s/solveur_pression/Ecrire_fichier_xyz_valeur vitesse 0.001 bords 1 INLET solveur_pression/g
+        s/solveur_pression/Ecrire_fichier_xyz_valeur { fields 1 vitesse dt 0.001 boundaries 1 INLET } solveur_pression/g
 	s/Champ_Front_LU dom $DIM VELOCITY_PROFILE_INLET.dat/Champ_front_uniforme $DIM 0. 0. $ZERO/g" test.data > prepare.data
    cd -
 done

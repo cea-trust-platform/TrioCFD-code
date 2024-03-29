@@ -21,8 +21,8 @@ if [ "$test_calcul" != "Arret des processes."  ] ;then
 	python ../dernierTemps.py Moyennes_spatiales_nut
 
 	#recuperation des valeurs de v,k,eps a injecter en entree du vrai calcul 
-	fichier_V=`ls -art | grep "pb_VITESSE_PERIO" | tail -1`
-	fichier_K=`ls -art | grep "pb_K_EPS_PERIO"   | tail -1`
+	fichier_V=`ls -art | grep -i "pb_VITESSE_PERIO" | tail -1`
+	fichier_K=`ls -art | grep -i "pb_K_EPS_PERIO"   | tail -1`
 
 	#preparation du repertoire pour le calcul final sur le vrai maillage
 	cp $fichier_V FICHIER_V_PREPARE

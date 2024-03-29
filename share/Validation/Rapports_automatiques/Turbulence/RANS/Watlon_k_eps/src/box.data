@@ -92,8 +92,12 @@ Lire pb
             		}
 			turbulence_paroi loi_standard_hydr dt_impr_ustar 1.
 		}
-		Ecrire_fichier_xyz_valeur k_eps		5. bords 1 perio
-		Ecrire_fichier_xyz_valeur vitesse	5. bords 1 perio
+		Ecrire_fichier_xyz_valeur
+		{
+			dt 5.
+			fields 2 vitesse k_eps
+			boundaries 1 perio
+		}
 	}
 
 	Postraitement
