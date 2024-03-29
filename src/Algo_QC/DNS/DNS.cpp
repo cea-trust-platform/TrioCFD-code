@@ -9702,17 +9702,17 @@ void DNS_QC_double::run()
           Cerr << "*****************************************************************************\n"
                << "  Attention : projection du champ de vitesse initial sur div(u)=0\n"
                << "*****************************************************************************" << finl;
-
-          // pressure_projection_with_rho(rho_,velocity_[0], velocity_[1], velocity_[2],
-          //                              pressure_, 1.0 /* dt */, pressure_rhs_,
-          //                              1 /* check divergence */,
-          //                              poisson_solver_);
+          double shear_DU =0.;
+          pressure_projection_with_rho(rho_,velocity_[0], velocity_[1], velocity_[2],
+                                       pressure_, 1.0 /* dt */, pressure_rhs_,
+                                       1 /* check divergence */,
+                                       poisson_solver_, sheer_DU);
           pressure_.data() = 0.;
           pressure_rhs_.data() = 0.;
           // // Echange espace virtuel inutiles car deja fait dans pressure_projection_with_rho
-          // velocity_[0].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_I*/
-          // velocity_[1].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_J*/
-          // velocity_[2].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/
+          velocity_[0].echange_espace_virtuel(1, shear_DU); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_I*/
+          velocity_[1].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_J*/
+          velocity_[2].echange_espace_virtuel(1); /*, IJK_Field_double::EXCHANGE_GET_AT_RIGHT_K*/
           ///
         }
     }
