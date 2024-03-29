@@ -1,0 +1,15 @@
+#!/bin/bash
+# Generates timesteps file
+
+grep tinit test_save_each_dt_lata*.sauv | awk '{print $3}' | python -c "
+import sys; 
+import numpy as np
+import matplotlib.pyplot as plt;
+values=[]
+for line in sys.stdin:
+    values.append(np.double(line.replace('\n', '')));
+plt.plot(np.sort(values), 'x');
+plt.ylabel('saved time')
+plt.xlabel('timestep number');
+plt.title(r'Saving each 5000 $t^+$');
+plt.savefig('timesteps_evolution.pdf');"

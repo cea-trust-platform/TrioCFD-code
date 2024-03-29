@@ -1,0 +1,15 @@
+parametres {
+    titre "Test of Algo_QC, for saving each delta_t"
+    auteur "Yanis Zatout"
+    description "We verify with a simple simulation that we can save each delta_t time, simulation parameters don't matter much."
+    casTest . test_save_each_dt.data
+}
+Chapitre {
+    Titre "Test case saving each delta_t"
+    Description "\latex_(\input{../description_cas.tex}\latex_)"
+    Figure {
+        Title "Saved timesteps"
+        Width 12cm
+        picture timesteps_evolution.pdf
+    }
+}
