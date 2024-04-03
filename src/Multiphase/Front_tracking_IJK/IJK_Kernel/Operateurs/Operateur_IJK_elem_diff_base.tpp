@@ -55,8 +55,7 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
    * field in the current scope)
    */
   const IJK_Field_local_double& dummy_field = *input_field_;
-  bool is_functional = !is_structural_;
-  ConstIJK_double_ptr lambda(is_functional ? (is_vectorial_? get_model(_DIR_) : *lambda_) : dummy_field, 0, 0, k_layer);
+  ConstIJK_double_ptr lambda(!is_structural_ ? (is_vectorial_? get_model(_DIR_) : *lambda_) : dummy_field, 0, 0, k_layer);
   ConstIJK_double_ptr structural_model(is_structural_ ? get_model(_DIR_) : *lambda_, 0, 0, k_layer);
 
   IJK_double_ptr resu_ptr(resu, 0, 0, 0);

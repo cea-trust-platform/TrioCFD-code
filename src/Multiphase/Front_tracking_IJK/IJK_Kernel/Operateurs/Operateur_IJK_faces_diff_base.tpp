@@ -135,8 +135,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_(IJK_Field_local_double& re
 
   const IJK_Field_local_double& dummy_field = vCOMPO;
 
-  bool is_functional_ = !is_structural_;
-  ConstIJK_double_ptr molecular_nu(is_functional_ ? (is_tensorial_? get_coeff_tensor(_VCOMPO_, _DIR_) : get_nu()) : dummy_field , 0, 0, k_layer);
+  ConstIJK_double_ptr molecular_nu(!is_structural_ ? (is_tensorial_? get_coeff_tensor(_VCOMPO_, _DIR_) : get_nu()) : dummy_field , 0, 0, k_layer);
 
   ConstIJK_double_ptr div_ptr(with_divergence_ ? get_divergence() : dummy_field, 0, 0, k_layer);
 
@@ -189,7 +188,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_(IJK_Field_local_double& re
       vCOMPO_ptr.next_j();
       if(_DIR_ != _VCOMPO_)
         vDIR_ptr.next_j();
-      if(is_functional_)
+      if(!is_structural_)
         molecular_nu.next_j();
       if(is_turb_)
         {
