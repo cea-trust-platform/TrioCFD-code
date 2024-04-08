@@ -56,7 +56,7 @@ void Operateur_IJK_elem_diff_base_double::compute_flux_(IJK_Field_local_double& 
    */
   /*
    * Y.Z.: If the model is functional (i.e. not structural) then lambda takes the right value, and the "structural_model" variable points to dummy_field.
-   * Otherwise the model is structural then lambda points towards the dummy_field. 
+   * Otherwise the model is structural then lambda points towards the dummy_field.
    */
   const IJK_Field_local_double& dummy_field = *input_field_;
   ConstIJK_double_ptr lambda(!is_structural_ ? (is_vectorial_? get_model(_DIR_) : *lambda_) : dummy_field, 0, 0, k_layer);

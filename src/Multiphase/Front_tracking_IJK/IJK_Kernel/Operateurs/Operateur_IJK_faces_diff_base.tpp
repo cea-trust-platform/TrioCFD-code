@@ -147,7 +147,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_(IJK_Field_local_double& re
 
   /*
    * Y.Z.: If the model is functional (i.e. not structural) then lambda takes the right value, and the "structural_model" variable points to dummy_field.
-   * Otherwise the model is structural then lambda points towards the dummy_field. 
+   * Otherwise the model is structural then lambda points towards the dummy_field.
    */
   ConstIJK_double_ptr turbulent_nu      (is_turb_ ? get_nu() : dummy_field, 0, 0, k_layer);
   ConstIJK_double_ptr turbulent_k_energy(is_turb_ ? get_nu() : dummy_field, 0, 0, k_layer );
