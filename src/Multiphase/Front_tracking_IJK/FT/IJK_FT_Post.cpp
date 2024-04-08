@@ -69,6 +69,8 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
   dt_post_thermals_probes_ = 100;
   dt_post_stats_plans_ = 1;
   dt_post_stats_bulles_ = 1;
+  dt_post_stats_cisaillement_ = 100;
+  dt_post_stats_rmf_ = 100;
   //poisson_solver_post_ = xxxx;
   postraiter_sous_pas_de_temps_ = 0;
   post_par_paires_ = 0;
@@ -77,6 +79,8 @@ void IJK_FT_Post::complete_interpreter(Param& param, Entree& is)
   param.ajouter("dt_post_thermals_probes", &dt_post_thermals_probes_);
   param.ajouter("dt_post_stats_bulles", &dt_post_stats_bulles_);
   param.ajouter("dt_post_stats_plans", &dt_post_stats_plans_);
+  param.ajouter("dt_post_stats_cisaillement", &dt_post_stats_cisaillement_);
+  param.ajouter("dt_post_stats_rmf", &dt_post_stats_rmf_);
   param.ajouter("champs_a_postraiter", &liste_post_instantanes_);
   param.ajouter_flag("postraiter_sous_pas_de_temps", &postraiter_sous_pas_de_temps_);
   // Pour reconstruire au post-traitement la grandeur du/dt, on peut choisir de relever u^{dt_post} et u^{dt_post+1} :
@@ -1306,6 +1310,104 @@ statistiques().end_count(postraitement_counter_);
 
 }
 
+void IJK_FT_Post::ecrire_statistiques_cisaillement(int reset, const Nom& nom_cas, const double current_time) const
+{
+  if (disable_diphasique_)
+    return;
+
+  statistiques().begin_count(postraitement_counter_);
+
+  double v_x_droite;
+  double v_y_droite;
+  double v_z_droite;
+
+  double v_x_gauche;
+  double v_y_gauche;
+  double v_z_gauche;
+
+  ref_ijk_ft_.calculer_vitesse_gauche(velocity_[0],velocity_[1],velocity_[2],v_x_gauche,v_y_gauche,v_z_gauche);
+  ref_ijk_ft_.calculer_vitesse_droite(velocity_[0],velocity_[1],velocity_[2],v_x_droite,v_y_droite,v_z_droite);
+
+  if (Process::je_suis_maitre())
+    {
+      char s[1000];
+      const char *nomcas = nom_cas;
+      SFichier fic;
+      IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
+
+      snprintf(s, 1000, "%s_cisaillement.out", nomcas);
+      // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
+      fic.ouvrir(s, mode);
+      snprintf(s, 1000, "%.16e ", current_time);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", v_x_droite);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", v_y_droite);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", v_z_droite);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", v_x_gauche);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", v_y_gauche);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", v_z_gauche);
+      fic << s;
+
+      fic << endl;
+      fic.close();
+    }
+  statistiques().end_count(postraitement_counter_);
+
+}
+
+void IJK_FT_Post::ecrire_statistiques_rmf(int reset, const Nom& nom_cas, const double current_time) const
+{
+  if (disable_diphasique_)
+    return;
+
+  statistiques().begin_count(postraitement_counter_);
+
+  double ax_PID;
+  double ay_PID;
+  double az_PID;
+
+  ref_ijk_ft_.calculer_terme_asservissement(ax_PID,ay_PID,az_PID);
+
+  if (Process::je_suis_maitre())
+    {
+      char s[1000];
+      const char *nomcas = nom_cas;
+      SFichier fic;
+      IOS_OPEN_MODE mode = (reset) ? ios::out : ios::app;
+
+      snprintf(s, 1000, "%s_rmf.out", nomcas);
+      // Cerr << "Ecriture des donnees par bulles: fichier " << s << endl;
+      fic.ouvrir(s, mode);
+      snprintf(s, 1000, "%.16e ", current_time);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", ax_PID);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", ay_PID);
+      fic << s;
+
+      snprintf(s, 1000, "%.16e ", az_PID);
+      fic << s;
+
+      fic << endl;
+      fic.close();
+    }
+  statistiques().end_count(postraitement_counter_);
+
+}
+
 // Methode qui met a jour l'indicatrice, les termes de repulsion
 // ainsi que les termes interfaciaux : ai, kappa*ai, n(aux cellules)
 //
@@ -2196,6 +2298,14 @@ void IJK_FT_Post::postraiter_fin(bool stop, int tstep, double current_time, doub
     {
       if (current_time >= t_debut_statistiques_)
         posttraiter_statistiques_plans(current_time);
+    }
+  if (tstep % dt_post_stats_cisaillement_ == dt_post_stats_cisaillement_ - 1 || stop)
+    {
+      ecrire_statistiques_cisaillement(0, nom_cas, current_time);
+    }
+  if (tstep % dt_post_stats_rmf_ == dt_post_stats_rmf_ - 1 || stop)
+    {
+      ecrire_statistiques_rmf(0, nom_cas, current_time);
     }
   // Pour ne post-traiter qu'a la frequence demandee :
   les_sondes_.mettre_a_jour(current_time, timestep);

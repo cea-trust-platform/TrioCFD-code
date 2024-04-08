@@ -363,7 +363,8 @@ protected :
   static void force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                                   double v_imposed,
                                                   const IJK_Interfaces& interfaces,
-                                                  double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio, double Ux_origin);
+                                                  double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio,double Ux0,double Uy0,double Uz0,
+                                                  int epaisseur_maille);
   double find_timestep(const double max_timestep, const double cfl, const double fo, const double oh);
   void parcourir_maillage();
   void calculer_rho_mu_indicatrice(const bool parcourir = true);
@@ -379,6 +380,11 @@ protected :
   //ab-forcage-control-ecoulement-deb
   void calculer_terme_source_acceleration(IJK_Field_double& vx, const double time, const double timestep,
                                           const int rk_step);
+  // Correcteur PID
+  void calculer_terme_asservissement(double& ax, double& ay, double& az);
+  void calculer_vitesse_gauche(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz, double& vx_moy, double& vy_moy, double& vz_moy);
+  void calculer_vitesse_droite(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz, double& vx_moy, double& vy_moy, double& vz_moy);
+
   void compute_correction_for_momentum_balance(const int rk_step);
   void transfer_ft_to_ns();
   void compute_add_external_forces(const int dir);
@@ -641,7 +647,6 @@ protected :
   int upstream_stencil_;
   double nb_diam_upstream_;
   double nb_diam_ortho_shear_perio_;
-  double Ux_origin_;
 
   int harmonic_nu_in_diff_operator_;
   int harmonic_nu_in_calc_with_indicatrice_;
@@ -653,6 +658,16 @@ protected :
   double mu_liquide_;
   double mu_vapeur_;
   double sigma_;
+
+  // Correcteur PID
+  double Kp_;
+  double Kd_;
+  double Ki_;
+  double int_x_;
+  double int_y_;
+  double int_z_;
+  int epaisseur_maille_;
+
   ArrOfDouble gravite_; // vecteur de taille 3 a lire dans le jeu de donnees
   int direction_gravite_;
 #ifdef SMOOTHING_RHO

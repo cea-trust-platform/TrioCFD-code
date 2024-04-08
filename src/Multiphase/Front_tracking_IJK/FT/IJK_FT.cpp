@@ -133,6 +133,16 @@ IJK_FT_double::IJK_FT_double():
   coef_ammortissement_ = 0;
   coef_rayon_force_rappel_ = 0;
   terme_source_acceleration_ = 0;
+
+  // Correcteur PID
+  Kp_ = 0;
+  Kd_ = 0;
+  Ki_ = 0;
+  int_x_ = 0;
+  int_y_ = 0;
+  int_z_ = 0;
+  epaisseur_maille_ = 0;
+
   coef_mean_force_ = 0;
   coef_immobilisation_ = 0;
 
@@ -458,6 +468,15 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   mu_vapeur_ = -1.;
   sigma_     = 0.;
 
+  // Correcteur PID
+  Kp_ = 0.;
+  Kd_ = 0;
+  Ki_ = 0;
+  int_x_ = 0;
+  int_y_ = 0;
+  int_z_ = 0;
+  epaisseur_maille_ = 8;
+
   //ab-forcage-control-ecoulement-deb
   expression_derivee_acceleration_ = "0"; // par defaut pas de terme d'acceleration
   terme_source_acceleration_ = 0.; // par defaut, zero
@@ -528,7 +547,6 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("upstream_stencil", &upstream_stencil_); // XD_ADD_P int Width on which the velocity is set
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_); // XD_ADD_P floattant Number of bubble diameters upstream of bubble 0 to prescribe the velocity.
   param.ajouter("nb_diam_ortho_shear_perio", &nb_diam_ortho_shear_perio_); // XD_ADD_P chaine not_set
-  param.ajouter("Ux_origine_z_shear_perio", &Ux_origin_); // XD_ADD_P chaine not_set
   param.ajouter("rho_liquide", &rho_liquide_, Param::REQUIRED); // XD_ADD_P floattant liquid density
   param.ajouter("check_stop_file", &check_stop_file_); // XD_ADD_P chaine stop file to check (if 1 inside this file, stop computation)
   param.ajouter("dt_sauvegarde", &dt_sauvegarde_); // XD_ADD_P entier saving frequency (writing files for computation restart)
@@ -620,6 +638,13 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 
 
   param.ajouter("sigma", &sigma_); // XD_ADD_P floattant surface tension
+
+  // Correcteur PID
+  param.ajouter("Kp", &Kp_);
+  param.ajouter("Kd", &Kd_);
+  param.ajouter("Ki", &Ki_);
+  param.ajouter("epaisseur_maille",&epaisseur_maille_);
+
   param.ajouter("rho_vapeur", &rho_vapeur_); // XD_ADD_P floattant vapour density
   param.ajouter("mu_vapeur", &mu_vapeur_); // XD_ADD_P floattant vapour viscosity
 
@@ -1055,7 +1080,8 @@ void IJK_FT_double::force_entry_velocity(IJK_Field_double& vx, IJK_Field_double&
 void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                                         double v_imposed,
                                                         const IJK_Interfaces& interfaces,
-                                                        double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio, double Ux_origin)
+                                                        double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio,
+                                                        double Ux0,double Uy0,double Uz0,int epaisseur_maille)
 {
   assert(interfaces.get_nb_bulles_reelles() == 1);
   DoubleTab bounding_box;
@@ -1233,16 +1259,41 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
                         // ATTENTION : s assurer que la condition de corrections_qdm est compatible avec ce profil de vitesse
                         if(direction==0)
                           {
+
                             double z=dz/2.+(k+offset_k)*dz;
-                            velocity(i%ni,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
-                            velocity((i+1)%ni,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
-                            velocity((i+2)%ni,j,k)=Ux_origin+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                            /*
+                            velocity(i%ni,j,k)=Ux0+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                            velocity((i+1)%ni,j,k)=Ux0+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                            velocity((i+2)%ni,j,k)=Ux0+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                            */
+                            for (int m=0; m<epaisseur_maille; m++)
+                              {
+                                velocity((i+m)%ni,j,k)=Ux0+bc.get_dU_perio(bc.get_resolution_u_prime_())*z/lz;
+                              }
                           }
-                        else
+                        else if(direction==2)
                           {
+                            /*
                             velocity(i%ni,j,k)=0.;
                             velocity((i+1)%ni,j,k)=0.;
                             velocity((i+2)%ni,j,k)=0.;
+                            */
+                            for (int m=0; m<epaisseur_maille; m++)
+                              {
+                                velocity((i+m)%ni,j,k)=Uz0;
+                              }
+                          }
+                        else
+                          {
+                            /*
+                            velocity(i%ni,j,k)=0.;
+                            velocity((i+1)%ni,j,k)=0.;
+                            velocity((i+2)%ni,j,k)=0.;
+                            */
+                            for (int m=0; m<epaisseur_maille; m++)
+                              {
+                                velocity((i+m)%ni,j,k)=Uy0;
+                              }
 
                           }
                       }
@@ -2234,6 +2285,162 @@ static void runge_kutta3_update_for_float(const double dx, double& store, double
       Cerr << "Error in runge_kutta_update_for_float: wrong step" << finl;
       Process::exit();
     };
+}
+
+void IJK_FT_double::calculer_vitesse_droite(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz, double& vx_moy, double& vy_moy, double& vz_moy)
+{
+  /* Renvoie le vecteur vitesse moyen (spatial) en z = 0 */
+  /* Ne fonctionne que pour des maillages uniformes */
+  const IJK_Splitting& splitting = vx.get_splitting();
+  const int ni = vx.ni();
+  const int nj = vx.nj();
+  const int nk = vx.nk();
+  //const int nk = vx.nk();
+  //double dz = splitting.get_grid_geometry().get_constant_delta(DIRECTION_K);
+  int z_index = splitting.get_local_slice_index(2);
+  int z_index_max = splitting.get_nprocessor_per_direction(2) - 1;
+  vx_moy = 0.;
+  vy_moy = 0.;
+  vz_moy = 0.;
+  double alpha_l_moy = 0.;
+
+  if(z_index==z_index_max)
+    {
+      for (int i = 0; i < ni; i++)
+        {
+          for (int j = 0; j < nj; j++)
+            {
+              vx_moy += vx(i,j,nk-1)*interfaces_.I(i,j,nk-1);
+              vy_moy += vy(i,j,nk-1)*interfaces_.I(i,j,nk-1);
+              vz_moy += vz(i,j,nk-1)*interfaces_.I(i,j,nk-1);
+              alpha_l_moy += interfaces_.I(i,j,nk-1);
+            }
+        }
+    }
+  vx_moy=Process::mp_sum(vx_moy);
+  vy_moy=Process::mp_sum(vy_moy);
+  vz_moy=Process::mp_sum(vz_moy);
+  alpha_l_moy=Process::mp_sum(alpha_l_moy);
+
+  vx_moy = vx_moy/alpha_l_moy;
+  vy_moy = vy_moy/alpha_l_moy;
+  vz_moy = vz_moy/alpha_l_moy;
+
+  return;
+}
+
+void IJK_FT_double::calculer_vitesse_gauche(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz, double& vx_moy, double& vy_moy, double& vz_moy)
+{
+  /* Renvoie le vecteur vitesse moyen (spatial) en z = 0 */
+  /* Ne fonctionne que pour des maillages uniformes */
+  const IJK_Splitting& splitting = vx.get_splitting();
+  const int ni = vx.ni();
+  const int nj = vx.nj();
+  //const int nk = vx.nk();
+  //double dz = splitting.get_grid_geometry().get_constant_delta(DIRECTION_K);
+  int z_index = splitting.get_local_slice_index(2);
+  int z_index_min = 0;
+  vx_moy = 0.;
+  vy_moy = 0.;
+  vz_moy = 0.;
+  double alpha_l_moy = 0.;
+
+  if (z_index == z_index_min)
+    {
+      for (int i = 0; i < ni; i++)
+        {
+          for (int j = 0; j < nj; j++)
+            {
+              vx_moy += vx(i,j,0)*interfaces_.I(i,j,0);
+              vy_moy += vy(i,j,0)*interfaces_.I(i,j,0);
+              vz_moy += vz(i,j,0)*interfaces_.I(i,j,0);
+              alpha_l_moy += interfaces_.I(i,j,0);
+            }
+        }
+    }
+
+  vx_moy=Process::mp_sum(vx_moy);
+  vy_moy=Process::mp_sum(vy_moy);
+  vz_moy=Process::mp_sum(vz_moy);
+  alpha_l_moy=Process::mp_sum(alpha_l_moy);
+
+  vx_moy = vx_moy/alpha_l_moy;
+  vy_moy = vy_moy/alpha_l_moy;
+  vz_moy = vz_moy/alpha_l_moy;
+  return;
+}
+
+void IJK_FT_double::calculer_terme_asservissement(double& ax, double& ay, double& az)
+{
+  // On trouve la vitesse moyenne de la phase vapeur pour la partie derivee du correcteur
+
+  update_rho_v();
+  double v_moyx = calculer_v_moyen(velocity_[0]);
+  double v_moyy = calculer_v_moyen(velocity_[1]);
+  double v_moyz = calculer_v_moyen(velocity_[2]);
+
+  double rhov_moyx = calculer_v_moyen(rho_v_[DIRECTION_I]);
+  double rhov_moyy = calculer_v_moyen(rho_v_[DIRECTION_J]);
+  double rhov_moyz = calculer_v_moyen(rho_v_[DIRECTION_K]);
+
+  const IJK_Grid_Geometry& geom = velocity_[direction_gravite_].get_splitting().get_grid_geometry();
+  double Lz =  geom.get_domain_length(DIRECTION_K);
+  double Lx =  geom.get_domain_length(DIRECTION_I);
+  double Ly =  geom.get_domain_length(DIRECTION_J);
+
+  double vol_dom = Lz*Lx*Ly;
+  double alv = 0.;
+  if (vol_bulle_monodisperse_>=0.)
+    alv = interfaces_.get_nb_bulles_reelles()*vol_bulle_monodisperse_/vol_dom;
+  else
+    alv = 1.-calculer_v_moyen(interfaces_.I());
+
+  double drho = rho_liquide_-rho_vapeur_;
+  double facv = 0.;
+  if (std::fabs(alv*drho)>DMINFLOAT)
+    {
+      facv=1./(alv*drho);
+    }
+  double uvx = facv*(rho_liquide_*v_moyx-rhov_moyx);
+  double uvy = facv*(rho_liquide_*v_moyy-rhov_moyy);
+  double uvz = facv*(rho_liquide_*v_moyz-rhov_moyz);
+
+  // On evalue la position de chaque bulles pour trouver le barycentre de la phase vapeur
+
+  ArrOfDouble volumes;
+  DoubleTab centre_gravite;
+
+  const int nbulles_reelles = interfaces_.get_nb_bulles_reelles();
+  const int nbulles_ghost = interfaces_.get_nb_bulles_ghost();
+  const int nbulles_tot = nbulles_reelles + nbulles_ghost;
+
+  volumes.resize_array(nbulles_tot, Array_base::NOCOPY_NOINIT);
+  volumes = 0.;
+  centre_gravite.resize(nbulles_tot, 3, Array_base::NOCOPY_NOINIT);
+  centre_gravite = 0.;
+
+  double centre_moyx = 0;
+  double centre_moyy = 0;
+  double centre_moyz = 0;
+
+  interfaces_.calculer_volume_bulles(volumes,centre_gravite);
+
+  for (int i = 0; i < nbulles_tot; i++)
+    {
+      centre_moyx += 1.0*centre_gravite(i,0)/nbulles_tot;
+      centre_moyy += 1.0*centre_gravite(i,1)/nbulles_tot;
+      centre_moyz += 1.0*centre_gravite(i,2)/nbulles_tot;
+    }
+
+  // On met a jour l'integrale du deplacement du barycentre
+
+  int_x_ += (centre_moyx-Lx/2)*timestep_;
+  int_y_ += (centre_moyy-Ly/2)*timestep_;
+  int_z_ += (centre_moyz-Lz/2)*timestep_;
+
+  ax = -Kp_*(centre_moyx-Lx/2)-Ki_*int_x_-Kd_*uvx;
+  ay = -Kp_*(centre_moyy-Ly/2)-Ki_*int_y_-Kd_*uvy;
+  az = -Kp_*(centre_moyz-Lz/2)-Ki_*int_z_-Kd_*uvz;
 }
 
 void IJK_FT_double::calculer_terme_source_acceleration(IJK_Field_double& vx, const double time, const double timestep,
@@ -3959,6 +4166,25 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
 
   fill_variable_source_and_potential_phi(time);
 
+  // Correcteur PID
+
+  ArrOfDouble acc_rmf;
+  acc_rmf.resize_array(3);
+  acc_rmf = 0.;
+
+  if (Kp_ != 0. || Kd_ != 0. || Ki_ != 0.)
+    {
+      double ax_PID;
+      double ay_PID;
+      double az_PID;
+
+      calculer_terme_asservissement(ax_PID,ay_PID,az_PID);
+
+      acc_rmf[0] = ax_PID;
+      acc_rmf[1] = ay_PID;
+      acc_rmf[2] = az_PID;
+    }
+
 
   for (int dir = 0; dir < 3; dir++)
     {
@@ -4023,6 +4249,12 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
           else
             mass_solver_with_rho(d_velocity_[dir], rho_field_, delta_z_local_, k);
 
+          if (Kp_ != 0. || Kd_ != 0.|| Ki_ != 0.)
+            {
+              for (int j = 0; j < nj; j++)
+                for (int i = 0; i < ni; i++)
+                  d_velocity_[dir](i,j,k) += acc_rmf[dir];
+            }
 
           // Terme source gravitaire en version simple "rho_g":
           // GAB : question a Guillaume : l 3235 -> "IJK_Field_double& dv = d_velocity_[dir];" ,  MAIS C'EST APRES
@@ -4437,8 +4669,15 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
 
           if (IJK_Splitting::defilement_ == 1)
             {
+              double vx;
+              double vy;
+              double vz;
+
+              calculer_vitesse_gauche(velocity_[0],velocity_[1],velocity_[2],vx,vy,vz);
+
               force_upstream_velocity_shear_perio(velocity_[0], velocity_[1], velocity_[2],
-                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_, Ux_origin_);
+                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_,
+                                                  vx,vy,vz,epaisseur_maille_);
             }
           else
             {
@@ -4652,8 +4891,16 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
         {
           if (IJK_Splitting::defilement_ == 1)
             {
+
+              double vx;
+              double vy;
+              double vz;
+
+              calculer_vitesse_gauche(velocity_[0],velocity_[1],velocity_[2],vx,vy,vz);
+
               force_upstream_velocity_shear_perio(velocity_[0], velocity_[1], velocity_[2],
-                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_, Ux_origin_);
+                                                  vitesse_upstream_, interfaces_, nb_diam_upstream_, boundary_conditions_, nb_diam_ortho_shear_perio_,
+                                                  vx,vy,vz,epaisseur_maille_);
             }
           else
             {

@@ -61,6 +61,8 @@ public:
   void posttraiter_champs_instantanes(const char * lata_name, double time, int time_iteration);
   void posttraiter_statistiques_plans(double time);
   void ecrire_statistiques_bulles(int reset, const Nom& nom_cas, const ArrOfDouble& gravite, const double current_time) const;
+  void ecrire_statistiques_cisaillement(int reset, const Nom& nom_cas, const double current_time) const;
+  void ecrire_statistiques_rmf(int reset, const Nom& nom_cas, const double current_time) const;
   void update_stat_ft(const double dt);
   void get_update_lambda2();
   void get_update_lambda2_and_rot_and_curl();
@@ -181,6 +183,8 @@ protected:
   int dt_post_thermals_probes_;
   int dt_post_stats_plans_; // intervalle de posttraitement des donnees par plan (pour les statistiques de canal)
   int dt_post_stats_bulles_; // intervalle de posttraitement des donnees par bulles
+  int dt_post_stats_cisaillement_; // intervalle de posttraitement des données liés au cisaillement
+  int dt_post_stats_rmf_; // intervalle de posttraitement des données liés au au rmf
   Motcles liste_post_instantanes_; // liste des champs instantanes a postraiter
   // Pour numeroter les fichiers .lata il faut compter combien on en a ecrit:
   int compteur_post_instantanes_;
