@@ -1675,7 +1675,7 @@ void Source_Con_Phase_field::premier_demi_dt()
 
                    DoubleTab x1(nb_elem_tot,2);
                    x1=0.;
-                   domaine_VDF.domaine().creer_tableau_elements(x1, Array_base::NOCOPY_NOINIT);
+                   domaine_VDF.domaine().creer_tableau_elements(x1, RESIZE_OPTIONS::NOCOPY_NOINIT);
                    double* x1_addr = x1.addr();
                    for(int n_elem=0; n_elem<nb_elem; n_elem++)
                      {
@@ -1707,7 +1707,7 @@ void Source_Con_Phase_field::premier_demi_dt()
 
 
                     DoubleTab second_membre(nb_elem, 2);
-                   domaine_VDF.domaine().creer_tableau_elements(second_membre, Array_base::NOCOPY_NOINIT);
+                   domaine_VDF.domaine().creer_tableau_elements(second_membre, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
                    // Assemblage du second membre
                    double* sm_addr = second_membre.addr();
@@ -1839,7 +1839,7 @@ void Source_Con_Phase_field::premier_demi_dt()
               DoubleTab X_mutilde(mutilde.size_totale());
               DoubleTab x1(nb_elem,2);
               x1=0.;
-              domaine_VDF.domaine().creer_tableau_elements(x1, Array_base::NOCOPY_NOINIT);
+              domaine_VDF.domaine().creer_tableau_elements(x1, RESIZE_OPTIONS::NOCOPY_NOINIT);
               double* x1_addr = x1.addr();
               for (int j=0; j<nb_equation_CH; j++)
                 for (int i=0; i<nb_elem; i++)
@@ -1880,7 +1880,7 @@ void Source_Con_Phase_field::premier_demi_dt()
               DoubleTab sm_c(nb_elem_tot);
               DoubleTab sm_mutilde(nb_elem_tot);
               DoubleTab second_membre(nb_elem_tot, 2);
-              domaine_VDF.domaine().creer_tableau_elements(second_membre, Array_base::NOCOPY_NOINIT);
+              domaine_VDF.domaine().creer_tableau_elements(second_membre, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
               // Assemblage du second membre
               double* sm_addr = second_membre.addr();

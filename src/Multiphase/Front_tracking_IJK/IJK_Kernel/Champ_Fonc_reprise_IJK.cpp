@@ -163,7 +163,6 @@ static int lire_special(Entree& fich, const DoubleTab& coords, DoubleTab& val, c
   DoubleTab buffer(buflines_max, dim + nb_comp);
   int bufptr = buflines_max;
   ArrOfInt items;
-  items.set_smart_resize(1);
 
   double max_epsilon_needed = epsilon;
   // Combien de fois on a trouve plusieurs candidats a moins de epsilon ?
@@ -206,7 +205,7 @@ static int lire_special(Entree& fich, const DoubleTab& coords, DoubleTab& val, c
 
       if (nb_items_proches > 0)
         {
-          items.resize_array(nb_items_proches, ArrOfInt::NOCOPY_NOINIT);
+          items.resize_array(nb_items_proches, RESIZE_OPTIONS::NOCOPY_NOINIT);
           // Voir doc de Octree_Double::search_elements: on copie les indices des items proches dans items:
           for (int j = 0; j < nb_items_proches; j++)
             items[j] = floor_elements[index++];

@@ -88,7 +88,6 @@ void Source_Dissipation_energie_cin_turb::dimensionner_blocs(matrices_t matrices
         int nc = dep.dimension_tot(0),
             M  = dep.line_size();
         IntTrav sten(0, 2);
-        sten.set_smart_resize(1);
         if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "tau"|| n_m.first == "omega")
           for (int e = 0; e < ne; e++)
             for (int n = 0; n < Nk; n++)

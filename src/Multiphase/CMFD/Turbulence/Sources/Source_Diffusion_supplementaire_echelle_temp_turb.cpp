@@ -61,7 +61,6 @@ void Source_Diffusion_supplementaire_echelle_temp_turb::dimensionner_blocs(matri
         int nc = dep.dimension_tot(0),
             M  = dep.line_size();
         IntTrav sten(0, 2);
-        sten.set_smart_resize(1);
         for (int e = 0; e < ne; e++)
           for (int n = 0; n < N; n++)
             if (n < M) sten.append_line(N * e + n, M * e + n);

@@ -192,8 +192,8 @@ public:
   void generer_structure();
   void remplir_structure(const DoubleTab& soms);
 
-  void creer_tableau_sommets(Array_base&, Array_base::Resize_Options opt = Array_base::COPY_INIT) const;
-  void creer_tableau_elements(Array_base&, Array_base::Resize_Options opt = Array_base::COPY_INIT) const;
+  void creer_tableau_sommets(Array_base&, RESIZE_OPTIONS opt=RESIZE_OPTIONS::COPY_INIT) const;
+  void creer_tableau_elements(Array_base&, RESIZE_OPTIONS opt=RESIZE_OPTIONS::COPY_INIT) const;
   double calcul_normale_3D(int num_facette, double norme[3]) const;
   virtual void   calculer_costheta_minmax(DoubleTab& costheta) const;
 

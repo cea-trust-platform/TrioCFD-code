@@ -180,8 +180,6 @@ void IJK_Composantes_Connex::compute_compo_connex_from_interface()
   const int nz = eulerian_compo_connex_from_interface_int_ns_.nk();
   ArrOfInt elems_vap;
   ArrOfInt elems_valid;
-  elems_vap.set_smart_resize(1);
-  elems_valid.set_smart_resize(1);
   for (int k=0; k < nz ; k++)
     for (int j=0; j< ny; j++)
       for (int i=0; i < nx; i++)
@@ -194,7 +192,6 @@ void IJK_Composantes_Connex::compute_compo_connex_from_interface()
     {
       ArrOfInt elems_valid_copy = elems_valid;
       elems_valid.reset();
-      elems_valid.set_smart_resize(1);
       for (int elem=0; elem<elems_valid_copy.size_array(); elem++)
         {
           const Int3 num_elem_ijk = splitting.convert_packed_to_ijk_cell(elems_valid_copy[elem]);
@@ -262,10 +259,6 @@ void IJK_Composantes_Connex::fill_mixed_cell_compo()
       compo_ghost_per_cell.reset();
       count_compo_per_cell.reset();
       count_compo_ghost_per_cell.reset();
-      compo_per_cell.set_smart_resize(1);
-      compo_ghost_per_cell.set_smart_resize(1);
-      count_compo_per_cell.set_smart_resize(1);
-      count_compo_ghost_per_cell.set_smart_resize(1);
       // Loop on the facets which cross the element
       while (index >= 0)
         {

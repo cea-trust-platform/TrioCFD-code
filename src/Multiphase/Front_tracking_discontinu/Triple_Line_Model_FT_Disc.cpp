@@ -136,7 +136,6 @@ Entree& Triple_Line_Model_FT_Disc::readOn( Entree& is )
 
       double tmp;
       ArrOfDouble list_val;
-      list_val.set_smart_resize(1);
 
       while (fic.get(&tmp, 1))
         {
@@ -290,13 +289,9 @@ void Triple_Line_Model_FT_Disc::initialize()
 
   // Information on the TCL region :
   // Resize the tables :
-  elems_.set_smart_resize(1);
   elems_.resize_array(0);
-  boundary_faces_.set_smart_resize(1);
   boundary_faces_.resize_array(0);
-  mp_.set_smart_resize(1);
   mp_.resize_array(0);
-  Q_.set_smart_resize(1);
   Q_.resize_array(0);
 }
 
@@ -1158,35 +1153,25 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // We store the elements (eulerian) crossed by a contact line.
   // As the specific source term is introduced here, a contribution of mdot should not be included afterwards.
 
-  elems_with_CL_contrib.set_smart_resize(1);
   elems_with_CL_contrib.resize_array(0);
 
-  num_faces.set_smart_resize(1);
   num_faces.resize_array(0);
 
-  mpoint_from_CL.set_smart_resize(1);
   mpoint_from_CL.resize_array(0);
 
-  Q_from_CL.set_smart_resize(1);
   Q_from_CL.resize_array(0);
 
   // List to be completed with the meso region:
   ArrOfInt list_meso_elems;
-  list_meso_elems.set_smart_resize(1);
   ArrOfInt list_meso_faces;
-  list_meso_faces.set_smart_resize(1);
 
   // List to be completed with the micro region:
   ArrOfInt list_micro_elems;
-  list_micro_elems.set_smart_resize(1);
   ArrOfInt list_micro_faces;
-  list_micro_faces.set_smart_resize(1);
   ArrOfInt list_micro_indexs;
-  list_micro_indexs.set_smart_resize(1);
 
   // list of Qtot W/m from TCL model for printing
   ArrOfDouble list_micro_fraction;
-  list_micro_fraction.set_smart_resize(1);
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
@@ -1402,7 +1387,6 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
             Cerr << "[TCL] Searching neighboor cells from Elem #" << elemi << " and face #" << num_face << finl;
 
             ArrOfInt future_new_elems;
-            future_new_elems.set_smart_resize(1);
 
             future_new_elems.append_array(elemi); // Initialize the list with the current micro cells
             while (future_new_elems.size_array()) // There are some elements to deal with

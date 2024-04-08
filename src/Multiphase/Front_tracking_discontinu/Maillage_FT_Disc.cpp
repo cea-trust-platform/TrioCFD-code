@@ -734,7 +734,6 @@ void Maillage_FT_Disc::ajouter_maillage(const Maillage_FT_Disc& maillage_tmp,int
   // Il faut maintenant mettre a jour les descripteurs
   // avec renumerotation des elements
   ArrOfInt elements_tmp;
-  elements_tmp.set_smart_resize(1);
   {
     //descripteurs des sommets : espace distant
     const Desc_Structure_FT& desc_sommets_tmp =  maillage_tmp.desc_sommets();
@@ -1014,7 +1013,6 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
     // sinon le resultat depend de l'ordre de parcours des elements
     // Liste des elements a mettre a changer (colonne 0) et valeur a mettre (colonne 1)
     IntTab elems_to_change(0,2);
-    elems_to_change.set_smart_resize(1);
     const int nb_faces_elem = elem_faces.line_size();
     const ArrOfInt& index_elem = intersections_elem_facettes_.index_elem();
     for (int elem = 0; elem < nb_elem; elem++)
@@ -1104,12 +1102,10 @@ void Maillage_FT_Disc::transporter(const DoubleTab& deplacement)
   const int nb_som = nb_sommets();
   // La taille est surestimee
   ArrOfInt liste_sommets;
-  liste_sommets.set_smart_resize(1);
-  liste_sommets.resize_array(nb_som, Array_base::NOCOPY_NOINIT);
+  liste_sommets.resize_array(nb_som, RESIZE_OPTIONS::NOCOPY_NOINIT);
   // Le tableau de deplacement des sommets reels
   DoubleTab vecteur;
-  vecteur.set_smart_resize(1);
-  vecteur.resize(nb_som, dim, Array_base::NOCOPY_NOINIT);
+  vecteur.resize(nb_som, dim, RESIZE_OPTIONS::NOCOPY_NOINIT);
   ArrOfIntFT liste_sommets_sortis;
   ArrOfIntFT numero_face_sortie;
 
@@ -1176,7 +1172,6 @@ void Maillage_FT_Disc::remplir_structure(const DoubleTab& soms)
   //  def_noeud(i,4) = numero de l element qui contient le sommet (-1 sinon)
 
   IntTab def_noeud(0, 4);
-  def_noeud.set_smart_resize(1);
 
   reset();
   construire_noeuds(def_noeud,soms);
@@ -6477,7 +6472,7 @@ int Maillage_FT_Disc::type_statut() const
 /*! @brief creation d'un tableau aux sommets du maillage Meme principe que Domaine::creer_tableau_sommets()
  *
  */
-void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, Array_base::Resize_Options opt) const
+void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, RESIZE_OPTIONS opt) const
 {
   const MD_Vector& md = desc_sommets().get_md_vector();
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);
@@ -6486,7 +6481,7 @@ void Maillage_FT_Disc::creer_tableau_sommets(Array_base& x, Array_base::Resize_O
 /*! @brief creation d'un tableau aux sommets du maillage Meme principe que Domaine::creer_tableau_elements()
  *
  */
-void Maillage_FT_Disc::creer_tableau_elements(Array_base& x, Array_base::Resize_Options opt) const
+void Maillage_FT_Disc::creer_tableau_elements(Array_base& x, RESIZE_OPTIONS opt) const
 {
   const MD_Vector& md = desc_facettes().get_md_vector();
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);

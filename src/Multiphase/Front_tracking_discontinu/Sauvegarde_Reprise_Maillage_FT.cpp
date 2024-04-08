@@ -71,9 +71,6 @@ void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, co
   DoubleTab coord_som;
   ArrOfInt  num_face_bord;
   ArrOfIntFT indice_global_sommet(nb_sommets);
-  coord_elem.set_smart_resize(1);
-  coord_som.set_smart_resize(1);
-  num_face_bord.set_smart_resize(1);
   // On surdimensionne les tableaux, on fera resize a la fin
   const int dim = mesh.sommets_.dimension(1);
   coord_elem.resize(nb_sommets, dim);
@@ -125,7 +122,6 @@ void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, co
   // et sauvegarde des facettes reeles uniquement.
   IntTab facettes_to_save;
   const int nb_facettes = mesh.nb_facettes();
-  facettes_to_save.set_smart_resize(1);
   facettes_to_save.resize(nb_facettes, dim);
   int nb_facettes_reeles = 0;
   for (i = 0; i < nb_facettes; i++)
@@ -190,7 +186,6 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
   const int chunk_size = 65536; // Lire les sommets par blocs
   // Pour chaque sommet conserve, quel est son indice global
   ArrOfInt indice_global_sommet;
-  indice_global_sommet.set_smart_resize(1);
   const Domaine * const domaine = (domaine_vf ? &domaine_vf->domaine() : 0);
   // Lecture des indices des elements contenant le sommet
   int erreur_sommets_exterieurs = 0;
@@ -415,7 +410,6 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
   {
     IntTab tmp;
     int i = 0;
-    facettes.set_smart_resize(1);
     while (i < nb_faces_tot)
       {
         const int n_to_read = std::min(chunk_size, nb_faces_tot - i);
@@ -481,7 +475,6 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
     // (au depart, la liste dont le processeur local a besoin, puis on
     // fait passer la liste au processeur suivant en chaine).
     ArrOfInt liste_sommets_globaux;
-    liste_sommets_globaux.set_smart_resize(1);
     // Recherche des sommets inconnus parmi les sommets des facettes
     {
       // Tableau facettes, vu comme un tableau monodimensionnel:
@@ -507,7 +500,6 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
     // Processeurs de qui on recoit : le precedent
     const int send_list_size = (pe_sender == next_pe ? 0 : 1);
     ArrOfInt send_list(send_list_size);
-    send_list.set_smart_resize(1);
     ArrOfInt recv_list(send_list_size);
     if (send_list_size)
       {
@@ -516,11 +508,9 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
       }
     Schema_Comm schema_comm;
     schema_comm.set_send_recv_pe_list(send_list, recv_list);
-    //send_list.set_smart_resize(1);
     send_list.resize_array(0);
     recv_list.resize_array(0);
     ArrOfInt new_list;
-    new_list.set_smart_resize(1);
     for (int num_proc = 0; num_proc < nproc - 1; num_proc++)
       {
         // A chaque iteration, on transmet la liste au processeur suivant

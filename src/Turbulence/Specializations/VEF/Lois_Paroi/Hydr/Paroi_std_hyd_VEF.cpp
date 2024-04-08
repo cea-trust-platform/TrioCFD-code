@@ -154,7 +154,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
 
       // Dimensionnement et initialisation de face_keps_imposee_
       if (!face_keps_imposee_.get_md_vector().non_nul())
-        domaine_VEF.creer_tableau_faces(face_keps_imposee_, Array_base::NOCOPY_NOINIT);
+        domaine_VEF.creer_tableau_faces(face_keps_imposee_, RESIZE_OPTIONS::NOCOPY_NOINIT);
       face_keps_imposee_=-2;
 
       // Remplissage de face_bords_diri donnant les faces
@@ -367,8 +367,8 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
                         DoubleTab coord_possible;
                         DoubleVect coord_ref;
                         int size_liste = possible.size();
-                        coord_possible.resize(size_liste,dimension,Array_base::NOCOPY_NOINIT);
-                        coord_ref.resize(dimension,Array_base::NOCOPY_NOINIT);
+                        coord_possible.resize(size_liste,dimension,RESIZE_OPTIONS::NOCOPY_NOINIT);
+                        coord_ref.resize(dimension,RESIZE_OPTIONS::NOCOPY_NOINIT);
                         coord_ref(0) = xv(ind_face,0);
                         coord_ref(1) = xv(ind_face,1);
                         if (dimension>2)
@@ -458,7 +458,7 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_f
     }
   if (flag_face_keps_imposee_==0)
     {
-      domaine_VEF.creer_tableau_faces(face_keps_imposee_, Array_base::NOCOPY_NOINIT);
+      domaine_VEF.creer_tableau_faces(face_keps_imposee_, RESIZE_OPTIONS::NOCOPY_NOINIT);
       face_keps_imposee_=-2;
     }
   if ((methode_calcul_face_keps_impose_==1) || (methode_calcul_face_keps_impose_==5))

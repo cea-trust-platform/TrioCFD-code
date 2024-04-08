@@ -2453,13 +2453,9 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
   //const double delta[3] = {dx,dy,dz};
   int nbsom = 0;
   // ArrOfInt liste_composantes_connexes_dans_element;
-  // liste_composantes_connexes_dans_element.set_smart_resize(1);
   DoubleTab positions_liq(2 * nbsom, 3); // Table of coordinates where interpolation needs to be computed
   DoubleTab positions_vap(2 * nbsom, 3);
   IntTab crossed_cells(nbsom, 3); // Table to store i,j,k of cells crossed by the interface.
-  positions_liq.set_smart_resize(1);
-  positions_vap.set_smart_resize(1);
-  crossed_cells.set_smart_resize(1);
 
   //pressure field has to be extended from ns to ft
   ref_ijk_ft_.redistribute_to_splitting_ft_elem_.redistribute(pressure_, pressure_ft_);
@@ -2602,9 +2598,9 @@ void IJK_FT_Post::compute_extended_pressures(const Maillage_FT_IJK& mesh)
                 }
 
               nbsom++;
-              crossed_cells.resize(nbsom, 3, Array_base::COPY_INIT);
-              positions_liq.resize(2 * nbsom, 3, Array_base::COPY_INIT);
-              positions_vap.resize(2 * nbsom, 3, Array_base::COPY_INIT);
+              crossed_cells.resize(nbsom, 3, RESIZE_OPTIONS::COPY_INIT);
+              positions_liq.resize(2 * nbsom, 3, RESIZE_OPTIONS::COPY_INIT);
+              positions_vap.resize(2 * nbsom, 3, RESIZE_OPTIONS::COPY_INIT);
 
               crossed_cells(nbsom - 1, 0) = i;
               crossed_cells(nbsom - 1, 1) = j;

@@ -71,7 +71,6 @@ void Rupture_bulles_1groupe_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, 
         int nc = dep.dimension_tot(0),
             M  = dep.line_size();
         IntTrav sten(0, 2);
-        sten.set_smart_resize(1);
         if (n_m.first == "alpha")
           for (int e = 0; e < ne; e++)
             for (int n = 0; n < N; n++)
