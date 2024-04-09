@@ -39,11 +39,10 @@ class Champ_Inc_base;
 class Transport_K_Eps_base: public Transport_2eq_base
 {
 
-  Declare_base_sans_constructeur(Transport_K_Eps_base);
+  Declare_base(Transport_K_Eps_base);
 
 public:
 
-  Transport_K_Eps_base();
   virtual void associer_modele_turbulence(const Mod_turb_hyd_RANS_keps& )=0;
   void discretiser() override;
   void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;

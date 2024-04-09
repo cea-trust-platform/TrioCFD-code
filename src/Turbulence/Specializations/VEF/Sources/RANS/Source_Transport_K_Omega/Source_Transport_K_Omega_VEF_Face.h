@@ -46,6 +46,8 @@ public:
   double blender(double const val1, double const val2, int const face) const;
 
   void creer_champ(const Motcle&) override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+
 protected:
   void associer_pb(const Probleme_base& pb) override;
   REF(Transport_K_Omega) eqn_K_Omega;

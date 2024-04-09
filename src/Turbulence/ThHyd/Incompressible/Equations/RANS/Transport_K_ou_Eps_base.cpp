@@ -29,12 +29,9 @@
 #include <communications.h>
 #include <Champ_Inc_P0_base.h>
 
-Implemente_base_sans_constructeur(Transport_K_ou_Eps_base,"Transport_K_ou_Eps_base",Equation_base);
+Implemente_base(Transport_K_ou_Eps_base,"Transport_K_ou_Eps_base",Equation_base);
 
-Transport_K_ou_Eps_base::Transport_K_ou_Eps_base()
-{
-  champs_compris_.ajoute_nom_compris("residu");
-}
+
 /*! @brief
  *
  * @param (Sortie& is) un flot de sortie

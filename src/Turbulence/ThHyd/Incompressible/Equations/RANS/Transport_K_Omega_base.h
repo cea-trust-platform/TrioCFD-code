@@ -39,11 +39,10 @@ class Champ_Inc;
  */
 class Transport_K_Omega_base: public Transport_2eq_base
 {
-  Declare_base_sans_constructeur(Transport_K_Omega_base);
+  Declare_base(Transport_K_Omega_base);
 
 public:
 
-  Transport_K_Omega_base();
   virtual void associer_modele_turbulence(const Mod_turb_hyd_RANS_komega& )=0;
   void discretiser() override;
   void discretiser_K_Omega(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;

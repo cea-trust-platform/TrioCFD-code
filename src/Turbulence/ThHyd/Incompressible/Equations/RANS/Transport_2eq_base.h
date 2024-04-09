@@ -39,11 +39,10 @@ class Champ_Inc;
  */
 class Transport_2eq_base: public Equation_base
 {
-  Declare_base_sans_constructeur(Transport_2eq_base);
+  Declare_base(Transport_2eq_base);
 
 public:
 
-  Transport_2eq_base();
   void set_param(Param&) override;
   void associer(const Equation_base&);
   inline void associer_vitesse(const Champ_base&);
