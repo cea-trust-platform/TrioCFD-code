@@ -156,7 +156,12 @@ Read pb
 			 turbulence_paroi loi_expert_hydr { Kappa 0.415 Erugu 9.11 A_plus 26 methode_calcul_face_keps_impose toutes_les_faces_accrochees } dt_impr_ustar 10. eps_min 1.e-15
 		}
 		# Ecriture de y_plus dans un fichier ASCII pour analyse # 
-		Ecrire_fichier_xyz_valeur y_plus 100. bords 1 Haut1
+		Ecrire_fichier_xyz_valeur
+		{
+		   dt 100.
+		   fields 1 y_plus
+		   boundaries 1 Haut1
+		}
 	}
 	Convection_Diffusion_Temperature_Turbulent
 	{

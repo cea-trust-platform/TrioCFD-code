@@ -127,9 +127,12 @@ Navier_Stokes_Turbulent
 	turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet } dt_impr_ustar 500.
         }
 			
-	ecrire_fichier_xyz_valeur vitesse 500. bords 1 PERIO
-	ecrire_fichier_xyz_valeur k_eps 500. bords 1 PERIO
-			     
+	ecrire_fichier_xyz_valeur
+	{
+		dt 500.
+		fields 2 vitesse k_eps
+		boundaries 1 PERIO
+	}		     
 }            
 	Postraitement 
 	{

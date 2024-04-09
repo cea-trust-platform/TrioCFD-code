@@ -119,7 +119,7 @@ int Transport_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)
       is >> terme_convectif;
       return 1;
     }
-  else if ((mot == "ecrire_fichier_xyz_valeur") || (mot == "ecrire_fichier_xyz_valeur_bin"))
+  else if (mot == "ecrire_fichier_xyz_valeur")
     {
       Cerr << mot << " is not understood by " << que_suis_je() << finl;
       Cerr << "Use this keyword in the Navier Stokes equation, not in turbulence equation, please." << finl;

@@ -74,8 +74,11 @@ Read pb
                         Turbulence_paroi  loi_standard_hydr dt_impr_ustar 3000
                 }
 		Traitement_particulier { temperature { bord sortie direction 2 } }
-		Ecrire_fichier_xyz_valeur vitesse 3000. bords 1 sortie
-                Ecrire_fichier_xyz_valeur k_eps 3000. bords 1 sortie
+		Ecrire_fichier_xyz_valeur  {
+		    dt 3000.
+		    fields 2 vitesse k_eps 
+		    boundaries 1 sortie
+         }
         }
 
         Convection_Diffusion_Temperature_Turbulent
@@ -92,7 +95,11 @@ Read pb
                         paroi   paroi_flux_impose Champ_Front_Uniforme 1 1.
                         }
                 conditions_initiales { Temperature Champ_Fonc_xyz dom01234 1 0. }
-		Ecrire_fichier_xyz_valeur temperature 3000. bords 1 sortie
+		        Ecrire_fichier_xyz_valeur  {
+		            dt 3000.
+		            fields 1 temperature 
+		            boundaries 1 sortie
+                 }
                 }
 
 	Postraitement

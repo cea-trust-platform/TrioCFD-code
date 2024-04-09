@@ -10,8 +10,8 @@ if [ "$test_calcul" != "Arret des processes."  ] ;then
 
 
 	# recuperation des valeurs de v,k,eps a injecter en entree du vrai calcul 
-	fichier_V_fin=`ls -art | grep "pb_VITESSE_perio" | tail -1`
-	fichier_K_fin=`ls -art | grep "pb_K_EPS_perio"   | tail -1`
+	fichier_V_fin=`ls -art | grep -i "pb_VITESSE_perio" | tail -1`
+	fichier_K_fin=`ls -art | grep -i "pb_K_EPS_perio"   | tail -1`
 	cp $fichier_V_fin FICHIER_V_PREPARE
 	cp $fichier_K_fin FICHIER_K_PREPARE
 	mv u_tau.dat u_tau.dat.perio

@@ -99,8 +99,12 @@ Read pb
 			turbulence_paroi loi_standard_hydr dt_impr_ustar 0.01
                         quiet
 		}
-		 Ecrire_fichier_xyz_valeur vitesse 100. bords 1 Haut
-		 Ecrire_fichier_xyz_valeur k_eps 100. bords 1 Haut	
+		Ecrire_fichier_xyz_valeur
+		{
+			dt 100.
+			fields 2 vitesse k_eps
+			boundaries 1 Haut
+		}
 	}
 
 	Convection_Diffusion_Temperature_turbulent
