@@ -29,14 +29,9 @@
 #include <Param.h>
 #include <Debog.h>
 
-Implemente_base_sans_constructeur(Transport_K_Omega_base,
-                                  "Transport_K_Omega_base",
-                                  Transport_2eq_base);
-
-Transport_K_Omega_base::Transport_K_Omega_base()
-{
-  champs_compris_.ajoute_nom_compris("K_Omega_residu");
-}
+Implemente_base(Transport_K_Omega_base,
+                "Transport_K_Omega_base",
+                Transport_2eq_base);
 
 /*! @brief
  *

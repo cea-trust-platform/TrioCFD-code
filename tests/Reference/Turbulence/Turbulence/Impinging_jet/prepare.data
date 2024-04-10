@@ -93,8 +93,13 @@ Read pb
             		}
 			turbulence_paroi loi_standard_hydr dt_impr_ustar 0.05
 		}
-		Ecrire_fichier_xyz_valeur_bin k_eps		1. bords 1 PERIO
-		Ecrire_fichier_xyz_valeur_bin vitesse	1. bords 1 PERIO
+		Ecrire_fichier_xyz_valeur
+		{
+			binary_file
+			dt 1.
+			fields 2 vitesse k_eps
+			boundaries 1 PERIO
+		}
 	}
 	Post_processing
 	{

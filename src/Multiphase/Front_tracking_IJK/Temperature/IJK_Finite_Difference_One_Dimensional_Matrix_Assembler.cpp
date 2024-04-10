@@ -710,10 +710,6 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::initialise_sparse_m
   if (first_initialisation)
     {
       matrix_subproblems.typer("Matrice_Morse");
-      if (initialise_sparse_indices)
-        for (int l=0; l<6; l++)
-          first_indices_sparse_matrix[l].set_smart_resize(1);
-
     }
   if (initialise_sparse_indices)
     {
@@ -1483,9 +1479,9 @@ void IJK_Finite_Difference_One_Dimensional_Matrix_Assembler::reduce_solver_matri
 //      tab1_reduced = tab1;
 //      tab2_reduced = tab2;
 //      coeff_reduced = coeff;
-//      tab1_reduced.resize(nb_rows, Array_base::COPY_NOINIT);
-//      tab2_reduced.resize(nb_coeff, Array_base::COPY_NOINIT);
-//      coeff_reduced.resize(nb_coeff, Array_base::COPY_NOINIT);
+//      tab1_reduced.resize(nb_rows, RESIZE_OPTIONS::COPY_NOINIT);
+//      tab2_reduced.resize(nb_coeff, RESIZE_OPTIONS::COPY_NOINIT);
+//      coeff_reduced.resize(nb_coeff, RESIZE_OPTIONS::COPY_NOINIT);
 
       int i;
       for (i=0; i<nb_rows; i++)

@@ -109,10 +109,13 @@ Read pb
             # Friction velocity u* printed with a 0.05s period #
             Turbulence_paroi loi_standard_hydr dt_impr_ustar 0.05
         }
-        # Write the "perio" boundary K-Epsilon field into a file #
-        Ecrire_fichier_xyz_valeur k_eps		1. bords 1 perio
-        # Write the "perio" boundary velocity field into a file #
-        Ecrire_fichier_xyz_valeur vitesse	1. bords 1 perio
+        # Write the fields K-Epsilon and velocity on the "perio" boundary  into a file #
+        Ecrire_fichier_xyz_valeur
+	{
+		dt 1.0
+		fields 2 k_eps vitesse
+		boundaries 1 perio
+	}
     }
     # Energy equation #
     Convection_Diffusion_Temperature_Turbulent
@@ -138,7 +141,7 @@ Read pb
             dt_impr_nusselt 0.05
         }
         # Write the "perio" boundary temperature field into a file #
-        Ecrire_fichier_xyz_valeur temperature	1. bords 1 perio
+        Ecrire_fichier_xyz_valeur { dt 1. fields 1 temperature boundaries 1 perio }
     }
     # Post processing definition #
     Post_processing

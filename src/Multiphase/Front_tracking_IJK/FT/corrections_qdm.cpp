@@ -235,11 +235,8 @@ moyenne_glissante::moyenne_glissante() // @suppress("Class members should be pro
   list_index_=0;
   offset_list_index_=0; /*è MOLTO IMPORTANTE lasciare il valore 0*/
   liste_instants_.resize_array(0);
-  liste_instants_.set_smart_resize(1);
   liste_v_cible_dl_.resize_array(0);
-  liste_v_cible_dl_.set_smart_resize(1);
   liste_v_cible_.resize_array(0);
-  liste_v_cible_.set_smart_resize(1);
   rho_liq_=0;
 
   tstep_=0;

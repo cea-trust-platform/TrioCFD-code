@@ -144,7 +144,6 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       calculer_centres_gravite(le_dom_VF.xp());
 
       DoubleTab& xv=le_dom_VF.xv();
-      xv.set_smart_resize(1);
       xv.reset();
       Type_Face type_face=type_elem().type_face();
       IntTab& elem_faces=le_dom_VF.elem_faces();

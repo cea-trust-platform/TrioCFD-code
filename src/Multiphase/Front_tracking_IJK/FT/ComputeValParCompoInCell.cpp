@@ -155,7 +155,6 @@ void ComputeValParCompoInCell::calculer_moy_par_compo(
   const int nk = ref_splitting_->get_nb_elem_local(DIRECTION_K);
 
   ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -288,7 +287,6 @@ void ComputeValParCompoInCell::calculer_moy_field_sommet_par_compo(
   const int nk = field_par_compo[0].nk();
 
   ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
   liste_composantes_connexes_dans_element = 0;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
@@ -373,7 +371,6 @@ void ComputeValParCompoInCell::calculer_moy_field_fa7_par_compo(
   const int nk = field_par_compo[0].nk();
 
   ArrOfInt liste_composantes_connexes_dans_element;
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -432,7 +429,6 @@ int ComputeValParCompoInCell::compute_list_compo_connex_in_element(
   const ArrOfInt& index_elem = intersections.index_elem();
   const ArrOfInt& compo_connexe_facettes = mesh_->compo_connexe_facettes();
 
-  liste_composantes_connexes_dans_element.set_smart_resize(1);
   liste_composantes_connexes_dans_element.resize_array(0);
 
   // L'element, est-il traverse par une interface ?

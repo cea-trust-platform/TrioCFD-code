@@ -48,7 +48,6 @@ std::vector<int> arg_sort_array_phi(const ArrOfDouble& angle_incr, const ArrOfDo
   ArrOfDouble sub_array;
   for (int i=0; i<angle_incr.size_array(); i++)
     {
-      sub_array.set_smart_resize(1);
       const double angle_min = angle_incr(i) - constant_angle_incr / 2;
       const double angle_max = angle_incr(i) + constant_angle_incr / 2;
       for (int j=0; j<first_angle.size_array(); j++)

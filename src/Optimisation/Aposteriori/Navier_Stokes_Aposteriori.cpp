@@ -23,7 +23,7 @@
 #include <Champ_P1NC.h>
 #include <EChaine.h>
 
-Implemente_instanciable_sans_constructeur(Navier_Stokes_Aposteriori,"Navier_Stokes_Aposteriori",Navier_Stokes_std);
+Implemente_instanciable(Navier_Stokes_Aposteriori,"Navier_Stokes_Aposteriori",Navier_Stokes_std);
 // XD Navier_Stokes_Aposteriori navier_stokes_standard Navier_Stokes_Aposteriori -1 Modification of the Navier_Stokes_standard class in order to accept the estimateur_aposteriori post-processing. To post-process estimateur_aposteriori, add this keyword into the list of fields to be post-processed. This estimator whill generate a map of aposteriori error estimators; it is defined on each mesh cell and is a measure of the local discretisation error. This will serve for adaptive mesh refinement
 
 Sortie& Navier_Stokes_Aposteriori::printOn(Sortie& is) const { return Navier_Stokes_std::printOn(is); }
@@ -59,6 +59,18 @@ void Navier_Stokes_Aposteriori::creer_champ(const Motcle& motlu)
           champ_src_.completer(probleme().postraitements().front());
         }
     }
+}
+
+
+void Navier_Stokes_Aposteriori::get_noms_champs_postraitables(Noms& nom,Option opt) const
+{
+  Navier_Stokes_std::get_noms_champs_postraitables(nom,opt);
+  Noms noms_compris = champs_compris_.liste_noms_compris();
+  noms_compris.add("estimateur_aposteriori");
+  if (opt==DESCRIPTION)
+    Cerr<<" Navier_Stokes_Aposteriori : "<< noms_compris <<finl;
+  else
+    nom.add(noms_compris);
 }
 
 const Champ_base& Navier_Stokes_Aposteriori::get_champ(const Motcle& nom) const

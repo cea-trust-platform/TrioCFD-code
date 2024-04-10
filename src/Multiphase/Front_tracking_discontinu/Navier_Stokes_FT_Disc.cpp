@@ -865,7 +865,7 @@ void Navier_Stokes_FT_Disc::discretiser()
   champs_compris.add(variables_internes().second_membre_projection_jump_.valeur());
   champs_compris_.ajoute_champ(variables_internes().second_membre_projection_jump_);
   dis.discretiser_champ("vitesse", mon_dom_dis,
-                        "gradient_pression", "",
+                        "gradient_pression_interne", "m/s2",
                         -1 /* nb composantes par defaut */, temps,
                         variables_internes().gradient_pression);
   champs_compris.add(variables_internes().gradient_pression.valeur());
@@ -1217,7 +1217,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
 
   // Calcul du "potentiel aux sommets du maillage"
   ArrOfDouble potentiel_sommets;
-  potentiel_sommets.resize_array(maillage.nb_sommets(), Array_base::NOCOPY_NOINIT);
+  potentiel_sommets.resize_array(maillage.nb_sommets(), RESIZE_OPTIONS::NOCOPY_NOINIT);
 
   // (ce potentiel est constant sur chaque portion connexe d'interface si
   //  l'interface est a l'equilibre).
@@ -2453,7 +2453,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
 
   // On cree un tableau avec la meme structure que la pression
   DoubleTab resu;
-  resu.copy(variables_internes().second_membre_projection.valeurs(), Array_base::NOCOPY_NOINIT);
+  resu.copy(variables_internes().second_membre_projection.valeurs(), RESIZE_OPTIONS::NOCOPY_NOINIT);
   resu=0.;
 
   //On utilise un operateur de divergence temporaire et pas celui porte par l equation
@@ -3307,7 +3307,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   if ( nb_eq_non_nul == nb_eqs && nb_eqs != 0 )
     {
       interf_vitesse_imposee_ok = true;
-      terme_mul.copy(champ_rho_faces_.valeur().valeurs(), Array_base::COPY_INIT);
+      terme_mul.copy(champ_rho_faces_.valeur().valeurs(), RESIZE_OPTIONS::COPY_INIT);
       terme_mul = 0.;
     }
 

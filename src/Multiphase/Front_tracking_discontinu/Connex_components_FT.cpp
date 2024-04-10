@@ -68,9 +68,7 @@ int search_connex_components_local_FT(const Maillage_FT_Disc& mesh, ArrOfInt& nu
   int start_element = 0;
   int num_compo_courant = 0;
   ArrOfInt liste_elems;
-  liste_elems.set_smart_resize(1);
   ArrOfInt tmp_liste;
-  tmp_liste.set_smart_resize(1);
   //const int nb_som_elem=dimension-1;
   const int nb_som_elem=dimension;
 
@@ -163,7 +161,6 @@ int compute_global_connex_components_FT(const Maillage_FT_Disc& mesh, ArrOfInt& 
   markers = 0;
   // Tableau de correspondances entre composantes connexes locales et distantes
   IntTab graph;
-  graph.set_smart_resize(1);
   int graph_size = 0;
   // Parcours des elements virtuels uniquement
   for (i = 0; i < nbelem_tot; i++)

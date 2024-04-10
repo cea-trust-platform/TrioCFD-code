@@ -99,7 +99,6 @@ void Source_Transport_Eps_VDF_Elem::dimensionner_blocs(matrices_t matrices, cons
   if(!mat) return;
 
   IntTab stencil(0, 2);
-  stencil.set_smart_resize(1);
   const int size = mon_eq_transport_K->inconnue().valeurs().dimension(0);
   for (int e = 0; e < size; e++)
     stencil.append_line(e, e);

@@ -97,9 +97,6 @@ void Maillage_FT_IJK::deplacer_sommets(const ArrOfInt& liste_sommets,
   ArrOfInt send_pe_list; // Liste des processeurs a qui on envoie des sommets
   ArrOfInt drapeau_processeur_destination(Process::nproc());
   int max_voisinage = 0;
-  send_pe_list.set_smart_resize(1);
-  liste_sommets_sortis.set_smart_resize(1);
-  liste_processeurs_destination.set_smart_resize(1);// algorithme d'allocation "predictif" pour append_array()
   for (int i_sommet = 0; i_sommet < nb_som; i_sommet++)
     {
       // Indice dans le maillage du sommet a deplacer:
@@ -481,13 +478,9 @@ void Maillage_FT_IJK::lire_maillage_ft_dans_lata(const char *filename_with_path,
       VECT(ArrOfInt) liste_compo_connexe_facettes(nbproc);
       for(int p=0; p<nbproc; p++)
         {
-          liste_sommets[p].set_smart_resize(1);
           liste_sommets[p].resize(0,3);
-          liste_coord[p].set_smart_resize(1);
           liste_coord[p].resize(0,3);
-          liste_facettes[p].set_smart_resize(1);
           liste_facettes[p].resize(0,3);
-          liste_compo_connexe_facettes[p].set_smart_resize(1);
           liste_compo_connexe_facettes[p].resize_array(0);
         }
 
@@ -700,9 +693,6 @@ void Maillage_FT_IJK::initialize_processor_neighbourhood()
   int npy = splitting.get_nprocessor_per_direction(1);
   int npz = splitting.get_nprocessor_per_direction(2);
   voisinage_processeur_.resize_array(np);
-  liste_processeurs_voisins_faces_.set_smart_resize(1);
-  liste_processeurs_voisins_coins_.set_smart_resize(1);
-  liste_processeurs_voisins_aretes_.set_smart_resize(1);
 
   voisinage_processeur_ = 4; // On initialize le tableau comme non-voisins.
   Int3 my_ijk, voisin_ijk;
@@ -957,7 +947,7 @@ void Maillage_FT_IJK::calculer_compo_connexe_sommets(ArrOfIntFT& compo_connexe_s
 
   const int nb_fa7 = facettes_.dimension(0);
   const int nbsom = sommets().dimension(0);
-  compo_connexe_sommets.resize_array(nbsom, Array_base::NOCOPY_NOINIT); // tous les sommets, y compris virtuels.
+  compo_connexe_sommets.resize_array(nbsom, RESIZE_OPTIONS::NOCOPY_NOINIT); // tous les sommets, y compris virtuels.
   compo_connexe_sommets = -10000000; // Force une initialisation bidon.
   // On parcours toutes les facettes.
   for (int i = 0; i < nb_fa7; i++)
@@ -989,7 +979,7 @@ void Maillage_FT_IJK::recopie_force_compo(const Maillage_FT_IJK& source_mesh, co
   Process::exit();
   recopie(source_mesh, MINIMAL);
   const int nf = nb_facettes();
-  compo_connexe_facettes_.resize_array(nf, Array_base::NOCOPY_NOINIT); // tous les sommets, y compris virtuels.
+  compo_connexe_facettes_.resize_array(nf, RESIZE_OPTIONS::NOCOPY_NOINIT); // tous les sommets, y compris virtuels.
   for (int i_facette = 0; i_facette < nf; i_facette++)
     {
       compo_connexe_facettes_[i_facette] = icompo;

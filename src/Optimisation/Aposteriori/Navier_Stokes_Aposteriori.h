@@ -21,18 +21,13 @@
 
 class Navier_Stokes_Aposteriori : public Navier_Stokes_std
 {
-  Declare_instanciable_sans_constructeur(Navier_Stokes_Aposteriori);
+  Declare_instanciable(Navier_Stokes_Aposteriori);
 public:
-
-  // constructeur
-  Navier_Stokes_Aposteriori() : Navier_Stokes_std()
-  {
-    champs_compris_.ajoute_nom_compris("estimateur_aposteriori");
-  }
 
   void discretiser() override;
   const Champ_base& get_champ(const Motcle& nom) const override;
   void creer_champ(const Motcle& motlu) override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
 
   Champ_Post_Operateur_Eqn& get_champ_source() { return champ_src_; }
 

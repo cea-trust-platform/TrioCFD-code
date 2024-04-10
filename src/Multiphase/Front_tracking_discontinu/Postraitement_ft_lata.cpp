@@ -248,7 +248,6 @@ int Postraitement_ft_lata::ecrire_maillage_ft_disc()
   if (no_virtuals_)
     {
       IntTab real_fa7;
-      real_fa7.set_smart_resize(1);
       filter_out_virtual_fa7(real_fa7);
       return fpl.ecrire_domaine_low_level(id_domaine_, sommets, real_fa7, type_elem);
     }

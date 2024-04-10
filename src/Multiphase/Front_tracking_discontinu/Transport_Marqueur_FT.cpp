@@ -55,8 +55,6 @@ Transport_Marqueur_FT::Transport_Marqueur_FT()
   methode_couplage_ = SUIVI;
   phase_marquee_ = -1;
   contrib_one_way = 1;
-  champs_compris_.ajoute_nom_compris("densite_particules");
-  champs_compris_.ajoute_nom_compris("volume_particules");
 
 }
 
@@ -733,8 +731,8 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
   int nb_elem = zvf.nb_elem();
   int dim = xp_elem.dimension(1);
 
-  volumes.resize_array(nb_compo, Array_base::NOCOPY_NOINIT);
-  positions.resize(nb_compo, dim, Array_base::NOCOPY_NOINIT);
+  volumes.resize_array(nb_compo, RESIZE_OPTIONS::NOCOPY_NOINIT);
+  positions.resize(nb_compo, dim, RESIZE_OPTIONS::NOCOPY_NOINIT);
   volumes = 0.;
   positions = 0.;
 
@@ -786,7 +784,7 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
 
   domaine_geom.chercher_elements(positions, elems);
 
-  flags_compo_a_supprimer.resize_array(nb_compo, Array_base::NOCOPY_NOINIT);
+  flags_compo_a_supprimer.resize_array(nb_compo, RESIZE_OPTIONS::NOCOPY_NOINIT);
   flags_compo_a_supprimer = 0;
 
   // Construction d'un tableau de flags des elements reels contenus dans les sous-domaines de destruction
@@ -1219,6 +1217,17 @@ void Transport_Marqueur_FT::update_tableaux_apres_transport(Maillage_FT_Disc& ma
     }
 }
 
+void Transport_Marqueur_FT::get_noms_champs_postraitables(Noms& nom,Option opt) const
+{
+  Equation_base::get_noms_champs_postraitables(nom,opt);
+  Noms noms_compris = champs_compris_.liste_noms_compris();
+  noms_compris.add("densite_particules");
+  noms_compris.add("volume_particules");
+  if (opt==DESCRIPTION)
+    Cerr<<" Transport_Marqueur_FT : "<< noms_compris <<finl;
+  else
+    nom.add(noms_compris);
+}
 
 void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
 {
