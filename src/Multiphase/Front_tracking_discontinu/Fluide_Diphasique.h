@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2024, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,59 +19,62 @@
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
+
 #ifndef Fluide_Diphasique_included
 #define Fluide_Diphasique_included
-#include <Objet_U.h>
+
 #include <Fluide_Incompressible.h>
 #include <Milieu_base.h>
+#include <Objet_U.h>
+#include <Milieu.h>
 
-class Entree;
-class Motcle;
-
-class Fluide_Diphasique : public Milieu_base
+class Fluide_Diphasique: public Milieu_base
 {
   Declare_instanciable_sans_constructeur(Fluide_Diphasique);
 public:
-  Fluide_Diphasique();
-  // Renvoie le fluide de la phase 0 ou 1.
+
+  Fluide_Diphasique()
+  {
+    indic_rayo_ = NONRAYO;
+    formule_mu_ = "standard";
+  }
+
   const Fluide_Incompressible& fluide_phase(int la_phase) const;
   double sigma() const;
   double chaleur_latente() const;
   int formule_mu() const;
-  // Methode utilisee pour le calcul du mu du domaine
 
   // Surcharge des methodes standard du milieu_base :
   void set_param(Param& param) override;
-  void verifier_coherence_champs(int& err,Nom& message) override;
-  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void verifier_coherence_champs(int& err, Nom& message) override;
   int initialiser(const double temps) override;
   void mettre_a_jour(double temps) override;
-  void discretiser(const Probleme_base& pb, const  Discretisation_base& dis) override;
+  void discretiser(const Probleme_base& pb, const Discretisation_base& dis) override;
 
   // L'appel a ces methodes est invalide et genere une erreur
-  const Champ& masse_volumique() const override;
-  Champ&       masse_volumique() override;
-  const Champ_Don& diffusivite() const override;
-  Champ_Don&       diffusivite() override;
-  const Champ_Don& conductivite() const override;
-  Champ_Don&       conductivite() override;
-  const Champ_Don& capacite_calorifique() const override;
-  Champ_Don&       capacite_calorifique() override;
-  const Champ_Don& beta_t() const override;
-  Champ_Don&       beta_t() override;
-
-
-protected:
+  const Champ& masse_volumique() const override { return invalid_<const Champ&>(__func__); }
+  Champ& masse_volumique() override { return invalid_<Champ&>(__func__); }
+  const Champ_Don& diffusivite() const override { return invalid_<const Champ_Don&>(__func__); }
+  Champ_Don& diffusivite() override { return invalid_<Champ_Don&>(__func__); }
+  const Champ_Don& conductivite() const override  { return invalid_<const Champ_Don&>(__func__); }
+  Champ_Don& conductivite() override { return invalid_<Champ_Don&>(__func__); }
+  const Champ_Don& capacite_calorifique() const override  { return invalid_<const Champ_Don&>(__func__); }
+  Champ_Don& capacite_calorifique() override { return invalid_<Champ_Don&>(__func__); }
+  const Champ_Don& beta_t() const override  { return invalid_<const Champ_Don&>(__func__); }
+  Champ_Don& beta_t() override { return invalid_<Champ_Don&>(__func__); }
 
 private:
+  Milieu phase0_, phase1_;
+  Champ_Don sigma_; // Tension de surface (J/m^2)
+  Champ_Don chaleur_latente_; // Enthalpie de changement de phase h(phase1_) - h(phase0_) (J/kg/K)
+  Motcle formule_mu_; // Formule utilisee pour le calcul de la moyenne de mu
 
-  Fluide_Incompressible phase0_;
-  Fluide_Incompressible phase1_;
-  // Tension de surface (J/m^2)
-  Champ_Don sigma_;
-  // Enthalpie de changement de phase h(phase1_) - h(phase0_) (J/kg/K)
-  Champ_Don chaleur_latente_;
-  // Formule utilisee pour le calcul de la moyenne de mu
-  Motcle formule_mu_;
+  template <typename RETURN_TYPE>
+  RETURN_TYPE invalid_(const char * nom_funct) const
+  {
+    Cerr << "Invalid call to the method Fluide_Diphasique::" << nom_funct << " !!!" << finl;
+    throw;
+  }
 };
-#endif
+
+#endif /* Fluide_Diphasique_included */
