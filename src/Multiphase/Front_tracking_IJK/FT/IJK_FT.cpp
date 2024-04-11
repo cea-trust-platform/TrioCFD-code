@@ -1691,7 +1691,6 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   LecFicDiffuse_JDD fichier(fichier_reprise);
   Param param(que_suis_je());
   param.ajouter("tinit", &current_time_);
-
   param.ajouter("terme_acceleration_init", &terme_source_acceleration_);
   param.ajouter("fichier_reprise_vitesse", &fichier_reprise_vitesse_);
   param.ajouter("timestep_reprise_vitesse", &timestep_reprise_vitesse_);
@@ -1726,6 +1725,7 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
 
   // Appeler ensuite initialize() pour lire les fichiers lata etc...
   Cerr << "Reprise des donnees a t=" << current_time_ << "\n" << finl;
+  IJK_Shear_Periodic_helpler::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
   reprise_ = 1;
   interfaces_.set_reprise(1);
   Nom prefix = dirname(fichier_reprise);
@@ -2026,8 +2026,10 @@ int IJK_FT_double::initialise()
   // On la met a jour 2 fois, une fois next et une fois old
   update_twice_indicator_field();
 
+  // Maj des grandeurs shear perio
   if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
+      IJK_Shear_Periodic_helpler::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.get_shear_BC_helpler().set_indicatrice_ghost_zmin_(I_ns_, 0);
@@ -2110,6 +2112,7 @@ int IJK_FT_double::initialise()
 
   if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
+      IJK_Shear_Periodic_helpler::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
       rho_field_.get_shear_BC_helpler().set_indicatrice_ghost_zmin_(I_ns_, 0);
@@ -3808,6 +3811,8 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
   //   si je ne les re-initialise pas alors je n'aurai pas leur valeur pour chaque avancement (apres je pourrai me passer de ce niveau de detail)
   //   ==> Ce qui est certain c'est que je ne dois pas re initialiser ICI mes rho_u_... puisqu'ils sont
   //       evalues EN DEHORS des boucles de RK3.
+
+
   if (rk_step<=0)
     {
       terme_convection_ = 0.;
@@ -3832,6 +3837,7 @@ void IJK_FT_double::calculer_dv(const double timestep, const double time, const 
   static Stat_Counter_Id calcul_dv_counter_ = statistiques().new_counter(2, "maj vitesse : calcul derivee vitesse");
   statistiques().begin_count(calcul_dv_counter_);
   // Calcul d_velocity = convection
+
   if (!disable_convection_qdm_)
     {
       if (velocity_convection_op_.get_convection_op_option_rank() == non_conservative_simple)
