@@ -54,6 +54,12 @@ void Fluide_Diphasique::verifier_coherence_champs(int& err, Nom& msg)
       err = 1;
     }
 
+  if (phase0_->a_gravite() || phase1_->a_gravite())
+    {
+      msg += "The gravity field should be defined in the Fluide_Diphasique bloc and not inside the Incompressible fluids bloc. \n";
+      err = 1;
+    }
+
   if (!sub_type(Champ_Uniforme, sigma_.valeur()))
     {
       msg += "The surface tension sigma must be specify with a Champ_Uniforme type field. \n";
