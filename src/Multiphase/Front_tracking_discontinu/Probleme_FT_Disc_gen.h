@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2024, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,9 +23,9 @@
 #ifndef Probleme_FT_Disc_gen_included
 #define Probleme_FT_Disc_gen_included
 
+#include <Triple_Line_Model_FT_Disc.h>
 #include <Pb_Fluide_base.h>
 #include <TRUST_Vector.h>
-#include <Triple_Line_Model_FT_Disc.h>
 #include <TRUST_Ref.h>
 
 class Chimie;
@@ -34,47 +34,29 @@ class Milieu_base;
 class Navier_Stokes_FT_Disc;
 class Transport_Interfaces_FT_Disc;
 
-class Probleme_FT_Disc_gen : public Pb_Fluide_base
+class Probleme_FT_Disc_gen: public Pb_Fluide_base
 {
   Declare_instanciable(Probleme_FT_Disc_gen);
 public:
-  //
-  // Methodes virtuelles pures de Probleme_base :
-  //
   int nombre_d_equations(void) const override;
   const Equation_base& equation(int i) const override;
   Equation_base& equation(int i) override;
 
-  bool is_pb_FT() override { return true ; }
-
-  //
-  // Methodes reimplementees de Probleme_base :
-  //
   const Equation_base& get_equation_by_name(const Nom& le_nom) const override;
   Equation_base& getset_equation_by_name(const Nom& le_nom) override;
-  void   associer_milieu_base(const Milieu_base& milieu) override;
+  void associer_milieu_base(const Milieu_base& milieu) override;
   int associer_(Objet_U& ob) override;
-  void   completer(void) override;
-  int    verifier(void) override;
-  void   preparer_calcul(void) override;
+  void completer(void) override;
+  int verifier(void) override;
+  void preparer_calcul(void) override;
   double calculer_pas_de_temps(void) const override;
-  void   mettre_a_jour(double temps) override;
+  void mettre_a_jour(double temps) override;
   virtual bool updateGivenFields() override;
-  //
-  // Methodes nouvelles de Probleme_FT_Disc_gen
-  //
-  void associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1);
-  const Triple_Line_Model_FT_Disc& tcl() const
-  {
-    return tcl_ ;
-  };
-  Triple_Line_Model_FT_Disc& tcl()
-  {
-    return tcl_ ;
-  };
+
   virtual void associer_equation(Equation_base& eq);
+
   // Raccourcis pour le Front_Tracking
-  virtual const Navier_Stokes_FT_Disc&         equation_hydraulique(const Motcle& nom) const;
+  virtual const Navier_Stokes_FT_Disc& equation_hydraulique(const Motcle& nom) const;
   virtual const Transport_Interfaces_FT_Disc& equation_interfaces(const Motcle& nom) const;
 
   // methodes appelees par resoudre_ft_disc -> par encore codees
@@ -82,14 +64,16 @@ public:
 
   // methodes appelees dans le readOn -> on ne sait pas encore s'il faut les modifier
   void discretiser(Discretisation_base&) override;
-protected:
+
+  void associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1);
+  const Triple_Line_Model_FT_Disc& tcl() const { return tcl_; }
+  Triple_Line_Model_FT_Disc& tcl() { return tcl_; }
 
 private:
-  // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces,
-  //   puis ConvDiff.
+  // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces, puis ConvDiff.
   VECT(REF(Equation_base)) equations_;
-  REF(Chimie)  la_chimie_;
+  REF(Chimie) la_chimie_;
   Triple_Line_Model_FT_Disc tcl_;
 };
 
-#endif
+#endif /* Probleme_FT_Disc_gen_included */

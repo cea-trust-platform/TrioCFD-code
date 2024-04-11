@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2024, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,42 +20,21 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Probleme_FT_Disc_gen.h>
-#include <TRUST_List.h>
-#include <Transport_Interfaces_FT_Disc.h>
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
-#include <Constituant.h>
 #include <Convection_Diffusion_Concentration.h>
-#include <Chimie.h>
+#include <Transport_Interfaces_FT_Disc.h>
 #include <Triple_Line_Model_FT_Disc.h>
-#include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
+#include <Probleme_FT_Disc_gen.h>
+#include <Dirichlet_paroi_fixe.h>
+#include <Constituant.h>
+#include <TRUST_List.h>
+#include <Chimie.h>
 
-Implemente_instanciable(Probleme_FT_Disc_gen,"Probleme_FT_Disc_gen",Pb_Fluide_base);
+Implemente_instanciable(Probleme_FT_Disc_gen, "Probleme_FT_Disc_gen", Pb_Fluide_base);
 
-Entree& Probleme_FT_Disc_gen::readOn(Entree& is)
-{
-  return Pb_Fluide_base::readOn(is);
-}
-
-Sortie& Probleme_FT_Disc_gen::printOn(Sortie& os) const
-{
-  return os;
-}
-
-// Pour construire le probleme, il faut lui associer les differentes
-// equations dans cet ordre :
-//
-//  Probleme_FT_Disc_gen pb
-//  Navier_Stokes_FT_Disc eq_ns
-//  Associer pb eq_ns
-//  Transport_Interfaces_FT_Disc eq_transport
-//  Associer pb eq_transport
-//  ...
-//  Discretiser pb
-//  Lire pb {
-//     comme d'habitude
-//  }
+Entree& Probleme_FT_Disc_gen::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
+Sortie& Probleme_FT_Disc_gen::printOn(Sortie& os) const { return os; }
 
 int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
 {
@@ -64,15 +43,14 @@ int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
       associer_equation(ref_cast(Equation_base, ob));
       return 1;
     }
-  if (sub_type(Chimie,ob))
+  if (sub_type(Chimie, ob))
     {
-      la_chimie_=ref_cast(Chimie,ob);
+      la_chimie_ = ref_cast(Chimie, ob);
       return 1;
     }
-  if (sub_type(Triple_Line_Model_FT_Disc,ob))
+  if (sub_type(Triple_Line_Model_FT_Disc, ob))
     {
-      //tcl_=ref_cast(Triple_Line_Model_FT_Disc,ob);
-      associate_triple_line_model(ref_cast(Triple_Line_Model_FT_Disc,ob));
+      associate_triple_line_model(ref_cast(Triple_Line_Model_FT_Disc, ob));
       return 1;
     }
   return Pb_Fluide_base::associer_(ob);
@@ -82,11 +60,11 @@ void Probleme_FT_Disc_gen::associer_equation(Equation_base& eq)
 {
   // Ajoute une reference a l'equation dans le tableau
 
-  if (equations_.size()==1)
-    if (!sub_type(Navier_Stokes_FT_Disc,equation(0)))
+  if (equations_.size() == 1)
+    if (!sub_type(Navier_Stokes_FT_Disc, equation(0)))
       {
-        Cerr<<"WARNING!!! L'equation d'hydraulique n'a pas ete associee comme premiere equation"<<finl;
-        Cerr<<"WARNING! considered as ERROR, exiting... "<<finl;
+        Cerr << "WARNING!!! L'equation d'hydraulique n'a pas ete associee comme premiere equation" << finl;
+        Cerr << "WARNING! considered as ERROR, exiting... " << finl;
         Process::exit();
       }
   equations_.add(eq);
@@ -140,7 +118,7 @@ Equation_base& Probleme_FT_Disc_gen::equation(int i)
 const Equation_base& Probleme_FT_Disc_gen::get_equation_by_name(const Nom& un_nom) const
 {
   const int n = nombre_d_equations();
-  const Equation_base * eq = 0;
+  const Equation_base *eq = 0;
   int i;
   for (i = 0; i < n; i++)
     {
@@ -170,7 +148,7 @@ const Equation_base& Probleme_FT_Disc_gen::get_equation_by_name(const Nom& un_no
 Equation_base& Probleme_FT_Disc_gen::getset_equation_by_name(const Nom& un_nom)
 {
   const int n = nombre_d_equations();
-  Equation_base * eq = 0;
+  Equation_base *eq = 0;
   int i;
   for (i = 0; i < n; i++)
     {
@@ -202,14 +180,13 @@ Probleme_FT_Disc_gen::equation_interfaces(const Motcle& un_nom) const
 {
   const int n = nombre_d_equations();
   int i;
-  const Transport_Interfaces_FT_Disc * eq_ptr = 0;
+  const Transport_Interfaces_FT_Disc *eq_ptr = 0;
   for (i = 0; i < n; i++)
     {
       const Equation_base& eq = equation(i);
-      if (un_nom == eq.le_nom()
-          && sub_type(Transport_Interfaces_FT_Disc, eq))
+      if (un_nom == eq.le_nom() && sub_type(Transport_Interfaces_FT_Disc, eq))
         {
-          eq_ptr = & ref_cast(Transport_Interfaces_FT_Disc, eq);
+          eq_ptr = &ref_cast(Transport_Interfaces_FT_Disc, eq);
           break;
         }
     }
@@ -217,9 +194,8 @@ Probleme_FT_Disc_gen::equation_interfaces(const Motcle& un_nom) const
     {
       if (Process::je_suis_maitre())
         {
-          Cerr << "Erreur dans Probleme_FT_Disc_gen::equation_interfaces(const Motcle & nom)\n"
-               << " Le probleme ne contient pas d'equation Transport_Interfaces_FT_Disc\n"
-               << " de nom " << un_nom << finl;
+          Cerr << "Erreur dans Probleme_FT_Disc_gen::equation_interfaces(const Motcle & nom)\n" << " Le probleme ne contient pas d'equation Transport_Interfaces_FT_Disc\n" << " de nom " << un_nom
+               << finl;
           Cerr << "Liste des equations du probleme:" << finl;
           for (i = 0; i < n; i++)
             {
@@ -239,14 +215,13 @@ Probleme_FT_Disc_gen::equation_hydraulique(const Motcle& un_nom) const
 {
   const int n = nombre_d_equations();
   int i;
-  const Navier_Stokes_FT_Disc * eq_ptr = 0;
+  const Navier_Stokes_FT_Disc *eq_ptr = 0;
   for (i = 0; i < n; i++)
     {
       const Equation_base& eq = equation(i);
-      if (un_nom == eq.le_nom()
-          && sub_type(Navier_Stokes_FT_Disc, eq))
+      if (un_nom == eq.le_nom() && sub_type(Navier_Stokes_FT_Disc, eq))
         {
-          eq_ptr = & ref_cast(Navier_Stokes_FT_Disc, eq);
+          eq_ptr = &ref_cast(Navier_Stokes_FT_Disc, eq);
           break;
         }
     }
@@ -254,9 +229,7 @@ Probleme_FT_Disc_gen::equation_hydraulique(const Motcle& un_nom) const
     {
       if (Process::je_suis_maitre())
         {
-          Cerr << "Erreur dans Probleme_FT_Disc_gen::equation_hydraulique(const Motcle & nom)\n"
-               << " Le probleme ne contient pas d'equation Navier_Stokes_FT_Disc\n"
-               << " de nom " << un_nom << finl;
+          Cerr << "Erreur dans Probleme_FT_Disc_gen::equation_hydraulique(const Motcle & nom)\n" << " Le probleme ne contient pas d'equation Navier_Stokes_FT_Disc\n" << " de nom " << un_nom << finl;
           Cerr << "Liste des equations du probleme:" << finl;
           for (i = 0; i < n; i++)
             {
@@ -273,7 +246,6 @@ Probleme_FT_Disc_gen::equation_hydraulique(const Motcle& un_nom) const
 
 double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
 {
-
 
   // remaillage, calcul indicatrice, et autres
   //mon_equation_interfaces->preparer_pas_de_temps();
@@ -294,12 +266,11 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
   if (la_chimie_.non_nul())
 
     {
-      dt=std::min(dt,la_chimie_.valeur().calculer_pas_de_temps());
-      dt=mp_min(dt);
+      dt = std::min(dt, la_chimie_.valeur().calculer_pas_de_temps());
+      dt = mp_min(dt);
     }
   return dt;
 }
-
 
 void Probleme_FT_Disc_gen::discretiser(Discretisation_base& dis)
 {
@@ -312,7 +283,7 @@ void Probleme_FT_Disc_gen::mettre_a_jour(double temps)
   if (schema_temps().que_suis_je() == "RK3_FT")
     {
       int nb_eqn = nombre_d_equations();
-      for (int i=2; i<nb_eqn; i++)
+      for (int i = 2; i < nb_eqn; i++)
         equation(i).mettre_a_jour(temps);
 
       les_postraitements_.mettre_a_jour(temps);
@@ -335,7 +306,6 @@ void Probleme_FT_Disc_gen::preparer_mise_a_jour(void)
   //   -> etalement de la courbure
 }
 
-
 void Probleme_FT_Disc_gen::completer(void)
 {
   Pb_Fluide_base::completer();
@@ -347,16 +317,16 @@ void Probleme_FT_Disc_gen::completer(void)
 
   // TODO : A activer peut-etre?
   /*
-    // CLEANER, but how usefull?
-    // Un premier nettoyage des noeuds initiaux si besoin:
-    const int nb_eqn = nombre_d_equations();
-    for (int i=2; i<nb_eqn; i++)
-      if (sub_type(Transport_Interfaces_FT_Disc,equation(i)))
-        {
-          Transport_Interfaces_FT_Disc& transport = ref_cast(Transport_Interfaces_FT_Disc,equation(i));
-          transport.nettoyer_maillage();
-        }
-  */
+   // CLEANER, but how usefull?
+   // Un premier nettoyage des noeuds initiaux si besoin:
+   const int nb_eqn = nombre_d_equations();
+   for (int i=2; i<nb_eqn; i++)
+   if (sub_type(Transport_Interfaces_FT_Disc,equation(i)))
+   {
+   Transport_Interfaces_FT_Disc& transport = ref_cast(Transport_Interfaces_FT_Disc,equation(i));
+   transport.nettoyer_maillage();
+   }
+   */
 }
 
 int Probleme_FT_Disc_gen::verifier(void)
@@ -366,7 +336,7 @@ int Probleme_FT_Disc_gen::verifier(void)
 
 void Probleme_FT_Disc_gen::preparer_calcul(void)
 {
-  Cerr<<"Probleme_FT_Disc_gen::preparer_calcul"<<finl;
+  Cerr << "Probleme_FT_Disc_gen::preparer_calcul" << finl;
   Pb_Fluide_base::preparer_calcul();
 }
 
@@ -375,17 +345,14 @@ bool Probleme_FT_Disc_gen::updateGivenFields()
   // add: fill the lists of TCL model if actived
   // Which will be used for updated the BCs
 
-  if (tcl ().is_activated ())
+  if (tcl().is_activated())
     {
 
       ArrOfInt elems_with_CL_contrib;
       ArrOfInt faces_with_CL_contrib;
       ArrOfDouble mpoint_from_CL;
       ArrOfDouble Q_from_CL;
-      tcl ().compute_TCL_fluxes_in_all_boundary_cells (elems_with_CL_contrib,
-                                                       faces_with_CL_contrib,
-                                                       mpoint_from_CL,
-                                                       Q_from_CL);
+      tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib, faces_with_CL_contrib, mpoint_from_CL, Q_from_CL);
     }
   Probleme_base::updateGivenFields();
   return true;
