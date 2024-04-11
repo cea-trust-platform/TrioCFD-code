@@ -92,6 +92,7 @@ IJK_FT_double
   check_divergence
   gravite 3 -10.0 0.0 0.0
   interfaces {
+   terme_gravite rho_g
    fichier_reprise_interface init.lata
    timestep_reprise_interface       1
    lata_meshname   INTERFACES 

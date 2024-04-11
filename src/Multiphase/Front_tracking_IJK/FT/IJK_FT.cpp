@@ -1114,10 +1114,10 @@ void IJK_FT_double::force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJ
   // Calcule la hauteur du plan ou sera impose la vitesse par rapport a la bulle reelle
   double xobj = xb + nb_diam*Dbx;
   // Calcule la hauteur du plan ou sera impose la vitesse par rapport a la bulle shear periodique par le shear positif
-  double xb_offsetp  = xb +  std::fmod(std::fmod(IJK_Splitting::shear_x_time_, lx)+lx,lx) ;
+  double xb_offsetp  = xb +  std::fmod(std::fmod(IJK_Shear_Periodic_helpler::shear_x_time_, lx)+lx,lx) ;
   double xobj_offsetp = xb_offsetp + nb_diam*Dbx;
   // Calcule la hauteur du plan ou sera impose la vitesse par rapport a la bulle shear periodique par le shear negatif
-  double xb_offsetm  = xb -  std::fmod(std::fmod(IJK_Splitting::shear_x_time_, lx)+lx,lx) ;
+  double xb_offsetm  = xb -  std::fmod(std::fmod(IJK_Shear_Periodic_helpler::shear_x_time_, lx)+lx,lx) ;
   double xobj_offsetm = xb_offsetm + nb_diam*Dbx;
 
   perio =  geom.get_periodic_flag(DIRECTION_I);
@@ -2026,7 +2026,7 @@ int IJK_FT_double::initialise()
   // On la met a jour 2 fois, une fois next et une fois old
   update_twice_indicator_field();
 
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
@@ -2108,7 +2108,7 @@ int IJK_FT_double::initialise()
       update_twice_indicator_field();
     }
 
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
@@ -2678,7 +2678,7 @@ void IJK_FT_double::run()
   thermal_probes_ghost_cells_ = 2;
   thermals_.compute_ghost_cell_numbers_for_subproblems(splitting_, thermal_probes_ghost_cells_);
   thermal_probes_ghost_cells_ = thermals_.get_probes_ghost_cells(thermal_probes_ghost_cells_);
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       allocate_velocity(velocity_, splitting_, 2, boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()));
     }
@@ -2687,7 +2687,7 @@ void IJK_FT_double::run()
       allocate_velocity(velocity_, splitting_, thermal_probes_ghost_cells_);
     }
 
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       if (splitting_.get_nb_elem_local(2) < 4 )
         {
@@ -2763,21 +2763,21 @@ void IJK_FT_double::run()
       molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, mu_vapeur_, mu_liquide_);
       rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, rho_vapeur_, rho_liquide_);
       nalloc += 2;
-      IJK_Splitting::rho_vap_ref_for_poisson_=rho_vapeur_;
-      IJK_Splitting::rho_liq_ref_for_poisson_=rho_liquide_;
+      IJK_Shear_Periodic_helpler::rho_vap_ref_for_poisson_=rho_vapeur_;
+      IJK_Shear_Periodic_helpler::rho_liq_ref_for_poisson_=rho_liquide_;
       if (use_inv_rho_)
         {
           inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2, 0 ,1, false, 2, 1./rho_vapeur_, 1./rho_liquide_);
-          IJK_Splitting::rho_vap_ref_for_poisson_=1./rho_vapeur_;
-          IJK_Splitting::rho_liq_ref_for_poisson_=1./rho_liquide_;
+          IJK_Shear_Periodic_helpler::rho_vap_ref_for_poisson_=1./rho_vapeur_;
+          IJK_Shear_Periodic_helpler::rho_liq_ref_for_poisson_=1./rho_liquide_;
           nalloc += 1;
         }
     }
   else
     {
 
-      IJK_Splitting::rho_vap_ref_for_poisson_=rho_vapeur_;
-      IJK_Splitting::rho_liq_ref_for_poisson_=rho_liquide_;
+      IJK_Shear_Periodic_helpler::rho_vap_ref_for_poisson_=rho_vapeur_;
+      IJK_Shear_Periodic_helpler::rho_liq_ref_for_poisson_=rho_liquide_;
       molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2);
       rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
       nalloc += 2;
@@ -2785,8 +2785,8 @@ void IJK_FT_double::run()
         {
           inv_rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
           nalloc += 1;
-          IJK_Splitting::rho_vap_ref_for_poisson_=1./rho_vapeur_;
-          IJK_Splitting::rho_liq_ref_for_poisson_=1./rho_liquide_;
+          IJK_Shear_Periodic_helpler::rho_vap_ref_for_poisson_=1./rho_vapeur_;
+          IJK_Shear_Periodic_helpler::rho_liq_ref_for_poisson_=1./rho_liquide_;
         }
     }
 
@@ -3460,7 +3460,7 @@ void IJK_FT_double::run()
       //ab-forcage-control-ecoulement-fin
       current_time_ += timestep_;
       // stock dans le spliting le decallage periodique total avec condition de shear (current_time_) et celui du pas de temps (timestep_)
-      IJK_Splitting::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
+      IJK_Shear_Periodic_helpler::shear_x_time_ = boundary_conditions_.get_dU_perio()*(current_time_ + boundary_conditions_.get_t0_shear());
 
       if (current_time_ >= post_.t_debut_statistiques())
         {
@@ -4667,7 +4667,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
             }
           Cerr << "Force upstream velocity" << finl;
 
-          if (IJK_Splitting::defilement_ == 1)
+          if (IJK_Shear_Periodic_helpler::defilement_ == 1)
             {
               double vx;
               double vy;
@@ -4889,7 +4889,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
       // Forcage de la vitesse en amont de la bulle :
       if (vitesse_upstream_ > -1e20)
         {
-          if (IJK_Splitting::defilement_ == 1)
+          if (IJK_Shear_Periodic_helpler::defilement_ == 1)
             {
 
               double vx;
@@ -5036,7 +5036,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);
     redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);
 
-    if (IJK_Splitting::defilement_ == 1)
+    if (IJK_Shear_Periodic_helpler::defilement_ == 1)
       {
         // after redistribute, velocity in ft domain must be shifted by the shear
         velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), ijk_splitting_ft_extension_);
@@ -5098,7 +5098,7 @@ void IJK_FT_double::deplacer_interfaces(const double timestep, const int rk_step
     thermals_.recompute_temperature_init();
   // mise a jour de l'indicatrice pour les variables monofluides
 
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       // mise a jour de l'indicatrice pour les variables monofluides
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
@@ -5142,7 +5142,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
   redistribute_to_splitting_ft_faces_[1].redistribute(velocity_[1], velocity_ft_[1]);
   redistribute_to_splitting_ft_faces_[0].redistribute(velocity_[0], velocity_ft_[0]);
 
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       // after redistribute, velocity in ft domain must be shifted by the shear
       velocity_ft_[0].redistribute_with_shear_domain_ft(velocity_[0], boundary_conditions_.get_dU_perio(boundary_conditions_.get_resolution_u_prime_()), ijk_splitting_ft_extension_);
@@ -5171,7 +5171,7 @@ void IJK_FT_double::deplacer_interfaces_rk3(const double timestep, const int rk_
 
   update_indicator_field();
 
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       redistribute_from_splitting_ft_elem_ghostz_min_.redistribute(interfaces_.I_ft(), I_ns_);
       redistribute_from_splitting_ft_elem_ghostz_max_.redistribute(interfaces_.I_ft(), I_ns_);
