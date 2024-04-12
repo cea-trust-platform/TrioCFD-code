@@ -26,7 +26,9 @@
 #include <Triple_Line_Model_FT_Disc.h>
 #include <Pb_Fluide_base.h>
 #include <TRUST_Vector.h>
+#include <TRUST_List.h>
 #include <TRUST_Ref.h>
+#include <Equation.h>
 
 class Chimie;
 class Equation_base;
@@ -38,9 +40,11 @@ class Probleme_FT_Disc_gen: public Pb_Fluide_base
 {
   Declare_instanciable(Probleme_FT_Disc_gen);
 public:
-  int nombre_d_equations(void) const override;
+  int nombre_d_equations() const override { return equations_.size(); }
   const Equation_base& equation(int i) const override;
   Equation_base& equation(int i) override;
+
+  Entree& lire_equations(Entree& , Motcle& ) override;
 
   const Equation_base& get_equation_by_name(const Nom& le_nom) const override;
   Equation_base& getset_equation_by_name(const Nom& le_nom) override;
@@ -53,14 +57,9 @@ public:
   void mettre_a_jour(double temps) override;
   virtual bool updateGivenFields() override;
 
-  virtual void associer_equation(Equation_base& eq);
-
   // Raccourcis pour le Front_Tracking
   virtual const Navier_Stokes_FT_Disc& equation_hydraulique(const Motcle& nom) const;
   virtual const Transport_Interfaces_FT_Disc& equation_interfaces(const Motcle& nom) const;
-
-  // methodes appelees par resoudre_ft_disc -> par encore codees
-  virtual void preparer_mise_a_jour(void);
 
   // methodes appelees dans le readOn -> on ne sait pas encore s'il faut les modifier
   void discretiser(Discretisation_base&) override;
@@ -71,7 +70,8 @@ public:
 
 private:
   // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces, puis ConvDiff.
-  VECT(REF(Equation_base)) equations_;
+//  VECT(REF(Equation_base)) equations_;
+  LIST(Equation) equations_;
   REF(Chimie) la_chimie_;
   Triple_Line_Model_FT_Disc tcl_;
 };
