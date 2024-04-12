@@ -35,10 +35,9 @@ class Fluide_Diphasique;
 
 class Navier_Stokes_FT_Disc: public Navier_Stokes_Turbulent
 {
-  Declare_instanciable_sans_constructeur(Navier_Stokes_FT_Disc);
+  Declare_instanciable(Navier_Stokes_FT_Disc);
 public:
 
-  Navier_Stokes_FT_Disc();
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   const Milieu_base& milieu() const override;
@@ -106,7 +105,7 @@ private:
   Navier_Stokes_FT_Disc_interne& variables_internes();
 
   // Ne pas utiliser ce pointeur : utiliser variables_internes() a la place !
-  Navier_Stokes_FT_Disc_interne *variables_internes_;
+  Navier_Stokes_FT_Disc_interne variables_internes_;
 
   double minx = -123., maxx = -123., pente = -123.;
   int is_repulsion = 0;

@@ -45,7 +45,7 @@
 
 #define NS_VERBOSE 0 // To activate verbose mode on err ...
 
-Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_FT_Disc, "Navier_Stokes_FT_Disc", Navier_Stokes_Turbulent);
+Implemente_instanciable(Navier_Stokes_FT_Disc, "Navier_Stokes_FT_Disc", Navier_Stokes_Turbulent);
 
 /*! @brief Calcul de champ_rho_faces_ et champ_rho_elem_ en fonction de l'indicatrice: rho_elem_ = indicatrice * ( rho(phase_1) - rho(phase_0) ) + rho(phase_0)
  *
@@ -109,7 +109,6 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Domaine_dis_base& doma
             {
               Cerr << "The method specified for formule_mu in not recognized. \n" << finl;
               Cerr << "you can choose : standard, arithmetic or harmonic. \n" << finl;
-              //Cerr << "We should not be here Navier_Stokes_FT_Disc::FT_disc_calculer_champs_rho_mu_nu_dipha" << finl;
               Process::exit();
             }
           }
@@ -212,16 +211,6 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis,
 
       val_rho_faces.echange_espace_virtuel();
     }
-}
-
-Navier_Stokes_FT_Disc::Navier_Stokes_FT_Disc()
-{
-  variables_internes_ = new Navier_Stokes_FT_Disc_interne;
-}
-
-Navier_Stokes_FT_Disc::~Navier_Stokes_FT_Disc()
-{
-  delete variables_internes_;
 }
 
 Sortie& Navier_Stokes_FT_Disc::printOn(Sortie& os) const
@@ -467,28 +456,28 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
         {
         case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the historical way" << " where a mean value + upwind is used." << finl;
             return 1;
           }
         case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the field indicatrice_faces" << " as defined by the interfacial transport option." << finl;
             return 1;
           }
         case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area" << " and on the normal to the interface." << finl;
             return 1;
           }
         case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the historical way" << " where a mean value + upwind is used." << " Additionally, uv_ext is used."
                    << finl;
@@ -496,7 +485,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
           }
         case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the field indicatrice_faces" << " as defined by the interfacial transport option."
                    << " Additionally, uv_ext is used." << finl;
@@ -504,7 +493,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
           }
         case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area" << " and on the normal to the interface." << " Additionally, uv_ext is used."
                    << finl;
@@ -512,7 +501,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
           }
         case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the historical way" << " where a mean value + upwind is used." << " Additionally, ui_ext is used."
                    << finl;
@@ -520,7 +509,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
           }
         case Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the field indicatrice_faces" << " as defined by the interfacial transport option."
                    << " Additionally, ui_ext is used." << finl;
@@ -528,7 +517,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
           }
         case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT:
           {
-            variables_internes_->type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT;
+            variables_internes_.type_interpol_indic_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT;
             if (Process::je_suis_maitre())
               Cerr << " The interpolation of indicatrice to faces in calculer_dI_dt is based on the interfacial area" << " and on the normal to the interface." << " Additionally, ui_ext is used."
                    << finl;
@@ -555,28 +544,28 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
         {
         case Navier_Stokes_FT_Disc_interne::NO_CORRECTION:
           {
-            variables_internes_->OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::NO_CORRECTION;
+            variables_internes_.OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::NO_CORRECTION;
             if (Process::je_suis_maitre())
               Cerr << " No correction of div(chi u) at exit (historical way)" << finl;
             return 1;
           }
         case Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC:
           {
-            variables_internes_->OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC;
+            variables_internes_.OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC;
             if (Process::je_suis_maitre())
               Cerr << " Correction of chi in ghost cells (virtually)" << finl;
             return 1;
           }
         case Navier_Stokes_FT_Disc_interne::ZERO_NET_FLUX_ON_MIXED_CELLS:
           {
-            variables_internes_->OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::ZERO_NET_FLUX_ON_MIXED_CELLS;
+            variables_internes_.OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::ZERO_NET_FLUX_ON_MIXED_CELLS;
             if (Process::je_suis_maitre())
               Cerr << " correction of div(chi u) at exit : zero divergence on cells touching outlet." << finl;
             return 1;
           }
         case Navier_Stokes_FT_Disc_interne::ZERO_OUT_FLUX_ON_MIXED_CELLS:
           {
-            variables_internes_->OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::ZERO_OUT_FLUX_ON_MIXED_CELLS;
+            variables_internes_.OutletCorrection_pour_dI_dt_ = Navier_Stokes_FT_Disc_interne::ZERO_OUT_FLUX_ON_MIXED_CELLS;
             if (Process::je_suis_maitre())
               {
                 Cerr << " correction of div(chi u) at exit : zero vapour mass flux on cells touching outlet." << finl;
@@ -1488,7 +1477,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(const Champ_base& indi
       gradient.calculer(indic_p1b, gradient_i.valeurs());
     }
 
-  const bool ghost_correction = (variables_internes_->OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC);
+  const bool ghost_correction = (variables_internes_.OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC);
   if (ghost_correction)
     {
       // Correction du gradient a la ligne de contact :
@@ -2188,9 +2177,9 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
   div_tmp.l_op_base().associer_eqn(*this);
   div_tmp->completer();
 
-  if ((variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT)
-      || (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT)
-      || (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT))
+  if ((variables_internes_.type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT)
+      || (variables_internes_.type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UVEXT)
+      || (variables_internes_.type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UVEXT))
     {
       // Avec changement de phase, on veut reconstruire u_vap (ie phase 0)
       // Prise en compte du terme source div(u) du changement de phase
@@ -2201,9 +2190,9 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
           tmp += variables_internes().vitesse_jump0_.valeurs();
         }
     }
-  if ((variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT)
-      || (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT)
-      || (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT))
+  if ((variables_internes_.type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT)
+      || (variables_internes_.type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_MODIFIEE_UIEXT)
+      || (variables_internes_.type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT))
     {
       // Reconstruction d'un champ de vitesse interfaciale (ie phase 1)
       // Prise en compte du terme source div(u) du changement de phase
@@ -2224,8 +2213,8 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
         }
     }
 
-  const bool ghost_correction = (variables_internes_->OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC);
-  switch(variables_internes_->type_interpol_indic_pour_dI_dt_)
+  const bool ghost_correction = (variables_internes_.OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC);
+  switch(variables_internes_.type_interpol_indic_pour_dI_dt_)
     {
     case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD:
     case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT:
@@ -2340,7 +2329,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
       Process::exit();
     }
 
-  if (variables_internes_->type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT)
+  if (variables_internes_.type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED_UIEXT)
     tmp *= -1;
 
   // Question: il y a un assert_espace_virtuel_vect dans divergence.calculer,
@@ -2367,7 +2356,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
   // Concretement, il suffit de faire "resu(elem) =0." dans les mailles concernees.
   //   - On recalcule le flux sur la face de bord des mailles mixtes et on retranche celui qui avait ete ajoute (ZERO_OUT_FLUX_ON_MIXED_CELLS)
   // Cela ne laisse pas sortir la vapeur, ce n'est donc pas bon.
-  switch(variables_internes_->OutletCorrection_pour_dI_dt_)
+  switch(variables_internes_.OutletCorrection_pour_dI_dt_)
     {
     case Navier_Stokes_FT_Disc_interne::NO_CORRECTION:
     case Navier_Stokes_FT_Disc_interne::CORRECTION_GHOST_INDIC:
@@ -2408,9 +2397,9 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
                     if (indic * (1 - indic) > 1e-6) // In a mixed cell!
                       {
                         const double coef = face_surfaces(num_face); //*porosite_surf(num_face);
-                        if (variables_internes_->OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::ZERO_NET_FLUX_ON_MIXED_CELLS)
+                        if (variables_internes_.OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::ZERO_NET_FLUX_ON_MIXED_CELLS)
                           resu(elem) = 0.;
-                        else if (variables_internes_->OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::ZERO_OUT_FLUX_ON_MIXED_CELLS)
+                        else if (variables_internes_.OutletCorrection_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::ZERO_OUT_FLUX_ON_MIXED_CELLS)
                           {
                             for (int j = 0; j < dim; j++)
                               {
@@ -2461,7 +2450,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
   }
 #endif
 
-  switch(variables_internes_->type_interpol_indic_pour_dI_dt_)
+  switch(variables_internes_.type_interpol_indic_pour_dI_dt_)
     {
     case Navier_Stokes_FT_Disc_interne::INTERP_AI_BASED:
     case Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UVEXT:
@@ -3725,11 +3714,11 @@ void Navier_Stokes_FT_Disc::calculer_la_pression_en_pa()
 
 const Navier_Stokes_FT_Disc_interne& Navier_Stokes_FT_Disc::variables_internes() const
 {
-  return *variables_internes_;
+  return variables_internes_;
 }
 Navier_Stokes_FT_Disc_interne& Navier_Stokes_FT_Disc::variables_internes()
 {
-  return *variables_internes_;
+  return variables_internes_;
 }
 
 /*! @brief Si le champ de vitesse est discontinu (calcul avec changement de phase), renvoie un pointeur vers le champ delta_v de "discontinuite", tel que
