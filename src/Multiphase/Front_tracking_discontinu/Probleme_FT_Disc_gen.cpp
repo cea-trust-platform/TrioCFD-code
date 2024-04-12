@@ -34,18 +34,7 @@
 Implemente_instanciable(Probleme_FT_Disc_gen, "Probleme_FT_Disc_gen", Pb_Fluide_base);
 
 Sortie& Probleme_FT_Disc_gen::printOn(Sortie& os) const { return os; }
-Entree& Probleme_FT_Disc_gen::readOn(Entree& is)
-{
-  /* Step 1 : Add NAVIER_STOKES_FT_DISC en premier */
-  equations_.add(Equation());
-  equations_.dernier().typer("NAVIER_STOKES_FT_DISC");
-  Equation_base& eq = equations_.dernier().valeur();
-  eq.associer_pb_base(*this);
-  eq.associer_sch_tps_base(le_schema_en_temps_);
-
-  /* Step 2 : Go readOn */
-  return Pb_Fluide_base::readOn(is);
-}
+Entree& Probleme_FT_Disc_gen::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
 
 const Equation_base& Probleme_FT_Disc_gen::equation(int i) const
 {
@@ -72,50 +61,73 @@ int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
   return Pb_Fluide_base::associer_(ob);
 }
 
-Entree& Probleme_FT_Disc_gen::lire_equations(Entree& is, Motcle& dernier_mot)
+void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
 {
-  Noms noms_eq, noms_eq_maj; // noms de toutes les equations possibles!
+  /* Step 1 : special FT : read the list of equations to solve ... */
+
+  // Here are all possible equations !!!
+  Noms noms_eq, noms_eq_maj;
   Type_info::les_sous_types(Nom("Equation_base"), noms_eq);
   for (auto &itr : noms_eq) noms_eq_maj.add(Motcle(itr)); //ha ha ha
 
-  Cerr << "Reading of the equations" << finl;
+  Motcle read_mc;
+  is >> read_mc;
 
-  is >> dernier_mot;
-  if (dernier_mot != "NAVIER_STOKES_FT_DISC")
+  if (read_mc != "SOLVED_EQUATIONS")
     {
-      Cerr << "Error in Probleme_FT_Disc_gen::lire_equations !!! The Navier-Stokes equation should be read at first !!!" << finl;
+      Cerr << "Error in Probleme_FT_Disc_gen::typer_lire_milieu !!! We expected reading the SOLVED_EQUATIONS bloc !!!" << finl;
       Cerr << "Fix your data file !!!" << finl;
       Process::exit();
     }
 
-  is >> equations_.dernier().valeur();
-
-  // On continue
-  for (is >> dernier_mot; noms_eq_maj.rang(dernier_mot) >= 0; is >> dernier_mot)
+  is >> read_mc;
+  if (read_mc != "{")
     {
-      if (!dernier_mot.finit_par("FT_DISC"))
+      Cerr << "Error in Probleme_FT_Disc_gen::typer_lire_milieu !!! We expected { instead of " << read_mc << " !!!" << finl;
+      Cerr << "Fix your data file !!!" << finl;
+      Process::exit();
+    }
+
+  std::map<std::string, std::string> solved_eqs;
+  for (is >> read_mc; read_mc != "}"; is >> read_mc)
+    {
+      if (noms_eq_maj.rang(read_mc) == -1 || !read_mc.finit_par("FT_DISC"))
         {
-          Cerr << "Error in Probleme_FT_Disc_gen::lire_equations !!! The equation " << dernier_mot << " could not be used with a problem of type " << que_suis_je() << " !!!" << finl;
+          Cerr << "Error in Probleme_FT_Disc_gen::typer_lire_milieu !!! The equation " << read_mc << " could not be used with a problem of type " << que_suis_je() << " !!!" << finl;
           Cerr << "You can only use the following equations :" << finl;
-          for (auto &itr : noms_eq)
+          for (auto &itr : noms_eq_maj)
             if (itr.finit_par("FT_DISC"))
               Cerr << "  - " << itr << finl;
           Process::exit();
         }
 
-      equations_.add(Equation());
-      equations_.dernier().typer(dernier_mot); //on lui donne le bon type
-      Equation_base& eq = equations_.dernier().valeur();
-      eq.associer_pb_base(*this);
-      eq.associer_milieu_base(milieu());
-      eq.associer_sch_tps_base(le_schema_en_temps_);
-      eq.associer_domaine_dis(domaine_dis());
-      eq.discretiser();
-      is >> eq;
-      eq.associer_milieu_equation();
+      Nom nom_eq;
+      is >> nom_eq;
+      solved_eqs.insert( { nom_eq.getString(), read_mc.getString() });
     }
 
-  return is;
+  /* Add NAVIER_STOKES_FT_DISC at first */
+  for (auto& itr : solved_eqs)
+    if (itr.second == "NAVIER_STOKES_FT_DISC")
+      add_FT_equation(itr.first, itr.second);
+
+  /* Add the remaining */
+  for (auto& itr : solved_eqs)
+    if (itr.second != "NAVIER_STOKES_FT_DISC")
+      add_FT_equation(itr.first, itr.second);
+
+  Pb_Fluide_base::typer_lire_milieu(is);
+}
+
+void Probleme_FT_Disc_gen::add_FT_equation(const std::string& eq_name, const std::string& eq_type)
+{
+  equations_.add(Equation());
+  equations_.dernier().typer(eq_type.c_str());
+  Equation_base& eq = equations_.dernier().valeur();
+  eq.associer_pb_base(*this);
+  eq.associer_sch_tps_base(le_schema_en_temps_);
+  eq.nommer(Nom(eq_name));
+  Cerr << "Equation " << eq_type << " added to the list and renamed to : " << eq_name << " ..." << finl;
 }
 
 void Probleme_FT_Disc_gen::associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1)

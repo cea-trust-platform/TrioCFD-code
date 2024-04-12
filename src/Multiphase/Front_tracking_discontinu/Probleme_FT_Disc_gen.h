@@ -44,7 +44,7 @@ public:
   const Equation_base& equation(int i) const override;
   Equation_base& equation(int i) override;
 
-  Entree& lire_equations(Entree& , Motcle& ) override;
+  void typer_lire_milieu(Entree& is) override;
 
   const Equation_base& get_equation_by_name(const Nom& le_nom) const override;
   Equation_base& getset_equation_by_name(const Nom& le_nom) override;
@@ -69,9 +69,8 @@ public:
   Triple_Line_Model_FT_Disc& tcl() { return tcl_; }
 
 private:
-  // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces, puis ConvDiff.
-//  VECT(REF(Equation_base)) equations_;
-  LIST(Equation) equations_;
+  void add_FT_equation(const std::string& , const std::string& );
+  LIST(Equation) equations_; // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces, puis ConvDiff.
   REF(Chimie) la_chimie_;
   Triple_Line_Model_FT_Disc tcl_;
 };
