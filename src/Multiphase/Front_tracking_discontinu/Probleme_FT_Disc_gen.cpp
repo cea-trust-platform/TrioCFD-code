@@ -64,7 +64,6 @@ int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
 void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
 {
   /* Step 1 : special FT : read the list of equations to solve ... */
-
   // Here are all possible equations !!!
   Noms noms_eq, noms_eq_maj;
   Type_info::les_sous_types(Nom("Equation_base"), noms_eq);
@@ -106,6 +105,7 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
       solved_eqs.insert( { nom_eq.getString(), read_mc.getString() });
     }
 
+  /* Step 2 : add equations to the list ... */
   /* Add NAVIER_STOKES_FT_DISC at first */
   for (auto& itr : solved_eqs)
     if (itr.second == "NAVIER_STOKES_FT_DISC")
@@ -116,7 +116,43 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
     if (itr.second != "NAVIER_STOKES_FT_DISC")
       add_FT_equation(itr.first, itr.second);
 
-  Pb_Fluide_base::typer_lire_milieu(is);
+  /* Step 3 : read medium(media) ... */
+  const std::string conc = "CONCENTRATION";
+  bool needs_constituant = false;
+
+  for (auto& itr : solved_eqs)
+    if (itr.second.find(conc) != std::string::npos)
+      {
+        needs_constituant = true; // pb contient concentration !
+        break;
+      }
+
+  const int nb_milieu = needs_constituant ? 2 : 1;
+  le_milieu_.resize(nb_milieu);
+
+  for (int i = 0; i < nb_milieu; i++)
+    {
+      is >> le_milieu_[i]; // On commence par la lecture du milieu
+      associer_milieu_base(le_milieu_[i].valeur()); // On l'associe a chaque equations (methode virtuelle pour chaque pb ...)
+    }
+
+  // Milieu(x) lu(s) ... Lets go ! On discretise les equations
+  discretiser_equations();
+
+  // remontee de l'inconnue vers le milieu
+  for (int i = 0; i < nombre_d_equations(); i++)
+    equation(i).associer_milieu_equation();
+
+  /* On discretise le milieu de l'eq 1 (NS) */
+  equations_(0)->milieu().discretiser((*this), la_discretisation_.valeur());
+
+  if (needs_constituant) // Et l'eq de concentration !
+    for (auto& itr : equations_.get_stl_list())
+      if (sub_type(Convection_Diffusion_Concentration, itr.valeur()))
+        {
+          itr->milieu().discretiser((*this), la_discretisation_.valeur());
+          break;
+        }
 }
 
 void Probleme_FT_Disc_gen::add_FT_equation(const std::string& eq_name, const std::string& eq_type)
