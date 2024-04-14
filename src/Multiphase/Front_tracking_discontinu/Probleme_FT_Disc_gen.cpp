@@ -36,16 +36,6 @@ Implemente_instanciable(Probleme_FT_Disc_gen, "Probleme_FT_Disc_gen", Pb_Fluide_
 Sortie& Probleme_FT_Disc_gen::printOn(Sortie& os) const { return os; }
 Entree& Probleme_FT_Disc_gen::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
 
-const Equation_base& Probleme_FT_Disc_gen::equation(int i) const
-{
-  return equations_[i].valeur();
-}
-
-Equation_base& Probleme_FT_Disc_gen::equation(int i)
-{
-  return equations_[i].valeur();
-}
-
 int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
 {
   if (sub_type(Chimie, ob))
@@ -74,7 +64,7 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
 
   if (read_mc != "SOLVED_EQUATIONS")
     {
-      Cerr << "Error in Probleme_FT_Disc_gen::typer_lire_milieu !!! We expected reading the SOLVED_EQUATIONS bloc !!!" << finl;
+      Cerr << "Error in Probleme_FT_Disc_gen::typer_lire_milieu !!! We expected reading the SOLVED_EQUATIONS bloc instead of " << read_mc << " !!!" << finl;
       Cerr << "Fix your data file !!!" << finl;
       Process::exit();
     }
@@ -90,12 +80,12 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
   std::map<std::string, std::string> solved_eqs;
   for (is >> read_mc; read_mc != "}"; is >> read_mc)
     {
-      if (noms_eq_maj.rang(read_mc) == -1 || !read_mc.finit_par("FT_DISC"))
+      if (noms_eq_maj.rang(read_mc) == -1 || (!read_mc.contient("_FT") && !read_mc.debute_par("CONVECTION_DIFFUSION_CONCENTRATION")))
         {
           Cerr << "Error in Probleme_FT_Disc_gen::typer_lire_milieu !!! The equation " << read_mc << " could not be used with a problem of type " << que_suis_je() << " !!!" << finl;
           Cerr << "You can only use the following equations :" << finl;
           for (auto &itr : noms_eq_maj)
-            if (itr.finit_par("FT_DISC"))
+            if (itr.contient("_FT") || itr.debute_par("CONVECTION_DIFFUSION_CONCENTRATION"))
               Cerr << "  - " << itr << finl;
           Process::exit();
         }
@@ -111,9 +101,14 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
     if (itr.second == "NAVIER_STOKES_FT_DISC")
       add_FT_equation(itr.first, itr.second);
 
+  /* Add Transport_Interfaces at second */
+  for (auto& itr : solved_eqs)
+    if (Nom(itr.second).debute_par("TRANSPORT_INTERFACES"))
+      add_FT_equation(itr.first, itr.second);
+
   /* Add the remaining */
   for (auto& itr : solved_eqs)
-    if (itr.second != "NAVIER_STOKES_FT_DISC")
+    if (itr.second != "NAVIER_STOKES_FT_DISC" && !Nom(itr.second).debute_par("TRANSPORT_INTERFACES"))
       add_FT_equation(itr.first, itr.second);
 
   /* Step 3 : read medium(media) ... */
@@ -181,8 +176,7 @@ void Probleme_FT_Disc_gen::associate_triple_line_model(Triple_Line_Model_FT_Disc
 void Probleme_FT_Disc_gen::associer_milieu_base(const Milieu_base& un_milieu)
 {
   // Le milieu est associe aux equations en fonction de son type :
-  // Si le milieu est un "Constituant", on l'associe uniquement
-  //  aux equations de convection_diffusion_concentration,
+  // Si le milieu est un "Constituant", on l'associe uniquement aux equations de convection_diffusion_concentration,
   // Sinon, on associe le milieu a toutes les autres equations.
   const int n = nombre_d_equations();
   const int is_constituant = sub_type(Constituant, un_milieu);
@@ -347,22 +341,9 @@ void Probleme_FT_Disc_gen::completer(void)
     tcl_.completer();
 }
 
-int Probleme_FT_Disc_gen::verifier(void)
-{
-  return Pb_Fluide_base::verifier();
-}
-
-void Probleme_FT_Disc_gen::preparer_calcul(void)
-{
-  Cerr << "Probleme_FT_Disc_gen::preparer_calcul" << finl;
-  Pb_Fluide_base::preparer_calcul();
-}
-
 bool Probleme_FT_Disc_gen::updateGivenFields()
 {
-  // add: fill the lists of TCL model if actived
-  // Which will be used for updated the BCs
-
+  // add: fill the lists of TCL model if actived, Which will be used for updated the BCs
   if (tcl().is_activated())
     {
 
@@ -372,6 +353,5 @@ bool Probleme_FT_Disc_gen::updateGivenFields()
       ArrOfDouble Q_from_CL;
       tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib, faces_with_CL_contrib, mpoint_from_CL, Q_from_CL);
     }
-  Probleme_base::updateGivenFields();
-  return true;
+  return Probleme_base::updateGivenFields();
 }

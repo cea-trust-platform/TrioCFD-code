@@ -41,8 +41,8 @@ class Probleme_FT_Disc_gen: public Pb_Fluide_base
   Declare_instanciable(Probleme_FT_Disc_gen);
 public:
   int nombre_d_equations() const override { return equations_.size(); }
-  const Equation_base& equation(int i) const override;
-  Equation_base& equation(int i) override;
+  const Equation_base& equation(int i) const override { return equations_[i].valeur(); }
+  Equation_base& equation(int i) override { return equations_[i].valeur(); }
 
   void typer_lire_milieu(Entree& is) override;
 
@@ -51,8 +51,6 @@ public:
   void associer_milieu_base(const Milieu_base& milieu) override;
   int associer_(Objet_U& ob) override;
   void completer(void) override;
-  int verifier(void) override;
-  void preparer_calcul(void) override;
   double calculer_pas_de_temps(void) const override;
   void mettre_a_jour(double temps) override;
   virtual bool updateGivenFields() override;
