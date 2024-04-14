@@ -80,12 +80,12 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
   std::map<std::string, std::string> solved_eqs;
   for (is >> read_mc; read_mc != "}"; is >> read_mc)
     {
-      if (noms_eq_maj.rang(read_mc) == -1 || (!read_mc.contient("_FT") && !read_mc.debute_par("CONVECTION_DIFFUSION_CONCENTRATION")))
+      if (noms_eq_maj.rang(read_mc) == -1 || (!read_mc.contient("_FT") && !read_mc.debute_par("CONVECTION_DIFFUSION_CONCENTRATION") && !read_mc.debute_par("CONVECTION_DIFFUSION_TEMPERATURE")))
         {
           Cerr << "Error in Probleme_FT_Disc_gen::typer_lire_milieu !!! The equation " << read_mc << " could not be used with a problem of type " << que_suis_je() << " !!!" << finl;
           Cerr << "You can only use the following equations :" << finl;
           for (auto &itr : noms_eq_maj)
-            if (itr.contient("_FT") || itr.debute_par("CONVECTION_DIFFUSION_CONCENTRATION"))
+            if (itr.contient("_FT") || itr.debute_par("CONVECTION_DIFFUSION_CONCENTRATION") || itr.debute_par("CONVECTION_DIFFUSION_TEMPERATURE"))
               Cerr << "  - " << itr << finl;
           Process::exit();
         }
