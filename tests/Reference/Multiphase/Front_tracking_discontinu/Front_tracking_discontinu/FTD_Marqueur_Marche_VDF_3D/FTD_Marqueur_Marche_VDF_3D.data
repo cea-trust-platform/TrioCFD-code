@@ -13,16 +13,16 @@ Read_file Marche.geo ;
 Sous_Zone zone1
 Associate zone1 dom
 Lire zone1 {
-   Boite
-     Origine 0. 1. 0.
-     Cotes  3  0.6 10
+    Boite
+    Origine 0. 1. 0.
+    Cotes  3  0.6 10
 }
 Sous_Zone zone2
 Associate zone2 dom
 Lire zone2 {
-   Boite
-     Origine 7. 0. 0.
-     Cotes  3  1. 10
+    Boite
+    Origine 7. 0. 0.
+    Cotes  3  1. 10
 }
 
 
@@ -31,9 +31,9 @@ Lire zone2 {
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur tranche { tranches 2 1 1 }
-	Larg_joint 1
-	Nom_Zones DOM
+    Partitionneur tranche { tranches 2 1 1 }
+    Larg_joint 1
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -53,14 +53,14 @@ VDF dis
 schema_Euler_explicite sch
 Lire sch
 {
-	tinit 0.
-	tmax 80.
-	dt_min 1.e-6
-	dt_max 0.2
-	dt_impr 0.2
-	dt_sauv 100.
-	seuil_statio 1.e-8
-	nb_pas_dt_max 10
+    tinit 0.
+    tmax 80.
+    dt_min 1.e-6
+    dt_max 0.2
+    dt_impr 0.2
+    dt_sauv 100.
+    seuil_statio 1.e-8
+    nb_pas_dt_max 10
 }
 
 Associate pb dom
@@ -69,123 +69,123 @@ Discretize pb dis
 
 Lire pb
 {
-		    solved_equations
+    solved_equations
     {
-Navier_Stokes_FT_Disc          hydraulique
-Transport_Marqueur_FT	       transport_marqueur
+        Navier_Stokes_FT_Disc          hydraulique
+        Transport_Marqueur_FT	       transport_marqueur
     }
-	Fluide_Incompressible 
-{
-	mu Champ_Uniforme 1 5e-05
-	rho Champ_Uniforme 1 2
-	gravite Champ_Uniforme 3 0. -9.81 0
-}
-	hydraulique
-	{
-		modele_turbulence sous_maille_wale
-       		 {
-         	  Cw               0.
-          	  turbulence_paroi negligeable
-       		 }
-		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
-		convection { amont }
-		diffusion { }
-		
-		conditions_initiales {
-			vitesse Champ_Uniforme 3  0. 0. 0.
-			}	
-		boundary_conditions {
-			 Bas1 Paroi_Fixe
-			 Haut1 Paroi_Fixe
-			 Haut2 Paroi_Fixe
-			 Haut3 Paroi_Fixe
-			 Bas2 Paroi_Fixe
-			 Gauche Paroi_Fixe
-			 Bas3 Paroi_Fixe
-			 Sud1 Paroi_Fixe 
-			 Nord1 Paroi_Fixe
-			 Sud2 Paroi_Fixe
-			 Nord2 Paroi_Fixe
-			 Sud3 Paroi_Fixe
-			 Nord3 Paroi_Fixe
-			 Sud4 Paroi_Fixe
-			 Nord4 Paroi_Fixe
-			 Sud5 Paroi_Fixe
-			 Nord5 Paroi_Fixe
-			 SortieBasse Sortie_libre_rho_variable champ_front_uniforme 1 0.
-			 SortieHaute Sortie_libre_rho_variable champ_front_uniforme 1 0.
-			 Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  1. 0. 0.
-		}
-		
-	}
+    Fluide_Incompressible
+    {
+        mu Champ_Uniforme 1 5e-05
+        rho Champ_Uniforme 1 2
+        gravite Champ_Uniforme 3 0. -9.81 0
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw               0.
+            turbulence_paroi negligeable
+        }
+        solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
+        convection { amont }
+        diffusion { }
 
-	transport_marqueur
-	{
-	 conditions_initiales {
-	               ensemble_points { sous_zones 2 zone1 aleatoire 1000 zone2 aleatoire 1000 }
-	               t_debut_integration 0.5 
-	 }
-	 boundary_conditions
-		{
-		 	
-		}
-	}
-	
-	Postraitement 
-	{
-		Sondes 
-		{
-			sonde_pression pression periode 0.5 points 1 7.5 0.9 5.5
-			sonde_vitesse vitesse periode 0.5 points 1 8.0 0.9 5.5		
-		}
-		
-		Champs dt_post 2.
-		{
-			pression elem
-			pression som
-			vitesse elem
-			vitesse som
-			densite_particules elem
-		}
-	}
-	liste_postraitements
-	{
-	       postraitement_ft_lata marqueurs { 
-    format Lata 
-    fichier transport_marqueur 
-    Champs dt_post 2.
-		{
-			densite_particules elem
-		}
-    interfaces transport_marqueur { 
-        vitesse som 
-    } 
-}	
-	}
+        conditions_initiales {
+            vitesse Champ_Uniforme 3  0. 0. 0.
+        }
+        boundary_conditions {
+            Bas1 Paroi_Fixe
+            Haut1 Paroi_Fixe
+            Haut2 Paroi_Fixe
+            Haut3 Paroi_Fixe
+            Bas2 Paroi_Fixe
+            Gauche Paroi_Fixe
+            Bas3 Paroi_Fixe
+            Sud1 Paroi_Fixe
+            Nord1 Paroi_Fixe
+            Sud2 Paroi_Fixe
+            Nord2 Paroi_Fixe
+            Sud3 Paroi_Fixe
+            Nord3 Paroi_Fixe
+            Sud4 Paroi_Fixe
+            Nord4 Paroi_Fixe
+            Sud5 Paroi_Fixe
+            Nord5 Paroi_Fixe
+            SortieBasse Sortie_libre_rho_variable champ_front_uniforme 1 0.
+            SortieHaute Sortie_libre_rho_variable champ_front_uniforme 1 0.
+            Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  1. 0. 0.
+        }
+
+    }
+
+    transport_marqueur
+    {
+        conditions_initiales {
+            ensemble_points { sous_zones 2 zone1 aleatoire 1000 zone2 aleatoire 1000 }
+            t_debut_integration 0.5
+        }
+        boundary_conditions
+        {
+
+        }
+    }
+
+    Postraitement
+    {
+        Sondes
+        {
+            sonde_pression pression periode 0.5 points 1 7.5 0.9 5.5
+            sonde_vitesse vitesse periode 0.5 points 1 8.0 0.9 5.5
+        }
+
+        Champs dt_post 2.
+        {
+            pression elem
+            pression som
+            vitesse elem
+            vitesse som
+            densite_particules elem
+        }
+    }
+    liste_postraitements
+    {
+        postraitement_ft_lata marqueurs {
+            format Lata
+            fichier transport_marqueur
+            Champs dt_post 2.
+            {
+                densite_particules elem
+            }
+            interfaces transport_marqueur {
+                vitesse som
+            }
+        }
+    }
 }
 Solve pb
 Fin
 boundary_conditions
-		{
-		 Bas1 Paroi_FT_disc symetrie
-	         Haut1 Paroi_FT_disc symetrie
-		 Haut2 Paroi_FT_disc symetrie
-		 Haut3 Paroi_FT_disc symetrie
-		 Bas2 Paroi_FT_disc symetrie
-		 Gauche Paroi_FT_disc symetrie
-		 Bas3 Paroi_FT_disc symetrie
-		 Sud1  Paroi_FT_disc symetrie
-		 Nord1 Paroi_FT_disc symetrie
-		 Sud2 Paroi_FT_disc symetrie
-		 Nord2 Paroi_FT_disc symetrie
-		 Sud3 Paroi_FT_disc symetrie
-		 Nord3 Paroi_FT_disc symetrie
-		 Sud4 Paroi_FT_disc symetrie
-		 Nord4 Paroi_FT_disc symetrie
-		 Sud5 Paroi_FT_disc symetrie
-		 Nord5 Paroi_FT_disc symetrie
-		 SortieBasse Paroi_FT_disc symetrie
-		 SortieHaute Paroi_FT_disc symetrie
-		 Entree Paroi_FT_disc symetrie	
-		}
- 
+{
+    Bas1 Paroi_FT_disc symetrie
+    Haut1 Paroi_FT_disc symetrie
+    Haut2 Paroi_FT_disc symetrie
+    Haut3 Paroi_FT_disc symetrie
+    Bas2 Paroi_FT_disc symetrie
+    Gauche Paroi_FT_disc symetrie
+    Bas3 Paroi_FT_disc symetrie
+    Sud1  Paroi_FT_disc symetrie
+    Nord1 Paroi_FT_disc symetrie
+    Sud2 Paroi_FT_disc symetrie
+    Nord2 Paroi_FT_disc symetrie
+    Sud3 Paroi_FT_disc symetrie
+    Nord3 Paroi_FT_disc symetrie
+    Sud4 Paroi_FT_disc symetrie
+    Nord4 Paroi_FT_disc symetrie
+    Sud5 Paroi_FT_disc symetrie
+    Nord5 Paroi_FT_disc symetrie
+    SortieBasse Paroi_FT_disc symetrie
+    SortieHaute Paroi_FT_disc symetrie
+    Entree Paroi_FT_disc symetrie
+}
+

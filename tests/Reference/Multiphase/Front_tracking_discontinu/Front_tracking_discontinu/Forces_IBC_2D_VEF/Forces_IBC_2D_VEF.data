@@ -5,18 +5,18 @@ dimension 2
 Probleme_FT_Disc_gen pb
 Domaine dom
 # BEGIN MESH #
-Lire_MED { 
-   domain dom 
-   file cavite_sans_disque.med 
+Lire_MED {
+    domain dom
+    file cavite_sans_disque.med
 }
 VerifierCoin dom { }
 # END MESH #
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur metis { Nb_parts 2 }
-	Larg_joint 2
-	Nom_Zones DOM
+    Partitionneur metis { Nb_parts 2 }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -30,11 +30,11 @@ VEFPreP1B dis
 Schema_Euler_explicite sch
 Lire sch
 {
-	tinit 0.           
-	tmax 0.4
-	dt_min 1.e-5
-	dt_max 1.
-	dt_impr 1.e-2  
+    tinit 0.
+    tmax 0.4
+    dt_min 1.e-5
+    dt_max 1.
+    dt_impr 1.e-2
 }
 
 Associate pb dom
@@ -43,82 +43,82 @@ Discretize pb dis
 Loi_horaire rotation
 Lire rotation
 {
-	position		2  	0.005 			0.005 
-	vitesse			2  	0. 			0.
-	rotation		4  	cos(t/0.003)		-sin(t/0.003) 
-					sin(t/0.003)    	cos(t/0.003)
-	derivee_rotation	4 	-sin(t/0.003)/0.003 	-cos(t/0.003)/0.003
-					cos(t/0.003)/0.003 	-sin(t/0.003)/0.003 
-} 
+    position		2  	0.005 			0.005
+    vitesse			2  	0. 			0.
+    rotation		4  	cos(t/0.003)		-sin(t/0.003)
+    sin(t/0.003)    	cos(t/0.003)
+    derivee_rotation	4 	-sin(t/0.003)/0.003 	-cos(t/0.003)/0.003
+    cos(t/0.003)/0.003 	-sin(t/0.003)/0.003
+}
 Lire pb
 {
-solved_equations
-{
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       body
-}
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc              hydraulique
+        Transport_Interfaces_FT_Disc       body
+    }
 
-Fluide_Incompressible 
-{
-	mu Champ_Uniforme 1 1.e-5
-	rho Champ_Uniforme 1 1.
-	gravite Champ_Uniforme 2 0 -9.81
-}
+    Fluide_Incompressible
+    {
+        mu Champ_Uniforme 1 1.e-5
+        rho Champ_Uniforme 1 1.
+        gravite Champ_Uniforme 2 0 -9.81
+    }
 
-   hydraulique
-   {
-	   modele_turbulence sous_maille_wale
-           {
-              Cw               0
-              turbulence_paroi negligeable
-           }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw               0
+            turbulence_paroi negligeable
+        }
 
-	   solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-9 }
-	   convection           { muscl }
-	   diffusion            { }
-	   conditions_initiales { vitesse champ_uniforme 2 0. 0. }
-	   equations_interfaces_vitesse_imposee 1   body
-	   boundary_conditions
-	   {
-			cl_1 	paroi_fixe
-	   }
-	   
-   }
-   body
-   {
-   	   conditions_initiales { 
-	   			fonction -((x-0.005)^2+(y-0.005)^2-(0.0029^2))
-				}
-	   boundary_conditions
-	   {
-			cl_1 	Paroi_FT_disc symetrie
-	   }
-	   methode_transport loi_horaire rotation
-   }
-   postraitements {
-     lml {
-	sondes 
-	{
-	   sonde_vorticite vorticite 	periode 0.01 points 1 0.0015 0.005
-	   sonde_vitesse  vitesse 	periode 0.01 segment 15 0.008 0.005 0.011 0.005
-	}
-	fichier Forces_IBC_2D_VEF format lml
-	champs dt_post 0.05 {
-	   indicatrice_body elem
-	   vitesse elem
-	}
-     }
-     lata {
-	fichier Forces_IBC_2D_VEF format lata
-	champs dt_post 0.05 {
-	   vitesse elem
-	   vitesse som
-	   vitesse faces
-	   terme_source_vitesse elem
-	   indicatrice_body elem	  
-	}
-     }     
-   }
+        solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-9 }
+        convection           { muscl }
+        diffusion            { }
+        conditions_initiales { vitesse champ_uniforme 2 0. 0. }
+        equations_interfaces_vitesse_imposee 1   body
+        boundary_conditions
+        {
+            cl_1 	paroi_fixe
+        }
+
+    }
+    body
+    {
+        conditions_initiales {
+            fonction -((x-0.005)^2+(y-0.005)^2-(0.0029^2))
+        }
+        boundary_conditions
+        {
+            cl_1 	Paroi_FT_disc symetrie
+        }
+        methode_transport loi_horaire rotation
+    }
+    postraitements {
+        lml {
+            sondes
+            {
+                sonde_vorticite vorticite 	periode 0.01 points 1 0.0015 0.005
+                sonde_vitesse  vitesse 	periode 0.01 segment 15 0.008 0.005 0.011 0.005
+            }
+            fichier Forces_IBC_2D_VEF format lml
+            champs dt_post 0.05 {
+                indicatrice_body elem
+                vitesse elem
+            }
+        }
+        lata {
+            fichier Forces_IBC_2D_VEF format lata
+            champs dt_post 0.05 {
+                vitesse elem
+                vitesse som
+                vitesse faces
+                terme_source_vitesse elem
+                indicatrice_body elem
+            }
+        }
+    }
 }
 # Calcul du moment resistant exerce par le fluide sur le disque tournant #
 Calculer_moments dom centre_de_gravite 0.005 0.005

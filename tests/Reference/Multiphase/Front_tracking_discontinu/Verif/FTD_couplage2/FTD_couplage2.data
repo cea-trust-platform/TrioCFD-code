@@ -11,41 +11,41 @@ Pb_conduction pb2
 # BEGIN MESH #
 Mailler dom_fluide
 {
-      pave pave1
-     {
-     origine 0. 0. 0.
-     longueurs 1. 1. 1.
-     nombre_de_noeuds 2 5 2
+    pave pave1
+    {
+        origine 0. 0. 0.
+        longueurs 1. 1. 1.
+        nombre_de_noeuds 2 5 2
 
-     }
-     {
-	bord paroi1   			 Z = 0.	    	0. <= X <= 1.		0. <= Y <= 1.
-	bord haut1    			 X = 1.   	0. <= Y <= 1.		0. <= Z <= 1.
-	raccord local homogene bas1      X = 0.	    	0. <= Y <= 1.		0. <= Z <= 1.
-	bord paroi1  			 Z = 1.   	0. <= X <= 1.		0. <= Y <= 1.
-	bord paroi1   			 Y = 0.	    	0. <= X <= 1.		0. <= Z <= 1.
-	bord paroi1    			 Y = 1.  	0. <= X <= 1.		0. <= Z <= 1.
-     }
+    }
+    {
+        bord paroi1   			 Z = 0.	    	0. <= X <= 1.		0. <= Y <= 1.
+        bord haut1    			 X = 1.   	0. <= Y <= 1.		0. <= Z <= 1.
+        raccord local homogene bas1      X = 0.	    	0. <= Y <= 1.		0. <= Z <= 1.
+        bord paroi1  			 Z = 1.   	0. <= X <= 1.		0. <= Y <= 1.
+        bord paroi1   			 Y = 0.	    	0. <= X <= 1.		0. <= Z <= 1.
+        bord paroi1    			 Y = 1.  	0. <= X <= 1.		0. <= Z <= 1.
+    }
 }
 transformer dom_fluide x*0.00025 y*0.001 z*0.00025
 
 Mailler dom_solide
-{  
- 	pave pave2
-	{ 
-	origine 0. 0. 0.
-	longueurs 1. 1. 1. 
-	nombre_de_noeuds 2 5 2
-	
-	}
-	{
-	bord paroi2    			 Z = 0.	    	0. <= X <= 1.		0. <= Y <= 1.
-	raccord local homogene haut2     X = 1.   	0. <= Y <= 1.		0. <= Z <= 1.
-	bord bas2     			 X = 0.	    	0. <= Y <= 1.		0. <= Z <= 1.
-	bord paroi2   			 Z = 1.   	0. <= X <= 1.		0. <= Y <= 1.
-	bord paroi2   			 Y = 0.	    	0. <= X <= 1.		0. <= Z <= 1.
-	bord paroi2    			 Y = 1.  	0. <= X <= 1.		0. <= Z <= 1.
-	}
+{
+    pave pave2
+    {
+        origine 0. 0. 0.
+        longueurs 1. 1. 1.
+        nombre_de_noeuds 2 5 2
+
+    }
+    {
+        bord paroi2    			 Z = 0.	    	0. <= X <= 1.		0. <= Y <= 1.
+        raccord local homogene haut2     X = 1.   	0. <= Y <= 1.		0. <= Z <= 1.
+        bord bas2     			 X = 0.	    	0. <= Y <= 1.		0. <= Z <= 1.
+        bord paroi2   			 Z = 1.   	0. <= X <= 1.		0. <= Y <= 1.
+        bord paroi2   			 Y = 0.	    	0. <= X <= 1.		0. <= Z <= 1.
+        bord paroi2    			 Y = 1.  	0. <= X <= 1.		0. <= Z <= 1.
+    }
 }
 transformer dom_solide (x-1.)*0.00025 y*0.001 z*0.00025
 
@@ -53,15 +53,15 @@ transformer dom_solide (x-1.)*0.00025 y*0.001 z*0.00025
 # BEGIN PARTITION
 Partition dom_fluide
 {
-        Partition_tool tranche { tranches 2 1 1 }
-        Larg_joint 2
-        zones_name DOM
+    Partition_tool tranche { tranches 2 1 1 }
+    Larg_joint 2
+    zones_name DOM
 }
 Partition dom_solide
 {
-        Partition_tool metis { nb_parts 2  }
-        Larg_joint 2
-        zones_name DOM_SOLIDE
+    Partition_tool metis { nb_parts 2  }
+    Larg_joint 2
+    zones_name DOM_SOLIDE
 }
 End
 
@@ -77,15 +77,15 @@ VDF dis
 Schema_Euler_explicite  sch
 Lire sch
 {
-	nb_pas_dt_max 1
-	tinit 0.
-	tmax  8.
-	dt_min 1.e-5
-	dt_max 1.e-5
-        dt_impr 1e-5
-	precision_impr 3
-	dt_sauv 1e-3
-	seuil_statio -1
+    nb_pas_dt_max 1
+    tinit 0.
+    tmax  8.
+    dt_min 1.e-5
+    dt_max 1.e-5
+    dt_impr 1e-5
+    precision_impr 3
+    dt_sauv 1e-3
+    seuil_statio -1
 }
 
 
@@ -100,226 +100,226 @@ Discretize pbc dis
 
 Lire pb1
 {
-		 solved_equations
+    solved_equations
     {
-Navier_stokes_FT_disc                         hydraulique
-Transport_interfaces_FT_disc                  interf
-convection_diffusion_temperature_ft_disc      thermique
-convection_diffusion_temperature_ft_disc      thermique_vapeur
+        Navier_stokes_FT_disc                         hydraulique
+        Transport_interfaces_FT_disc                  interf
+        convection_diffusion_temperature_ft_disc      thermique
+        convection_diffusion_temperature_ft_disc      thermique_vapeur
     }
 
 
-Fluide_diphasique 
-{
-  fluide1 Fluide_Incompressible  
-{
-  	mu champ_uniforme       1 0.00028291
-  	rho champ_uniforme      1 50.
-  	lambda champ_uniforme   1 0.5
-  	cp champ_uniforme       1 12.e3
-  
-  
-}
-  fluide0 Fluide_Incompressible 
-{
-  mu champ_uniforme       1 1.2269e-05	
-  rho champ_uniforme      1 40.
-  lambda champ_uniforme   1 0.1
-  cp champ_uniforme       1 5.e3
- 
-}
-  sigma   Champ_Uniforme 1            0.05
-  chaleur_latente Champ_Uniforme 1    -100.
-}
-	hydraulique
-	{
-	 	modele_turbulence sous_maille_wale
-        	{
-         	  Cw               0.
-         	  turbulence_paroi negligeable
-        	}
-		solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1e-12 impr }
-		convection { quick }
-		diffusion { }
-		conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
-		
-		equation_interfaces_proprietes_fluide interf
-		equation_temperature_mpoint thermique
-		equation_temperature_mpoint_vapeur thermique_vapeur
-		mpoint_inactif_sur_qdm 
-		mpoint_vapeur_inactif_sur_qdm
-		boundary_conditions 
-		{
-		paroi1   paroi_fixe 
-		bas1     paroi_fixe 
-		haut1    sortie_libre_rho_variable champ_front_uniforme 1 0.
-        	}
-	}
-	
-	
-	interf
-	{
-		interpolation_repere_local
-		methode_transport vitesse_interpolee hydraulique
-	        conditions_initiales { fonction (y-0.4e-3)+(-x) }
-         iterations_correction_volume 0
-  	 methode_interpolation_v vdf_lineaire
-         n_iterations_distance 10
-	 parcours_interface { correction_parcours_thomas }
-
-         boundary_conditions
-         {
-
-        bas1   Paroi_FT_disc symetrie
- 	paroi1 paroi_FT_disc symetrie
-	haut1   paroi_FT_disc symetrie
-         }
-     }
-
-	thermique
-	{
-		equation_interface interf
-		equation_navier_stokes hydraulique
-		phase 1
- 		stencil_width 11
-                diffusion { }
-                convection { quick }
-                boundary_conditions
-                {
-			bas1   echange_contact_VDF_FT_Disc {
-					autre_probleme pb2
-					autre_bord haut2 
-					autre_champ_temperature temperature 
-					nom_mon_indicatrice indicatrice_interf 
-					phase 1
-				}
-			haut1  paroi_adiabatique
-			paroi1 paroi_adiabatique
-                }
-                conditions_initiales { Temperature_thermique champ_fonc_xyz dom_fluide 1 -9. }
-	}
-	
-	thermique_vapeur
-	{
-		equation_interface interf
-		equation_navier_stokes hydraulique
-		phase 0
- 		stencil_width 11
-                diffusion { }
-                convection { quick }
-                boundary_conditions
-                {
-			bas1   echange_contact_VDF_FT_Disc {
-					autre_probleme pb2
-					autre_bord haut2 
-					autre_champ_temperature temperature 
-					nom_mon_indicatrice indicatrice_interf 
-					phase 0
-				}
-			haut1  paroi_adiabatique
-			paroi1 paroi_adiabatique
-                }
-                conditions_initiales { Temperature_thermique_vapeur champ_fonc_xyz dom_fluide 1 10. }
-	}
-	
-	Post_processing
+    Fluide_diphasique
+    {
+        fluide1 Fluide_Incompressible
         {
-		Definition_champs 
-		{
-			diffusion_Tl operateur_eqn 
-			{ 
-				sources { refchamp { pb_champ pb1 temperature_thermique  } }  
-				numero_op 0
-			}
-			diffusion_Tv operateur_eqn 
-			{ 
-				sources { refchamp { pb_champ pb1 temperature_thermique_vapeur  } }  
-				numero_op 0
-			}
-		}
-		fields dt_post 1.e-8
-		{
-		    diffusion_Tl elem
-		    diffusion_Tv elem
-		}
-	}
-liste_postraitements
-{
-	
-   postraitement_ft_lata post1 { 
-    format Lata 
-    fichier lata_fluide 
-    champs dt_post 1.e-8 { 
-        indicatrice_interf elem 
-        distance_interface_elem_interf elem 
-        normale_interface_interf elem 
-        SURFACE_INTERFACE_interf elem 
-        temperature_grad_thermique elem 
-        temperature_grad_thermique_vapeur elem 
-        temperature_thermique elem 
-        temperature_thermique_vapeur elem 
-        vitesse elem 
-        vitesse_delta_interface elem 
-        pression_laplacien_d elem 
-        pression elem 
-        temperature_mpoint elem 
-        temperature_mpointv elem 
-    } 
-    interfaces interf { 
-        courbure som 
-        PE elem 
-        PE_LOCAL elem 
-        COMPO_CONNEXE elem 
-    } 
-}
+            mu champ_uniforme       1 0.00028291
+            rho champ_uniforme      1 50.
+            lambda champ_uniforme   1 0.5
+            cp champ_uniforme       1 12.e3
+
+
+        }
+        fluide0 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 1.2269e-05
+            rho champ_uniforme      1 40.
+            lambda champ_uniforme   1 0.1
+            cp champ_uniforme       1 5.e3
+
+        }
+        sigma   Champ_Uniforme 1            0.05
+        chaleur_latente Champ_Uniforme 1    -100.
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw               0.
+            turbulence_paroi negligeable
+        }
+        solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1e-12 impr }
+        convection { quick }
+        diffusion { }
+        conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+
+        equation_interfaces_proprietes_fluide interf
+        equation_temperature_mpoint thermique
+        equation_temperature_mpoint_vapeur thermique_vapeur
+        mpoint_inactif_sur_qdm
+        mpoint_vapeur_inactif_sur_qdm
+        boundary_conditions
+        {
+            paroi1   paroi_fixe
+            bas1     paroi_fixe
+            haut1    sortie_libre_rho_variable champ_front_uniforme 1 0.
+        }
+    }
+
+
+    interf
+    {
+        interpolation_repere_local
+        methode_transport vitesse_interpolee hydraulique
+        conditions_initiales { fonction (y-0.4e-3)+(-x) }
+        iterations_correction_volume 0
+        methode_interpolation_v vdf_lineaire
+        n_iterations_distance 10
+        parcours_interface { correction_parcours_thomas }
+
+        boundary_conditions
+        {
+
+            bas1   Paroi_FT_disc symetrie
+            paroi1 paroi_FT_disc symetrie
+            haut1   paroi_FT_disc symetrie
+        }
+    }
+
+    thermique
+    {
+        equation_interface interf
+        equation_navier_stokes hydraulique
+        phase 1
+        stencil_width 11
+        diffusion { }
+        convection { quick }
+        boundary_conditions
+        {
+            bas1   echange_contact_VDF_FT_Disc {
+                autre_probleme pb2
+                autre_bord haut2
+                autre_champ_temperature temperature
+                nom_mon_indicatrice indicatrice_interf
+                phase 1
+            }
+            haut1  paroi_adiabatique
+            paroi1 paroi_adiabatique
+        }
+        conditions_initiales { Temperature_thermique champ_fonc_xyz dom_fluide 1 -9. }
+    }
+
+    thermique_vapeur
+    {
+        equation_interface interf
+        equation_navier_stokes hydraulique
+        phase 0
+        stencil_width 11
+        diffusion { }
+        convection { quick }
+        boundary_conditions
+        {
+            bas1   echange_contact_VDF_FT_Disc {
+                autre_probleme pb2
+                autre_bord haut2
+                autre_champ_temperature temperature
+                nom_mon_indicatrice indicatrice_interf
+                phase 0
+            }
+            haut1  paroi_adiabatique
+            paroi1 paroi_adiabatique
+        }
+        conditions_initiales { Temperature_thermique_vapeur champ_fonc_xyz dom_fluide 1 10. }
+    }
+
+    Post_processing
+    {
+        Definition_champs
+        {
+            diffusion_Tl operateur_eqn
+            {
+                sources { refchamp { pb_champ pb1 temperature_thermique  } }
+                numero_op 0
+            }
+            diffusion_Tv operateur_eqn
+            {
+                sources { refchamp { pb_champ pb1 temperature_thermique_vapeur  } }
+                numero_op 0
+            }
+        }
+        fields dt_post 1.e-8
+        {
+            diffusion_Tl elem
+            diffusion_Tv elem
+        }
+    }
+    liste_postraitements
+    {
+
+        postraitement_ft_lata post1 {
+            format Lata
+            fichier lata_fluide
+            champs dt_post 1.e-8 {
+                indicatrice_interf elem
+                distance_interface_elem_interf elem
+                normale_interface_interf elem
+                SURFACE_INTERFACE_interf elem
+                temperature_grad_thermique elem
+                temperature_grad_thermique_vapeur elem
+                temperature_thermique elem
+                temperature_thermique_vapeur elem
+                vitesse elem
+                vitesse_delta_interface elem
+                pression_laplacien_d elem
+                pression elem
+                temperature_mpoint elem
+                temperature_mpointv elem
+            }
+            interfaces interf {
+                courbure som
+                PE elem
+                PE_LOCAL elem
+                COMPO_CONNEXE elem
+            }
+        }
     }
 }
 
 Read pb2
 {
-Solide
-{
-	rho Uniform_Field 1 1000.
-	lambda Champ_Uniforme 1 0.125    
-	Cp Champ_Uniforme 1 11.e3
-}
-	Conduction
-	{
-		diffusion { }
-		initial_conditions {
-			temperature champ_fonc_xyz dom_solide 1 1.
-			}
-		boundary_conditions {
-			paroi2 paroi_adiabatique
-			bas2   paroi_adiabatique
-			haut2  echange_contact_VDF_FT_Disc_solid {
-				autre_probleme pb1
-				autre_bord bas1 
-				autre_champ_temperature_indic1 temperature_thermique
-				autre_champ_temperature_indic0 temperature_thermique_vapeur
-				autre_champ_indicatrice indicatrice_interf 
-			}
+    Solide
+    {
+        rho Uniform_Field 1 1000.
+        lambda Champ_Uniforme 1 0.125
+        Cp Champ_Uniforme 1 11.e3
+    }
+    Conduction
+    {
+        diffusion { }
+        initial_conditions {
+            temperature champ_fonc_xyz dom_solide 1 1.
+        }
+        boundary_conditions {
+            paroi2 paroi_adiabatique
+            bas2   paroi_adiabatique
+            haut2  echange_contact_VDF_FT_Disc_solid {
+                autre_probleme pb1
+                autre_bord bas1
+                autre_champ_temperature_indic1 temperature_thermique
+                autre_champ_temperature_indic0 temperature_thermique_vapeur
+                autre_champ_indicatrice indicatrice_interf
+            }
 
-		}
-		}
-	
-Post_processing
-	{
-		Definition_champs 
-		{
-			diffusion_Ts operateur_eqn 
-			{ 
-				sources { refchamp { pb_champ pb2 temperature  } }  
-				numero_op 0
-			}
-		}
-		fields dt_post 1.e-8
-		{
-		    diffusion_Ts elem
-		}
-	}
+        }
+    }
 
-	
+    Post_processing
+    {
+        Definition_champs
+        {
+            diffusion_Ts operateur_eqn
+            {
+                sources { refchamp { pb_champ pb2 temperature  } }
+                numero_op 0
+            }
+        }
+        fields dt_post 1.e-8
+        {
+            diffusion_Ts elem
+        }
+    }
+
+
 }
 
 imprimer_flux dom_solide  { haut2 }
@@ -327,5 +327,5 @@ imprimer_flux dom_fluide  { bas1 }
 ecriturelecturespecial 0
 
 Solve pbc
-FIN		     
- 
+FIN
+

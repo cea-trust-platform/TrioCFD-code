@@ -17,9 +17,9 @@ Reorienter_triangles dom
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur tranche { tranches 2 1 }
-	Larg_joint 2
-	Nom_Zones DOM
+    Partitionneur tranche { tranches 2 1 }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -33,14 +33,14 @@ VEFPreP1B dis
 Schema_Euler_explicite sch
 Lire sch
 {
-	tinit 0.
-	tmax 1.
-	dt_min 1.e-8
-	dt_max 1.e-5
-	dt_impr 0.01
-	dt_sauv 100
-	seuil_statio -1
-	nb_pas_dt_max 10
+    tinit 0.
+    tmax 1.
+    dt_min 1.e-8
+    dt_max 1.e-5
+    dt_impr 0.01
+    dt_sauv 100
+    seuil_statio -1
+    nb_pas_dt_max 10
 }
 
 Associate pb dom
@@ -49,117 +49,117 @@ Discretize pb dis
 
 Lire pb
 {
-	 solved_equations
+    solved_equations
     {
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       interf
+        Navier_Stokes_FT_Disc              hydraulique
+        Transport_Interfaces_FT_Disc       interf
 
     }
-	Fluide_Diphasique 
-{
-	fluide0 Fluide_Incompressible 
-{
-	mu  Champ_Uniforme 1 1.e-3
- 	rho Champ_Uniforme 1 998.2
-}
-	fluide1 Fluide_Incompressible 
-{
-	mu  Champ_Uniforme 1 1.7894e-5
- 	rho Champ_Uniforme 1 1.225
-}
-	sigma   Champ_Uniforme 1 0.07
-	gravite Champ_Uniforme 2 0. -9.81 
-}
-	hydraulique
-	{
-		modele_turbulence sous_maille_wale
-		{
-			Cw               0.
-			turbulence_paroi negligeable
-		}
-		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-6 impr }
-		convection           { muscl }
-		diffusion            { }
-		clipping_courbure_interface 1000
-		conditions_initiales { vitesse champ_uniforme 2 0. 0. }
-		equation_interfaces_proprietes_fluide interf
-		boundary_conditions
-		{
-			Parois	paroi_fixe
-			Axe 	paroi_fixe
-			Haut	paroi_fixe
-		}
-	}
-	interf
-	{
-		methode_transport vitesse_interpolee hydraulique
-		conditions_initiales
-		{
-			fonction ((x-0.5)^2+(y-0.5)^2-(0.1)^2)
-       		}
-       		iterations_correction_volume 1
-        	n_iterations_distance 2
-		remaillage
-		{
-			pas				0.000001
-			pas_lissage			0.000001
-			nb_iter_remaillage		1
-			nb_iter_barycentrage		3
-			relax_barycentrage		1
-			critere_arete			0.35
-			critere_remaillage		0.2
-			facteur_longueur_ideale		0.85
-			nb_iter_correction_volume	3
-			seuil_dvolume_residuel		1e-12
-			lissage_courbure_iterations	5
-			lissage_courbure_coeff		-0.1
-		}
-		collisions
-		{
-                	active
-                	juric_pour_tout
-                	type_remaillage Juric { source_isovaleur indicatrice }
-		}
-		boundary_conditions
-		{
-			Parois	Paroi_FT_disc symetrie
-			Axe 	Paroi_FT_disc symetrie
-			Haut	Paroi_FT_disc symetrie
-		}
-	}
+    Fluide_Diphasique
+    {
+        fluide0 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 1.e-3
+            rho Champ_Uniforme 1 998.2
+        }
+        fluide1 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 1.7894e-5
+            rho Champ_Uniforme 1 1.225
+        }
+        sigma   Champ_Uniforme 1 0.07
+        gravite Champ_Uniforme 2 0. -9.81
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw               0.
+            turbulence_paroi negligeable
+        }
+        solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-6 impr }
+        convection           { muscl }
+        diffusion            { }
+        clipping_courbure_interface 1000
+        conditions_initiales { vitesse champ_uniforme 2 0. 0. }
+        equation_interfaces_proprietes_fluide interf
+        boundary_conditions
+        {
+            Parois	paroi_fixe
+            Axe 	paroi_fixe
+            Haut	paroi_fixe
+        }
+    }
+    interf
+    {
+        methode_transport vitesse_interpolee hydraulique
+        conditions_initiales
+        {
+            fonction ((x-0.5)^2+(y-0.5)^2-(0.1)^2)
+        }
+        iterations_correction_volume 1
+        n_iterations_distance 2
+        remaillage
+        {
+            pas				0.000001
+            pas_lissage			0.000001
+            nb_iter_remaillage		1
+            nb_iter_barycentrage		3
+            relax_barycentrage		1
+            critere_arete			0.35
+            critere_remaillage		0.2
+            facteur_longueur_ideale		0.85
+            nb_iter_correction_volume	3
+            seuil_dvolume_residuel		1e-12
+            lissage_courbure_iterations	5
+            lissage_courbure_coeff		-0.1
+        }
+        collisions
+        {
+            active
+            juric_pour_tout
+            type_remaillage Juric { source_isovaleur indicatrice }
+        }
+        boundary_conditions
+        {
+            Parois	Paroi_FT_disc symetrie
+            Axe 	Paroi_FT_disc symetrie
+            Haut	Paroi_FT_disc symetrie
+        }
+    }
 
-	Postraitement
-	{
-		
-		Champs dt_post 0.01
-		{
-			vitesse elem
-			indicatrice_interf elem
-		}
-	}
+    Postraitement
+    {
 
-	liste_postraitements
-	{
-		postraitement_ft_lata post2 { 
-    format Lata 
-    fichier plot 
-    Champs dt_post 0.01
-		{
-			indicatrice_interf elem
-		}
-    interfaces interf { 
-    } 
-}
-	}
-	
+        Champs dt_post 0.01
+        {
+            vitesse elem
+            indicatrice_interf elem
+        }
+    }
+
+    liste_postraitements
+    {
+        postraitement_ft_lata post2 {
+            format Lata
+            fichier plot
+            Champs dt_post 0.01
+            {
+                indicatrice_interf elem
+            }
+            interfaces interf {
+            }
+        }
+    }
+
 }
 
 Solve pb
 Fin
 boundary_conditions
-		{
-			Parois	paroi_fixe
-			Axe 	paroi_fixe
-			Haut	paroi_fixe
-		}
- 
+{
+    Parois	paroi_fixe
+    Axe 	paroi_fixe
+    Haut	paroi_fixe
+}
+

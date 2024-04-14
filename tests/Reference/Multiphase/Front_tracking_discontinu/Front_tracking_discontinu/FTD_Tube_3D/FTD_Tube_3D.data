@@ -1,22 +1,24 @@
-#  
- Cas test Front-tracking discontinu VDF.
+#
+Cas test Front-tracking discontinu VDF.
 
-  Cas test avec interface liquide-vapeur "interf"
-           
-                concentration
+Cas test avec interface liquide-vapeur "interf"
 
-  Interface liquide-vapeur initiale : un demi-plan + une goutte
+concentration
 
-  Remaillage, barycentrage, lissage, test collision, gravite, 
-  tension superficielle.
-  Ecriture des resultats au format lata: un fichier lata avec
-  les champs volumiques et les interfaces liquide-vapeur(lata1),
-  un fichier avec uniquement le solide mobile (lata2)
+Interface liquide-vapeur initiale :
+un demi-plan + une goutte
 
- Les algorithmes de remaillage avec changement de connectivite
- ne sont pas strictement equivalents entre sequentiel et parallele.
- Il y a donc des ecarts entre le sequentiel et le parallele.
- PARALLEL RUNS
+Remaillage, barycentrage, lissage, test collision, gravite,
+tension superficielle.
+Ecriture des resultats au format lata:
+un fichier lata avec
+les champs volumiques et les interfaces liquide-vapeur(lata1),
+un fichier avec uniquement le solide mobile (lata2)
+
+Les algorithmes de remaillage avec changement de connectivite
+ne sont pas strictement equivalents entre sequentiel et parallele.
+Il y a donc des ecarts entre le sequentiel et le parallele.
+PARALLEL RUNS
 #
 # lance_test 4 ecarts #
 dimension 3
@@ -27,15 +29,15 @@ export domaine dom_pb1
 Read_file dom_pb1 defaut_Pb1.geom
 # END MESH #
 
-# BEGIN PARTITION 
+# BEGIN PARTITION
 Partition dom_pb1
 {
-   Partitionneur metis { nb_parts 8 }
-   Larg_joint 2
-   Nom_Zones DOM1
+    Partitionneur metis { nb_parts 8 }
+    Larg_joint 2
+    Nom_Zones DOM1
 }
 Fin
- END PARTITION #
+END PARTITION #
 
 # BEGIN SCATTER
 Scatter DOM1.Zones dom_pb1
@@ -51,14 +53,14 @@ VDF dis
 Schema_Euler_explicite  sch
 Lire sch
 {
-	nb_pas_dt_max 10
-	tinit 0.
-	tmax 10
-	dt_min 1.e-06
-	dt_max 1.e-06
-	dt_impr 0.001
-	dt_sauv 100
-	seuil_statio 1.e-8
+    nb_pas_dt_max 10
+    tinit 0.
+    tmax 10
+    dt_min 1.e-06
+    dt_max 1.e-06
+    dt_impr 0.001
+    dt_sauv 100
+    seuil_statio 1.e-8
 }
 
 Associate pb dom_pb1
@@ -67,122 +69,122 @@ Discretize pb dis
 
 Lire pb
 {
-	 solved_equations
+    solved_equations
     {
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       interf
+        Navier_Stokes_FT_Disc              hydraulique
+        Transport_Interfaces_FT_Disc       interf
     }
-	Fluide_Diphasique 
-{
-	fluide0 Fluide_Incompressible 
-{
-	mu    Champ_Uniforme 1 1.e-3
- 	rho   Champ_Uniforme 1 1000.
-}
-	fluide1 Fluide_Incompressible 
-{
-	mu  Champ_Uniforme 1 2.e-5
- 	rho Champ_Uniforme 1 1.2
-}
-	sigma   Champ_Uniforme 1 0.01
-	gravite Champ_Uniforme 3 0. 0. -9.81  
-}
+    Fluide_Diphasique
+    {
+        fluide0 Fluide_Incompressible
+        {
+            mu    Champ_Uniforme 1 1.e-3
+            rho   Champ_Uniforme 1 1000.
+        }
+        fluide1 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 2.e-5
+            rho Champ_Uniforme 1 1.2
+        }
+        sigma   Champ_Uniforme 1 0.01
+        gravite Champ_Uniforme 3 0. 0. -9.81
+    }
 
-hydraulique
-{
-	modele_turbulence null { }
-       
-       solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-16 }
-	
-	
-	convection           { quick }
-	diffusion            { }
-	conditions_initiales { vitesse champ_uniforme 3  0. 0. 0. }
-	equation_interfaces_proprietes_fluide interf
-	
-	boundary_conditions
-	{
-		entree Sortie_libre_rho_variable Champ_Front_Uniforme 1  0.     
-		sortie Sortie_libre_rho_variable Champ_Front_Uniforme 1  0.18
-		wall paroi_fixe
-	}
-}
-interf
-{
-	methode_transport vitesse_interpolee hydraulique
-	conditions_initiales {
-		fonction z-0.004
+    hydraulique
+    {
+        modele_turbulence null { }
+
+        solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-16 }
+
+
+        convection           { quick }
+        diffusion            { }
+        conditions_initiales { vitesse champ_uniforme 3  0. 0. 0. }
+        equation_interfaces_proprietes_fluide interf
+
+        boundary_conditions
+        {
+            entree Sortie_libre_rho_variable Champ_Front_Uniforme 1  0.
+            sortie Sortie_libre_rho_variable Champ_Front_Uniforme 1  0.18
+            wall paroi_fixe
+        }
+    }
+    interf
+    {
+        methode_transport vitesse_interpolee hydraulique
+        conditions_initiales {
+            fonction z-0.004
         }
         iterations_correction_volume 1
         n_iterations_distance 2
-	remaillage {
-		pas 0.000001
-		nb_iter_remaillage 1
-		critere_arete 0.4
-		critere_remaillage 0.4
-		pas_lissage 0.000001
-		lissage_courbure_iterations 0
-		lissage_courbure_coeff -0.1
-		nb_iter_barycentrage 3
-		relax_barycentrage 1
-		facteur_longueur_ideale 1.5
-		nb_iter_correction_volume 3
-		seuil_dvolume_residuel 1e-12
-	}
-	collisions
-	{
-                active
-                juric_pour_tout
-                type_remaillage Juric { source_isovaleur indicatrice }
-	}
-	boundary_conditions
-	{
-		entree Paroi_FT_disc symetrie
-		sortie Paroi_FT_disc symetrie
-		wall Paroi_FT_disc constant Champ_Front_Uniforme 1 150
-		
-		 
-	}
-}
+        remaillage {
+            pas 0.000001
+            nb_iter_remaillage 1
+            critere_arete 0.4
+            critere_remaillage 0.4
+            pas_lissage 0.000001
+            lissage_courbure_iterations 0
+            lissage_courbure_coeff -0.1
+            nb_iter_barycentrage 3
+            relax_barycentrage 1
+            facteur_longueur_ideale 1.5
+            nb_iter_correction_volume 3
+            seuil_dvolume_residuel 1e-12
+        }
+        collisions
+        {
+            active
+            juric_pour_tout
+            type_remaillage Juric { source_isovaleur indicatrice }
+        }
+        boundary_conditions
+        {
+            entree Paroi_FT_disc symetrie
+            sortie Paroi_FT_disc symetrie
+            wall Paroi_FT_disc constant Champ_Front_Uniforme 1 150
 
 
-Postraitement
-{
-	format lml
-	champs dt_post 0.05
-	{
-		indicatrice_interf elem
-		vitesse elem
-	}
-}
+        }
+    }
 
-liste_postraitements
-{
-	postraitement_ft_lata post1 { 
-    format Lata 
-    fichier post1 
-    champs dt_post 0.05 { 
-        vitesse elem 
-        distance_interface_elem_interf elem 
-        indicatrice_interf elem 
-        pression elem 
-    } 
-    interfaces interf { 
-        courbure som 
-        vitesse som 
-        pe elem 
-    } 
-}
-	postraitement_ft_lata post2 { 
-    format Lata 
-    fichier post2 
-}
-}
+
+    Postraitement
+    {
+        format lml
+        champs dt_post 0.05
+        {
+            indicatrice_interf elem
+            vitesse elem
+        }
+    }
+
+    liste_postraitements
+    {
+        postraitement_ft_lata post1 {
+            format Lata
+            fichier post1
+            champs dt_post 0.05 {
+                vitesse elem
+                distance_interface_elem_interf elem
+                indicatrice_interf elem
+                pression elem
+            }
+            interfaces interf {
+                courbure som
+                vitesse som
+                pe elem
+            }
+        }
+        postraitement_ft_lata post2 {
+            format Lata
+            fichier post2
+        }
+    }
 
 }
 
 Solve pb
 Fin
-  
+
 .3
- 
+

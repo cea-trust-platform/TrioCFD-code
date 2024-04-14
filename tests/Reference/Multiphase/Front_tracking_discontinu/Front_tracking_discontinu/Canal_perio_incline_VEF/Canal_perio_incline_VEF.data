@@ -1,4 +1,4 @@
-# Test option bord of source terme canal_perio when channel is not according an axis # 
+# Test option bord of source terme canal_perio when channel is not according an axis #
 # PARALLEL OK #
 Dimension 3
 Probleme_FT_Disc_gen pb3
@@ -38,25 +38,25 @@ Postraiter_domaine { domaines { DOM1 DOM2 DOM3 } fichier domaine.lata format lat
 # BEGIN PARTITION
 Partition DOM1
 {
-	Partitionneur metis { Nb_parts 2 }
-	Larg_joint 2
-	Nom_Zones DOM1
-	Periodique 1 perio1
+    Partitionneur metis { Nb_parts 2 }
+    Larg_joint 2
+    Nom_Zones DOM1
+    Periodique 1 perio1
 }
 
 Partition DOM2
 {
-	Partitionneur metis { Nb_parts 2 }
-	Larg_joint 2
-	Nom_Zones DOM2
-	Periodique 1 perio2
+    Partitionneur metis { Nb_parts 2 }
+    Larg_joint 2
+    Nom_Zones DOM2
+    Periodique 1 perio2
 }
 
 Partition DOM3
 {
-	Partitionneur metis { Nb_parts 2 }
-	Larg_joint 2
-	Nom_Zones DOM3
+    Partitionneur metis { Nb_parts 2 }
+    Larg_joint 2
+    Nom_Zones DOM3
 }
 Fin
 END PARTITION #
@@ -75,15 +75,15 @@ lire dis { P1 }
 Schema_Euler_explicite sch
 Lire sch
 {
-	tinit 0.
-	tmax 1.
-	nb_pas_dt_max 2
-	dt_min 1.e-9
-	dt_max 1.e-4
-	dt_impr 0.0001
-	dt_sauv 0.001
-	seuil_statio -1
-	facsec 0.6
+    tinit 0.
+    tmax 1.
+    nb_pas_dt_max 2
+    dt_min 1.e-9
+    dt_max 1.e-4
+    dt_impr 0.0001
+    dt_sauv 0.001
+    seuil_statio -1
+    facsec 0.6
 }
 
 Associate pb1 DOM1
@@ -100,36 +100,36 @@ Discretize pbc dis
 # # # Domaine principal # # #
 Lire pb3
 {
-solved_equations
-{
-	Navier_Stokes_FT_Disc              hydraulique
-}
-Fluide_inCompressible 
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho   Champ_Uniforme 1 1000.
-}
-	hydraulique {
-		modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable }
-		solveur_pression petsc cholesky {  }
-		convection { amont }
-		diffusion { }
-		conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
-		boundary_conditions
-		{
-			WALL	paroi_fixe
-			IN_G	frontiere_ouverte_vitesse_imposee champ_front_recyclage { pb_champ_evaluateur pb1 vitesse 3 distance_plan -0.00001 0 0.00001 }
-			IN_D	frontiere_ouverte_vitesse_imposee champ_front_recyclage { pb_champ_evaluateur pb2 vitesse 3 }
-			OUT	Sortie_libre_rho_variable champ_front_uniforme 1 0.
-		}
-	}
-	Postraitement
-	{
-	       Champs dt_post 5e-3
-	       { 
-		       pression_pa som
-	       }
-	}
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc              hydraulique
+    }
+    Fluide_inCompressible
+    {
+        mu Champ_Uniforme 1 1.85e-5
+        rho   Champ_Uniforme 1 1000.
+    }
+    hydraulique {
+        modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable }
+        solveur_pression petsc cholesky {  }
+        convection { amont }
+        diffusion { }
+        conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+        boundary_conditions
+        {
+            WALL	paroi_fixe
+            IN_G	frontiere_ouverte_vitesse_imposee champ_front_recyclage { pb_champ_evaluateur pb1 vitesse 3 distance_plan -0.00001 0 0.00001 }
+            IN_D	frontiere_ouverte_vitesse_imposee champ_front_recyclage { pb_champ_evaluateur pb2 vitesse 3 }
+            OUT	Sortie_libre_rho_variable champ_front_uniforme 1 0.
+        }
+    }
+    Postraitement
+    {
+        Champs dt_post 5e-3
+        {
+            pression_pa som
+        }
+    }
 }
 
 # # # Domaine principal # # #
@@ -138,42 +138,42 @@ Fluide_inCompressible
 
 
 # # # Boite gauche # # #
-lire pb1 
+lire pb1
 {
-Fluide_inCompressible
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho   Champ_Uniforme 1 1000.
-}
+    Fluide_inCompressible
+    {
+        mu Champ_Uniforme 1 1.85e-5
+        rho   Champ_Uniforme 1 1000.
+    }
 
-	Navier_Stokes_turbulent
-	{
-		solveur_pression petsc cholesky {  }
-		convection { muscl }
-		diffusion { }
-		Sources
-       		{
-       			Canal_perio { bord perio1 } 
-      		 }
-		conditions_initiales {
-			vitesse Champ_Uniforme 3 7 0 -7
-			}
-		boundary_conditions {
-			WALL paroi_fixe			
-			perio1 periodique 
-		}
-		modele_turbulence sous_maille_wale
-		{
-			turbulence_paroi loi_standard_hydr
-		}
-	}	
-	Postraitement
-	{
-	       Champs dt_post 5e-3
-	       { 
-		       pression_pa som
-	       }
-	}
+    Navier_Stokes_turbulent
+    {
+        solveur_pression petsc cholesky {  }
+        convection { muscl }
+        diffusion { }
+        Sources
+        {
+            Canal_perio { bord perio1 }
+        }
+        conditions_initiales {
+            vitesse Champ_Uniforme 3 7 0 -7
+        }
+        boundary_conditions {
+            WALL paroi_fixe
+            perio1 periodique
+        }
+        modele_turbulence sous_maille_wale
+        {
+            turbulence_paroi loi_standard_hydr
+        }
+    }
+    Postraitement
+    {
+        Champs dt_post 5e-3
+        {
+            pression_pa som
+        }
+    }
 }
 
 # # # Boite gauche # # #
@@ -183,39 +183,39 @@ Fluide_inCompressible
 # # # Boite droite # # #
 lire pb2
 {
-Fluide_inCompressible
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho   Champ_Uniforme 1 1000.
-}
-	Navier_Stokes_turbulent
-	{
-		solveur_pression petsc cholesky {  }
-		convection { muscl }
-		diffusion { }
-		Sources
-       		{
-       			Canal_perio { bord perio2 } 
-      		 }
-		conditions_initiales {
-			vitesse Champ_Uniforme 3 -7 0 -7
-			}
-		boundary_conditions {
-			WALL paroi_fixe			
-			perio2 periodique 
-		}
-		modele_turbulence sous_maille_wale
-		{
-			turbulence_paroi loi_standard_hydr
-		}
-	}
-	Postraitement
-	{
-	       Champs dt_post 5e-3
-	       { 
-		       pression_pa som
-	       }
-	}
+    Fluide_inCompressible
+    {
+        mu Champ_Uniforme 1 1.85e-5
+        rho   Champ_Uniforme 1 1000.
+    }
+    Navier_Stokes_turbulent
+    {
+        solveur_pression petsc cholesky {  }
+        convection { muscl }
+        diffusion { }
+        Sources
+        {
+            Canal_perio { bord perio2 }
+        }
+        conditions_initiales {
+            vitesse Champ_Uniforme 3 -7 0 -7
+        }
+        boundary_conditions {
+            WALL paroi_fixe
+            perio2 periodique
+        }
+        modele_turbulence sous_maille_wale
+        {
+            turbulence_paroi loi_standard_hydr
+        }
+    }
+    Postraitement
+    {
+        Champs dt_post 5e-3
+        {
+            pression_pa som
+        }
+    }
 }
 
 # # # Boite droite # # #

@@ -1,8 +1,8 @@
-#  
- Cas test Front-tracking discontinu VEF.
- Monophasique
- Interface IBC avec lecture MED
- PARALLEL OK 4
+#
+Cas test Front-tracking discontinu VEF.
+Monophasique
+Interface IBC avec lecture MED
+PARALLEL OK 4
 #
 
 dimension 3
@@ -15,11 +15,11 @@ Reorienter_tetraedres DOM
 Dilate DOM 0.0001
 # END MESH #
 
-# BEGIN PARTITION 
+# BEGIN PARTITION
 Partition DOM {
-        partitionneur metis { Nb_parts 4 }
-        larg_joint 2
-        Nom_Zones DOM
+    partitionneur metis { Nb_parts 4 }
+    larg_joint 2
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -33,14 +33,14 @@ VEFPreP1B dis
 Schema_Euler_explicite  sch
 Lire sch
 {
-	tinit 0.0
-	tmax  0.1
-	dt_min 1.e-7
-	dt_max 0.02
-	dt_impr 10.
-	dt_sauv 100
-	seuil_statio -1
-	nb_pas_dt_max 50
+    tinit 0.0
+    tmax  0.1
+    dt_min 1.e-7
+    dt_max 0.02
+    dt_impr 10.
+    dt_sauv 100
+    seuil_statio -1
+    nb_pas_dt_max 50
 }
 
 Associate pb DOM
@@ -49,85 +49,84 @@ Discretize pb dis
 
 Lire pb
 {
-		    solved_equations
+    solved_equations
     {
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       body
+        Navier_Stokes_FT_Disc              hydraulique
+        Transport_Interfaces_FT_Disc       body
     }
-	Fluide_Incompressible 
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
-}
-hydraulique
-{
-	modele_turbulence sous_maille_wale
+    Fluide_Incompressible
+    {
+        mu  Champ_Uniforme 1 0.282e-3
+        rho Champ_Uniforme 1 1000.
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
         {
-           Cw               0.
-           turbulence_paroi negligeable
+            Cw               0.
+            turbulence_paroi negligeable
         }
 
-	# solveur_pression petsc pipecg { precond ssor { omega 1.6 } seuil 1.e-10 impr } #
-	solveur_pression petsc gcp { precond ssor { omega 1.6 } seuil 1.e-10 impr }
-	convection           { amont }
-	diffusion            { }
-	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
-	equations_interfaces_vitesse_imposee 1 body
-	boundary_conditions
-	{
-		haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
-		paroi  paroi_fixe
-		bas    paroi_fixe
-	}
-}
-body
-{
-	conditions_initiales {
-                fichier_geom {
-                        fichier_geom halteres.geom
-                        point_phase 0 0. 0. 0.1
-                        default_phase 1
-			reverse_normal
-                        lata_dump connex
-                }		
-	}
-	remaillage {
-		pas -1e8
-		pas_lissage -1
-	}
-	boundary_conditions
-	{
-		haut  Paroi_FT_disc symetrie
-		paroi Paroi_FT_disc symetrie
-		bas   Paroi_FT_disc symetrie
-	}
-	methode_transport vitesse_imposee -y*10. x*10. 0.
-}
-postraitement {
-  sondes { 
-  	pression pression periode 0.01 points 1 0 0 0.1 
-	vitesse vitesse periode 0.01 points 1 0 0 0.1 
-  }
-  champs dt_post 1. {
-  	pression elem
-	vitesse elem
-	indicatrice_body elem
-  }
-}
-liste_postraitements {
-   postraitement_ft_lata post1 { 
-    format Lata 
-    champs dt_post 1.0 { 
-        indicatrice_body elem 
-        vitesse faces 
-    } 
-    interfaces body { 
-        courbure som 
-    } 
-}
-}
+        # solveur_pression petsc pipecg { precond ssor { omega 1.6 } seuil 1.e-10 impr } #
+        solveur_pression petsc gcp { precond ssor { omega 1.6 } seuil 1.e-10 impr }
+        convection           { amont }
+        diffusion            { }
+        conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+        equations_interfaces_vitesse_imposee 1 body
+        boundary_conditions
+        {
+            haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
+            paroi  paroi_fixe
+            bas    paroi_fixe
+        }
+    }
+    body
+    {
+        conditions_initiales {
+            fichier_geom {
+                fichier_geom halteres.geom
+                point_phase 0 0. 0. 0.1
+                default_phase 1
+                reverse_normal
+                lata_dump connex
+            }
+        }
+        remaillage {
+            pas -1e8
+            pas_lissage -1
+        }
+        boundary_conditions
+        {
+            haut  Paroi_FT_disc symetrie
+            paroi Paroi_FT_disc symetrie
+            bas   Paroi_FT_disc symetrie
+        }
+        methode_transport vitesse_imposee -y*10. x*10. 0.
+    }
+    postraitement {
+        sondes {
+            pression pression periode 0.01 points 1 0 0 0.1
+            vitesse vitesse periode 0.01 points 1 0 0 0.1
+        }
+        champs dt_post 1. {
+            pression elem
+            vitesse elem
+            indicatrice_body elem
+        }
+    }
+    liste_postraitements {
+        postraitement_ft_lata post1 {
+            format Lata
+            champs dt_post 1.0 {
+                indicatrice_body elem
+                vitesse faces
+            }
+            interfaces body {
+                courbure som
+            }
+        }
+    }
 }
 
 Solve pb
 Fin
- 

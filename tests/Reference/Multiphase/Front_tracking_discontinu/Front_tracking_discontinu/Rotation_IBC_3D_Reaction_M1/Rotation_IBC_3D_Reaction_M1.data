@@ -6,20 +6,20 @@ Domaine DOM
 # BEGIN MESH #
 Mailler DOM
 {
-	Pave pave1
-	{
-		origine 	-2. -2. -2.
-		longueurs 	 4.  4.  4.
-		nombre_de_noeuds 11 11 11
-	}
-	{
-		bord paroi X = -2   	-2 <= Y <= 2 	-2 <= Z <= 2
-		bord paroi X = 2.   	-2 <= Y <= 2 	-2 <= Z <= 2
-		bord paroi Y = -2   	-2 <= X <= 2 	-2 <= Z <= 2
-		bord paroi Y = 2.   	-2 <= X <= 2 	-2 <= Z <= 2
-		bord paroi Z = -2.  	-2 <= X <= 2 	-2 <= Y <= 2
-		bord paroi Z = 2.   	-2 <= X <= 2 	-2 <= Y <= 2
-	}
+    Pave pave1
+    {
+        origine 	-2. -2. -2.
+        longueurs 	 4.  4.  4.
+        nombre_de_noeuds 11 11 11
+    }
+    {
+        bord paroi X = -2   	-2 <= Y <= 2 	-2 <= Z <= 2
+        bord paroi X = 2.   	-2 <= Y <= 2 	-2 <= Z <= 2
+        bord paroi Y = -2   	-2 <= X <= 2 	-2 <= Z <= 2
+        bord paroi Y = 2.   	-2 <= X <= 2 	-2 <= Z <= 2
+        bord paroi Z = -2.  	-2 <= X <= 2 	-2 <= Y <= 2
+        bord paroi Z = 2.   	-2 <= X <= 2 	-2 <= Y <= 2
+    }
 }
 Tetraedriser_homogene_fin DOM
 Reorienter_tetraedres DOM
@@ -28,9 +28,9 @@ Reorienter_tetraedres DOM
 # BEGIN PARTITION
 Partition DOM
 {
-	Partitionneur metis { Nb_parts 2 }
-	Larg_joint 1
-	Nom_Zones DOM
+    Partitionneur metis { Nb_parts 2 }
+    Larg_joint 1
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -44,14 +44,14 @@ VEFPreP1B dis
 Schema_Euler_explicite sch
 Lire sch
 {
-	tinit 0.
-	tmax  0.5
-	dt_min 0.0002
-	dt_max 0.2
-	dt_impr 0.2
-	dt_sauv 100
-	seuil_statio -1
-	nb_pas_dt_max 50
+    tinit 0.
+    tmax  0.5
+    dt_min 0.0002
+    dt_max 0.2
+    dt_impr 0.2
+    dt_sauv 100
+    seuil_statio -1
+    nb_pas_dt_max 50
 }
 
 
@@ -65,224 +65,223 @@ Discretize pb dis
 # Agit en rotation #
 Read_file loi_horaire_3D.data ;
 
-# ===================================================================================== # 
+# ===================================================================================== #
 # Watch carefully the results : in VEF, parasite mode can appear at the inteface
-  This is basically related to the VEF formulation and the DFT method
-  to deal with this issue, it is possible to add in the hydraulique block the following 
-     - terme_gravite rho_g
-  If this does not solve the problem, try to stabilize a bit the flow by adding 
-     - Sources    { Source_Qdm_lambdaup { lambda 1. } }
-     - solveur_bar GCP { precond ssor { omega 1.5 } seuil 1.e-7 impr } #  
+This is basically related to the VEF formulation and the DFT method
+to deal with this issue, it is possible to add in the hydraulique block the following
+- terme_gravite rho_g
+If this does not solve the problem, try to stabilize a bit the flow by adding
+    - Sources    { Source_Qdm_lambdaup { lambda 1. } }
+    - solveur_bar GCP { precond ssor { omega 1.5 } seuil 1.e-7 impr } #
 # ===================================================================================== #
 
-Lire pb
+    Lire pb
 {
 
-solved_equations
-{
-    Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       interf
-Transport_Interfaces_FT_Disc       agit
-Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion1
-Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion2
-Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion3
-}
-Fluide_Diphasique 
-{
-    fluide1 Fluide_Incompressible 
-{
-    mu  Champ_Uniforme 1 0.282e-3
-    rho Champ_Uniforme 1 1000.
-    gravite Champ_Uniforme 3 0. 0. -9.81
-}
-    fluide0 Fluide_Incompressible 
-{
-    mu  Champ_Uniforme 1 2e-5
-    rho Champ_Uniforme 1 1.29
-}
-    sigma   Champ_Uniforme 1 0.07
-}
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc              hydraulique
+        Transport_Interfaces_FT_Disc       interf
+        Transport_Interfaces_FT_Disc       agit
+        Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion1
+        Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion2
+        Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion3
+    }
+    Fluide_Diphasique
+    {
+        fluide1 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 0.282e-3
+            rho Champ_Uniforme 1 1000.
+            gravite Champ_Uniforme 3 0. 0. -9.81
+        }
+        fluide0 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 2e-5
+            rho Champ_Uniforme 1 1.29
+        }
+        sigma   Champ_Uniforme 1 0.07
+    }
 
-Constituant 
-{
-    coefficient_diffusion Champ_Uniforme 1 1e-6
-}
+    Constituant
+    {
+        coefficient_diffusion Champ_Uniforme 1 1e-6
+    }
 
-     hydraulique
-     {	   
-	    equation_interfaces_proprietes_fluide interf
-	    equation_interfaces_vitesse_imposee agit
+    hydraulique
+    {
+        equation_interfaces_proprietes_fluide interf
+        equation_interfaces_vitesse_imposee agit
 
-	    modele_turbulence sous_maille_wale
-	    {
-               Cw 0.5
-               turbulence_paroi loi_standard_hydr
-	    }
+        modele_turbulence sous_maille_wale
+        {
+            Cw 0.5
+            turbulence_paroi loi_standard_hydr
+        }
 
-	    solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-7 impr }
-	    convection           { ef_stab { volumes_etendus alpha 0.2 } }
-	    diffusion            { }
-	    conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
-	    boundary_conditions 	 { paroi paroi_fixe }
-     }
-     interf
-     {
-     conditions_initiales { fonction  1.0-z }
-     n_iterations_distance 3
-     iterations_correction_volume 3	
-	
-	collisions {
-		active
-		juric_pour_tout
-		type_remaillage Juric { source_isovaleur indicatrice } 
-		   }
+        solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-7 impr }
+        convection           { ef_stab { volumes_etendus alpha 0.2 } }
+        diffusion            { }
+        conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+        boundary_conditions 	 { paroi paroi_fixe }
+    }
+    interf
+    {
+        conditions_initiales { fonction  1.0-z }
+        n_iterations_distance 3
+        iterations_correction_volume 3
+
+        collisions {
+            active
+            juric_pour_tout
+            type_remaillage Juric { source_isovaleur indicatrice }
+        }
 
         remaillage {
-                pas 1e-07
-                nb_iter_remaillage 3 
-                critere_arete 0.35
-                critere_remaillage 0.35
-                pas_lissage 1e-07
-                relax_barycentrage 1
-		facteur_longueur_ideale 1.0
-                nb_iter_barycentrage 2
-		nb_iter_correction_volume 3 
-		seuil_dvolume_residuel 1e-15
-		lissage_courbure_coeff -0.02
-		lissage_courbure_iterations_systematique 1
-		lissage_courbure_iterations_si_remaillage 5
+            pas 1e-07
+            nb_iter_remaillage 3
+            critere_arete 0.35
+            critere_remaillage 0.35
+            pas_lissage 1e-07
+            relax_barycentrage 1
+            facteur_longueur_ideale 1.0
+            nb_iter_barycentrage 2
+            nb_iter_correction_volume 3
+            seuil_dvolume_residuel 1e-15
+            lissage_courbure_coeff -0.02
+            lissage_courbure_iterations_systematique 1
+            lissage_courbure_iterations_si_remaillage 5
         }
         conditions_limites
         {
-		paroi paroi_ft_disc symetrie
+            paroi paroi_ft_disc symetrie
         }
         methode_transport vitesse_interpolee hydraulique
 
-     }
-     agit
-     {
-	    conditions_initiales { fonction -(x^2+y^2+(z+1)^2-(0.5^2)) }
-	    boundary_conditions { paroi Paroi_FT_disc symetrie }
-	    methode_transport loi_horaire loi
-     }
+    }
+    agit
+    {
+        conditions_initiales { fonction -(x^2+y^2+(z+1)^2-(0.5^2)) }
+        boundary_conditions { paroi Paroi_FT_disc symetrie }
+        methode_transport loi_horaire loi
+    }
 
-     eq_diffusion1
-     {
+    eq_diffusion1
+    {
         diffusion {  }
         convection { EF_stab { volumes_etendus tdivu } }
-        Nom_Inconnue c1                  
-	modele_turbulence schmidt  { turbulence_paroi negligeable_scalaire }
+        Nom_Inconnue c1
+        modele_turbulence schmidt  { turbulence_paroi negligeable_scalaire }
 
         equation_interface interf
         phase 1
         Sources {
-                Source_Constituant_Vortex {
-                        senseur_interface {
-                                equation_interface interf
-                                segment_senseur_1 3 -0.5 0. 0.5
-                                segment_senseur_2 3 -0.5 0. 1.5
-                                nb_points_tests 20
-                        }
-                        rayon_spot 0.01
-                        delta_spot 3 0. 0. -0.25
-                        integrale 0.5
-                        debit 1.0
+            Source_Constituant_Vortex {
+                senseur_interface {
+                    equation_interface interf
+                    segment_senseur_1 3 -0.5 0. 0.5
+                    segment_senseur_2 3 -0.5 0. 1.5
+                    nb_points_tests 20
                 }
+                rayon_spot 0.01
+                delta_spot 3 0. 0. -0.25
+                integrale 0.5
+                debit 1.0
+            }
         }
         conditions_initiales { c1 champ_uniforme 1 0. }
         conditions_limites
-                {
-                paroi paroi
-                }
+        {
+            paroi paroi
+        }
         option RAMASSE_MIETTES_SIMPLE
-     }
-     eq_diffusion2
-     {
+    }
+    eq_diffusion2
+    {
         diffusion { }
-        convection { EF_stab { volumes_etendus tdivu } } 
-	modele_turbulence schmidt  { turbulence_paroi negligeable_scalaire scturb 0.1 }
+        convection { EF_stab { volumes_etendus tdivu } }
+        modele_turbulence schmidt  { turbulence_paroi negligeable_scalaire scturb 0.1 }
         Nom_Inconnue c2
         equation_interface interf
         phase 1
         Sources {
-                Source_Constituant_Vortex {
-                        senseur_interface {
-                                equation_interface interf
-                                segment_senseur_1 3 0.5 0. 0.5
-                                segment_senseur_2 3 0.5 0. 1.5
-                                nb_points_tests 20
-                        }
-                        rayon_spot 0.01
-                        delta_spot 3 0. 0. -0.25
-                        integrale 0.3
-                        debit 1.0
+            Source_Constituant_Vortex {
+                senseur_interface {
+                    equation_interface interf
+                    segment_senseur_1 3 0.5 0. 0.5
+                    segment_senseur_2 3 0.5 0. 1.5
+                    nb_points_tests 20
                 }
+                rayon_spot 0.01
+                delta_spot 3 0. 0. -0.25
+                integrale 0.3
+                debit 1.0
+            }
         }
         conditions_initiales { c2 champ_uniforme 1 0. }
         conditions_limites
-                {
-                paroi paroi
-                }
+        {
+            paroi paroi
+        }
         option RAMASSE_MIETTES_SIMPLE
-     }
-     eq_diffusion3
-     {
+    }
+    eq_diffusion3
+    {
         diffusion { }
-        convection { EF_stab { volumes_etendus tdivu } } 
-	modele_turbulence schmidt  { turbulence_paroi negligeable_scalaire scturb 0.1 }
+        convection { EF_stab { volumes_etendus tdivu } }
+        modele_turbulence schmidt  { turbulence_paroi negligeable_scalaire scturb 0.1 }
         Nom_Inconnue c3
         equation_interface interf
         phase 1
         Sources { Source_Constituant champ_fonc_txyz DOM 1 0. }
         conditions_initiales { c3 champ_uniforme 1 0. }
         conditions_limites
-                {
-                paroi paroi
-                }
+        {
+            paroi paroi
+        }
 
         option RAMASSE_MIETTES_SIMPLE
         equations_source_chimie 2 eq_diffusion1 eq_diffusion2
         constante_cinetique 1000.
-	modele_cinetique 1 
+        modele_cinetique 1
         equation_nu_t hydraulique
-     }
-     Postraitement
-     {
-	    champs dt_post 0.1
-	    {
-		    vitesse
-		    c1
-		    c2
-		    c3
-		    y_plus
-	    }
- 
     }
-     liste_postraitements
-     {
-	    postraitement_ft_lata agit { 
-    format Lata 
-    fichier post1 
-    champs dt_post 0.1 { 
-        vitesse elem 
-    } 
-    interfaces agit { 
-    } 
-} 
-	   postraitement_ft_lata interf { 
-    format Lata 
-    fichier post2 
-    champs dt_post 0.1 { 
-        vitesse elem 
-        indicatrice_interf elem 
-    } 
-    interfaces interf { 
-        courbure som 
-    } 
-}
-     }
+    Postraitement
+    {
+        champs dt_post 0.1
+        {
+            vitesse
+            c1
+            c2
+            c3
+            y_plus
+        }
+
+    }
+    liste_postraitements
+    {
+        postraitement_ft_lata agit {
+            format Lata
+            fichier post1
+            champs dt_post 0.1 {
+                vitesse elem
+            }
+            interfaces agit {
+            }
+        }
+        postraitement_ft_lata interf {
+            format Lata
+            fichier post2
+            champs dt_post 0.1 {
+                vitesse elem
+                indicatrice_interf elem
+            }
+            interfaces interf {
+                courbure som
+            }
+        }
+    }
 }
 
 Solve pb
 Fin
- 

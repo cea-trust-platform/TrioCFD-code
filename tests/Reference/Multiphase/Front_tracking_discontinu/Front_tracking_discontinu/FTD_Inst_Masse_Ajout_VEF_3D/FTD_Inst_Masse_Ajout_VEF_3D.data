@@ -11,21 +11,21 @@ Domaine dom
 
 Mailler dom
 {
-	Pave Cavite 
-		{
-		Origine 0. 0. 0.
-     		Nombre_de_Noeuds 6 6 21
-		Longueurs 0.2 0.2 1.
-		}
-		{
-		Bord Gauche   X = 0.    0. <= Y <= 0.2  0. <= Z <= 1.
-		Bord Haut     Z = 1.    0. <= X <= 0.2  0. <= Y <= 0.2
-		Bord Bas      Z = 0.    0. <= X <= 0.2  0. <= Y <= 0.2
-		Bord Droit    X = 0.2   0. <= Y <= 0.2  0. <= Z <= 1.
-		Bord Avant    Y = 0.    0. <= X <= 0.2  0. <= Z <= 1.
-		Bord Arriere  Y = 0.2   0. <= X <= 0.2  0. <= Z <= 1.
-		
-		}
+    Pave Cavite
+    {
+        Origine 0. 0. 0.
+        Nombre_de_Noeuds 6 6 21
+        Longueurs 0.2 0.2 1.
+    }
+    {
+        Bord Gauche   X = 0.    0. <= Y <= 0.2  0. <= Z <= 1.
+        Bord Haut     Z = 1.    0. <= X <= 0.2  0. <= Y <= 0.2
+        Bord Bas      Z = 0.    0. <= X <= 0.2  0. <= Y <= 0.2
+        Bord Droit    X = 0.2   0. <= Y <= 0.2  0. <= Z <= 1.
+        Bord Avant    Y = 0.    0. <= X <= 0.2  0. <= Z <= 1.
+        Bord Arriere  Y = 0.2   0. <= X <= 0.2  0. <= Z <= 1.
+
+    }
 }
 
 Tetraedriser_homogene dom
@@ -33,9 +33,9 @@ Tetraedriser_homogene dom
 Sous_Zone zone1
 Associate zone1 dom
 Lire zone1 {
-   Boite
-     Origine 0.1 0.1 0.98
-     Cotes   0.01 0.01 0.02
+    Boite
+    Origine 0.1 0.1 0.98
+    Cotes   0.01 0.01 0.02
 }
 
 
@@ -44,9 +44,9 @@ Lire zone1 {
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur tranche { tranches 1 1 2 }
-	Larg_joint 2
-	Nom_Zones DOM
+    Partitionneur tranche { tranches 1 1 2 }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -64,14 +64,14 @@ VEFPreP1b ma_discretisation
 Schema_Euler_explicite mon_schema
 Lire mon_schema
 {
-	tinit 0.
-	tmax 1.5
-	dt_min 2.e-3
-	dt_max 2.e-3
-	dt_impr 5.e-3
-	dt_sauv 100
-	seuil_statio -1.
-	nb_pas_dt_max 45
+    tinit 0.
+    tmax 1.5
+    dt_min 2.e-3
+    dt_max 2.e-3
+    dt_impr 5.e-3
+    dt_sauv 100
+    seuil_statio -1.
+    nb_pas_dt_max 45
 }
 
 Associate pb dom
@@ -80,117 +80,116 @@ Discretize pb ma_discretisation
 
 Lire pb
 {
-			    solved_equations
+    solved_equations
     {
-Navier_Stokes_FT_Disc          hydraulique
-Transport_Marqueur_FT	       marqueurs
+        Navier_Stokes_FT_Disc          hydraulique
+        Transport_Marqueur_FT	       marqueurs
     }
-	Fluide_Incompressible 
-{
-	mu  Champ_Uniforme 1 3.7e-05
- 	rho Champ_Uniforme 1 2
- 	 gravite Champ_Uniforme 3 0. 0. -9.81
-}
-	hydraulique
-	{
-		modele_turbulence sous_maille_wale
-        	{
-           	  Cw 0.
-          	  turbulence_paroi negligeable
-        	}
-		
-		solveur_pression GCP { 
-			precond ssor { omega 1.5 } 
-			seuil 1.e-12
-			
-		}
-		convection { muscl }
-		diffusion { }
-		conditions_initiales {
-			vitesse Champ_Uniforme 3 0. 0. 0.
-			}
-		
-		boundary_conditions {
-			Gauche  frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
-			Droit   frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
-			Avant   frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
-			Arriere frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
-			Bas     frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
-			Haut    frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
-		}
-	        
-	}
-	
-        
-	marqueurs
-	{
-	 conditions_initiales {
-	        ensemble_points { fichier particules } 
-		proprietes_particules { 
-					distribution { 
-					nb_particules 1
-		       			vitesse 0. 0. 0.
-					temperature 273.
-					masse_volumique 1.
-					diametre 0.01
-					}
-		      		       }
-		t_debut_integration 0.
-	 }
-	 boundary_conditions
-		{
-		      
-		}
-         sources {  Masse_Ajoutee }	
-	 methode_transport vitesse_particules	
-	 methode_couplage one_way_coupling 
-	}
-	
-	Postraitement
-	{
-		Sondes
-		{
-			sonde_pression_p pression periode 0.05 points 1 0.105 0.105 0.5
-			sonde_vit_p vitesse periode 0.05 points 1 0.105 0.105 0.5
-			sonde_vit_c_vert vitesse periode 0.05 segment 20 0.105 0.105 0. 0.105 0.105 1.
-			sonde_vit_c_hori vitesse periode 0.05 segment 20 0. 0.105 0.5 0.2 0.105 0.5
-			sonde_dens_p densite_particules periode 0.05 points 1 0.105 0.105 0.5
-			sonde_dens_c_vert densite_particules periode 0.05 segment 20 0.105 0.105 0. 0.105 0.105 1.
-			sonde_dens_c_hori densite_particules periode 0.05 segment 20 0. 0.105 0.5 0.2 0.105 0.5
-						
-		}
-        	Format lml
-		Champs dt_post 0.05
-		{
-			
-			vitesse elem
-			vitesse som
-			densite_particules elem
-			volume_particules elem
-			gradient_pression elem
-		}
-		
-	}
-liste_postraitements
-{	
-        postraitement_ft_lata marqueurs { 
-    format Lata 
-    fichier marqueurs 
-    champs dt_post 0.05 { 
-        vitesse som 
-    } 
-    interfaces marqueurs { 
-        vitesse som 
-        volume som 
-        diametre som 
-        temperature som 
-        masse_volumique som 
-    } 
-}	
-}
+    Fluide_Incompressible
+    {
+        mu  Champ_Uniforme 1 3.7e-05
+        rho Champ_Uniforme 1 2
+        gravite Champ_Uniforme 3 0. 0. -9.81
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw 0.
+            turbulence_paroi negligeable
+        }
+
+        solveur_pression GCP {
+            precond ssor { omega 1.5 }
+            seuil 1.e-12
+
+        }
+        convection { muscl }
+        diffusion { }
+        conditions_initiales {
+            vitesse Champ_Uniforme 3 0. 0. 0.
+        }
+
+        boundary_conditions {
+            Gauche  frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
+            Droit   frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
+            Avant   frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
+            Arriere frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
+            Bas     frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
+            Haut    frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 3 0. 0. sin(2*3.14159265358979323846*t)
+        }
+
+    }
+
+
+    marqueurs
+    {
+        conditions_initiales {
+            ensemble_points { fichier particules }
+            proprietes_particules {
+                distribution {
+                    nb_particules 1
+                    vitesse 0. 0. 0.
+                    temperature 273.
+                    masse_volumique 1.
+                    diametre 0.01
+                }
+            }
+            t_debut_integration 0.
+        }
+        boundary_conditions
+        {
+
+        }
+        sources {  Masse_Ajoutee }
+        methode_transport vitesse_particules
+        methode_couplage one_way_coupling
+    }
+
+    Postraitement
+    {
+        Sondes
+        {
+            sonde_pression_p pression periode 0.05 points 1 0.105 0.105 0.5
+            sonde_vit_p vitesse periode 0.05 points 1 0.105 0.105 0.5
+            sonde_vit_c_vert vitesse periode 0.05 segment 20 0.105 0.105 0. 0.105 0.105 1.
+            sonde_vit_c_hori vitesse periode 0.05 segment 20 0. 0.105 0.5 0.2 0.105 0.5
+            sonde_dens_p densite_particules periode 0.05 points 1 0.105 0.105 0.5
+            sonde_dens_c_vert densite_particules periode 0.05 segment 20 0.105 0.105 0. 0.105 0.105 1.
+            sonde_dens_c_hori densite_particules periode 0.05 segment 20 0. 0.105 0.5 0.2 0.105 0.5
+
+        }
+        Format lml
+        Champs dt_post 0.05
+        {
+
+            vitesse elem
+            vitesse som
+            densite_particules elem
+            volume_particules elem
+            gradient_pression elem
+        }
+
+    }
+    liste_postraitements
+    {
+        postraitement_ft_lata marqueurs {
+            format Lata
+            fichier marqueurs
+            champs dt_post 0.05 {
+                vitesse som
+            }
+            interfaces marqueurs {
+                vitesse som
+                volume som
+                diametre som
+                temperature som
+                masse_volumique som
+            }
+        }
+    }
 }
 
 Solve pb
 Fin
 
- 

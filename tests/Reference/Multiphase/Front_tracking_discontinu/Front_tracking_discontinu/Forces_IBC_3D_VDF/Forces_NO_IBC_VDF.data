@@ -6,11 +6,11 @@ Domaine DOM
 Read_file DOM maillage_sans_cube.geom
 # END MESH #
 
-# BEGIN PARTITION 
+# BEGIN PARTITION
 Partition DOM {
-        partitionneur metis { Nb_parts 4 }
-        larg_joint 1
-        Nom_Zones DOM
+    partitionneur metis { Nb_parts 4 }
+    larg_joint 1
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -30,41 +30,41 @@ Discretize pb dis
 
 Lire pb
 {
-Fluide_Incompressible
-{
-	mu  Champ_Uniforme 1 10
- 	rho Champ_Uniforme 1 1000.
-}
-	Navier_Stokes_Standard
-	{
-	solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-12 impr }
-	convection           { amont }
-	diffusion            { }
-	conditions_initiales { vitesse champ_uniforme 3 1. 0. 0. }
-	boundary_conditions
-	{
-		entree	frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 1. 0. 0.
-		sortie	frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
-		paroi  	symetrie
-		cube 	paroi_fixe
-	}
-}
+    Fluide_Incompressible
+    {
+        mu  Champ_Uniforme 1 10
+        rho Champ_Uniforme 1 1000.
+    }
+    Navier_Stokes_Standard
+    {
+        solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-12 impr }
+        convection           { amont }
+        diffusion            { }
+        conditions_initiales { vitesse champ_uniforme 3 1. 0. 0. }
+        boundary_conditions
+        {
+            entree	frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 1. 0. 0.
+            sortie	frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+            paroi  	symetrie
+            cube 	paroi_fixe
+        }
+    }
 
-postraitements {
-  lata {
-     sondes 
-     {
-	   pression pression_pa periode 0.001 	points 3 0.5 1.5 1.5 2.5 1.5 1.5 1.5 1.5 1.5 
-	   vitesse vitesse periode 0.001 	points 3 0.5 1.5 1.5 2.5 1.5 1.5 1.5 1.5 1.5 
-     }
-     fichier Forces_NO_IBC_VDF
-     format lata
-     champs dt_post 0.02 {
-	   pression_pa elem
-	   vitesse elem
-     }
-  }
-}
+    postraitements {
+        lata {
+            sondes
+            {
+                pression pression_pa periode 0.001 	points 3 0.5 1.5 1.5 2.5 1.5 1.5 1.5 1.5 1.5
+                vitesse vitesse periode 0.001 	points 3 0.5 1.5 1.5 2.5 1.5 1.5 1.5 1.5 1.5
+            }
+            fichier Forces_NO_IBC_VDF
+            format lata
+            champs dt_post 0.02 {
+                pression_pa elem
+                vitesse elem
+            }
+        }
+    }
 }
 
 Solve pb

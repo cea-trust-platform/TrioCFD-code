@@ -1,56 +1,58 @@
-#  
- Cas test Front-tracking discontinu VDF.
+#
+Cas test Front-tracking discontinu VDF.
 
-  Cas test avec interface liquide-vapeur "interf"
-                solide mobile            "body"
-                concentration
+Cas test avec interface liquide-vapeur "interf"
+solide mobile            "body"
+concentration
 
-  Interface liquide-vapeur initiale : un demi-plan + une goutte
+Interface liquide-vapeur initiale :
+un demi-plan + une goutte
 
-  Remaillage, barycentrage, lissage, test collision, gravite, 
-  tension superficielle.
-  Ecriture des resultats au format lata: un fichier lata avec
-  les champs volumiques et les interfaces liquide-vapeur(lata1),
-  un fichier avec uniquement le solide mobile (lata2)
+Remaillage, barycentrage, lissage, test collision, gravite,
+tension superficielle.
+Ecriture des resultats au format lata:
+un fichier lata avec
+les champs volumiques et les interfaces liquide-vapeur(lata1),
+un fichier avec uniquement le solide mobile (lata2)
 
- Les algorithmes de remaillage avec changement de connectivite
- ne sont pas strictement equivalents entre sequentiel et parallele.
- Il y a donc des ecarts entre le sequentiel et le parallele.
- PARALLEL RUNS
+Les algorithmes de remaillage avec changement de connectivite
+ne sont pas strictement equivalents entre sequentiel et parallele.
+Il y a donc des ecarts entre le sequentiel et le parallele.
+PARALLEL RUNS
 #
 
 dimension 3
 
-# Generic problem used for Front Tracking calculation # 
+# Generic problem used for Front Tracking calculation #
 Probleme_FT_Disc_gen pb
 Domaine DOM
 
 # BEGIN MESH #
 Mailler DOM
 {
-	Pave pave1
-	{
-		origine 0. 0. 0.
-		longueurs 0.04 0.04 0.06
-		nombre_de_noeuds 11 11 16
-	}
-	{
-		bord paroi X = 0.   0. <= Y <= 0.04 0. <= Z <= 0.06
-		bord paroi X = 0.04 0. <= Y <= 0.04 0. <= Z <= 0.06
-		bord paroi Y = 0.   0. <= X <= 0.04 0. <= Z <= 0.06
-		bord paroi Y = 0.04 0. <= X <= 0.04 0. <= Z <= 0.06
-		bord bas   Z = 0.   0. <= X <= 0.04 0. <= Y <= 0.04
-		bord haut  Z = 0.06 0. <= X <= 0.04 0. <= Y <= 0.04
-	}
+    Pave pave1
+    {
+        origine 0. 0. 0.
+        longueurs 0.04 0.04 0.06
+        nombre_de_noeuds 11 11 16
+    }
+    {
+        bord paroi X = 0.   0. <= Y <= 0.04 0. <= Z <= 0.06
+        bord paroi X = 0.04 0. <= Y <= 0.04 0. <= Z <= 0.06
+        bord paroi Y = 0.   0. <= X <= 0.04 0. <= Z <= 0.06
+        bord paroi Y = 0.04 0. <= X <= 0.04 0. <= Z <= 0.06
+        bord bas   Z = 0.   0. <= X <= 0.04 0. <= Y <= 0.04
+        bord haut  Z = 0.06 0. <= X <= 0.04 0. <= Y <= 0.04
+    }
 }
 
 # END MESH #
 # BEGIN PARTITION
 Partition DOM
 {
-	Partition_tool tranche { tranches 2 1 1 }
-	Larg_joint 2
-	zones_name DOM
+    Partition_tool tranche { tranches 2 1 1 }
+    Larg_joint 2
+    zones_name DOM
 }
 End
 END PARTITION #
@@ -64,13 +66,13 @@ VDF dis
 Scheme_euler_explicit  sch
 Read sch
 {
-	tinit 0.
-	tmax  0.1
-	dt_min 1.e-7
-	dt_max 0.5e-2
-	dt_impr 10.
-	dt_sauv 100
-	seuil_statio -1
+    tinit 0.
+    tmax  0.1
+    dt_min 1.e-7
+    dt_max 0.5e-2
+    dt_impr 10.
+    dt_sauv 100
+    seuil_statio -1
 }
 
 Associate pb DOM
@@ -117,189 +119,191 @@ Read pb
     {
         coefficient_diffusion Champ_Uniforme 1 1e-6
     }
-hydraulique
-{
-	# Turbulence model needed and zeroed for laminar flow #
-	modele_turbulence sous_maille_wale
+    hydraulique
+    {
+        # Turbulence model needed and zeroed for laminar flow #
+        modele_turbulence sous_maille_wale
         {
-           Cw               0.5
-           turbulence_paroi loi_standard_hydr
+            Cw               0.5
+            turbulence_paroi loi_standard_hydr
         }
 
-	solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
-	convection           { quick }
-	diffusion            { }
-	initial_conditions { vitesse champ_uniforme 3 0. 0. 0. }
-	
-	# Relation beetween Navier Stokes equation and interface equations #
-	equation_interfaces_proprietes_fluide interf # The velocity field moves the gas-liquid interface #
-	equation_interfaces_vitesse_imposee   body   # The body has an imposed velocity field, so moves the fluid #
-	boundary_conditions
-	{
-		haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.	# Outlet boundary condition for FT model #
-		paroi  paroi_fixe
-		bas    Frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0.0 0.0 0.001
-	}
-	Traitement_particulier { Ec { Ec periode 1.e-7 } }
-}
-interf
-{
-	# Definition of the transport method of the interface: velocity from the Navier Stokes equation #
-	methode_transport vitesse_interpolee hydraulique
-	# Initial position of the water-gas interface and a drop of water #
-	initial_conditions {
-		fonction z-0.03-((x-0.02)^2+(y-0.02)^2)*10 ,
-		fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
+        solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
+        convection           { quick }
+        diffusion            { }
+        initial_conditions { vitesse champ_uniforme 3 0. 0. 0. }
+
+        # Relation beetween Navier Stokes equation and interface equations #
+        equation_interfaces_proprietes_fluide interf # The velocity field moves the gas-liquid interface #
+        equation_interfaces_vitesse_imposee   body   # The body has an imposed velocity field, so moves the fluid #
+        boundary_conditions
+        {
+            haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.	# Outlet boundary condition for FT model #
+            paroi  paroi_fixe
+            bas    Frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0.0 0.0 0.001
         }
-	# Options for the meshing algorithm #
-	VOFlike_correction_volume 1
-	nb_lissage_correction_volume 1
+        Traitement_particulier { Ec { Ec periode 1.e-7 } }
+    }
+    interf
+    {
+        # Definition of the transport method of the interface: velocity from the Navier Stokes equation #
+        methode_transport vitesse_interpolee hydraulique
+        # Initial position of the water-gas interface and a drop of water #
+        initial_conditions {
+            fonction z-0.03-((x-0.02)^2+(y-0.02)^2)*10 ,
+            fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
+        }
+        # Options for the meshing algorithm #
+        VOFlike_correction_volume 1
+        nb_lissage_correction_volume 1
         nb_iterations_correction_volume 3 # taken from nb_iter_correction_volume in remaillage { ... } #
         n_iterations_distance 2
-	remaillage {
-		pas 0.000001
-		nb_iter_remaillage 1
-		critere_arete 0.35
-		critere_remaillage 0.2
-		pas_lissage 0.000001
-		lissage_courbure_iterations 3
-		lissage_courbure_coeff -0.1
-		nb_iter_barycentrage 3
-		relax_barycentrage 1
-		facteur_longueur_ideale 0.85
-		nb_iter_correction_volume 3
-		seuil_dvolume_residuel 1e-12
-	}
-	# Algorithm for the collision algorithm between interfaces #
-	collisions
-	{
-                active
-                juric_pour_tout
-                type_remaillage Juric { source_isovaleur indicatrice }
-	}
-	# Boundary condition, variable contact angle is possible #
-	boundary_conditions
-	{
-		paroi Paroi_FT_disc symetrie
-		haut  Paroi_FT_disc symetrie
-		bas   Paroi_FT_disc symetrie
-	}
-}
-body
-{
-	# Initial position of the moving body #
-	initial_conditions { fonction -(((x-0.02))^2+((y-0.02)/0.6)^2+((z-0.02)/0.6)^2-(0.015^2)) }
-	remaillage {
-		pas 1e8
-		nb_iter_remaillage 5
-		critere_arete 0.5
-		critere_remaillage 0.2
-		pas_lissage -1
-		nb_iter_barycentrage 5
-		relax_barycentrage 1
-		facteur_longueur_ideale 1
-	}
-	boundary_conditions
-	{
-		haut  Paroi_FT_disc symetrie
-		paroi Paroi_FT_disc symetrie
-		bas   Paroi_FT_disc symetrie
-	}
-	# 2 methods to move the body: velocity(x,y,z)=f(x,y,z) or velocity(x,y,z)=f(t) #
-	methode_transport vitesse_imposee
-	    -(y-0.02)*10
-	    (x-0.02)*10
-	    0.
-}
+        remaillage {
+            pas 0.000001
+            nb_iter_remaillage 1
+            critere_arete 0.35
+            critere_remaillage 0.2
+            pas_lissage 0.000001
+            lissage_courbure_iterations 3
+            lissage_courbure_coeff -0.1
+            nb_iter_barycentrage 3
+            relax_barycentrage 1
+            facteur_longueur_ideale 0.85
+            nb_iter_correction_volume 3
+            seuil_dvolume_residuel 1e-12
+        }
+        # Algorithm for the collision algorithm between interfaces #
+        collisions
+        {
+            active
+            juric_pour_tout
+            type_remaillage Juric { source_isovaleur indicatrice }
+        }
+        # Boundary condition, variable contact angle is possible #
+        boundary_conditions
+        {
+            paroi Paroi_FT_disc symetrie
+            haut  Paroi_FT_disc symetrie
+            bas   Paroi_FT_disc symetrie
+        }
+    }
+    body
+    {
+        # Initial position of the moving body #
+        initial_conditions { fonction -(((x-0.02))^2+((y-0.02)/0.6)^2+((z-0.02)/0.6)^2-(0.015^2)) }
+        remaillage {
+            pas 1e8
+            nb_iter_remaillage 5
+            critere_arete 0.5
+            critere_remaillage 0.2
+            pas_lissage -1
+            nb_iter_barycentrage 5
+            relax_barycentrage 1
+            facteur_longueur_ideale 1
+        }
+        boundary_conditions
+        {
+            haut  Paroi_FT_disc symetrie
+            paroi Paroi_FT_disc symetrie
+            bas   Paroi_FT_disc symetrie
+        }
+        # 2 methods to move the body: velocity(x,y,z)=f(x,y,z) or velocity(x,y,z)=f(t) #
+        methode_transport vitesse_imposee
+        -(y-0.02)*10
+        (x-0.02)*10
+        0.
+    }
 # Constituent equation #
-concentration
-{
-	diffusion { negligeable }
-	convection { quick }
-	initial_conditions { concentration champ_fonc_xyz DOM 1 EXP(-((x-0.02)^2+(y-0.02)^2+(z-0.03)^2)/0.03^2) }
-	boundary_conditions {
-		haut  frontiere_ouverte C_ext Champ_Front_Uniforme 1 0.
-		paroi paroi
-		bas   paroi
-	}
-}
-
-Post_processing
-{
-	Definition_champs 
-	{	
-	     Energie_cinetique_hydro Reduction_0D {
-		     methode somme_ponderee source Transformation 
-		     {
-		             # Ec=sum[0.5*rho*vol*(u^2+v^2+w^2)dV] #
-		  	     methode formule expression 1 0.5*rho*u2_plus_v2_plus_w2
-			     sources {
-				     Transformation 
-				     { 
-					     methode produit_scalaire sources 
-					     {
-			 			     Interpolation {
-						 	     localisation elem
-			  				     source refChamp { Pb_champ pb vitesse } } ,
-			 			     Interpolation {
-			 				     localisation elem
-			  				     source refChamp { Pb_champ pb vitesse } }
-					     }
-					     nom_source u2_plus_v2_plus_w2
-				     } ,
-				     refChamp { Pb_champ pb masse_volumique nom_source rho }
-			     } 			 
-		     } 		 
-	     } 
-
-	}
-	Probes {
-		vitesse vitesse periode 1.e-7 point 1 0.02 0.02 0.03
-		pression pression periode 1.e-7 point 1 0.02 0.02 0.03
-		indicatrice_interf indicatrice_interf periode 1.e-7 point 1 0.02 0.02 0.03
-		energie_cinetique energie_cinetique_hydro periode 1.e-7 point 1 0.02 0.02 0.03
-	}
-	
-	fields dt_post 0.05
-	{
-		indicatrice_interf
-		concentration
-		masse_volumique
-		y_plus
-	}
-}
-
-liste_postraitements
-{
-	# Another keywords to post process FT results #
-	postraitement_ft_lata liquid_gas { 
-    format Lata 
-    fichier liquid_gas 
-    fields dt_post 0.05
+    concentration
     {
-       indicatrice_interf elem
+        diffusion { negligeable }
+        convection { quick }
+        initial_conditions { concentration champ_fonc_xyz DOM 1 EXP(-((x-0.02)^2+(y-0.02)^2+(z-0.03)^2)/0.03^2) }
+        boundary_conditions {
+            haut  frontiere_ouverte C_ext Champ_Front_Uniforme 1 0.
+            paroi paroi
+            bas   paroi
+        }
     }
-    interfaces interf { 
-        courbure som 
-        vitesse som 
-        pe elem 
-    } 
-}
-	postraitement_ft_lata body { 
-    format Lata 
-    fichier body 
-    fields dt_post 0.05
+
+    Post_processing
     {
-       indicatrice_body elem
+        Definition_champs
+        {
+            Energie_cinetique_hydro Reduction_0D {
+                methode somme_ponderee source Transformation
+                {
+                    # Ec=sum[0.5*rho*vol*(u^2+v^2+w^2)dV] #
+                    methode formule expression 1 0.5*rho*u2_plus_v2_plus_w2
+                    sources {
+                        Transformation
+                        {
+                            methode produit_scalaire sources
+                            {
+                                Interpolation {
+                                    localisation elem
+                                    source refChamp { Pb_champ pb vitesse }
+                                } ,
+                                Interpolation {
+                                    localisation elem
+                                    source refChamp { Pb_champ pb vitesse }
+                                }
+                            }
+                            nom_source u2_plus_v2_plus_w2
+                        } ,
+                        refChamp { Pb_champ pb masse_volumique nom_source rho }
+                    }
+                }
+            }
+
+        }
+        Probes {
+            vitesse vitesse periode 1.e-7 point 1 0.02 0.02 0.03
+            pression pression periode 1.e-7 point 1 0.02 0.02 0.03
+            indicatrice_interf indicatrice_interf periode 1.e-7 point 1 0.02 0.02 0.03
+            energie_cinetique energie_cinetique_hydro periode 1.e-7 point 1 0.02 0.02 0.03
+        }
+
+        fields dt_post 0.05
+        {
+            indicatrice_interf
+            concentration
+            masse_volumique
+            y_plus
+        }
     }
-    interfaces body { 
-        courbure som 
-    } 
-}
-}
+
+    liste_postraitements
+    {
+        # Another keywords to post process FT results #
+        postraitement_ft_lata liquid_gas {
+            format Lata
+            fichier liquid_gas
+            fields dt_post 0.05
+            {
+                indicatrice_interf elem
+            }
+            interfaces interf {
+                courbure som
+                vitesse som
+                pe elem
+            }
+        }
+        postraitement_ft_lata body {
+            format Lata
+            fichier body
+            fields dt_post 0.05
+            {
+                indicatrice_body elem
+            }
+            interfaces body {
+                courbure som
+            }
+        }
+    }
 
 }
 
 Solve pb
 End
- 
+

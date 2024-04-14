@@ -86,7 +86,7 @@ Discretize pb dis
 
 Lire pb
 {
-       solved_equations
+    solved_equations
     {
         # Navier Stokes equation #
         Navier_Stokes_FT_Disc              hydraulique

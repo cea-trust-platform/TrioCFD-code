@@ -1,4 +1,4 @@
- # Cas test Front-tracking discontinu VDF 2D #
+# Cas test Front-tracking discontinu VDF 2D #
 # Interface solide a l exterieur du domaine #
 # Presence d un marqueur #
 # Geometrie de l obstacle #
@@ -14,27 +14,27 @@ Domaine dom
 
 Mailler dom
 {
-	Pave Cavite 
-		{
-		Origine 0. 0.
-     		Nombre_de_Noeuds 11 51
-		Longueurs 0.2 1.
-		}
-		{
-		Bord Gauche X = 0.  0. <= Y <= 1.
-		Bord Haut Y = 1.    0. <= X <= 0.2
-		Bord Bas Y = 0.     0. <= X <= 0.2
-		Bord Droit X = 0.2  0. <= Y <= 1.
-		}
+    Pave Cavite
+    {
+        Origine 0. 0.
+        Nombre_de_Noeuds 11 51
+        Longueurs 0.2 1.
+    }
+    {
+        Bord Gauche X = 0.  0. <= Y <= 1.
+        Bord Haut Y = 1.    0. <= X <= 0.2
+        Bord Bas Y = 0.     0. <= X <= 0.2
+        Bord Droit X = 0.2  0. <= Y <= 1.
+    }
 }
 Trianguler_H dom
 
 Sous_Zone zone1
 Associate zone1 dom
 Lire zone1 {
-   Rectangle
-     Origine 0.05 0.1
-     Cotes 0.1 0.1
+    Rectangle
+    Origine 0.05 0.1
+    Cotes 0.1 0.1
 }
 
 # END MESH #
@@ -42,9 +42,9 @@ Lire zone1 {
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur tranche { tranches 2 1 }
-	Larg_joint 2
-	Nom_Zones DOM
+    Partitionneur tranche { tranches 2 1 }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -62,14 +62,14 @@ VEFPreP1b ma_discretisation
 Schema_Euler_explicite mon_schema
 Lire mon_schema
 {
-	tinit 0.
-	tmax 0.6
-	dt_min 5.e-3
-	dt_max 5.e-3
-	dt_impr 5.e-3
-	dt_sauv 100
-	seuil_statio -1
-	nb_pas_dt_max 80
+    tinit 0.
+    tmax 0.6
+    dt_min 5.e-3
+    dt_max 5.e-3
+    dt_impr 5.e-3
+    dt_sauv 100
+    seuil_statio -1
+    nb_pas_dt_max 80
 }
 
 Associate pb dom
@@ -78,110 +78,110 @@ Discretize pb ma_discretisation
 
 Lire pb
 {
-	solved_equations
-{
-	Navier_Stokes_FT_Disc          hydraulique
-Transport_Marqueur_FT	       marqueurs
-}
-Fluide_Incompressible 
-{
-	mu  Champ_Uniforme 1 3.7e-05
- 	rho Champ_Uniforme 1 2
- 	 gravite Champ_Uniforme 2 0. -9.81
-}
-	hydraulique
-	{
-		modele_turbulence sous_maille_wale
-        	{
-           	  Cw 0.
-          	  turbulence_paroi negligeable
-        	}
-		
-		solveur_pression GCP { 
-			precond ssor { omega 1.500000 } 
-			seuil 1.000000e-6 
-			impr 
-		}
-		convection { negligeable }
-		diffusion { }
-		conditions_initiales {
-			vitesse Champ_Uniforme 2 0. 0.
-			}
-		
-		boundary_conditions {
-			Gauche paroi_fixe
-			Droit paroi_fixe
-			Bas  paroi_fixe
-			Haut Sortie_libre_rho_variable champ_front_uniforme 1 0. 
-		}
-	        
-	}
-	
-        
-	marqueurs
-	{
-	 conditions_initiales {
-	        ensemble_points { sous_zones 1 zone1 aleatoire 10 } 
-		proprietes_particules { 
-					distribution {
-					nb_particules 10
-		       			vitesse 0. 0.
-					temperature 273.
-					masse_volumique 1.
-					diametre 0.01
-					}
-		      		       }
-		t_debut_integration 0.1
-	 }
-	 boundary_conditions
-		{
-		      
-		}
-         sources { Flottabilite }	
-	 methode_transport vitesse_particules	
-	 methode_couplage one_way_coupling 
-	}
-	
-	Postraitement
-	{
-		Sondes
-		{
-			sonde_pression_point pression periode 0.01 points 1 0.1 0.5
-			sonde_vit_point vitesse periode 0.01 points 1 0.1 0.5
-			sonde_vit_coupe vitesse periode 0.01 segment 20 0.1 0. 0.1 1.
-			sonde_densite_point densite_particules periode 0.01 points 1 0.1 0.5
-			sonde_densite_coupe densite_particules periode 0.01 segment 20 0.1 0. 0.1 1.
-						
-		}
-        	Format lml
-		Champs dt_post 5.e-2
-		{
-			pression elem
-			pression som
-			vitesse elem
-			vitesse som
-			densite_particules elem
-			vorticite elem
-		}
-		
-	}
-liste_postraitements
-{	
-        postraitement_ft_lata marqueurs { 
-    format Lata 
-    fichier marqueurs 
-    champs dt_post 0.05 { 
-        vitesse som 
-    } 
-    interfaces marqueurs { 
-        vitesse som 
-        volume som 
-        diametre som 
-        temperature som 
-        masse_volumique som 
-    } 
-}	
-}
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc          hydraulique
+        Transport_Marqueur_FT	       marqueurs
+    }
+    Fluide_Incompressible
+    {
+        mu  Champ_Uniforme 1 3.7e-05
+        rho Champ_Uniforme 1 2
+        gravite Champ_Uniforme 2 0. -9.81
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw 0.
+            turbulence_paroi negligeable
+        }
+
+        solveur_pression GCP {
+            precond ssor { omega 1.500000 }
+            seuil 1.000000e-6
+            impr
+        }
+        convection { negligeable }
+        diffusion { }
+        conditions_initiales {
+            vitesse Champ_Uniforme 2 0. 0.
+        }
+
+        boundary_conditions {
+            Gauche paroi_fixe
+            Droit paroi_fixe
+            Bas  paroi_fixe
+            Haut Sortie_libre_rho_variable champ_front_uniforme 1 0.
+        }
+
+    }
+
+
+    marqueurs
+    {
+        conditions_initiales {
+            ensemble_points { sous_zones 1 zone1 aleatoire 10 }
+            proprietes_particules {
+                distribution {
+                    nb_particules 10
+                    vitesse 0. 0.
+                    temperature 273.
+                    masse_volumique 1.
+                    diametre 0.01
+                }
+            }
+            t_debut_integration 0.1
+        }
+        boundary_conditions
+        {
+
+        }
+        sources { Flottabilite }
+        methode_transport vitesse_particules
+        methode_couplage one_way_coupling
+    }
+
+    Postraitement
+    {
+        Sondes
+        {
+            sonde_pression_point pression periode 0.01 points 1 0.1 0.5
+            sonde_vit_point vitesse periode 0.01 points 1 0.1 0.5
+            sonde_vit_coupe vitesse periode 0.01 segment 20 0.1 0. 0.1 1.
+            sonde_densite_point densite_particules periode 0.01 points 1 0.1 0.5
+            sonde_densite_coupe densite_particules periode 0.01 segment 20 0.1 0. 0.1 1.
+
+        }
+        Format lml
+        Champs dt_post 5.e-2
+        {
+            pression elem
+            pression som
+            vitesse elem
+            vitesse som
+            densite_particules elem
+            vorticite elem
+        }
+
+    }
+    liste_postraitements
+    {
+        postraitement_ft_lata marqueurs {
+            format Lata
+            fichier marqueurs
+            champs dt_post 0.05 {
+                vitesse som
+            }
+            interfaces marqueurs {
+                vitesse som
+                volume som
+                diametre som
+                temperature som
+                masse_volumique som
+            }
+        }
+    }
 }
 
 Solve pb
@@ -189,27 +189,26 @@ Fin
 Sous_Zone zone1
 Associate zone1 dom
 Lire zone1 {
-   Rectangle
-     Origine 0.05 0.1
-     Cotes 0.1 0.1
+    Rectangle
+    Origine 0.05 0.1
+    Cotes 0.1 0.1
 }
 
 nb_pas_dt_max 80
 nb_pas_dt_max 200
 Lire liquide
 {
-	mu  Champ_Uniforme 1 3.7e-05
- 	rho Champ_Uniforme 1 2
+    mu  Champ_Uniforme 1 3.7e-05
+    rho Champ_Uniforme 1 2
 }
 Bas  frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 0. 1.
 sources {  Trainee , Flottabilite , Masse_Ajoutee }
 terme_gravite rho_g
 
 boundary_conditions
-		{
-		      Gauche Paroi_FT_disc symetrie
-		      Droit Paroi_FT_disc symetrie
-		      Bas  Paroi_FT_disc symetrie
-		      Haut Paroi_FT_disc symetrie
-		}
- 
+{
+    Gauche Paroi_FT_disc symetrie
+    Droit Paroi_FT_disc symetrie
+    Bas  Paroi_FT_disc symetrie
+    Haut Paroi_FT_disc symetrie
+}

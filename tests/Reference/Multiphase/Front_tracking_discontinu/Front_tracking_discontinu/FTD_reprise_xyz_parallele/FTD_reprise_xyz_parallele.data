@@ -1,11 +1,11 @@
-#  
- Cas test Front-tracking discontinu VEF.
- Chute d'une goutte avec G=-10 
-  (sonde de vitesse dans la goutte on verifie v(t)=-10*t)
- Test de la reprise xyz
+#
+Cas test Front-tracking discontinu VEF.
+Chute d'une goutte avec G=-10
+(sonde de vitesse dans la goutte on verifie v(t)=-10*t)
+Test de la reprise xyz
 
- Essai de reprise du fichier, puis trois pas de temps
- PARALLEL OK 4
+Essai de reprise du fichier, puis trois pas de temps
+PARALLEL OK 4
 #
 # lance_test 1 ecart #
 dimension 3
@@ -18,9 +18,9 @@ Lire_fichier_bin DOM cylindre_bin.geom
 
 # BEGIN PARTITION
 Partition DOM {
-	partitionneur metis { Nb_parts 4 }
-	larg_joint 2
-	Nom_Zones DOM
+partitionneur metis { Nb_parts 4 }
+larg_joint 2
+Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -35,14 +35,14 @@ VEFPreP1B dis
 Schema_Euler_explicite  sch
 Lire sch
 {
-	tinit 2.e-2
-	tmax  0.1
-	dt_min 1.e-7
-	dt_max 0.02
-	dt_impr 10.
-	dt_sauv 100
-	seuil_statio -1
-	nb_pas_dt_max 0
+tinit 2.e-2
+tmax  0.1
+dt_min 1.e-7
+dt_max 0.02
+dt_impr 10.
+dt_sauv 100
+seuil_statio -1
+nb_pas_dt_max 0
 }
 
 Associate pb DOM
@@ -52,85 +52,85 @@ System "mkdir -p lata"
 Discretize pb dis
 Lire pb
 {
-		    solved_equations
-    {
+solved_equations
+{
 Navier_Stokes_FT_Disc              hydraulique
 Transport_Interfaces_FT_Disc       interf
-    }
-	Fluide_Diphasique 
-{
-	fluide0 Fluide_Incompressible 
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
 }
-	fluide1 Fluide_Incompressible 
+Fluide_Diphasique
 {
-	mu  Champ_Uniforme 1 0.282e-5
- 	rho Champ_Uniforme 1 1.
+fluide0 Fluide_Incompressible
+{
+mu  Champ_Uniforme 1 0.282e-3
+rho Champ_Uniforme 1 1000.
 }
-	sigma   Champ_Uniforme 1 0.05
-	gravite Champ_Uniforme 3 0. 0. -10.
+fluide1 Fluide_Incompressible
+{
+mu  Champ_Uniforme 1 0.282e-5
+rho Champ_Uniforme 1 1.
+}
+sigma   Champ_Uniforme 1 0.05
+gravite Champ_Uniforme 3 0. 0. -10.
 }
 hydraulique
 {
-	modele_turbulence sous_maille_wale
-        {
-           Cw               0.
-           turbulence_paroi negligeable
-        }
+modele_turbulence sous_maille_wale
+{
+Cw               0.
+turbulence_paroi negligeable
+}
 
-	solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-10 impr }
-	convection           { amont }
-	diffusion            { }
-	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
-	equation_interfaces_proprietes_fluide interf
-	boundary_conditions
-	{
-		haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
-		paroi  paroi_fixe
-		bas    paroi_fixe
-	}
-	terme_gravite rho_g
+solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-10 impr }
+convection           { amont }
+diffusion            { }
+conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+equation_interfaces_proprietes_fluide interf
+boundary_conditions
+{
+haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
+paroi  paroi_fixe
+bas    paroi_fixe
+}
+terme_gravite rho_g
 }
 interf
 {
-	conditions_initiales {
-		fonction z-0.05
-        }
-	methode_transport vitesse_interpolee hydraulique
-        iterations_correction_volume 0
-        n_iterations_distance 2
-	remaillage {
-                pas -1e8
-                pas_lissage -0.000001
-	}
-	boundary_conditions
-	{
-		paroi Paroi_FT_disc symetrie
-		haut  Paroi_FT_disc symetrie
-		bas   Paroi_FT_disc symetrie
-	}
+conditions_initiales {
+fonction z-0.05
+}
+methode_transport vitesse_interpolee hydraulique
+iterations_correction_volume 0
+n_iterations_distance 2
+remaillage {
+pas -1e8
+pas_lissage -0.000001
+}
+boundary_conditions
+{
+paroi Paroi_FT_disc symetrie
+haut  Paroi_FT_disc symetrie
+bas   Paroi_FT_disc symetrie
+}
 }
 postraitement {
-	sondes { v_goutte nodes vitesse periode 0.000001 points 1 0. 0. 0.04 }
-	champs dt_post 1. {
-		indicatrice_interf
-	}
+sondes { v_goutte nodes vitesse periode 0.000001 points 1 0. 0. 0.04 }
+champs dt_post 1. {
+indicatrice_interf
+}
 }
 liste_postraitements {
-	postraitement_ft_lata post1 { 
-    format Lata 
-    fichier lata/post 
-    champs dt_post 0.00005 { 
-        indicatrice_interf elem 
-        pression som 
-        vitesse faces 
-    } 
-    interfaces interf { 
-        pe som 
-        courbure som 
-    } 
+postraitement_ft_lata post1 {
+format Lata
+fichier lata/post
+champs dt_post 0.00005 {
+indicatrice_interf elem
+pression som
+vitesse faces
+}
+interfaces interf {
+pe som
+courbure som
+}
 }
 }
 
@@ -140,4 +140,3 @@ Reprise xyz PAR_prepare.xyz
 
 Solve pb
 Fin
- 

@@ -4,188 +4,180 @@ Probleme_FT_Disc_gen pb
 
 Domaine DOM
 
-# DEBUT MAILLAGE # 
+# DEBUT MAILLAGE #
 Mailler DOM
 {
 
-	Pave bloc
-	{
-		Origine			-2. -2.
-		Nombre_de_Noeuds	65 65
-		Longueurs		4 4 
+    Pave bloc
+    {
+        Origine			-2. -2.
+        Nombre_de_Noeuds	65 65
+        Longueurs		4 4
 
-	}
-	{
-		Bord entree	X = -2. -2.  <= Y <= 2.
-		Bord bord	Y = -2. -2.  <= X <= 2.
-		Bord bord	Y = 2.	-2.  <= X <= 2.
-		Bord sortie 	X = 2.	-2.  <= Y <= 2.	
-	} 
+    }
+    {
+        Bord entree	X = -2. -2.  <= Y <= 2.
+        Bord bord	Y = -2. -2.  <= X <= 2.
+        Bord bord	Y = 2.	-2.  <= X <= 2.
+        Bord sortie 	X = 2.	-2.  <= Y <= 2.
+    }
 }
- 
+
 # FIN MAILLAGE #
 
-# DEBUT DECOUPAGE 
+# DEBUT DECOUPAGE
 Partition DOM
 {
-        Partitionneur tranche { tranches 4 2 }
-        Larg_joint 2
-        Nom_Zones DOM
+    Partitionneur tranche { tranches 4 2 }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 Fin
-  FIN DECOUPAGE #
+FIN DECOUPAGE #
 
-# DEBUT LECTURE  
- Scatter DOM.Zones DOM
- FIN LECTURE #
+# DEBUT LECTURE
+Scatter DOM.Zones DOM
+FIN LECTURE #
 
 VDF dis
 
 Schema_Euler_explicite sch
 Lire sch
 {
-	tinit 0.
-	tmax  2.
-	nb_pas_dt_max 3
-        dt_start dt_fixe 0.002
-        dt_min 0.002
-	dt_max 0.002
-        facsec 20.0
-	diffusion_implicite 1
-        seuil_diffusion_implicite 1e-6
-        impr_diffusion_implicite 1
-	dt_impr 0.
-        dt_sauv -1.
-	seuil_statio -1
-        
+    tinit 0.
+    tmax  2.
+    nb_pas_dt_max 3
+    dt_start dt_fixe 0.002
+    dt_min 0.002
+    dt_max 0.002
+    facsec 20.0
+    diffusion_implicite 1
+    seuil_diffusion_implicite 1e-6
+    impr_diffusion_implicite 1
+    dt_impr 0.
+    dt_sauv -1.
+    seuil_statio -1
+
 }
 # Creation d'un repertoire pour les fichiers lata #
 system "mkdir -p lata"
-
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Uniforme 1  0.01
-	rho Champ_Uniforme 1 1.
-}
-
-
-Champ_Uniforme gravite
-Lire gravite 2 0. 0.
-
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc cylindre
-
-Associate pb eq_hydraulique
-Associate pb cylindre
-
 Associate pb DOM
 Associate pb sch
-Associate pb fluide
-
 Discretize pb dis
 
 Lire pb
 {
-	eq_hydraulique
-	{
-		modele_turbulence sous_maille_wale 
-		{	Cw 0.
-			turbulence_paroi negligeable 
-		}
-	        solveur_pression GCP { precond ssor { omega 1.5 }  seuil 1e-10 impr  } 
-		convection { QUICK }
-		diffusion { }
-		conditions_initiales  { vitesse champ_uniforme 2 0. 0. }
-		equations_interfaces_vitesse_imposee 1 cylindre
-                penalisation_forcage { }
-        	boundary_conditions
-	        {
-                	bord paroi_fixe
-			entree Frontiere_ouverte_gradient_pression_impose Champ_front_Uniforme 1 0.
-			sortie Frontiere_ouverte_gradient_pression_impose Champ_front_Uniforme 1 0.
-	        }
-                Parametre_equation parametre_diffusion_implicite
-                {
-                  crank 0
-                  preconditionnement_diag 1
-                }
+solved_equations
+{
+Navier_Stokes_FT_Disc eq_hydraulique
+Transport_Interfaces_FT_Disc cylindre
+}
+
+
+Fluide_Incompressible
+{
+    mu Champ_Uniforme 1  0.01
+    rho Champ_Uniforme 1 1.
+}
+
+    eq_hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {   Cw 0.
+            turbulence_paroi negligeable
+        }
+        solveur_pression GCP { precond ssor { omega 1.5 }  seuil 1e-10 impr  }
+        convection { QUICK }
+        diffusion { }
+        conditions_initiales  { vitesse champ_uniforme 2 0. 0. }
+        equations_interfaces_vitesse_imposee 1 cylindre
+        penalisation_forcage { }
+        boundary_conditions
+        {
+            bord paroi_fixe
+            entree Frontiere_ouverte_gradient_pression_impose Champ_front_Uniforme 1 0.
+            sortie Frontiere_ouverte_gradient_pression_impose Champ_front_Uniforme 1 0.
+        }
+        Parametre_equation parametre_diffusion_implicite
+        {
+            crank 0
+            preconditionnement_diag 1
+        }
+    }
+
+    cylindre
+    {
+        conditions_initiales { fonction  -(y^2+x^2-0.5) }
+        remaillage
+        {
+            pas -1.
+            nb_iter_remaillage 5
+            critere_arete 0.5
+            critere_remaillage 0.2
+            pas_lissage -1
+            nb_iter_barycentrage 5
+            relax_barycentrage 1
+            facteur_longueur_ideale 0.1
         }
 
-	cylindre
-	{
-		conditions_initiales { fonction  -(y^2+x^2-0.5) }
-		remaillage
-		{
-			pas -1.
-			nb_iter_remaillage 5
-			critere_arete 0.5
-			critere_remaillage 0.2
-			pas_lissage -1
-			nb_iter_barycentrage 5
-			relax_barycentrage 1
-			facteur_longueur_ideale 0.1
-		}
+        boundary_conditions
+        {
+            bord		Paroi_FT_disc symetrie
+            entree		Paroi_FT_disc symetrie
+            sortie		Paroi_FT_disc symetrie
+        }
+        type_vitesse_imposee analytique
+        distance_projete_faces simplifiee
+        methode_transport vitesse_imposee 2.*pi*0.125*sin(2.*pi*t) -0.
+        vitesse_imposee_regularisee 1
+        type_indic_faces modifiee
+        {
+            position -1.0
+            thickness 0.9
+        }
+        interpolation_champ_face lineaire { vitesse_fluide_explicite }
+        n_iterations_interpolation_ibc 5
+    }
 
-		boundary_conditions
-		{
-	        	bord		Paroi_FT_disc symetrie
-		        entree		Paroi_FT_disc symetrie
-		        sortie		Paroi_FT_disc symetrie
-		}
-                type_vitesse_imposee analytique
-		distance_projete_faces simplifiee
-                methode_transport vitesse_imposee 2.*pi*0.125*sin(2.*pi*t) -0.
-                vitesse_imposee_regularisee 1
-		type_indic_faces modifiee
-		{ 
-		  position -1.0
-		  thickness 0.9
-		}
-		interpolation_champ_face lineaire { vitesse_fluide_explicite }
-                n_iterations_interpolation_ibc 5
-	}
-      
 
-        Postraitement
-	{
-		champs dt_post 100
-		{
-			pression
-		}
-	        Sondes 
-		{
-			# Sonde de vitesse horizontale #
-	                Sonde_vitesse_v	 nodes vitesse periode 0.01 segment 901 -30 0.  30. 0.
-		}
-	
-	}
+    Postraitement
+    {
+        champs dt_post 100
+        {
+            pression
+        }
+        Sondes
+        {
+            # Sonde de vitesse horizontale #
+            Sonde_vitesse_v	 nodes vitesse periode 0.01 segment 901 -30 0.  30. 0.
+        }
 
-	liste_postraitements
-	{	        
-                postraitement_ft_lata post_dom { 
-    format Lata 
-    fichier lata/post_dom 
-    champs dt_post 0.5 { 
-        Vorticite som 
-        Critere_Q som 
-        vitesse faces 
-        pression elem 
-        Divergence_U elem 
-        indicatrice_cylindre elem 
-        gradient_pression faces 
-        indicatrice_faces_cylindre faces 
-    } 
-    interfaces cylindre { 
-        pe elem 
-        courbure som 
-    } 
-}        
-	}
+    }
+
+    liste_postraitements
+    {
+        postraitement_ft_lata post_dom {
+            format Lata
+            fichier lata/post_dom
+            champs dt_post 0.5 {
+                Vorticite som
+                Critere_Q som
+                vitesse faces
+                pression elem
+                Divergence_U elem
+                indicatrice_cylindre elem
+                gradient_pression faces
+                indicatrice_faces_cylindre faces
+            }
+            interfaces cylindre {
+                pe elem
+                courbure som
+            }
+        }
+    }
 }
 
 Solve pb
 
 Fin
 
- 

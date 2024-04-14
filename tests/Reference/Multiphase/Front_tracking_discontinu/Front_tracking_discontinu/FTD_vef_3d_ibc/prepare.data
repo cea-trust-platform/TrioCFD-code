@@ -1,9 +1,9 @@
 dimension 3
 
 Domaine dom_surface
-Lire_MED { 
-   domain dom_surface 
-   file halteres.med 
+Lire_MED {
+    domain dom_surface
+    file halteres.med
 }
 Dilate dom_surface 0.1
 Transformer dom_surface z x y+0.03

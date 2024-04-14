@@ -1,8 +1,9 @@
-#  
- Cas test Front-tracking discontinu VDF.
- Test de la reprise xyz
+#
+Cas test Front-tracking discontinu VDF.
+Test de la reprise xyz
 
- Preparation du calcul: generation d'un maillage de depart #
+Preparation du calcul:
+generation d'un maillage de depart #
 
 dimension 3
 Probleme_FT_Disc_gen pb
@@ -10,20 +11,20 @@ Domaine DOM
 
 Mailler DOM
 {
-	Pave pave1
-	{
-		origine 0. 0. 0.
-		longueurs 0.04 0.04 0.06
-		nombre_de_noeuds 11 11 16
-	}
-	{
-		bord paroi X = 0.   0. <= Y <= 0.04 0. <= Z <= 0.06
-		bord paroi X = 0.04 0. <= Y <= 0.04 0. <= Z <= 0.06
-		bord paroi Y = 0.   0. <= X <= 0.04 0. <= Z <= 0.06
-		bord paroi Y = 0.04 0. <= X <= 0.04 0. <= Z <= 0.06
-		bord bas   Z = 0.   0. <= X <= 0.04 0. <= Y <= 0.04
-		bord haut  Z = 0.06 0. <= X <= 0.04 0. <= Y <= 0.04
-	}
+Pave pave1
+{
+origine 0. 0. 0.
+longueurs 0.04 0.04 0.06
+nombre_de_noeuds 11 11 16
+}
+{
+bord paroi X = 0.   0. <= Y <= 0.04 0. <= Z <= 0.06
+bord paroi X = 0.04 0. <= Y <= 0.04 0. <= Z <= 0.06
+bord paroi Y = 0.   0. <= X <= 0.04 0. <= Z <= 0.06
+bord paroi Y = 0.04 0. <= X <= 0.04 0. <= Z <= 0.06
+bord bas   Z = 0.   0. <= X <= 0.04 0. <= Y <= 0.04
+bord haut  Z = 0.06 0. <= X <= 0.04 0. <= Y <= 0.04
+}
 }
 
 VDF dis
@@ -31,15 +32,15 @@ VDF dis
 Schema_Euler_explicite  sch
 Lire sch
 {
-	tinit 0.
-	tmax  0.1
-	dt_min 1.e-7
-	dt_max 0.5e-2
-	dt_start dt_min
-	dt_impr 10.
-	dt_sauv 100
-	seuil_statio -1
-	nb_pas_dt_max 3
+tinit 0.
+tmax  0.1
+dt_min 1.e-7
+dt_max 0.5e-2
+dt_start dt_min
+dt_impr 10.
+dt_sauv 100
+seuil_statio -1
+nb_pas_dt_max 3
 }
 
 Associate pb DOM
@@ -48,132 +49,132 @@ Discretize pb dis
 
 Lire pb
 {
-	solved_equations
-    {
+solved_equations
+{
 Navier_Stokes_FT_Disc              hydraulique
 Transport_Interfaces_FT_Disc       interf
 Transport_Interfaces_FT_Disc       body
-    }
+}
 
-	Fluide_Diphasique 
+Fluide_Diphasique
 {
-	fluide0 Fluide_Incompressible 
+fluide0 Fluide_Incompressible
 {
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
+mu  Champ_Uniforme 1 0.282e-3
+rho Champ_Uniforme 1 1000.
 }
-	fluide1 Fluide_Incompressible 
+fluide1 Fluide_Incompressible
 {
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 100.
+mu  Champ_Uniforme 1 0.282e-3
+rho Champ_Uniforme 1 100.
 }
-	sigma   Champ_Uniforme 1 0.05
-	gravite Champ_Uniforme 3 0. 0. -9.81
+sigma   Champ_Uniforme 1 0.05
+gravite Champ_Uniforme 3 0. 0. -9.81
 }
 hydraulique
 {
-	modele_turbulence sous_maille_wale
-        {
-           Cw               0.
-           turbulence_paroi negligeable
-        }
+modele_turbulence sous_maille_wale
+{
+Cw               0.
+turbulence_paroi negligeable
+}
 
-	solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-12 impr }
-	convection           { quick }
-	diffusion            { }
-	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
-	equation_interfaces_proprietes_fluide interf
-	equation_interfaces_vitesse_imposee   body
-	boundary_conditions
-	{
-		haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
-		paroi  paroi_fixe
-		bas    Frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0.0 0.0 0.001
-	}
+solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-12 impr }
+convection           { quick }
+diffusion            { }
+conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+equation_interfaces_proprietes_fluide interf
+equation_interfaces_vitesse_imposee   body
+boundary_conditions
+{
+haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
+paroi  paroi_fixe
+bas    Frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0.0 0.0 0.001
+}
 }
 interf
 {
-	methode_transport vitesse_interpolee hydraulique
-	conditions_initiales {
-		fonction z-0.03-((x-0.02)^2+(y-0.02)^2)*10 ,
-		fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
-        }
-        VOFlike_correction_volume 1
-	nb_lissage_correction_volume 1
-	nb_iterations_correction_volume 3
-        n_iterations_distance 2
-	remaillage {
-		pas 0.000001
-		nb_iter_remaillage 1
-		critere_arete 0.35
-		critere_remaillage 0.2
-		pas_lissage 0.000001
-		lissage_courbure_iterations 3
-		lissage_courbure_coeff -0.1
-		nb_iter_barycentrage 3
-		relax_barycentrage 1
-		facteur_longueur_ideale 0.85
-		nb_iter_correction_volume 3
-		seuil_dvolume_residuel 1e-12
-	}
-	collisions
-	{
-                active
-                juric_pour_tout
-                type_remaillage Juric { source_isovaleur indicatrice }
-	}
-	boundary_conditions
-	{
-		paroi Paroi_FT_disc symetrie
-		haut  Paroi_FT_disc symetrie
-		bas   Paroi_FT_disc symetrie
-	}
+methode_transport vitesse_interpolee hydraulique
+conditions_initiales {
+fonction z-0.03-((x-0.02)^2+(y-0.02)^2)*10 ,
+fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
+}
+VOFlike_correction_volume 1
+nb_lissage_correction_volume 1
+nb_iterations_correction_volume 3
+n_iterations_distance 2
+remaillage {
+pas 0.000001
+nb_iter_remaillage 1
+critere_arete 0.35
+critere_remaillage 0.2
+pas_lissage 0.000001
+lissage_courbure_iterations 3
+lissage_courbure_coeff -0.1
+nb_iter_barycentrage 3
+relax_barycentrage 1
+facteur_longueur_ideale 0.85
+nb_iter_correction_volume 3
+seuil_dvolume_residuel 1e-12
+}
+collisions
+{
+active
+juric_pour_tout
+type_remaillage Juric { source_isovaleur indicatrice }
+}
+boundary_conditions
+{
+paroi Paroi_FT_disc symetrie
+haut  Paroi_FT_disc symetrie
+bas   Paroi_FT_disc symetrie
+}
 }
 body
 {
-	conditions_initiales { fonction -(((x-0.02))^2+((y-0.02)/0.6)^2+((z-0.02)/0.6)^2-(0.015^2)) }
-	remaillage {
-		pas 1e8
-		nb_iter_remaillage 5
-		critere_arete 0.5
-		critere_remaillage 0.2
-		pas_lissage -1
-		nb_iter_barycentrage 5
-		relax_barycentrage 1
-		facteur_longueur_ideale 1
-	}
-	boundary_conditions
-	{
-		haut  Paroi_FT_disc symetrie
-		paroi Paroi_FT_disc symetrie
-		bas   Paroi_FT_disc symetrie
-	}
-	methode_transport vitesse_imposee
-	    -(y-0.02)*10
-	    (x-0.02)*10
-	    0.
+conditions_initiales { fonction -(((x-0.02))^2+((y-0.02)/0.6)^2+((z-0.02)/0.6)^2-(0.015^2)) }
+remaillage {
+pas 1e8
+nb_iter_remaillage 5
+critere_arete 0.5
+critere_remaillage 0.2
+pas_lissage -1
+nb_iter_barycentrage 5
+relax_barycentrage 1
+facteur_longueur_ideale 1
+}
+boundary_conditions
+{
+haut  Paroi_FT_disc symetrie
+paroi Paroi_FT_disc symetrie
+bas   Paroi_FT_disc symetrie
+}
+methode_transport vitesse_imposee
+-(y-0.02)*10
+(x-0.02)*10
+0.
 }
 liste_postraitements {
-  postraitement_ft_lata post1 { 
-    format Lata 
-    fichier prepare1 
-    champs dt_post 1.0 { 
-        indicatrice_body elem 
-        indicatrice_interf elem 
-        pression elem 
-        vitesse faces 
-    } 
-    interfaces interf { 
-    } 
+postraitement_ft_lata post1 {
+format Lata
+fichier prepare1
+champs dt_post 1.0 {
+indicatrice_body elem
+indicatrice_interf elem
+pression elem
+vitesse faces
 }
-  postraitement_ft_lata post2 { 
-    format Lata 
-    fichier prepare2 
-    champs dt_post 1.0 { 
-        indicatrice_body elem 
-    } 
-    interfaces body { 
-    } 
+interfaces interf {
+}
+}
+postraitement_ft_lata post2 {
+format Lata
+fichier prepare2
+champs dt_post 1.0 {
+indicatrice_body elem
+}
+interfaces body {
+}
 }
 }
 
@@ -182,4 +183,4 @@ Sauvegarde xyz prepare.xyz
 
 Solve pb
 Fin
- 
+

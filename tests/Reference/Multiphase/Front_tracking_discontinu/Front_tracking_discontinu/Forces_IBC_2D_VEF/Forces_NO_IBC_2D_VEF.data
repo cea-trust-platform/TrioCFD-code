@@ -5,9 +5,9 @@ dimension 2
 Pb_Hydraulique pb
 Domaine dom
 # BEGIN MESH #
-Lire_MED { 
-   domain dom 
-   file cavite_avec_disque.med 
+Lire_MED {
+    domain dom
+    file cavite_avec_disque.med
 }
 VerifierCoin dom { }
 # END MESH #
@@ -15,9 +15,9 @@ VerifierCoin dom { }
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur metis { Nb_parts 2 }
-	Larg_joint 1
-	Nom_Zones DOM
+    Partitionneur metis { Nb_parts 2 }
+    Larg_joint 1
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -31,11 +31,11 @@ VEFPreP1B dis
 Schema_Euler_explicite sch
 Lire sch
 {
-	tinit 0.           
-	tmax 0.4
-	dt_min 1.e-5
-	dt_max 1.
-	dt_impr 1.e-3  
+    tinit 0.
+    tmax 0.4
+    dt_min 1.e-5
+    dt_max 1.
+    dt_impr 1.e-3
 }
 
 Associate pb dom
@@ -44,50 +44,50 @@ Discretize pb dis
 
 Lire pb
 {
-Fluide_Incompressible
-{
-	mu Champ_Uniforme 1 1.e-5
-	rho Champ_Uniforme 1 1.
-	gravite Champ_Uniforme 2 0 -9.81
-}
-	Navier_Stokes_standard
-	{
-		solveur_pression cholesky { }
-		convection { muscl }
-		diffusion { }
-		conditions_initiales {
-			vitesse Champ_Uniforme 2 0. 0.
-		}
-		boundary_conditions {
-			cl_1 	frontiere_ouverte_vitesse_imposee Champ_front_fonc_xyz 2 -(y-0.005)/0.003 (x-0.005)/0.003
-			cl_2 	paroi_fixe
-		}
-	}
-	Postraitement
-	{	
-		Definition_champs {
-  			solution Transformation {
-				localisation faces
-				methode formule expression 1 2*0.003/sqrt((x-0.005)*(x-0.005)+(y-0.005)*(y-0.005))-1
-			} 
-  		} 	
-		Sondes
-		{
-			sonde_vorticite vorticite 	periode 0.01 points 1 0.0015 0.005
-			sonde_pression  pression 	periode 0.01 segment 15 0.008 0.005 0.011 0.005
-			sonde_vitesse  vitesse 		periode 0.01 segment 15 0.008 0.005 0.011 0.005
-			sonde_solution solution 	periode 0.01 segment 15 0.008 0.005 0.011 0.005
-		}
-		format lata
-		Champs dt_post 0.05
-		{
-			pression elem
-			vitesse elem
-			vitesse som
-			vitesse faces
-			divergence_U elem
-		}
-	}
+    Fluide_Incompressible
+    {
+        mu Champ_Uniforme 1 1.e-5
+        rho Champ_Uniforme 1 1.
+        gravite Champ_Uniforme 2 0 -9.81
+    }
+    Navier_Stokes_standard
+    {
+        solveur_pression cholesky { }
+        convection { muscl }
+        diffusion { }
+        conditions_initiales {
+            vitesse Champ_Uniforme 2 0. 0.
+        }
+        boundary_conditions {
+            cl_1 	frontiere_ouverte_vitesse_imposee Champ_front_fonc_xyz 2 -(y-0.005)/0.003 (x-0.005)/0.003
+            cl_2 	paroi_fixe
+        }
+    }
+    Postraitement
+    {
+        Definition_champs {
+            solution Transformation {
+                localisation faces
+                methode formule expression 1 2*0.003/sqrt((x-0.005)*(x-0.005)+(y-0.005)*(y-0.005))-1
+            }
+        }
+        Sondes
+        {
+            sonde_vorticite vorticite 	periode 0.01 points 1 0.0015 0.005
+            sonde_pression  pression 	periode 0.01 segment 15 0.008 0.005 0.011 0.005
+            sonde_vitesse  vitesse 		periode 0.01 segment 15 0.008 0.005 0.011 0.005
+            sonde_solution solution 	periode 0.01 segment 15 0.008 0.005 0.011 0.005
+        }
+        format lata
+        Champs dt_post 0.05
+        {
+            pression elem
+            vitesse elem
+            vitesse som
+            vitesse faces
+            divergence_U elem
+        }
+    }
 }
 # Calcul du moment resistant exerce par le fluide sur le disque tournant #
 Calculer_moments dom centre_de_gravite 0.005 0.005

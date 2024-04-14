@@ -4,54 +4,54 @@
 # PARALLEL RUNS #
 
 dimension 3
-domaine dom 
+domaine dom
 Option_VDF
 {
-traitement_coins oui
-P_imposee_aux_faces oui
+    traitement_coins oui
+    P_imposee_aux_faces oui
 }
 
 # BEGIN MESH #
-mailler dom 
-  {
-    pave Entree 
-      { 
-        Origine 0.0 0.0 0.0 
+mailler dom
+{
+    pave Entree
+    {
+        Origine 0.0 0.0 0.0
         longueurs 1.0 1.0 1.0
         nombre_de_noeuds 41 41 3
-      }
-    
-      {
+    }
+
+    {
         bord Entree  X = 0.0 0.0 <= Y <= 1.0 0.0 <= Z <= 1.0
         bord Haut    Y = 1.0 0.0 <= X <= 1.0  0.0 <= Z <= 1.0
         bord Bas     Y = 0.0 0.0 <= X <= 1.0  0.0 <= Z <= 1.0
         bord Sortie  X = 1.0 0.0 <= Y <= 1.0  0.0 <= Z <= 1.0
-	bord new     Z = 0.0 0.0 <= X <= 1.0  0.0 <= Y <= 1.0
-	bord new     Z = 1.0 0.0 <= X <= 1.0  0.0 <= Y <= 1.0
+        bord new     Z = 0.0 0.0 <= X <= 1.0  0.0 <= Y <= 1.0
+        bord new     Z = 1.0 0.0 <= X <= 1.0  0.0 <= Y <= 1.0
 
-      }
-  }
+    }
+}
 # END MESH #
 
-# BEGIN PARTITION 
-Partition dom 
-  { 
-    Partitionneur tranche   { tranches 2 1 1  } 
-    Larg_joint 1 
-    Nom_Zones DOM 
-  } 
-Fin 
+# BEGIN PARTITION
+Partition dom
+{
+    Partitionneur tranche   { tranches 2 1 1  }
+    Larg_joint 1
+    Nom_Zones DOM
+}
+Fin
 END PARTITION #
 
-# BEGIN SCATTER 
-Scatter DOM.Zones dom 
+# BEGIN SCATTER
+Scatter DOM.Zones dom
 END SCATTER #
 
-vdf dis 
+vdf dis
 
-schema_euler_explicite sch 
+schema_euler_explicite sch
 Lire sch
-  { 
+{
     tinit 0.0
     tmax 5000.0
     dt_min 0.000001
@@ -61,159 +61,158 @@ Lire sch
     dt_impr 0.0001
     seuil_statio 1e-05
     nb_pas_dt_max 20
-  }
-  
+}
 
-Pb_Thermohydraulique_Especes_QC pb 
+
+Pb_Thermohydraulique_Especes_QC pb
 Associate pb dom
 Associate pb sch
 Discretize pb dis
 
 Lire pb
-  { 
-  fluide_quasi_compressible 
-  { 
-    pression 171428.571429
-    loi_etat gaz_parfait_qc 
-      { 
-        Cp 1000.0
-        gamma 1.4
-        Prandtl 1.0
-        
-      }
-    traitement_pth constant
-    traitement_rho_gravite moins_rho_moyen
-    mu champ_uniforme  1 2.0
-  }
-    navier_stokes_qc 
-      { 
-        solveur_pression gcp 
-          { 
-            precond ssor 
-              { 
+{
+    fluide_quasi_compressible
+    {
+        pression 171428.571429
+        loi_etat gaz_parfait_qc
+        {
+            Cp 1000.0
+            gamma 1.4
+            Prandtl 1.0
+
+        }
+        traitement_pth constant
+        traitement_rho_gravite moins_rho_moyen
+        mu champ_uniforme  1 2.0
+    }
+    navier_stokes_qc
+    {
+        solveur_pression gcp
+        {
+            precond ssor
+            {
                 omega 1.65
-              }
+            }
             seuil 1e-12
-            impr 
-          }
-        convection   { negligeable } 
-        diffusion    { } 
-        conditions_initiales 
-          {
+            impr
+        }
+        convection   { negligeable }
+        diffusion    { }
+        conditions_initiales
+        {
             vitesse champ_uniforme  3 0. 0. 0.
-          }
-        boundary_conditions 
-          {
-            Haut paroi_fixe 
-            Bas paroi_fixe 
-	    new symetrie
+        }
+        boundary_conditions
+        {
+            Haut paroi_fixe
+            Bas paroi_fixe
+            new symetrie
             Entree frontiere_ouverte_pression_imposee champ_front_uniforme  1 0.
             Sortie frontiere_ouverte_pression_imposee champ_front_uniforme  1 0.
-          }
-      }
-    convection_diffusion_chaleur_qc 
-      { 
-        convection   { negligeable } 
-        diffusion    { negligeable } 
-        conditions_initiales 
-          {
+        }
+    }
+    convection_diffusion_chaleur_qc
+    {
+        convection   { negligeable }
+        diffusion    { negligeable }
+        conditions_initiales
+        {
             temperature champ_uniforme  1 300.0
-          }
-        boundary_conditions 
-          {
-            Haut paroi_adiabatique 
-            Bas paroi_adiabatique 
-	    new symetrie
+        }
+        boundary_conditions
+        {
+            Haut paroi_adiabatique
+            Bas paroi_adiabatique
+            new symetrie
             Entree frontiere_ouverte T_ext champ_front_uniforme  1 300.0
             Sortie frontiere_ouverte T_ext champ_front_uniforme  1 300.0
-          }
-      }
-      Equations_Scalaires_Passifs
-       {
-	Transport_Interfaces_FT_Disc    
-	{
-	conditions_initiales { fonction (1-((x-0.5)^2+(y-0.5)^2)/(0.1)^2) }
-		
-	
-	boundary_conditions
-	{
-		Haut  Paroi_FT_disc symetrie
-		Entree Paroi_FT_disc symetrie
-		Sortie Paroi_FT_disc symetrie
-		Bas   Paroi_FT_disc symetrie
-		new   Paroi_FT_disc symetrie
-	}
-	
-	remaillage {
-		pas -1
-		facteur_longueur_ideale 1
-		pas_lissage 1e8
-		nb_iter_barycentrage 2
-		relax_barycentrage 1
-	}
+        }
+    }
+    Equations_Scalaires_Passifs
+    {
+        Transport_Interfaces_FT_Disc
+        {
+            conditions_initiales { fonction (1-((x-0.5)^2+(y-0.5)^2)/(0.1)^2) }
 
-	methode_transport vitesse_imposee
-	    -(y-0.5)*1
-	    (x-0.5)*1
-	    0.
-       }
-      }
-      
+
+            boundary_conditions
+            {
+                Haut  Paroi_FT_disc symetrie
+                Entree Paroi_FT_disc symetrie
+                Sortie Paroi_FT_disc symetrie
+                Bas   Paroi_FT_disc symetrie
+                new   Paroi_FT_disc symetrie
+            }
+
+            remaillage {
+                pas -1
+                facteur_longueur_ideale 1
+                pas_lissage 1e8
+                nb_iter_barycentrage 2
+                relax_barycentrage 1
+            }
+
+            methode_transport vitesse_imposee
+            -(y-0.5)*1
+            (x-0.5)*1
+            0.
+        }
+    }
+
     postraitements
-      { 
-       first_post {
-	format lata
-        champs dt_post 0.005
-          {
-            pression_pa elem
-            pression_pa som
-            vitesse elem
-            vitesse som
-            INDICATRICE_pbTransport_Interfaces_FT_Disc0 elem
-          }
-       }
-       
-      second_post {
-       fichier Quasi_Comp_IBC_VDF_3D
-       Format lml
-       Sondes {
-	 sonde_vitesse_est vitesse periode 0.00001 point 1 0.59 0.5 0.5
-	 sonde_vitesse_ouest vitesse periode 0.00001 point 1 0.41 0.5 0.5
-	 sonde_vitesse_sud vitesse periode 0.00001 point 1 0.5 0.41 0.5
-	 sonde_vitesse_nord vitesse periode 0.00001 point 1 0.5 0.59 0.5
-	 sonde_vitesse_est_ouest vitesse periode 0.00005 segment 30 0. 0.5 0.5 1. 0.5 0.5
-	 sonde_vitesse_sud_nord vitesse periode 0.00005 segment 30 0.5 0. 0.5 0.5  1. 0.5
-	 sonde_vitesse_vertical_centre vitesse periode 0.00005 segment 30 0.5 0.5 0. 0.5 0.5 1.
-	 sonde_vitesse_vertical_est vitesse periode 0.00005 segment 30 0.59 0.5 0. 0.59 0.5 1.
-	 sonde_vitesse_vertical_nord vitesse periode 0.00005 segment 30 0.5 0.59 0. 0.5 0.59 1.
-	}
-       
-       champs  dt_post 0.005
-          {
-            pression_pa elem
-            pression_pa som
-            vitesse elem
-            vitesse som
-	    temperature elem 
-	    temperature som
-	    INDICATRICE_pbTransport_Interfaces_FT_Disc0 elem
-          }
-      }
-     }
-     
-  liste_postraitements
-  {
-        postraitement_ft_lata post1 { 
-    format Lata 
-    fichier post1 
-    champs dt_post 0.05 { 
-        vitesse som 
-    } 
-}
-  }
+    {
+        first_post {
+            format lata
+            champs dt_post 0.005
+            {
+                pression_pa elem
+                pression_pa som
+                vitesse elem
+                vitesse som
+                INDICATRICE_pbTransport_Interfaces_FT_Disc0 elem
+            }
+        }
+
+        second_post {
+            fichier Quasi_Comp_IBC_VDF_3D
+            Format lml
+            Sondes {
+                sonde_vitesse_est vitesse periode 0.00001 point 1 0.59 0.5 0.5
+                sonde_vitesse_ouest vitesse periode 0.00001 point 1 0.41 0.5 0.5
+                sonde_vitesse_sud vitesse periode 0.00001 point 1 0.5 0.41 0.5
+                sonde_vitesse_nord vitesse periode 0.00001 point 1 0.5 0.59 0.5
+                sonde_vitesse_est_ouest vitesse periode 0.00005 segment 30 0. 0.5 0.5 1. 0.5 0.5
+                sonde_vitesse_sud_nord vitesse periode 0.00005 segment 30 0.5 0. 0.5 0.5  1. 0.5
+                sonde_vitesse_vertical_centre vitesse periode 0.00005 segment 30 0.5 0.5 0. 0.5 0.5 1.
+                sonde_vitesse_vertical_est vitesse periode 0.00005 segment 30 0.59 0.5 0. 0.59 0.5 1.
+                sonde_vitesse_vertical_nord vitesse periode 0.00005 segment 30 0.5 0.59 0. 0.5 0.59 1.
+            }
+
+            champs  dt_post 0.005
+            {
+                pression_pa elem
+                pression_pa som
+                vitesse elem
+                vitesse som
+                temperature elem
+                temperature som
+                INDICATRICE_pbTransport_Interfaces_FT_Disc0 elem
+            }
+        }
+    }
+
+    liste_postraitements
+    {
+        postraitement_ft_lata post1 {
+            format Lata
+            fichier post1
+            champs dt_post 0.05 {
+                vitesse som
+            }
+        }
+    }
 }
 
 Solve pb
-fin 
+fin
 
- 
