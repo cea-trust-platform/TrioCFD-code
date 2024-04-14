@@ -80,9 +80,19 @@ Lire sch
         diffusion_implicite 0	
 }
 
-Fluide_Incompressible fluide
+Associate pb DOM
+Associate pb sch
+Discretize pb dis
+# Debog pb seq faces 1.e-12 0 #
 
-Lire fluide
+Lire pb
+{
+	 solved_equations
+    {
+Navier_Stokes_FT_Disc eq_hydraulique
+Convection_Diffusion_Temperature   temperature
+    }
+	Fluide_Incompressible 
 {
    beta_th  Champ_Uniforme 1 8.3e-5
    rho      Champ_Uniforme 1 2596.0
@@ -92,22 +102,6 @@ Lire fluide
    lambda   champ_fonc_fonction pb temperature 1 1.0*(val_LE_373.0)+(7.6452e-4*val+0.7148)*(373.0<val)*(val_LE_700.0)+(3.8704e-3*val-1.45928)*(700.0<val)*(val_LE_1271.0)+(1.09725e-3*val+2.06538)*(1271.0<val)*(val_LE_1672.0)+3.9*(val>1672.0)
 }
 
-Navier_Stokes_FT_Disc eq_hydraulique
-Convection_Diffusion_Temperature   temperature
-
-Associate pb eq_hydraulique
-Associate pb temperature
-
-Associate pb DOM
-Associate pb sch
-Associate pb fluide
-
-Discretize pb dis
-# Debog pb seq faces 1.e-12 0 #
-
-
-Lire pb
-{
 eq_hydraulique
 {
 	modele_turbulence sous_maille_wale

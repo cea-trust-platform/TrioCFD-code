@@ -37,25 +37,8 @@ Lire sch
 	dt_impr 1.e-2  
 }
 
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu Champ_Uniforme 1 1.e-5
-	rho Champ_Uniforme 1 1.
-	gravite Champ_Uniforme 2 0 -9.81
-}
-
-
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       body
-
-Associate pb hydraulique
-Associate pb body
-
 Associate pb dom
 Associate pb sch
-Associate pb fluide
-
 Discretize pb dis
 Loi_horaire rotation
 Lire rotation
@@ -69,6 +52,19 @@ Lire rotation
 } 
 Lire pb
 {
+solved_equations
+{
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       body
+}
+
+Fluide_Incompressible 
+{
+	mu Champ_Uniforme 1 1.e-5
+	rho Champ_Uniforme 1 1.
+	gravite Champ_Uniforme 2 0 -9.81
+}
+
    hydraulique
    {
 	   modele_turbulence sous_maille_wale

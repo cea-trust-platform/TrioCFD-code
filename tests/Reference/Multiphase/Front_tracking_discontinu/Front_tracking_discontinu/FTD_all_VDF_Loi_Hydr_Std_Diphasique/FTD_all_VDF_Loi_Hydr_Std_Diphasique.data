@@ -73,72 +73,50 @@ Read sch
 	seuil_statio -1
 }
 
-# First phase: liquid #
-Fluide_Incompressible liquide
-Read liquide
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
-}
-
-# Second phase: gas #
-Fluide_Incompressible gaz
-Read gaz
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 100.
-}
-
-# Definition of the two phase media #
-Fluide_Diphasique fluide
-Read fluide
-{
-	# Give a number for each phase #
-	fluide0 liquide
-	fluide1 gaz
-	# Surface tension #
-	sigma   Champ_Uniforme 1 0.05
-}
-
-# Add a constituent #
-Constituant constituant
-Read constituant
-{
-	coefficient_diffusion Champ_Uniforme 1 1e-6
-}
-
-# Gravity field #
-Champ_Uniforme gravite
-Read gravite 3 0. 0. -9.81
-Associate fluide gravite
-
-# Navier Stokes equation #
-Navier_Stokes_FT_Disc              hydraulique
-
-# One equation for the two phase flow interface #
-Transport_Interfaces_FT_Disc       interf
-
-# One equation for a moving body #
-Transport_Interfaces_FT_Disc       body
-
-# One equation for the constituent #
-Convection_Diffusion_Concentration concentration
-
-Associate pb hydraulique
-Associate pb interf
-Associate pb body
-Associate pb concentration
-
 Associate pb DOM
 Associate pb sch
-Associate pb fluide
-Associate pb constituant
-
 Discretize pb dis
 
 # Define the front tracking problem #
 Read pb
 {
+    solved_equations
+    {
+        # Navier Stokes equation #
+        Navier_Stokes_FT_Disc              hydraulique
+
+        # One equation for the two phase flow interface #
+        Transport_Interfaces_FT_Disc       interf
+
+        # One equation for a moving body #
+        Transport_Interfaces_FT_Disc       body
+
+        # One equation for the constituent #
+        Convection_Diffusion_Concentration concentration
+    }
+    Fluide_Diphasique
+    {
+        # Give a number for each phase #
+        fluide0 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 0.282e-3
+            rho Champ_Uniforme 1 1000.
+        }
+        fluide1 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 0.282e-3
+            rho Champ_Uniforme 1 100.
+        }
+        # Surface tension #
+        sigma   Champ_Uniforme 1 0.05
+        # Gravity field #
+        gravite Champ_Uniforme 3 0. 0. -9.81
+    }
+
+    Constituant
+    {
+        coefficient_diffusion Champ_Uniforme 1 1e-6
+    }
 hydraulique
 {
 	# Turbulence model needed and zeroed for laminar flow #

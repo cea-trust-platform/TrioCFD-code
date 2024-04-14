@@ -61,47 +61,32 @@ Lire mon_schema
 	seuil_statio 1.e-8
 }
 
+Associate pb dom
+Associate pb mon_schema
+Discretize pb dis
 
-Fluide_Incompressible liquide
-Lire liquide
+Lire pb
 {
-	mu  Champ_Uniforme 1 1.e-3
- 	rho Champ_Uniforme 1 1000.
-}
-
-Fluide_Incompressible gaz
-Lire gaz
+		 solved_equations
+    {
+Navier_Stokes_FT_Disc          hydraulique
+Transport_Interfaces_FT_Disc   interf
+    }
+	Fluide_Diphasique 
+{
+	fluide0 Fluide_Incompressible 
 {
 	mu  Champ_Uniforme 1 1.92e-5
  	rho Champ_Uniforme 1 1.2
 }
-
-Fluide_Diphasique fluide
-Lire fluide
+	fluide1 Fluide_Incompressible 
 {
-	fluide0 gaz
-	fluide1 liquide
-	sigma   Champ_Uniforme 1 0.05
+	mu  Champ_Uniforme 1 1.e-3
+ 	rho Champ_Uniforme 1 1000.
 }
-
-Champ_Uniforme gravite
-Lire gravite 3  0. 0. -9.81
-Associate fluide gravite
-
-Navier_Stokes_FT_Disc          hydraulique
-Transport_Interfaces_FT_Disc   interf
-
-Associate pb hydraulique
-Associate pb interf
-Associate pb dom
-Associate pb mon_schema
-Associate pb fluide
-
-Discretize pb dis
-
-
-Lire pb
-{
+	sigma   Champ_Uniforme 1 0.05
+	gravite Champ_Uniforme 3  0. 0. -9.81
+}
 	hydraulique
 	{		
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.0e-08 }

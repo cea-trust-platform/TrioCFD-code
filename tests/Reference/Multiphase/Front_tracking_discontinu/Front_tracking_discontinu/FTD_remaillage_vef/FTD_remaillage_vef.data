@@ -38,26 +38,22 @@ Lire sch
 	nb_pas_dt_max 20
 }
 
-Fluide_Incompressible liquide
-Lire liquide
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
-}
-
-Transport_Interfaces_FT_Disc interf
-
-Associate pb interf
-
 Associate pb DOM
 Associate pb sch
-Associate pb liquide
-
 System "mkdir -p lata"
 
 Discretize pb dis
 Lire pb
 {
+            	    solved_equations
+    {
+Transport_Interfaces_FT_Disc interf
+    }
+        Fluide_Incompressible 
+{
+	mu  Champ_Uniforme 1 0.282e-3
+ 	rho Champ_Uniforme 1 1000.
+}
 interf
 {
 	conditions_initiales {

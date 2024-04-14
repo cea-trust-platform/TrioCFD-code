@@ -92,45 +92,8 @@ Lire sch
  nb_pas_dt_max 1
 }
 
-Fluide_Incompressible liquide
-Lire liquide
-{
- mu Champ_Uniforme 1 65.16e-6
- rho Champ_Uniforme 1 574.3
- lambda Champ_Uniforme 1 0.447
- cp Champ_Uniforme 1 10.11e3
- beta_th Champ_Uniforme 1 0.
-}
-Fluide_Incompressible gaz
-Lire gaz
-{
- mu Champ_Uniforme 1 23.73e-6
- rho Champ_Uniforme 1 113.6
- lambda Champ_Uniforme 1 0.138
- cp Champ_Uniforme 1 17.15e3
-}
-Fluide_Diphasique fluide
-Lire fluide
-{
- fluide0 gaz
- fluide1 liquide
- sigma Champ_Uniforme 1 6.e-6
- chaleur_latente Champ_Uniforme 1 -895.7e3
-}
-Champ_Uniforme gravite
-Lire gravite 3 0 0 -5.e-5
-Associate fluide gravite
 
-Navier_Stokes_FT_Disc hydraulique
-Transport_Interfaces_FT_Disc interf
-Convection_Diffusion_Temperature_FT_Disc temp
-
-Associate pb_bulle hydraulique
-Associate pb_bulle interf
-Associate pb_bulle temp
 Associate pb_bulle DOM
-Associate pb_bulle fluide
-
 Associate pb_THI THI
 
 Probleme_Couple pb_couplage
@@ -214,6 +177,35 @@ sauvegarde binaire sauvegarde_THI.sauv
 
 Lire pb_bulle
 {
+  	    solved_equations
+    {
+Navier_Stokes_FT_Disc hydraulique
+Transport_Interfaces_FT_Disc interf
+Convection_Diffusion_Temperature_FT_Disc temp
+    }
+
+  Fluide_Diphasique 
+{
+ fluide0 Fluide_Incompressible 
+{
+ mu Champ_Uniforme 1 23.73e-6
+ rho Champ_Uniforme 1 113.6
+ lambda Champ_Uniforme 1 0.138
+ cp Champ_Uniforme 1 17.15e3
+}
+ fluide1 Fluide_Incompressible 
+{
+ mu Champ_Uniforme 1 65.16e-6
+ rho Champ_Uniforme 1 574.3
+ lambda Champ_Uniforme 1 0.447
+ cp Champ_Uniforme 1 10.11e3
+ beta_th Champ_Uniforme 1 0.
+}
+ sigma Champ_Uniforme 1 6.e-6
+ chaleur_latente Champ_Uniforme 1 -895.7e3
+ gravite Champ_Uniforme 3 0 0 -5.e-5
+}
+
 hydraulique
 {
  modele_turbulence sous_maille_wale

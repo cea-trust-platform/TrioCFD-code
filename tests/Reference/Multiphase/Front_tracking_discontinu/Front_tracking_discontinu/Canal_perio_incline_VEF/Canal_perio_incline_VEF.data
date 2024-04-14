@@ -86,18 +86,6 @@ Lire sch
 	facsec 0.6
 }
 
-Fluide_inCompressible fluide3
-Lire fluide3
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho   Champ_Uniforme 1 1000.
-}
-
-Navier_Stokes_FT_Disc              hydraulique
-
-Associate pb3 hydraulique
-
-Associate pb3 fluide3
 Associate pb1 DOM1
 Associate pb2 DOM2
 Associate pb3 DOM3
@@ -112,6 +100,15 @@ Discretize pbc dis
 # # # Domaine principal # # #
 Lire pb3
 {
+solved_equations
+{
+	Navier_Stokes_FT_Disc              hydraulique
+}
+Fluide_inCompressible 
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho   Champ_Uniforme 1 1000.
+}
 	hydraulique {
 		modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable }
 		solveur_pression petsc cholesky {  }

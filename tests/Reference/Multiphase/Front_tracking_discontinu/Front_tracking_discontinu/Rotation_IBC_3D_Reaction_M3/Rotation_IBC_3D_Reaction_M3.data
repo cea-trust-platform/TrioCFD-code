@@ -54,54 +54,8 @@ Lire sch
 	nb_pas_dt_max 50
 }
 
-Fluide_Incompressible liquide
-Lire liquide
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
- 	gravite Champ_Uniforme 3 0. 0. -9.81
-}
-
-Fluide_Incompressible vapeur
-Lire vapeur
-{
-	mu  Champ_Uniforme 1 2e-5
- 	rho Champ_Uniforme 1 1.29
-}
-
-Fluide_Diphasique fluide
-Lire fluide
-{
-	fluide1 liquide
-	fluide0 vapeur
-	sigma   Champ_Uniforme 1 0.07
-}
-
-Constituant constituant
-Lire constituant
-{
-	coefficient_diffusion Champ_Uniforme 1 1e-6
-}
-
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc 	   interf
-Transport_Interfaces_FT_Disc       agit
-Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion1
-Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion2
-Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion3
-
-Associate pb hydraulique
-Associate pb interf
-Associate pb agit
-Associate pb eq_diffusion1
-Associate pb eq_diffusion2
-Associate pb eq_diffusion3
-
 Associate pb DOM
 Associate pb sch
-Associate pb fluide
-Associate pb constituant
-
 Discretize pb dis
 
 # Agit en rotation #
@@ -119,6 +73,36 @@ Read_file loi_horaire_3D.data ;
 
 Lire pb
 {
+        solved_equations
+{
+    Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+Transport_Interfaces_FT_Disc       agit
+Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion1
+Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion2
+Convection_Diffusion_Concentration_Turbulent_ft_disc eq_diffusion3
+}
+Fluide_Diphasique 
+{
+    fluide1 Fluide_Incompressible 
+{
+    mu  Champ_Uniforme 1 0.282e-3
+    rho Champ_Uniforme 1 1000.
+    gravite Champ_Uniforme 3 0. 0. -9.81
+}
+    fluide0 Fluide_Incompressible 
+{
+    mu  Champ_Uniforme 1 2e-5
+    rho Champ_Uniforme 1 1.29
+}
+    sigma   Champ_Uniforme 1 0.07
+}
+
+Constituant 
+{
+    coefficient_diffusion Champ_Uniforme 1 1e-6
+}
+
      hydraulique
      {	   
 	    equation_interfaces_proprietes_fluide interf

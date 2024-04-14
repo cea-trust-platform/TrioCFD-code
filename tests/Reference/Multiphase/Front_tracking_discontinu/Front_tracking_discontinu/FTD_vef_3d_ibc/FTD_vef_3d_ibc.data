@@ -43,27 +43,23 @@ Lire sch
 	nb_pas_dt_max 10
 }
 
-Fluide_Incompressible liquide
-Lire liquide
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
-}
-
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       body
-
-Associate pb hydraulique
-Associate pb body
-
 Associate pb DOM
 Associate pb sch
-Associate pb liquide
-
 Discretize pb dis
 
 Lire pb
 {
+		 solved_equations
+    {
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       body
+    }
+
+	Fluide_Incompressible 
+{
+	mu  Champ_Uniforme 1 0.282e-3
+ 	rho Champ_Uniforme 1 1000.
+}
 hydraulique
 {
 	modele_turbulence sous_maille_wale

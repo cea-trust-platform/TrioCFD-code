@@ -96,28 +96,23 @@ Lire sch
 	nb_pas_dt_max 10
 }
 
-Fluide_Incompressible eau
-Lire eau
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+{
+			    solved_equations
+    {
+Navier_Stokes_FT_Disc          hydraulique
+Transport_Marqueur_FT	       marqueurs
+    }
+	Fluide_Incompressible 
 {
 	mu Champ_Uniforme 1 0.02
 	rho Champ_Uniforme 1 2
 	gravite Champ_Uniforme 2 0. -9.81
 }
-
-Navier_Stokes_FT_Disc          hydraulique
-Transport_Marqueur_FT	       marqueurs
-
-Associate pb hydraulique
-Associate pb marqueurs
-
-Associate pb dom
-Associate pb sch
-Associate pb eau
-
-Discretize pb dis
-
-Lire pb
-{
 	hydraulique
 	{
 		modele_turbulence sous_maille_wale

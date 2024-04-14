@@ -43,40 +43,6 @@ Scatter DOM.Zones dom
  END SCATTER #
 
 Probleme_FT_Disc_gen pb
-Fluide_Incompressible  liquid_water
-Lire liquid_water 
-{
-  mu champ_uniforme       1 2.8e-4
-  rho champ_uniforme      1 958.37
-  lambda champ_uniforme   1 0.679
-  cp champ_uniforme       1 4.21e3
-  # import CoolProp.CoolProp as CP
-  P,Q -> (pression, fraction de vapeur)
-  CP.PropsSI('ISOBARIC_EXPANSION_COEFFICIENT', "P", 101325, "Q", 0, "Water")                                                     0.0007504815417629351
-  CP.PropsSI('ISOBARIC_EXPANSION_COEFFICIENT', "P", 101325, "Q", 1, "Water")                                                     0.002902383982248589
-  Ou pas a saturation:
-  PropsSI('ISOBARIC_EXPANSION_COEFFICIENT','P',101325,'T',373.124,'Water')  #
-  beta_th Champ_Uniforme  1 0.0007504815417629351
-}
-
-Fluide_Incompressible vapour
-Lire vapour
-{
-  mu champ_uniforme       1 1.227e-5
-  rho champ_uniforme      1 0.597 
-  lambda champ_uniforme   1 0.025
-  cp champ_uniforme       1 2.077e3 
-  beta_th Champ_Uniforme  1 0.002902383982248589
-}
-
-Fluide_diphasique fluide
-Lire fluide
-{
-  fluide1 liquid_water
-  fluide0 vapour
-  sigma   Champ_Uniforme 1            5.89e-2
-  chaleur_latente Champ_Uniforme 1    -2.256e6
-}
 
 Schema_Euler_explicite  sch
 Lire sch
@@ -99,19 +65,7 @@ Lire sch
    periode_sauvegarde_securite_en_heures 0.5
 }
 
-
-Champ_Uniforme gravite
-Lire gravite 2 0. -9.81
-Associate fluide gravite 
-
-Navier_stokes_FT_disc                         hydraulique
-Transport_interfaces_FT_disc                  interf
 Associate pb dom
-Associate pb hydraulique
-Associate pb interf
-Associate pb fluide
-
-
 Associate pb sch
 VDF dis
 Discretize pb dis
@@ -119,7 +73,41 @@ system "mkdir -p lata"
 option_vdf { All_options } # To set the BC of pressure on the Boundary, not at the center of ghost cells! #
 Lire pb
 {
-   
+   	 solved_equations
+    {
+Navier_stokes_FT_disc                         hydraulique
+Transport_interfaces_FT_disc                  interf
+    }
+
+Fluide_diphasique 
+{
+  fluide1 Fluide_Incompressible  
+{
+  mu champ_uniforme       1 2.8e-4
+  rho champ_uniforme      1 958.37
+  lambda champ_uniforme   1 0.679
+  cp champ_uniforme       1 4.21e3
+  # import CoolProp.CoolProp as CP
+  P,Q -> (pression, fraction de vapeur)
+  CP.PropsSI('ISOBARIC_EXPANSION_COEFFICIENT', "P", 101325, "Q", 0, "Water")                                                     0.0007504815417629351
+  CP.PropsSI('ISOBARIC_EXPANSION_COEFFICIENT', "P", 101325, "Q", 1, "Water")                                                     0.002902383982248589
+  Ou pas a saturation:
+  PropsSI('ISOBARIC_EXPANSION_COEFFICIENT','P',101325,'T',373.124,'Water')  #
+  beta_th Champ_Uniforme  1 0.0007504815417629351
+}
+
+  fluide0 Fluide_Incompressible 
+{
+  mu champ_uniforme       1 1.227e-5
+  rho champ_uniforme      1 0.597 
+  lambda champ_uniforme   1 0.025
+  cp champ_uniforme       1 2.077e3 
+  beta_th Champ_Uniforme  1 0.002902383982248589
+}
+  sigma   Champ_Uniforme 1            5.89e-2
+  chaleur_latente Champ_Uniforme 1    -2.256e6
+  gravite Champ_Uniforme 2 0. -9.81
+}
    hydraulique
    {
       # parametre_equation parametre_diffusion_implicite

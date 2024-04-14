@@ -73,28 +73,8 @@ Lire sch
 	seuil_statio -1
 }
 
-Fluide_Incompressible air
-Lire air
-{
-	mu  Champ_Uniforme 1 1.8e-5
- 	rho Champ_Uniforme 1 1.2
-	gravite Champ_Uniforme 3 0. 0. -9.81
-}
-
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       corps
-Transport_Interfaces_FT_Disc       aile_gauche
-Transport_Interfaces_FT_Disc       aile_droite
-
-Associate pb hydraulique
-Associate pb corps
-Associate pb aile_gauche
-Associate pb aile_droite
-
 Associate pb DOM
 Associate pb sch
-Associate pb air
-
 Discretize pb dis
 
 # Oiseau en translation #
@@ -107,6 +87,19 @@ Attention, probleme hydraulique degenere:
 #
 Lire pb
 {
+		 solved_equations
+    {
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       corps
+Transport_Interfaces_FT_Disc       aile_gauche
+Transport_Interfaces_FT_Disc       aile_droite
+    }
+	Fluide_Incompressible 
+{
+	mu  Champ_Uniforme 1 1.8e-5
+ 	rho Champ_Uniforme 1 1.2
+	gravite Champ_Uniforme 3 0. 0. -9.81
+}
      hydraulique
      {
 	    modele_turbulence sous_maille_wale

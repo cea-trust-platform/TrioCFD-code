@@ -50,24 +50,8 @@ Lire sch
 	seuil_statio -1
 }
 
-Fluide_Incompressible liquide
-Lire liquide
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
- 	gravite Champ_Uniforme 2 0. -9.81
-}
-
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       balle
-
-Associate pb hydraulique
-Associate pb balle
-
 Associate pb DOM
 Associate pb sch
-Associate pb liquide
-
 Discretize pb dis
 
 # Balle en translation #
@@ -80,6 +64,19 @@ Attention, probleme hydraulique degenere:
 #
 Lire pb
 {
+		 solved_equations
+    {
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       balle
+    }
+
+	Fluide_Incompressible 
+{
+	mu  Champ_Uniforme 1 0.282e-3
+ 	rho Champ_Uniforme 1 1000.
+ 	gravite Champ_Uniforme 2 0. -9.81
+}
+
      hydraulique
      {
 	    modele_turbulence sous_maille_wale
