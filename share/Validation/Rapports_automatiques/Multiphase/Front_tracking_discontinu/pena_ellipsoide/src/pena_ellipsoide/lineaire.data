@@ -72,32 +72,27 @@ Read sch
 # Creation d'un repertoire pour les fichiers lata #
 # system "mkdir -p lata" #
 
-# Definition du fluide #
-Fluide_Incompressible huile
-Read huile
+Associate pb DOM
+Associate pb sch
+Discretize pb dis
+# Debog pb seq faces 1.e-6 0 #
+
+Read pb
+{
+	        	solved_equations
+	{
+Navier_Stokes_FT_Disc eq_hydraulique
+Transport_Interfaces_FT_Disc agit
+Transport_Interfaces_FT_Disc cuve
+	}
+
+Fluide_Incompressible 
 {
 	rho Champ_Uniforme 1 973
 	mu  Champ_Uniforme 1 3.89200000000000000000 # 3.892 -> nu=4000cS     8.69862 -> nu=8940cs #
 	gravite Champ_Uniforme 3 0. 0. -9.81
 }
 
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc agit
-Transport_Interfaces_FT_Disc cuve
-
-Associate pb eq_hydraulique
-Associate pb agit
-Associate pb cuve
-
-Associate pb DOM
-Associate pb sch
-Associate pb huile
-
-Discretize pb dis
-# Debog pb seq faces 1.e-6 0 #
-
-Read pb
-{
     eq_hydraulique
     {
 	    modele_turbulence null {  }

@@ -45,37 +45,6 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 
-
-Fluide_Incompressible  eau
-Lire eau 
-{
-  mu champ_uniforme       1 70.e-6
-  rho champ_uniforme      1 610
-  lambda champ_uniforme   1 461.e-3
-  cp champ_uniforme       1 8270
-  
-  
-}
-
-Fluide_Incompressible air
-Lire air
-{
-  mu champ_uniforme       1 22.e-6
-  rho champ_uniforme      1 100
-  lambda champ_uniforme   1 111.e-3
-  cp champ_uniforme       1 11000
- 
-}
-
-Fluide_diphasique fluide
-Lire fluide
-{
-  fluide1 eau
-  fluide0 air
-  sigma   Champ_Uniforme 1            0.02
-  chaleur_latente Champ_Uniforme 1    -50000
-}
-
 Schema_Euler_explicite  sch
 Lire sch
 {
@@ -89,23 +58,38 @@ Lire sch
 	seuil_statio -1
 }
 
-Champ_Uniforme gravite
-Lire gravite 3 0 0 0 
-Associate fluide gravite
-
-Navier_stokes_FT_disc                         hydraulique
-Transport_interfaces_FT_disc                  interf
 Associate pb dom
-Associate pb hydraulique
-Associate pb interf
-Associate pb fluide
-
 Associate pb sch
 VDF dis
 Discretize pb dis
 system "mkdir -p lata"
 Lire pb
 {
+	solved_equations
+	{
+Navier_stokes_FT_disc                         hydraulique
+Transport_interfaces_FT_disc                  interf
+	}
+	Fluide_diphasique 
+{
+  fluide1 Fluide_Incompressible  
+{
+  mu champ_uniforme       1 70.e-6
+  rho champ_uniforme      1 610
+  lambda champ_uniforme   1 461.e-3
+  cp champ_uniforme       1 8270
+}
+  fluide0 Fluide_Incompressible 
+{
+  mu champ_uniforme       1 22.e-6
+  rho champ_uniforme      1 100
+  lambda champ_uniforme   1 111.e-3
+  cp champ_uniforme       1 11000
+}
+  sigma   Champ_Uniforme 1            0.02
+  chaleur_latente Champ_Uniforme 1    -50000
+  gravite Champ_Uniforme 3 0 0 0 
+}
 	
 	hydraulique
 	{

@@ -45,68 +45,48 @@ VDF dis
 Schema_Euler_explicite sch
 Lire sch
 {
-
 	tinit 0.
 	tmax 0.2
 	nb_pas_dt_max 400
 	dt_min 1e-6
 	dt_max 1e-5
-
-
 	diffusion_implicite 1
         seuil_diffusion_implicite 1e-6
         impr_diffusion_implicite 1
 	dt_impr 0.01
 	dt_sauv 100
 	seuil_statio -1
-
-
-
 }
 system "mkdir -p lata"
 
-Fluide_Incompressible inclusion
-Lire inclusion
-{
-
-	mu  Champ_Uniforme 1 515e-3
- 	rho Champ_Uniforme 1 1050
-}
-
-Fluide_Incompressible fluide
-Lire fluide
-{
-	mu  Champ_Uniforme 1 6e-3
- 	rho Champ_Uniforme 1 950
-}
-
-Fluide_Diphasique fluidediph
-Lire fluidediph
-{
-	fluide0 inclusion
-	fluide1 fluide
-	sigma   Champ_Uniforme 1 18.2e-3
-	formule_mu standard
-}
-
-Champ_Uniforme gravite
-Lire gravite 3 0. -9.81 0 
-Associate fluidediph gravite
-
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       interf
-
-Associate pb hydraulique
-Associate pb interf
-
 Associate pb dom
 Associate pb sch
-Associate pb fluidediph
-
 Discretize pb dis
 
 Lire pb
 {
+				solved_equations
+	{
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+	}
+Fluide_Diphasique 
+{
+	fluide0 Fluide_Incompressible 
+{
+	mu  Champ_Uniforme 1 515e-3
+ 	rho Champ_Uniforme 1 1050
+}
+	fluide1 Fluide_Incompressible 
+{
+	mu  Champ_Uniforme 1 6e-3
+ 	rho Champ_Uniforme 1 950
+}
+	sigma   Champ_Uniforme 1 18.2e-3
+	formule_mu standard
+	gravite Champ_Uniforme 3 0. -9.81 0 
+}
+
 	hydraulique
 	{
 		modele_turbulence sous_maille_wale

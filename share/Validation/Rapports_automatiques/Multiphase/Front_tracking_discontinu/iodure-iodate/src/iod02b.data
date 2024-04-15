@@ -46,20 +46,6 @@ Read sch
 	seuil_statio -1.e-8
 }
 
-
-Constituant sirop
-Read sirop
-{
-coefficient_diffusion Champ_Uniforme 1 0.2e-4
-}
-
-Fluide_inCompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho   Champ_Uniforme 1 1000.
-}
-
 Chimie la_chimie
 Read la_chimie
 {
@@ -100,7 +86,15 @@ reactions {
 }
 # ecrire la_chimie #
 
+Associate pb dom
+Associate pb sch
+Associate pb la_chimie
+Discretize pb dis
 
+Read pb
+{
+	solved_equations
+	{
 Navier_Stokes_FT_Disc              hydraulique
 Convection_Diffusion_Concentration H2BO3m
 Convection_Diffusion_Concentration Hp
@@ -110,26 +104,18 @@ Convection_Diffusion_Concentration IO3m
 Convection_Diffusion_Concentration I2
 Convection_Diffusion_Concentration H2O
 Convection_Diffusion_Concentration I3m
-
-Associate pb hydraulique
-Associate pb H2BO3m
-Associate pb Hp	
-Associate pb H3BO3	
-Associate pb Im	
-Associate pb IO3m	
-Associate pb I2	
-Associate pb H2O	
-Associate pb I3m	
-Associate pb fluide
-Associate pb sirop
-Associate pb dom
-Associate pb sch
-Associate pb la_chimie
-Discretize pb dis
-
-
-Read pb
+	}
+	Fluide_inCompressible 
 {
+	mu Champ_Uniforme 1 1.85e-5
+	rho   Champ_Uniforme 1 1000.
+}
+
+Constituant 
+{
+coefficient_diffusion Champ_Uniforme 1 0.2e-4
+}
+
 	hydraulique { 
 		modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable }
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-22  impr }

@@ -25,48 +25,34 @@ Read sch
 	nb_pas_dt_max 10000
 }
 
-Fluide_Incompressible liquide
-Read liquide
-{
-	mu  Champ_Uniforme 1 0.273556
- 	rho Champ_Uniforme 1 1000.
-}
-
-Fluide_Incompressible vapeur
-Read vapeur
-{
-	mu  Champ_Uniforme 1 0.00273556
- 	rho Champ_Uniforme 1 10.
-}
-
-Fluide_Diphasique fluide
-Read fluide
-{
-	fluide0 liquide
-	fluide1 vapeur
-	sigma   champ_uniforme 1  0.1
-}
-
-
-Champ_Uniforme gravite
-Read gravite 3 0 0 -10.
-Associate fluide gravite
-
-Navier_Stokes_FT_Disc        hydraulique
-Transport_Interfaces_FT_Disc interf
-
-Associate pb hydraulique
-Associate pb interf
 Associate pb DOM
 Associate pb sch
-Associate pb fluide
-
 Discretize pb dis
 
 System "mkdir -p lata"
 
 Read pb
 {
+			solved_equations
+	{
+Navier_Stokes_FT_Disc        hydraulique
+Transport_Interfaces_FT_Disc interf
+	}
+Fluide_Diphasique 
+{
+	fluide0 Fluide_Incompressible 
+{
+	mu  Champ_Uniforme 1 0.273556
+ 	rho Champ_Uniforme 1 1000.
+}
+	fluide1 Fluide_Incompressible 
+{
+	mu  Champ_Uniforme 1 0.00273556
+ 	rho Champ_Uniforme 1 10.
+}
+	sigma           constant 0.1
+	gravite Champ_Uniforme 3 0 0 -10.
+}
 hydraulique
 {
 	modele_turbulence null { }

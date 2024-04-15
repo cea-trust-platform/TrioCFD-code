@@ -68,51 +68,37 @@ Read sch
 # Creation d'un repertoire pour les fichiers lata #
 # system "mkdir -p lata" #
 
-Fluide_Incompressible liquide
-Read liquide
-{
-	rho Champ_Uniforme 1 973
-	mu  Champ_Uniforme 1 3.89200000000000000000 # 3.892 -> nu=4000cS     8.69862 -> nu=8940cs #
-}
-
-Fluide_Incompressible air
-# (air a 20C) #
-Read air
-{
-	mu  Champ_Uniforme 1 1.85e-5
- 	rho Champ_Uniforme 1 1.204
-}
-Fluide_Diphasique fluide
-Read fluide
-{
-	fluide0 liquide
-	fluide1 air
-	sigma Champ_Uniforme 1 2.1e-2 
-}
-
-Champ_Uniforme gravite
-Read gravite 3 0. 0. -9.81
-Associate fluide gravite
-
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc agit
-Transport_Interfaces_FT_Disc cuve
-Transport_Interfaces_FT_Disc interf
-
-Associate pb eq_hydraulique
-Associate pb agit
-Associate pb cuve
-Associate pb interf
-
 Associate pb DOM
 Associate pb sch
-Associate pb fluide
-
 Discretize pb dis
 # Debog pb seq faces 1.e-6 0 #
 
 Read pb
 {
+	solved_equations
+	{
+Navier_Stokes_FT_Disc eq_hydraulique
+Transport_Interfaces_FT_Disc agit
+Transport_Interfaces_FT_Disc cuve
+Transport_Interfaces_FT_Disc interf
+	}
+	Fluide_Diphasique 
+{
+	fluide0 Fluide_Incompressible 
+{
+	rho Champ_Uniforme 1 973
+	mu  Champ_Uniforme 1 3.89200000000000000000 # 3.892 -> nu=4000cS     8.69862 -> nu=8940cs #
+}
+	fluide1 Fluide_Incompressible 
+# (air a 20C) #
+{
+	mu  Champ_Uniforme 1 1.85e-5
+ 	rho Champ_Uniforme 1 1.204
+}
+	sigma Champ_Uniforme 1 2.1e-2 
+	gravite Champ_Uniforme 3 0. 0. -9.81
+}
+
 eq_hydraulique
 {
 	modele_turbulence null {  }

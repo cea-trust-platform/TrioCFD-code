@@ -61,9 +61,20 @@ Read sch
         diffusion_implicite 1	
 }
 
-Fluide_Incompressible fluide
+Associate pb DOM
+Associate pb sch
+Discretize pb dis
 
-Read fluide
+Read pb
+{
+        	solved_equations
+	{
+Navier_Stokes_FT_Disc eq_hydraulique
+Transport_Interfaces_FT_Disc cylindre
+Convection_Diffusion_Temperature temperature
+	}
+
+        Fluide_Incompressible 
 {
    beta_th  Champ_Uniforme 1 8.3e-5
    rho      Champ_Uniforme 1 2475.243
@@ -73,22 +84,6 @@ Read fluide
    mu       champ_fonc_fonction pb temperature 1 1.0e5*(val_LE_893.57)+10^(-6.8668+10603.8/val)*(893.57<val)*(val_LE_1200.0)+10^(-1.70617+1794.99/(val-710.352))*(val>1200.0)
 }
 
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc cylindre
-Convection_Diffusion_Temperature temperature
-
-Associate pb eq_hydraulique
-Associate pb cylindre
-Associate pb temperature
-
-Associate pb DOM
-Associate pb sch
-Associate pb fluide
-
-Discretize pb dis
-
-Read pb
-{
 eq_hydraulique
 {
 	modele_turbulence null {  }

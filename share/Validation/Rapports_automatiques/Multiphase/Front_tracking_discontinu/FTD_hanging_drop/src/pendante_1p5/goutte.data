@@ -20,46 +20,33 @@ Read sch
 	facsec 1
 }
 
-Fluide_Incompressible eau
-Read eau
-{
-	mu Champ_Uniforme 1 2.82e-4
-	rho Champ_Uniforme 1 1000.
-}
-
-Fluide_Incompressible air
-Read air
-{
-	mu Champ_Uniforme 1 2.82e-5
-	rho Champ_Uniforme 1 10.
-}
-
-Fluide_Diphasique fluide
-Read fluide
-{
-	fluide0 air
-	fluide1 eau
-	sigma Champ_Uniforme 1 0.07
-}
-
-Champ_Uniforme gravite
-Read gravite 3 0. -9.81 0.
-Associate fluide gravite
-
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       interf
-
-Associate pb1 hydraulique
-Associate pb1 interf
 Associate pb1 dom_pb1
 Associate pb1 sch
-Associate pb1 fluide
-
 System "mkdir -p lata"
 
 Discretize pb1 dis
 Read pb1
 {
+		solved_equations
+	{
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+	}
+	Fluide_Diphasique 
+{
+	gravite Champ_Uniforme 3 0. -9.81 0.
+	fluide0 Fluide_Incompressible 
+{
+	mu Champ_Uniforme 1 2.82e-5
+	rho Champ_Uniforme 1 10.
+}
+	fluide1 Fluide_Incompressible 
+{
+	mu Champ_Uniforme 1 2.82e-4
+	rho Champ_Uniforme 1 1000.
+}
+	sigma Champ_Uniforme 1 0.07
+}
 hydraulique
 {
 	modele_turbulence sous_maille_wale

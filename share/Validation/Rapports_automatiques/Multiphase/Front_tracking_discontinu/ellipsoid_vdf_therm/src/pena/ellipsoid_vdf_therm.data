@@ -79,9 +79,22 @@ Read sch
         diffusion_implicite 1	
 }
 
-Fluide_Incompressible fluide
+Associate pb DOM
+Associate pb sch
+Discretize pb dis
+PrecisionGeom 1.0e-11
 
-Read fluide
+Read pb
+{
+	solved_equations
+	{
+Navier_Stokes_FT_Disc eq_hydraulique
+Transport_Interfaces_FT_Disc agit
+Transport_Interfaces_FT_Disc internes
+Transport_Interfaces_FT_Disc cuve
+Convection_Diffusion_Temperature   temperature
+	}
+        Fluide_Incompressible 
 {
    beta_th  Champ_Uniforme 1 8.3e-5
    rho      Champ_Uniforme 1 2596.0
@@ -93,27 +106,6 @@ gravite Champ_Uniforme 3 0. 0. -9.81
 
 }
 
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc agit
-Transport_Interfaces_FT_Disc internes
-Transport_Interfaces_FT_Disc cuve
-Convection_Diffusion_Temperature   temperature
-
-Associate pb eq_hydraulique
-Associate pb agit
-Associate pb cuve
-Associate pb temperature
-Associate pb internes
-
-Associate pb DOM
-Associate pb sch
-Associate pb fluide
-
-Discretize pb dis
-PrecisionGeom 1.0e-11
-
-Read pb
-{
 eq_hydraulique
 {
 	modele_turbulence null {  }

@@ -55,19 +55,6 @@ Read sch
 	niter_max 4
 }
 
-Constituant sirop
-Read sirop
-{
-coefficient_diffusion Champ_Uniforme 1 1e-9
-}
-
-Fluide_inCompressible fluide3
-Read fluide3
-{
-	mu Champ_Uniforme 1 1.e-3
-	rho   Champ_Uniforme 1 1000.
-}
-
 Chimie la_chimie
 Read la_chimie
 {
@@ -109,6 +96,16 @@ reactions {
    }
 }
 
+Associate pb3 DOM3
+Associate pb3 sch
+Associate pb3 la_chimie
+Discretize pb3 dis
+
+# Domaine principal #
+Read pb3
+{
+		solved_equations
+	{
 Navier_Stokes_FT_Disc              hydraulique
 Convection_Diffusion_Concentration H2BO3m
 Convection_Diffusion_Concentration Hp
@@ -119,34 +116,17 @@ Convection_Diffusion_Concentration I2
 Convection_Diffusion_Concentration H2O
 Convection_Diffusion_Concentration I3m
 # Transport_Interfaces_FT_Disc interf #
+	}
 
-Associate pb3 hydraulique
-Associate pb3 H2BO3m
-Associate pb3 Hp
-Associate pb3 H3BO3
-Associate pb3 Im
-Associate pb3 IO3m
-Associate pb3 I2
-Associate pb3 H2O
-Associate pb3 I3m
-
-
-Associate pb3 fluide3
-Associate pb3 sirop
-
-
-Associate pb3 DOM3
-
-
-Associate pb3 sch
-
-Associate pb3 la_chimie
-# Associate pb3 interf #
-Discretize pb3 dis
-
-# Domaine principal #
-Read pb3
+	Fluide_inCompressible 
 {
+	mu Champ_Uniforme 1 1.e-3
+	rho   Champ_Uniforme 1 1000.
+}
+Constituant 
+{
+coefficient_diffusion Champ_Uniforme 1 1e-9
+}
 	# constante_cinetique1 1.  #
 	# constante_cinetique2 0.1 #
 	

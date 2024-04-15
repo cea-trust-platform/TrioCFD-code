@@ -30,36 +30,6 @@ Mailler dom
 }
 transformer dom x*0.0002 y*0.00012-0.00006 z*0.00012-0.00006 # END MESH #
 
-Fluide_Incompressible  eau
-Lire eau
-{
-       mu champ_uniforme       1 0.0005
-       rho champ_uniforme      1 1000.
-       lambda champ_uniforme   1 0.6 # 60. 0.6 #
-       cp champ_uniforme       1 600.
-
-
-}
-
-Fluide_Incompressible vapeur
-Lire vapeur
-{
-       mu champ_uniforme       1 0.00028291
-       rho champ_uniforme      1 500.
-       lambda champ_uniforme   1 0.4
-       cp champ_uniforme       1 100.
-
-}
-
-Fluide_diphasique fluide
-Lire fluide
-{
-   fluide1 eau
-   fluide0 vapeur
-   sigma   Champ_Uniforme 1            0.0 # 0.05 #
-   chaleur_latente Champ_Uniforme 1    -3.
-}
-
 Schema_Euler_explicite  sch
 Lire sch
 {
@@ -73,21 +43,7 @@ Lire sch
      seuil_statio -1
 }
 
-Champ_Uniforme gravite
-Lire gravite 3 0. 0. 0.
-Associate fluide gravite
-
-Navier_stokes_FT_disc                         hydraulique
-Transport_interfaces_FT_disc                  interf
-convection_diffusion_temperature_ft_disc      thermique
-convection_diffusion_temperature_ft_disc      thermique_vapeur
 Associate pb dom
-Associate pb hydraulique
-Associate pb thermique
-Associate pb thermique_vapeur
-Associate pb interf
-Associate pb fluide
-
 Associate pb sch
 VDF dis
 Discretize pb dis
@@ -96,7 +52,33 @@ system "mkdir -p lata"
 
 Lire pb
 {
-
+    	solved_equations
+	{
+Navier_stokes_FT_disc                         hydraulique
+Transport_interfaces_FT_disc                  interf
+convection_diffusion_temperature_ft_disc      thermique
+convection_diffusion_temperature_ft_disc      thermique_vapeur
+	}
+  Fluide_diphasique 
+{
+   fluide1 Fluide_Incompressible  
+{
+       mu champ_uniforme       1 0.0005
+       rho champ_uniforme      1 1000.
+       lambda champ_uniforme   1 0.6 # 60. 0.6 #
+       cp champ_uniforme       1 600.
+}
+   fluide0 Fluide_Incompressible 
+{
+       mu champ_uniforme       1 0.00028291
+       rho champ_uniforme      1 500.
+       lambda champ_uniforme   1 0.4
+       cp champ_uniforme       1 100.
+}
+   sigma   Champ_Uniforme 1            0.0 # 0.05 #
+   chaleur_latente Champ_Uniforme 1    -3.
+   gravite Champ_Uniforme 3 0. 0. 0.
+}
      hydraulique
      {
           modele_turbulence sous_maille_wale
