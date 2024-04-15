@@ -10,174 +10,160 @@ VDF dis
 schema_euler_explicite  sch
 Read sch
 {
-	tinit 0.0
+    tinit 0.0
 	nb_pas_dt_max 3
-	tmax  10.
-	dt_min 1.e-10
-	dt_max 0.001
-	dt_impr 0.2
-	dt_sauv 10.
-	seuil_statio -1.e-8
-	facsec 1
+    tmax  10.
+    dt_min 1.e-10
+    dt_max 0.001
+    dt_impr 0.2
+    dt_sauv 10.
+    seuil_statio -1.e-8
+    facsec 1
 }
 
-Fluide_Incompressible eau
-Read eau
-{
-	mu Champ_Uniforme 1 2.82e-4
-	rho Champ_Uniforme 1 1000.
-}
-
-Fluide_Incompressible air
-Read air
-{
-	mu Champ_Uniforme 1 2.82e-5
-	rho Champ_Uniforme 1 10.
-}
-
-Fluide_Diphasique fluide
-Read fluide
-{
-	fluide0 air
-	fluide1 eau
-	sigma  Champ_Uniforme 1 0.07
-}
-
-Champ_Uniforme gravite
-Read gravite 3 0. -9.81 0.
-Associate fluide gravite
-
-Navier_Stokes_FT_Disc              hydraulique
-Transport_Interfaces_FT_Disc       interf
-
-Associate pb1 hydraulique
-Associate pb1 interf
 Associate pb1 dom_pb1
 Associate pb1 sch
-Associate pb1 fluide
-
 System "mkdir -p lata"
 
 Discretize pb1 dis
 Read pb1
 {
-hydraulique
-{
-	modele_turbulence sous_maille_wale
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc              hydraulique
+        Transport_Interfaces_FT_Disc       interf
+    }
+    Fluide_Diphasique
+    {
+        fluide0 Fluide_Incompressible
         {
-           Cw               0.
-           turbulence_paroi negligeable
+            mu Champ_Uniforme 1 2.82e-5
+            rho Champ_Uniforme 1 10.
+        }
+        fluide1 Fluide_Incompressible
+        {
+            mu Champ_Uniforme 1 2.82e-4
+            rho Champ_Uniforme 1 1000.
+        }
+        sigma  Champ_Uniforme 1 0.07
+        gravite Champ_Uniforme 3 0. -9.81 0.
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw               0.
+            turbulence_paroi negligeable
         }
 
-	solveur_pression GCP { optimized precond ssor { omega 1.6 } seuil 1.e-11 impr }
-	convection           { quick }
-	diffusion            { }
-	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
-	equation_interfaces_proprietes_fluide interf
-	conditions_limites
-	{
-		injection	frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0. -0.1 0.
-		paroi	paroi_fixe
-		ouverte Sortie_libre_rho_variable champ_front_uniforme 1 0.
-	}
-	terme_gravite grad_I
-}
-interf
-{
-	conditions_initiales {
-           fonction
- -(x-0.0105)*(x-0.0105)-(z-0.0105)*(z-0.0105)-(y-0.012)*(y-0.012)+0.0005*0.0005
+        solveur_pression GCP { optimized precond ssor { omega 1.6 } seuil 1.e-11 impr }
+        convection           { quick }
+        diffusion            { }
+        conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+        equation_interfaces_proprietes_fluide interf
+        conditions_limites
+        {
+            injection	frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0. -0.1 0.
+            paroi	paroi_fixe
+            ouverte Sortie_libre_rho_variable champ_front_uniforme 1 0.
         }
-	methode_transport vitesse_interpolee hydraulique
+        terme_gravite grad_I
+    }
+    interf
+    {
+        conditions_initiales {
+            fonction
+            -(x-0.0105)*(x-0.0105)-(z-0.0105)*(z-0.0105)-(y-0.012)*(y-0.012)+0.0005*0.0005
+        }
+        methode_transport vitesse_interpolee hydraulique
         iterations_correction_volume 0
         n_iterations_distance 2
-	remaillage {
-                pas 1.e-4
-                nb_iter_remaillage 2
-                critere_arete 0.5
-                critere_remaillage 0.1
-                pas_lissage 1.e-5
-                lissage_courbure_iterations 20
-                lissage_courbure_coeff -0.05
-                nb_iter_barycentrage 3
-                relax_barycentrage 1.
-                facteur_longueur_ideale 1.
-                nb_iter_correction_volume 5
-                seuil_dvolume_residuel 1e-15		
-	}
+        remaillage {
+            pas 1.e-4
+            nb_iter_remaillage 2
+            critere_arete 0.5
+            critere_remaillage 0.1
+            pas_lissage 1.e-5
+            lissage_courbure_iterations 20
+            lissage_courbure_coeff -0.05
+            nb_iter_barycentrage 3
+            relax_barycentrage 1.
+            facteur_longueur_ideale 1.
+            nb_iter_correction_volume 5
+            seuil_dvolume_residuel 1e-15
+        }
         collisions {
-                    active
-                    juric_pour_tout
-                    type_remaillage
-                    Thomas { distance_interface_element_max 1 }	
-	}
-	conditions_limites
-	{
+            active
+            juric_pour_tout
+            type_remaillage
+            Thomas { distance_interface_element_max 1 }
+        }
+        conditions_limites
+        {
 #		injection Paroi_FT_disc	Constant Champ_Front_Uniforme 1 120 #
 #		Pour un angle de contact de 1   radian compte dans le gaz on a 57  degres comptes dans le gaz et 123 degres comptes dans le liquide #
 #		Pour un angle de contact de 1.5 radian compte dans le gaz on a 86  degres comptes dans le gaz et 94  degres comptes dans le liquide  #
 #		Pour un angle de contact de 2   radian compte dans le gaz on a 115 degres comptes dans le gaz et 65  degres comptes dans le liquide  #
 #		Pour un angle de contact de 2.5 radian compte dans le gaz on a 143 degres comptes dans le gaz et 37  degres comptes dans le liquide  #
 #		Pour un angle de contact de 3   radian compte dans le gaz on a 172 degres comptes dans le gaz et 8   degres comptes dans le liquide #
-		injection Paroi_FT_disc	Constant Champ_Front_Fonc_xyz 1 37.+sqrt(((x-0.0105)*(x-0.0105)+(z-0.0105)*(z-0.0105)))*100.
-		paroi	Paroi_FT_disc Constant Champ_Front_Fonc_xyz 1 37.+sqrt(((x-0.0105)*(x-0.0105)+(z-0.0105)*(z-0.0105)))*100.
-		ouverte	Paroi_FT_disc Constant Champ_Front_Fonc_xyz 1 37.+sqrt(((x-0.0105)*(x-0.0105)+(z-0.0105)*(z-0.0105)))*100.
-	}
-}
-	postraitement  {
-		Definition_champs {
-			hauteur1 Reduction_0D {
-				methode moyenne_ponderee
-				source Transformation {
-					methode formule
-					expression 1 exp(-(x*x+z*z)*1000)*(1-indicatrice_interf_natif_dom_pb1)
-					source refChamp { Pb_champ pb1 indicatrice_interf }
-                        	}
-			}
-			hauteur2 Reduction_0D {
-				methode moyenne_ponderee
-				source Transformation {
-					methode formule
-					expression 1 exp(-(x*x+z*z)*10000)*(1-indicatrice_interf_natif_dom_pb1)
-					source refChamp { Pb_champ pb1 indicatrice_interf }
-                        	}
-			}
-			hauteur3 Reduction_0D {
-				methode moyenne_ponderee
-				source Transformation {
-					methode formule
-					expression 1 exp(-(x*x+z*z)*100000)*(1-indicatrice_interf_natif_dom_pb1)
-					source refChamp { Pb_champ pb1 indicatrice_interf }
-                        	}
-			}
-		}
-		Sondes {
-			hauteur1 hauteur1 periode 0.02 points 1 0. 0.1 0.
-			hauteur2 hauteur2 periode 0.02 points 1 0. 0.1 0.
-			hauteur3 hauteur3 periode 0.02 points 1 0. 0.1 0.
-		}
-		champs dt_post 1e3
-		{
-		indicatrice_interf elem
-		}
-	}
-liste_postraitements {
-	postraitement_ft_lata post1 { 
-    format Lata 
-    fichier lata/post 
-    champs dt_post 0.01 { 
-        indicatrice_interf elem 
-        vitesse faces 
-    } 
-    interfaces interf { 
-        courbure som 
-    } 
-}
-}
+            injection Paroi_FT_disc	Constant Champ_Front_Fonc_xyz 1 37.+sqrt(((x-0.0105)*(x-0.0105)+(z-0.0105)*(z-0.0105)))*100.
+            paroi	Paroi_FT_disc Constant Champ_Front_Fonc_xyz 1 37.+sqrt(((x-0.0105)*(x-0.0105)+(z-0.0105)*(z-0.0105)))*100.
+            ouverte	Paroi_FT_disc Constant Champ_Front_Fonc_xyz 1 37.+sqrt(((x-0.0105)*(x-0.0105)+(z-0.0105)*(z-0.0105)))*100.
+        }
+    }
+    postraitement  {
+        Definition_champs {
+            hauteur1 Reduction_0D {
+                methode moyenne_ponderee
+                source Transformation {
+                    methode formule
+                    expression 1 exp(-(x*x+z*z)*1000)*(1-indicatrice_interf_natif_dom_pb1)
+                    source refChamp { Pb_champ pb1 indicatrice_interf }
+                }
+            }
+            hauteur2 Reduction_0D {
+                methode moyenne_ponderee
+                source Transformation {
+                    methode formule
+                    expression 1 exp(-(x*x+z*z)*10000)*(1-indicatrice_interf_natif_dom_pb1)
+                    source refChamp { Pb_champ pb1 indicatrice_interf }
+                }
+            }
+            hauteur3 Reduction_0D {
+                methode moyenne_ponderee
+                source Transformation {
+                    methode formule
+                    expression 1 exp(-(x*x+z*z)*100000)*(1-indicatrice_interf_natif_dom_pb1)
+                    source refChamp { Pb_champ pb1 indicatrice_interf }
+                }
+            }
+        }
+        Sondes {
+            hauteur1 hauteur1 periode 0.02 points 1 0. 0.1 0.
+            hauteur2 hauteur2 periode 0.02 points 1 0. 0.1 0.
+            hauteur3 hauteur3 periode 0.02 points 1 0. 0.1 0.
+        }
+        champs dt_post 1e3
+        {
+            indicatrice_interf elem
+        }
+    }
+    liste_postraitements {
+        postraitement_ft_lata post1 {
+            format Lata
+            fichier lata/post
+            champs dt_post 0.01 {
+                indicatrice_interf elem
+                vitesse
+            }
+            interfaces interf {
+                courbure som
+            }
+        }
+    }
 
-sauvegarde binaire Oscillation_bulle3.rep
+    sauvegarde binaire Oscillation_bulle3.rep
 }
 
 Solve pb1
 Fin
- 

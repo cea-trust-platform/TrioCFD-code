@@ -8,29 +8,29 @@ Domaine DOM
 # BEGIN MESH #
 Mailler DOM
 {
-        Pave pave1
-        {
-                origine 0. 0. 0.
-                longueurs 0.04 0.04 0.06
-                nombre_de_noeuds 11 11 16
-		facteurs 1.05 1. 1.
-        }
-        {
-                bord paroi X = 0.   0. <= Y <= 0.04 0. <= Z <= 0.06
-                bord paroi X = 0.04 0. <= Y <= 0.04 0. <= Z <= 0.06
-                bord paroi Y = 0.   0. <= X <= 0.04 0. <= Z <= 0.06
-                bord paroi Y = 0.04 0. <= X <= 0.04 0. <= Z <= 0.06
-                bord bas   Z = 0.   0. <= X <= 0.04 0. <= Y <= 0.04
-                bord haut  Z = 0.06 0. <= X <= 0.04 0. <= Y <= 0.04
-        }
+    Pave pave1
+    {
+        origine 0. 0. 0.
+        longueurs 0.04 0.04 0.06
+        nombre_de_noeuds 11 11 16
+        facteurs 1.05 1. 1.
+    }
+    {
+        bord paroi X = 0.   0. <= Y <= 0.04 0. <= Z <= 0.06
+        bord paroi X = 0.04 0. <= Y <= 0.04 0. <= Z <= 0.06
+        bord paroi Y = 0.   0. <= X <= 0.04 0. <= Z <= 0.06
+        bord paroi Y = 0.04 0. <= X <= 0.04 0. <= Z <= 0.06
+        bord bas   Z = 0.   0. <= X <= 0.04 0. <= Y <= 0.04
+        bord haut  Z = 0.06 0. <= X <= 0.04 0. <= Y <= 0.04
+    }
 }
 transformer DOM x*2-0.04 y*2-0.04 z*2
 # END MESH #
 
 # BEGIN PARTITION
 Partition DOM {
-	partitionneur fichier_decoupage { fichier decoupage }
-	Nom_Zones DOM
+    partitionneur fichier_decoupage { fichier decoupage }
+    Nom_Zones DOM
 }
 Fin
 END PARTITION #
@@ -44,91 +44,89 @@ VDF dis
 Schema_Euler_explicite  sch
 Lire sch
 {
-	tinit 0.
+    tinit 0.
 	nb_pas_dt_max 3
-	tmax  1
-	dt_min 1.e-7
-	dt_max 0.02
-	dt_impr 10.
-	dt_sauv 100
-	seuil_statio -1
+    tmax  1
+    dt_min 1.e-7
+    dt_max 0.02
+    dt_impr 10.
+    dt_sauv 100
+    seuil_statio -1
 }
 
-Fluide_Incompressible liquide
-Lire liquide
-{
-	mu  Champ_Uniforme 1 0.282e-3
- 	rho Champ_Uniforme 1 1000.
-}
-
-Transport_Interfaces_FT_Disc interf
-
-Associate pb interf
 
 Associate pb DOM
 Associate pb sch
-Associate pb liquide
-
 System "mkdir -p lata"
 
 Discretize pb dis
 Lire pb
 {
-interf
-{
-	conditions_initiales {
-		fonction x*x+y*y+(z-0.065)^2*5-0.03*0.03 ,
-		fonction_ignorer_collision ajout_phase0 x*x+y*y+(z-0.035)^2*5-0.03*0.03
+    solved_equations
+    {
+        Transport_Interfaces_FT_Disc interf
+    }
+    Fluide_Incompressible
+    {
+        mu  Champ_Uniforme 1 0.282e-3
+        rho Champ_Uniforme 1 1000.
+    }
+
+    interf
+    {
+        conditions_initiales {
+            fonction x*x+y*y+(z-0.065)^2*5-0.03*0.03 ,
+            fonction_ignorer_collision ajout_phase0 x*x+y*y+(z-0.035)^2*5-0.03*0.03
         }
-	methode_transport vitesse_imposee 0. 0. 0.
+        methode_transport vitesse_imposee 0. 0. 0.
         iterations_correction_volume 0
         n_iterations_distance 2
-	remaillage {
-                pas 1e-8
-                nb_iter_remaillage 1
-                critere_arete 0.36
-                critere_remaillage 0.36
-                pas_lissage 1e-8
-                lissage_courbure_iterations 13
-                lissage_courbure_coeff -0.1
-                nb_iter_barycentrage 10
-                relax_barycentrage 0.8
-                critere_longueur_fixe 0.008
-                nb_iter_correction_volume 6
-                seuil_dvolume_residuel 1e-15		
-	}
-	collisions
-       	{
-               	active
-                juric_pour_tout
-                type_remaillage Thomas { distance_interface_element_max 2 }
+        remaillage {
+            pas 1e-8
+            nb_iter_remaillage 1
+            critere_arete 0.36
+            critere_remaillage 0.36
+            pas_lissage 1e-8
+            lissage_courbure_iterations 13
+            lissage_courbure_coeff -0.1
+            nb_iter_barycentrage 10
+            relax_barycentrage 0.8
+            critere_longueur_fixe 0.008
+            nb_iter_correction_volume 6
+            seuil_dvolume_residuel 1e-15
         }
- 	boundary_conditions
-	{
-		paroi Paroi_FT_disc symetrie
-		haut  Paroi_FT_disc symetrie
-		bas   Paroi_FT_disc symetrie
-	}
-}
-postraitement {
-	champs dt_post 1. { indicatrice_interf elem }
-}
-liste_postraitements {
-	postraitement_ft_lata post1 { 
-    format Lata 
-    fichier lata/post 
-    champs dt_post 0.05 {
-        indicatrice_interf elem
+        collisions
+        {
+            active
+            juric_pour_tout
+            type_remaillage Thomas { distance_interface_element_max 2 }
+        }
+        boundary_conditions
+        {
+            paroi Paroi_FT_disc symetrie
+            haut  Paroi_FT_disc symetrie
+            bas   Paroi_FT_disc symetrie
+        }
     }
-    interfaces interf { 
-        pe som 
-        courbure som 
-    } 
-}
-}
+    postraitement {
+        champs dt_post 1. { indicatrice_interf elem }
+    }
+    liste_postraitements {
+        postraitement_ft_lata post1 {
+            format Lata
+            fichier lata/post
+            champs dt_post 0.05 {
+                indicatrice_interf elem
+            }
+            interfaces interf {
+                pe som
+                courbure som
+            }
+        }
+    }
 
 }
 
 Solve pb
 Fin
- 
+

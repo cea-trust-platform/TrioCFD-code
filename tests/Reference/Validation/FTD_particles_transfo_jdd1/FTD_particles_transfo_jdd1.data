@@ -13,29 +13,29 @@ Domaine dom
 
 Mailler dom
 {
-	Pave Cavite 
-		{
-		Origine 0. 0. 0.
-     		Nombre_de_Noeuds 53 53 75
-		Longueurs 0.025 0.025 0.06
-		}
-		{
-		Bord Gauche   X = 0.      0. <= Y <= 0.025  0. <= Z <= 0.06
-		Bord Haut     Z = 0.06    0. <= X <= 0.025  0. <= Y <= 0.025
-		Bord Bas      Z = 0.      0. <= X <= 0.025  0. <= Y <= 0.025
-		Bord Droit    X = 0.025   0. <= Y <= 0.025  0. <= Z <= 0.06
-		Bord Avant    Y = 0.      0. <= X <= 0.025  0. <= Z <= 0.06
-		Bord Arriere  Y = 0.025   0. <= X <= 0.025  0. <= Z <= 0.06
-		
-		}
+    Pave Cavite
+    {
+        Origine 0. 0. 0.
+        Nombre_de_Noeuds 53 53 75
+        Longueurs 0.025 0.025 0.06
+    }
+    {
+        Bord Gauche   X = 0.      0. <= Y <= 0.025  0. <= Z <= 0.06
+        Bord Haut     Z = 0.06    0. <= X <= 0.025  0. <= Y <= 0.025
+        Bord Bas      Z = 0.      0. <= X <= 0.025  0. <= Y <= 0.025
+        Bord Droit    X = 0.025   0. <= Y <= 0.025  0. <= Z <= 0.06
+        Bord Avant    Y = 0.      0. <= X <= 0.025  0. <= Z <= 0.06
+        Bord Arriere  Y = 0.025   0. <= X <= 0.025  0. <= Z <= 0.06
+
+    }
 }
 
 Sous_Zone zone_transfo1
 Associate zone_transfo1 dom
 Read zone_transfo1 {
-   Boite
-     Origine 0.    0.    0.026
-     Cotes   0.025 0.025 0.007
+    Boite
+    Origine 0.    0.    0.026
+    Cotes   0.025 0.025 0.007
 }
 
 
@@ -44,9 +44,9 @@ Read zone_transfo1 {
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur tranche { tranches 2 1 1 }
-	Larg_joint 2
-	Nom_Zones DOM
+    Partitionneur tranche { tranches 2 1 1 }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 End
 END PARTITION #
@@ -64,226 +64,210 @@ VDF ma_discretisation
 Schema_Euler_explicite mon_schema
 Read mon_schema
 {
-	tinit 0.
+    tinit 0.
 	nb_pas_dt_max 3
-	tmax 1.
-	dt_min 0.0001
-	dt_max 0.0001
-	dt_impr 5.e-3
-	dt_sauv 100
-	seuil_statio 1.e-8
+    tmax 1.
+    dt_min 0.0001
+    dt_max 0.0001
+    dt_impr 5.e-3
+    dt_sauv 100
+    seuil_statio 1.e-8
 }
-
-
-Fluide_Incompressible liquide
-Read liquide
-{
-	mu  Champ_Uniforme 1 1.e-3
- 	rho Champ_Uniforme 1 1000
-}
-
-Fluide_Incompressible gaz
-Read gaz
-{
-	mu  Champ_Uniforme 1 1.983e-5
- 	rho Champ_Uniforme 1 1.177
-}
-
-Fluide_Diphasique fluide
-Read fluide
-{
-	fluide0 liquide
-	fluide1 gaz
-	sigma  Champ_Uniforme 1 0.05
-}
-
-Champ_Uniforme gravite
-Read gravite 3  0. 0. -9.81
-Associate fluide gravite
-
-Navier_Stokes_FT_Disc          hydraulique
-Transport_Interfaces_FT_Disc   interf
-Transport_Marqueur_FT	       marqueurs
-
-Associate pb hydraulique
-Associate pb interf
-Associate pb marqueurs
 
 Associate pb dom
 Associate pb mon_schema
-Associate pb fluide
-
 Discretize pb ma_discretisation
 
 Read pb
 {
-	hydraulique
-	{
-		modele_turbulence sous_maille_wale
-        	{
-           	  Cw 0.
-          	  turbulence_paroi negligeable
-        	}
-		
-		solveur_pression GCP { 
-			precond ssor { omega 1.5 } 
-			seuil 1.0e-12
-			
-		}
-		convection { quick }
-		diffusion { }
-		conditions_initiales {
-			vitesse Champ_Uniforme 3 0. 0. 0.
-			}
-		equation_interfaces_proprietes_fluide interf
-		boundary_conditions {
-			Gauche  paroi_fixe
-			Droit   paroi_fixe
-			Avant   paroi_fixe
-			Arriere paroi_fixe
-			Haut    Sortie_libre_rho_variable champ_front_uniforme 1 0.
-			Bas     paroi_fixe
-		}
-	       
-	}
-	
-	interf
-	{
-	 methode_transport vitesse_interpolee hydraulique
-	 
-	 iterations_correction_volume 3
-	 n_iterations_distance 2
-	 
-	 conditions_initiales {
-		fonction z-0.033 ,
-		fonction_ignorer_collision ajout_phase1 -(x-0.0148919)^2-(y-0.0110423)^2-(z-0.02567055)^2+(0.0018)^2 ,
-		fonction_ignorer_collision ajout_phase1 -(x-0.0120877)^2-(y-0.0167042)^2-(z-0.02601048)^2+(0.0016)^2 ,
-  		fonction_ignorer_collision ajout_phase1 -(x-0.0080201)^2-(y-0.0066194)^2-(z-0.02530917)^2+(0.0019)^2 ,
-  		fonction_ignorer_collision ajout_phase1 -(x-0.0214957)^2-(y-0.0081803)^2-(z-0.02495283)^2+(0.0020)^2 ,
-   		fonction_ignorer_collision ajout_phase1 -(x-0.0217606)^2-(y-0.0151058)^2-(z-0.02597214)^2+(0.0016)^2 ,
- 		fonction_ignorer_collision ajout_phase1 -(x-0.0105892)^2-(y-0.0084337)^2-(z-0.02639606)^2+(0.0014)^2 ,
-  		fonction_ignorer_collision ajout_phase1 -(x-0.0197362)^2-(y-0.0201345)^2-(z-0.02526849)^2+(0.0020)^2 , 
-  		fonction_ignorer_collision ajout_phase1 -(x-0.0070055)^2-(y-0.0117926)^2-(z-0.02572091)^2+(0.0018)^2
-		
-			
-         }
-       
-	 
-	remaillage {
-		pas 0.000001
-		nb_iter_remaillage 3
-		pas_lissage 0.000001
-		nb_iter_barycentrage 3
-		relax_barycentrage 1
-		facteur_longueur_ideale 1.5
-		
-		lissage_courbure_coeff -0.05
-		lissage_courbure_iterations 1
-		
-		critere_arete 0.35
-		critere_remaillage 0.2
-			
-		nb_iter_correction_volume 5
-		seuil_dvolume_residuel 1e-16
-		
-	 }
-	 
-	 boundary_conditions
-	 {
-		Gauche  Paroi_FT_disc symetrie
-		Droit   Paroi_FT_disc symetrie 
-		Avant   Paroi_FT_disc symetrie
-		Arriere Paroi_FT_disc symetrie
-		Haut    Paroi_FT_disc symetrie 
-		Bas     Paroi_FT_disc symetrie 
-	 }
-	}
-        
-	marqueurs
-	{
-	 conditions_initiales {
-	        ensemble_points { } 
-		proprietes_particules { }
-		t_debut_integration 0.
-	}
-	 
-	boundary_conditions
-	{
-		
-	}
-	 
-	
-	transformation_bulles
-	{
-	   localisation 1  zone_transfo1
-	   diametre_min 0.006
-	   interface interf
-	   t_debut_transfo 0.
-	   
-	}
-	
-	phase_marquee 0
-        sources { Trainee , Flottabilite , Masse_Ajoutee }	
-	methode_transport vitesse_particules	
-	methode_couplage one_way_coupling 
-	nb_iterations 50
-	implicite 1
-	}
-	
-	Postraitement
-	{
-		Sondes
-		{
-			sonde_pression_point pression periode 0.005 points 1 0.1 0.1 0.5
-			sonde_vit_point vitesse periode 0.005 points 1 0.09 0.11 0.5
-			sonde_vit_coupe vitesse periode 0.005 segment 20 0.09 0.11 0. 0.09 0.11 1.
-			sonde_densite_point densite_particules periode 0.005 points 1 0.09 0.11 0.75
-			sonde_densite_coupe densite_particules periode 0.005 segment 50 0.09 0.11 0. 0.09 0.11 1.
-						
-		}
-        	Format lml
-		Champs dt_post 0.005
-		{
-			vitesse elem
-			densite_particules elem
-			volume_particules elem
-		}
-		
-	}
-liste_postraitements
-{	
-        postraitement_ft_lata marqueurs { 
-    format Lata 
-    fichier marqueurs
-    champs dt_post 0.05 {
-        indicatrice_interf elem
-    } 
-    champs dt_post 0.005 { 
-        vitesse som 
-    } 
-    interfaces marqueurs { 
-        vitesse som 
-        volume som 
-        diametre som 
-        temperature som 
-        masse_volumique som 
-    } 
-}
-	postraitement_ft_lata interface { 
-    format Lata 
-    fichier interface 
-    champs dt_post 0.005 {
-        indicatrice_interf elem
-    }    
-    interfaces interf { 
-    } 
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc          hydraulique
+        Transport_Interfaces_FT_Disc   interf
+        Transport_Marqueur_FT	       marqueurs
+    }
+    Fluide_Diphasique
+    {
+        fluide0 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 1.e-3
+            rho Champ_Uniforme 1 1000
+        }
+        fluide1 Fluide_Incompressible
+        {
+            mu  Champ_Uniforme 1 1.983e-5
+            rho Champ_Uniforme 1 1.177
+        }
+        sigma  Champ_Uniforme 1 0.05
+        gravite Champ_Uniforme 3  0. 0. -9.81
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw 0.
+            turbulence_paroi negligeable
+        }
 
-}	
-}
+        solveur_pression GCP {
+            precond ssor { omega 1.5 }
+            seuil 1.0e-12
+
+        }
+        convection { quick }
+        diffusion { }
+        conditions_initiales {
+            vitesse Champ_Uniforme 3 0. 0. 0.
+        }
+        equation_interfaces_proprietes_fluide interf
+        boundary_conditions {
+            Gauche  paroi_fixe
+            Droit   paroi_fixe
+            Avant   paroi_fixe
+            Arriere paroi_fixe
+            Haut    Sortie_libre_rho_variable champ_front_uniforme 1 0.
+            Bas     paroi_fixe
+        }
+
+    }
+
+    interf
+    {
+        methode_transport vitesse_interpolee hydraulique
+
+        iterations_correction_volume 3
+        n_iterations_distance 2
+
+        conditions_initiales {
+            fonction z-0.033 ,
+            fonction_ignorer_collision ajout_phase1 -(x-0.0148919)^2-(y-0.0110423)^2-(z-0.02567055)^2+(0.0018)^2 ,
+            fonction_ignorer_collision ajout_phase1 -(x-0.0120877)^2-(y-0.0167042)^2-(z-0.02601048)^2+(0.0016)^2 ,
+            fonction_ignorer_collision ajout_phase1 -(x-0.0080201)^2-(y-0.0066194)^2-(z-0.02530917)^2+(0.0019)^2 ,
+            fonction_ignorer_collision ajout_phase1 -(x-0.0214957)^2-(y-0.0081803)^2-(z-0.02495283)^2+(0.0020)^2 ,
+            fonction_ignorer_collision ajout_phase1 -(x-0.0217606)^2-(y-0.0151058)^2-(z-0.02597214)^2+(0.0016)^2 ,
+            fonction_ignorer_collision ajout_phase1 -(x-0.0105892)^2-(y-0.0084337)^2-(z-0.02639606)^2+(0.0014)^2 ,
+            fonction_ignorer_collision ajout_phase1 -(x-0.0197362)^2-(y-0.0201345)^2-(z-0.02526849)^2+(0.0020)^2 ,
+            fonction_ignorer_collision ajout_phase1 -(x-0.0070055)^2-(y-0.0117926)^2-(z-0.02572091)^2+(0.0018)^2
+
+
+        }
+
+
+        remaillage {
+            pas 0.000001
+            nb_iter_remaillage 3
+            pas_lissage 0.000001
+            nb_iter_barycentrage 3
+            relax_barycentrage 1
+            facteur_longueur_ideale 1.5
+
+            lissage_courbure_coeff -0.05
+            lissage_courbure_iterations 1
+
+            critere_arete 0.35
+            critere_remaillage 0.2
+
+            nb_iter_correction_volume 5
+            seuil_dvolume_residuel 1e-16
+
+        }
+
+        boundary_conditions
+        {
+            Gauche  Paroi_FT_disc symetrie
+            Droit   Paroi_FT_disc symetrie
+            Avant   Paroi_FT_disc symetrie
+            Arriere Paroi_FT_disc symetrie
+            Haut    Paroi_FT_disc symetrie
+            Bas     Paroi_FT_disc symetrie
+        }
+    }
+
+    marqueurs
+    {
+        conditions_initiales {
+            ensemble_points { }
+            proprietes_particules { }
+            t_debut_integration 0.
+        }
+
+        boundary_conditions
+        {
+
+        }
+
+
+        transformation_bulles
+        {
+            localisation 1  zone_transfo1
+            diametre_min 0.006
+            interface interf
+            t_debut_transfo 0.
+
+        }
+
+        phase_marquee 0
+        sources { Trainee , Flottabilite , Masse_Ajoutee }
+        methode_transport vitesse_particules
+        methode_couplage one_way_coupling
+        nb_iterations 50
+        implicite 1
+    }
+
+    Postraitement
+    {
+        Sondes
+        {
+            sonde_pression_point pression periode 0.005 points 1 0.1 0.1 0.5
+            sonde_vit_point vitesse periode 0.005 points 1 0.09 0.11 0.5
+            sonde_vit_coupe vitesse periode 0.005 segment 20 0.09 0.11 0. 0.09 0.11 1.
+            sonde_densite_point densite_particules periode 0.005 points 1 0.09 0.11 0.75
+            sonde_densite_coupe densite_particules periode 0.005 segment 50 0.09 0.11 0. 0.09 0.11 1.
+
+        }
+        Format lml
+        Champs dt_post 0.005
+        {
+            vitesse elem
+            densite_particules elem
+            volume_particules elem
+        }
+
+    }
+    liste_postraitements
+    {
+        postraitement_ft_lata marqueurs {
+            format Lata
+            fichier marqueurs
+            champs dt_post 0.05 {
+                indicatrice_interf elem
+            }
+            champs dt_post 0.005 {
+                vitesse som
+            }
+            interfaces marqueurs {
+                vitesse som
+                volume som
+                diametre som
+                temperature som
+                masse_volumique som
+            }
+        }
+        postraitement_ft_lata interface {
+            format Lata
+            fichier interface
+            champs dt_post 0.005 {
+                indicatrice_interf elem
+            }
+            interfaces interf {
+            }
+
+        }
+    }
 
 }
 
 Solve pb
 End
 
- 
+

@@ -7,18 +7,18 @@ Domaine dom
 # BEGIN MESH #
 Mailler dom
 {
-	Pave Entree
-		{
-		Origine 0. 0.
-		Nombre_de_Noeuds 2 2
-		Longueurs 1. 1.
-		}
-		{
-		bord Bord   X = 0.0 0.0 <= Y <= 1.0
-		bord Bord   X = 1.0 0.0 <= Y <= 1.0
-		bord Bord   Y = 0.0 0.0 <= X <= 1.0
-		bord Bord Y = 1.0 0.0 <= X <= 1.0
-		}
+    Pave Entree
+    {
+        Origine 0. 0.
+        Nombre_de_Noeuds 2 2
+        Longueurs 1. 1.
+    }
+    {
+        bord Bord   X = 0.0 0.0 <= Y <= 1.0
+        bord Bord   X = 1.0 0.0 <= Y <= 1.0
+        bord Bord   Y = 0.0 0.0 <= X <= 1.0
+        bord Bord Y = 1.0 0.0 <= X <= 1.0
+    }
 }
 dilate dom 1e-3
 trianguler_h dom
@@ -26,9 +26,9 @@ trianguler_h dom
 # BEGIN PARTITION
 Partition dom
 {
-        Partitionneur metis { Nb_parts 2 }
-        Larg_joint 2
-        Nom_Zones DOM
+    Partitionneur metis { Nb_parts 2 }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 End
 END PARTITION #
@@ -42,201 +42,188 @@ VEFPrep1b dis
 Schema_Euler_explicite sch
 Read sch
 {
-	tinit 0
+    tinit 0
 	nb_pas_dt_max 3
-	dt_min 1e-5
-	dt_max 1e-5
-	dt_impr 1
-	dt_sauv 10
-	seuil_statio -1.e-8
-}
-
-
-Constituant sirop
-Read sirop
-{
-coefficient_diffusion Champ_Uniforme 1 0.2e-4
-}
-
-Fluide_inCompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 1.85e-5
-	rho   Champ_Uniforme 1 1000.
+    dt_min 1e-5
+    dt_max 1e-5
+    dt_impr 1
+    dt_sauv 10
+    seuil_statio -1.e-8
 }
 
 Chimie la_chimie
 Read la_chimie
 {
-modele_micro_melange 1
-constante_modele_micro_melange 1e-1
-reactions
-{
-	{
-	reactifs H2BO3m+Hp
-	produits H3BO3
-	constante_taux_reaction 1.e11
-	coefficients_activites { H2BO3m 1 Hp 1 }
-	exposant_beta 0.
-	enthalpie_reaction 0.
-	energie_activation 0.
-	}
-	,
-	{
-	reactifs 6*Hp+5*Im+IO3m
-	produits 3*I2+3*H2O
-	constante_taux_reaction 5.8e7
-	coefficients_activites { Hp 2 Im 2 IO3m 1 }
-	exposant_beta 0.
-	enthalpie_reaction 0.
-	energie_activation 0.
-	}
-	,
-	{
-	reactifs Im+I2
-	produits I3m
-	/* proportion_max_admissible 0.5 */
-	constante_taux_reaction 5.6e9
-	contre_reaction 786.
-	coefficients_activites { Im 1 I2 1 I3m 1 }
-	exposant_beta 0.
-	enthalpie_reaction 0.
-	energie_activation 0.
-	contre_energie_activation 0.
-	}
-}
+    modele_micro_melange 1
+    constante_modele_micro_melange 1e-1
+    reactions
+    {
+        {
+            reactifs H2BO3m+Hp
+            produits H3BO3
+            constante_taux_reaction 1.e11
+            coefficients_activites { H2BO3m 1 Hp 1 }
+            exposant_beta 0.
+            enthalpie_reaction 0.
+            energie_activation 0.
+        }
+        ,
+        {
+            reactifs 6*Hp+5*Im+IO3m
+            produits 3*I2+3*H2O
+            constante_taux_reaction 5.8e7
+            coefficients_activites { Hp 2 Im 2 IO3m 1 }
+            exposant_beta 0.
+            enthalpie_reaction 0.
+            energie_activation 0.
+        }
+        ,
+        {
+            reactifs Im+I2
+            produits I3m
+            /* proportion_max_admissible 0.5 */
+            constante_taux_reaction 5.6e9
+            contre_reaction 786.
+            coefficients_activites { Im 1 I2 1 I3m 1 }
+            exposant_beta 0.
+            enthalpie_reaction 0.
+            energie_activation 0.
+            contre_energie_activation 0.
+        }
+    }
 }
 # ecrire la_chimie #
 
-
-Navier_Stokes_FT_Disc              hydraulique
-Convection_Diffusion_Concentration H2BO3m
-Convection_Diffusion_Concentration Hp
-Convection_Diffusion_Concentration H3BO3
-Convection_Diffusion_Concentration Im
-Convection_Diffusion_Concentration IO3m
-Convection_Diffusion_Concentration I2
-Convection_Diffusion_Concentration H2O
-Convection_Diffusion_Concentration I3m
-
-Associate pb hydraulique
-Associate pb H2BO3m
-Associate pb Hp	
-Associate pb H3BO3	
-Associate pb Im	
-Associate pb IO3m	
-Associate pb I2	
-Associate pb H2O	
-Associate pb I3m	
-Associate pb fluide
-Associate pb sirop
 Associate pb dom
 Associate pb sch
 Associate pb la_chimie
 Discretize pb dis
 
-
 Read pb
 {
-	hydraulique { 
-		modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable }
-		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-22  impr }
-		convection { amont }
-		diffusion { }
-		conditions_initiales { vitesse Champ_Uniforme 2 0. 0. }
-		boundary_conditions { Bord paroi_fixe }
-	}
-	H2BO3m	{
-		diffusion { }
-		convection { amont }
-		boundary_conditions { Bord  paroi }
-		nom_inconnue H2BO3m
-		masse_molaire 61
-		conditions_initiales { H2BO3m Champ_Uniforme 1 0.25 }
-		}
-	Hp	{ 
-		diffusion { }
-		convection { amont }
-		alias Hp
-		
-		boundary_conditions { Bord  paroi }
-		conditions_initiales { Hp Champ_Uniforme 1 0.1 }
-		masse_molaire 1
-		}
-	H3BO3	{ 
-		diffusion { }
-		convection { amont }
-		nom_inconnue H3BO3
-		boundary_conditions { Bord  paroi }
-		conditions_initiales { H3BO3 Champ_Uniforme 1 0.25 }
-		masse_molaire 62
-	}
-	Im	{ 
-		diffusion { }
-		convection { amont }
-		nom_inconnue Im
-		boundary_conditions { Bord  paroi }
-		conditions_initiales { Im Champ_Uniforme 1 0.035 }
-		masse_molaire 127
-	}
-	IO3m	{ 
-		diffusion { }
-		convection { amont }
-		nom_inconnue IO3m
-		boundary_conditions { Bord  paroi }
-		conditions_initiales { IO3m Champ_Uniforme 1 0.007 }
-		masse_molaire 175
-	}
-	I2	{ 
-		diffusion { }
-		convection { amont }
-		nom_inconnue I2
-		boundary_conditions { Bord  paroi }
-		conditions_initiales { I2 Champ_Uniforme 1 0.021 }
-		masse_molaire 254
-	}
-	H2O	{ 
-		diffusion { }
-		convection { amont }
-		nom_inconnue H2O
-		boundary_conditions { Bord  paroi }
-		conditions_initiales { H2O Champ_Uniforme 1 0. }
-		masse_molaire 18
-	}
-	I3m	{ 
-		diffusion { }
-		convection { amont }
-		nom_inconnue I3m
-		boundary_conditions { Bord  paroi }
-		conditions_initiales { I3m Champ_Uniforme 1 0. }
-		masse_molaire 381
-	}
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc              hydraulique
+        Convection_Diffusion_Concentration H2BO3m
+        Convection_Diffusion_Concentration Hp
+        Convection_Diffusion_Concentration H3BO3
+        Convection_Diffusion_Concentration Im
+        Convection_Diffusion_Concentration IO3m
+        Convection_Diffusion_Concentration I2
+        Convection_Diffusion_Concentration H2O
+        Convection_Diffusion_Concentration I3m
+    }
 
-   Postraitement  {
-	Sondes	{
-		H2BO3m	H2BO3m	 periode 1.e-12 numero_elem_sur_maitre 0
-		Hp	Hp	 periode 1.e-12 numero_elem_sur_maitre 0
-		H3BO3	H3BO3	 periode 1.e-12 numero_elem_sur_maitre 0
-		Im	Im	 periode 1.e-12 numero_elem_sur_maitre 0
-		IO3m	IO3m	 periode 1.e-12 numero_elem_sur_maitre 0
-		I2	I2	 periode 1.e-12 numero_elem_sur_maitre 0
-		H2O	H2O	 periode 1.e-12 numero_elem_sur_maitre 0
-		I3m	I3m	 periode 1.e-12 numero_elem_sur_maitre 0
-		}
-	format lml 
-	champs dt_post 1.e-12
-	{
-		vitesse elem
-		H2BO3m
-		Hp
-		H3BO3
-		Im
-		IO3m
-		I2
-		H2O
-		I3m
-	}
-   }
+    Fluide_inCompressible
+    {
+        mu Champ_Uniforme 1 1.85e-5
+        rho   Champ_Uniforme 1 1000.
+    }
+
+    Constituant
+    {
+        coefficient_diffusion Champ_Uniforme 1 0.2e-4
+    }
+
+    hydraulique {
+        modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable }
+        solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-22  impr }
+        convection { amont }
+        diffusion { }
+        conditions_initiales { vitesse Champ_Uniforme 2 0. 0. }
+        boundary_conditions { Bord paroi_fixe }
+    }
+    H2BO3m	{
+        diffusion { }
+        convection { amont }
+        boundary_conditions { Bord  paroi }
+        nom_inconnue H2BO3m
+        masse_molaire 61
+        conditions_initiales { H2BO3m Champ_Uniforme 1 0.25 }
+    }
+    Hp	{
+        diffusion { }
+        convection { amont }
+        alias Hp
+
+        boundary_conditions { Bord  paroi }
+        conditions_initiales { Hp Champ_Uniforme 1 0.1 }
+        masse_molaire 1
+    }
+    H3BO3	{
+        diffusion { }
+        convection { amont }
+        nom_inconnue H3BO3
+        boundary_conditions { Bord  paroi }
+        conditions_initiales { H3BO3 Champ_Uniforme 1 0.25 }
+        masse_molaire 62
+    }
+    Im	{
+        diffusion { }
+        convection { amont }
+        nom_inconnue Im
+        boundary_conditions { Bord  paroi }
+        conditions_initiales { Im Champ_Uniforme 1 0.035 }
+        masse_molaire 127
+    }
+    IO3m	{
+        diffusion { }
+        convection { amont }
+        nom_inconnue IO3m
+        boundary_conditions { Bord  paroi }
+        conditions_initiales { IO3m Champ_Uniforme 1 0.007 }
+        masse_molaire 175
+    }
+    I2	{
+        diffusion { }
+        convection { amont }
+        nom_inconnue I2
+        boundary_conditions { Bord  paroi }
+        conditions_initiales { I2 Champ_Uniforme 1 0.021 }
+        masse_molaire 254
+    }
+    H2O	{
+        diffusion { }
+        convection { amont }
+        nom_inconnue H2O
+        boundary_conditions { Bord  paroi }
+        conditions_initiales { H2O Champ_Uniforme 1 0. }
+        masse_molaire 18
+    }
+    I3m	{
+        diffusion { }
+        convection { amont }
+        nom_inconnue I3m
+        boundary_conditions { Bord  paroi }
+        conditions_initiales { I3m Champ_Uniforme 1 0. }
+        masse_molaire 381
+    }
+
+    Postraitement  {
+        Sondes	{
+            H2BO3m	H2BO3m	 periode 1.e-12 numero_elem_sur_maitre 0
+            Hp	Hp	 periode 1.e-12 numero_elem_sur_maitre 0
+            H3BO3	H3BO3	 periode 1.e-12 numero_elem_sur_maitre 0
+            Im	Im	 periode 1.e-12 numero_elem_sur_maitre 0
+            IO3m	IO3m	 periode 1.e-12 numero_elem_sur_maitre 0
+            I2	I2	 periode 1.e-12 numero_elem_sur_maitre 0
+            H2O	H2O	 periode 1.e-12 numero_elem_sur_maitre 0
+            I3m	I3m	 periode 1.e-12 numero_elem_sur_maitre 0
+        }
+        format lml
+        champs dt_post 1.e-12
+        {
+            vitesse elem
+            H2BO3m
+            Hp
+            H3BO3
+            Im
+            IO3m
+            I2
+            H2O
+            I3m
+        }
+    }
 }
 Solve pb
 End

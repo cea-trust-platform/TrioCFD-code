@@ -57,32 +57,25 @@ Read sch
         facsec 1.
 }
 
-Fluide_Incompressible fluide
-Read fluide
-{
-	mu Champ_Uniforme 1 1.e-1
-	rho Champ_Uniforme 1 1.
-}
-
-Champ_Uniforme gravite
-Read gravite 2 0. 0.
-
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc cylind_1
-Transport_Interfaces_FT_Disc cylind_2
-
-Associate pb eq_hydraulique
-Associate pb cylind_1
-Associate pb cylind_2
-
 Associate pb DOM
 Associate pb sch
-Associate pb fluide
-
 Discretize pb dis
 
 Read pb
 {
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc eq_hydraulique
+        Transport_Interfaces_FT_Disc cylind_1
+        Transport_Interfaces_FT_Disc cylind_2
+    }
+
+    Fluide_Incompressible
+    {
+        mu Champ_Uniforme 1 1.e-1
+        rho Champ_Uniforme 1 1.
+    }
+
 	eq_hydraulique
 	{
 		modele_turbulence sous_maille_wale 
