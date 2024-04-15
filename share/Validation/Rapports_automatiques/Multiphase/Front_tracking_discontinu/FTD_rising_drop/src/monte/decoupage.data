@@ -1,27 +1,27 @@
 Dimension 3
 Domaine dom
-Mailler dom 
+Mailler dom
 {
-Pave 1
-	{
-	Origine 0. 0. 0.
-	Nombre_de_Noeuds  181 181 361
+    Pave 1
+    {
+        Origine 0. 0. 0.
+        Nombre_de_Noeuds  181 181 361
 
-	Longueurs 0.12 0.12 0.24
-	}
-	{
-	Bord paroi_defaut X = 0.  	0. <= Y <= 0.12  	0. <= Z <= 0.24
-	Bord paroi_defaut X = 0.12 	0. <= Y <= 0.12  	0. <= Z <= 0.24
-	Bord paroi_defaut Y = 0.  	0. <= X <= 0.12 		0. <= Z <= 0.24
-	Bord paroi_defaut Y = 0.12   	0. <= X <= 0.12 		0. <= Z <= 0.24
-	Bord paroi_defaut Z = 0.  	0. <= X <= 0.12 		0. <= Y <= 0.12  
-	Bord haut  	Z = 0.24  	0. <= X <= 0.12 		0. <= Y <= 0.12  
-	}  
+        Longueurs 0.12 0.12 0.24
+    }
+    {
+        Bord paroi_defaut X = 0.  	0. <= Y <= 0.12  	0. <= Z <= 0.24
+        Bord paroi_defaut X = 0.12 	0. <= Y <= 0.12  	0. <= Z <= 0.24
+        Bord paroi_defaut Y = 0.  	0. <= X <= 0.12 		0. <= Z <= 0.24
+        Bord paroi_defaut Y = 0.12   	0. <= X <= 0.12 		0. <= Z <= 0.24
+        Bord paroi_defaut Z = 0.  	0. <= X <= 0.12 		0. <= Y <= 0.12
+        Bord haut  	Z = 0.24  	0. <= X <= 0.12 		0. <= Y <= 0.12
+    }
 }
 
 Partition dom {
-        partitionneur tranche { tranches 2 2 8 }
-        larg_joint 2
-        nom_zones dom
+    partitionneur tranche { tranches 2 2 8 }
+    larg_joint 2
+    nom_zones dom
 }
 End

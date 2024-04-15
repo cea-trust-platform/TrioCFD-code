@@ -8,48 +8,49 @@ export domaine DOM
 # BEGIN MESH #
 
 Mailler DOM
-{ 
-	Pave pave1
-	{ 
-		origine -0.4 -0.4 0.
-		longueurs 0.8 0.8 0.550
-		nombre_de_noeuds 31 31 21
-	}
-	{ 
-		bord bord X = -0.4   -0.4 <= Y <= 0.4 0. <= Z <= 0.55
-		bord bord X = 0.4    -0.4 <= Y <= 0.4 0. <= Z <= 0.55
-		bord bord Y = -0.4   -0.4 <= X <= 0.4 0. <= Z <= 0.55
-		bord bord Y = 0.4    -0.4 <= X <= 0.4 0. <= Z <= 0.55
-		bord fond Z = 0.     -0.4 <= X <= 0.4 -0.4 <= Y <= 0.4
+{
+    Pave pave1
+    {
+        origine -0.4 -0.4 0.
+        longueurs 0.8 0.8 0.550
+        nombre_de_noeuds 31 31 21
+    }
+    {
+        bord bord X = -0.4   -0.4 <= Y <= 0.4 0. <= Z <= 0.55
+        bord bord X = 0.4    -0.4 <= Y <= 0.4 0. <= Z <= 0.55
+        bord bord Y = -0.4   -0.4 <= X <= 0.4 0. <= Z <= 0.55
+        bord bord Y = 0.4    -0.4 <= X <= 0.4 0. <= Z <= 0.55
+        bord fond Z = 0.     -0.4 <= X <= 0.4 -0.4 <= Y <= 0.4
 
-		bord haut_p Z = 0.55   -0.4  <= X <= -0.37 -0.4 <= Y <= -0.37
-		bord haut_s Z = 0.55   -0.37 <= X <= 0.4   -0.4 <= Y <= -0.37
-		bord haut_s Z = 0.55   -0.4 <= X <= 0.4    -0.37 <= Y <= 0.4
-	}
+        bord haut_p Z = 0.55   -0.4  <= X <= -0.37 -0.4 <= Y <= -0.37
+        bord haut_s Z = 0.55   -0.37 <= X <= 0.4   -0.4 <= Y <= -0.37
+        bord haut_s Z = 0.55   -0.4 <= X <= 0.4    -0.37 <= Y <= 0.4
+    }
 }
 
 Sous_zone zone_puissance
 Associate zone_puissance DOM
 Read zone_puissance {
-	Tube
-	Origine 0.0 0.0 0.15
-	dir z
-	ri 0.19
-	re 0.305
-	hauteur 0.35 }
+    Tube
+    Origine 0.0 0.0 0.15
+    dir z
+    ri 0.19
+    re 0.305
+    hauteur 0.35
+}
 
-	
+
 # END MESH #
 
-# BEGIN PARTITION 
+# BEGIN PARTITION
 Partition DOM
 {
-   Partitionneur Metis 
-   {
-      Nb_parts 2 
-   }
-   Larg_joint 2
-   Nom_Zones DOM
+    Partitionneur Metis
+    {
+        Nb_parts 2
+    }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 End
 END PARTITION #
@@ -67,16 +68,16 @@ VDF dis
 Runge_Kutta_ordre_4_D3P  sch
 Read sch
 {
-	tinit 0.
-	tmax 0.8
-        dt_start dt_fixe 4.5e-3
-	dt_min 0.5e-4
-	dt_max 0.01
-	dt_impr 0.01
-	dt_sauv 3
-	seuil_statio -1
-        facsec 1.0
-        diffusion_implicite 1	
+    tinit 0.
+    tmax 0.8
+    dt_start dt_fixe 4.5e-3
+    dt_min 0.5e-4
+    dt_max 0.01
+    dt_impr 0.01
+    dt_sauv 3
+    seuil_statio -1
+    facsec 1.0
+    diffusion_implicite 1
 }
 
 Associate pb DOM
@@ -86,241 +87,243 @@ PrecisionGeom 1.0e-11
 
 Read pb
 {
-	solved_equations
-	{
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc agit
-Transport_Interfaces_FT_Disc internes
-Transport_Interfaces_FT_Disc cuve
-Convection_Diffusion_Temperature   temperature
-	}
-        Fluide_Incompressible 
-{
-   beta_th  Champ_Uniforme 1 8.3e-5
-   rho      Champ_Uniforme 1 2596.0
-   mu       champ_fonc_fonction pb temperature 1 0.001*(val-1400.0)+7.9
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc eq_hydraulique
+        Transport_Interfaces_FT_Disc agit
+        Transport_Interfaces_FT_Disc internes
+        Transport_Interfaces_FT_Disc cuve
+        Convection_Diffusion_Temperature   temperature
+    }
+    Fluide_Incompressible
+    {
+        beta_th  Champ_Uniforme 1 8.3e-5
+        rho      Champ_Uniforme 1 2596.0
+        mu       champ_fonc_fonction pb temperature 1 0.001*(val-1400.0)+7.9
 #   mu       champ_fonc_fonction pb temperature 1 1.0e5*(val_LE_893.57)+10^(-6.8668+10603.8/val)*(893.57<val)*(val_LE_1200.0)+10^(-1.70617+1794.99/(val-710.352))*(val>1200.0) #
-   Cp       Champ_Uniforme 1 1500.0
-   lambda   champ_fonc_fonction pb temperature 1 1.0*(val_LE_373.0)+(7.6452e-4*val+0.7148)*(373.0<val)*(val_LE_700.0)+(3.8704e-3*val-1.45928)*(700.0<val)*(val_LE_1271.0)+(1.09725e-3*val+2.06538)*(1271.0<val)*(val_LE_1672.0)+3.9*(val>1672.0)
-gravite Champ_Uniforme 3 0. 0. -9.81
+        Cp       Champ_Uniforme 1 1500.0
+        lambda   champ_fonc_fonction pb temperature 1 1.0*(val_LE_373.0)+(7.6452e-4*val+0.7148)*(373.0<val)*(val_LE_700.0)+(3.8704e-3*val-1.45928)*(700.0<val)*(val_LE_1271.0)+(1.09725e-3*val+2.06538)*(1271.0<val)*(val_LE_1672.0)+3.9*(val>1672.0)
+        gravite Champ_Uniforme 3 0. 0. -9.81
 
-}
+    }
 
-eq_hydraulique
-{
-	modele_turbulence null {  }
+    eq_hydraulique
+    {
+        modele_turbulence null {  }
         solveur_pression GCP { precond ssor { omega 1.5 } seuil 5.e-18 impr }
 #	solveur_pression Petsc GCP { precond boomerAMG { } seuil 5.e-18 impr } #
 #	solveur_pression Petsc CLI { -ksp_type cg -pc_type hypre -pc_hypre_type boomerAMG -ksp_atol 5.e-18 -ksp_divtol 5.e+18 seuil 5.e-18 impr } #
-	convection           { quick }
-	diffusion            { }
+        convection           { quick }
+        diffusion            { }
         Sources { Boussinesq_temperature { T0 1400.0 verif_boussinesq 0 } }
-	conditions_initiales { vitesse Champ_uniforme 3 0. 0. 0. }
-	equations_interfaces_vitesse_imposee 3 agit cuve internes
+        conditions_initiales { vitesse Champ_uniforme 3 0. 0. 0. }
+        equations_interfaces_vitesse_imposee 3 agit cuve internes
         penalisation_forcage { pression_reference 0. }   # CAS PENA #
-	boundary_conditions
-	{
-		haut_s Symetrie
-		haut_p Frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
-		fond paroi_fixe
-		bord paroi_fixe
-	}
+        boundary_conditions
+        {
+            haut_s Symetrie
+            haut_p Frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+            fond paroi_fixe
+            bord paroi_fixe
+        }
         Parametre_equation parametre_diffusion_implicite
         {
-                crank 0
-                preconditionnement_diag 1
+            crank 0
+            preconditionnement_diag 1
         }
-}
+    }
 
-temperature
-{
+    temperature
+    {
 
         Diffusion { }
         Convection { quick }
-        Sources { Puissance_thermique Champ_uniforme_morceaux DOM 1
-			{ 
-				defaut 0.
-				zone_puissance 2393700.06
-			} 
-	 	}
+        Sources {
+            Puissance_thermique Champ_uniforme_morceaux DOM 1
+            {
+                defaut 0.
+                zone_puissance 2393700.06
+            }
+        }
         conditions_initiales { temperature champ_uniforme 1 1400.0 }
         boundary_conditions
         {
-                haut_s  Paroi_echange_externe_impose H_imp champ_front_fonction 1 temperature 20.0+0.9*5.6704e-8*(val*val+303.0*303.0)*(val+303.0) T_ext champ_front_fonc_XYZ 1 303.0+497.0*((x*x+y*y)^(0.5)>0.325)
-                haut_p  Paroi_echange_externe_impose H_imp champ_front_fonction 1 temperature 20.0+0.9*5.6704e-8*(val*val+303.0*303.0)*(val+303.0) T_ext champ_front_uniforme 1 800.0
-                fond    Paroi_temperature_imposee champ_front_uniforme 1 800.0
-		bord    Paroi_temperature_imposee champ_front_uniforme 1 800.0
+            haut_s  Paroi_echange_externe_impose H_imp champ_front_fonction 1 temperature 20.0+0.9*5.6704e-8*(val*val+303.0*303.0)*(val+303.0) T_ext champ_front_fonc_XYZ 1 303.0+497.0*((x*x+y*y)^(0.5)>0.325)
+            haut_p  Paroi_echange_externe_impose H_imp champ_front_fonction 1 temperature 20.0+0.9*5.6704e-8*(val*val+303.0*303.0)*(val+303.0) T_ext champ_front_uniforme 1 800.0
+            fond    Paroi_temperature_imposee champ_front_uniforme 1 800.0
+            bord    Paroi_temperature_imposee champ_front_uniforme 1 800.0
         }
         penalisation_L2_FTD {   		# CAS PENA #
-                         cuve 1 800.0		# CAS PENA #
-                         internes 1 800.0	# CAS PENA #
-                         agit    1 800.0	# CAS PENA #
-                           } 			# CAS PENA #
-        
-}        
+            cuve 1 800.0		# CAS PENA #
+            internes 1 800.0	# CAS PENA #
+            agit    1 800.0	# CAS PENA #
+        } 			# CAS PENA #
 
-cuve
-{
+    }
+
+    cuve
+    {
         conditions_initiales { fonction (x*x+y*y)^0.5-0.325 }
         remaillage {
-                pas -1e8
-                nb_iter_remaillage 5
-                critere_arete 0.5
-                critere_remaillage 0.2
-                pas_lissage -1
-                nb_iter_barycentrage 5
-                relax_barycentrage 1
-                facteur_longueur_ideale 0.5
+            pas -1e8
+            nb_iter_remaillage 5
+            critere_arete 0.5
+            critere_remaillage 0.2
+            pas_lissage -1
+            nb_iter_barycentrage 5
+            relax_barycentrage 1
+            facteur_longueur_ideale 0.5
         }
         boundary_conditions
         {
-                haut_p paroi_ft_disc symetrie
-                haut_s paroi_ft_disc symetrie
-                fond paroi_ft_disc symetrie
-                bord paroi_ft_disc symetrie
+            haut_p paroi_ft_disc symetrie
+            haut_s paroi_ft_disc symetrie
+            fond paroi_ft_disc symetrie
+            bord paroi_ft_disc symetrie
         }
         methode_transport vitesse_imposee
-		0.
-		0.
-		0. 
-       interpolation_champ_face lineaire { }
-       type_vitesse_imposee uniforme
-       n_iterations_interpolation_ibc 1 
-       vitesse_imposee_regularisee 0
-}
+        0.
+        0.
+        0.
+        interpolation_champ_face lineaire { }
+        type_vitesse_imposee uniforme
+        n_iterations_interpolation_ibc 1
+        vitesse_imposee_regularisee 0
+    }
 
-internes
-{
+    internes
+    {
         conditions_initiales { fonction -((x-0.25)*(x-0.25)+y*y)^0.5+0.025 }
-	remaillage {
-		pas -1e8
-		nb_iter_remaillage 5
-		critere_arete 0.5
-		critere_remaillage 0.2
-		pas_lissage -1
-		nb_iter_barycentrage 5
-		relax_barycentrage 1
-		facteur_longueur_ideale 0.5
-	}
-	boundary_conditions
-	{
-		haut_p paroi_ft_disc symetrie
-		haut_s paroi_ft_disc symetrie
-		fond paroi_ft_disc symetrie
-		bord paroi_ft_disc symetrie		
-	}
-	methode_transport vitesse_imposee
-		0.
-		0.
-		0.
-       interpolation_champ_face lineaire { }
-       type_vitesse_imposee uniforme
-       n_iterations_interpolation_ibc 1
-       vitesse_imposee_regularisee 0
-}
+        remaillage {
+            pas -1e8
+            nb_iter_remaillage 5
+            critere_arete 0.5
+            critere_remaillage 0.2
+            pas_lissage -1
+            nb_iter_barycentrage 5
+            relax_barycentrage 1
+            facteur_longueur_ideale 0.5
+        }
+        boundary_conditions
+        {
+            haut_p paroi_ft_disc symetrie
+            haut_s paroi_ft_disc symetrie
+            fond paroi_ft_disc symetrie
+            bord paroi_ft_disc symetrie
+        }
+        methode_transport vitesse_imposee
+        0.
+        0.
+        0.
+        interpolation_champ_face lineaire { }
+        type_vitesse_imposee uniforme
+        n_iterations_interpolation_ibc 1
+        vitesse_imposee_regularisee 0
+    }
 
-agit
-{
-	conditions_initiales { fonction
-        -(((x/0.05)^2)+((y/0.09)^2)+(((z-0.15)/0.04)^2)-1.0)
-	}
-	remaillage {
-		pas 1e8
-		nb_iter_remaillage 5
-		critere_arete 0.5
-		critere_remaillage 0.2
-		pas_lissage -1
-		nb_iter_barycentrage 5
-		relax_barycentrage 1
-		facteur_longueur_ideale 0.5
-	}
-	boundary_conditions
-	{
-		haut_p paroi_ft_disc symetrie
-		haut_s paroi_ft_disc symetrie
-		fond paroi_ft_disc symetrie
-		bord paroi_ft_disc symetrie
-	}
-        
-	methode_transport vitesse_imposee
+    agit
+    {
+        conditions_initiales {
+            fonction
+            -(((x/0.05)^2)+((y/0.09)^2)+(((z-0.15)/0.04)^2)-1.0)
+        }
+        remaillage {
+            pas 1e8
+            nb_iter_remaillage 5
+            critere_arete 0.5
+            critere_remaillage 0.2
+            pas_lissage -1
+            nb_iter_barycentrage 5
+            relax_barycentrage 1
+            facteur_longueur_ideale 0.5
+        }
+        boundary_conditions
+        {
+            haut_p paroi_ft_disc symetrie
+            haut_s paroi_ft_disc symetrie
+            fond paroi_ft_disc symetrie
+            bord paroi_ft_disc symetrie
+        }
+
+        methode_transport vitesse_imposee
         -5.23599*y
-	5.23599*x
-        0.	
+        5.23599*x
+        0.
         interpolation_champ_face lineaire { }
         type_vitesse_imposee analytique
         n_iterations_interpolation_ibc 1
-	vitesse_imposee_regularisee 0
-} 
+        vitesse_imposee_regularisee 0
+    }
 
 
-Postraitement
-	{
-		Sondes 
-		{
-			Sonde_niv1 Vitesse Periode 0.01 Points 6 0.
--0.280 0.03 0. -0.210 0.03 0. -0.140 0.03 0. 0.135 0.03 0. 0.180 0.03 0. 0.270 0.03
+    Postraitement
+    {
+        Sondes
+        {
+            Sonde_niv1 Vitesse Periode 0.01 Points 6 0.
+            -0.280 0.03 0. -0.210 0.03 0. -0.140 0.03 0. 0.135 0.03 0. 0.180 0.03 0. 0.270 0.03
 
-			Sonde_niv3 Vitesse Periode 0.01 Points 3 0.
--0.280 0.380 0. -0.210 0.380 0. -0.140 0.380
+            Sonde_niv3 Vitesse Periode 0.01 Points 3 0.
+            -0.280 0.380 0. -0.210 0.380 0. -0.140 0.380
 
-			Sonde_niv3_temp Temperature Periode 0.01 Points 8 0.
--0.280 0.380 0. -0.210 0.380 0. -0.140 0.380 0. -0.230 0.200 0. -0.320 0.200 0. 0.320 0.5  0. -0.325 0.200 0. 0.325 0.5   
+            Sonde_niv3_temp Temperature Periode 0.01 Points 8 0.
+            -0.280 0.380 0. -0.210 0.380 0. -0.140 0.380 0. -0.230 0.200 0. -0.320 0.200 0. 0.320 0.5  0. -0.325 0.200 0. 0.325 0.5
 
-			Sonde_niv1_p Pression Periode 0.01 Points 1  0. -0.210 0.03
-		}
-  	       champs dt_post 0.01
- 	       {
-	           vitesse elem
-                   temperature elem
-	       }	
-	}
+            Sonde_niv1_p Pression Periode 0.01 Points 1  0. -0.210 0.03
+        }
+        champs dt_post 0.01
+        {
+            vitesse elem
+            temperature elem
+        }
+    }
 
- liste_postraitements
-       {
-	
-	
-	postraitement_ft_lata post_therm_vdf { 
-    format Lata 
-    fichier lata/post_therm_vdf 
-    champs dt_post 0.01 { 
-        vitesse elem 
-        pression elem 
-        Divergence_U elem 
-        temperature elem 
-        indicatrice_agit elem 
-        indicatrice_internes elem 
-        indicatrice_cuve elem 
-        Puissance_volumique elem 
-    } 
-    interfaces agit { 
-        courbure som 
-    } 
-}
-        postraitement_ft_lata post_internes { 
-    format Lata 
-    fichier lata/post_internes 
-    champs dt_post 0.01 { 
-        indicatrice_internes elem 
-    } 
-    interfaces internes { 
-        courbure som 
-    } 
-}
-        postraitement_ft_lata post_cuve { 
-    format Lata 
-    fichier lata/post_cuve 
-    champs dt_post 0.01 { 
-        indicatrice_cuve elem 
-    } 
-    interfaces cuve { 
-        courbure som 
-    } 
-}
-    } 
+    liste_postraitements
+    {
+
+
+        postraitement_ft_lata post_therm_vdf {
+            format Lata
+            fichier lata/post_therm_vdf
+            champs dt_post 0.01 {
+                vitesse elem
+                pression elem
+                Divergence_U elem
+                temperature elem
+                indicatrice_agit elem
+                indicatrice_internes elem
+                indicatrice_cuve elem
+                Puissance_volumique elem
+            }
+            interfaces agit {
+                courbure som
+            }
+        }
+        postraitement_ft_lata post_internes {
+            format Lata
+            fichier lata/post_internes
+            champs dt_post 0.01 {
+                indicatrice_internes elem
+            }
+            interfaces internes {
+                courbure som
+            }
+        }
+        postraitement_ft_lata post_cuve {
+            format Lata
+            fichier lata/post_cuve
+            champs dt_post 0.01 {
+                indicatrice_cuve elem
+            }
+            interfaces cuve {
+                courbure som
+            }
+        }
+    }
 
 }
 
 Solve pb
 End
 
- 
+

@@ -9,32 +9,32 @@ export domaine DOM
 # BEGIN MESH #
 
 Mailler DOM
-{ 
-	Pave pave1
-	{ 
-		origine -0.08 0.0
-		longueurs 0.26 0.16
-		nombre_de_noeuds 61 41
-	}
-	{ 
-		bord haut Y = 0.0 -0.08 <= X <= 0.18   
-		bord bas Y = 0.16  -0.08 <= X <= 0.18   
-		bord gauche X = -0.08  0.0 <= Y <= 0.16
-		bord droit  X = 0.18  0.0 <= Y <= 0.16
-	}
+{
+    Pave pave1
+    {
+        origine -0.08 0.0
+        longueurs 0.26 0.16
+        nombre_de_noeuds 61 41
+    }
+    {
+        bord haut Y = 0.0 -0.08 <= X <= 0.18
+        bord bas Y = 0.16  -0.08 <= X <= 0.18
+        bord gauche X = -0.08  0.0 <= Y <= 0.16
+        bord droit  X = 0.18  0.0 <= Y <= 0.16
+    }
 }
-	
+
 # END MESH #
 
-# BEGIN PARTITION 
+# BEGIN PARTITION
 Partition DOM
 {
-   Partitionneur Metis 
-   {
-      Nb_parts 2 
-   }
-   Larg_joint 2
-   Nom_Zones DOM
+    Partitionneur Metis
+    {
+        Nb_parts 2
+    }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 End
 END PARTITION #
@@ -49,16 +49,16 @@ VDF dis
 Runge_Kutta_ordre_4_D3P  sch
 Read sch
 {
-	tinit 0.
-	tmax 500.
-        dt_start dt_fixe 4.5e-3
-	dt_min 0.5e-4
-	dt_max 0.1
-	dt_impr 0.1
-	dt_sauv 3
-	seuil_statio 5.0e-2
-        facsec 1.0
-        diffusion_implicite 1	
+    tinit 0.
+    tmax 500.
+    dt_start dt_fixe 4.5e-3
+    dt_min 0.5e-4
+    dt_max 0.1
+    dt_impr 0.1
+    dt_sauv 3
+    seuil_statio 5.0e-2
+    facsec 1.0
+    diffusion_implicite 1
 }
 
 Associate pb DOM
@@ -67,137 +67,137 @@ Discretize pb dis
 
 Read pb
 {
-        	solved_equations
-	{
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc cylindre
-Convection_Diffusion_Temperature temperature
-	}
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc eq_hydraulique
+        Transport_Interfaces_FT_Disc cylindre
+        Convection_Diffusion_Temperature temperature
+    }
 
-        Fluide_Incompressible 
-{
-   beta_th  Champ_Uniforme 1 8.3e-5
-   rho      Champ_Uniforme 1 2475.243
-   lambda   champ_fonc_fonction pb temperature 1 1.0*(val_LE_373.0)+(7.6452e-4*val+0.7148)*(373.0<val)*(val_LE_700.0)+(3.8704e-3*val-1.45928)*(700.0<val)*(val_LE_1271.0)+(1.09725e-3*val+2.06538)*(1271.0<val)*(val_LE_1672.0)+3.9*(val>1672.0)
-   Cp       Champ_Uniforme 1 1528.0
+    Fluide_Incompressible
+    {
+        beta_th  Champ_Uniforme 1 8.3e-5
+        rho      Champ_Uniforme 1 2475.243
+        lambda   champ_fonc_fonction pb temperature 1 1.0*(val_LE_373.0)+(7.6452e-4*val+0.7148)*(373.0<val)*(val_LE_700.0)+(3.8704e-3*val-1.45928)*(700.0<val)*(val_LE_1271.0)+(1.09725e-3*val+2.06538)*(1271.0<val)*(val_LE_1672.0)+3.9*(val>1672.0)
+        Cp       Champ_Uniforme 1 1528.0
 #   mu       champ_fonc_fonction pb temperature 1 0.0419*(1500.0-val)+3.69 #
-   mu       champ_fonc_fonction pb temperature 1 1.0e5*(val_LE_893.57)+10^(-6.8668+10603.8/val)*(893.57<val)*(val_LE_1200.0)+10^(-1.70617+1794.99/(val-710.352))*(val>1200.0)
-}
+        mu       champ_fonc_fonction pb temperature 1 1.0e5*(val_LE_893.57)+10^(-6.8668+10603.8/val)*(893.57<val)*(val_LE_1200.0)+10^(-1.70617+1794.99/(val-710.352))*(val>1200.0)
+    }
 
-eq_hydraulique
-{
-	modele_turbulence null {  }
+    eq_hydraulique
+    {
+        modele_turbulence null {  }
         solveur_pression GCP { precond ssor { omega 1.5 } seuil 5.e-12 impr }
-	convection           { quick }
-	diffusion            { }
-	conditions_initiales { vitesse Champ_uniforme 2 0.1 0. }
-	equations_interfaces_vitesse_imposee 1 cylindre
+        convection           { quick }
+        diffusion            { }
+        conditions_initiales { vitesse Champ_uniforme 2 0.1 0. }
+        equations_interfaces_vitesse_imposee 1 cylindre
         penalisation_forcage { pression_reference 0. }
-	boundary_conditions
-	{
-                haut paroi_fixe
-		bas Symetrie
-                gauche Frontiere_ouverte_vitesse_imposee Champ_front_uniforme 2 0.1 0.0
-		droit Frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
-	}
+        boundary_conditions
+        {
+            haut paroi_fixe
+            bas Symetrie
+            gauche Frontiere_ouverte_vitesse_imposee Champ_front_uniforme 2 0.1 0.0
+            droit Frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+        }
         Parametre_equation parametre_diffusion_implicite
         {
-                crank 0
-                preconditionnement_diag 1
+            crank 0
+            preconditionnement_diag 1
         }
-}
+    }
 
-temperature
-{
+    temperature
+    {
 
         Diffusion { }
         Convection { quick }
         conditions_initiales { temperature champ_uniforme 1 1500.0 }
         boundary_conditions
         {
-                haut    Paroi_adiabatique
-                bas     Symetrie
-                gauche  Frontiere_ouverte_temperature_imposee champ_front_uniforme 1 1500.0
-		droit   Frontiere_ouverte T_EXT champ_front_uniforme 1 1500.0
+            haut    Paroi_adiabatique
+            bas     Symetrie
+            gauche  Frontiere_ouverte_temperature_imposee champ_front_uniforme 1 1500.0
+            droit   Frontiere_ouverte T_EXT champ_front_uniforme 1 1500.0
         }
         penalisation_L2_FTD { cylindre 1 800.0 } # CAS PENA #
-        
-}        
 
-cylindre
-{
+    }
+
+    cylindre
+    {
         conditions_initiales { fonction -(x*x+y*y)^0.5+0.02 }
         remaillage {
-                pas -1e8
-                nb_iter_remaillage 5
-                critere_arete 0.5
-                critere_remaillage 0.2
-                pas_lissage -1
-                nb_iter_barycentrage 5
-                relax_barycentrage 1
-                facteur_longueur_ideale 0.5
+            pas -1e8
+            nb_iter_remaillage 5
+            critere_arete 0.5
+            critere_remaillage 0.2
+            pas_lissage -1
+            nb_iter_barycentrage 5
+            relax_barycentrage 1
+            facteur_longueur_ideale 0.5
         }
         boundary_conditions
         {
-                haut   paroi_ft_disc symetrie
-                bas    paroi_ft_disc symetrie
-                gauche paroi_ft_disc symetrie
-                droit  paroi_ft_disc symetrie
+            haut   paroi_ft_disc symetrie
+            bas    paroi_ft_disc symetrie
+            gauche paroi_ft_disc symetrie
+            droit  paroi_ft_disc symetrie
         }
         methode_transport vitesse_imposee
-		0.
-		0.
-       interpolation_champ_face base
-       type_vitesse_imposee uniforme
-       n_iterations_interpolation_ibc 1 
-       vitesse_imposee_regularisee 0
-}
+        0.
+        0.
+        interpolation_champ_face base
+        type_vitesse_imposee uniforme
+        n_iterations_interpolation_ibc 1
+        vitesse_imposee_regularisee 0
+    }
 
 
-Postraitement
-	{
-		Sondes 
-		{
-			V_M Vitesse     Periode 3.0 segment 200 -0.01414 0.01414 -0.04243 0.04243 
-			T_M Temperature Periode 3.0 segment 200 -0.01414 0.01414 -0.04243 0.04243 
+    Postraitement
+    {
+        Sondes
+        {
+            V_M Vitesse     Periode 3.0 segment 200 -0.01414 0.01414 -0.04243 0.04243
+            T_M Temperature Periode 3.0 segment 200 -0.01414 0.01414 -0.04243 0.04243
 
-			V_P Vitesse     Periode 3.0 segment 200 0.01414 0.0141 0.04243 0.04243 
-			T_P Temperature Periode 3.0 segment 200 0.01414 0.0141 0.04243 0.04243
+            V_P Vitesse     Periode 3.0 segment 200 0.01414 0.0141 0.04243 0.04243
+            T_P Temperature Periode 3.0 segment 200 0.01414 0.0141 0.04243 0.04243
 
-			P_1 Pression Periode 3.0 segment 200 -0.08 0.0  0.18 0.0 
-			P_2 Pression Periode 3.0 segment 200  0.10 0.0  0.10 0.16 
-		}
-  	       champs dt_post 3.0
- 	       {
-	           vitesse elem
-	           pression elem
-                   temperature elem
-	       }	
-	}
+            P_1 Pression Periode 3.0 segment 200 -0.08 0.0  0.18 0.0
+            P_2 Pression Periode 3.0 segment 200  0.10 0.0  0.10 0.16
+        }
+        champs dt_post 3.0
+        {
+            vitesse elem
+            pression elem
+            temperature elem
+        }
+    }
 
- liste_postraitements
-       {
-	
-	
-	postraitement_ft_lata post_cylindre_refroidi { 
-    format Lata 
-    fichier lata/post_cylindre_refroidi 
-    champs dt_post 3.0 { 
-        vitesse elem 
-        pression elem 
-        Divergence_U elem 
-        temperature elem 
-        indicatrice_cylindre elem 
-    } 
-    interfaces cylindre { 
-        courbure som 
-    } 
-}
-    } 
+    liste_postraitements
+    {
+
+
+        postraitement_ft_lata post_cylindre_refroidi {
+            format Lata
+            fichier lata/post_cylindre_refroidi
+            champs dt_post 3.0 {
+                vitesse elem
+                pression elem
+                Divergence_U elem
+                temperature elem
+                indicatrice_cylindre elem
+            }
+            interfaces cylindre {
+                courbure som
+            }
+        }
+    }
 
 }
 
 Solve pb
 End
 
- 
+

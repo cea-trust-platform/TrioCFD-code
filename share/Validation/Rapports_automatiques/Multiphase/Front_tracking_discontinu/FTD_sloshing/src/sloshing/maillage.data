@@ -1,22 +1,22 @@
 dimension 3
 domaine dom
-Mailler dom 
+Mailler dom
 {
-Pave oo
- {
-                Origine -0.22 0  -0.22
-                Nombre_de_Noeuds 89 61 89
-                Longueurs 0.44 .5 .44
-		Facteurs 1. 1.01 1.
-        }
-        {
-                Bord Paroi  X = -0.22     0. <= Y <= .5    -0.22 <= Z <= 0.22
-                Bord Paroi  X =  0.22     0. <= Y <= .5  -0.22 <= Z <= 0.22
-                Bord Bas   Y = 0.     -0.22 <= X <= 0.22     -0.22 <= Z <= 0.22
-                Bord Haute   Y = 0.5           -0.22 <= X <= 0.22     -0.22 <= Z <= 0.22
-                Bord Paroi   Z = -0.22           -0.22 <= X <= 0.22     0. <= Y <= 0.5
-                Bord Paroi   Z = 0.22           -0.22 <= X <= 0.22     0. <= Y <= 0.5
-                }
+    Pave oo
+    {
+        Origine -0.22 0  -0.22
+        Nombre_de_Noeuds 89 61 89
+        Longueurs 0.44 .5 .44
+        Facteurs 1. 1.01 1.
+    }
+    {
+        Bord Paroi  X = -0.22     0. <= Y <= .5    -0.22 <= Z <= 0.22
+        Bord Paroi  X =  0.22     0. <= Y <= .5  -0.22 <= Z <= 0.22
+        Bord Bas   Y = 0.     -0.22 <= X <= 0.22     -0.22 <= Z <= 0.22
+        Bord Haute   Y = 0.5           -0.22 <= X <= 0.22     -0.22 <= Z <= 0.22
+        Bord Paroi   Z = -0.22           -0.22 <= X <= 0.22     0. <= Y <= 0.5
+        Bord Paroi   Z = 0.22           -0.22 <= X <= 0.22     0. <= Y <= 0.5
+    }
 
 }
 remove_elem dom { fonction (x*x+z*z)>0.22*0.22 }

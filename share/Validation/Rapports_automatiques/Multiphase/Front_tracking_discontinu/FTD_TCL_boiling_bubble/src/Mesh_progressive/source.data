@@ -1,7 +1,7 @@
 # Boiling bubble simulation #
 # lance_test 4 ecarts #
 # PARALLEL RUNS #
-dimension 2 
+dimension 2
 PrecisionGeom 1e-18
 # bidim_axi #
 
@@ -14,5 +14,5 @@ Read_MED { domain dom file test.med }
 
 discretiser_domaine dom
 postraiter_domaine { domaine dom fichier file format lata }
-End        
+End
 

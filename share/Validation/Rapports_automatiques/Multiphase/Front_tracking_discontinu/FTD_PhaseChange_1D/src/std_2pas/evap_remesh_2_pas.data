@@ -11,36 +11,36 @@ Probleme_FT_Disc_gen pb
 # BEGIN MESH #
 Mailler dom
 {
-      pave pave1
-     {
-     origine 0. 0. 0.
-     longueurs 1. 1. 1.
-     # nombre_de_noeuds 11 7 7 #
-     nombre_de_noeuds 21 7 7
+    pave pave1
+    {
+        origine 0. 0. 0.
+        longueurs 1. 1. 1.
+        # nombre_de_noeuds 11 7 7 #
+        nombre_de_noeuds 21 7 7
 
-     }
-     {
-     bord entree   X = 0.            0. <= Y <= 1.        0. <= Z <= 1.
-     bord paroi    Z = 1.           0. <= X <= 1.        0. <= Y <= 1.
-     bord paroi    Z = 0.            0. <= X <= 1.        0. <= Y <= 1.
-     bord sortie   X = 1.           0. <= Y <= 1.        0. <= Z <= 1.
-     bord paroi    Y = 0.            0. <= X <= 1.        0. <= Z <= 1.
-     bord paroi    Y = 1.          0. <= X <= 1.        0. <= Z <= 1.
-     }
+    }
+    {
+        bord entree   X = 0.            0. <= Y <= 1.        0. <= Z <= 1.
+        bord paroi    Z = 1.           0. <= X <= 1.        0. <= Y <= 1.
+        bord paroi    Z = 0.            0. <= X <= 1.        0. <= Y <= 1.
+        bord sortie   X = 1.           0. <= Y <= 1.        0. <= Z <= 1.
+        bord paroi    Y = 0.            0. <= X <= 1.        0. <= Z <= 1.
+        bord paroi    Y = 1.          0. <= X <= 1.        0. <= Z <= 1.
+    }
 }
 transformer dom x*0.0002 y*0.00012-0.00006 z*0.00012-0.00006 # END MESH #
 
 Schema_Euler_explicite  sch
 Lire sch
 {
-     nb_pas_dt_max 3 # 15000 #
-     tinit 0.
-     tmax 150.e-6
-     dt_min 1.e-8
-     dt_max 1.e-8 # 1.e-4      #
-         dt_impr 1.e-7
-     dt_sauv 1e-8
-     seuil_statio -1
+    nb_pas_dt_max 3 # 15000 #
+    tinit 0.
+    tmax 150.e-6
+    dt_min 1.e-8
+    dt_max 1.e-8 # 1.e-4      #
+    dt_impr 1.e-7
+    dt_sauv 1e-8
+    seuil_statio -1
 }
 
 Associate pb dom
@@ -52,195 +52,198 @@ system "mkdir -p lata"
 
 Lire pb
 {
-    	solved_equations
-	{
-Navier_stokes_FT_disc                         hydraulique
-Transport_interfaces_FT_disc                  interf
-convection_diffusion_temperature_ft_disc      thermique
-convection_diffusion_temperature_ft_disc      thermique_vapeur
-	}
-  Fluide_diphasique 
+    solved_equations
+    {
+        Navier_stokes_FT_disc                         hydraulique
+        Transport_interfaces_FT_disc                  interf
+        convection_diffusion_temperature_ft_disc      thermique
+        convection_diffusion_temperature_ft_disc      thermique_vapeur
+    }
+    Fluide_diphasique
+    {
+        fluide1 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 0.0005
+            rho champ_uniforme      1 1000.
+            lambda champ_uniforme   1 0.6 # 60. 0.6 #
+            cp champ_uniforme       1 600.
+        }
+        fluide0 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 0.00028291
+            rho champ_uniforme      1 500.
+            lambda champ_uniforme   1 0.4
+            cp champ_uniforme       1 100.
+        }
+        sigma   Champ_Uniforme 1            0.0 # 0.05 #
+        chaleur_latente Champ_Uniforme 1    -3.
+        gravite Champ_Uniforme 3 0. 0. 0.
+    }
+    hydraulique
+    {
+        modele_turbulence sous_maille_wale
+        {
+            Cw               0.
+            turbulence_paroi negligeable
+        }
+        solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1e-7 impr }
+        convection { quick }
+        diffusion { }
+        # conditions_initiales { vitesse champ_uniforme 3 5.e+1 0. 0. } #
+        conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+
+        equation_interfaces_proprietes_fluide interf
+        equation_temperature_mpoint thermique
+        equation_temperature_mpoint_vapeur thermique_vapeur
+
+
+        boundary_conditions
+        {
+            paroi   symetrie
+            sortie  paroi_fixe
+            #  entree  frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 5.e+1 0. 0. #
+            entree  sortie_libre_rho_variable champ_front_uniforme 1 0.
+        }
+    }
+    interf
+    {
+        interpolation_repere_local
+        methode_transport vitesse_interpolee hydraulique
+        # zlim = 0.00088-0.000848*sqrt(1-1.944*1.944/(1+1.944*1.944) =  #
+        conditions_initiales { fonction -(x-0.000105) }
+        iterations_correction_volume 0
+        methode_interpolation_v vdf_lineaire
+        n_iterations_distance 10 # 3 is enough, but we test what happens when BC are reached... #
+        # maillage {
+        correction_contact_courbure_coeff 0.
+        calcul_courbure_iterations 1
+    }  #
+    parcours_interface { correction_parcours_thomas }
+    remaillage {
+        pas 1.e-10 # -1 #
+        nb_iter_remaillage 1
+        # equilateral 0 #
+        critere_arete 0.35
+        pas_lissage 0.8e-7
+        lissage_courbure_iterations_systematique 3
+        lissage_courbure_iterations_si_remaillage 3
+        lissage_courbure_coeff -0.05
+        nb_iter_barycentrage 3
+        relax_barycentrage 1.00
+        facteur_longueur_ideale 1.45
+        nb_iter_correction_volume 5
+        seuil_dvolume_residuel 1e-20
+    }
+    #    remaillage {
+    pas 1.e-6
+    nb_iter_remaillage 0
+    equilateral 0
+    critere_arete 0.35
+    pas_lissage 1.e-3
+    lissage_courbure_iterations_systematique 1
+    lissage_courbure_iterations_si_remaillage 1
+    lissage_courbure_coeff -0.05
+    nb_iter_barycentrage 2
+    relax_barycentrage 1.00
+    facteur_longueur_ideale 1.45
+    nb_iter_correction_volume 1
+    seuil_dvolume_residuel 1e-20
+}  #
+# collisions
 {
-   fluide1 Fluide_Incompressible  
+    active
+    Juric_local
+    type_remaillage thomas { distance_interface_element_max 2 }
+    phase_continue 1
+} #
+boundary_conditions
 {
-       mu champ_uniforme       1 0.0005
-       rho champ_uniforme      1 1000.
-       lambda champ_uniforme   1 0.6 # 60. 0.6 #
-       cp champ_uniforme       1 600.
+    # bas  Paroi_FT_disc constant champ_front_fonc_xyz 1
+    80*abs(cos(2*3.1415/0.0027*sqrt(x*x+y*y)))+40 #
+    # bas Paroi_FT_disc constant champ_front_fonc_xyz 1 60 #
+    entree   Paroi_FT_disc symetrie
+    paroi    Paroi_FT_disc symetrie # constant champ_front_fonc_xyz 1 90 #
+    sortie   Paroi_FT_disc symetrie
 }
-   fluide0 Fluide_Incompressible 
+}
+
+thermique
 {
-       mu champ_uniforme       1 0.00028291
-       rho champ_uniforme      1 500.
-       lambda champ_uniforme   1 0.4
-       cp champ_uniforme       1 100.
-}
-   sigma   Champ_Uniforme 1            0.0 # 0.05 #
-   chaleur_latente Champ_Uniforme 1    -3.
-   gravite Champ_Uniforme 3 0. 0. 0.
-}
-     hydraulique
-     {
-          modele_turbulence sous_maille_wale
-             {
-                Cw               0.
-                turbulence_paroi negligeable
-             }
-         solveur_pression GCP { optimized precond ssor { omega 1.5 } seuil 1e-7 impr }
-         convection { quick }
-         diffusion { }
-         # conditions_initiales { vitesse champ_uniforme 3 5.e+1 0. 0. } #
-         conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+    equation_interface interf
+    equation_navier_stokes hydraulique
+    phase 1
+    stencil_width 11 # n_iterations_distance+1 is a good choice. 4 could suffice #
+    diffusion { }
+    convection { quick }
+    boundary_conditions
+    {
+        entree   Paroi_flux_impose Champ_front_Uniforme 1 15.e4 # 20000. #
+        sortie   paroi_adiabatique
+        paroi    paroi_adiabatique
+    }
+    conditions_initiales {
+        Temperature_thermique champ_fonc_xyz dom 1 -2.5e5*(x-0.000105)
+        # Temperature_grad_thermique champ_fonc_xyz dom 1 -2.5e5 # }
+    }
 
-         equation_interfaces_proprietes_fluide interf
-         equation_temperature_mpoint thermique
-	 equation_temperature_mpoint_vapeur thermique_vapeur
+    thermique_vapeur
+    {
+        equation_interface interf
+        equation_navier_stokes hydraulique
+        phase 0
+        stencil_width 11 # n_iterations_distance+1 is a good choice. 4 could suffice #
+        diffusion { }
+        convection { quick }
+        boundary_conditions
+        {
+            entree   Paroi_flux_impose Champ_front_Uniforme 1 0.
+            sortie   paroi_adiabatique
+            paroi    paroi_adiabatique
+        }
+        conditions_initiales {
+            Temperature_thermique_vapeur champ_fonc_xyz dom 1
+            0.*50000000./40.*(x-0.0104)
+        }
+    }
 
+    liste_postraitements
+    {
 
-         boundary_conditions
-         {
-         paroi   symetrie
-         sortie  paroi_fixe
-	#  entree  frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 5.e+1 0. 0. #
-         entree  sortie_libre_rho_variable champ_front_uniforme 1 0.
-             }
-     }
-     interf
-     {
-         interpolation_repere_local
-         methode_transport vitesse_interpolee hydraulique
-         # zlim = 0.00088-0.000848*sqrt(1-1.944*1.944/(1+1.944*1.944) =  #
-         conditions_initiales { fonction -(x-0.000105) }
-         iterations_correction_volume 0
-  	 methode_interpolation_v vdf_lineaire
-         n_iterations_distance 10 # 3 is enough, but we test what happens when BC are reached... #
-	   # maillage { 
-	       correction_contact_courbure_coeff 0.
-	       calcul_courbure_iterations 1
-	    }  #
-	 parcours_interface { correction_parcours_thomas }
-remaillage {
-   pas 1.e-10 # -1 # 
-   nb_iter_remaillage 1
-   # equilateral 0 #
-   critere_arete 0.35
-   pas_lissage 0.8e-7
-   lissage_courbure_iterations_systematique 3
-   lissage_courbure_iterations_si_remaillage 3
-   lissage_courbure_coeff -0.05
-   nb_iter_barycentrage 3
-   relax_barycentrage 1.00
-   facteur_longueur_ideale 1.45
-   nb_iter_correction_volume 5
-   seuil_dvolume_residuel 1e-20
-             } 
-      #    remaillage {
-   pas 1.e-6
-   nb_iter_remaillage 0
-   equilateral 0
-   critere_arete 0.35
-   pas_lissage 1.e-3
-   lissage_courbure_iterations_systematique 1
-   lissage_courbure_iterations_si_remaillage 1
-   lissage_courbure_coeff -0.05
-   nb_iter_barycentrage 2
-   relax_barycentrage 1.00
-   facteur_longueur_ideale 1.45
-   nb_iter_correction_volume 1
-   seuil_dvolume_residuel 1e-20
-             }  #
-         # collisions
-         {
-                 active
-         Juric_local
-                 type_remaillage thomas { distance_interface_element_max 2 }
-   phase_continue 1
-  } #
-         boundary_conditions
-         {
-         # bas  Paroi_FT_disc constant champ_front_fonc_xyz 1
-	 80*abs(cos(2*3.1415/0.0027*sqrt(x*x+y*y)))+40 #
-         # bas Paroi_FT_disc constant champ_front_fonc_xyz 1 60 #
-         entree   Paroi_FT_disc symetrie
-         paroi    Paroi_FT_disc symetrie # constant champ_front_fonc_xyz 1 90 #
-         sortie   Paroi_FT_disc symetrie
-         }
-     }
+        postraitement_ft_lata post1 {
+            format Lata
+            fichier lata/post
+            champs dt_post 1.e-8 {
+                indicatrice_interf elem
+                indicatrice_cache_interf elem
+                vitesse_filtree_interf elem
+                distance_interface_elem_interf elem
+                normale_interface_interf elem
+                SURFACE_INTERFACE_interf elem
+                temperature_thermique elem
+                temperature_thermique_vapeur elem
+                temperature_grad_thermique elem
+                vitesse elem
+                vitesse_delta_interface elem
+                vitesse_conv_thermique faces
+                vitesse_conv_thermique_vapeur faces
+                vitesse faces
+                pression_laplacien_d elem
+                pression elem
+                temperature_mpoint elem
+                temperature_mpointv elem
+            }
+            interfaces interf {
+                courbure som
+                PE elem
+                PE_LOCAL elem
+                COMPO_CONNEXE elem
+            }
+        }
 
-     thermique
-     {
-         equation_interface interf
-         equation_navier_stokes hydraulique
-         phase 1
-  	 stencil_width 11 # n_iterations_distance+1 is a good choice. 4 could suffice #
-                 diffusion { }
-                 convection { quick }
-                 boundary_conditions
-                 {
-             entree   Paroi_flux_impose Champ_front_Uniforme 1 15.e4 # 20000. #
-             sortie   paroi_adiabatique
-             paroi    paroi_adiabatique
-                 }
-                 conditions_initiales { Temperature_thermique champ_fonc_xyz dom 1 -2.5e5*(x-0.000105)
-	 				# Temperature_grad_thermique champ_fonc_xyz dom 1 -2.5e5 # }
-     }
-
-     thermique_vapeur
-     {
-         equation_interface interf
-         equation_navier_stokes hydraulique
-         phase 0
-  stencil_width 11 # n_iterations_distance+1 is a good choice. 4 could suffice #
-                 diffusion { }
-                 convection { quick }
-                 boundary_conditions
-                 {
-             entree   Paroi_flux_impose Champ_front_Uniforme 1 0. 
-             sortie   paroi_adiabatique
-             paroi    paroi_adiabatique
-                 }
-                 conditions_initiales { Temperature_thermique_vapeur champ_fonc_xyz dom 1
-         0.*50000000./40.*(x-0.0104) }
-     }
-
-liste_postraitements
-{
-
-    postraitement_ft_lata post1 { 
-    format Lata 
-    fichier lata/post 
-    champs dt_post 1.e-8 { 
-        indicatrice_interf elem 
-        indicatrice_cache_interf elem 
-        vitesse_filtree_interf elem 
-        distance_interface_elem_interf elem 
-        normale_interface_interf elem 
-        SURFACE_INTERFACE_interf elem 
-        temperature_thermique elem 
-        temperature_thermique_vapeur elem 
-        temperature_grad_thermique elem 
-        vitesse elem 
-        vitesse_delta_interface elem 
-        vitesse_conv_thermique faces
-        vitesse_conv_thermique_vapeur faces
-        vitesse faces
-        pression_laplacien_d elem 
-        pression elem 
-        temperature_mpoint elem 
-        temperature_mpointv elem 
-    } 
-    interfaces interf { 
-        courbure som 
-        PE elem 
-        PE_LOCAL elem 
-        COMPO_CONNEXE elem 
-    } 
-}
-
-}
+    }
 
 }
 Solve pb
 FIN
 
- 
+

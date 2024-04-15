@@ -9,41 +9,41 @@ export domaine DOM
 
 # BEGIN MESH #
 Mailler DOM
-{ 
-	Pave pave
-	{ 
-		origine -0.4 -0.4 0.
-		longueurs 0.8 0.8 0.550
-		nombre_de_noeuds 43 43 31
-	}
-	{
-   
-		bord bord X = -0.4   -0.4 <= Y <= 0.4 0. <= Z <= 0.55
-		bord bord X = 0.4    -0.4 <= Y <= 0.4 0. <= Z <= 0.55
-		bord bord Y = -0.4   -0.4 <= X <= 0.4 0. <= Z <= 0.55
-		bord bord Y = 0.4    -0.4 <= X <= 0.4 0. <= Z <= 0.55
-		bord fond Z = 0.     -0.4 <= X <= 0.4 -0.4 <= Y <= 0.4
-		bord haut Z = 0.55   -0.4 <= X <= 0.4 -0.4 <= Y <= 0.4
-	}
+{
+    Pave pave
+    {
+        origine -0.4 -0.4 0.
+        longueurs 0.8 0.8 0.550
+        nombre_de_noeuds 43 43 31
+    }
+    {
+
+        bord bord X = -0.4   -0.4 <= Y <= 0.4 0. <= Z <= 0.55
+        bord bord X = 0.4    -0.4 <= Y <= 0.4 0. <= Z <= 0.55
+        bord bord Y = -0.4   -0.4 <= X <= 0.4 0. <= Z <= 0.55
+        bord bord Y = 0.4    -0.4 <= X <= 0.4 0. <= Z <= 0.55
+        bord fond Z = 0.     -0.4 <= X <= 0.4 -0.4 <= Y <= 0.4
+        bord haut Z = 0.55   -0.4 <= X <= 0.4 -0.4 <= Y <= 0.4
+    }
 }
 
 # END MESH #
-# Calcul parallele pour 2 processeurs # 
-# BEGIN PARTITION 
+# Calcul parallele pour 2 processeurs #
+# BEGIN PARTITION
 Partition DOM
 {
-   Partitionneur tranche { tranches 2 1 1 }
-   Larg_joint 2
-   Nom_Zones DOM
+    Partitionneur tranche { tranches 2 1 1 }
+    Larg_joint 2
+    Nom_Zones DOM
 }
 End
 END PARTITION #
 
-# BEGIN SCATTER 
+# BEGIN SCATTER
 Scatter DOM.Zones DOM
 END SCATTER #
 
-export domaine ANCRE 
+export domaine ANCRE
 
 # type de discretisation spatiale #
 
@@ -52,18 +52,18 @@ VDF dis
 Runge_Kutta_ordre_4_D3P sch
 Read sch
 {
-	tinit 	0.
-	nb_pas_dt_max 3
-	tmax 1.6
-        dt_start dt_fixe 4.5e-4
-	dt_min 0.5e-4
+    tinit 	0.
+    nb_pas_dt_max 3
+    tmax 1.6
+    dt_start dt_fixe 4.5e-4
+    dt_min 0.5e-4
 #	dt_max 0.01 #
-	dt_max 0.0005
-	dt_impr 1.e-10
-	dt_sauv 3
-	seuil_statio -1
-        facsec 1.0
-        diffusion_implicite 1	
+    dt_max 0.0005
+    dt_impr 1.e-10
+    dt_sauv 3
+    seuil_statio -1
+    facsec 1.0
+    diffusion_implicite 1
 }
 # Creation d'un repertoire pour les fichiers lata #
 # system "mkdir -p lata" #
@@ -75,218 +75,218 @@ Discretize pb dis
 
 Read pb
 {
-	solved_equations
-	{
-Navier_Stokes_FT_Disc eq_hydraulique
-Transport_Interfaces_FT_Disc agit
-Transport_Interfaces_FT_Disc cuve
-Transport_Interfaces_FT_Disc interf
-	}
-	Fluide_Diphasique 
-{
-	fluide0 Fluide_Incompressible 
-{
-	rho Champ_Uniforme 1 973
-	mu  Champ_Uniforme 1 3.89200000000000000000 # 3.892 -> nu=4000cS     8.69862 -> nu=8940cs #
-}
-	fluide1 Fluide_Incompressible 
+    solved_equations
+    {
+        Navier_Stokes_FT_Disc eq_hydraulique
+        Transport_Interfaces_FT_Disc agit
+        Transport_Interfaces_FT_Disc cuve
+        Transport_Interfaces_FT_Disc interf
+    }
+    Fluide_Diphasique
+    {
+        fluide0 Fluide_Incompressible
+        {
+            rho Champ_Uniforme 1 973
+            mu  Champ_Uniforme 1 3.89200000000000000000 # 3.892 -> nu=4000cS     8.69862 -> nu=8940cs #
+        }
+        fluide1 Fluide_Incompressible
 # (air a 20C) #
-{
-	mu  Champ_Uniforme 1 1.85e-5
- 	rho Champ_Uniforme 1 1.204
-}
-	sigma Champ_Uniforme 1 2.1e-2 
-	gravite Champ_Uniforme 3 0. 0. -9.81
-}
+        {
+            mu  Champ_Uniforme 1 1.85e-5
+            rho Champ_Uniforme 1 1.204
+        }
+        sigma Champ_Uniforme 1 2.1e-2
+        gravite Champ_Uniforme 3 0. 0. -9.81
+    }
 
-eq_hydraulique
-{
-	modele_turbulence null {  }
-        solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-16 impr } 
+    eq_hydraulique
+    {
+        modele_turbulence null {  }
+        solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-16 impr }
 #	solveur_pression Petsc CLI { -ksp_type cg -pc_type hypre -pc_hypre_type boomerAMG -ksp_atol 5.e-16 -ksp_divtol 5.e+18 seuil 5.e-16 impr } #
-	convection           { quick }
-	diffusion            { }
-	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+        convection           { quick }
+        diffusion            { }
+        conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
         equation_interfaces_proprietes_fluide interf
         equations_interfaces_vitesse_imposee 2 agit cuve
-	# Options de penalisation #
+        # Options de penalisation #
         penalisation_forcage { pression_reference 0. domaine_flottant_fluide 0. -0.320 0.15 }
         Parametre_equation parametre_diffusion_implicite
         {
-                preconditionnement_diag 1
+            preconditionnement_diag 1
         }
-	boundary_conditions
-	{
-		haut Sortie_libre_rho_variable champ_front_uniforme 1 0.
-		fond paroi_fixe
-		bord paroi_fixe
-	}
-}
-agit
-{
+        boundary_conditions
+        {
+            haut Sortie_libre_rho_variable champ_front_uniforme 1 0.
+            fond paroi_fixe
+            bord paroi_fixe
+        }
+    }
+    agit
+    {
 # 1/2 axes x, y et z : 21.5 cm 12.9 cm et 12.9 cm #
-	    conditions_initiales {
-		      fonction -(x^2+(y/0.6)^2+((z-0.225)/0.6)^2-(0.215^2))
-	}
-	remaillage {
-		pas -1e8
-		nb_iter_remaillage 5
-		critere_arete 0.5
-		critere_remaillage 0.2
-		pas_lissage -1
-		nb_iter_barycentrage 5
-		relax_barycentrage 1
-		facteur_longueur_ideale 0.5
-	}
-	boundary_conditions
-	{
-		haut paroi_ft_disc symetrie
-		fond paroi_ft_disc symetrie
-		bord paroi_ft_disc symetrie
-	}
-	    # L'agitateur tourne dans le sens horaire #        
-	methode_transport vitesse_imposee	
-	            6.28318530717958647688*(0.1325748+y*cos(22.0*3.141592653/180.)-z*sin(22.0*3.141592653/180.))      
-		    -6.28318530717958647688*x*cos(22.0*3.141592653/180.)
-        	    6.28318530717958647688*x*sin(22.0*3.141592653/180.)
-	    # Options module Baltik penalisation #	   
-	    interpolation_champ_face lineaire { vitesse_fluide_explicite }
-            nombre_facettes_retenues_par_cellule 10
-	    type_vitesse_imposee analytique
-	    n_iterations_interpolation_ibc 1
-            seuil_convergence_uzawa 1e-16 
-            
-            # the parameter 'nb_iteration_max_uzawa' shall be set to : #
-            # - 50000 for validation #
-            # - 100 for non-regression #
-            nb_iteration_max_uzawa 100 
-	    vitesse_imposee_regularisee 0
+        conditions_initiales {
+            fonction -(x^2+(y/0.6)^2+((z-0.225)/0.6)^2-(0.215^2))
+        }
+        remaillage {
+            pas -1e8
+            nb_iter_remaillage 5
+            critere_arete 0.5
+            critere_remaillage 0.2
+            pas_lissage -1
+            nb_iter_barycentrage 5
+            relax_barycentrage 1
+            facteur_longueur_ideale 0.5
+        }
+        boundary_conditions
+        {
+            haut paroi_ft_disc symetrie
+            fond paroi_ft_disc symetrie
+            bord paroi_ft_disc symetrie
+        }
+        # L'agitateur tourne dans le sens horaire #
+        methode_transport vitesse_imposee
+        6.28318530717958647688*(0.1325748+y*cos(22.0*3.141592653/180.)-z*sin(22.0*3.141592653/180.))
+        -6.28318530717958647688*x*cos(22.0*3.141592653/180.)
+        6.28318530717958647688*x*sin(22.0*3.141592653/180.)
+        # Options module Baltik penalisation #
+        interpolation_champ_face lineaire { vitesse_fluide_explicite }
+        nombre_facettes_retenues_par_cellule 10
+        type_vitesse_imposee analytique
+        n_iterations_interpolation_ibc 1
+        seuil_convergence_uzawa 1e-16
+
+        # the parameter 'nb_iteration_max_uzawa' shall be set to : #
+        # - 50000 for validation #
+        # - 100 for non-regression #
+        nb_iteration_max_uzawa 100
+        vitesse_imposee_regularisee 0
     }
     cuve
     {
-            conditions_initiales { fonction (x*x+y*y)^0.5-(0.5*0.650) } # Cuve de 0.650 m de diametre #
-	    remaillage {
-                pas -1e8
-                nb_iter_remaillage 5
-                critere_arete 0.5
-                critere_remaillage 0.2
-                pas_lissage -1
-                nb_iter_barycentrage 5
-                relax_barycentrage 1
-                facteur_longueur_ideale 0.5
+        conditions_initiales { fonction (x*x+y*y)^0.5-(0.5*0.650) } # Cuve de 0.650 m de diametre #
+        remaillage {
+            pas -1e8
+            nb_iter_remaillage 5
+            critere_arete 0.5
+            critere_remaillage 0.2
+            pas_lissage -1
+            nb_iter_barycentrage 5
+            relax_barycentrage 1
+            facteur_longueur_ideale 0.5
         }
         boundary_conditions
         {
-                haut paroi_ft_disc symetrie
-                fond paroi_ft_disc symetrie
-                bord paroi_ft_disc symetrie
+            haut paroi_ft_disc symetrie
+            fond paroi_ft_disc symetrie
+            bord paroi_ft_disc symetrie
         }
         methode_transport vitesse_imposee
-		0.0
-		0.0
-		0.0 
-       interpolation_champ_face lineaire { vitesse_fluide_explicite }
-       type_vitesse_imposee uniforme
-       n_iterations_interpolation_ibc 1
-       vitesse_imposee_regularisee 0
-}
-interf
-{
+        0.0
+        0.0
+        0.0
+        interpolation_champ_face lineaire { vitesse_fluide_explicite }
+        type_vitesse_imposee uniforme
+        n_iterations_interpolation_ibc 1
+        vitesse_imposee_regularisee 0
+    }
+    interf
+    {
         conditions_initiales { fonction z-0.430 }
-	iterations_correction_volume 1
-	n_iterations_distance 3
-	collisions {
-		active
-		juric_pour_tout
-                juric_local phase_continue 0
-		type_remaillage Juric { source_isovaleur indicatrice }
-		   }
+        iterations_correction_volume 1
+        n_iterations_distance 3
+        collisions {
+            active
+            juric_pour_tout
+            juric_local phase_continue 0
+            type_remaillage Juric { source_isovaleur indicatrice }
+        }
         remaillage {
-                pas 1e-07
-                nb_iter_remaillage 2
-                critere_arete 0.4
-                critere_remaillage 0.4
-                pas_lissage 1e-07
-                relax_barycentrage 1
-                critere_longueur_fixe 0.02
-                nb_iter_barycentrage 3
-		nb_iter_correction_volume 2
-		seuil_dvolume_residuel 1e-12
-		lissage_courbure_coeff -0.05
-		lissage_courbure_iterations 2
+            pas 1e-07
+            nb_iter_remaillage 2
+            critere_arete 0.4
+            critere_remaillage 0.4
+            pas_lissage 1e-07
+            relax_barycentrage 1
+            critere_longueur_fixe 0.02
+            nb_iter_barycentrage 3
+            nb_iter_correction_volume 2
+            seuil_dvolume_residuel 1e-12
+            lissage_courbure_coeff -0.05
+            lissage_courbure_iterations 2
         }
         boundary_conditions
         {
-		haut paroi_ft_disc symetrie
-		fond paroi_ft_disc symetrie
-		bord paroi_ft_disc symetrie
+            haut paroi_ft_disc symetrie
+            fond paroi_ft_disc symetrie
+            bord paroi_ft_disc symetrie
         }
         methode_transport vitesse_interpolee eq_hydraulique
-        injecteur_interfaces input_bulle.txt 
-}
+        injecteur_interfaces input_bulle.txt
+    }
 
 
-Postraitement
-	{
-		Sondes 
-		{
-			Sonde_niv1 Vitesse Periode 0.01 Points 6 0.
--0.280 0.03 0. -0.210 0.03 0. -0.140 0.03 0. 0.135 0.03 0. 0.180 0.03 0. 0.270 0.03
+    Postraitement
+    {
+        Sondes
+        {
+            Sonde_niv1 Vitesse Periode 0.01 Points 6 0.
+            -0.280 0.03 0. -0.210 0.03 0. -0.140 0.03 0. 0.135 0.03 0. 0.180 0.03 0. 0.270 0.03
 
-			Sonde_niv3 Vitesse Periode 0.01 Points 3 0.
--0.280 0.380 0. -0.210 0.380 0. -0.140 0.380
+            Sonde_niv3 Vitesse Periode 0.01 Points 3 0.
+            -0.280 0.380 0. -0.210 0.380 0. -0.140 0.380
 
-			Sonde_niv1_p Pression Periode 0.01 Points 1  0. -0.210 0.03
-		}
-  	       champs dt_post  .06250000000000000000
- 	       {
-	           vitesse elem
-	           pression elem
-	       }	
-	}
+            Sonde_niv1_p Pression Periode 0.01 Points 1  0. -0.210 0.03
+        }
+        champs dt_post  .06250000000000000000
+        {
+            vitesse elem
+            pression elem
+        }
+    }
 
- liste_postraitements
-       {
-        postraitement_ft_lata post_ancre { 
-    format Lata 
-    fichier lata/ancre 
-    champs dt_post .06250000000000000000
-     { 
-        indicatrice_agit elem 
-    } 
-    interfaces agit { 
-        courbure som 
-    } 
-}
-        postraitement_ft_lata post_cuve { 
-    format Lata 
-    fichier lata/post_cuve 
-    champs dt_post .06250000000000000000
-     { 
-        indicatrice_cuve elem 
-    } 
-    interfaces cuve { 
-        courbure som 
-    } 
-}
-	postraitement_ft_lata post_interf { 
-    format Lata 
-    fichier lata/post_interf 
-    champs dt_post .06250000000000000000
-     { 
-        vitesse elem 
-        pression elem 
-        Divergence_U elem 
-        indicatrice_interf elem 
-        indicatrice_agit elem 
-        indicatrice_cuve elem 
-    } 
-    interfaces interf { 
-        courbure som 
-    } 
-}
-    } 
+    liste_postraitements
+    {
+        postraitement_ft_lata post_ancre {
+            format Lata
+            fichier lata/ancre
+            champs dt_post .06250000000000000000
+            {
+                indicatrice_agit elem
+            }
+            interfaces agit {
+                courbure som
+            }
+        }
+        postraitement_ft_lata post_cuve {
+            format Lata
+            fichier lata/post_cuve
+            champs dt_post .06250000000000000000
+            {
+                indicatrice_cuve elem
+            }
+            interfaces cuve {
+                courbure som
+            }
+        }
+        postraitement_ft_lata post_interf {
+            format Lata
+            fichier lata/post_interf
+            champs dt_post .06250000000000000000
+            {
+                vitesse elem
+                pression elem
+                Divergence_U elem
+                indicatrice_interf elem
+                indicatrice_agit elem
+                indicatrice_cuve elem
+            }
+            interfaces interf {
+                courbure som
+            }
+        }
+    }
 }
 Solve pb
 End
- 
+
