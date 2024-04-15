@@ -299,7 +299,6 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
   double dt = Pb_Fluide_base::calculer_pas_de_temps();
 
   if (la_chimie_.non_nul())
-
     {
       dt = std::min(dt, la_chimie_.valeur().calculer_pas_de_temps());
       dt = mp_min(dt);
@@ -307,12 +306,6 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
   return dt;
 }
 
-void Probleme_FT_Disc_gen::discretiser(Discretisation_base& dis)
-{
-  Pb_Fluide_base::discretiser(dis);
-  if (la_chimie_.non_nul())
-    la_chimie_.valeur().discretiser(*this);
-}
 void Probleme_FT_Disc_gen::mettre_a_jour(double temps)
 {
   if (schema_temps().que_suis_je() == "RK3_FT")
@@ -334,8 +327,12 @@ void Probleme_FT_Disc_gen::mettre_a_jour(double temps)
 void Probleme_FT_Disc_gen::completer(void)
 {
   Pb_Fluide_base::completer();
+
   if (la_chimie_.non_nul())
-    la_chimie_.valeur().completer(*this);
+    {
+      la_chimie_.valeur().discretiser(*this); /* XXX : Elie Saikali : j'ai retarde ca et mis ici ... */
+      la_chimie_.valeur().completer(*this);
+    }
 
   if (tcl_.is_activated())
     tcl_.completer();

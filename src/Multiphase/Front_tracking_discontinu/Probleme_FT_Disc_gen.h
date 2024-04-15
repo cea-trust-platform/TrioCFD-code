@@ -59,9 +59,6 @@ public:
   virtual const Navier_Stokes_FT_Disc& equation_hydraulique(const Motcle& nom) const;
   virtual const Transport_Interfaces_FT_Disc& equation_interfaces(const Motcle& nom) const;
 
-  // methodes appelees dans le readOn -> on ne sait pas encore s'il faut les modifier
-  void discretiser(Discretisation_base&) override;
-
   void associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1);
   const Triple_Line_Model_FT_Disc& tcl() const { return tcl_; }
   Triple_Line_Model_FT_Disc& tcl() { return tcl_; }
