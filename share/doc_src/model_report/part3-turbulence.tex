@@ -1010,16 +1010,18 @@ where $i$ is the number of the $i^{th}$ cell in the wall normal direction, and $
 
 \texttt{variation\_cste\_modele\_fonctionnel} is the indicator of two-layered mixed model.
 
-\texttt{smoothing\_center\_fr} corresponds to the smoothing center, noted $s_c$ above, for the cold side
+\texttt{smoothing\_center\_fr} corresponds to the smoothing center, noted $s_c$ above, for the cold side.
 
 \texttt{smoothing\_factor\_fr} corresponds to the smoothing factor $s_f$ as explained above, for the cold side.
 
-\texttt{Re\_tau\_fr} expected friction Reynolds number on the cold side to scale the smoothing center and smoothing factor
+\texttt{Re\_tau\_fr} expected friction Reynolds number on the cold side to scale the smoothing center and smoothing factor.
 
-\texttt{Re\_tau\_ch} expected friction Reynolds number on the hot side to scale the smoothing center and smoothing factor
+\texttt{Re\_tau\_ch} expected friction Reynolds number on the hot side to scale the smoothing center and smoothing factor.
 
-\texttt{ponderation\_fr} Ponderation coefficient for turbulent model constant for cold side
+\texttt{ponderation\_fr} Ponderation coefficient for turbulent model constant for cold side.
 
-\texttt{ponderation\_ch} Ponderation coefficient for turbulent model constant for hot side
+\texttt{ponderation\_ch} Ponderation coefficient for turbulent model constant for hot side.
 
-\texttt{center\_constant} Constant value in front of the functional model
+\texttt{center\_constant} Constant value in front of the functional model.
+
+\texttt{dt\_save\_oscillating\_cycle\_raw\_data} Enforce saving raw data fields at a specific specific $\Delta_t$ interval. Enforcing each timestep to be saved each $\Delta_t$.
