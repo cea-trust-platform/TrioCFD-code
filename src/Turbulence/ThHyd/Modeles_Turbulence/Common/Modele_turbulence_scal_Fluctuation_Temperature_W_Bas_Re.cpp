@@ -110,7 +110,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   const DoubleTab& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeurs();
   const Domaine_dis& le_dom_dis = eqn_transport_Fluctu_Temp->domaine_dis();
 
-  const Probleme_base& mon_pb = mon_equation->probleme();
+  const Probleme_base& mon_pb = mon_equation_->probleme();
   const Equation_base& eqn_hydr = mon_pb.equation(0);
   const RefObjU& modele_turbulence = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,modele_turbulence.valeur());
@@ -182,7 +182,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
 void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::completer()
 {
   eqn_transport_Fluctu_Temp->completer();
-  const Probleme_base& mon_pb = mon_equation->probleme();
+  const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
   const Champ_Fonc& visc_turb = mod_turb_hydr.viscosite_turbulente();

@@ -159,7 +159,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature::completer()
 {
   eqn_transport_Fluctu_Temp.completer();
   eqn_transport_Flux_Chaleur_Turb.completer();
-  const Probleme_base& mon_pb = mon_equation->probleme();
+  const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
   const Champ_Fonc& visc_turb = mod_turb_hydr.viscosite_turbulente();
@@ -179,7 +179,7 @@ int Modele_turbulence_scal_Fluctuation_Temperature::sauvegarder(Sortie& os) cons
 int Modele_turbulence_scal_Fluctuation_Temperature::reprendre(Entree& is)
 {
   Modele_turbulence_scal_base::reprendre(is);
-  if (mon_equation.non_nul())
+  if (mon_equation_.non_nul())
     {
       eqn_transport_Fluctu_Temp.reprendre(is);
       eqn_transport_Flux_Chaleur_Turb.reprendre(is);

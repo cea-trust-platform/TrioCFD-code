@@ -153,7 +153,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::mettre_a_jour(double)
   const DoubleTab& tab_Cp = le_milieu.capacite_calorifique().valeurs();
   const bool Ccp = sub_type(Champ_Uniforme, le_milieu.capacite_calorifique().valeur());
   const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
-  const Probleme_base& mon_pb = mon_equation->probleme();
+  const Probleme_base& mon_pb = mon_equation_->probleme();
   DoubleTab& lambda_t = conductivite_turbulente_.valeurs();
   lambda_t = diffusivite_turbulente_.valeurs();
   if (sub_type(Pb_Thermohydraulique_Turbulent_QC, mon_pb))
@@ -348,7 +348,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calculer_grad_teta(const DoubleVect& te
   const int nb_faces_tot = le_dom_VDF->nb_faces();
   const int nb_faces_bord = le_dom_VDF->domaine().nb_faces_bord();
 
-  const Op_Dift_VDF_base& operateur_diff = ref_cast(Op_Dift_VDF_base, (mon_equation->operateur(0)).l_op_base());
+  const Op_Dift_VDF_base& operateur_diff = ref_cast(Op_Dift_VDF_base, (mon_equation_->operateur(0)).l_op_base());
   const DoubleVect& flux_bords = operateur_diff.flux_bords();
   // Si flux_bords n'est pas encore rempli (1er pas de temps)
   // alors on le calcule en appelant la methode ajouter de l'operateur
@@ -681,7 +681,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::stabilise_moyenne_euler(const DoubleTab
   int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   static DoubleTab haut_moy(nb_elem_tot);
   static DoubleTab bas_moy(nb_elem_tot);
-  double dt = mon_equation->schema_temps().pas_de_temps();
+  double dt = mon_equation_->schema_temps().pas_de_temps();
   int element_number;
   DoubleTab haut_moy_tmp(nb_elem_tot), bas_moy_tmp(nb_elem_tot);
   double eps, T;
@@ -754,7 +754,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::stabilise_moyenne_lagrange(const Double
   int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   static DoubleTab haut_moy(nb_elem_tot);
   static DoubleTab bas_moy(nb_elem_tot);
-  double dt = mon_equation->schema_temps().pas_de_temps();
+  double dt = mon_equation_->schema_temps().pas_de_temps();
   int element_number;
   DoubleTab haut_moy_tmp(nb_elem_tot), bas_moy_tmp(nb_elem_tot);
   double haut_moy_int, bas_moy_int;
@@ -1015,7 +1015,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calc_elem_elem(void)
 void Modele_turbulence_scal_LES_dyn_VDF::calcul_tableaux_correspondance(int& N_c, IntVect& compt_c, IntVect& corresp_c)
 {
   // Initialisation de : Yuv + compt_c + corresp_c
-  const Domaine_dis_base& zdisbase = mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase = mon_equation_->inconnue().domaine_dis_base();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, zdisbase);
   const DoubleTab& xp = domaine_VDF.xp();
   int nb_elems = domaine_VDF.domaine().nb_elem();

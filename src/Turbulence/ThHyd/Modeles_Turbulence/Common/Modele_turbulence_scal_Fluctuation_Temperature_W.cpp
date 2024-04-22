@@ -108,7 +108,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W::calculer_diffusivi
   double temps = la_viscosite_turbulente->temps();
   const Champ_base& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeur();
 
-  const Probleme_base& mon_pb = mon_equation->probleme();
+  const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,modele_turbulence.valeur());
   const Transport_K_Eps_base& eqBasRe = mod_turb_hydr.eqn_transp_K_Eps();
@@ -158,7 +158,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::completer()
 {
   Cerr << "Dans Modele_turbulence_scal_Fluctuation_Temperature_W::completer()" << finl;
   eqn_transport_Fluctu_Temp->completer();
-  const Probleme_base& mon_pb = mon_equation->probleme();
+  const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
   const Champ_Fonc& visc_turb = mod_turb_hydr.viscosite_turbulente();
@@ -177,7 +177,7 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W::sauvegarder(Sortie& os) co
 int Modele_turbulence_scal_Fluctuation_Temperature_W::reprendre(Entree& is)
 {
   Modele_turbulence_scal_base::reprendre(is);
-  if (mon_equation.non_nul())
+  if (mon_equation_.non_nul())
     {
       equation_Fluctu().reprendre(is);
       return 1;
