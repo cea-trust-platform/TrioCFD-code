@@ -73,8 +73,10 @@
 ./share/Validation/Rapports_automatiques/Turbulence/RANS/Two_Layers_Stratif_impl
 ./share/Validation/Rapports_automatiques/Turbulence/RANS/Two_Layers_Stratif
 ./share/Validation/Rapports_automatiques/Turbulence/RANS/wl_vef_correlation
+./share/Validation/Rapports_automatiques/Turbulence/Verification_codage/Constituants_Turb
 ./share/Validation/Rapports_automatiques/Turbulence/Verification_codage/decroissance_keps
 ./share/Validation/Rapports_automatiques/Turbulence/Verification_codage/Marche_incline
+./share/Validation/Rapports_automatiques/Turbulence/Verification_codage/multi_cloned_concentration_turb
 ./share/Validation/Rapports_automatiques/Turbulence/Verification_codage/Op_diff_dift_vdf
 ./share/Validation/Rapports_automatiques/Turbulence/Verification_codage/Test_ghost_visit
 ./share/Validation/Rapports_automatiques/Turbulence/Verification_codage/Uniform_keps_front_field_from_ud
