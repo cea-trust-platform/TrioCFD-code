@@ -24,7 +24,7 @@
 #include <Param.h>
 
 Implemente_base(Modele_turbulence_hyd_RANS_K_Eps_base, "Modele_turbulence_hyd_RANS_K_Eps_base", Modele_turbulence_hyd_2_eq_base);
-// XD mod_turb_hyd_rans_keps modele_turbulence_hyd_deriv mod_turb_hyd_rans_keps -1 Class for RANS turbulence model for Navier-Stokes equations.
+// XD mod_turb_hyd_rans_keps mod_turb_hyd_rans mod_turb_hyd_rans_keps -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Sortie& Modele_turbulence_hyd_RANS_K_Eps_base::printOn(Sortie& is) const { return Modele_turbulence_hyd_2_eq_base::printOn(is); }
 

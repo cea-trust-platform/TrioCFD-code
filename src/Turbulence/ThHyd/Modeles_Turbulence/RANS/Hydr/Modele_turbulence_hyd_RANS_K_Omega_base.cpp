@@ -24,7 +24,7 @@
 #include <Param.h>
 
 Implemente_base_sans_constructeur(Modele_turbulence_hyd_RANS_K_Omega_base, "Modele_turbulence_hyd_RANS_K_Omega_base", Modele_turbulence_hyd_2_eq_base);
-// XD mod_turb_hyd_rans_komega modele_turbulence_hyd_deriv mod_turb_hyd_rans_komega -1 Class for RANS turbulence model for Navier-Stokes equations.
+// XD mod_turb_hyd_rans_komega mod_turb_hyd_rans mod_turb_hyd_rans_komega -1 Class for RANS turbulence model for Navier-Stokes equations.
 
 Sortie& Modele_turbulence_hyd_RANS_K_Omega_base::printOn(Sortie& is) const { return Modele_turbulence_hyd_2_eq_base::printOn(is); }
 
