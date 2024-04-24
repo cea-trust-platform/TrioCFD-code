@@ -31,9 +31,9 @@
 #include <Debog.h>
 #include <TRUSTList.h>
 #include <EcrFicPartage.h>
-#include <Mod_turb_hyd_RANS_0_eq.h>
+#include <Modele_turbulence_hyd_Longueur_Melange_base.h>
 #include <Neumann_sortie_libre.h>
-#include <Mod_turb_hyd_combin.h>
+#include <Modele_turbulence_hyd_combinaison.h>
 #include <Param.h>
 #include <Paroi_rugueuse.h>
 #include <SFichier.h>
@@ -1585,8 +1585,8 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       coef_vit=nfac-1;
     }
 
-  bool LM   =(sub_type(Mod_turb_hyd_RANS_0_eq,mon_modele_turb_hyd.valeur()) ? 1 : 0); // Longueur de Melange
-  bool COMB =(sub_type(Mod_turb_hyd_combin,mon_modele_turb_hyd.valeur()) ? 1 : 0);  //Modele Combinaison (fonction analytique et (ou) dependance a des champs sources)
+  bool LM   =(sub_type(Modele_turbulence_hyd_Longueur_Melange_base,mon_modele_turb_hyd.valeur()) ? 1 : 0); // Longueur de Melange
+  bool COMB =(sub_type(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur()) ? 1 : 0);  //Modele Combinaison (fonction analytique et (ou) dependance a des champs sources)
 
   // Loop on boundaries
   int nb_bords=domaine_VEF.nb_front_Cl();
@@ -1674,7 +1674,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
               // La valeur de dist_corr n est valable que dans le cas particuler ou nu_t est fonction lineaire de y
               if (COMB)
                 {
-                  Mod_turb_hyd_combin& modele_turb = ref_cast(Mod_turb_hyd_combin,mon_modele_turb_hyd.valeur());
+                  Modele_turbulence_hyd_combinaison& modele_turb = ref_cast(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur());
                   if (modele_turb.nombre_sources()==0)
                     tab_nu_t(elem) *= dist_corr;
                 }
@@ -1772,7 +1772,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
               // La valeur de dist_corr n est valable que dans le cas particuler ou nu_t est fonction lineaire de y
               if (COMB)
                 {
-                  Mod_turb_hyd_combin& modele_turb = ref_cast(Mod_turb_hyd_combin,mon_modele_turb_hyd.valeur());
+                  Modele_turbulence_hyd_combinaison& modele_turb = ref_cast(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur());
                   if (modele_turb.nombre_sources()==0)
                     tab_nu_t(elem) *= dist_corr;
                 }

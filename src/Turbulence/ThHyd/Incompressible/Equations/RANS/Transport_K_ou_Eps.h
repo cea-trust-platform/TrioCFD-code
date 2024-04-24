@@ -50,7 +50,7 @@ public:
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline void associer_Champ_Inconnu(const Champ_Inc& );
-  void associer_modele_turbulence(const Mod_turb_hyd_RANS_Bicephale& ) override;
+  void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_Bicephale_base& ) override;
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;

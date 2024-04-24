@@ -22,19 +22,18 @@
 #ifndef Modele_turbulence_hyd_K_Eps_included
 #define Modele_turbulence_hyd_K_Eps_included
 
-#include <Transport_K_Eps.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
+#include <Transport_K_Eps.h>
+
 /*! @brief Classe Modele_turbulence_hyd_K_Eps Cette classe represente le modele de turbulence (k,eps) pour les
  *
  *     equations de Navier-Stokes.
  *
- * @sa Modele_turbulence_hyd_base Mod_turb_hyd_ss_maille
+ * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps : public Mod_turb_hyd_RANS_keps
+class Modele_turbulence_hyd_K_Eps: public Modele_turbulence_hyd_RANS_K_Eps_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Eps>
 {
-
   Declare_instanciable(Modele_turbulence_hyd_K_Eps);
-
 public:
 
   void set_param(Param& param) override;
@@ -42,26 +41,27 @@ public:
   int preparer_calcul() override;
   void verifie_loi_paroi() override;
   bool initTimeStep(double dt) override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   virtual inline Champ_Inc& K_Eps();
   virtual inline const Champ_Inc& K_Eps() const;
 
-  inline int nombre_d_equations() const override;
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
-  const Equation_base& equation_k_eps(int) const override ;
-
-
+  const Equation_base& equation_k_eps(int i) const override
+  {
+    assert((i == 0));
+    return eqn_transport_K_Eps_;
+  }
 
   const Champ_base& get_champ(const Motcle& nom) const override;
-  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
-
-protected:
-  Transport_K_Eps  eqn_transport_K_Eps;
+  void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
+  void controler() { eqn_transport_K_Eps_.controler_K_Eps(); }
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
+protected:
+  Transport_K_Eps eqn_transport_K_Eps_;
+  void fill_turbulent_viscosity_tab(const int , const DoubleTab&, const DoubleTab& , const DoubleTab& , const DoubleTab&  , DoubleTab& );
 };
-
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
@@ -73,9 +73,8 @@ protected:
  */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps() const
 {
-  return eqn_transport_K_Eps.inconnue();
+  return eqn_transport_K_Eps_.inconnue();
 }
-
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
@@ -86,7 +85,7 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps() const
  */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps()
 {
-  return eqn_transport_K_Eps.inconnue();
+  return eqn_transport_K_Eps_.inconnue();
 }
 
 /*! @brief Renvoie l'equation du modele de turbulence i.
@@ -97,7 +96,7 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps()
  */
 inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps()
 {
-  return eqn_transport_K_Eps;
+  return eqn_transport_K_Eps_;
 }
 
 /*! @brief Renvoie l'equation du modele de turbulence i.
@@ -109,10 +108,7 @@ inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps()
  */
 inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps() const
 {
-  return eqn_transport_K_Eps;
+  return eqn_transport_K_Eps_;
 }
-inline int Modele_turbulence_hyd_K_Eps::nombre_d_equations() const
-{
-  return 1;
-}
-#endif
+
+#endif /* Modele_turbulence_hyd_K_Eps_included */

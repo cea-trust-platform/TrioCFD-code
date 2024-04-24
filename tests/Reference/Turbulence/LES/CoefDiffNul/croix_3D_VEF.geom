@@ -1,1 +1,0 @@
-../croix_3D_VEF/croix_3D_VEF.geom

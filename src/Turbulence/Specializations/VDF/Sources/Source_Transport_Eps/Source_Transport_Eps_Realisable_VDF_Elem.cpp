@@ -60,7 +60,7 @@ void Source_Transport_Eps_Realisable_VDF_Elem::fill_resu_real(const int is_visco
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale,eqn_k_Rea->modele_turbulence());
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
-  const double LeK_MIN = mod_turb.get_LeK_MIN(), LeEPS_MIN = mod_turb.get_LeEPS_MIN();
+  const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
 
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
@@ -75,7 +75,7 @@ void Source_Transport_Eps_Realisable_VDF_Elem::fill_resu_real(const int is_visco
 void Source_Transport_Eps_Realisable_VDF_Elem::mettre_a_jour(double temps)
 {
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
-  const double epsilon_minimum = eqn_eps_Rea->modele_turbulence().get_LeEPS_MIN();
+  const double epsilon_minimum = eqn_eps_Rea->modele_turbulence().get_EPS_MIN();
   Modele_Fonc_Realisable_base& mon_modele_fonc = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale,eqn_k_Rea->modele_turbulence()).associe_modele_fonction();
   mon_modele_fonc.Contributions_Sources_BiK(eqn_k_Rea ->domaine_dis(),eqn_k_Rea->domaine_Cl_dis(),vit,K_Rea,eps_Rea,epsilon_minimum);
   Source_Transport_Realisable_VDF_Elem_base::mettre_a_jour(temps);

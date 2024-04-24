@@ -28,9 +28,9 @@
 #include <Transport_K_Omega_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
-#include <Mod_turb_hyd_RANS_keps.h>
+#include <Modele_turbulence_hyd_RANS_K_Eps_base.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
-#include <Mod_turb_hyd_RANS_komega.h>
+#include <Modele_turbulence_hyd_RANS_K_Omega_base.h>
 
 Implemente_instanciable_sans_constructeur(Champ_Post_Operateur_Eqn,"Operateur_Eqn|Champ_Post_Operateur_Eqn",Champ_Generique_Operateur_base);
 // XD champ_post_operateur_eqn champ_post_de_champs_post operateur_eqn 1 Post-process equation operators/sources
@@ -132,7 +132,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
                     const RefObjU& modele_turbulence = eq_test.get_modele(TURBULENCE);
                     if (sub_type(Modele_turbulence_hyd_K_Eps, modele_turbulence.valeur()) || sub_type(Modele_turbulence_hyd_K_Eps_Realisable, modele_turbulence.valeur()))
                       {
-                        const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_test.get_modele(TURBULENCE).valeur());
+                        const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_test.get_modele(TURBULENCE).valeur());
                         const Transport_K_Eps_base& transportkeps = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
                         if ((transportkeps.inconnue().le_nom() == mon_champ_inc.le_nom()))
                           {
@@ -143,7 +143,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
                       }
                     else if (sub_type(Modele_turbulence_hyd_K_Omega, modele_turbulence.valeur()))
                       {
-                        const Mod_turb_hyd_RANS_komega& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_komega, eq_test.get_modele(TURBULENCE).valeur());
+                        const Modele_turbulence_hyd_RANS_K_Omega_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Omega_base, eq_test.get_modele(TURBULENCE).valeur());
                         const Transport_K_Omega_base& transportkomega = ref_cast(Transport_K_Omega_base, le_mod_RANS.eqn_transp_K_Omega());
                         if ((transportkomega.inconnue().le_nom() == mon_champ_inc.le_nom()))
                           {
@@ -168,13 +168,13 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
     ref_eq_=Pb.equation(numero_eq_);
   else if (iskeps)
     {
-      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       ref_eq_ = ref_cast(Equation_base, eqn);
     }
   else if (iskomega)
     {
-      const Mod_turb_hyd_RANS_komega& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_komega, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_K_Omega_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Omega_base, Pb.equation(numero_eq_).get_modele(TURBULENCE).valeur());
       const Transport_K_Omega_base& eqn = ref_cast(Transport_K_Omega_base, le_mod_RANS.eqn_transp_K_Omega());
       ref_eq_ = ref_cast(Equation_base, eqn);
     }

@@ -1,1 +1,0 @@
-../ThHyd_C_Wale_Scalaires_Passifs_VEFPreP1B/croix_3D_VEF.geom

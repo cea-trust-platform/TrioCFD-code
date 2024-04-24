@@ -204,13 +204,13 @@ int Transport_K_ou_Eps_base::controler_variable()
   */
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis().valeur());
 
-  double Le_MIN = modele_turbulence().get_LeEPS_MIN();
+  double Le_MIN = modele_turbulence().get_EPS_MIN();
 
-  double LeEPS_MAX = modele_turbulence().get_LeEPS_MAX();
+  double LeEPS_MAX = modele_turbulence().get_EPS_MAX();
 
   if ( transporte_K_ )
     {
-      Le_MIN = modele_turbulence().get_LeK_MIN();
+      Le_MIN = modele_turbulence().get_K_MIN();
     }
 
   const IntTab& face_voisins = domaine_vf.face_voisins();

@@ -28,13 +28,11 @@
  *
  *     equations de Navier-Stokes.
  *
- * @sa Modele_turbulence_hyd_base Mod_turb_hyd_ss_maille
+ * @sa Modele_turbulence_hyd_base Modele_turbulence_hyd_LES_base
  */
-class Modele_turbulence_hyd_K_Eps_2_Couches : public Mod_turb_hyd_RANS_keps
+class Modele_turbulence_hyd_K_Eps_2_Couches: public Modele_turbulence_hyd_RANS_K_Eps_base, public Modele_turbulence_hyd_RANS_Gen<Modele_turbulence_hyd_K_Eps_2_Couches>
 {
-
   Declare_instanciable(Modele_turbulence_hyd_K_Eps_2_Couches);
-
 public:
 
   void set_param(Param& param) override;
@@ -42,7 +40,7 @@ public:
   void completer() override;
   int preparer_calcul() override;
   bool initTimeStep(double dt) override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   inline Champ_Inc& K_Eps();
   inline const Champ_Inc& K_Eps() const;
   inline int get_nbcouches() const;
@@ -51,21 +49,22 @@ public:
   inline int get_switch() const;
   inline int get_impr() const;
 
-  inline int nombre_d_equations() const override;
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
-  const Equation_base& equation_k_eps(int) const override;
+  const Equation_base& equation_k_eps(int i) const override
+  {
+    assert((i == 0));
+    return eqn_transport_K_Eps_;
+  }
 
-  //  void imprimer(Sortie& os) const;
-protected :
+  void controler() { eqn_transport_K_Eps_.controler_K_Eps(); }
 
-private:
-
-  Transport_K_KEps  eqn_transport_K_Eps;
   Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
+private:
+  Transport_K_KEps eqn_transport_K_Eps_;
+  void fill_turbulent_viscosity_tab(const int , const DoubleTab&, DoubleTab& );
 };
-
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
@@ -77,9 +76,8 @@ private:
  */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
 {
-  return eqn_transport_K_Eps.inconnue();
+  return eqn_transport_K_Eps_.inconnue();
 }
-
 
 /*! @brief Renvoie le champ inconnue du modele de turbulence i.
  *
@@ -90,9 +88,8 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
  */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps()
 {
-  return eqn_transport_K_Eps.inconnue();
+  return eqn_transport_K_Eps_.inconnue();
 }
-
 
 /*! @brief Renvoie le nombre couches utilises pour les lois de paroi Ce nombre est porte par l'equation de transport K_K-eps.
  *
@@ -100,9 +97,8 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps()
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nbcouches() const
 {
-  return eqn_transport_K_Eps.get_nbcouches();
+  return eqn_transport_K_Eps_.get_nbcouches();
 }
-
 
 /*! @brief Renvoie le y* de switch entre les deux couches pour le modele a deux couches.
  *
@@ -112,9 +108,8 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nbcouches() const
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_yswitch() const
 {
-  return eqn_transport_K_Eps.get_yswitch();
+  return eqn_transport_K_Eps_.get_yswitch();
 }
-
 
 /*! @brief Renvoie 0 si on choisit le switch par y*, 1 par nu_t.
  *
@@ -124,7 +119,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_yswitch() const
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_switch() const
 {
-  return eqn_transport_K_Eps.get_switch();
+  return eqn_transport_K_Eps_.get_switch();
 }
 
 /*! @brief Renvoie la valeur de nut/nu qui delimite les deux couches.
@@ -135,7 +130,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_switch() const
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nutswitch() const
 {
-  return eqn_transport_K_Eps.get_nutswitch();
+  return eqn_transport_K_Eps_.get_nutswitch();
 }
 
 /*! @brief indique si on doit ecrire le domaine des 2 couches dans le .
@@ -146,7 +141,7 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nutswitch() const
  */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_impr() const
 {
-  return eqn_transport_K_Eps.get_impr();
+  return eqn_transport_K_Eps_.get_impr();
 }
 
 /*! @brief Renvoie l'equation.
@@ -155,9 +150,9 @@ inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_impr() const
  *
  * @return (Trasnport_K_KEps)
  */
-inline const Transport_K_Eps_base&  Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps() const
+inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps() const
 {
-  return eqn_transport_K_Eps;
+  return eqn_transport_K_Eps_;
 }
 
 /*! @brief Renvoie l'equation.
@@ -168,12 +163,7 @@ inline const Transport_K_Eps_base&  Modele_turbulence_hyd_K_Eps_2_Couches::eqn_t
  */
 inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps()
 {
-  return eqn_transport_K_Eps;
+  return eqn_transport_K_Eps_;
 }
 
-inline int Modele_turbulence_hyd_K_Eps_2_Couches::nombre_d_equations() const
-{
-  return 1;
-}
-
-#endif
+#endif /* Modele_turbulence_hyd_K_Eps_2_Couches_included */

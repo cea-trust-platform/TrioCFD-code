@@ -41,7 +41,7 @@ void Source_Transport_Eps_anisotherme_VDF_Elem::associer_pb(const Probleme_base&
 void Source_Transport_Eps_anisotherme_VDF_Elem::fill_resu_anisotherme(const DoubleVect& G, const DoubleVect& volumes, const DoubleVect& porosite_vol, DoubleTab& resu) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  double C3_loc, LeK_MIN = mon_eq_transport_Eps->modele_turbulence().get_LeK_MIN() ;
+  double C3_loc, LeK_MIN = mon_eq_transport_Eps->modele_turbulence().get_K_MIN() ;
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
       if (K(elem) >= LeK_MIN)

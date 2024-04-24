@@ -86,7 +86,7 @@ void Source_Transport_Eps_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& re
 {
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_LeK_MIN();
+  const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_K_MIN();
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     if (K(elem) >= LeK_MIN)
       resu(elem) += (C1*P(elem)- C2*Eps(elem))*volumes(elem)*porosite_vol(elem)*Eps(elem)/K(elem);

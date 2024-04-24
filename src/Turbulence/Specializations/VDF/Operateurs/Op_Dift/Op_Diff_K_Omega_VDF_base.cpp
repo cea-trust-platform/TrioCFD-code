@@ -82,7 +82,7 @@ void Op_Diff_K_Omega_VDF_base::associer_diffusivite_turbulente()
     {
       const Transport_K_Omega_base& eqn_transport = ref_cast(Transport_K_Omega_base,mon_equation.valeur());
       {
-        const Mod_turb_hyd_RANS_komega& mod_turb = ref_cast(Mod_turb_hyd_RANS_komega,eqn_transport.modele_turbulence());
+        const Modele_turbulence_hyd_RANS_K_Omega_base& mod_turb = ref_cast(Modele_turbulence_hyd_RANS_K_Omega_base,eqn_transport.modele_turbulence());
         const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
         Eval_Diff_K_Omega_VDF& eval_diff = dynamic_cast<Eval_Diff_K_Omega_VDF&> (iter->evaluateur());
         eval_diff.associer_diff_turb(diff_turb);

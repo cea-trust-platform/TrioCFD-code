@@ -24,7 +24,7 @@
 #define Transport_K_ou_Eps_base_included
 
 #include <Equation_base.h>
-#include <Mod_turb_hyd_RANS_Bicephale.h>
+#include <Modele_turbulence_hyd_RANS_Bicephale_base.h>
 #include <TRUST_Ref.h>
 
 class Champ_Inc;
@@ -47,7 +47,7 @@ public:
   double calculer_pas_de_temps() const override;
   inline void associer_vitesse(const Champ_base& );
   void associer_milieu_base(const Milieu_base&) override;
-  virtual void associer_modele_turbulence(const Mod_turb_hyd_RANS_Bicephale& )=0;
+  virtual void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_Bicephale_base& )=0;
   const Milieu_base& milieu() const override ;
   Milieu_base& milieu() override ;
   void associer(const Equation_base&);
@@ -58,8 +58,8 @@ public:
   void valider_iteration() override;
   inline const Champ_Inc& inconnue() const override;
   inline Champ_Inc& inconnue() override;
-  inline const Mod_turb_hyd_RANS_Bicephale& modele_turbulence() const;
-  inline Mod_turb_hyd_RANS_Bicephale& modele_turbulence();
+  inline const Modele_turbulence_hyd_RANS_Bicephale_base& modele_turbulence() const;
+  inline Modele_turbulence_hyd_RANS_Bicephale_base& modele_turbulence();
 
   const Champ_base& get_champ( const Motcle& nom ) const override;
 //  void creer_champ( const Motcle& motlu );
@@ -75,7 +75,7 @@ protected:
 
   REF(Milieu_base) le_fluide;
   REF(Champ_Inc_base) la_vitesse_transportante;
-  REF(Mod_turb_hyd_RANS_Bicephale) mon_modele;
+  REF(Modele_turbulence_hyd_RANS_Bicephale_base) mon_modele;
 
   bool transporte_K_;
 };
@@ -109,7 +109,7 @@ inline const Champ_Inc& Transport_K_ou_Eps_base::inconnue() const
  *
  * @return (Modele_turbulence_hyd_K_Eps&) le modele de turbulence associe a l'equation
  */
-inline const Mod_turb_hyd_RANS_Bicephale& Transport_K_ou_Eps_base::modele_turbulence() const
+inline const Modele_turbulence_hyd_RANS_Bicephale_base& Transport_K_ou_Eps_base::modele_turbulence() const
 {
   assert(mon_modele.non_nul());
   return mon_modele.valeur();
@@ -120,7 +120,7 @@ inline const Mod_turb_hyd_RANS_Bicephale& Transport_K_ou_Eps_base::modele_turbul
  *
  * @return (Modele_turbulence_hyd_K_Eps&) le modele de turbulence associe a l'equation
  */
-inline Mod_turb_hyd_RANS_Bicephale& Transport_K_ou_Eps_base::modele_turbulence()
+inline Modele_turbulence_hyd_RANS_Bicephale_base& Transport_K_ou_Eps_base::modele_turbulence()
 {
   assert(mon_modele.non_nul());
   return mon_modele.valeur();

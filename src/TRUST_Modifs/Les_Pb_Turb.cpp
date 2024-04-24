@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Mod_turb_hyd_RANS_keps.h>
+#include <Modele_turbulence_hyd_RANS_K_Eps_base.h>
 #include <Verif_Cl_Turb.h>
 #include <Les_mod_turb.h>
 #include <Les_Pb_Turb.h>
@@ -39,9 +39,9 @@ int Pb_Hydraulique_Concentration_Turbulent::verifier()
 
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_concentration(domaine_Cl_hydr,domaine_Cl_co);
-  if ( sub_type( Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
+  if ( sub_type( Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
-      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
@@ -51,7 +51,7 @@ int Pb_Hydraulique_Concentration_Turbulent::verifier()
   const Modele_turbulence_hyd& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
   const Modele_turbulence_scal_base& le_mod_turb_co = ref_cast(Modele_turbulence_scal_base,eq_concentration.get_modele(TURBULENCE).valeur());
 
-  if ((sub_type(Mod_turb_hyd_ss_maille,le_mod_turb_hyd.valeur())) || (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur())))
+  if ((sub_type(Modele_turbulence_hyd_LES_base,le_mod_turb_hyd.valeur())) || (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur())))
     {
       if (!sub_type(Modele_turbulence_scal_Schmidt,le_mod_turb_co))
         {
@@ -83,9 +83,9 @@ int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::verifier()
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_fraction_massique(domaine_Cl_hydr,domaine_Cl_fm);
 
-  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ) )
+  if ( sub_type(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur() ) )
     {
-      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
@@ -122,9 +122,9 @@ int Pb_Hydraulique_Turbulent::verifier()
 {
   const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
 
-  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
+  if ( sub_type(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
-      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
@@ -158,9 +158,9 @@ int Pb_Thermohydraulique_Concentration_Turbulent::verifier()
   // Verification de la compatibilite des conditions aux limites
   tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
   tester_compatibilite_hydr_concentration(domaine_Cl_hydr,domaine_Cl_co);
-  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
+  if ( sub_type(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
-      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
@@ -170,7 +170,7 @@ int Pb_Thermohydraulique_Concentration_Turbulent::verifier()
   const Modele_turbulence_hyd& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
   const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eq_thermique.get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_base& le_mod_turb_co = ref_cast(Modele_turbulence_scal_base,eq_concentration.get_modele(TURBULENCE).valeur());
-  if ((sub_type(Mod_turb_hyd_ss_maille,le_mod_turb_hyd.valeur()))  || (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur())))
+  if ((sub_type(Modele_turbulence_hyd_LES_base,le_mod_turb_hyd.valeur()))  || (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur())))
     {
       if (!sub_type(Modele_turbulence_scal_Prandtl,le_mod_turb_th))
         {
@@ -206,9 +206,9 @@ int Pb_Thermohydraulique_Turbulent_QC::verifier()
 
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
-  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ) )
+  if ( sub_type(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur() ) )
     {
-      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
@@ -250,9 +250,9 @@ int Pb_Thermohydraulique_Turbulent::verifier()
 
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
-  if ( sub_type(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
+  if ( sub_type(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
-      const Mod_turb_hyd_RANS_keps& le_mod_RANS = ref_cast(Mod_turb_hyd_RANS_keps, eq_hydraulique.get_modele(TURBULENCE).valeur());
+      const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
       const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);

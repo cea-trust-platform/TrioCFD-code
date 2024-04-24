@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Transport_K_Omega.h>
-#include <Mod_turb_hyd_RANS_komega.h>
+#include <Modele_turbulence_hyd_RANS_K_Omega_base.h>
 #include <Transport_2eq_base.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
 #include <Fluide_Quasi_Compressible.h>
@@ -134,7 +134,7 @@ int Transport_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)
  *
  * @param (Modele_turbulence_hyd_K_Omega& modele) le modele de turbulence K-Omega a asoocier a l'equation
  */
-void Transport_K_Omega::associer_modele_turbulence(const Mod_turb_hyd_RANS_komega& modele)
+void Transport_K_Omega::associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Omega_base& modele)
 {
   const Equation_base& eqn_hydr = modele.equation();
   associer(eqn_hydr);

@@ -86,7 +86,7 @@ void Source_Transport_Eps_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco_t
 void Source_Transport_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_LeK_MIN();
+  const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_K_MIN();
   for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     if (K(fac) >= LeK_MIN)
       resu(fac) += ((C1 * P(fac) * F1(fac) - C2 * Eps(fac) * F2(fac)) * Eps(fac) / (K(fac)) + E(fac)) * volumes_entrelaces(fac);
@@ -95,7 +95,7 @@ void Source_Transport_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_
 void Source_Transport_Eps_VEF_Face::fill_resu(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, DoubleTab& resu) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_LeK_MIN();
+  const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_K_MIN();
   for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     if (K(fac) >= LeK_MIN)
       resu(fac) += (C1 * P(fac) - C2 * Eps(fac)) * volumes_entrelaces(fac) * Eps(fac) / K(fac);
