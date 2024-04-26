@@ -27,9 +27,12 @@
 #include <Motcle.h>
 #include <Param.h>
 
+// XD fluid_diph_lu objet_lecture nul 0 Single fluid to be read.
+// XD  attr fluid_name chaine fluid_name 0 Name of the fluid which is part of the diphasic fluid.
+// XD  attr single_fld fluide_incompressible single_fld 0 Definition of the single fluid part of a multiphasic fluid.
+
 Implemente_instanciable_sans_constructeur(Fluide_Diphasique, "Fluide_Diphasique", Milieu_base);
-// X_D fluide_diphasique milieu_v2_base fluide_diphasique -1 Two-phase fluid.
-// XD fluide_diphasique milieu_base fluide_diphasique -1 Two-phase fluid.
+// XD fluide_diphasique milieu_base fluide_diphasique -1 fluid_diph_lu 0 Two-phase fluid.
 
 Sortie& Fluide_Diphasique::printOn(Sortie& os) const { return os; }
 
@@ -38,8 +41,8 @@ Entree& Fluide_Diphasique::readOn(Entree& is) { return Milieu_base::readOn(is); 
 void Fluide_Diphasique::set_param(Param& param)
 {
   param.ajouter("sigma", &sigma_, Param::REQUIRED); // XD_ADD_P champ_don_base surfacic tension (J/m2)
-  param.ajouter("fluide0|phase0", &phase0_, Param::REQUIRED); // XD_ADD_P chaine first phase fluid
-  param.ajouter("fluide1|phase1", &phase1_, Param::REQUIRED); // XD_ADD_P chaine second phase fluid
+  param.ajouter("fluide0|phase0", &phase0_, Param::REQUIRED); // XD_ADD_P fluid_diph_lu first phase fluid
+  param.ajouter("fluide1|phase1", &phase1_, Param::REQUIRED); // XD_ADD_P fluid_diph_lu second phase fluid
   param.ajouter("chaleur_latente", &chaleur_latente_); // XD_ADD_P champ_don_base phase changement enthalpy h(phase1_) - h(phase0_) (J/kg/K)
   param.ajouter("formule_mu", &formule_mu_); // XD_ADD_P chaine (into=[standard,arithmetic,harmonic]) formula used to calculate average
   Milieu_base::set_additional_params(param); // XD ref gravite field_base

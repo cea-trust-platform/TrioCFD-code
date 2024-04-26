@@ -33,6 +33,14 @@
 
 Implemente_instanciable(Probleme_FT_Disc_gen, "Probleme_FT_Disc_gen", Pb_Fluide_base);
 
+// XD listdeuxmots_acc listobj nul 1 deuxmots 0 List of groups of two words (with curly brackets).
+
+// XD probleme_ft_disc_gen problem_read_generic probleme_ft_disc_gen -1 The generic Front-Tracking problem in the discontinuous version. It differs from the rest of the TRUST code : The problem does not state the number of equations that are enclosed in the problem. Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared in the beginning of the data file. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible). As the list of equations to be solved in the generic Front-Tracking problem is declared in the data file and not pre-defined in the structure of the problem, each equation has to be distinctively associated with the problem with the Associer keyword.
+// XD attr solved_equations listdeuxmots_acc solved_equations 0 List of sovled equations in the form 'equation_type' 'equation_alias'
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible 1 The fluid medium associated with the problem.
+// XD attr fluide_diphasique fluide_diphasique fluide_diphasique 1 The diphasic fluid medium associated with the problem.
+// XD attr constituant constituant constituant 1 Constituent.
+
 Sortie& Probleme_FT_Disc_gen::printOn(Sortie& os) const { return os; }
 Entree& Probleme_FT_Disc_gen::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
 

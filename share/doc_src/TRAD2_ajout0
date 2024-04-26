@@ -278,14 +278,6 @@ navier_stokes_ft_disc navier_stokes_turbulent navier_stokes_ft_disc -1 Two-phase
 source_trainee source_base trainee 0 drag effect
 source_flottabilite source_base flottabilite 0 buoyancy effect
 source_masse_ajoutee source_base masse_ajoutee 0 weight added effect
-probleme_ft_disc_gen problem_read_generic probleme_ft_disc_gen -1 The generic Front-Tracking problem in the discontinuous version. It differs from the rest of the TRUST code : The problem does not state the number of equations that are enclosed in the problem. Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared in the beginning of the data file. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible). As the list of equations to be solved in the generic Front-Tracking problem is declared in the data file and not pre-defined in the structure of the problem, each equation has to be distinctively associated with the problem with the Associer keyword.
-  ref mm milieu_v2_base
-  ref chimie chimie
-  ref constituant constituant
-  ref fluide_incompressible fluide_incompressible
-  ref fluide_diphasique fluide_diphasique
-  ref Triple_Line_Model_FT_Disc Triple_Line_Model_FT_Disc
-
 probleme_couple_rayonnement coupled_problem pb_couple_rayonnement -1 This keyword is used to define a problem coupling several other problems to which radiation coupling is added.
   ref modele modele_rayonnement_base
 frontiere_ouverte_temperature_imposee_rayo_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_transp -1 Imposed temperature condition for a radiation problem with transparent gas.
