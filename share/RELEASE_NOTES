@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.4 : Enhancements, modifications and corrected bugs since version 1.9.3 :
 --------------------------------------------------------------------------------------------------
+29/04/24 (TrioCFD) New Feature : Algo QC - Decoupled saving raw data and statistics files
 08/04/24 (TrioCFD) Syntax      : Keyword 'Ecrire_fichier_xyz_valeur' new syntax is on the form: Ecrire_fichier_xyz_valeur { dt 5. fields 2 vitesse k_eps boundaries 1 PERIO }
 13/03/24 (TrioCFD) New feature : FT IJK - Implementation of a spectral forcing method for FT IJK compatible with a bubble swarm
 06/03/24 (TrioCFD) New feature : FT IJK - First implementation of a one-dimensional thermal sub-resolution technique in the vicinity of bubble's interfaces and exploration of various thermal coupling strategies with IJK discretisation. 
