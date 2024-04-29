@@ -135,10 +135,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_(IJK_Field_local_double& re
 
   const IJK_Field_local_double& dummy_field = vCOMPO;
 
-//  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_molecular_nu_tensor(_VCOMPO_, _DIR_) : get_molecular_nu(), 0, 0, k_layer);
-//  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_coeff_tensor(_VCOMPO_, _DIR_) : get_molecular_nu(), 0, 0, k_layer);
-  ConstIJK_double_ptr molecular_nu(is_tensorial_? get_coeff_tensor(_VCOMPO_, _DIR_) : get_nu(), 0, 0, k_layer);
-
+  ConstIJK_double_ptr molecular_nu(!is_structural_ ? (is_tensorial_? get_coeff_tensor(_VCOMPO_, _DIR_) : get_nu()) : dummy_field , 0, 0, k_layer);
 
   ConstIJK_double_ptr div_ptr(with_divergence_ ? get_divergence() : dummy_field, 0, 0, k_layer);
 
@@ -148,8 +145,12 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_(IJK_Field_local_double& re
   //  ConstIJK_double_ptr structural_model(is_structural_ ? get_structural_model(_DIR_, _VCOMPO_) : dummy_field, 0, 0, k_layer);
   //  ConstIJK_double_ptr structural_model(is_structural_ ? get_coeff_tensor(_DIR_, _VCOMPO_) : dummy_field, 0, 0, k_layer);
 
-  ConstIJK_double_ptr turbulent_nu(is_turb_ ? get_nu() : *nu_, 0, 0, k_layer);
-  ConstIJK_double_ptr turbulent_k_energy(is_turb_ ? get_nu() : *nu_, 0, 0, k_layer );
+  /*
+   * Y.Z.: If the model is functional (i.e. not structural) then lambda takes the right value, and the "structural_model" variable points to dummy_field.
+   * Otherwise the model is structural then lambda points towards the dummy_field.
+   */
+  ConstIJK_double_ptr turbulent_nu      (is_turb_ ? get_nu() : dummy_field, 0, 0, k_layer);
+  ConstIJK_double_ptr turbulent_k_energy(is_turb_ ? get_nu() : dummy_field, 0, 0, k_layer );
   ConstIJK_double_ptr structural_model(is_structural_ ? get_coeff_tensor(_DIR_, _VCOMPO_) : *nu_, 0, 0, k_layer);
 
   // Result (fluxes in direction DIR for component COMPO of the convected field)
@@ -191,7 +192,8 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_(IJK_Field_local_double& re
       vCOMPO_ptr.next_j();
       if(_DIR_ != _VCOMPO_)
         vDIR_ptr.next_j();
-      molecular_nu.next_j();
+      if(!is_structural_)
+        molecular_nu.next_j();
       if(is_turb_)
         {
           turbulent_nu.next_j();
