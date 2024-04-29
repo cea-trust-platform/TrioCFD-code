@@ -12,7 +12,7 @@ cp propertiesGeometry.dat ..
 # Extract number of cells and update the prm
 err=`ls test.err .test.err 2>/dev/null`
 cells=`awk '/Total number of elements/ && (NF==6) {gsub(":","",$NF);print $NF}' $err`
-echo $ECHO_OPTS "1,$ s?\$"$dis"_NUMBER_OF_ELEMENTS\$?$cells?g\nw" | ed $prm 1>/dev/null 2>&1
+sed -i "s?\$"$dis"_NUMBER_OF_ELEMENTS\$?$cells?g" $prm
 
 # Profiling if binary _pg
 [ -f gmon.out ] && [ gmon.out -nt test.cpu ] && [ ${exec%_pg} != $exec ] && gprof $exec 1>test.cpu && nedit test.cpu &

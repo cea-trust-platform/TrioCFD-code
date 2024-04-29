@@ -1,4 +1,4 @@
-echo $ECHO_OPTS "1,$ s?resume_last_time ?sauvegarde ?g\nw sauvegarde.data" | ed ThHyd_C_K_Eps_VEF.data || exit -1
+sed "s?resume_last_time ?sauvegarde ?g" ThHyd_C_K_Eps_VEF.data > sauvegarde.data
 
 if [ "$TRUST_DISABLE_MPI" != 1 ]
 then
