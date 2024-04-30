@@ -23,15 +23,13 @@
 #ifndef Echange_contact_VDF_Zoom_base_included
 #define Echange_contact_VDF_Zoom_base_included
 
-
 #include <Echange_externe_impose.h>
+#include <Domaine_forward.h>
+
 class Front_VF;
 class Domaine_VDF;
-class Faces;
 
 /*! @brief classe : Echange_contact_VDF_Zoom_base
- *
- *
  *
  */
 

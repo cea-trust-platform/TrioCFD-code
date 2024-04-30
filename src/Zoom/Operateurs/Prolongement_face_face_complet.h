@@ -25,9 +25,8 @@
 #define Prolongement_face_face_complet_included
 
 
-
 #include <Prolongement_base.h>
-
+#include <Domaine_forward.h>
 
 class Pb_1G;
 

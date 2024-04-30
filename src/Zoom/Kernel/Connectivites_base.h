@@ -24,10 +24,11 @@
 #ifndef Connectivites_base_included
 #define Connectivites_base_included
 
-
 #include <TRUSTVect.h>
+#include <Domaine_forward.h>
+
 class Domaine_VF;
-class Domaine;
+
 /*! @brief class Connectivites_base
  *
  */

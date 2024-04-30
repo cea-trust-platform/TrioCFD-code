@@ -27,20 +27,14 @@
 
 
 #include <Prolongement_base.h>
+#include <TRUSTTabs_forward.h>
+#include <Domaine_forward.h>
+
 class Domaine_VF;
-class Frontiere;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
+
 /*! @brief class Prolongement_elem_elem_complet
  *
  */
-
-//////////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Prolongement_elem_elem_complet
-//
-/////////////////////////////////////////////////////////////////////////////////
-
 class Prolongement_elem_elem_complet : public Prolongement_base
 {
   Declare_instanciable(Prolongement_elem_elem_complet);

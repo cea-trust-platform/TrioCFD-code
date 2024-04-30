@@ -36,6 +36,7 @@
 #include <Champ_Fonc.h>
 #include <Navier_Stokes_FT_Disc.h>
 #include <Proprietes_part_vol.h>
+#include <TRUSTTabs_forward.h>
 #include <TRUSTTabFT_forward.h>
 #include <TRUST_Ref.h>
 
@@ -45,8 +46,6 @@ class Navier_Stokes_FT_Disc;
 class Loi_horaire;
 
 class Transport_Interfaces_FT_Disc_interne;
-template <typename titi> class TRUSTTab;
-using FloatTab = TRUSTTab<float>;
 
 class Transport_Interfaces_FT_Disc : public Transport_Interfaces_base
 {

@@ -30,7 +30,6 @@
 
 class Zone_VF;
 class Maillage_FT_Disc;
-class Domaine;
 class Domaine_dis;
 class Connectivite_frontieres;
 

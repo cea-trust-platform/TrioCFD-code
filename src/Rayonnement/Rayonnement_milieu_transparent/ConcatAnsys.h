@@ -33,9 +33,6 @@
  * @sa Interprete
  */
 #include <Interprete_geometrique_base.h>
-#include <Domaine.h>
-
-class Domaine;
 
 class ConcatAnsys : public Interprete_geometrique_base
 {

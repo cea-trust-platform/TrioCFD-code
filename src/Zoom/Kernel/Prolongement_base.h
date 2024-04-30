@@ -24,23 +24,15 @@
 #ifndef Prolongement_base_included
 #define Prolongement_base_included
 
-
 #include <Objet_U.h>
+#include <TRUSTTabs_forward.h>
+#include <Domaine_forward.h>
+
 class Domaine_VF;
-class Frontiere;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
 
 /*! @brief class Prolongement_base
  *
  */
-
-//////////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Prolongement_base
-//
-/////////////////////////////////////////////////////////////////////////////////
-
 class Prolongement_base : public Objet_U
 {
   Declare_base(Prolongement_base);

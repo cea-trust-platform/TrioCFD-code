@@ -28,12 +28,12 @@
 #include <TRUSTArray.h>
 #include <TRUSTTabFT_forward.h>
 #include <TRUSTTabs_forward.h>
+#include <Domaine_forward.h>
+#include <ArrOfBit.h>
 #include <TRUST_Ref.h>
 
 class Domaine_VF;
-class ArrOfBit;
 class Desc_Structure_FT;
-class Domaine;
 
 class Marching_Cubes : public Objet_U
 {

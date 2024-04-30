@@ -27,9 +27,10 @@
 
 #include <Connectivites_base.h>
 #include <TRUST_Deriv.h>
-class Domaine_VF;
-class Domaine;
 #include <TRUSTTabs_forward.h>
+#include <Domaine_forward.h>
+
+class Domaine_VF;
 
 /*! @brief class Connectivites
  *

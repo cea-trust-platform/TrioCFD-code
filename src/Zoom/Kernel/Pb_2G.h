@@ -33,6 +33,7 @@
 #include <Prolongement.h>
 #include <Restriction.h>
 #include <TRUST_Ref.h>
+#include <Domaine_forward.h>
 
 class Pb_MG;
 class Prolongement;
@@ -40,7 +41,6 @@ class Restriction;
 class Pb_grossier;
 class Champ_front_zoom;
 class Pb_1G;
-class Frontiere;
 class Probleme_base;
 /*! @brief class Pb_2G
  *

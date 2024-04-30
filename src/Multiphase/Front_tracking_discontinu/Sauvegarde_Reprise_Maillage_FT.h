@@ -21,13 +21,15 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef Sauvegarde_Reprise_Maillage_FT_included
 #define Sauvegarde_Reprise_Maillage_FT_included
+
 #include <arch.h>
+#include <Domaine_forward.h>
 
 class Maillage_FT_Disc;
 class Domaine_VF;
 class Sortie;
 class Entree;
-class Domaine;
+
 class Sauvegarde_Reprise_Maillage_FT
 {
 public:

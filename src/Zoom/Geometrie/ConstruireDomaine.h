@@ -25,11 +25,9 @@
 
 
 #include <Interprete_geometrique_base.h>
-class Domaine;
-class Sous_Domaine;
 #include <TRUSTTabs_forward.h>
-class Domaine;
-#include <TRUSTTabs_forward.h>
+#include <Domaine_forward.h>
+
 /*! @brief Classe ConstruireDomaine Cette classe est un interprete qui sert a lire et executer
  *
  *     la directive ConstruireDomaine :
