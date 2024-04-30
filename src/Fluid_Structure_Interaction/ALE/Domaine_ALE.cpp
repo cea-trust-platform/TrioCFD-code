@@ -145,7 +145,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
       DoubleTab& xv=le_dom_VF.xv();
       xv.reset();
-      Type_Face type_face=type_elem().type_face();
+      Type_Face type_face=type_elem()->type_face();
       IntTab& elem_faces=le_dom_VF.elem_faces();
       IntTab& face_voisins=le_dom_VF.face_voisins();
 

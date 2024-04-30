@@ -212,14 +212,14 @@ void ConstruireDomaine::creer_bords(Domaine& domaineraf, Sous_Domaine& ssz, IntT
 
   Bord& bord=mes_faces_bord.add(Bord());
   bord.nommer("interface");
-  bord.typer_faces(elem.type_face());
+  bord.typer_faces(elem->type_face());
   bord.associer_domaine(domaineraf);
   bord.dimensionner(0);
 
   Faces mes_faces;
   {
     // bloc a factoriser avec Domaine_VF.cpp :
-    Type_Face type_face = domaine0.type_elem().type_face(0);
+    Type_Face type_face = domaine0.type_elem()->type_face(0);
     mes_faces.typer(type_face);
     mes_faces.associer_domaine(domaine0);
 

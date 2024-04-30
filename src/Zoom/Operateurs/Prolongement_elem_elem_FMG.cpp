@@ -212,7 +212,7 @@ void Prolongement_elem_elem_FMG::prolonger(Domaine_VF& domaine_VFG,
               coord_somG(dim) = coordG(num_som, dim);
             }
           //on regarde si l'elemF contient le sommet nb_som
-          trouve = elem_geomF.contient(coord_somG, nbelemsF);
+          trouve = elem_geomF->contient(coord_somG, nbelemsF);
           if (trouve == 0)
             nb_som = nb_som+1;
         }

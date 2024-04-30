@@ -99,7 +99,7 @@ void Prolongement_face_face_lin::prolonger(Domaine_VF& domaine_VFG, Domaine_VF& 
             const IntTab& face_voisG = domaine_vdfG.face_voisins();
 
             const Domaine& domaineg = domaine_vdfG.domaine();
-            int nb_faces_elemG = domaineg.type_elem().nb_faces();
+            int nb_faces_elemG = domaineg.type_elem()->nb_faces();
             IntTab& elem_facesG =  domaine_vdfG.elem_faces();
 
             const DoubleTab& xvG = domaine_vdfG.xv();

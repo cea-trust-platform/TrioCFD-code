@@ -473,7 +473,7 @@ void Sonde_IJK::initialiser()
   const Domaine& domaine_geom = ref_ijk_ft_->probleme(splitting).domaine();
   if ( numero_elem_==-1)
     {
-      int nb_som = domaine_geom.type_elem().nb_som();
+      int nb_som = domaine_geom.type_elem()->nb_som();
       int nb_coord = les_positions_.dimension(1);
       if (nb_coord+1>nb_som)
         {

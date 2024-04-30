@@ -127,7 +127,7 @@ void Restriction_face_face::calculer(const Domaine_VF& domaine_VFG,
           //On regarde si son centre de gravite est dans l'elemF
           for(dim=0; dim<dimension; dim++)
             coord_cgG(dim) = cg_facesG(num_faceG, dim);
-          int est_dedans = mon_elemF.contient(coord_cgG, nbelemsF);
+          int est_dedans = mon_elemF->contient(coord_cgG, nbelemsF);
           //s'il est dedans
           if ( est_dedans == 1 )
             {
@@ -260,7 +260,7 @@ void Restriction_face_face::restreindre(const Domaine_VF& domaine_VFG,
               //On regarde si son centre de gravite est dans l'elemF
               for(dim=0; dim<dimension; dim++)
                 coord_cgG(dim) = cg_facesG(num_faceG, dim);
-              int est_dedans = mon_elemF.contient(coord_cgG, nbelemsF);
+              int est_dedans = mon_elemF->contient(coord_cgG, nbelemsF);
               //s'il est dedans
               if ( est_dedans == 1 )
                 {

@@ -68,7 +68,7 @@ DoubleTab& Source_Reaction_Particules_VDF::ajouter(DoubleTab& resu) const
   int premiere_face_interne = zvf.premiere_face_int();
   int nb_pos = positions.dimension(0);
   int nb_som_elem = domaine_geom.nb_som_elem();
-  int nb_som_face = domaine_geom.type_elem().nb_som_face();
+  int nb_som_face = domaine_geom.type_elem()->nb_som_face();
   int is_QC=0;
   int is_FT=0;
   double coord_b=0.;

@@ -107,7 +107,7 @@ void Restriction_elem_elem_2::calculer(const Domaine_VF& domaine_VFG,
               for(dim=0; dim<dimension; dim++)
                 coordF(dim) = cg_elem_fin(num_elem_voisin, dim);
               //regardons si son centre de gravite est dans l'elemG ou non
-              est_dedans = elem_geomG.contient(coordF, num_elemG);
+              est_dedans = elem_geomG->contient(coordF, num_elemG);
               if (est_dedans == 0)
                 {
                   //s'il n'est pas dans l'elemG
@@ -217,7 +217,7 @@ void Restriction_elem_elem_2::restreindre(const Domaine_VF& domaine_VFG,
               for(dim=0; dim<dimension; dim++)
                 coordF(dim) = cg_elem_fin(num_elem_voisin, dim);
               //regardons si son centre de gravite est dans l'elemG ou non
-              est_dedans = elem_geomG.contient(coordF, num_elemG);
+              est_dedans = elem_geomG->contient(coordF, num_elemG);
               if (est_dedans == 0)
                 {
                   //s'il n'est pas dans l'elemG

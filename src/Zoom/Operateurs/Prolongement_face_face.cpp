@@ -86,7 +86,7 @@ void Prolongement_face_face::prolonger(Domaine_VF& domaine_VFG, Domaine_VF& doma
           const IntVect& oriG = domaine_vdfG.orientation();
           const IntTab& face_voisG = domaine_vdfG.face_voisins();
           const Domaine& domaineg = domaine_vdfG.domaine();
-          const int nb_faces_elemG = domaineg.type_elem().nb_faces();
+          const int nb_faces_elemG = domaineg.type_elem()->nb_faces();
           const IntTab& elem_facesG =  domaine_vdfG.elem_faces();
           int num_face_gros;
           int num_elemG;
