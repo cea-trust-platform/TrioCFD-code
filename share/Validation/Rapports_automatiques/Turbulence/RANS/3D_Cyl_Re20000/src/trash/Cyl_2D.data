@@ -46,7 +46,7 @@ Read mon_schema
 	dt_impr 1.e-10 # Petit pour le calcul de Cp moyen #
 	dt_sauv 100
 	seuil_statio 1.e-40
-	seuil_statio_relatif_deconseille 1
+	Residuals { relative 1 }
 }
 
 # Je definis un milieu #

@@ -46,7 +46,7 @@ Read sch
 	dt_impr 1.e-10 # Petit pour le calcul de Cp moyen #
 	dt_sauv 10.
 	seuil_statio 1.e-4
-	seuil_statio_relatif_deconseille 1
+	Residuals { relative 1 }
 }
 
 # Reynolds = 1000 * 0.05 * U (0.44 or 0.87) / 0.00129 = 1.7e4 or 3.4e4 # 

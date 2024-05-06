@@ -17,7 +17,7 @@ Lire sch
 	dt_impr 0.001
 	dt_sauv 400.
 	seuil_statio 1.e-3
-	seuil_statio_relatif_deconseille 1
+	Residuals { relative 1 }
 	facsec 30. 
 	facsec_max 300. 
 	Solveur Implicite { 
