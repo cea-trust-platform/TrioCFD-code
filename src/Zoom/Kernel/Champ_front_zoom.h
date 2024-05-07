@@ -66,7 +66,7 @@ public:
   const Champ_Inc_base& inconnue() const ;
   const Equation_base& equation() const;
   //  inline Nom& dirichlet_ou_neumann_();
-  const Domaine_dis_base& domaine_dis() const;
+  const Domaine_dis_base& domaine_dis() const override;
   const Domaine_Cl_dis_base& domaine_Cl_dis() const;
   const Milieu_base& milieu() const;
   const Frontiere_dis_base& front_dis_exterieure() const;
