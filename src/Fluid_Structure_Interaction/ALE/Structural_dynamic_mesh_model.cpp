@@ -231,7 +231,7 @@ void Structural_dynamic_mesh_model::initDynamicMeshProblem(const int nsom, const
   a=0 ;
   ff=0 ;
   mass=0. ;
-  nodalScaleMass=0. ;
+  if (getGridDtMin() > 0.) nodalScaleMass=0. ;
 
   B0_ = 0. ;
   Stress_ = 0. ;

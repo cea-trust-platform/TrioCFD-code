@@ -1686,7 +1686,8 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       double d = str_mesh_model->getDampingCoefficient() ;
       for (int i=0; i<nbSom; i++)
         {
-          mm = str_mesh_model->mass[i] + str_mesh_model->nodalScaleMass[i] ;
+          mm = str_mesh_model->mass[i] ;
+          if (dtm > 0.) mm += str_mesh_model->nodalScaleMass[i] ;
           for (int j=0; j<dimension; j++)
             {
               rhs = -str_mesh_model->ff(i,j) - d * mm * str_mesh_model->vp(i,j) ;
