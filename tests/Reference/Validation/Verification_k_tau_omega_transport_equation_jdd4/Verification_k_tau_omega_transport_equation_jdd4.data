@@ -222,7 +222,7 @@ Lire pb
             k		k			periode 1 segment 20 0.025 0.025 0.025 0.975 0.975 0.975
             tau		tau			periode 1 position_like k
             epsilon	epsilon		periode 1 position_like k
-            nut		viscosite_turbulente_liquide_eau	periode 1 position_like k
+            nut		mu_turbulente_liquide_eau	periode 1 position_like k
 
             prod_k 	prod_k 		periode 1 position_like k
             diss_k 	diss_k 		periode 1 position_like k
@@ -246,7 +246,7 @@ Lire pb
             k_bord		k			periode 1 segment 20 0.025 0.025 0.025 0.025 0.975 0.025
             tau_bord	tau			periode 1 position_like k_bord
             epsilon_bord	epsilon		periode 1 position_like k_bord
-            nut_bord	viscosite_turbulente_liquide_eau	periode 1 position_like k_bord
+            nut_bord	mu_turbulente_liquide_eau	periode 1 position_like k_bord
 
             prod_k_bord 	prod_k 		periode 1 position_like k_bord
             diss_k_bord 	diss_k 		periode 1 position_like k_bord
@@ -264,7 +264,7 @@ Lire pb
             k elem
             tau elem
             vitesse elem
-            viscosite_turbulente_liquide_eau elem
+            mu_turbulente_liquide_eau elem
 	    gradient_vitesse_liquide_eau elem
             prod_k elem
             diss_k elem

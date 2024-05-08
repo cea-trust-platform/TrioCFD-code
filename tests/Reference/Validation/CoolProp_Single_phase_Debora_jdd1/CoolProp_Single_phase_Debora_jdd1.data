@@ -168,7 +168,7 @@ Lire pb
 					pression elem
                     k elem
                     omega elem
-                    viscosite_turbulente_liquide_r134a elem
+                    mu_turbulente_liquide_r134a elem
                     omega_residu elem
                     k_residu elem
                     vitesse_residu elem
