@@ -339,6 +339,7 @@ protected :
 
   const IJK_FT_double& operator=(const IJK_FT_double&);
   void update_rho_v();
+  void update_v_ghost_from_rho_v();
   void update_pressure_phase();
   int initialise();
   void terme_source_gravite(IJK_Field_double& dv, int k_index, int dir) const;
@@ -359,6 +360,11 @@ protected :
   static void force_upstream_velocity(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                       double v_imposed,const IJK_Interfaces& interfaces, double nb_diam,
                                       int upstream_dir, int gravity_dir, int upstream_stencil);
+  static void force_upstream_velocity_shear_perio(IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
+                                                  double v_imposed,
+                                                  const IJK_Interfaces& interfaces,
+                                                  double nb_diam, Boundary_Conditions& bc, double nb_diam_ortho_shear_perio,double Ux0,double Uy0,double Uz0,
+                                                  int epaisseur_maille);
   double find_timestep(const double max_timestep, const double cfl, const double fo, const double oh);
   void parcourir_maillage();
   void calculer_rho_mu_indicatrice(const bool parcourir = true);
@@ -374,6 +380,11 @@ protected :
   //ab-forcage-control-ecoulement-deb
   void calculer_terme_source_acceleration(IJK_Field_double& vx, const double time, const double timestep,
                                           const int rk_step);
+  // Correcteur PID
+  void calculer_terme_asservissement(double& ax, double& ay, double& az);
+  void calculer_vitesse_gauche(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz, double& vx_moy, double& vy_moy, double& vz_moy);
+  void calculer_vitesse_droite(const IJK_Field_double& vx, const IJK_Field_double& vy, const IJK_Field_double& vz, double& vx_moy, double& vy_moy, double& vz_moy);
+
   void compute_correction_for_momentum_balance(const int rk_step);
   void transfer_ft_to_ns();
   void compute_add_external_forces(const int dir);
@@ -399,7 +410,6 @@ protected :
 
   // GAB, qdm
   Vecteur3 calculer_inv_rho_grad_p_moyen(const IJK_Field_double& inv_rho, const IJK_Field_double& pression);
-  void calculer_I_kappa_sigma(IJK_Field_double& kappa_ft,const IJK_Field_double& indic, double sigma);
   Vecteur3 calculer_grad_p_moyen(const IJK_Field_double& pression);
   Vecteur3 calculer_grad_p_over_rho_moyen(const IJK_Field_double& pression);
   FixedVector<IJK_Field_double, 3> terme_convection_mass_solver_;
@@ -474,7 +484,6 @@ protected :
   // terme source qdm pour pousser le fluide dans le canal (en m/s/s)
   double terme_source_acceleration_;
   int compute_force_init_;
-
   // Vecteurs de taille 3 a lire dans le jeu de donnees :
   ArrOfDouble terme_source_correction_; // Valeur de la force de correction moyenne a appliquer
   ArrOfInt correction_force_; // 3 flags d'activation de la correction ou non
@@ -593,8 +602,10 @@ protected :
   // Pressure field
   IJK_Field_double pressure_;
   IJK_Field_double pressure_ghost_cells_;
+
   IJK_Field_double kappa_ft_;
-  IJK_Field_double kappa_ft_ns_;
+  IJK_Field_double kappa_ns_;
+
   IJK_Field_double I_ns_;
   // Molecular diffusivity (see diffusion operator)
   IJK_Field_double molecular_mu_;
@@ -635,6 +646,10 @@ protected :
   int upstream_dir_; // static
   int upstream_stencil_;
   double nb_diam_upstream_;
+  double nb_diam_ortho_shear_perio_;
+
+  int harmonic_nu_in_diff_operator_;
+  int harmonic_nu_in_calc_with_indicatrice_;
   double rho_liquide_;
   double rho_vapeur_;
   // GAB, pour THI (23.08.21)
@@ -643,6 +658,16 @@ protected :
   double mu_liquide_;
   double mu_vapeur_;
   double sigma_;
+
+  // Correcteur PID
+  double Kp_;
+  double Kd_;
+  double Ki_;
+  double int_x_;
+  double int_y_;
+  double int_z_;
+  int epaisseur_maille_;
+
   ArrOfDouble gravite_; // vecteur de taille 3 a lire dans le jeu de donnees
   int direction_gravite_;
 #ifdef SMOOTHING_RHO
@@ -708,6 +733,9 @@ protected :
   FixedVector<Redistribute_Field, 3> redistribute_to_splitting_ft_faces_;
   FixedVector<Redistribute_Field, 3> redistribute_from_splitting_ft_faces_;
   Redistribute_Field redistribute_from_splitting_ft_elem_;
+  Redistribute_Field redistribute_from_splitting_ft_elem_ghostz_;
+  Redistribute_Field redistribute_from_splitting_ft_elem_ghostz_min_;
+  Redistribute_Field redistribute_from_splitting_ft_elem_ghostz_max_;
 
   // Champs volumiques sur le maillage FT (pour convection des interfaces, etc)
   FixedVector<IJK_Field_double, 3> velocity_ft_;

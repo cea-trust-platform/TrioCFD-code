@@ -2,99 +2,154 @@
 Parametres {
 	Titre "Shear-periodicity condition (velocity jump at z-boundary + desynchronization of z-border) "
 	Auteur "A. du Cluzeau"
-	CasTest . perio_shear_defilant.data 
-	CasTest . mixte_shear_avec_bulle.data 
-	CasTest . mixte_shear_avec_bulle_9proc.data 9
-	CasTest . mixte_shear_avec_bulle_9proc_reprise.data 9
-}
-
-
-
-
-Chapitre {
-
-Titre "Monophasique"
-
-
-	visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor perio_shear_defilant.lata DOM_dual VELOCITY_X FACES
-	}
-		visu {
-		titre "Shear periodicity avec defilement : Etat final (PRESSURE)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor perio_shear_defilant.lata DOM PRESSURE ELEM
-	}
+	CasTest . une_bulle_et_upstream_velocity_9proc.data 9
+	CasTest . une_bulle_9proc.data 9
+	CasTest . une_bulle_9proc_reprise.data 9
+	CasTest . quatre_bulles_seq.data
+	CasTest . quatre_bulles_pary.data 3
+	CasTest . quatre_bulles_parz.data 3
+	CasTest . quatre_bulles_paryz.data 9
 }
 
 
 Chapitre {
 
-Titre "Diphasique sequentiel"
+	figure {
+		titre "Position des bulles uniques en z"
+		incluredesccourbes 0
+		labelX  "t"
+		labelY "centre_z"
+				Courbe {
+		   fichier une_bulle_et_upstream_velocity_9proc_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "une_bulle_et_upstream_velocity_9proc"
+		}
+				Courbe {
+		   fichier une_bulle_9proc_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "une_bulle_9proc"
+		}
+				Courbe {
+		   fichier une_bulle_9proc_reprise_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "une_bulle_9proc_reprise"
+		}
+		}
 
-	visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle.lata DOM_dual VELOCITY_X FACES
-	}
-	
-		visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle.lata DOM PRESSURE ELEM
-	}
+			figure {
+		titre "Position des bulles uniques en x"
+		incluredesccourbes 0
+		labelX  "t"
+		labelY "centre_x"
+				Courbe {
+		   fichier une_bulle_et_upstream_velocity_9proc_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "une_bulle_et_upstream_velocity_9proc"
+		}
+				Courbe {
+		   fichier une_bulle_9proc_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "une_bulle_9proc"
+		}
+				Courbe {
+		   fichier une_bulle_9proc_reprise_bulles_centre_x.out
+		     colonnes ($1) ($2)
+		     Legende "une_bulle_9proc_reprise"
+		}
+		}
+		
+		
+		figure {
+		titre "Position des bulles en essaims en z"
+		incluredesccourbes 0
+		labelX  "t"
+		labelY "centre_z"
+		Courbe {
+		   fichier quatre_bulles_seq_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "quatre_bulles_seq 1"
+		}
+						Courbe {
+		   fichier quatre_bulles_seq_bulles_centre_z.out
+		     colonnes ($1) ($3)
+		     Legende "quatre_bulles_seq 2"
+		}
+						Courbe {
+		   fichier quatre_bulles_seq_bulles_centre_z.out
+		     colonnes ($1) ($4)
+		     Legende "quatre_bulles_seq 3"
+		}
+						Courbe {
+		   fichier quatre_bulles_seq_bulles_centre_z.out
+		     colonnes ($1) ($5)
+		     Legende "quatre_bulles_seq 4"
+		}
+		
+				Courbe {
+		   fichier quatre_bulles_pary_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "quatre_bulles_pary 1"
+		}
+						Courbe {
+		   fichier quatre_bulles_pary_bulles_centre_z.out
+		     colonnes ($1) ($3)
+		     Legende "quatre_bulles_pary 2"
+		}
+						Courbe {
+		   fichier quatre_bulles_pary_bulles_centre_z.out
+		     colonnes ($1) ($4)
+		     Legende "quatre_bulles_pary 3"
+		}
+						Courbe {
+		   fichier quatre_bulles_pary_bulles_centre_z.out
+		     colonnes ($1) ($5)
+		     Legende "quatre_bulles_pary 4"
+		}
+		
+						Courbe {
+		   fichier quatre_bulles_parz_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "quatre_bulles_parz 1"
+		}
+						Courbe {
+		   fichier quatre_bulles_parz_bulles_centre_z.out
+		     colonnes ($1) ($3)
+		     Legende "quatre_bulles_parz 2"
+		}
+						Courbe {
+		   fichier quatre_bulles_parz_bulles_centre_z.out
+		     colonnes ($1) ($4)
+		     Legende "quatre_bulles_parz 3"
+		}
+						Courbe {
+		   fichier quatre_bulles_parz_bulles_centre_z.out
+		     colonnes ($1) ($5)
+		     Legende "quatre_bulles_parz 4"
+		}
+		
+						Courbe {
+		   fichier quatre_bulles_paryz_bulles_centre_z.out
+		     colonnes ($1) ($2)
+		     Legende "quatre_bulles_paryz 1"
+		}
+						Courbe {
+		   fichier quatre_bulles_paryz_bulles_centre_z.out
+		     colonnes ($1) ($3)
+		     Legende "quatre_bulles_paryz 2"
+		}
+						Courbe {
+		   fichier quatre_bulles_paryz_bulles_centre_z.out
+		     colonnes ($1) ($4)
+		     Legende "quatre_bulles_paryz 3"
+		}
+						Courbe {
+		   fichier quatre_bulles_paryz_bulles_centre_z.out
+		     colonnes ($1) ($5)
+		     Legende "quatre_bulles_paryz 4"
+		}
+		
+		
 
+		}
 }
 
-Chapitre {
-
-Titre "Diphasique parallele"
-
-	visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle_9proc.lata DOM_dual VELOCITY_X FACES
-	}
-	
-		visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle_9proc.lata DOM PRESSURE ELEM
-	}
-
-}
-
-Chapitre {
-
-Titre "Reprise"
-
-	visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle_9proc_reprise.lata DOM_dual VELOCITY_X FACES
-	}
-	
-		visu {
-		titre "Shear periodicity avec defilement : Etat final (VX)"
-		Normal3d 0 1 0
-		Up3D 1 0 0
-		zoom3D 0 0 1.
-		pseudocolor mixte_shear_avec_bulle_9proc_reprise.lata DOM PRESSURE ELEM
-	}
-
-}

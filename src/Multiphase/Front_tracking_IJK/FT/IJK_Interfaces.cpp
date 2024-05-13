@@ -604,9 +604,19 @@ int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
           // laquelle on declanche la duplication des bulles (si une bulle depasse a
           // l'exterieur du domaine, on duplique) Cette domaine tient compte du stencil
           // des forces de tension superficielle et de repulsion
-          const double duplicate_stencil_width =
-            std::max(1 * delta,
-                     portee_force_repulsion_); // GB2020.12.20 : avant c'etait 2. Est-ce
+          //duCluz  : 2 cest mieux pour les echanges espaces virtuels pour la condition de shear-periodicite
+          double duplicate_stencil_width ;
+
+          if(IJK_Shear_Periodic_helpler::defilement_ == 1)
+            duplicate_stencil_width =
+              std::max(2 * delta,
+                       portee_force_repulsion_);
+          else
+            duplicate_stencil_width =
+              std::max(delta,
+                       portee_force_repulsion_);
+
+          // GB2020.12.20 : avant c'etait 2. Est-ce
           // que la precaution etait necessaire? Elle
           // conduit a de plus gros cas tests comme
           // interfacial_temperature_and_flux
@@ -1220,7 +1230,7 @@ void IJK_Interfaces::calculer_volume_bulles(ArrOfDouble& volumes, DoubleTab& cen
     }
   mp_sum_for_each_item(volumes);
   mp_sum_for_each_item(centre_gravite);
-  Cerr << "volumes : " << volumes << finl;
+  //Cerr << "volumes : " << volumes << finl;
   for (int i = 0; i < nbulles_tot; i++)
     {
       // const double x = 1./volumes[i];
@@ -1228,6 +1238,72 @@ void IJK_Interfaces::calculer_volume_bulles(ArrOfDouble& volumes, DoubleTab& cen
       centre_gravite(i, 0) *= x;
       centre_gravite(i, 1) *= x;
       centre_gravite(i, 2) *= x;
+    }
+}
+
+
+void IJK_Interfaces::calculer_aspect_ratio(ArrOfDouble& aspect_ratio) const
+{
+  const Maillage_FT_IJK& mesh = maillage_ft_ijk_;
+  const int n = mesh.nb_facettes();
+  const int nbulles_reelles = get_nb_bulles_reelles();
+  const int nbulles_ghost = get_nb_bulles_ghost();
+  const int nbulles_tot = nbulles_reelles + nbulles_ghost;
+  const IntTab& facettes = mesh.facettes();
+  const DoubleTab& sommets = mesh.sommets();
+  const ArrOfInt& compo_facettes = mesh.compo_connexe_facettes();
+  aspect_ratio.resize_array(nbulles_tot);
+
+  ArrOfDouble volumes;
+  DoubleTab centre_gravite;
+  this->calculer_volume_bulles(volumes,centre_gravite);
+
+  DoubleTab d_max(nbulles_tot);
+  d_max = -1;
+  DoubleTab d_min(nbulles_tot);
+  d_min = 300;
+
+  double d_imax;
+  double d_imin;
+
+  for (int i = 0; i < n; i++)
+    {
+      if (mesh.facette_virtuelle(i))
+        continue;
+      int compo = compo_facettes[i];
+      // les bulles dupliquees a la fin :
+      if (compo < 0)
+        {
+          // L'index de la bulle ghost est (entre -1 et -nbulles_ghost):
+          const int idx_ghost = get_ghost_number_from_compo(compo);
+          // On la place en fin de tableau :
+          compo = nbulles_reelles - 1 - idx_ghost;
+        }
+      // Calcul des distances entre sommet_i et le centre de gravite
+      const int i0 = facettes(i, 0);
+      const int i1 = facettes(i, 1);
+      const int i2 = facettes(i, 2);
+      const double d_i_0 = sqrt( (sommets(i0, 0)-centre_gravite(compo,0))*(sommets(i0, 0)-centre_gravite(compo,0)) + (sommets(i0, 1)-centre_gravite(compo,1))*(sommets(i0, 1)-centre_gravite(compo,1)) + (sommets(i0, 2)-centre_gravite(compo,2))*(sommets(i0, 2)-centre_gravite(compo,2)) );
+      const double d_i_1 = sqrt( (sommets(i1, 0)-centre_gravite(compo,0))*(sommets(i1, 0)-centre_gravite(compo,0)) + (sommets(i1, 1)-centre_gravite(compo,1))*(sommets(i1, 1)-centre_gravite(compo,1)) + (sommets(i1, 2)-centre_gravite(compo,2))*(sommets(i1, 2)-centre_gravite(compo,2)) );
+      const double d_i_2 = sqrt( (sommets(i2, 0)-centre_gravite(compo,0))*(sommets(i2, 0)-centre_gravite(compo,0)) + (sommets(i2, 1)-centre_gravite(compo,1))*(sommets(i2, 1)-centre_gravite(compo,1)) + (sommets(i2, 2)-centre_gravite(compo,2))*(sommets(i2, 2)-centre_gravite(compo,2)) );
+
+      // On rÃ©cupÃ¨re la plus grande distance et la plus petite distance parmi les 3 calculÃ©es
+      d_imax = std::max(d_i_0,std::max(d_i_1,d_i_2));
+      d_imin = std::min(d_i_0,std::min(d_i_1,d_i_2));
+
+      // On met Ã  jour le grand axe et le petit axe
+      if (d_imax > d_max[compo])
+        d_max[compo] = d_imax;
+
+      if (d_imin < d_min[compo])
+        d_min[compo] = d_imin;
+    }
+
+  mp_min_for_each_item(d_min);
+  mp_max_for_each_item(d_max);
+  for (int i = 0; i < nbulles_tot; i++)
+    {
+      aspect_ratio[i] = d_max[i]/d_min[i];
     }
 }
 
@@ -2117,7 +2193,7 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int o
 
   ArrOfDouble position_xmax_compo;
   ArrOfDouble position_xmin_compo;
-  if (option_shear != 0 && IJK_Splitting::defilement_ == 1)
+  if (option_shear != 0 && IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       position_xmax_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
       position_xmin_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
@@ -2144,14 +2220,14 @@ void IJK_Interfaces::calculer_bounding_box_bulles(DoubleTab& bounding_box, int o
           double coord = sommets(i_sommet, direction);
           int iconnex = compo_connex_som[i_sommet];
 
-          if (direction==0 && option_shear != 0 && IJK_Splitting::defilement_ == 1)
+          if (direction==0 && option_shear != 0 && IJK_Shear_Periodic_helpler::defilement_ == 1)
             {
               // position du barycentre de la bulle de reference a laquelle appartient le sommet
               double pos_ref = position(iconnex,0);
               //const IJK_Splitting& split = ref_splitting_.valeur();
-              double Lx =  IJK_Splitting::Lx_for_shear_perio;
+              double Lx =  IJK_Shear_Periodic_helpler::Lx_for_shear_perio;
               //double Lx =  split.get_grid_geometry().get_domain_length(0) - (position_xmax_compo(iconnex)-pos_ref);
-              double offset = option_shear * IJK_Splitting::shear_x_time_;
+              double offset = option_shear * IJK_Shear_Periodic_helpler::shear_x_time_;
               // le barycentre de la bulle reelle (compo >0) est situe entre db et Lx + db (pas entre 0 et Lx)
               // vrai uniquement pour des bulles qui montent.
               // Ne fonctionnera pas pour des bulles descendantes...
@@ -2207,7 +2283,7 @@ void IJK_Interfaces::creer_duplicata_bulles()
   // masque_duplicata_pour_compo_ghost, un encodage du deplacement maximal pour toutes
   // les bulles duplique/decalle par le cisaillement qui sortent de NS: Le critere pour declancher la duplication des
   // bulles est le meme que pour les bulles reelles.
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       // Evaluation du cube contenant chaque bulle offset par le shear positif
       DoubleTab bounding_box_offsetp;
@@ -2278,7 +2354,7 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
 
   ArrOfDouble position_xmax_compo;
   ArrOfDouble position_xmin_compo;
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       position_xmax_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
       position_xmin_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
@@ -2323,10 +2399,10 @@ static void calculer_deplacement_from_code_compo_connexe(const Maillage_FT_IJK& 
           double pos = 0;
           double decallage_bulle_reel_ext_domaine_reel = 0.;
           // si seulement on a traverser une frontiere shear periodique
-          if (dir==2 && depl != 0. && IJK_Splitting::defilement_ == 1)
+          if (dir==2 && depl != 0. && IJK_Shear_Periodic_helpler::defilement_ == 1)
             {
-              double Lx =  IJK_Splitting::Lx_for_shear_perio;
-              double offset = decode * IJK_Splitting::shear_x_time_;
+              double Lx =  IJK_Shear_Periodic_helpler::Lx_for_shear_perio;
+              double offset = decode * IJK_Shear_Periodic_helpler::shear_x_time_;
               // position du barycentre de la bulle de reference a laquelle appartient le sommet
               pos_ref = position(compo_bulle_reel,0);
               // on veut le barycentre de la bulle decallee dans le domaine reel
@@ -2442,7 +2518,7 @@ static void calculer_deplacement_from_masque_in_array(const Maillage_FT_IJK& m,
 
   ArrOfDouble position_xmax_compo;
   ArrOfDouble position_xmin_compo;
-  if (IJK_Splitting::defilement_ == 1)
+  if (IJK_Shear_Periodic_helpler::defilement_ == 1)
     {
       position_xmax_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
       position_xmin_compo.resize_array(nbulles, RESIZE_OPTIONS::NOCOPY_NOINIT);
@@ -2483,10 +2559,10 @@ static void calculer_deplacement_from_masque_in_array(const Maillage_FT_IJK& m,
           double pos = 0;
           double decallage_bulle_reel_ext_domaine_reel = 0.;
           // si seulement on a traverser une frontiere shear periodique
-          if (dir==2 && depl != 0. && IJK_Splitting::defilement_ == 1)
+          if (dir==2 && depl != 0. && IJK_Shear_Periodic_helpler::defilement_ == 1)
             {
-              double Lx =  IJK_Splitting::Lx_for_shear_perio;
-              double offset = decode * IJK_Splitting::shear_x_time_;
+              double Lx =  IJK_Shear_Periodic_helpler::Lx_for_shear_perio;
+              double offset = decode * IJK_Shear_Periodic_helpler::shear_x_time_;
               // position du barycentre de la bulle de reference a laquelle appartient le sommet
               pos_ref = position(compo_bulle_reel,0);
               // on veut le barycentre de la bulle decallee dans le domaine reel
@@ -2570,7 +2646,7 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
           // Si on a epuise toutes les copies a faire pour cette composante,
           // index_copie restera a -1:
           index_copie[icompo] = -1;
-          if (IJK_Splitting::defilement_ != 1)
+          if (IJK_Shear_Periodic_helpler::defilement_ != 1)
             {
               int compteur = 0;
               const int masque = masque_duplicata_pour_compo[icompo] & 7; // masque sans les bits de signe
@@ -2764,7 +2840,7 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
           icompo = decoder_numero_bulle(compo_connexe_facettes[i_facette]);
           // Pour cette composante, quelle est la prochaine copie a faire ?
           index = index_copie[icompo];
-          if(IJK_Splitting::defilement_ == 1)
+          if(IJK_Shear_Periodic_helpler::defilement_ == 1)
             signe = index_signe[icompo];
 
           if (index > 0)
@@ -2787,7 +2863,7 @@ void IJK_Interfaces::dupliquer_bulle_perio(ArrOfInt& masque_duplicata_pour_compo
               // | 3 |  2  | 11 |
               // |___|_____|____|
               // Calcul du deplacement a faire,
-              if(IJK_Splitting::defilement_ != 1)
+              if(IJK_Shear_Periodic_helpler::defilement_ != 1)
                 signe = masque_duplicata_pour_compo[icompo] & (7 << 3); // Recupere seulement le signe.
               const int code_deplacement = signe | index;                 // l'index donne les directions a deplacer lors de
               // cette iteration.
@@ -2984,7 +3060,7 @@ void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
                       masque_sortie_domaine_reel |= (1 << direction); // met le bit "direction" a 1 dans le masque
                       masque_sortie_domaine_reel |= (16 << direction); // met le bit de signe a 1 dans le masque
                       // il faudra deplacer la copie vers la droite
-                      if(direction==2 && IJK_Splitting::defilement_ == 1)
+                      if(direction==2 && IJK_Shear_Periodic_helpler::defilement_ == 1)
                         // on est sorti en z, est-ce que la bulle ghost depasse en x ? pour condition perio shear
                         // si sortie de la bulle en z, verifier la sortie en x de la bulle ghost
                         // ici, sortie par la gauche, donc shear positif dans bounding_box_offsetp
@@ -3009,7 +3085,7 @@ void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
                       masque_sortie_domaine_reel |= (1 << direction); // met le bit "direction" a 1 dans le masque
                       // le bit de signe reste a zero, qui signifie un deplacement vers
                       // les coord negatives.
-                      if(direction==2 && IJK_Splitting::defilement_ == 1)
+                      if(direction==2 && IJK_Shear_Periodic_helpler::defilement_ == 1)
                         // on est sorti en z, est-ce que la bulle ghost depasse en x ? pour condition perio shear
                         // si sortie de la bulle en z, verifier la sortie en x de la bulle ghost
                         // ici, sortie par la droite, donc shear negatif dans bounding_box_offsetm
