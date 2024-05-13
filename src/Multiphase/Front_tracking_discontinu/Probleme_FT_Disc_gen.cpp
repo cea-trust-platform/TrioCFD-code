@@ -31,11 +31,11 @@
 #include <TRUST_List.h>
 #include <Chimie.h>
 
-Implemente_instanciable(Probleme_FT_Disc_gen, "Probleme_FT_Disc_gen", Pb_Fluide_base);
+Implemente_instanciable(Probleme_FT_Disc_gen, "Probleme_FT_Disc_gen|Pb_FrontTracking_Disc", Pb_Fluide_base);
 
 // XD listdeuxmots_acc listobj nul 1 deuxmots 0 List of groups of two words (with curly brackets).
 
-// XD probleme_ft_disc_gen problem_read_generic probleme_ft_disc_gen -1 The generic Front-Tracking problem in the discontinuous version. It differs from the rest of the TRUST code : The problem does not state the number of equations that are enclosed in the problem. Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared in the beginning of the data file. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible). As the list of equations to be solved in the generic Front-Tracking problem is declared in the data file and not pre-defined in the structure of the problem, each equation has to be distinctively associated with the problem with the Associer keyword.
+// XD Pb_FrontTracking_Disc problem_read_generic probleme_ft_disc_gen -1 The generic Front-Tracking problem in the discontinuous version. It differs from the rest of the TRUST code : The problem does not state the number of equations that are enclosed in the problem. Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared in the beginning of the data file. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible). As the list of equations to be solved in the generic Front-Tracking problem is declared in the data file and not pre-defined in the structure of the problem, each equation has to be distinctively associated with the problem with the Associer keyword.
 // XD attr solved_equations listdeuxmots_acc solved_equations 0 List of sovled equations in the form 'equation_type' 'equation_alias'
 // XD attr fluide_incompressible fluide_incompressible fluide_incompressible 1 The fluid medium associated with the problem.
 // XD attr fluide_diphasique fluide_diphasique fluide_diphasique 1 The diphasic fluid medium associated with the problem.
@@ -68,6 +68,8 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
   for (auto &itr : noms_eq) noms_eq_maj.add(Motcle(itr)); //ha ha ha
 
   Motcle read_mc;
+  Nom nom_eq;
+
   is >> read_mc;
 
   if (read_mc != "SOLVED_EQUATIONS")
@@ -85,7 +87,8 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
       Process::exit();
     }
 
-  std::map<std::string, std::string> solved_eqs;
+  std::vector<Nom> eq_types, eq_name;
+
   for (is >> read_mc; read_mc != "}"; is >> read_mc)
     {
       if (noms_eq_maj.rang(read_mc) == -1 || (!read_mc.contient("_FT") && !read_mc.debute_par("CONVECTION_DIFFUSION_CONCENTRATION") && !read_mc.debute_par("CONVECTION_DIFFUSION_TEMPERATURE")))
@@ -98,33 +101,39 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
           Process::exit();
         }
 
-      Nom nom_eq;
+      eq_types.push_back(read_mc);
       is >> nom_eq;
-      solved_eqs.insert( { nom_eq.getString(), read_mc.getString() });
+      eq_name.push_back(nom_eq);
+    }
+
+  if (eq_types.size() != eq_name.size())
+    {
+      Cerr << "Error in Probleme_FT_Disc_gen::typer_lire_milieu !!! The number of strings read in the bloc SOLVED_EQUATIONS is not correct !!!" << finl;
+      Cerr << "Fix your data file !!!" << finl;
+      Process::exit();
     }
 
   /* Step 2 : add equations to the list ... */
   /* Add NAVIER_STOKES_FT_DISC at first */
-  for (auto& itr : solved_eqs)
-    if (itr.second == "NAVIER_STOKES_FT_DISC")
-      add_FT_equation(itr.first, itr.second);
+  for (int i = 0; i < static_cast<int>(eq_types.size()); i++)
+    if (eq_types[i] == "NAVIER_STOKES_FT_DISC")
+      add_FT_equation(eq_name[i], eq_types[i]);
 
   /* Add Transport_Interfaces at second */
-  for (auto& itr : solved_eqs)
-    if (Nom(itr.second).debute_par("TRANSPORT_INTERFACES"))
-      add_FT_equation(itr.first, itr.second);
+  for (int i = 0; i < static_cast<int>(eq_types.size()); i++)
+    if (eq_types[i].debute_par("TRANSPORT_INTERFACES"))
+      add_FT_equation(eq_name[i], eq_types[i]);
 
   /* Add the remaining */
-  for (auto& itr : solved_eqs)
-    if (itr.second != "NAVIER_STOKES_FT_DISC" && !Nom(itr.second).debute_par("TRANSPORT_INTERFACES"))
-      add_FT_equation(itr.first, itr.second);
+  for (int i = 0; i < static_cast<int>(eq_types.size()); i++)
+    if (eq_types[i] != "NAVIER_STOKES_FT_DISC" && !eq_types[i].debute_par("TRANSPORT_INTERFACES"))
+      add_FT_equation(eq_name[i], eq_types[i]);
 
   /* Step 3 : read medium(media) ... */
-  const std::string conc = "CONCENTRATION";
   bool needs_constituant = false;
 
-  for (auto& itr : solved_eqs)
-    if (itr.second.find(conc) != std::string::npos)
+  for (auto& itr : eq_types)
+    if (itr.contient("CONCENTRATION"))
       {
         needs_constituant = true; // pb contient concentration !
         break;
@@ -158,10 +167,10 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
         }
 }
 
-void Probleme_FT_Disc_gen::add_FT_equation(const std::string& eq_name, const std::string& eq_type)
+void Probleme_FT_Disc_gen::add_FT_equation(const Nom& eq_name, const Nom& eq_type)
 {
   equations_.add(Equation());
-  equations_.dernier().typer(eq_type.c_str());
+  equations_.dernier().typer(eq_type);
   Equation_base& eq = equations_.dernier().valeur();
   eq.associer_pb_base(*this);
   eq.associer_sch_tps_base(le_schema_en_temps_);

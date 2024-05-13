@@ -64,7 +64,7 @@ public:
   Triple_Line_Model_FT_Disc& tcl() { return tcl_; }
 
 private:
-  void add_FT_equation(const std::string& , const std::string& );
+  void add_FT_equation(const Nom& , const Nom& );
   LIST(Equation) equations_; // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces, puis ConvDiff.
   REF(Chimie) la_chimie_;
   Triple_Line_Model_FT_Disc tcl_;
