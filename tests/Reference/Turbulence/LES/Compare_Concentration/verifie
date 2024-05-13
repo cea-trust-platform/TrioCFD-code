@@ -15,7 +15,7 @@ err=0
 # Comparaison lml
 #################
 cp $jdd.lml $jdd"_LML".lml
-echo -e "1,$ s?TEMPERATURE?CONCENTRATION?g\nw" | ed $jdd"_LML".lml 1>/dev/null 2>&1
+sed -i "s?TEMPERATURE?CONCENTRATION?g" $jdd"_LML".lml
 compare_lata $jdd"_LML".lml C_$jdd"_LML".lml 1>compare_lata.log 2>&1
 [ $? != 0 ] && echo $ECHO_OPTS "Error when comparing $jdd"_LML".lml C_$jdd"_LML".lml files:" && cat compare_lata.log
 

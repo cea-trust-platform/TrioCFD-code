@@ -30,12 +30,12 @@ do
        
        if [ $modele = lm ]
        then
-          echo $ECHO_OPTS "1,$ s?Distance_paroi?Distance_paroi dom 1 Forme binaire?g\nw" | ed $modele.data 1>/dev/null 2>&1
+          sed -i "s?Distance_paroi?Distance_paroi dom 1 Forme binaire?g" $modele.data
           echo "
 	       modele_turbulence longueur_melange { dmax 1000 fichier dom_Wall_length.xyz turbulence_paroi loi_standard_hydr }" >> $modele.data  
        elif [ $modele = keps ]
        then
-          echo $ECHO_OPTS "1,$ s?Distance_paroi??g\nw" | ed $modele.data 1>/dev/null 2>&1
+          sed -i "s?Distance_paroi??g" $modele.data
           echo "
                modele_turbulence K_Epsilon {
                      Transport_K_Epsilon
@@ -56,7 +56,7 @@ do
                 }" >> $modele.data  
        elif [ $modele = k3r ]
        then
-          echo $ECHO_OPTS "1,$ s?Distance_paroi??g\nw" | ed $modele.data 1>/dev/null 2>&1
+          sed -i "s?Distance_paroi??g" $modele.data
           echo "
                modele_turbulence K_Epsilon_Realisable {
                      Transport_K_Epsilon_Realisable
@@ -81,7 +81,7 @@ do
                 }" >> $modele.data    
        elif [ $modele = k3r_alt ]
        then
-          echo $ECHO_OPTS "1,$ s?Distance_paroi??g\nw" | ed $modele.data 1>/dev/null 2>&1
+          sed -i "s?Distance_paroi??g" $modele.data
           echo "
                modele_turbulence K_Epsilon_Realisable {
                      Transport_K_Epsilon_Realisable

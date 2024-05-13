@@ -34,7 +34,7 @@ Lire sch
    	tmax    3
 	dt_impr 0.01
 	seuil_statio	1.e-4
-	seuil_statio_relatif_deconseille 1 
+	Residuals { relative 1 } 
         facsec		500
 	facsec_max	500
 	Solveur Implicite

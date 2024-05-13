@@ -97,14 +97,14 @@ do
    then
       geo=Gmsh$REFINE.geo
       geom=Gmsh$REFINE.geom
-      echo $ECHO_OPTS "1,$ s?REFINE?$REFINE?g\nw $geo" | ed Gmsh.geo 1>/dev/null 2>&1
+      sed "s?REFINE?$REFINE?g" Gmsh.geo > $geo
       [ ! -f $geom ] && gmsh -2 $geo && echo -e "1\nGmsh$REFINE\nn" | gmsh2geom
    else
       Nombre_de_Noeuds=`echo "8*$REFINE+1" | bc`
       Nombre_de_Mailles=`echo "8*$REFINE" | bc`
       [ $REFINE = 1 ] && COARSE=$Nombre_de_Mailles"*"$Nombre_de_Mailles
-      echo $ECHO_OPTS "1,$ s?\$Nombre_de_Noeuds?$Nombre_de_Noeuds?g\nw Mesh$REFINE.data" | ed $InitMesh 1>/dev/null 2>&1
-      echo $ECHO_OPTS "1,$ s?\$LENGTH?$LENGTH?g\nw" | ed Mesh$REFINE.data 1>/dev/null 2>&1
+      sed "s?\$Nombre_de_Noeuds?$Nombre_de_Noeuds?g" $InitMesh > Mesh$REFINE.data
+      sed -i "s?\$LENGTH?$LENGTH?g" Mesh$REFINE.data
    fi
 done
 tmp_liste_cas_exclu_nr=`mktemp_`

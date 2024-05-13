@@ -581,7 +581,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("expression_potential_phi", &expression_potential_phi_); // XD_ADD_P chaine parser to define phi and make a momentum source Nabla phi.
 
   param.ajouter("velocity_diffusion_op", &velocity_diffusion_op_);
-  param.ajouter("velocity_convection_op", &velocity_convection_op_);
+  param.ajouter("velocity_convection_op", &velocity_convection_op_); // XD_ADD_P chaine Type of velocity convection scheme
 
   param.ajouter("interfaces", &interfaces_); // XD_ADD_P interfaces not_set
   // GAB, THI

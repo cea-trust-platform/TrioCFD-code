@@ -29,7 +29,7 @@ cp propertiesGeometry.dat ..
 err=`ls test.err .test.err 2>/dev/null`
 CELLS=`awk '/Total number of elements/ && (NF==6) {gsub(":","",$NF);cells=$NF} END {print cells}' $err`
 MESH=`echo $rep | awk -F_ '{print $NF}'`
-echo $ECHO_OPTS "1,$ s?\$NUMBER_OF_ELEMENTS_$MESH\$ ?$CELLS ?g\nw" | ed $prm 1>/dev/null 2>&1
+sed -i "s?\$NUMBER_OF_ELEMENTS_$MESH\$ ?$CELLS ?g" $prm
 
 #exit
 # Profiling if binary _pg

@@ -41,7 +41,7 @@ Lire sch
 	dt_max	0.5
 	dt_impr 0.001
 	seuil_statio	1.e-6
-	seuil_statio_relatif_deconseille 1 
+	Residuals { relative 1 } 
         facsec		$FACSEC
 	facsec_max	$FACSECMAX
 	solveur implicite
