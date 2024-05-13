@@ -163,7 +163,7 @@ Read pb
             sonde_k 	     k periode 0.01 points 1 0.5 0.5
             sonde_omega 	 omega periode 0.01 points 1 0.5 0.5
             sonde_epsilon epsilon periode 0.01 points 1 0.5 0.5
-            sonde_visc viscosite_turbulente_liquide_eau periode 0.01 points 1 0.5 0.5
+            sonde_visc mu_turbulente_liquide_eau periode 0.01 points 1 0.5 0.5
         }
         fields dt_post 200.
         {
