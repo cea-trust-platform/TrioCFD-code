@@ -93,6 +93,14 @@
 \def\green{\color{green}}
 \def\gray{\color{gray}}
 \def\white{\color{white}}
+\def\dron#1#2{\frac{\partial #1}{\partial #2}}
+\def\lrb#1{\left( #1\right)}
+\def\lrbb#1{\left[ #1\right]}
+\def\surf#1{\overline{#1}^{i}}
+\def\inter#1{\overline{\overline{#1}}^{i}}
+\def\spa#1{\langle#1\rangle}
+\def\spak#1{\langle#1\rangle^k}
+\def\phase#1{\overline{#1}^k}
 
 %%%%   Algo_QC   %%%%
 \DeclareMathOperator{\tr}{tr}
@@ -365,6 +373,7 @@ v\codeVersion & \today & \includegraphics[scale=0.05]{../pictures/signTrioCFDMan
 \input{./part41-CMFD.tex}
 \input{./part42-FTD.tex}
 \input{./part43-Phase_field.tex}
+\input{./part44-IJK.tex}
 
 \part{The Arbitrary Lagrangian-Eulerian Method}
 \label{sec:ALE}
@@ -394,7 +403,7 @@ v\codeVersion & \today & \includegraphics[scale=0.05]{../pictures/signTrioCFDMan
 \lhead{}
 \rhead{BIBLIOGRAPHIE}
 \bibliographystyle{plain}
-\bibliography{BibTeX_TrioCFD, 18-Stokes_bib, bibALE, bibCMFD, bibFTD, bibSENSITIVITY, bibAlgo_QC.bib}
+\bibliography{BibTeX_TrioCFD, 18-Stokes_bib, bibALE, bibCMFD, bibFTD, bibIJK, bibSENSITIVITY, bibAlgo_QC.bib}
 
 \end{document}
 
