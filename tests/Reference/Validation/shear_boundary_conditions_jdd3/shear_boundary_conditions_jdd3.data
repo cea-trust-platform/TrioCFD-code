@@ -73,7 +73,7 @@ IJK_FT_double
   check_stop_file stop.txt
   dt_sauvegarde 5000
   tinit 0
-  nb_pas_dt_max 200
+	nb_pas_dt_max 3
   
   multigrid_solver {
     solver_precision mixed
