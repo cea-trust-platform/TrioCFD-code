@@ -59,7 +59,7 @@ int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
   return Pb_Fluide_base::associer_(ob);
 }
 
-void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
+void Probleme_FT_Disc_gen::lire_solved_equations(Entree& is)
 {
   /* Step 1 : special FT : read the list of equations to solve ... */
   // Here are all possible equations !!!
@@ -128,12 +128,15 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
   for (int i = 0; i < static_cast<int>(eq_types.size()); i++)
     if (eq_types[i] != "NAVIER_STOKES_FT_DISC" && !eq_types[i].debute_par("TRANSPORT_INTERFACES"))
       add_FT_equation(eq_name[i], eq_types[i]);
+}
 
-  /* Step 3 : read medium(media) ... */
+void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
+{
   bool needs_constituant = false;
 
-  for (auto& itr : eq_types)
-    if (itr.contient("CONCENTRATION"))
+  auto& list_stl = equations_.get_stl_list();
+  for (auto& itr : list_stl)
+    if (Motcle(itr->que_suis_je()).contient("CONCENTRATION"))
       {
         needs_constituant = true; // pb contient concentration !
         break;

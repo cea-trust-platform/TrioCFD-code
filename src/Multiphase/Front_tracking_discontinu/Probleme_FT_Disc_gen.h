@@ -45,6 +45,7 @@ public:
   Equation_base& equation(int i) override { return equations_[i].valeur(); }
 
   void typer_lire_milieu(Entree& is) override;
+  void lire_solved_equations(Entree& is) override;
 
   const Equation_base& get_equation_by_name(const Nom& le_nom) const override;
   Equation_base& getset_equation_by_name(const Nom& le_nom) override;
