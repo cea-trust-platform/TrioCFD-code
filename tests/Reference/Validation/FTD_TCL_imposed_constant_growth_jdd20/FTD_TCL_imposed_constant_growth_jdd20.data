@@ -42,34 +42,6 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 
-Fluide_Incompressible  eau
-Lire eau
-{
-    mu champ_uniforme       1 2.8e-4
-    rho champ_uniforme      1 1000
-    lambda champ_uniforme   1 0.679
-    cp champ_uniforme       1 4.21e3
-
-}
-
-Fluide_Incompressible eau2
-Lire eau2
-{
-    mu champ_uniforme       1 2.8e-4
-    rho champ_uniforme      1 800
-    lambda champ_uniforme   1 0.679
-    cp champ_uniforme       1 4.21e3
-}
-
-Fluide_diphasique fluide
-Lire fluide
-{
-    fluide1 eau
-    fluide0 eau2
-    sigma   Champ_Uniforme 1            0.0
-    chaleur_latente Champ_Uniforme 1    -2.256e6
-}
-
 Schema_Euler_explicite  sch
 Lire sch
 {
@@ -81,41 +53,41 @@ Lire sch
     facsec 10000.
     seuil_statio -1
 }
-
-Triple_Line_Model_FT_Disc TCL
-Read TCL
-{
-    deactivate
-    Qtcl 0.0 # W/m #
-    lv 10.e-9
-    ym 5.e-6
-    sm 5.e-6 # TestCase at theta_app = 90° => sm=ym #
-}
-
-Champ_Uniforme gravite
-Lire gravite 2 0. 0.
-Associate fluide gravite
-
-Navier_stokes_FT_disc                         hydraulique
-Transport_interfaces_FT_disc                  interf
-convection_diffusion_temperature_ft_disc      thermique
 Associate pb dom
-Associate pb hydraulique
-Associate pb thermique
-Associate pb interf
-Associate pb fluide
-
-Associate TCL hydraulique
-Associate TCL thermique
-Associate TCL interf
-Associate pb TCL
-
 Associate pb sch
 VDF dis
 Discretize pb dis
 system "mkdir -p lata"
 Lire pb
 {
+    solved_equations
+    {
+        Navier_stokes_FT_disc                         hydraulique
+        Transport_interFaces_FT_disc                  interf
+        convection_diffusion_temperature_ft_disc      thermique
+    }
+    Fluide_diphasique
+    {
+        fluide1 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 2.8e-4
+            rho champ_uniforme      1 1000
+            lambda champ_uniforme   1 0.679
+            cp champ_uniforme       1 4.21e3
+
+        }
+        fluide0 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 2.8e-4
+            rho champ_uniforme      1 800
+            lambda champ_uniforme   1 0.679
+            cp champ_uniforme       1 4.21e3
+        }
+
+        sigma   Champ_Uniforme 1            0.0
+        chaleur_latente Champ_Uniforme 1    -2.256e6
+        gravite Champ_Uniforme 2 0 0
+    }
 
     hydraulique
     {
@@ -131,11 +103,11 @@ Lire pb
         conditions_initiales { vitesse champ_uniforme 2 0. 0. }
         projection_initiale 0
         dt_projection 1.e-10 1.e-18
-        equation_interfaces_proprietes_fluide interf
+        equation_interFaces_proprietes_fluide interf
         equation_temperature_mpoint thermique
         new_mass_source   # -> it's a flag, when not activated, the variable is 0 #
         # when new_mass_source is used, it forces the use of the new jump(1/rho)*ai*mp as a source term in the RHS of Poisson instead of the historical div(delta_u) #
-        interpol_indic_pour_dI_dt interp_standard # { interpolation to faces of indic ONLY used in calculer_dIdt : INTERP_STANDARD, INTERP_MODIFIEE, INTERP_AI_BASED } #
+        interpol_indic_pour_dI_dt interp_standard # { interpolation to Faces of indic ONLY used in calculer_dIdt : INTERP_STANDARD, INTERP_MODIFIEE, INTERP_AI_BASED } #
         boundary_conditions
         {
             up      sortie_libre_rho_variable champ_front_uniforme 1 0.
@@ -146,7 +118,7 @@ Lire pb
     }
     interf
     {
-        type_indic_faces standard # interpolation to faces of indic : { STANDARD, MODIFIEE, AI_BASED } #
+        type_indic_Faces standard # interpolation to Faces of indic : { STANDARD, MODIFIEE, AI_BASED } #
         # interpolation_repere_local #
         methode_interpolation_v vdf_lineaire
         methode_transport vitesse_interpolee hydraulique
@@ -232,6 +204,17 @@ Lire pb
         }
         conditions_initiales { Temperature_thermique Champ_Fonc_xyz dom 1 0.0 }
     }
+    Triple_Line_Model_FT_Disc
+    {
+        equation_navier_stokes hydraulique
+        equation_temperature thermique
+        equation_interface interf
+        deactivate
+        Qtcl 0.0 # W/m #
+        lv 10.e-9
+        ym 5.e-6
+        sm 5.e-6 # TestCase at theta_app = 90° => sm=ym #
+    }
     postraitement
     {
         champs dt_post 100
@@ -254,7 +237,7 @@ Lire pb
                 indicatrice_interf elem
                 temperature_thermique elem
                 vitesse elem
-                vitesse
+                vitesse Faces
                 pression elem
                 mpoint_thermique elem
                 distance_interface_elem_interf elem
@@ -263,15 +246,15 @@ Lire pb
                 second_membre_projection elem
                 second_membre_projection_jump elem
                 interfacial_area elem
-                vitesse_delta_interface
-                vitesse_jump0_hydraulique
-                # vitesse_ph0_hydraulique faces  : N'existe plus? :'-( #
-                vitesse_conv_thermique
-                terme_convection_vitesse
-                terme_diffusion_vitesse
-                flux_tmp_interf
+                vitesse_delta_interface Faces
+                vitesse_jump0_hydraulique Faces
+                # vitesse_ph0_hydraulique Faces  : N'existe plus? :'-( #
+                vitesse_conv_thermique Faces
+                terme_convection_vitesse Faces
+                terme_diffusion_vitesse Faces
+                flux_tmp_interf Faces
             }
-            interfaces interf {
+            interFaces interf {
                 courbure som
                 vitesse som
                 # vitesse_repere_local som #
