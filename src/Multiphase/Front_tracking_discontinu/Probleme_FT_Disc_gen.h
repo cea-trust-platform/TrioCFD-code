@@ -46,6 +46,7 @@ public:
 
   void typer_lire_milieu(Entree& is) override;
   void lire_solved_equations(Entree& is) override;
+  Entree& lire_equations(Entree& is, Motcle& dernier_mot) override;
 
   const Equation_base& get_equation_by_name(const Nom& le_nom) const override;
   Equation_base& getset_equation_by_name(const Nom& le_nom) override;
@@ -60,9 +61,10 @@ public:
   virtual const Navier_Stokes_FT_Disc& equation_hydraulique(const Motcle& nom) const;
   virtual const Transport_Interfaces_FT_Disc& equation_interfaces(const Motcle& nom) const;
 
-  void associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1);
   const Triple_Line_Model_FT_Disc& tcl() const { return tcl_; }
   Triple_Line_Model_FT_Disc& tcl() { return tcl_; }
+
+  inline const LIST(Equation)& get_list_equations() const { return equations_; }
 
 private:
   void add_FT_equation(const Nom& , const Nom& );

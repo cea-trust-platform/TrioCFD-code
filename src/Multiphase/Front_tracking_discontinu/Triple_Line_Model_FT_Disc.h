@@ -22,135 +22,65 @@
 #ifndef Triple_Line_Model_FT_Disc_included
 #define Triple_Line_Model_FT_Disc_included
 
-#include <Objet_U.h>
+#include <Transport_Interfaces_FT_Disc.h>
 #include <Domaine_VDF.h>
 #include <FTd_tools.h>
-#include <Transport_Interfaces_FT_Disc.h>
 #include <TRUST_Ref.h>
 
-class Navier_Stokes_FT_Disc;
 class Convection_Diffusion_Temperature_FT_Disc;
-
-//#include <Maillage_FT_Disc.h>
-class Param;
+class Navier_Stokes_FT_Disc;
 class Parcours_interface;
 class Equation_base;
-#define TCL_MODEL 1
+class Param;
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Triple_Line_Model_FT_Disc
-//
-// <Description of class Triple_Line_Model_FT_Disc>
-//
-/////////////////////////////////////////////////////////////////////////////
+#define TCL_MODEL 1
 
 class Triple_Line_Model_FT_Disc : public Objet_U
 {
-
   Declare_instanciable_sans_constructeur( Triple_Line_Model_FT_Disc ) ;
-
 public :
   Triple_Line_Model_FT_Disc();
 
+  void associer_pb(const Probleme_base&);
   void initialize();
   void completer();
-  int associer_(Objet_U& ob) override;
   void set_param(Param& p);
   double get_Qtcl(const int num_face);
-  const double& get_lv() const
-  {
-    return lv_;
-  };
-  const double& get_ym() const
-  {
-    return ym_;
-  };
-  double get_sm()
-  {
-    return sm_;
-  };
-  const double& get_initial_CL_xcoord() const
-  {
-    return initial_CL_xcoord_;
-  };
-  const double& get_rhocpl() const
-  {
-    return rhocpl_;
-  };
-  const bool& is_activated() const
-  {
-    return activated_;
-  };
-  const int& is_capillary_activated() const
-  {
-    return capillary_effect_on_theta_activated_;
-  };
+  const double& get_lv() const { return lv_; }
+  const double& get_ym() const { return ym_; }
+  double get_sm() { return sm_; }
+  const double& get_initial_CL_xcoord() const { return initial_CL_xcoord_; }
+  const double& get_rhocpl() const { return rhocpl_; }
+  const bool& is_activated() const { return activated_; }
+  const int& is_capillary_activated() const { return capillary_effect_on_theta_activated_; }
+  const int& is_read_via_file() const { return read_via_file_; }
+  const int& Rc_tcl_GridN() const { return Rc_tcl_GridN_; }
+  const double& Rc_inject() const { return Rc_inject_; }
+  const double& thetaC_tcl() const { return thetaC_tcl_; }
+  const int& reinjection_tcl() const { return reinjection_tcl_; }
+  const int& distri_first_facette() const { return distri_first_facette_; }
+  const bool& ready_inject_tcl() const { return ready_inject_tcl_; }
+  bool& ready_inject_tcl() { return ready_inject_tcl_; }
+  const double& tempC_tcl() const { return tempC_tcl_; }
+  const int& tag_tcl() const { return tag_tcl_; }
 
-  const int& is_read_via_file() const
-  {
-    return read_via_file_;
-  };
-  const int& Rc_tcl_GridN() const
-  {
-    return Rc_tcl_GridN_;
-  };
-  const double& Rc_inject() const
-  {
-    return Rc_inject_;
-  };
-  const double& thetaC_tcl() const
-  {
-    return thetaC_tcl_;
-  };
-  const int& reinjection_tcl() const
-  {
-    return reinjection_tcl_;
-  };
-  const int& distri_first_facette() const
-  {
-    return distri_first_facette_;
-  };
-  const bool& ready_inject_tcl() const
-  {
-    return ready_inject_tcl_;
-  };
-  bool& ready_inject_tcl()
-  {
-    return ready_inject_tcl_;
-  };
-  const double& tempC_tcl() const
-  {
-    return tempC_tcl_;
-  };
-  const int& tag_tcl() const
-  {
-    return tag_tcl_;
-  };
   double compute_capillary_number() const;
   int get_any_tcl_face() const;
 
   // Using the exact in/out intersections of the interface within the cell (works only in 2D, and may assume the wall in y-)
-  void get_in_out_coords(const Domaine_VDF& zvdf, const int elem,
-                         const double dt,
-                         DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot);
+  void get_in_out_coords(const Domaine_VDF& zvdf, const int elem, const double dt, DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot);
 
   // computes an approximate interface position (equivalent mean-plane)
   // returns in_out table and the mean normal in elem, and the interface surface
-  void compute_approximate_interface_inout(const Domaine_VDF& zvdf, const int korient,
-                                           const int elem, const int num_face,
-                                           DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot) const;
+  void compute_approximate_interface_inout(const Domaine_VDF& zvdf, const int korient, const int elem, const int num_face, DoubleTab& in_out, FTd_vecteur3& norm_elem, double& surface_tot) const;
 
   double compute_local_cos_theta(const Parcours_interface& parcours, const int num_face, const FTd_vecteur3& norm_elem) const;
 
   // Computes the integral flux in a cell in the meso zone.
   // in and out are the interface position on both sides of the cell.
-  double compute_Qint(const DoubleTab& in_out, const double theta_app_locs,
-                      const int num_face, double& Qmeso) const;
+  double compute_Qint(const DoubleTab& in_out, const double theta_app_locs, const int num_face, double& Qmeso) const;
 
-  void compute_TCL_fluxes_in_all_boundary_cells(ArrOfInt& elems_with_CL_contrib,
-                                                ArrOfInt& faces_with_CL_contrib,
-                                                ArrOfDouble& mpoint_from_CL, ArrOfDouble& Q_from_CL);
+  void compute_TCL_fluxes_in_all_boundary_cells(ArrOfInt& elems_with_CL_contrib, ArrOfInt& faces_with_CL_contrib, ArrOfDouble& mpoint_from_CL, ArrOfDouble& Q_from_CL);
 
   void corriger_mpoint(DoubleTab& mpoint) const;
   void corriger_secmem(const double coef, DoubleTab& secmem2) const;
@@ -159,23 +89,31 @@ public :
   void correct_TCL_energy_evolution(DoubleTab& temperature) const;
   double get_theta_app(const int num_face);
 
-
-  void associer_eq_temperature(const Convection_Diffusion_Temperature_FT_Disc& eq_temp);
-  void associer_eq_ns(const Equation_base& eq);
-  void associer_eq_interf(const Equation_base& eq);
-
   enum InoutMethod { EXACT, APPROX, BOTH };
+
   //InoutMethod inout_method() const { return inout_method_;} ;
   inline ArrOfInt& elems();
-  inline const ArrOfInt& elems() const;
-  inline ArrOfInt& boundary_faces();
-  inline const ArrOfInt& boundary_faces() const;
-  inline ArrOfDouble& mp();
-  inline const ArrOfDouble& mp() const;
-  inline ArrOfDouble& Q();
-  inline const ArrOfDouble& Q() const;
+
+  inline const ArrOfInt& elems() const
+  {
+    assert(tag_tcl() == ref_eq_interf_.valeur().maillage_interface().get_mesh_tag());
+    return elems_;
+  }
+
+  inline ArrOfInt& boundary_faces() { return boundary_faces_; }
+
+  inline const ArrOfInt& boundary_faces() const
+  {
+    assert(tag_tcl() == ref_eq_interf_.valeur().maillage_interface().get_mesh_tag());
+    return boundary_faces_;
+  }
+
+  inline ArrOfDouble& mp() { return mp_; }
+  inline const ArrOfDouble& mp() const { return mp_; }
+  inline ArrOfDouble& Q() { return Q_; }
+  inline const ArrOfDouble& Q() const { return Q_; }
 //  double initial_CL_xcoord_;
-protected :
+protected:
 
   bool activated_;
   int deactivate_;
@@ -200,7 +138,7 @@ protected :
   double rhocpl_;
   int inout_method_ = 0;
   // Tabulation TCL model
-  int read_via_file_ ;
+  int read_via_file_;
   Nom Nom_ficher_tcl_;
   DoubleTab tab_Mtcl_;
   // total nb of colons
@@ -213,7 +151,6 @@ protected :
   int num_colon_app_;
   // num -colon for Qtcl
   int num_colon_qtcl_;
-
 
   // parameters to force numerical breakup
   // Radius of nucleate site; [in number of grids]
@@ -258,11 +195,13 @@ protected :
   double integrated_vmeso_evap_;
   double vevap_int_;
 
-  REF(Convection_Diffusion_Temperature_FT_Disc)  ref_eq_temp_;
-  REF(Transport_Interfaces_FT_Disc)  ref_eq_interf_;
+  Nom nom_eq_hydr_, nom_eq_therm_, nom_eq_interf_;
+
+  REF(Probleme_base) pb_base_;
+  REF(Convection_Diffusion_Temperature_FT_Disc) ref_eq_temp_;
+  REF(Transport_Interfaces_FT_Disc) ref_eq_interf_;
   REF(Navier_Stokes_FT_Disc) ref_ns_;
 };
-
 
 inline ArrOfInt& Triple_Line_Model_FT_Disc::elems()
 {
@@ -284,43 +223,6 @@ inline ArrOfInt& Triple_Line_Model_FT_Disc::elems()
       Process::exit();
     }
   return elems_;
-}
-
-inline const ArrOfInt& Triple_Line_Model_FT_Disc::elems() const
-{
-  assert(tag_tcl() == ref_eq_interf_.valeur().maillage_interface().get_mesh_tag());
-  return elems_;
-}
-
-inline ArrOfInt& Triple_Line_Model_FT_Disc::boundary_faces()
-{
-  return boundary_faces_;
-}
-
-inline const ArrOfInt& Triple_Line_Model_FT_Disc::boundary_faces() const
-{
-  assert(tag_tcl() == ref_eq_interf_.valeur().maillage_interface().get_mesh_tag());
-  return boundary_faces_;
-}
-
-inline ArrOfDouble& Triple_Line_Model_FT_Disc::mp()
-{
-  return mp_;
-}
-
-inline const ArrOfDouble& Triple_Line_Model_FT_Disc::mp() const
-{
-  return mp_;
-}
-
-inline ArrOfDouble& Triple_Line_Model_FT_Disc::Q()
-{
-  return Q_;
-}
-
-inline const ArrOfDouble& Triple_Line_Model_FT_Disc::Q() const
-{
-  return Q_;
 }
 
 #endif /* Triple_Line_Model_FT_Disc_included */

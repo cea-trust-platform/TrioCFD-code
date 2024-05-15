@@ -51,12 +51,8 @@ int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
       la_chimie_ = ref_cast(Chimie, ob);
       return 1;
     }
-  if (sub_type(Triple_Line_Model_FT_Disc, ob))
-    {
-      associate_triple_line_model(ref_cast(Triple_Line_Model_FT_Disc, ob));
-      return 1;
-    }
-  return Pb_Fluide_base::associer_(ob);
+  else
+    return Pb_Fluide_base::associer_(ob);
 }
 
 void Probleme_FT_Disc_gen::lire_solved_equations(Entree& is)
@@ -170,6 +166,20 @@ void Probleme_FT_Disc_gen::typer_lire_milieu(Entree& is)
         }
 }
 
+Entree& Probleme_FT_Disc_gen::lire_equations(Entree& is, Motcle& dernier_mot)
+{
+  Pb_Fluide_base::lire_equations(is, dernier_mot);
+
+  if (dernier_mot == "TRIPLE_LINE_MODEL_FT_DISC")
+    {
+      is >> tcl_; // on lit
+      tcl_.associer_pb(*this);
+      tcl_.initialize(); // on initialise !!
+      is >> dernier_mot; // et on lit le dernier mot
+    }
+  return is;
+}
+
 void Probleme_FT_Disc_gen::add_FT_equation(const Nom& eq_name, const Nom& eq_type)
 {
   equations_.add(Equation());
@@ -179,14 +189,6 @@ void Probleme_FT_Disc_gen::add_FT_equation(const Nom& eq_name, const Nom& eq_typ
   eq.associer_sch_tps_base(le_schema_en_temps_);
   eq.nommer(Nom(eq_name));
   Cerr << "Equation " << eq_type << " added to the list and renamed to : " << eq_name << " ..." << finl;
-}
-
-void Probleme_FT_Disc_gen::associate_triple_line_model(Triple_Line_Model_FT_Disc& tcl_1)
-{
-  // TODO: A verifier. Working fine?
-  // tcl.initialize(); // ca ne marche pas, apres le '=' ci-dessous, le tcl_.elems_.smart_resize_ est toujours a 0!!!
-  tcl_ = tcl_1;
-  tcl_.initialize();
 }
 
 /*! @brief Verifie que le milieu est de type Fluide_Diphasique et associe le milieu aux equations.
@@ -354,8 +356,7 @@ void Probleme_FT_Disc_gen::completer(void)
       la_chimie_.valeur().completer(*this);
     }
 
-  if (tcl_.is_activated())
-    tcl_.completer();
+  if (tcl_.is_activated()) tcl_.completer();
 }
 
 bool Probleme_FT_Disc_gen::updateGivenFields()
@@ -363,11 +364,8 @@ bool Probleme_FT_Disc_gen::updateGivenFields()
   // add: fill the lists of TCL model if actived, Which will be used for updated the BCs
   if (tcl().is_activated())
     {
-
-      ArrOfInt elems_with_CL_contrib;
-      ArrOfInt faces_with_CL_contrib;
-      ArrOfDouble mpoint_from_CL;
-      ArrOfDouble Q_from_CL;
+      ArrOfInt elems_with_CL_contrib, faces_with_CL_contrib;
+      ArrOfDouble mpoint_from_CL, Q_from_CL;
       tcl().compute_TCL_fluxes_in_all_boundary_cells(elems_with_CL_contrib, faces_with_CL_contrib, mpoint_from_CL, Q_from_CL);
     }
   return Probleme_base::updateGivenFields();

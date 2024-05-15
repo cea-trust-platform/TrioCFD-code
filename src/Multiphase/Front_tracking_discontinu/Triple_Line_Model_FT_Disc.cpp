@@ -32,6 +32,7 @@
 #include <LecFicDiffuse.h>
 #include <Domaine_Cl_VDF.h>
 #include <Echange_contact_VDF_FT_Disc.h>
+#include <Probleme_FT_Disc_gen.h>
 
 
 static const double TSAT_CONSTANTE = 0.;
@@ -165,6 +166,11 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   //p.ajouter("ylim", &ym_); // XD_ADD_P floattant not_set
   p.ajouter("ym", &ym_); // XD_ADD_P floattant Wall distance of the point M delimiting micro/meso transition [m]
   p.ajouter("sm", &sm_,Param::REQUIRED); // XD_ADD_P floattant Curvilinear abscissa of the point M delimiting micro/meso transition [m]
+
+  p.ajouter("hydraulic_equation|equation_navier_stokes", &nom_eq_hydr_,Param::REQUIRED); // XD_ADD_P chaine Hydraulic equation name
+  p.ajouter("thermal_equation|equation_temperature", &nom_eq_therm_,Param::REQUIRED); // XD_ADD_P chaine Thermal equation name
+  p.ajouter("interface_equation|equation_interface", &nom_eq_interf_,Param::REQUIRED); // XD_ADD_P chaine Interface equation name
+
   p.ajouter("ymeso", &ymeso_); // XD_ADD_P floattant Meso region extension in wall-normal direction [m]
   p.ajouter("n_extend_meso", &n_ext_meso_); // XD_ADD_P entier Meso region extension in number of cells [-]
   p.ajouter("initial_CL_xcoord", &initial_CL_xcoord_); // XD_ADD_P floattant Initial interface position (unused)
@@ -190,82 +196,29 @@ void Triple_Line_Model_FT_Disc::set_param(Param& p)
   p.dictionnaire("both", BOTH); // Makes both and compare them
 }
 
-void Triple_Line_Model_FT_Disc::associer_eq_temperature(const Convection_Diffusion_Temperature_FT_Disc& eq_temp)
+void Triple_Line_Model_FT_Disc::associer_pb(const Probleme_base& pb)
 {
-  if (! sub_type(Convection_Diffusion_Temperature_FT_Disc, eq_temp))
-    {
-      Cerr << "Error for associer_eq_temperature is not given what we expect\n"
-           << "A Convection_Diffusion_Temperature_FT_Disc medium was expected." << finl;
-      Process::exit();
-    }
-  ref_eq_temp_ = ref_cast(Convection_Diffusion_Temperature_FT_Disc, eq_temp);
-}
-
-void Triple_Line_Model_FT_Disc::associer_eq_interf(const Equation_base& eq)
-{
-  if (!sub_type(Transport_Interfaces_FT_Disc,eq))
-    {
-      Cerr<<"No interface transport equation has been associated to TCL model"<<finl;
-      Process::exit();
-    }
-  ref_eq_interf_ = ref_cast(Transport_Interfaces_FT_Disc, eq);
-}
-
-void Triple_Line_Model_FT_Disc::associer_eq_ns(const Equation_base& eq)
-{
-  if (!sub_type(Navier_Stokes_FT_Disc,eq))
-    {
-      Cerr<<"No NS equation has been associated to TCL model"<<finl;
-      Process::exit();
-    }
-  ref_ns_ = ref_cast(Navier_Stokes_FT_Disc, eq);
-}
-
-int Triple_Line_Model_FT_Disc::associer_(Objet_U& ob)
-{
-  if (sub_type(Transport_Interfaces_FT_Disc, ob))
-    {
-      associer_eq_interf(ref_cast(Transport_Interfaces_FT_Disc, ob));
-      return 1;
-    }
-  else if (sub_type(Navier_Stokes_FT_Disc,ob))
-    {
-      associer_eq_ns(ref_cast(Navier_Stokes_FT_Disc,ob));
-      return 1;
-    }
-  else if (sub_type(Convection_Diffusion_Temperature_FT_Disc,ob))
-    {
-      associer_eq_temperature(ref_cast(Convection_Diffusion_Temperature_FT_Disc,ob));
-      return 1;
-    }
-  else
-    {
-      Cerr << "Error in TCL association to obj " << ob.que_suis_je() << finl;
-      Process::exit();
-    }
-  return 0;
+  pb_base_ = pb;
 }
 
 void Triple_Line_Model_FT_Disc::initialize()
 {
-  if (!ref_eq_interf_.non_nul())
+  const auto& list_eqs = ref_cast(Probleme_FT_Disc_gen, pb_base_.valeur()).get_list_equations();
+
+  for (const auto &itr : list_eqs)
     {
-      Cerr << "No interfacial transport has been associated to TCL model" << finl;
-      Cerr << "Please use Associate [TCL] [Transport_Interface_FT_Disc]" << finl;
-      Process::exit();
+      if (itr->le_nom() == nom_eq_hydr_)
+        ref_ns_ = ref_cast(Navier_Stokes_FT_Disc, itr.valeur());
+
+      if (itr->le_nom() == nom_eq_therm_)
+        ref_eq_temp_ = ref_cast(Convection_Diffusion_Temperature_FT_Disc, itr.valeur());
+
+      if (itr->le_nom() == nom_eq_interf_)
+        ref_eq_interf_ = ref_cast(Transport_Interfaces_FT_Disc, itr.valeur());
     }
-  if (!ref_eq_temp_.non_nul())
-    {
-      Cerr << "No temperature equation has been associated to TCL model" << finl;
-      Cerr << "Please use Associate [TCL] [Convection_Diffusion_FT_Disc]" << finl;
-      Process::exit();
-    }
-  if (!ref_ns_.non_nul())
-    {
-      Cerr << "No NS equation has been associated to TCL model" << finl;
-      Cerr << "Please use Associate [TCL] [Navier_Stokes_FT_Disc]" << finl;
-      Process::exit();
-    }
+
+  assert(ref_ns_.non_nul() && ref_eq_temp_.non_nul() && ref_eq_interf_.non_nul());
+
   const Transport_Interfaces_FT_Disc& transport = ref_eq_interf_.valeur();
   const Maillage_FT_Disc& maillage = transport.maillage_interface();
   tag_tcl_ = maillage.get_mesh_tag();
