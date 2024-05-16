@@ -1,0 +1,6 @@
+#!/bin/bash
+lata=`ls shear_boundary_conditions_jdd*lata 2>/dev/null`
+tar xzf ref.tar.gz
+compare_lata $lata  ref/$lata
+exit $?
+

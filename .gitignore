@@ -13,3 +13,4 @@ README.BALTIK
 index.html
 build/
 local/
+__pycache__
