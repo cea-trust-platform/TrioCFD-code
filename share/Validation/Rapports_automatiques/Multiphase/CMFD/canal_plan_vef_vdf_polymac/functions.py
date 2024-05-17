@@ -22,35 +22,6 @@ AR_polymac = 1 # trainguler avec polymac
 L = 100 # [m] Longueur du domaine (canal)
 H = 1 # [m] demi hauteur du canal (CL : symétrie)
 
-description_fiche = f"""On simule un écoulement monophasique turbulent en RANS 
-    dans un canal plan avec les différentes configurations:\n
-    \t- VDF, VEF et PolyMAC (schémas numériques)\n
-    \t- k-epsilon, k-omega et k-tau (modèles de turbulence)\n
-    
-    La simulation est faite sur un canal de longueur L=100m et hauteur 2H=2m
-                                         symétrie
-                _______________________________________________________________
-                |                                                             |
-    Inlet:      |             Bloc maillage n°3 : hauteur=0.6m                | Outlet:
-      velocity->|-------------------------------------------------------------|-> pressure
-      k       ->|             Bloc maillage n°2 : hauteur=0.2m                |-> k
-      epsilon ->|-------------------------------------------------------------|-> epsilon
-                |             Bloc maillage n°1 : hauteur=0.2m                |
-                |_____________________________________________________________|
-                                         Paroi
-    
-    
-    il est possible de lancer le calcul sur plusieurs maillages : \n
-    L'utilisateur choisi le nombre de noeuds selon y dans le bloc n°1 : \n
-            liste du nombre de noeuds par maillage Ny\n
-    Comme les rectangles sont coupés en 4 triangles pour VEF, \n
-    il y aura 2 fois plus de mailles que la valeur entrée\n
-    Attention : le rapport d'aspect AR={AR} est défini dans function.py.\n
-                pour VEF, si Ny=2 le rapport d'aspect est diviser par 2\n
-    il est possible de déraffiner le maillage dans les bloc n°2 et 3 avec \n
-    des facteurs multiplictaifs des tailles de mailles : taux1 et taux2\n
-    """
-
 ###############################################################################
 ######################### Substitution in data file ###########################
 ###############################################################################
