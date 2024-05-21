@@ -587,20 +587,10 @@ void AssembleurPVDF_PF::modifier_secmem_vitesse_imposee(const Entree_fluide_vite
 
   if (get_resoudre_increment_pression())
     {
-      int gpoint_variable;
-      if (sub_type(Champ_front_instationnaire_base, champ_front))
-        gpoint_variable = 0; // Instationnaire uniforme
-      else if (sub_type(Champ_front_var_instationnaire, champ_front))
-        gpoint_variable = 1; // Instationnaire variable
-      else
-        gpoint_variable = -1; // Stationnaire
-
-      if (gpoint_variable >= 0)
+      if (champ_front.instationnaire())
         {
-          const DoubleTab& tab_gpoint = (gpoint_variable)
-                                        ? ref_cast(Champ_front_var_instationnaire,  champ_front).Gpoint()
-                                        : ref_cast(Champ_front_instationnaire_base, champ_front).Gpoint();
-
+          const DoubleTab& tab_gpoint = champ_front.derivee_en_temps();
+          bool ch_unif = (tab_gpoint.nb_dim()==1);
           const int nb_faces = frontiere_vf.nb_faces();
           const int num_premiere_face = frontiere_vf.num_premiere_face();
           for (int i = 0; i < nb_faces; i++)
@@ -615,7 +605,7 @@ void AssembleurPVDF_PF::modifier_secmem_vitesse_imposee(const Entree_fluide_vite
               // Numero de l'element adjacent a la face de bord
               const int elem = elem0 + elem1 + 1;
               const int ori = le_dom.orientation(num_face);
-              const double gpoint = (gpoint_variable) ? tab_gpoint(i, ori) : tab_gpoint(ori);
+              const double gpoint = ch_unif ? tab_gpoint(ori) : tab_gpoint(i, ori);
 
               secmem[elem] += signe * surface * gpoint;
             }

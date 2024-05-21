@@ -107,7 +107,7 @@ bool RK3_FT::iterateTimeStep(bool& converged)
       //  "mettre_a_jour". On fait une difference finie avec un delta_t tout petit:
       prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
       prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_);
-      prob.equation(i).domaine_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
+      prob.equation(i).domaine_Cl_dis()->calculer_derivee_en_temps(temps_courant_ - epsilon_dt,temps_courant_);
     }
 
   temps_courant_ += dt_*1./3.;
@@ -145,7 +145,7 @@ bool RK3_FT::iterateTimeStep(bool& converged)
     {
       prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
       prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_);
-      prob.equation(i).domaine_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
+      prob.equation(i).domaine_Cl_dis()->calculer_derivee_en_temps(temps_courant_ - epsilon_dt,temps_courant_);
     }
 
   temps_courant_ += dt_*5./12.;
@@ -187,7 +187,7 @@ bool RK3_FT::iterateTimeStep(bool& converged)
     {
       prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_ - epsilon_dt);
       prob.equation(i).domaine_Cl_dis().mettre_a_jour(temps_courant_);
-      prob.equation(i).domaine_Cl_dis()->Gpoint(temps_courant_ - epsilon_dt,temps_courant_);
+      prob.equation(i).domaine_Cl_dis()->calculer_derivee_en_temps(temps_courant_ - epsilon_dt,temps_courant_);
     }
 
   temps_courant_ += dt_*1./4.;
