@@ -13,44 +13,6 @@ from scipy.optimize import newton, brentq
 # # paramètres fixés pour tous les calculs
 tmax = 2 # [s]
 
-
-description_fiche = f"""On simule un écoulement monophasique turbulent en RANS 
-    sur une marche descendante avec les différentes configurations:\n
-    \t- VDF, VEF et PolyMAC (schémas numériques)\n
-    \t- k-epsilon, k-omega et k-tau (modèles de turbulence)\n
-    
-    La simulation est faite sur le domaine suivant :
-                                         
-                _______________________________________________________________
-                |                                                        ↑    |
-    Inlet:    ->|                                                     H = 8h  | Outlet:
-     v=44.2m/s->|                                                        |    |-> p=0
-     k-eps    ->|__________________________________                      ↓    |-> k-eps
-                ←     l = 1.1133                 →|                      ↑    |
-                                                  |                 h = 0.0127|
-                                                  |______________________↓____|
-                                                   ←---------L = 0.5---------→
-    
-    Cette simulation se base sur l'expérience de Driver & Seegmiller [1]. 
-    Nous chercherons donc à valider les différents modèles de turbulence
-    en comparant les résultats obtenus aux données expérimentales fournies par turbomodels [2].
-    
-    Les dimensions du domaine sont disponible sur le site de turbomodels,
-    ces derniers ont choisis de mettre en entrée du domaine sur une longueur de
-    0.8867 m  une condition limite de symétrie aux paroix inférieure et supérieure
-    pour éviter toute incompatibilité entre les conditions d'écoulements en entrée
-    et les conditions limites aux parois. Cependant, la reproduction de ce maillage
-    sur trio donne des résidus très grands aux points où les parois frottantes commencent.
-    Nous avons donc fait le choix de raccourcir la longueur l par rapport aux maillages
-    de turbmodels 1.5 - 0.8867 = 1.1133 m pour imposer directement des parois frottantes.
-    
-    References:
-     - 1: Driver, D. M. and Seegmiller, H. L., “Features of Reattaching Turbulent
-        Shear Layer in Divergent Channel Flow,” AIAA Journal, 
-        Vol. 23, No. 2, Feb 1985, pp. 163-171.
-     - 2: https://turbmodels.larc.nasa.gov/Backstep_validation/profiles.exp.dat
-    """
-
 def find_zero(x_sonde,velocity_sonde,x_min, x_max):
     f = lambda x : np.interp(x,x_sonde,velocity_sonde)
     try:

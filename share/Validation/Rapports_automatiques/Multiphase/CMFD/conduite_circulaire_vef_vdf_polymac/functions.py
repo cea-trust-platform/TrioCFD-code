@@ -9,27 +9,6 @@ from string import Template
 import numpy as np
 from math import *
 
-description_fiche = """On simule un écoulement monophasique turbulent en RANS 
-    dans une conduite circulaire (tube) avec les différentes configurations:\n
-    \t- VDF, VEF et PolyMAC (schémas numériques)\n
-    \t- k-epsilon, k-omega et k-tau (modèles de turbulence)\n
-    La simulation est faite sur un tube de longueur L=100m et rayon R=2m\n
-    Les maillages utilisées avec VEF et Polymac sont générés avec salomé (voir script python dans src/)\n
-    Pour VDF, on utilise un maillages 2D avec une condition limite d'axisymétrie en x=0\n
-    
-                                            paroi
-                _______________________________________________________________
-                |                                                             |
-    Inlet:      |                                                             | Outlet:
-      velocity->|                                                             |-> pressure
-      k       ->|                                                             |-> k
-      epsilon ->|                                                             |-> epsilon
-                |                                                             |
-                |_____________________________________________________________|
-                                         axisymétrie
-    """
-
-
 # # paramètres fixés pour tous les calculs
     
 kappa = 0.41
