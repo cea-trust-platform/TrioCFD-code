@@ -247,7 +247,7 @@ class Case:
         return jobsteady_ID, ok
 
     def runCase(self):
-        if os.getenv("project_directory") is None:
+        if os.getenv("TrioCFD_project_directory") is None:
             raise Exception("TrioCFD environment is required but not found")
         cwd = os.getcwd()
         os.chdir(self.directory)

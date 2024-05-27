@@ -3,13 +3,13 @@
 if [ ! -d FTD_remaillage_vef_SEQ ]
 then
   # copie_cas_test FTD_remaillage_vef
-  cp -R ${project_directory}/tests/Reference/Multiphase/Front_tracking_discontinu/Front_tracking_discontinu/FTD_remaillage_vef ./FTD_remaillage_vef_SEQ
+  cp -R ${TrioCFD_project_directory}/tests/Reference/Multiphase/Front_tracking_discontinu/Front_tracking_discontinu/FTD_remaillage_vef ./FTD_remaillage_vef_SEQ
 fi
 
 if [ ! -d FTD_remaillage_vdf_SEQ ]
 then
   # copie_cas_test FTD_remaillage_vdf
-  cp -R ${project_directory}/tests/Reference/Multiphase/Front_tracking_discontinu/Front_tracking_discontinu/FTD_remaillage_vdf ./FTD_remaillage_vdf_SEQ
+  cp -R ${TrioCFD_project_directory}/tests/Reference/Multiphase/Front_tracking_discontinu/Front_tracking_discontinu/FTD_remaillage_vdf ./FTD_remaillage_vdf_SEQ
 fi
 
 cp -R ./FTD_remaillage_vef_SEQ ./FTD_remaillage_vef_PAR

@@ -28,7 +28,7 @@ for Discr in $Discretization ; do
         mkdir -p $fold
 
         MeshFile="mesh_tetra_"$num
-        ln -sfn $project_directory/share/Validation/Rapports_automatiques/P1NCP0RT/mesh/$MeshFile".med" $fold/.
+        ln -sfn $TrioCFD_project_directory/share/Validation/Rapports_automatiques/P1NCP0RT/mesh/$MeshFile".med" $fold/.
 
         DataFile="StatVortex_"$Discr"_"$Re".data"
         cp  $DataFile $fold/StatVortex.data
