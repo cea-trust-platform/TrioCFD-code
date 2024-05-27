@@ -178,7 +178,7 @@ void IJK_Composantes_Connex::compute_compo_connex_from_interface()
   const int nx = eulerian_compo_connex_from_interface_int_ns_.ni();
   const int ny = eulerian_compo_connex_from_interface_int_ns_.nj();
   const int nz = eulerian_compo_connex_from_interface_int_ns_.nk();
-  ArrOfInt elems_vap;
+  //ArrOfInt elems_vap;
   ArrOfInt elems_valid;
   for (int k=0; k < nz ; k++)
     for (int j=0; j< ny; j++)
