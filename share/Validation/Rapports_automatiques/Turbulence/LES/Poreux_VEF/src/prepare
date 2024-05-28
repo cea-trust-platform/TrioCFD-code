@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TCFD_REP_TEST=${project_directory}/tests/Reference/Turbulence/LES
+TCFD_REP_TEST=${TrioCFD_project_directory}/tests/Reference/Turbulence/LES
 TRUS_REP_TEST=${TRUST_ROOT}/tests/Reference
 
 for cas in Poreux_VEF_2D Poreux_VEF_3D Poreux_VEF_3D_EFstab Poreux_VEF_3D_turb Poreux_VEF_Poiseuille

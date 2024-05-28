@@ -1,6 +1,6 @@
 #!/bin/bash
 
-local_root=$project_directory/share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_static_thermal_wedge/src/
+local_root=$TrioCFD_project_directory/share/Validation/Rapports_automatiques/Multiphase/Front_tracking_discontinu/FTD_TCL_static_thermal_wedge/src/
 lata_to_med ()
 {
   [ ! -d lata ] && echo "Lata is missing" && return -2
