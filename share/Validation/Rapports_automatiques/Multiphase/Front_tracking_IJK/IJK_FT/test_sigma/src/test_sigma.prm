@@ -7,6 +7,10 @@ Parametres {
 	CasTest . test_sigma_drho_seq.data
 	CasTest . test_sigma_par8.data 8
 	ExtraUsedFile init.lata*
+	ExtraUsedFile test_sigma*.lata.*.CELL_RHO_SOURCE_QDM_INTERF_X
+	ExtraUsedFile test_sigma*.lata.*.RHO
+	ExtraUsedFile test_sigma*.lata.*.CELL_SOURCE_QDM_INTERF_X
+	ExtraUsedFile test_sigma*.lata.*.CELL_RHO_SOURCE_QDM_INTERF_X
 	# DISABLE_PARALLEL_RUN #
 }
 
