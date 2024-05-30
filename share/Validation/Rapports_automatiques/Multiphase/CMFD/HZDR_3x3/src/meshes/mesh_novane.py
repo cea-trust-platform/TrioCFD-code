@@ -40,7 +40,7 @@ def build_geom(step_name, x_bottom_tet, x_top_tet, eps, radius):
 
     return fluid_domain, []
 
-def extrude_top_and_bottom(mesh, d, dxh, dx):
+def extrude_top_and_bottom(mesh, boundary, dx_zone1, dx_zone2):
     
     mesh3d = mc.ReadUMeshFromFile(mesh)
 
@@ -70,8 +70,8 @@ def extrude_top_and_bottom(mesh, d, dxh, dx):
     # and build mesh from the 1D meshes created
     for g, x, sgn in [("bottom", xmin, -1.0), ("top", xmax, 1.0)]:
         mesh_bord = mf.buildPartOfMySelf(sorted(groups[g]), False)
-        nz1, nz2 = int(d[g][0] / dxh + 1e-7), int(d[g][1] / dx + 1e-7)
-        dx1, dx2 = d[g][0] / nz1, d[g][1] / nz2
+        nz1, nz2 = int(boundary[g][0] / dx_zone1 + 1e-7), int(boundary[g][1] / dx_zone2 + 1e-7)
+        dx1, dx2 = boundary[g][0] / nz1, boundary[g][1] / nz2
         print(f"dxh redefined to {dx1}, dx redefined to {dx2}")
         mesh1d = mc.MEDCouplingUMesh("ex", 1)
         mesh1d.allocateCells(nz1 + nz2)
@@ -140,12 +140,13 @@ if __name__ == "__main__":
     ####################
     # geometry
     x_bottom_tet, x_top_tet = 0.42, 0.45      # bottom on top axis of the tetrahedrons zone
-    x_bottom_dom, x_top_dom = -220e-3, 110e-3 # bottom on top axis of the tetrahedrons zone
-    eps = 1e-2                                # distance added upstream and downstream of the 3*3 rod bundle mesh with tetrahedrons, needed for the extrusion.
+    #x_bottom_dom, x_top_dom = -0.22, 0.110    # bottom on top axis of the tetrahedrons zone
+    x_bottom_dom, x_top_dom = -0.11, 0.055    # bottom on top axis of the tetrahedrons zone
+    eps = 0.01                                # distance added upstream and downstream of the 3*3 rod bundle mesh with tetrahedrons, needed for the extrusion.
     r = 5e-3                                  # radius of the rod
     #----------
-    dx = 8e-4 # 4e-4                          # mesh refinement of the tetrahedrons zone
-    step_name = "../../CAD/070721_full_novane.stp"
+    dx = 4e-4                          # mesh refinement of the tetrahedrons zone
+    step_name = "../CAD/070721_full_novane.stp"
 
     ####################
     # build the geometry for the tetrahedrons zone 
@@ -177,6 +178,9 @@ if __name__ == "__main__":
     dx_zone1 = 5*dx
     dx_zone2 = 25* dx
     # extrude the bottom and top face and merge meshes to the tetrahedron mesh.
-    mesh = extrude_top_and_bottom(maillage, {"bottom" : [220e-3 - 3e-2 - eps, 0.2], "top" : [110e-3 - eps, 0.2]}, dx_zone1, dx_zone2)
+    #mesh = extrude_top_and_bottom(maillage, {"bottom" : [-x_bottom_dom - 0.03 - eps, 0.2], "top" : [x_top_dom - eps, 0.2]}, dx_zone1, dx_zone2)
+    mesh = extrude_top_and_bottom(maillage, {"bottom" : [-x_bottom_dom - (x_top_tet- x_bottom_tet) - eps, 0.2], "top" : [x_top_dom - eps, 0.2]}, dx_zone1, dx_zone2)
     mm = create_groups(mesh, r, x_top_tet + x_bottom_dom, x_top_tet + x_top_dom)
     mm.write("mesh_novane.med", 2)
+
+#def extrude_top_and_bottom(mesh, d, dxh, dx):
