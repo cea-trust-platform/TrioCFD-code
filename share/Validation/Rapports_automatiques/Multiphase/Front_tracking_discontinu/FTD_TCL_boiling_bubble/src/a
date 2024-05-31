@@ -1,7 +1,0 @@
-#!/bin/bash
-submission ()
-{
-  wait $1
-  echo $2
-}
-submission $1 $2
