@@ -2,6 +2,7 @@
 # Modele_turbulence (K, Epsilon) with wall law  #
 # Warning: very coarse mesh.  This is a numerical test case, we do not look at physical aspects in detail here #
 # PARALLEL ONLY 6 # 
+# OPENMP NOT #
 
 
 dimension 3

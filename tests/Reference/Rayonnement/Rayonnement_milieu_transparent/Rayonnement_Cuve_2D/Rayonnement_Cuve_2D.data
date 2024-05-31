@@ -1,5 +1,6 @@
 # 2 problemes de Thermohydraulique 2D VEF couplee a 2 problemes de Conduction avec rayonnement de paroi transparent sur un 1 seul probleme fluide #
 # PARALLEL OK #
+# OPENMP NOT #
 dimension 2 
 
 Pb_Rayo_Thermohydraulique_Turbulent pb1

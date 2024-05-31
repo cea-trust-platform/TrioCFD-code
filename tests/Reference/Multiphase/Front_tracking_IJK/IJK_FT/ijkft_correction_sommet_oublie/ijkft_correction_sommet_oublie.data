@@ -1,5 +1,6 @@
 # Sommet reel passant seul sur un proc (sans facette)  #
 # PARALLEL ONLY 8 #
+# OPENMP NOT #
 IJK_Grid_Geometry DOM
 
 Lire DOM
