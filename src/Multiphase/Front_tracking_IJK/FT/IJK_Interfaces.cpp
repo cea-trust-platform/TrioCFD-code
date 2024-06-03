@@ -1287,11 +1287,11 @@ void IJK_Interfaces::calculer_aspect_ratio(ArrOfDouble& aspect_ratio) const
       const double d_i_1 = sqrt( (sommets(i1, 0)-centre_gravite(compo,0))*(sommets(i1, 0)-centre_gravite(compo,0)) + (sommets(i1, 1)-centre_gravite(compo,1))*(sommets(i1, 1)-centre_gravite(compo,1)) + (sommets(i1, 2)-centre_gravite(compo,2))*(sommets(i1, 2)-centre_gravite(compo,2)) );
       const double d_i_2 = sqrt( (sommets(i2, 0)-centre_gravite(compo,0))*(sommets(i2, 0)-centre_gravite(compo,0)) + (sommets(i2, 1)-centre_gravite(compo,1))*(sommets(i2, 1)-centre_gravite(compo,1)) + (sommets(i2, 2)-centre_gravite(compo,2))*(sommets(i2, 2)-centre_gravite(compo,2)) );
 
-      // On rÃ©cupÃ¨re la plus grande distance et la plus petite distance parmi les 3 calculÃ©es
+      // On recupere la plus grande distance et la plus petite distance parmi les 3 calculees
       d_imax = std::max(d_i_0,std::max(d_i_1,d_i_2));
       d_imin = std::min(d_i_0,std::min(d_i_1,d_i_2));
 
-      // On met Ã  jour le grand axe et le petit axe
+      // On met a jour le grand axe et le petit axe
       if (d_imax > d_max[compo])
         d_max[compo] = d_imax;
 
@@ -3049,7 +3049,7 @@ void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
           // la bulle sort du domaine (et le domaine est periodique)
 
           // pour le shear_periodic,
-          // on passe d'une variable 6 bit, à 8 bit, puisqu on a un degres de liberte supplementaire sur les ghost
+          // on passe d'une variable 6 bit, a 8 bit, puisqu on a un degres de liberte supplementaire sur les ghost
           for (int direction = 0; direction < 3; direction++)
             {
               if (perio_NS_[direction])
@@ -3109,7 +3109,7 @@ void IJK_Interfaces::preparer_duplicata_bulles(const DoubleTab& bounding_box,
           // Stocke le masque dans le tableau resultat :
           masque_duplicata_pour_compo[icompo] = masque_sortie_domaine_reel;
           // duCluzeau : pour shear-perio, il faut stocker un autre tableau avec le nombre de duplicata par bulles.
-          // pour ça, il faut tester la position de la bulle ghost en z, et verifier si elle sort en x
+          // pour ca, il faut tester la position de la bulle ghost en z, et verifier si elle sort en x
         }
     }
   envoyer_broadcast(masque_duplicata_pour_compo, 0);
@@ -3132,7 +3132,7 @@ void IJK_Interfaces::preparer_duplicata_bulles_masque_6bit(const DoubleTab& boun
           // la bulle sort du domaine (et le domaine est periodique)
 
           // pour le shear_periodic,
-          // on passe d'une variable 6 bit, à 8 bit, puisqu on a un degres de liberte supplementaire sur les ghost
+          // on passe d'une variable 6 bit, a 8 bit, puisqu on a un degres de liberte supplementaire sur les ghost
           for (int direction = 0; direction < 3; direction++)
             {
               if (perio_NS_[direction])
