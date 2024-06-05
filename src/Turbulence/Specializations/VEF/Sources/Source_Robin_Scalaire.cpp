@@ -37,7 +37,8 @@
 #include <Paroi_std_scal_hyd_VEF.h>
 
 Implemente_instanciable(Source_Robin_Scalaire,"Source_Robin_Scalaire_VEF_P1NC",Source_base);
-
+// XD source_robin_scalaire source_base source_robin_scalaire 0 This source term should be used when a Paroi_decalee_Robin boundary condition is set in a an energy equation. The source term will be applied on the N specified boundaries. The values temp_wall_valueI are the temperature specified on the Ith boundary. The last value dt_impr is a printing period which is mandatory to specify in the data file but has no effect yet.
+// XD attr bords listdeuxmots_sacc bords 0 not_set
 
 // printOn
 Sortie& Source_Robin_Scalaire::printOn(Sortie& s) const

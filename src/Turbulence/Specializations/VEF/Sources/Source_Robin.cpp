@@ -33,7 +33,7 @@
 #include <Paroi_std_hyd_VEF.h>
 
 Implemente_instanciable(Source_Robin,"Source_Robin_VEF_P1NC",Source_base);
-
+// XD source_robin source_base source_robin 0 This source term should be used when a Paroi_decalee_Robin boundary condition is set in a hydraulic equation. The source term will be applied on the N specified boundaries. To post-process the values of tauw, u_tau and Reynolds_tau into the files tauw_robin.dat, reynolds_tau_robin.dat and u_tau_robin.dat, you must add a block Traitement_particulier { canal { } }
 
 // printOn
 Sortie& Source_Robin::printOn(Sortie& s) const
@@ -46,7 +46,7 @@ Sortie& Source_Robin::printOn(Sortie& s) const
 Entree& Source_Robin::readOn(Entree& s)
 {
 //  s >> noms_parois >> dt_post;
-  s >> noms_parois ;
+  s >> noms_parois ; // XD attr bords vect_nom bords 0 not_set
   return s;
 }
 
