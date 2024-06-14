@@ -1,3 +1,7 @@
 TrioCFD v1.9.4 merge 17
 
+<<<<<<< HEAD
 Based on trust Id SHA1 : 1261cd0925c861463e61d793c98346b6b0aceab3
+=======
+Based on trust Id SHA1 : e098e36341e9730a27b81308bfef9ce6533c4d56
+>>>>>>> 566cc8918 ( update the TRUST version corresponding)
