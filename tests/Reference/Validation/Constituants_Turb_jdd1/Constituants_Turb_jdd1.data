@@ -93,7 +93,7 @@ Read pb
             }
     }
 
-    liste_equations
+    list_equations
     {
         Convection_diffusion_Concentration_Turbulent {
             Sources {
