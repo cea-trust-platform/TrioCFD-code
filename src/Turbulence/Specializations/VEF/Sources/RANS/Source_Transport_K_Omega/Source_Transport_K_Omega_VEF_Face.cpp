@@ -100,14 +100,14 @@ void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgrad
   const DoubleTab& kinematic_viscosity = get_visc_turb();
   const DoubleTab& distmin = le_dom_VEF->y_faces(); // Minimum distance to the edge
 
-  DoubleTab& tmpF1 = ref_cast_non_const(DoubleTab, turbulence_model->get_blenderF1());
-  DoubleTab& tmpF2 = ref_cast_non_const(DoubleTab, turbulence_model->get_fieldF2());
+  DoubleTab& blenderF1 = ref_cast_non_const(DoubleTab, turbulence_model->get_blenderF1());
+  DoubleTab& fieldF2 = ref_cast_non_const(DoubleTab, turbulence_model->get_fieldF2());
 
-  DoubleTab visc_face( le_dom_VEF->nb_faces());
+  DoubleTab visc_face(le_dom_VEF->nb_faces_tot()); // dimension_tot(0)
   elem_to_face(le_dom_VEF.valeur(), kinematic_viscosity, visc_face);
 
-  // Loop on faces
-  for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
+  // Loop on all faces (dimension_tot(0))
+  for (int face = 0; face < le_dom_VEF->nb_faces_tot(); face++)
     {
       double const dmin = std::max(distmin(face), 1e-20);
       double const enerK = K_Omega(face, 0);
@@ -115,13 +115,13 @@ void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgrad
 
       double const tmp1 = sqrt(enerK)/(BETA_K*omega*dmin);
       double const tmp2 = 500.0*visc_face(face)/(omega*dmin*dmin);
-      double const tmp3 = 4.0*SIGMA_OMEGA2*enerK/(std::max(2*SIGMA_OMEGA2*gradKgradOmega(face)/omega, 10e-20)*dmin*dmin);
+      double const tmp3 = 4.0*SIGMA_OMEGA2*enerK/(std::max(2*SIGMA_OMEGA2*gradKgradOmega(face)/omega, 1e-20)*dmin*dmin);
 
       double const arg1 = std::min(std::max(tmp1, tmp2), tmp3); // Common name of the variable
-      tmpF1(face) = std::tanh(arg1*arg1*arg1*arg1);
+      blenderF1(face) = std::tanh(arg1*arg1*arg1*arg1);
 
       double const arg2 = std::max(2.*tmp1, tmp2);
-      tmpF2(face) = std::tanh(arg2*arg2);
+      fieldF2(face) = std::tanh(arg2*arg2);
     }
 }
 
@@ -136,40 +136,32 @@ double Source_Transport_K_Omega_VEF_Face::blender(double const val1, double cons
 void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradKgradOmega) const
 {
   // Same structure than Source_WC_Chaleur_VEF.cpp in TRUST
-  // A mettre dans la base ?
 
   // = First, store K and Omega in two separated Tab for the gradient computation, not ideal
   const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
   DoubleTab enerK; // field on faces
   DoubleTab omega; // field on faces
-  enerK.resize(K_Omega.dimension(0));
-  omega.resize(K_Omega.dimension(0));
-  for (int num_face = 0; num_face < le_dom_VEF->nb_faces(); ++num_face)
+  enerK.resize(K_Omega.dimension_tot(0));
+  omega.resize(K_Omega.dimension_tot(0));
+  for (int num_face = 0; num_face < le_dom_VEF->nb_faces_tot(); ++num_face)
     {
       enerK(num_face) = K_Omega(num_face, 0);
       omega(num_face) = K_Omega(num_face, 1);
-      gradKgradOmega(num_face) = 0; // mise à zéro pour être certain
+      gradKgradOmega(num_face) = 0;
     }
 
   // = Definition of the gradients
-  DoubleTab gradK_elem; // field on elements
-  DoubleTab gradOmega_elem; // field on elements
-
   // Get number of componants, for gradient resize
   // We use the velocity field to resize the gradient as the velocity is on faces
-  // const auto& eqHyd = mon_equation->probleme().equation(0);
-  // const Probleme_base& mon_pb = mon_equation->probleme();
-  // const auto& eqHyd = mon_pb.equation();
   const Navier_Stokes_Turbulent& eqHyd = ref_cast(Navier_Stokes_Turbulent,
                                                   ref_cast(Pb_Hydraulique_Turbulent,
                                                            mon_equation->probleme()).equation(0));
   const DoubleTab& velocity_field_face = eqHyd.vitesse().valeurs(); // Velocity on faces
-  // const int ncompovelocity = eq_hydraulique->inconnue().valeurs().dimension(1);
-  const int nbr_velocity_components = velocity_field_face.dimension(1);
-  gradK_elem.resize(le_dom_VEF->nb_elem(), nbr_velocity_components);
-  gradOmega_elem.resize(le_dom_VEF->nb_elem(), nbr_velocity_components);
-  // resize_gradient_tab(gradK);
-  // resize_gradient_tab(gradOmega);
+  const int nbr_velocity_components = velocity_field_face.dimension(1); // dimension_tot ?
+  DoubleTab gradK_elem; // field on elements
+  DoubleTab gradOmega_elem; // field on elements
+  gradK_elem.resize(le_dom_VEF->nb_elem_tot(), nbr_velocity_components);
+  gradOmega_elem.resize(le_dom_VEF->nb_elem_tot(), nbr_velocity_components);
 
   // Compute the two gradients
   const Operateur_Grad& Op_Grad_komega = eqn_K_Omega->gradient_operator_komega();
@@ -177,22 +169,23 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   Op_Grad_komega.calculer(omega, gradOmega_elem);
 
   DoubleTab& chmp_post = ref_cast_non_const(DoubleTab, grad_k_omega_->valeurs());
-  for (int num_elem = 0; num_elem < le_dom_VEF->nb_elem(); ++num_elem)
+  for (int num_elem = 0; num_elem < le_dom_VEF->nb_elem_tot(); ++num_elem)
     for (int ncompo = 0; ncompo < nbr_velocity_components; ++ncompo)
       chmp_post(num_elem) += gradK_elem(num_elem, ncompo) * gradOmega_elem(num_elem, ncompo);
-
-  // Correction on the boundaries? Elie put the pressure at zero.
 
   // Interpolate from elem to face
   const Domaine_dis_base& domaine_dis = mon_equation->inconnue().domaine_dis_base();
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_dis);
-  DoubleTab gradK_face(velocity_field_face); // gradK on faces is similar to the velocity
+  DoubleTab gradK_face;
+  gradK_face.resize(velocity_field_face.dimension_tot(0), nbr_velocity_components);
   elem_to_face(domaine, gradK_elem, gradK_face);
-  DoubleTab gradOmega_face(velocity_field_face);
+  //DoubleTab gradOmega_face(velocity_field_face);
+  DoubleTab gradOmega_face;
+  gradOmega_face.resize(velocity_field_face.dimension_tot(0), nbr_velocity_components);
   elem_to_face(domaine, gradOmega_elem, gradOmega_face);
 
   // Dot Product gradKgradOmega
-  for (int num_face = 0; num_face < le_dom_VEF->nb_faces(); ++num_face)
+  for (int num_face = 0; num_face < le_dom_VEF->nb_faces_tot(); ++num_face)
     for (int ncompo = 0; ncompo < nbr_velocity_components; ++ncompo)
       gradKgradOmega(num_face) +=
         gradK_face(num_face, ncompo) * gradOmega_face(num_face, ncompo);
