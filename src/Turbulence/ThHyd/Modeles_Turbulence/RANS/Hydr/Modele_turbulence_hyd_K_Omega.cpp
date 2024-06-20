@@ -168,6 +168,12 @@ void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const int n, co
     }
 }
 
+/*! @brief Initialise three tabs when turbulence model variant is SST
+ *
+ *  The tables F1, F2 and enstrophy are used to computer a blending function.
+ *  They are initialised with the total (real+virtual) DoF.
+ *
+ */
 void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
 {
   int const n = K_Omega().valeurs().dimension_tot(0);
