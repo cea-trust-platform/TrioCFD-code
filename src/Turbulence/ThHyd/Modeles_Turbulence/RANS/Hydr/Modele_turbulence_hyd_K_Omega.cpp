@@ -173,23 +173,7 @@ void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
   // de la taille de K_Omega, et pas de la_viscosite_turbulente ?
   int const n = K_Omega().valeurs().dimension_tot(0);
 
-  Cerr << "K_Omega().valeurs().nb_dim() " << K_Omega().valeurs().nb_dim() << "\n";
-  Cerr << "K_Omega().valeurs().size() " << K_Omega().valeurs().size() << "\n";
-  Cerr << "K_Omega().valeurs().dimension(0) " << K_Omega().valeurs().dimension(0) << "\n";
-  Cerr << "K_Omega().valeurs().dimension(1) " << K_Omega().valeurs().dimension(1) << "\n";
-  Cerr << "K_Omega().valeurs().dimension_tot(0) " << K_Omega().valeurs().dimension_tot(0) << "\n";
-  Cerr << "K_Omega().valeurs().dimension_tot(1) " << K_Omega().valeurs().dimension_tot(1) << "\n";
-
-  Cerr << "blenderF1.nb_dim()" << blenderF1_.nb_dim() << "\n";
-  Cerr << "blenderF1.size()" << blenderF1_.size() << "\n";
-  Cerr << "blenderF1.dimension(0) " << blenderF1_.dimension(0) << "\n";
-  Cerr << "blenderF1.dimension_tot(0) " << blenderF1_.dimension_tot(0) << "\n";
   blenderF1_.resize(n);
-  Cerr << "blenderF1.nb_dim()" << blenderF1_.nb_dim() << "\n";
-  Cerr << "blenderF1.size()" << blenderF1_.size() << "\n";
-  Cerr << "blenderF1.dimension(0) " << blenderF1_.dimension(0) << "\n";
-  Cerr << "blenderF1.dimension_tot(0) " << blenderF1_.dimension_tot(0) << "\n";
-
   fieldF2_.resize(n);
   enstrophy_.resize(n);
 
