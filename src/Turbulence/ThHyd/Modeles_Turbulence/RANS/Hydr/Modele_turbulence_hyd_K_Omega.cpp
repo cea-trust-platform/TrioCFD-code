@@ -170,14 +170,11 @@ void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const int n, co
 
 void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
 {
-  // de la taille de K_Omega, et pas de la_viscosite_turbulente ?
   int const n = K_Omega().valeurs().dimension_tot(0);
 
   blenderF1_.resize(n);
   fieldF2_.resize(n);
   enstrophy_.resize(n);
-
-  // le_champ_K_Omega.valeur().equation().domaine_dis().domaine().init_dist_paroi_globale
 }
 
 int Modele_turbulence_hyd_K_Omega::preparer_calcul()
