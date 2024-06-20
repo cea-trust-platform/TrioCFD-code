@@ -199,13 +199,12 @@ bool Modele_turbulence_hyd_K_Omega::initTimeStep(double dt)
   return eqn_transport_K_Omega_.initTimeStep(dt);
 }
 
-/*! @brief Effectue une mise a jour en temps du modele de turbulence.
+/*! @brief Performs a time update of the turbulence model.
  *
- * Met a jour l'equation de transport K-Omega,
- *     calcule la loi de paroi et la viscosite turbulente
- *     au nouveau temps.
+ * Update the transport equation of k and omega, computes the wall function and the turbulence
+ * viscosity.
  *
- * @param (double temps) le temps de mise a jour
+ * @param[in] (double temps) new time
  */
 void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
 {
