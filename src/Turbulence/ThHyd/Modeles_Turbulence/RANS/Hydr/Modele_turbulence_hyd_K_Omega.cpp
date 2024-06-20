@@ -220,8 +220,3 @@ void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
   Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente after", la_viscosite_turbulente_.valeurs());
   statistiques().end_count(nut_counter_);
 }
-
-void Modele_turbulence_hyd_K_Omega::verifie_loi_paroi()
-{
-  Cerr << "We should probably do something here... Should be negligeable, isn't it?" << finl;
-}
