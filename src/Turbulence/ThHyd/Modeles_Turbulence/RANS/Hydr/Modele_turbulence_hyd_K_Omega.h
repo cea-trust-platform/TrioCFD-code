@@ -39,7 +39,6 @@ public:
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   int preparer_calcul() override;
-  void verifie_loi_paroi() override;
   bool initTimeStep(double dt) override;
   void mettre_a_jour(double) override;
   virtual inline Champ_Inc& K_Omega();
