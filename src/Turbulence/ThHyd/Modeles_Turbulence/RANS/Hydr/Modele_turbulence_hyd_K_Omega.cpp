@@ -183,6 +183,11 @@ void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
   enstrophy_.resize(n);
 }
 
+/*! @brief Prepare the computation of the k-omega model.
+ *
+ * Initialise tables if model variant is SST and compute the viscosity limit.
+ *
+ */
 int Modele_turbulence_hyd_K_Omega::preparer_calcul()
 {
   eqn_transp_K_Omega().preparer_calcul();
