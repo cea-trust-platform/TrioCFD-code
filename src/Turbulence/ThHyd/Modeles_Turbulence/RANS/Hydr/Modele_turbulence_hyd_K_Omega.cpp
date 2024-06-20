@@ -54,7 +54,7 @@ Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
       // equation().probleme().equation(0).creer_champ("distance_paroi_globale");
       // equation().creer_champ("distance_paroi_globale");
 
-      Navier_Stokes_std moneq = ref_cast(Navier_Stokes_std, equation());
+      Navier_Stokes_std& moneq = ref_cast(Navier_Stokes_std, equation());
       moneq.creer_champ("distance_paroi_globale");
     }
 
