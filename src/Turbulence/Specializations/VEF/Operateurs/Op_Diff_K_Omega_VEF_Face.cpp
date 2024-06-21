@@ -105,9 +105,7 @@ DoubleTab& Op_Diff_K_Omega_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTa
   inv_Prdt[1] = 1./Prdt_Omega;
 
   double invPrdtOmega = 1./Prdt_Omega;
-  int is_SST = 0;
-  if (turbulence_model->get_model_variant() == "SST")
-    is_SST = 1;
+  const bool is_SST = turbulence_model->is_SST();
 
   int is_mu_unif = sub_type(Champ_Uniforme, diffusivite_.valeur());
   const DoubleTab& mu = diffusivite_->valeurs();
