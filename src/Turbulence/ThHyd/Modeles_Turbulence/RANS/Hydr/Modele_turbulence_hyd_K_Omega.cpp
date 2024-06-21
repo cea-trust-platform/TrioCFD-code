@@ -157,8 +157,8 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
  * @param[in] (turbulent_viscosity&) the turbulent viscosity table
  */
 void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const int tab_K_Omega_dim0,
-                                                                 const DoubleTab &tab_K_Omega,
-                                                                 DoubleTab &turbulent_viscosity)
+                                                                 const DoubleTab& tab_K_Omega,
+                                                                 DoubleTab& turbulent_viscosity)
 {
   for (int i = 0; i < tab_K_Omega_dim0; ++i)
     {
@@ -166,12 +166,13 @@ void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const int tab_K
 
       if (omega <= OMEGA_MIN_)
         turbulent_viscosity[i] = 0;
-      else {
-        const double enerK = tab_K_Omega(i, 0);
-        turbulent_viscosity[i] = is_SST() ?
-          enerK*CST_A1/std::max(CST_A1*omega, get_enstrophy()[i]*get_fieldF2()[i])
-          : enerK/omega;
-      }
+      else
+        {
+          const double enerK = tab_K_Omega(i, 0);
+          turbulent_viscosity[i] = is_SST() ?
+                                   enerK*CST_A1/std::max(CST_A1*omega, get_enstrophy()[i]*get_fieldF2()[i])
+                                   : enerK/omega;
+        }
     }
 }
 
