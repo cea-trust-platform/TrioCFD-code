@@ -98,23 +98,23 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
   // K_Omega(i, 0) = K au noeud i
   // K_Omega(i, 1) = Omega au noeud i
 
-  int n = tab_K_Omega.dimension(0);
-  if (n < 0)
-    {
-      if (!sub_type(Champ_Inc_P0_base, chK_Omega))
-        {
-          Cerr << "Unsupported K_Omega field in Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente" << finl;
-          Process::exit(-1);
-        }
-      n = eqn_transp_K_Omega().domaine_dis().domaine().nb_elem();
+  int komega_real_size = tab_K_Omega.dimension(0);
+  if (komega_real_size < 0) {
+    if (!sub_type(Champ_Inc_P0_base, chK_Omega)) {
+      Cerr << "Unsupported K_Omega field in "
+              "Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente"
+           << finl;
+      Process::exit(-1);
     }
+    komega_real_size = eqn_transp_K_Omega().domaine_dis().domaine().nb_elem();
+  }
 
   // cAlan, le 20/01/2023 : sortir cette partie et en faire une fonction à part ?
   // dans le cas d'une domaine nulle on doit effectuer le dimensionnement
   double non_prepare = 1;
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente before", la_viscosite_turbulente_.valeurs());
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente tab_K_Omega", tab_K_Omega);
-  if (visco_turb.size() == n)
+  if (visco_turb.size() == komega_real_size)
     non_prepare = 0.;
   non_prepare = mp_max(non_prepare);
 
@@ -122,17 +122,20 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
     {
       Champ_Inc visco_turb_au_format_K_Omega;
       visco_turb_au_format_K_Omega.typer(type);
-      DoubleTab& visco_turb_K_Omega = complete_viscosity_field(n, eqn_transp_K_Omega().domaine_dis().valeur(), visco_turb_au_format_K_Omega);
+      DoubleTab &visco_turb_K_Omega = complete_viscosity_field(
+          komega_real_size, eqn_transp_K_Omega().domaine_dis().valeur(),
+          visco_turb_au_format_K_Omega);
 
-      if (visco_turb_K_Omega.size() != n)
-        {
-          Cerr << "visco_turb_K_Omega size is " << visco_turb_K_Omega.size() << " instead of " << n << finl;
-          exit();
-        }
+      if (visco_turb_K_Omega.size() != komega_real_size) {
+        Cerr << "visco_turb_K_Omega size is " << visco_turb_K_Omega.size()
+             << " instead of " << komega_real_size << finl;
+        exit();
+      }
 
       // A la fin de cette boucle, le tableau visco_turb_K_Omega contient les valeurs de la viscosite turbulente
       // au centre des faces du maillage.
-      fill_turbulent_viscosity_tab(n, tab_K_Omega, visco_turb_K_Omega);
+      fill_turbulent_viscosity_tab(komega_real_size, tab_K_Omega,
+                                   visco_turb_K_Omega);
 
       // On connait donc la viscosite turbulente au centre des faces de chaque element
       // On cherche maintenant a interpoler cette viscosite turbulente au centre des elements.
@@ -140,7 +143,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
       Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente visco_turb_au_format_K_Omega", visco_turb_au_format_K_Omega.valeur());
     }
   else
-    fill_turbulent_viscosity_tab(n, tab_K_Omega, visco_turb);
+      fill_turbulent_viscosity_tab(komega_real_size, tab_K_Omega, visco_turb);
 
   la_viscosite_turbulente_.changer_temps(temps);
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente after", la_viscosite_turbulente_.valeurs());
