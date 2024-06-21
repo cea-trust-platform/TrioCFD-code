@@ -48,11 +48,13 @@ Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
 {
   Modele_turbulence_hyd_RANS_K_Omega_base::readOn(s);
 
+  is_SST_ = false;
   if (model_variant_ == "SST")
     {
       Cerr << "SST model: initialize les distances paroi" << "\n";
       Navier_Stokes_std& moneq = ref_cast(Navier_Stokes_std, equation());
       moneq.creer_champ("distance_paroi_globale");
+      is_SST_ = true;
     }
 
   return s;
