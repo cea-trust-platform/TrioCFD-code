@@ -147,23 +147,31 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
   return la_viscosite_turbulente_;
 }
 
-void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const int n, const DoubleTab& tab_K_Omega, DoubleTab& turbulent_viscosity)
+/*! @brief Fill the turbulent viscosity table depending on the model.
+ *
+ * If omega is lower that the threshold OMEGA_MIN_, turbulent viscosity is null.
+ * If the model variant is SST, a special inverse time scale is computed in place of omega.
+ *
+ * @param[in] (tab_K_Omega_dim0) the dimension(0) of the K_Omega table, i.e. the number of face or elements.
+ * @param[in] (tab_K_Omega&) the table containing the turbulent kinetic and the inverse time scale omega
+ * @param[in] (turbulent_viscosity&) the turbulent viscosity table
+ */
+void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const int tab_K_Omega_dim0,
+                                                                 const DoubleTab &tab_K_Omega,
+                                                                 DoubleTab &turbulent_viscosity)
 {
-  for (int i = 0; i < n; ++i)
+  for (int i = 0; i < tab_K_Omega_dim0; ++i)
     {
-      if (tab_K_Omega(i, 1) <= OMEGA_MIN_)
+      const double omega = tab_K_Omega(i, 1);
+
+      if (omega <= OMEGA_MIN_)
         turbulent_viscosity[i] = 0;
-      else
-        {
-          if (model_variant_ == "SST")
-            {
-              // SST variant from the TurbModel group formulation
-              const double tmpmax = std::max(CST_A1 * tab_K_Omega(i, 1), get_enstrophy()[i] * get_fieldF2()[i]);
-              turbulent_viscosity[i] = tab_K_Omega(i, 0) * CST_A1 / tmpmax;
-            }
-          else
-            turbulent_viscosity[i] = tab_K_Omega(i, 0) / tab_K_Omega(i, 1); // k/omega
-        }
+      else {
+        const double enerK = tab_K_Omega(i, 0);
+        turbulent_viscosity[i] = is_SST() ?
+          enerK*CST_A1/std::max(CST_A1*omega, get_enstrophy()[i]*get_fieldF2()[i])
+          : enerK/omega;
+      }
     }
 }
 
