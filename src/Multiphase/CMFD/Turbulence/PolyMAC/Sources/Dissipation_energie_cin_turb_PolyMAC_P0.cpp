@@ -21,8 +21,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Dissipation_energie_cin_turb_PolyMAC_P0.h>
-
+#include <Synonyme_info.h>
 Implemente_instanciable(Dissipation_energie_cin_turb_PolyMAC_P0,"Dissipation_energie_cin_turb_Elem_PolyMAC_P0|Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0", Source_Dissipation_energie_cin_turb);
+Add_synonym(Dissipation_energie_cin_turb_PolyMAC_P0, "Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0P1NC");
+Add_synonym(Dissipation_energie_cin_turb_PolyMAC_P0, "Terme_dissipation_energie_cinetique_turbulente_Elem_PolyVEF_P0");
+Add_synonym(Dissipation_energie_cin_turb_PolyMAC_P0, "Terme_dissipation_energie_cinetique_turbulente_Elem_PolyVEF_P0P1");
+Add_synonym(Dissipation_energie_cin_turb_PolyMAC_P0, "Terme_dissipation_energie_cinetique_turbulente_Elem_PolyVEF_P0P1NC");
 
 Sortie& Dissipation_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const { return Source_Dissipation_energie_cin_turb::printOn(os); }
 Entree& Dissipation_energie_cin_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Dissipation_energie_cin_turb::readOn(is); }
