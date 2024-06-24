@@ -1,0 +1,26 @@
+%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Fluid solid coupled simulations}
+
+Since CMFD is a TRUST~\cite{trustonline} baltik dedicated to multi-phase flow fluid-solid coupled simulations can be easily perform. This section is composed of two sections. The first one explained the theory and the second one present a dataset needed to perform such simulation.
+
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Conjugate heat transfer theory}
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Setting up data for fluid-solid simulation}
+
+It is easy to perform a coupled calculation between two instances of TRIOCFD. An example is avaialable in TRIOCFD distribution in the following directory.
+\begin{verbatim}
+$ ls share/Validation/Rapports_automatiques/Multiphase/CMFD/CoolProp_Single_phase_Debora
+\end{verbatim}
+
+Dans TRUST : 
+\begin{verbatim}
+$ ls TRUST/Outils/ICoCo/ICoCo_src/share/Validation/Rapports_automatiques/CouplageFluideSolide
+$ ls TRUST/Validation/Rapports_automatiques/Verification/Verification_codage/conduction_couple
+\end{verbatim}
+\begin{lstlisting}
+# Domain definition #
+Domaine dom
+\end{lstlisting}

@@ -1,0 +1,279 @@
+%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Homogeneous mixture modeling}
+%\chapter{Evanescence operator in HEM context}\label{sec:evanescence_HEM}
+This chapter focuses on the modeling of homogeneous mixtures through TrioCFD multiphase. The first part is a review of the use of the evanescence operator (section \ref{HEM:eva}) before describing the equilibrium models dedicated to mixtures (section \ref{HEM:model}).
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Homogeneous evanescence for mixture modeling}\label{HEM:eva}
+The \texttt{Pb_multiphase} framework allows to model a mixture by taking advantage of the evanescence operator described in section~\ref{sec:evanescence}. By choosing the correct values of \texttt{alpha_res}=1 and \texttt{alpha_res_min}=0.5, one can reduce the system to three partial differential equations corresponding to the dynamics of a mixture. Without any model, this approach can be referred to as the Homogeneous Equilibrium Model as the two phases can be considered dynamically locked and at the same temperature. This can be the starting point of a homogeneous relaxation model approach by adding different models to describe the relation between the two phases.
+
+%The evanescence operator is detailed in . This operator allows to properly manage a vanishing phase. ensure a convergence of the solver when a minority phase is about to disappear ({\color{red} pas uniquement, c'est plutot une utilisation detournée}). This operator is well designed to emulate a 3 partial differential equations system corresponding to a Homogeneous Equilibrium Model (HEM) where both phase are dynamically locked and at the same temperature. Using evanescence operator this way reduce the degree of freedom of the problem considered.
+
+%This approach is call homogeneous evanescence ({\color{red} porte à confusion avec le nom de la fonction, dire plutot que la fonction principale de homogeneous evanescence est d'emuler la HEM}) since it simulate an homogeneous mixture: the minority phase is considered as totally evanescent ({\color{red} porte à confusion, dans ce cas là elle n'a pas disparu, elle est seulement sommée}) in the overall domain. To do so, $\alpha_{min}$ is nullify ({\color{red} porte à confusion, fait croire qu'on impose $\alpha_{min}=0$}) imposing the values of $\alpha_{\textrm{res}}$ and $\alpha_{\textrm{res,min}}$. In this case, the velocity and temperature of the minority phase are fully driven by correlations. 
+%Indeed, the HEM approach imposes $\alpha_{\textrm{res,min}}=0.5$ ({\color{red} uniquement si 2 phases}) so only one phase properties are transported and $\alpha_{\textrm{res}}=1$ which imposes the values of the minority phases properties({\color{red} confus}). 
+
+Imposing the above-mentioned values lead to a simplification of Equation~\ref{eq:evanescence_momentum}:
+\begin{equation}
+\label{eq:evanescence_momentum_HEM}
+\begin{pmatrix}
+{\mathcal{Q}_{\text{pred}}} \\
+{\mathcal{Q}_{\text{mino}}}
+\end{pmatrix}
+\Longrightarrow
+\begin{pmatrix}
+{\mathcal{Q}_{\text{pred}}} +  {\mathcal{Q}_{\text{mino}}} \\
+{v_{\text{mino}} = v_{\text{pred}} + v_{\text{drift}}}
+\end{pmatrix}
+\end{equation} 
+
+\section{Dedicated mixture modeling}\label{HEM:model}
+\subsection{Drift velocity}\label{sec:phyical_modeling_drift_velocity}
+The drift velocity of a gas phase $u_{gj}$ is defined as the velocity of the gas phase $u_g$ with respect to the volume center of the mixture $j$. The area average $\prec F\succ $ of a quantity $F$ over the cross-sectional area $ A$ is defined by: 
+\begin{equation}
+    \prec F\succ=\frac{1}{A}\int_A FdA
+\end{equation}
+The one-dimensional drift-flux model is defined as: 
+\begin{equation}
+    \frac{\prec j_g\succ}{\prec \alpha_g \succ}=C_0 \prec j\succ+V_{g0},
+\end{equation}
+with
+\begin{align}
+    &C_0 = \frac{\prec \alpha_g j \succ}{\prec \alpha_g \succ \prec  j \succ},\\
+    &V_{g0} = \frac{\prec \alpha_g u_{gj} \succ}{\prec \alpha_g \succ}.
+\end{align}
+
+The model is implemented in:
+\begin{lstlisting}[language=c++]
+void Vitesse_derive_base::set_param(Param& param)
+\end{lstlisting}
+The drift velocity operator must fill $vr$ and $dvr$ tabs for each dimension $d$ so that :
+\begin{itemize}
+    \item[\small \textcolor{blue}{\ding{109}}]$\texttt{vr}({\color{myteal}k1}, {\color{mydarkorchid}k2}, d)$ Relative velocity in dimension d
+    \item[\small \textcolor{blue}{\ding{109}}]$\texttt{dvr}({\color{myteal}k1}, {\color{mydarkorchid}k2}, d, \texttt{dimension}*{\color{mydarkorchid}k2}+d)$ Relative velocity derivative regarding the inlet superficial velocity $\texttt{v}(d, {\color{mydarkorchid}k2})$
+    \item[\small \textcolor{blue}{\ding{109}}]$\texttt{vr}({\color{mydarkorchid}k2}), {\color{myteal}k1}, d)=-\texttt{output.vr}({\color{myteal}k1}, {\color{mydarkorchid}k2}), d)$
+    \item[\small \textcolor{blue}{\ding{109}}]$\texttt{dvr}({\color{myteal}k1}, {\color{mydarkorchid}k2}), d, dimension*{\color{mydarkorchid}k2}+d)=-\texttt{vr}({\color{myteal}k1}, {\color{mydarkorchid}k2}), d, dimension*{\color{mydarkorchid}k2}+d)$
+\end{itemize}
+
+\begin{table}[!ht]
+\begin{center}
+\renewcommand{\arraystretch}{1}
+   \begin{tabular}{ c  c  c c }
+     \toprule
+     Model & Used & Validated & Test case  \\
+    \midrule
+     \rowcolor[gray]{0.9} Constant bubble & \checkmark & \checkmark (100\%) & TrioCFD/Drift flux,\\
+     \rowcolor[gray]{0.9}  \ & \ & \ & Trust/Canal bouillant drift \\
+     Ishii-Hibiki & \checkmark & \checkmark (100\%) & TrioCFD/Drift flux,\\
+      \ & \ & \ & Trust/Canal bouillant drift \\
+     \rowcolor[gray]{0.9} Spelt & \checkmark & \xmark (0\%) & \ \\
+     Forces &\checkmark & \checkmark (100\%) &  TrioCFD/Drift flux,\\
+      \ & \ & \ & Trust/Canal bouillant drift \\
+     \bottomrule
+   \end{tabular}
+ \end{center}
+\caption{Availability of heat flux models in Trio\textunderscore CFD.}
+\label{heatfluxtable}
+\end{table}
+
+%%%
+\subsubsection{Constant}
+The model is described in \textcite{ishii1977one}.\\
+The model is implemented in:
+\begin{lstlisting}[language=c++]
+void Vitesse_derive_constante::set_param(Param& param)
+{
+  param.ajouter("C0", &C0, Param::REQUIRED);
+  param.ajouter("vg0_x", &vg0[0], Param::REQUIRED);
+  param.ajouter("vg0_y", &vg0[1], Param::REQUIRED);
+  if (dimension == 3) param.ajouter("vg0_z", &vg0[2], Param::REQUIRED);
+}
+\end{lstlisting}
+
+%%%
+\subsubsection{Ishii-Hibiki : Bubbly flow}
+The model is described in \textcite{HIBIKI2002707}.\\
+The model is implemented in:
+\begin{lstlisting}[language=c++]
+void Vitesse_derive_Ishii::set_param(Param& param)
+{
+  param.ajouter("subcooled_boiling", &sb_, Param::REQUIRED);
+}
+\end{lstlisting}
+Default values :  $\texttt{sb\_} = 0$ (0 : no, 1 : yes),  $\texttt{Cinf} = 1.2$, $\texttt{theta} = 1.75$, $\texttt{zeta} = 18.0$.\\
+The implemented model is:
+\begin{align}
+  & C_0=(\texttt{C_{inf}}+(1-\texttt{C_{inf}})\sqrt{\frac{\rho_g}{\rho_l}})(1-\texttt{sb\_} exp(-\texttt{zeta}\alpha_g))\\
+  & \vec{V_{g0}} =-\sqrt{2}(\frac{\rho_l-\rho_g)g\sigma}{\rho_l^2})^{1/4}(1-\alpha_g)^{\texttt{theta}} \frac{\vec{g}}{|g|}
+\end{align}
+
+\subsubsection{Spelt Biesheuvel}
+The model is described in \textcite{Spelt1997}.\\
+The model is implemented in:
+\begin{lstlisting}[language=c++]
+void Vitesse_derive_Spelt_Biesheuvel::set_param(Param& param)
+\end{lstlisting}
+Default values  $\texttt{Prt\_} = 1.$\\
+\begin{equation}
+  \vec{V_{g0}} =(-(u_g-u_l)\frac{\vec{g}}{|g|}+\frac{\nu_{Spelt}\nabla \alpha_g}{max(\alpha_g,0.0001)})(1-C_0\alpha_g)
+\end{equation}
+with
+\begin{itemize}
+    \item[\small \textcolor{blue}{\ding{109}}] $C_0=1.0$,
+    \item[\small \textcolor{blue}{\ding{109}}]$\nu_{Spelt}=\frac{\parent{C_\mu^{1/4}k^{1/2}}^2L }{u_g-u_l}\parent{\frac{1}{2}+\frac{3}{8}\parent{\frac{\tau^2}{\lambda_t}}^2\frac{\lambda_t}{L}}$,
+    \item[\small \textcolor{blue}{\ding{109}}]$L=C_\mu^{3/4}\frac{k^{3/2}}{\varepsilon}$,
+    \item[\small \textcolor{blue}{\ding{109}}]$\tau=\frac{u_g-u_l}{2g}$,
+    \item[\small \textcolor{blue}{\ding{109}}]$\lambda_t=\sqrt{10\nu_l\frac{k}{\varepsilon}}$,
+    \item[\small \textcolor{blue}{\ding{109}}]$\varepsilon=C_\mu \frac{k^2}{\nu_t}$.
+
+\end{itemize}
+
+\subsubsection{Forces}
+The model is implemented in :
+\begin{lstlisting}[language=c++]
+void Vitesse_derive_Forces::set_param(Param& param)
+{
+  param.ajouter("alpha_lim", &alpha_lim_);
+}
+\end{lstlisting}
+Default values : $\texttt{alpha\_lim\_}=\num{1.e-5}$.\\
+\begin{equation}
+  \vec{V_{g0}} =\parent{-\parent{u_g-u_l}\frac{\vec{g}}{|g|}+\frac{F^{\text{dispersion}}+F^{\text{lift}}}{f^DU_r}}\parent{1-C_0\alpha_g}
+\end{equation}
+
+%%%
+\subsection{Two-phase frictional multiplier}\label{sec:phyical_modeling_frictionl_multiplier}
+The frictional pressure drop in gas–liquid flow can be expressed as a function of a two-phase friction multiplier \cite{FARAJI2022111863}, based on empirical correlations and both pure liquid friction $f_l$ and pure gas friction $f_g$. \\
+The general expression of the two-phase frictional multiplier is :
+\begin{equation}
+    \Phi_{k}^2=\frac{(\frac{\partial p}{\partial z})|_{Two-phase}}{(\frac{\partial p}{\partial z})|_{Single\ phase\ k}}
+\end{equation}
+\begin{lstlisting}[language=c++]
+void Multiplicateur_diphasique_base::set_param(Param& param)
+\end{lstlisting}
+The available input parameters are: 
+\begin{lstlisting}[language=c++]
+ const double alpha ; // Void fraction
+const double rho ; //  Density
+const double v ;  //Velocity
+const double f ;  // Darcy coefficient as if all the flow rate was in phase k
+const double   mu ;  // Viscosity
+const double   Dh ;  // Hydraulic diameter 
+const double gamma ;  // Surface tension
+\end{lstlisting}
+The interfacial heat flux operator must fill $coeff$ tab so that :
+\begin{itemize}
+    \item[\small \textcolor{blue}{\ding{109}}]$coeff(k, 0)$ multiplier for the single phase friction factor
+    \item[\small \textcolor{blue}{\ding{109}}]$coeff(k, 1)$ multiplier for the mix friction factor
+\end{itemize}
+
+
+\subsubsection{Homogeneous}
+The model is implemented in :
+\begin{lstlisting}[language=c++]
+void Multiplicateur_diphasique_homogene::set_param(Param& param)
+{
+  param.ajouter("alpha_min", &alpha_min_);
+  param.ajouter("alpha_max", &alpha_max_);
+}
+\end{lstlisting}
+Default values : $\texttt{alpha\_min\_}= 0.9995$, $\texttt{alpha\_max\_} = 1$.\\
+The model implemented is :
+\begin{equation}
+   \Phi^2= 1+x(\frac{\rho_l}{\rho_g}-1) 
+\end{equation}
+\begin{equation}
+    coeff(n_l, 0) = Frag\_l\Phi^2,\ coeff(n_g, 0) = \frac{Frag\_g}{\alpha_g^2}
+\end{equation}
+With $Frag\_g=min(max(\frac{\alpha_g-\texttt{alpha\_min\_}}{\texttt{alpha\_max\_}-\texttt{alpha\_min\_}},0),1)$,$Frag\_l=1-Frag\_g$,
+
+%%
+\subsubsection{Fridel: horizontal and vertical smooth tubes with $\mu_l/\mu_g<1000$ }
+The model is described in \textcite{friedel1979improved}.\\
+The model is implemented in :
+\begin{lstlisting}[language=c++]
+void Multiplicateur_diphasique_Friedel::set_param(Param& param)
+{
+  param.ajouter("alpha_min", &alpha_min_);
+  param.ajouter("alpha_max", &alpha_max_);
+  param.ajouter("min_lottes_flinn", &min_lottes_flinn_);
+  param.ajouter("min_sensas", &min_sensas_);
+}
+\end{lstlisting}
+Default values : $\texttt{alpha\_min\_} = 1$, $\texttt{alpha\_max\_} = 1.1$, $\texttt{min\_lottes\_flinn\_} = 0$, $\texttt{min\_sensas\_} = 0$.\\
+The model implemented is :
+\begin{equation}
+   \Phi^2= E+\frac{3.24FH}{Fr^{0.0454}We^{0.035}} 
+\end{equation}
+if $F_k min(1,1.14429\alpha_l^{0.6492}) < \Phi^2 F_m \alpha_l^2$ and $\texttt{min\_sensas}=1$ and $\texttt{min\_lottes\_flinn\_}=1$: 
+\begin{equation}
+    coeff(n_l, 0) = \frac{Frac\_l}{\alpha_l^2},\ coeff(n_g, 0) = \frac{Frac\_g}{\alpha_l^2};
+\end{equation}
+else 
+\begin{equation}
+    coeff(n_l, 1) = Frag\_l\Phi^2,\ coeff(n_g, 1) = Frag\_g\Phi^2
+\end{equation}
+With $Frag\_g=min(max(\frac{\alpha_g-\texttt{alpha\_min\_}}{\texttt{alpha\_max\_}-\texttt{alpha\_min\_}},0),1)$, $Frag\_l=1-Frag\_g$,
+\begin{itemize}
+    \item[\small \textcolor{blue}{\ding{109}}]$E=(1-x)^2+x^2\frac{\rho_lf_g}{\rho_gf_l}$
+    \item[\small \textcolor{blue}{\ding{109}}]$F=x^{0.78}(1-x)^{0.224}$
+    \item[\small \textcolor{blue}{\ding{109}}]$G=\alpha_l\rho_lu_l+\alpha_g\rho_gu_g$
+    \item[\small \textcolor{blue}{\ding{109}}]$H=(\frac{\rho_l}{\rho_g})^{0.91}(\frac{\mu_g}{\mu_l})^{0.19}(1-\frac{\mu_g}{\mu_l})^{0.7}$
+    \item[\small \textcolor{blue}{\ding{109}}]$x=\frac{\alpha_g \rho_gu_g}{G}$
+    \item[\small \textcolor{blue}{\ding{109}}]$Fr=\frac{(\alpha_l\rho_lu_l+\alpha_g \rho_gu_g)^2}{9.81D_h\rho_m^2}$
+    \item[\small \textcolor{blue}{\ding{109}}]$We=\frac{G^2D_h}{\sigma \rho_m}$
+    \item[\small \textcolor{blue}{\ding{109}}]$\rho_m=\frac{1}{\frac{x}{\rho_g}+\frac{1-x}{\rho_l}}$
+\end{itemize}
+
+%%
+\subsubsection{Lottes and Flinn: sodium two-phase pressure drop}
+The model is described in \textcite{lottes1956method}.\\
+The model is implemented in :
+\begin{lstlisting}[language=c++]
+void Multiplicateur_diphasique_Lottes_Flinn::set_param(Param& param)
+{
+  param.ajouter("alpha_min", &alpha_min_);
+  param.ajouter("alpha_max", &alpha_max_);
+}
+\end{lstlisting}
+Default values : $\texttt{alpha\_min\_} = 0.9$, $\texttt{alpha\_max\_} = 0.95$. \\
+The model implemented is :
+\begin{equation}
+    coeff(n_l, 0) = \begin{cases}\frac{max(\alpha_l-1+\texttt{alpha\_max\_},0)}{(1-\texttt{alpha\_min\_})^2} , if \alpha_l<1-\texttt{alpha\_min\_}\\
+    \frac{1}{\alpha_l^2}, otherwise.
+    \end{cases},
+\end{equation}
+\begin{equation}
+    coeff(n_g, 0) = min(max(\frac{\alpha_g-\texttt{alpha\_min\_}}{\texttt{alpha\_max\_}-\texttt{alpha\_min\_}},0),1)
+\end{equation}
+
+%%
+\subsubsection{Muller-Steinhagen: air–water, water-hydrocarbons and refrigerants in pipes}
+The model is described in \textcite{MULLERSTEINHAGEN1986297}.\\
+The model is implemented in :
+\begin{lstlisting}[language=c++]
+void Multiplicateur_diphasique_Muhler_Steinhagen::set_param(Param& param)
+{
+  param.ajouter("alpha_min", &alpha_min_);
+  param.ajouter("alpha_max", &alpha_max_);
+  param.ajouter("min_lottes_flinn", &min_lottes_flinn_);
+  param.ajouter("min_sensas", &min_sensas_);
+  param.ajouter("a", &a_);
+  param.ajouter("b", &b_);
+  param.ajouter("c", &c_);
+}
+\end{lstlisting}
+Default values : $\texttt{alpha\_min\_} = 1$, $\texttt{alpha\_max\_} = 1.1$, $\texttt{a\_} = 2$, $\texttt{b\_} = 1$, $\texttt{c\_} = 3$, $\texttt{min\_lottes\_flinn\_} = 0$, $\texttt{min\_sensas\_} = 0$.\\
+The model implemented is :\\
+if $F_k min(1,1.14429\alpha_l^{0.6492}) < \rho_l F_m \alpha_l^2 \frac{f_m^*}{f_l}$ and $\texttt{min\_sensas}=1$ and $\texttt{min\_lottes\_flinn\_}=1$ : 
+\begin{equation}
+    coeff(n_l, 0) = \frac{min(1,1.14429\alpha_l^{0.6492})}{\alpha_l^2}.
+\end{equation}
+else 
+\begin{equation}
+    coeff(n_l, 1) = Frac\_l\rho_l\frac{f_m^*}{f_l},\ coeff(n_g, 1) = Frac\_g\rho_g\frac{f_m^*}{f_g}
+\end{equation}
+With $Frac\_g=min(max(\frac{\alpha_g-\texttt{alpha\_min\_}}{\texttt{alpha\_max\_}-\texttt{alpha\_min\_}},0),1)$, $Frac\_l=1-Frac\_g$,
+\begin{itemize}
+    \item[\small \textcolor{blue}{\ding{109}}]$G=\alpha_l\rho_lu_l+\alpha_g\rho_gu_g$
+    \item[\small \textcolor{blue}{\ding{109}}]$x=\frac{\alpha_g \rho_gu_g}{G}$
+    \item[\small \textcolor{blue}{\ding{109}}]$fm^*=\parent{\frac{f_l}{\rho_l}+ax^b\parent{\frac{f_g}{\rho_g}-\frac{f_l}{\rho_l}}}(1-x)^{1/c}+\frac{f_g}{\rho_g}x^c.$
+\end{itemize}

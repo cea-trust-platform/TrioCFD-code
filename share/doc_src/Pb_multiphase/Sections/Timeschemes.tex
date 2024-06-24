@@ -1,0 +1,318 @@
+\chapter{Time schemes}
+\label{sec:time_scheme}
+This chapter aims to describe the different time schemes available for TrioCFD multiphase computations. The first section (\ref{time:preambule}) is an introduction to the time stepping general methods before delving into the ICE/SETS method (section \ref{time:ice}) and the future PAT method (section \ref{time:pat}).
+\section{Preamble}\label{time:preambule}
+Compressible codes fall into two categories based on their approach to solving the compressible Navier-Stokes equations. The first category comprises density-based methods, which are commonly employed for modeling flows dominated by acoustic phenomena or fluid compressibility effects. These methods aim to directly solve the compressible form of the Navier-Stokes equations, closing the system by computing thermodynamic pressure through an equation of state. However, density-based solvers face a drawback in low-Mach number flow modeling due to their explicit time integration approach. 
+The main drawback of density-based solvers in the context of low-Mach number flow modeling is their explicit time integration of the governing equation system. When fluid flow is modeled with a fully explicit method, time-step sizes are restricted by the local Courant-Friedrichs-Lewy limit as:
+\begin{equation}
+    \label{eq:time_step_compressible1}
+    \Delta_{t,acs} \leq \frac{k \Delta_x}{\mid u\mid + c} \; ,
+\end{equation}
+with $k$ a constant depending of the numerical scheme, $c$ the sound speed and $u$ the velocity. Because of the significant difference between the entropy and the acoustic wave propagation speeds in low-Mach number flows, the explicit resolution of these phenomena is poorly optimized in low-Mach cases. Indeed, defining a convective acoustic time step as 
+\begin{equation}
+    \label{eq:time_step_compressible2}
+    \Delta_{t,conv} \leq \frac{k \Delta_x}{\mid u\mid} \; ,
+\end{equation}
+it leads to the relation
+\begin{equation}
+    \label{eq:time_step_compressible3}
+    \Delta_{t,acs} = \Delta_{t,conv} \frac{\mathcal{M}_a}{1+ \mathcal{M}_a} \; ,
+\end{equation}
+with $\mathcal{M}_a$ the local Mach number. $\Delta_{t,acs} \ll \Delta_{t,conv}$ if $\mathcal{M}_a \ll 1$.
+
+To overcome this difficulty pressure-based methods have been developed. In contrast to density-based methods, which solve the Navier-Stokes equation for density and compute the pressure thanks to an equation of state, the main idea of pressure-based methods is to use the pressure gradient as a constraint on the velocity in the momentum equations. The pressure gradient, calculated from a Helmholtz-type wave equation, has thus the great advantage of remaining finite in low-Mach number flows. Hence, such methods are commonly used to compute compressible phenomena in low-Mach number flows. 
+This section presents the two pressure-based methods available within CFMD called ICE (Implicit Continuity Equation) and initially developed by \textcite{harlow1968numerical,harlow1971numerical}. It is a pressure-based approach used in solving the Navier-Stokes equations for numerical simulation of fluid flows. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The ICE/SETS methods} \label{time:ice}
+All the temporal schemes available with the \texttt{Pb\textunderscore multiphase} problem belong to the SETS class. ICE temporal scheme is a sub-class of SETS class.\\ The class ICE inherits from the SETS class. Both classes share the same parameters that are listed below.
+\begin{lstlisting}
+int p_degen = -1
+\end{lstlisting}
+If \texttt{SETS.p\textunderscore degen} is equal to -1, the numerical schem is corresponding to a semi-implicit scheme.\\ If \texttt{SETS.p\textunderscore degen} is equal to 1, the numerical scheme is corresponding to an incompressible solver. In this case, the pressure has a relative value: no BC can be impose on the pressure and no compressibility effects are considered.
+
+\subsection{Description of the algorithm}
+The keyword to activate the \textsc{ice} method in a multiphase computation in TrioCFD is \lstinline{solver ICE}. The algorithm is implemented in the \texttt{SETS.cpp} file as it is closely related to the \textsc{sets} method. This algorithm carries two main functions that are used to solve the equations, namely \texttt{iterer_eqn} and \texttt{iterer_NS}. The first is use to iterate all equations in time and the second uses a Newton method to solve the momentum equation on velocity with pressure reduction. We briefly describe the algorithm of both function.
+% \begin{lstlisting}[language=c++]
+% void iterer_eqn // Equation iteration
+% \end{lstlisting}
+\paragraph{General algorithm for every equation}\mbox{}\\
+\begin{algorithm}[H]
+  \SetAlgoLined
+  \KwIn{Unknowns: void fraction (always), temperature (ICE), standard convection-diffusion quantities (for example turbulence or IATE, ICE)}
+  \KwOut{Updated unknowns}
+  
+  \BlankLine
+  \textbf{Step 1: Positivity Enforcement}\;
+  \ForEach{unknown}{
+    \eIf{unknown is positive}{
+      Update current unknown via increment\;
+    }{
+      Impose 0 (via unknown_positivation)\;
+    }
+  }
+  
+  \BlankLine
+  \textbf{Step 2: Solve Navier-Stokes Equations}\;
+  \If{Navier-Stokes equations are in the system}{
+    Call iterer_NS to solve velocity and pressure\;
+  }
+  
+  \BlankLine
+  \textbf{Step 3: Solve Thermal Equation}\;
+  Solve multiphase or conduction thermal equation explicitly if ICE is used\;
+  
+  \BlankLine
+  \textbf{Step 4: Check Positivity of Temperature}\;
+  Check if temperature is positive\;
+  
+  \BlankLine
+  \textbf{Step 5: Update Time Step and Unknowns}\;
+  Update time step and the unknowns\;
+  
+  \caption{Algorithm iterer_eqn}
+\end{algorithm}
+
+\paragraph{Specific algorithm for the momentum and pressure equations}\mbox{}\\
+\begin{algorithm}[H]
+  \SetAlgoLined
+  \KwIn{Initial values}
+  \KwOut{Updated values}
+  
+  \BlankLine
+  \textbf{Step 1: Initialization}\;
+  Save current values in the past\;
+  
+  \BlankLine
+  \textbf{Step 2: Solve Velocity}\;
+  \eIf{SETS is activated}{
+    Solve velocity with explicit pressure and store it\;
+  }{
+    Save past value of velocity\;
+  }
+  
+  \BlankLine
+  \textbf{Step 3: PolyMAC Correction}\;
+  \If{PolyMAC is active}{
+    Correct velocity at elements using mass\;
+  }
+  
+  \BlankLine
+  \textbf{Step 4: Newton Method}\;
+  \textbf{Step 4.1:} Fill energy equation to obtain wall transfers\;
+  \textbf{Step 4.2:} Fill other equations\;
+  \textbf{Step 4.3:} Assemble pressure system\;
+  \eIf{pressure reduction}{
+    \textbf{Step 4.4.1:} Eliminate unknowns for $A_p$ and $b_p$ for each phase by substitution\;
+    \textbf{Step 4.4.2:} Assemble system $A_p$ and $B_p$\;
+    \textbf{Step 4.4.3:} Solve pressure\;
+    \textbf{Step 4.4.4:} Solve other increments\;
+  }{
+    \textbf{Step 4.5:} Solve directly by \texttt{mat_semi_impl}\;
+  }
+  \textbf{Step 4.6:} If PolyMAC, apply mass correction to correct velocity at elements\;
+  
+  \BlankLine
+  \textbf{Step 5: Convergence Check}\;
+  Convergence criteria (see Table~\ref{tab:convergence} for default criteria)\;
+  
+  \BlankLine
+  \textbf{Step 6: Update}\;
+  Update values\;
+  
+  \caption{Algorithm for iterer_NS}
+\end{algorithm}
+
+\begin{table}[!h]
+    \centering
+       \begin{tabular}{c c c}
+        \toprule
+        Field & Notation & Criteria   \\
+        \midrule
+        \rowcolor[gray]{0.9} Void fraction & $\alpha$  & $0.01$  \\
+        Temperature & $T$  & $0.1$ \\
+        \rowcolor[gray]{0.9} Velocity & $v$ &  $0.01$ \\
+        Pressure & $p$  &  $100$\\
+        \rowcolor[gray]{0.9} Turbulent kinetic energy & $k$   &  $0.01$\\
+        Wake induced turbulent energy & $k_{WIT}$ &   $0.01$\\
+        \rowcolor[gray]{0.9} Rate of dissipation & $\omega$  &  $0.01$\\
+        Dissipation time scale & $\tau$  &  $0.01$ \\
+        \rowcolor[gray]{0.9} Interfacial area concentration & $ai$ &  $100$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Default convergence criteria}
+    \label{tab:convergence}
+\end{table} 
+
+\subsection{Principle of the time discretization}
+The following steps are also presented in \textcite{GerschenfeldPolyMAC2022}. \\
+We can write the time discretized mass, momentum and energy conservation equations along with the continuity axiom:
+% \begin{equation}
+% \begin{aligned}
+% (\mathcal{M}_k) \hspace{1cm}
+% 		\frac{ {\color{red} \alpha_k^{n+1} \rho_k^{n+1}}-\alpha_k^{n} \rho_k^{n}}{\Delta t} +\nabla \cdot ({\alpha_k^{n} \rho_k^{n}} {\color{red}  \vec{v_k}^{n+1}})
+% 		= {\color{red} \Gamma_k^{n+1}}  
+% \end{aligned}
+% \end{equation}
+% \begin{equation}
+% \begin{aligned}
+% (\mathcal{Q}_k) \hspace{1cm}
+% 		\alpha_k^{n} \rho_k^{n}\frac{{\color{red}\vec{v_k}^{n+1}}-\vec{v_k}^{n}}{\Delta t} + \underline{\nabla} \cdot ({\alpha_k^{n} \rho_k^{n} \vec{v_k}^{n}} \otimes \vec{v_k}^{n})-\vec{v_k}^{n}\underline{\nabla} \cdot (\alpha_k^{n} \rho_k^{n} \vec{v_k}^{n})
+% 		= &  -\alpha_k^{n} \underline{\nabla} {\color{red}P^{n+1}}  +
+% 		 \underline{\nabla} \cdot (\alpha_k^{n} \mu_k^{n} \underline{\underline{\nabla}} \vec{u_k}^{n}) \\ & - \underline{\nabla} \cdot  (\alpha_k^{n}\rho_k^{n} \overline{u_i'u_j'}^{n}) 
+% 		 + {\color{red}\vec{F}_{ki}^{n+1}}
+% 		+ {\color{red}\vec{F}_k^{n+1}}
+% \end{aligned}
+% \end{equation}
+% \begin{equation}
+% \begin{aligned}
+% 		(\mathcal{E}_k) \hspace{1cm} \frac{ {\color{red}\alpha_k^{n+1} \rho_k^{n+1} e_k^{n+1}}-\alpha_k^{n} \rho_k^{n} e_k^{n}}{\Delta t} + \nabla \cdot ({\alpha_k^{n} \rho_k^{n} e_k^{n}} {\color{red}\vec{v_k^{n+1}}}) = & 
+% 		 \nabla \cdot [ \alpha_k^{n}\lambda_k \underline{\nabla} T^{n}  - \alpha_k^{n}\rho_k^{n} \overline{u_i'e_k'}^{n}] + q_{ki}^{n} +
+% 		q_{kp}^{n} \\
+% 		& -{\color{red}P^{n+1}} \left[\frac{{\color{red}\alpha_k^{n+1}}-\alpha_k^n}{\Delta t} + \nabla \cdot (\alpha_k^{n} {\color{red}\vec{v_k^{n+1}}})\right]& &
+% \end{aligned}
+% \end{equation}
+
+\begin{align}
+& (\mathcal{C}) && \sum_k  {\color{red} \alpha_k^{n+1}}=1 \label{eq:discAlphak}\\
+& (\mathcal{M}_k) && \frac{ {\color{red} \alpha_k^{n+1} \rho_k^{n+1}}-\alpha_k^{n} \rho_k^{n}}{\Delta t} +\nabla \cdot ({\alpha_k^{n} \rho_k^{n}} {\color{red}  \vec{u_k}^{n+1}}) = {\color{red} \Gamma_k^{n+1}}\label{eq:discMk}\\
+&(\mathcal{Q}_k) &&
+  \begin{multlined}[c][0.8\linewidth]
+    \alpha_k^{n} \rho_k^{n}\frac{{\color{red}\vec{u_k}^{n+1}}-\vec{u_k}^{n}}{\Delta t} + \underline{\nabla} \cdot \parent{{\alpha_k^{n} \rho_k^{n} \vec{u_k}^{n}} \otimes \vec{u_k}^{n}}-\vec{u_k}^{n}\underline{\nabla} \cdot \parent{\alpha_k^{n} \rho_k^{n} \vec{u_k}^{n}} = \\-\alpha_k^{n} \underline{\nabla} {\color{red}P^{n+1}} + \underline{\nabla} \cdot \parent{\alpha_k^{n} \mu_k^{n} \underline{\underline{\nabla}} \vec{u_k}^{n}} \\- \underline{\nabla} \cdot  (\alpha_k^{n}\rho_k^{n} \overline{u_i'u_j'}^{n}) + {\color{red}\vec{F}_{ki}^{n+1}} + {\color{red}\vec{F}_k^{n+1}}
+  \end{multlined}\label{eq:discQk}\\
+&(\mathcal{E}_k) &&
+  \begin{multlined}[c][0.8\linewidth]
+    \frac{ {\color{red}\alpha_k^{n+1} \rho_k^{n+1} e_k^{n+1}}-\alpha_k^{n} \rho_k^{n} e_k^{n}}{\Delta t} + \nabla \cdot ({\alpha_k^{n} \rho_k^{n} e_k^{n}} {\color{red}\vec{u_k}^{n+1}}) = \\\nabla \cdot \parent{ \alpha_k^{n}\lambda_k \underline{\nabla} T_k ^{n}  - \alpha_k^{n}\rho_k^{n} \overline{u_i'e_k'}^{n}} + q_{ki}^{n} + q_{kp}^{n} \\- {\color{red}P^{n+1}} \parent{\frac{{\color{red}\alpha_k^{n+1}}-\alpha_k^n}{\Delta t} + \nabla \cdot (\alpha_k^{n} {\color{red}\vec{u_k}^{n+1}})}
+  \end{multlined}\label{eq:discEk}
+\end{align}
+Once this system is written, one can express a matrix system in terms of increments on the unknowns. For example, for the temporal term in the mass equation:
+\begin{equation}
+    \frac{1}{\Delta t}\parent{{\color{red} \alpha_k^{n+1} \rho_k^{n+1}}-\alpha_k^{n} \rho_k^{n}} = \frac{1}{\Delta t}\parent{{\rho_k^{n}}({\color{red} \alpha_k^{n+1}}-\alpha_k^{n}}+{\color{red} \alpha_k^{n+1}}\parent{{\color{red} \rho_k^{n+1}}-\rho_k^{n})+\alpha_k^{n} \rho_k^{n}-\alpha_k^{n} \rho_k^{n}}
+\end{equation}
+Let's remind that the unknowns are $(\alpha,\ T,\ P,\ \vec{u})$. Then, the void fraction increment is ${\color{red}\delta \alpha_k}={\color{red}\alpha_k^{n+1}}-\alpha_k^{n}$. 
+For the density, one must add its dependencies to the unknowns. In this case, the density field $\rho(T,P)$ depends only on the temperature and the pressure fields. Also its differential is $d\rho= \frac{\partial \rho}{\partial T}\delta T + \frac{\partial \rho}{\partial P}\delta P$. Thus we obtain the following equation for the increments:
+\begin{equation}
+    \underbrace{\frac{{ \rho_k^{n}}}{\Delta t}}_{ \frac{\partial \mathcal{M}_k}{\partial \alpha_k}^{(n)}}{\color{red} \delta \alpha_k}+\underbrace{\frac{\color{red}\alpha_k^{n+1}}{\Delta t} \parent{\frac{d\rho_k}{dT_k}}^n}_{\color{red} \frac{\partial \mathcal{M}_k}{\partial T_k}^{(n+1)}} {\color{red} \delta T_k}+\underbrace{\frac{\color{red}\alpha_k^{n+1}}{\Delta t} \parent{\frac{d\rho_k}{dP}}^n }_{\color{red} \frac{\partial \mathcal{M}_k}{\partial P}^{(n+1)}}{\color{red} \delta P}
+\end{equation}
+We can then do this for all terms and construct the following system for the increments of unknowns:
+\begin{equation}
+\begin{pmatrix}
+\colorboxed{OPblue!50}{\frac{\partial \mathcal{M}_k}{\partial \alpha_k}^{(n)}} & \colorboxed{OPblue!50}{\color{red} \frac{\partial \mathcal{M}_k}{\partial T_k}^{(n+1)}} & \frac{\partial \mathcal{M}_k}{\partial \overrightarrow{u_k}}^{(n)} & {\color{red} \frac{\partial \mathcal{M}_k}{\partial P}^{(n+1)}} \\
+\colorboxed{OPblue!50}{\color{red}\frac{\partial \mathcal{E}_k}{\partial \alpha_k}^{(n+1)}} & \colorboxed{OPblue!50}{\color{red}\frac{\partial \mathcal{E}_k}{\partial T_k}^{(n+1)}} & {\color{red}\frac{\partial \mathcal{E}_k}{\partial \overrightarrow{u_k}}^{(n+1)}} & \frac{\partial \mathcal{E}_k}{\partial P}^{(n)}\\
+0 & 0 & \colorboxed{OPblue!50}{\frac{\partial \mathcal{Q}_k}{\partial \overrightarrow{u_k}}^{(n)}} & \frac{\partial \mathcal{Q}_k}{\partial P}^{(n)}
+\end{pmatrix}\begin{pmatrix}
+{\color{red} \delta\alpha_k ^{(n+1)}}={\color{red} \alpha_k^{n+1}}-\alpha_k^{n}\\
+{\color{red} \delta T_k^{(n+1)}}\\
+{\color{red}\delta \overrightarrow{u_k}^{(n+1)}}\\
+{\color{red} \delta P^{(n+1)}}
+\end{pmatrix}=\begin{pmatrix}
+\delta\mathcal{M}_k^{(n)} \\
+\delta\mathcal{E}_k^{(n)}\\
+\delta\mathcal{Q}_k^{(n)}
+\end{pmatrix}
+\end{equation}
+The terms framed in blue (\fcolorbox{OPblue!50}{white}{\textcolor{white}{T}}) are block diagonal because they only depend on unknowns coming from the cell in which they are computed.\\
+In a Newton algorithm, one can take the first line of the system, replace unknows then adds for any phases and substracts the void fraction dependency with $\sum_k  {\color{red} \delta\alpha_k^{n+1}}=0$ and then get ${\color{red}\delta P^{(n+1)}}$. This step is called pressure reduction and is described after. The last line allows the direct prediction to get $\delta \overrightarrow{u_k}^{(n+1)}$, so that the system becomes: 
+\begin{equation}
+\begin{pmatrix}
+{\color{red}\frac{\partial \mathcal{M}_k}{\partial \alpha_k}^{(n+1)}} & \frac{\partial \mathcal{M}_k}{\partial T_k}^{(n)} \\
+{\frac{\partial \mathcal{E}_k}{\partial \alpha_k}^{(n+1)}} & {\color{red}\frac{\partial \mathcal{E}_k}{\partial T_k}^{(n+1)}} \end{pmatrix}\begin{pmatrix}
+{\color{red} \delta\alpha_k ^{(n+1)}}\\
+{\color{red} \delta T_k^{(n+1)}}
+\end{pmatrix}=\begin{pmatrix}
+\delta\mathcal{M}_k^{(n)} \\
+\delta\mathcal{E}_k^{(n)}
+\end{pmatrix}+\begin{pmatrix}
+\frac{\partial \mathcal{M}_k}{\partial P_k}^{(n)} \\
+\frac{\partial \mathcal{E}_k}{\partial P_k}^{(n)}
+\end{pmatrix}\delta P^{(n+1)}+
+\begin{pmatrix}
+\frac{\partial \mathcal{M}_k}{\partial \overrightarrow{u_k}}^{(n)} \\
+\frac{\partial \mathcal{E}_k}{\partial \overrightarrow{u_k}}^{(n+1)}
+\end{pmatrix}\delta \overrightarrow{u_k}^{(n+1)}
+\end{equation}
+Then the temperature can be solved. The convergence criteria must be then verified. 
+
+\subsection{Principle of the pressure reduction}
+To avoid heavy notations, the subscript $k$ which refers to each phase are dropped. The previous system can be written as:
+\begin{align}
+    &M_{\alpha}\delta \alpha +M_T \delta T +M_u\delta u +M_p \delta P=f_M\label{eq:presredM1}\\
+    &{\color{myteal}E_{\alpha}}\delta \alpha +{\color{myteal} E_T} \delta T +{\color{myteal} E_u}\delta u +{\color{myteal}E_p} \delta P={\color{myteal}f_E}\label{eq:presredE1}\\
+    &{\color{mydarkorchid} Q_u} \delta u+{\color{mydarkorchid} Q_p} \delta P={\color{mydarkorchid} f_Q} \label{eq:presredQ1}
+\end{align}
+From equation~\eqref{eq:presredQ1}, we can express the velocity increment as 
+\begin{equation}
+\delta u = {\color{mydarkorchid}Q_u^{-1}f_Q-Q_u^{-1}Q_p}\delta P.
+\end{equation}
+Injecting it into the previous system, we obtain the following system
+\begin{align}
+    &M_{\alpha}\delta \alpha + M_T \delta T + M_u{\parent{{\color{mydarkorchid}Q_u^{-1}f_Q} - {\color{mydarkorchid} Q_u^{-1}Q_p}\delta P}} + M_p \delta P = f_M\label{eq:presredM2}\\
+    &{\color{myteal} E_{\alpha}}\delta \alpha + {\color{myteal} E_T} \delta T + {\color{myteal} E_u}{\parent{{\color{mydarkorchid}Q_u^{-1}f_Q} - {\color{mydarkorchid}Q_u^{-1}Q_p}\delta P}} + {\color{myteal} E_p} \delta P = {\color{myteal}f_E}\label{eq:presredE2}
+\end{align}
+One can then replace the temperature from the energy equation~\eqref{eq:presredE2} in the mass equation~\eqref{eq:presredM2}:
+\begin{multline}
+    M_{\alpha}\delta \alpha + M_T {{\color{myteal}E_T^{-1}}\parent{{\color{myteal}-E_{\alpha}}\delta \alpha - {\color{myteal}E_u}{\parent{{\color{mydarkorchid}Q_u^{-1}f_Q} - {\color{mydarkorchid}Q_u^{-1}Q_p}\delta P}} - {\color{myteal}E_p} \delta P + {\color{myteal}f_E}}}\\
+    - M_u{\parent{{\color{mydarkorchid}Q_u^{-1}f_Q} - {\color{mydarkorchid}Q_u^{-1}Q_p}\delta P}} + M_p \delta P = f_M
+    %M_{\alpha}\delta \alpha +M_TE_T^{-1}(-E_{\alpha}\delta \alpha+E_vQ_v^{-1}Q_p\delta P-E_vQ_v^{-1}f_Q-E_p\delta P+f_E)-M_vQ_v^{-1}Q_p\delta P+M_vQ_v^{-1}f_Q+M_p \delta P=f_M\\
+\end{multline}
+We then group together terms that multiply $\delta\alpha$ and $\delta P$. We obtain: 
+\begin{multline}
+\underbrace{\parent{M_{\alpha} - M_T{\color{myteal}E_T^{-1}E_\alpha}}}_{K_\alpha}\delta \alpha +\underbrace{(M_T{\color{myteal}E_T^{-1}}({\color{myteal}E_u}{\color{mydarkorchid}Q_u^{-1}Q_p} - {\color{myteal}E_p}) - {\color{mydarkorchid}M_uQ_u^{-1}Q_p}+M_p)}_{K_p}\delta P=  \\\underbrace{f_M - M_u{\color{mydarkorchid}Q_u^{ - 1}f_Q} - M_T{\color{myteal} E_T^{-1}}({\color{myteal}f_E} - {\color{myteal} E_u}{\color{mydarkorchid}Q_u^{-1}f_Q})}_{K_f}\label{eq:presred3}
+\end{multline}
+\textbf{Remark}: if we neglect the temperature, we have a simpler system: 
+\begin{equation}
+    \underbrace{M_{\alpha}}_{K_\alpha}\delta \alpha +\underbrace{(M_p-{\color{mydarkorchid} M_uQ_u^{-1}Q_p})}_{K_p}\delta P= \underbrace{f_M-M_u{\color{mydarkorchid} Q_u^{-1}f_Q}}_{K_f}.\label{eq:presred4}
+\end{equation}
+By inverting matrix $K_\alpha$, equations~\eqref{eq:presred3} and \eqref{eq:presred4} can be rewritten as
+\begin{equation}
+\delta \alpha + K_\alpha^{-1}K_p\delta P=K_\alpha^{-1}K_f.\label{eq:presred5}
+\end{equation}
+With the axiom of continuity, i.e. by summing equation~\eqref{eq:presred5} on all phases, we obtain the final linear system of the form $Ax=B$: 
+\begin{equation}
+\underbrace{\sum_k (K_\alpha^{-1}K_p)_k}_{A_p}\delta P=\underbrace{\sum_k (K_\alpha^{-1}K_f)_k}_{B_p}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SETS}
+The Stability-Enhancing Two-Step (SETS) \cite{MAHAFFY1982329} time resolution method offers a mean to overcome the material Courant limit, thus mitigating certain stability issues associated with time-step size. Nonetheless, this approach does introduce a higher degree of numerical diffusion. Its interest lies notably in its suitability for simulating slow transients, allowing the use of way larger time steps compared to ICE. However, in multiphase simulations the time step is still limited by the convective time step because of $\alpha$. At each time step, this method yields an intermediate time velocity, temperature and other convected quantities (turbulence, IATE) field. This is particularly advantageous because achieving a solution with mass and energy convection becomes smoother when the velocity is already pressure-balanced. This algorithm is activated through the data set with the following keyword.
+\begin{lstlisting}
+solveur SETS
+\end{lstlisting}
+The main idea is to remind that we can use an intermediate time stepping, written $\widetilde{\cdot}$, to get closer to the wanted solution: 
+\begin{equation}
+    \delta P=P^{n+1}-P^n= \underbrace{P^{n+1}- \widetilde{P}^{n+1}}_{\delta P^{n+1}}+\underbrace{\widetilde{P}^{n+1}-P^{n}}_{\delta \widetilde{P}}
+\end{equation}
+Thus we obtain:
+\begin{equation}
+    \delta T=T^{n+1}-T^n= \underbrace{T^{n+1}- \widetilde{T}^{n+1}}_{\delta T^{n+1}}+\underbrace{\widetilde{T}^{n+1}-T^{n}}_{\delta \widetilde{T}}
+\end{equation}
+\begin{equation}
+    \delta u=u^{n+1}-u^n= \underbrace{u^{n+1}- \widetilde{u}^{n+1}}_{\delta u^{n+1}}+\underbrace{\widetilde{u}^{n+1}-u^{n}}_{\delta \widetilde{u}}
+\end{equation}
+It means that if one choose wisely the intermediate pressure, we can have a first prediction of velocity and temperature to ease the computation of convection in the Newton algorithm. In the case of SETS, using a first prediction with explicit pressure $\delta \widetilde{P}=0$ allows to predict a pressure balanced intermediate time step for the velocity and temperature.
+
+In the alogorithm, if \texttt{facsec_diffusion_for_sets} is bigger than 0, then the facsec is chosen to impose on the diffusion time step in SETS while the total time step stays smaller than the convection time step.
+
+In order to overcome problems of implicit convection for $\alpha$ (due to the constraint $\sum \alpha_k =1$), one solution that could be implemented is to predict the minority phases and to impose for the major phase $\alpha^{major}=1-\sum \alpha_k^{minor}$.
+
+\subsection{Specific case of ICE modelization within single phase framework}
+
+Initially, ICE method solves the equations for momentum and pressure simultaneously by using an implicit formulation of the continuity equation. ICE method was initially developed for single-phase flows, and the pressure reduction method relies on MAC numerical scheme~\cite{harlow1965numerical}. 
+A easy way to be more familiar with ICE method is to visualize the equations in the simple case of a single-phase flow. In this specific condition, ICE method relies on the resolution of a Poisson equation based on the implicit continuity equation. The pressure field at the end of the time step, $P^{n+1}$ is calculated by  
+\begin{equation}
+    \label{eq:poisson_ICE}
+    \frac{\delta P}{\Delta_t^2 c^2} - \Delta P = \nabla  \cdot \nabla \left( \rho \mathbf{u u} - \mathbf{\tau}\right) + \frac{\nabla  \cdot \rho \mathbf{u}}{\Delta_t} \; .
+\end{equation}
+From the sound speed definition the density can be updated
+\begin{equation}
+    \label{eq:density_update_ICE}
+    \delta \rho = \frac{\delta P}{c^2}  \; .
+\end{equation}
+The equation of state is involved in the calculation of the sound speed $c$. Once $P^{n+1}$ and $\rho^{n+1}$ are known, the velocity can be estimated solving the transport equation of the momentum. Finally, at the end of the time step, the temperature can be calculated from $P^{n+1}$, $\rho^{n+1}$ and $\mathbf{u}^{n+1}$.
+The ICE solver is robust but must respect a strong assumption $CFL\leq 1$. Note that in this method, the diffusion of the temperature is always explicit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{PAT (incoming)} \label{time:pat}
+The so-called PAT for $(P,\alpha, T)$ resolution is a NeptuneCFD-looklike time scheme. It is available as an alternative for PolyVEF spatial scheme, which is not optimal with ICE/SETS method. This quasi-implicit method features a velocity prediction step followed by the calculation of pressure $P$, volume fraction $\alpha$, and temperature $T$. It uses maximal implicitness while avoiding saddle points anomalies. This time scheme is not yet validated, we advise not to use it. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

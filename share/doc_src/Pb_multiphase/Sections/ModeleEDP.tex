@@ -1,0 +1,355 @@
+\chapter{Governing equations}
+
+This chapter gives a general introduction to the theoretical framework of the multiphase system of averaged equations (Section~\ref{sec:multi-sys-ave}), the two-fluid and drift-flux approches (Section~\ref{sec:two-fluid-drift}) and a few details on turbulence equation (Section~\ref{sec:intro-turbulence}). The curious reader can find extensive details on the multiphase Navier-Stokes framework in the books of \textcite{LivreIH}, \textcite{Morel2015}, \textcite{LivreDrewPassman}. 
+
+\section{Multiphase system averaged equations\label{sec:multi-sys-ave}}
+
+\subsection{General balance equations}
+
+The balance equations express the conservation of a quantity $\phi_k$ of a phase k with a velocity $\mathbf{u}_k$ in a reference frame (X,t) by integrating its changes in a control volume $\Omega$. Assuming then the continuity of the quantity $\phi_k$ related to any control volume, we can derive the integral balance equations into differential balance equations. Then we must introduce volume variables as the fluid density $\rho_k$, the flux $\ull{J}$ and the body source $g_k$. The general differential balance equation of $\phi_k$ is given by: 
+\begin{equation}\label{base:everything}
+    \underbrace{\frac{\partial}{\partial t}\rho_k\phi_k}_{\color{mydarkorchid}\text{Time changes}}+\underbrace{\nabla\cdot\parent{\rho_k\phi_ku_k}}_{\color{mydarkorchid} \text{Convection}}=\underbrace{-\nabla\cdot\ull{J}}_{\color{myteal}\text{Diffusion}}+\underbrace{\rho_k g_k}_{\color{myteal}\text{Source}}
+\end{equation}
+Considering a physical system the quantities $\phi_k$ are the mass, momentum and energy. The table~\ref{tab:quantities} summarizes the particular cases of the general differential balance equation with $\Gamma_k$ the source of mass flow rate, $P_k$ the pressure, $\ull{\tau}_k$ the viscous stress tensor, $\mathbf{g}$ the body forces, $e_k$ the internal energy, $q_k$ the heat flux and $\dot{q}_k$ the body heat. The subscript $k$ refers to each phase.
+
+
+
+\begin{table}[!ht]
+\centering
+   \begin{tabular}{c  c  c  c}
+    \toprule
+     Quantity & $\phi_k$ & $\ull{J}$ & $g_k$  \\
+    \midrule
+     \rowcolor[gray]{0.9} Mass & 1 & 0 & $\Gamma_k$ \\
+     Momentum & $\mathbf{u}_k$ & $-\ull{T}_k=P_k\ull{I}-\ull{\tau}_k$ & $\mathbf{g}$ \\
+    \rowcolor[gray]{0.9} Energy & $e_k+\frac{u_k^2}{2}$ & $q_k-\ull{T}_k\cdot\mathbf{u}$ & $\mathbf{g}\cdot{}\mathbf{u}_k$+$\frac{\dot{q}_k}{\rho_k}$\\
+     \bottomrule
+   \end{tabular}
+\caption{Conserved quantities in balance equations}
+\label{tab:quantities}
+\end{table}
+
+\subsection{Multiphase balance equations}
+
+The simulation of an averaged multiphase system requires the computation of the averaged local Navier-Stokes equations for each phase $k$. The averaged Navier-Stokes equations predict the average behavior of fluid motion and properties by filtering out local instant fluctuations. However, precise modeling of all microscopic scales is still necessary for an accurate reproduction of the averaged flow. To handle multiple phases within the averaged framework, it becomes essential to introduce a variable that defines the phase mixture.
+
+Let $\chi^{phase}_k$ be a tracer of phase $k$ which defines whether or not we are in this phase. It takes the value $1$ if we are in the phase, $0$ otherwise. The fraction of phase $k$, denoted as $\alpha_k$, in a controlled volume $V_{\Omega k}$ within a reference frame $(X,\ t)$, is defined as follows by
+\begin{equation}
+    \alpha_k=\frac{1}{V_\Omega}\int_{V_\Omega} \chi^{\text{phase}}_k(X,\ t) dV_\Omega=\frac{V_{\Omega k}}{V_\Omega}.
+\end{equation}
+From this equation arises the well-known axiom of continuity over all phases:
+\begin{equation}\label{base:contaxiom}
+    \sum_k\alpha_k=\sum_k\frac{V_{\Omega k}}{V_\Omega}=\frac{V_{\Omega}}{V_\Omega}=1.
+\end{equation}
+The averaged method introduces two different mean quantities for a property $\phi$: the mean of a field $k$ in the controlled volume $\bar{\phi}_k$ and the mean of a field in its proper volume in the controlled volume $\overline{\overline{{\phi}_k}}$. With the fraction $\alpha_k$ of the field $k$ in a controlled volume $V_{\Omega k}$ in a reference frame $(X,\ t)$, they are defined by:
+\begin{align}
+    &\bar{\phi}_k=\frac{1}{V_\Omega}\int_{V_{\Omega}}\phi_k(X,\ t)dV_\Omega,\\
+    &\overline{\overline{{\phi}_k}}=\frac{1}{V_{\Omega k}}\int_{V_{\Omega k}} \phi_k(X,\ t) dV_\Omega=\frac{\bar{\phi}_k}{\alpha_k}.\\
+\end{align}
+It means that we can replace the mean $\bar{\phi}_k$ from the general balance equation by the quantity $\alpha_k \overline{\overline{{\phi}_k}}$, with $\overline{\overline{{\phi}_k}}$ being the quantity seen as single phase. To illustrate this, Figure~\ref{fig:moyenne} gives an example of the different means and the link with the void fraction. 
+\begin{figure}[bh]
+   \centering
+\begin{tikzpicture}[scale=2]
+    % Axes
+    \draw[->] (0,0) -- (4.5,0) node[right] {$Time$};
+    \draw[->] (0,0) -- (0,1.5) node[above] {$\phi_k$};
+    
+    % Graduations
+    \foreach \x in {0,1,2,3,4}
+        \draw (\x cm,1pt) -- (\x cm,-1pt) node[anchor=north] {$\x$};
+    \foreach \y in {0,0.5,1}
+        \draw (1pt,\y cm) -- (-1pt,\y cm) node[anchor=east] {$\y$};
+    
+    % Créneau 1
+    \draw (1,0) rectangle (2,1);
+    
+    % Créneau 2
+    \draw (3,0) rectangle (4,0.5);
+    
+    % Trait horizontal vert
+    \draw[mygreen,dashed] (1,-0.5) -- (2,-0.5) ;
+    \draw[mygreen,dashed] (3,-0.5) -- (4,-0.5) node[right] {\small$\Omega_k=2$} ;
+    \draw[mygreen] (0,3/4) -- (4,3/4) node[right] {$\overline{\overline{\phi}}_k=\frac{1+0.5}{2}=\frac{3}{4}$};
+    
+    % Trait horizontal vert
+    \draw[mycrimson,dashed] (0,-0.3) -- (4,-0.3) node[right] {\small$\Omega=4$};
+    \draw[mycrimson] (0,3/8) -- (4,3/8) node[right] {$\bar{\phi}_k=\frac{1+0.5}{4}=\frac{3}{8}$} ;
+    \draw[myslateblue,dashed] (0,-0.7) -- (4,-0.7) node[right] {\small$\alpha_k=\frac{2}{4}=\frac{1}{2}$} ;
+\end{tikzpicture}
+\caption{Example of means computation from a quantity $\phi_k$.}
+\label{fig:moyenne}
+\end{figure}
+In this perspective, we can interpret each quantity as follows:
+\begin{itemize}
+  \item[\small \textcolor{blue}{\ding{109}}] $\bar{\phi}_k$ is the true observed conserved mean quantity,
+  \item[\small \textcolor{blue}{\ding{109}}] $\overline{\overline{\phi}}_k$ is the easily modeled mean value as if it is a single phase,
+  \item[\small \textcolor{blue}{\ding{109}}] $\alpha_k$ is the respective presence given by the equilibrium between phases.
+\end{itemize}
+
+Furthermore, in order to ensure accuracy, the mean values must satisfy a fundamental assumption of regularity, which ensures that the average of a mean value remains consistent with the mean value itself. In order to account for the zero mean value of the fluctuation $\phi'$, another commonly used approach is the Favre averaging. The Favre average of the quantity $\phi$ for the field $k$ is defined as $\tilde{\phi_k}=\frac{\overline{\rho\phi_k}}{\bar{\rho}}$, where the overline represents the averaging operation.
+For the sake of clarity, the variables in the following equations are assumed averaged even if bar notations are not used. \\
+Then conservation equations for mass in each phase $k$ is given by: 
+\begin{equation}\label{base1:1}
+\underbrace{\frac{\partial}{\partial t}\rho_k\alpha_k}_{\color{mydarkorchid}\text{Time changes}}+\underbrace{\nabla\cdot\parent{\rho_k\alpha_k\mathbf{u}_k}}_{\color{mydarkorchid} \text{Convection}}=\underbrace{\Gamma_k}_{\color{myteal}\text{Source}},
+\end{equation}
+with $t$ the time, $\rho_k$ the density of phase $k$, $\mathbf{u}_k$ the velocity of phase $k$ and $\Gamma_k$ a mass source term of phase $k$.
+
+The conservation equation for momentum in each phase is:
+\begin{equation}\label{base2:1}
+\underbrace{\frac{\partial}{\partial t}\rho_k\alpha_k \mathbf{u}_k}_{\color{mydarkorchid}\text{Time  changes}}+\underbrace{\nabla\cdot\parent{\rho_k\alpha_k \mathbf{u}_k \otimes \mathbf{u}_k}}_{\color{mydarkorchid}\text{Convection}}=\underbrace{-\alpha_k\nabla P_k}_{\color{myteal}\text{Pressure}}+\underbrace{\nabla \cdot \parent{\alpha_k\ull{\tau}_k}
+}_{\color{myteal}\text{Diffusion}}-\underbrace{\nabla \cdot \parent{\alpha_k\ull{\tau}^t_k}
+}_{\color{myteal}\text{Turbulence}}+\underbrace{\rho_k\alpha_k \mathbf{g}}_{\color{myteal} \text{Gravity}}+\underbrace{\mathbf{I_k}}_{\color{myteal}\text{Sources}},
+\end{equation}
+with $P_k$ the pressure, $\ull{\tau}_k$ and $\ull{\tau}^t_k$ respectively the viscous and turbulent stress tensors, $\mathbf{g}$ gravity and $\mathbf{I_k}$ an interfacial transfer.
+
+The conservation equation for the internal energy in each phase is:
+\begin{equation}\label{base2:2}
+\underbrace{\frac{\partial}{\partial t}\rho_k\alpha_k  e_k}_{\color{mydarkorchid}\text{Time changes}}+\underbrace{\nabla\cdot\parent{\rho_k\alpha_k  e_k \mathbf{u}_k}}_{\color{mydarkorchid} \text{Convection}}=\underbrace{-P_k\frac{D\alpha_k}{Dt}}_{\color{myteal}\text{Pressure}}+\underbrace{\nabla \cdot {\psi}_k
+}_{\color{myteal}\text{Diffusion}}-\underbrace{\nabla \cdot {\psi}^t_k
+}_{\color{myteal}\text{Turbulence}}+\underbrace{ {q_k}}_{\color{myteal}\text{Sources}},
+\end{equation}
+with  $\psi_k$ and $\psi^t_k$ respectively the heat and turbulent fluxes, and $\mathbf{q_k}$ a source of heat.
+
+\subsection{Interfacial momentum transfers with dispersed hypothesis}
+According to \textcite{LivreIH}, the interfacial transfer between two phases in the momentum balance equation can be expressed as follows:
+\begin{equation}
+\begin{aligned}
+\mathbf{I}_k & =-\frac{1}{\Delta t}\sum_j \frac{1}{u_{ni}}\parent{\rho_k\mathbf{n}_k\parent{\mathbf{u}_k-\mathbf{u}_i}\mathbf{u}_k-\ull{T}_k\mathbf{n}_k}\\ 
+&=-\sum_j \frac{1}{\Delta t}\frac{1}{u_{nij}} \parent{\rho_k\mathbf{n}_k\parent{\mathbf{u}_k-\mathbf{u}_i}\mathbf{u}_k-\parent{\ull{T}_k-\ull{T}^{\text{interface}}_{k}}\mathbf{n}_k}+\sum_j \ull{T}^{\text{interface}}_{k}\frac{1}{\Delta t}\frac{1}{u_{nij}}\mathbf{n}_k,
+\end{aligned}
+\end{equation}
+with $u_{ni}$ the interfacial normal velocity, $\mathbf{n}_k$ the interfacial normal vector, $\mathbf{u}_i$ the interfacial velocity and $\ull{T}^{\text{interface}}$ interfacial stress tensor.
+
+A new variable, called interfacial area concentration $a_i$, can be introduced to simplify the formulation:
+\begin{equation}
+    a_{ij}=\frac{1}{\Delta t u_{ni}}_j,
+\end{equation}
+with $\Delta t$ a time interval. 
+
+We can also notice that:
+\begin{equation}
+\frac{1}{\Delta t}\sum_j \frac{1}{u_{nij}}\mathbf{n}_k=- \nabla \alpha
+\end{equation}
+By decomposing the stress into pressure and shear-stress components, subscripted $i$ at the interface, and incorporating the mass loss rate $\dot{m}$, we obtain the following expression:
+\begin{equation}
+\begin{aligned}
+\mathbf{I}_k= &\underbrace{\Gamma_k \tilde{\mathbf{u}}_{ki}}_{\color{myteal}\text{Mass transfer}} + \underbrace{\sum_j a_{ij}\parent{\overline{\overline{P_{ki}}}-P_k}\mathbf{n}_k}_{\color{myteal}\text{Interfacial pressure imbalance}} + \underbrace{\sum_j a_{ij} \parent{{\ull{\tau}}_{k} - \overline{\overline{{\ull{\tau}}_{ki}}}}\mathbf{n_k}}_{\color{myteal}\text{Interfacial shear-stress imbalance}}\\ 
+& +\underbrace{\overline{\overline{P_{ki}}}\nabla \alpha_k}_{\color{myteal}\substack{\text{Interfacial pressure}\\\text{dispersion}}} - \underbrace{\overline{\overline{{\ull{\tau}}_{ki}}}\nabla \alpha_k}_{\color{myteal}\substack{\text{Interfacial shear-stress}\\\text{dispersion}}},
+\end{aligned}
+\end{equation}
+with quantities denoted with an i as quantities at the interface and $\Gamma_k$ the mass transfer term.
+
+When one fluid can be supposed to be dispersed, the expression for the averaged interfacial momentum transfers depends on the hydrodynamical models, denoted as $M^k$: 
+\begin{equation}
+\mathbf{I}_k=\underbrace{\sum_j a_{ij}\mathbf{M}^k}_{\color{myteal}\text{Hydrodynamical forces}} +  \underbrace{\mathbf{M}^k\nabla \alpha_k}_{\color{myteal}\text{Interfacial dispersion force}}.
+\end{equation}
+When a phase can be assumed to be dispersed, we can represent it as a population of bubbles/droplet with varying diameters, which serves as a topological characteristic for the continuous fluid. The dispersed fluid is characterized by two interconnected attributes: a distribution of bubble diameters and the concentration of interfaces.
+
+We can define the Sauter-mean diameter of the distribution $f_d$ of sizes $D$ as:
+\begin{equation}
+    D_{sm} = \frac{\int f_d D^3 \mathrm{d}D}{\int f_d D^2 \mathrm{d}D},
+\end{equation}
+One can write a relation between the Sauter-mean diameter and the area concentration per unit of volume $A_i$ so that in dispersed bubbly hypothesis $A_i=\pi D^2$, the interfacial area concentration $a_i=\int f_d A_i \mathrm{d}V$ and the void fraction $\alpha$. The relation between those variables is:
+\begin{equation}\label{eq:disphypo}
+    D_{sm} = \frac{\int f_d D^3 \mathrm{d}D}{\int f_d D^2 \mathrm{d}D} = 6\frac{\int f_d V \mathrm{d}V}{\int f_d A_i \mathrm{d}V} = \frac{6\alpha}{a_i}.
+\end{equation}
+This relation arises from the dispersed hypothesis. It means that we have two options:
+\begin{itemize}
+  \item[\small \textcolor{blue}{\ding{109}}] either we take a user-defined diameter $D_{sm}$ and let the void fraction play the crucial role of modeling the interfacial area concentration, presented in section \ref{Dsmuserdefine},
+  \item[\small \textcolor{blue}{\ding{109}}] or we model directly the interfacial area concentration. It is often done by introducing a new transport equation for $a_i$, presented in \ref{Dsmu1grp}.
+\end{itemize}
+
+\section{Two-fluid and Drift-flux models\label{sec:two-fluid-drift}}
+
+\subsection{Equilibrium between phases}
+
+A new fundamental relation arises by summing the differential equations of each phase to get the differential equations for the mixture. Assuming that the subscript $m$ denotes the quantity for the mixture, the relation can be expressed as follows:
+\begin{equation}\label{mixtureeq}
+  \begin{aligned}
+   \sum_k \overline{\rho_k \phi_k \mathbf{u}_k} &= \sum_k \alpha_k(\overline{\overline{\rho_k}}\overline{\overline{\phi_k \mathbf{u}_k}}+\overline{\overline{\rho_k' \phi_k \mathbf{u}_k}}) = \sum_k \alpha_k\parent{\overline{\overline{\rho_k}}\tilde{\phi_k} \tilde{\mathbf{u}_k}+\overline{\overline{\rho_k \phi_k' \mathbf{u}_k'}}}\\ &=\underbrace{\rho_m\phi_m \mathbf{u}_m}_{\color{mydarkorchid}\text{Mean transport}} + \underbrace{\sum_k\alpha_k\overline{\overline{\rho_k}}\tilde{\phi_k}\parent{\mathbf{u}_k-\mathbf{u}_m}}_{\color{mydarkorchid}\text{Phase transport}} + \underbrace{\sum_k\alpha_k\overline{\overline{\rho_k\phi_k'\mathbf{u}_k'}}}_{\color{myteal}\substack{\text{Turbulent and}\\\text{interfacial transport}}}.
+   \end{aligned}
+\end{equation}
+This relation provides the basis for separating the mixture and individual phases into distinct sets of equations. Two approaches stem from this separation: simulating only the mixture while modeling phase phenomena with a drift model, known as the \emph{drift-flux} model, or simulating the behavior of each phase while incorporating turbulent and interfacial phenomena, known as the \emph{two-fluid} model. According to \textcite{LivreIH}, the last approach offers several advantages, including the ability to simulate segregated dynamics and non-equilibrium interactions between phases. However, the drift-flux main advantage is that it drastically decrease the number of equations to only one set of equation for the mixture while the two-fluid must handle a set of equation for each phase.
+
+To summarize:
+\begin{itemize}
+  \item[\small \textcolor{blue}{\ding{109}}] the \emph{two-fluid} model handles a set of conservative equations for each phase. In TRUST/TrioCFD, it is referred as \texttt{Pb\_multiphase}. Only the last term of equation~\ref{mixtureeq} is modeled, i.e. turbulence and interfacial transport.
+  \item[\small \textcolor{blue}{\ding{109}}] The \emph{drift-flux} model supposes mechanical equilibrium. When thermal equilibrium is also supposed in order to handle only one set of equations for the mixture, it degenerates to the well-known Homogeneous Equilibrium Model. In the framework of TRUST/TrioCFD, this model is referred as \texttt{Pb\_multiphase\_HEM}. The two last terms of equation~\ref{mixtureeq} are modeled i.e. the drift between the phases, turbulence and interfacial transport along with a thermal jump condition between phases.
+\end{itemize}
+
+\subsection{Example of modeling for liquid-gaz systems}
+
+Modeling the dynamics of two-phase flows presents significant challenges due to the diverse range of scenarios encountered, including steady and transient behaviors, as well as losses in homogeneity and thermal effects. One notable approach is the four-fields model, initially introduced by \textcite{Lahey2001}. The four-fields model partitions the flow into distinct regions, each associated with specific characteristics. These regions include the liquid phase, bubbly phase, droplet phase, and gas phase. Within this model, a continuous liquid field ($lc$) is managed to represent the presence of liquid, a continuous gas field ($gc$) captures the behavior of large gas pockets, a dispersed gas field ($gd$) models the dispersed bubbles, and a dispersed liquid field ($ld$) represents the behavior of liquid droplets (as illustrated in Figure~\ref{fig:lahey}).
+
+While the four-fields model offers a comprehensive approach to capture the complex dynamics of two-phase flows, it can be computationally intensive. This model requires the solution of twelve balance equations, accounting for mass, momentum, and energy conservation. Additionally, closure laws are needed to describe the interfacial transfers and interactions between the different fields. Implementing the four-fields model accurately demands careful consideration of the closure laws and numerical techniques to ensure reliable predictions of the system behavior.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[scale=0.4]{Figure/Lahey.png}
+    \caption{Principle of a four-field model handling any kind of topology of interest. From~\textcite{Lahey2001}. The subscripts $v$ and $l$ refer respectively to vapor and liquid whereas $d$ and $c$ denote respectively the dispersed and the continuous phases.}
+    \label{fig:lahey}
+\end{figure}
+To reduce the number of equations, \textcite{Morel2007} proposed two degenerate four-fields to two-fields models that combines the two-fluid and drift-flux approaches. The first proposition involves using two dispersed fields of bubbles carried by liquid ($bm$) and droplets carried by gas ($dm$), and then drifting the mixture made by the dispersed field. Another proposition is to use two separated fields for gas ($g$) and liquid ($l$), with each field being a hybrid of dispersed and continuous phases.
+The benefit is the reduction of the number of closure laws to 6 balance equations. However, these approaches have limitations, such as the inability to handle non-equilibrium physical phenomena.
+
+Table~\ref{tab:Modelchamp} provides a summary of the current possibilities in TrioCFD two-phase flow computation.
+\begin{table}[!ht]
+%\begin{center}
+%\large
+\renewcommand{\arraystretch}
+{1.2}
+   \begin{tabular}{ c  c  c  c  c  c }
+     %\hline
+     \toprule
+     Model & Set 1 & Set 2 & Set 3 & Set 4 & TrioCFD  \\ %\hline \hline
+     \midrule
+     \rowcolor[gray]{0.9} Four Fields & $\alpha_{gd}$ & $\alpha_{gc}$ & $\alpha_{ld}$ & $\alpha_{lc}$ & Pb\_multiphase \\ 
+     Hybrid Drift-flux & $\alpha_{bm}=\alpha_{gd}+\alpha_{lc}$ & $\alpha_{dm}=\alpha_{ld}+\alpha_{gc}$ &  &  & Pb\_multiphase \\ 
+     \rowcolor[gray]{0.9} Hybrid Two-fluid & $\alpha_{g}=\alpha_{gd}+\alpha_{gc}$ & $\alpha_{l}=\alpha_{ld}+\alpha_{lc}$ &  &   & \xmark \\
+     Bubbly Two-fluid & $\alpha_{gd}$ & $\alpha_{lc}$ &  &  & Pb\_multiphase  \\ 
+     \rowcolor[gray]{0.9} Droplet Two-fluid & $\alpha_{ld}$ & $\alpha_{gc}$ &  &  &  Pb\_multiphase \\ 
+     Bubbly Drift-flux & $\alpha_{bm}=\alpha_{gd}+\alpha_{lc}$ &  &  &   & Pb\_multiphase\_HEM\\ 
+      \rowcolor[gray]{0.9} Droplet Drift-flux & $\alpha_{dm}=\alpha_{ld}+\alpha_{gc}$ &  &  &  & Pb\_multiphase\_HEM \\ 
+ \bottomrule
+   \end{tabular}
+% \end{center}
+\caption{Table of the different approaches. $g$ denotes for gas, $l$ denotes for liquid, $d$ denotes for dispersed, $c$ denotes for continuous and $m$ denotes for mixture.}
+\label{tab:Modelchamp}
+\end{table}
+
+\section{Turbulence equations\label{sec:intro-turbulence}}
+
+\subsection{Single-phase Reynolds Averaged Navier-Stokes equations}
+
+The turbulent stress term is derived from the process of averaging the momentum equation of the Navier-Stokes equations. While the turbulence tends to expand the range of length scale, the averaged approach tends to erase the smallest scales. The Reynolds Averaged Navier-Stokes (RANS) simulates only the macroscopic scale and models the other scales. It is the cheapest approach in terms of computational power, but it needs a high proportion of model to get complex behaviors. 
+
+For simplicity, we will focus on a single-phase, incompressible problem without any external sources. The momentum equation for this example can be expressed as follows:
+\begin{equation}\label{eq:qdm-classic}
+    \frac{\partial v_i}{\partial t}+\underbrace{v_i\frac{\partial v_i}{\partial x_k}}_{\color{mydarkorchid}\text{Advection}} = \underbrace{-\frac{1}{\rho}\frac{\partial P}{\partial x_i}}_{\color{mydarkorchid}\text{Pressure}} + \underbrace{\nu \frac{\partial^2 v_i}{\partial x_k \partial x_k}}_{\color{mydarkorchid}\text{Viscosity}}.
+\end{equation}
+In order to apprehend the averaging, we stand that the quantities $v_i$ and $P$ can be decomposed into a mean value $U_i$, $\bar{P}$ and a fluctuation $u_i$, $p$ value so that $v_i=U_i+u_i$. By applying the mean to the previous equation we obtain:
+\begin{equation}\label{eq:qdm-turbu}
+        \frac{\partial U_i}{\partial t}+\underbrace{U_i\frac{\partial U_i}{\partial x_k}}_{\color{mydarkorchid}\text{Advection}} + \underbrace{\frac{\partial \overline{u_iu_k}}{\partial x_k}}_{\color{myteal}\text{Turbulent stress}} = \underbrace{-\frac{1}{\rho}\frac{\partial \bar{P}}{\partial x_i}}_{\color{mydarkorchid}\text{Pressure}} + \underbrace{\nu \frac{\partial^2 U_i}{\partial x_k \partial x_k}}_{\color{mydarkorchid}\text{Viscosity}}.
+\end{equation}
+The operating average filter preserves the fundamental structure of the instantaneous equation, with one notable exception: the emergence of the turbulent stress term, also called Reynolds stress, represented as $\overline{u_iu_j}$. This term captures the effects of turbulent fluctuations that occur within the flow. Thus, it becomes crucial to compute this term to properly account for these fluctuations.
+
+If we subtract  equation \ref{eq:qdm-turbu} to \ref{eq:qdm-classic}, we can get the equation $Eq_i$ of the fluctuating velocity $u_i$. The Reynolds stress equation can be obtained by performing the operation $\overline{u_jEq_i+u_iEq_j}$:
+%\begin{equation}
+ % \begin{aligned}
+ \begin{multline}
+     \frac{\partial \overline{u_iu_j}}{\partial t}  +\underbrace{U_i\frac{\partial \overline{u_iu_j}}{\partial x_k}}_{\color{mydarkorchid}\text{Advection}} + \underbrace{\overline{u_iu_k}\frac{\partial \overline{U_j}}{\partial x_k} + \overline{u_ju_k}\frac{\partial U_i}{\partial x_k}}_{\color{mydarkorchid}\text{Exchange mean-fluctuations}} + \underbrace{\frac{\partial \overline{u_iu_ju_k}}{\partial x_k}}_{\color{myteal}\substack{\text{Triple correlation}\\\text{transport}}} \\  = \underbrace{\frac{1}{\rho} \overline{p\parent{\frac{\partial u_i}{\partial x_j}      + \frac{\partial u_j}{\partial x_i}}}}_{\color{myteal}\text{Pressure redistribution}} 
+     - \underbrace{\frac{1}{\rho}\frac{\partial}{\partial x_k}\parent{\overline{u_ip}\delta_{jk} + \overline{u_jp}\delta_{ik}}}_{\color{myteal}\text{Pressure diffusion}} 
+     - \underbrace{2\nu\overline{\frac{\partial u_i}{\partial x_k}\frac{\partial u_j}{\partial x_k}}}_{\color{myteal}\text{Pseudo-dissipation}} 
+     + \underbrace{\nu \frac{\partial^2 \overline{u_iu_j}}{\partial x_k \partial x_k}}_{\color{mydarkorchid}\substack{\text{Molecular}\\\text{dissipation}}}.
+\end{multline}
+ %\end{aligned}
+%\end{equation}
+This expression is an analytical equation for the Reynolds stress. However, $4$ non-linear terms need models because they cannot be computed because they are not directly depending on the Reynolds stress or the mean flow. We then have 6 equations with 24 new unknowns. In order to get rid of some terms, one idea is to consider the turbulent kinetic energy $k=\frac{1}{2}\overline{u_iu_i}$. The equation then becomes:
+\begin{multline}
+    \frac{\partial k}{\partial t} +\underbrace{U_i\frac{\partial k}{\partial x_k}}_{\color{mydarkorchid}\text{Advection}} + \underbrace{\overline{u_iu_k}\frac{\partial U_i}{\partial x_k}}_{\color{myteal}\substack{\text{Exchange}\\\text{mean-fluctuations}}} + \underbrace{\frac{\partial \frac{1}{2} \overline{u_iu_iu_k}}{\partial x_k}}_{\color{myteal}\substack{\text{Triple correlation}\\\text{transport}}} \\ =-\underbrace{\frac{1}{\rho}\frac{\partial}{\partial x_k}\overline{u_kp}}_{\color{myteal}\text{Pressure diffusion}}  -\underbrace{\nu\overline{\frac{\partial u_i}{\partial x_k}\frac{\partial u_i}{\partial x_k}}}_{\color{myteal}\text{Dissipation}} + \underbrace{\nu \frac{\partial^2 k}{\partial x_k \partial x_k}}_{\color{mydarkorchid} \text{Molecular dissipation}}.
+\end{multline}
+Three fundamental quantities can be notified from those equations and are presented in table \ref{tab:turbqte}.
+\begin{table}[!ht]
+\begin{center}
+%\renewcommand{\arraystretch}{2}
+   \begin{tabular}{ c  c  c }
+     \toprule
+     Quantity & Symbol & Expression \\
+     \midrule
+     \rowcolor[gray]{0.9} Turbulent kinetic energy & $k$ & $\frac{1}{2}\overline{u_iu_i}$  \\ 
+     Dissipation & $\varepsilon$ &  $\nu\overline{\frac{\partial u_i}{\partial x_k}\frac{\partial u_i}{\partial x_k}}$ \\ 
+     \rowcolor[gray]{0.9} Anisotropy & $b_{ij}$ &  $\frac{\overline{u_iu_j}}{2k}-\frac{1}{3}\delta_{ij}$\\ 
+     \bottomrule
+   \end{tabular}
+ \end{center}
+\caption{Table of the fundamental turbulent quantities.}
+\label{tab:turbqte}
+\end{table}
+In this example, the instantaneous pressure also depends on the mean flow and the fluctuations. The Poisson equation gives the instantaneous value for the pressure. With incompressible hypothesis and without external forces, the equation is as follows: 
+\begin{equation}
+\frac{1}{\rho}\frac{\partial^2 P}{\partial x_i\partial x_i}=-\frac{\partial v_i}{\partial x_j}\frac{\partial v_j}{\partial x_i}=\underbrace{-S_{ij}S_{ji}}_{\color{mydarkorchid}\substack{\text{Pure deformation}\\\text{sink term}}} + \underbrace{\frac{\Omega^2}{2}}_{\color{mydarkorchid}\substack{\text{Rotation}\\\text{source term}}},
+\end{equation}
+with $S_{ij}=\frac{1}{2}(\frac{\partial v_j}{\partial x_i}+\frac{\partial v_i}{\partial x_j})$ and $\Omega=\nabla \times \mathbf{v}$.
+
+By applying the mean to the previous equation we get:
+\begin{equation}
+\frac{1}{\rho}\frac{\partial^2 \overline{P}}{\partial x_i\partial x_i} = \underbrace{-\overline{S}_{ij}\overline{S}_{ji}+\frac{\overline{\Omega}^2}{2}}_{\color{mydarkorchid}\text{Mean contribution}}\underbrace{-\overline{s}_{ij}\overline{s}_{ji}+\frac{\overline{\omega}^2}{2}}_{\color{myteal}\substack{\text{Fluctuating}\\\text{contribution}}},
+\end{equation}
+with $s_{ij}$ the pure deformation from the fluctuating velocity and $\omega_{ij}$ the rotational of the fluctuating velocity.
+
+As for the velocity, the operating average filter preserves the fundamental structure of the instantaneous equation, with one notable exception: the emergence of the fluctuating pressure.
+
+Then by subtracting this equation to the instantaneous Poisson equation, we get: 
+\begin{equation}
+\frac{1}{\rho}\frac{\partial^2 p}{\partial x_i\partial x_i} = \underbrace{-2\frac{\partial^2 u_i U_j}{\partial x_i\partial x_j}}_{\color{myteal}\text{Slow linear term}} - \underbrace{\frac{\partial^2 (u_iu_j-\overline{u_iu_j})}{\partial x_i\partial x_j}}_{\color{myteal}\text{Fast quadratic term}}.
+\end{equation}
+The equation reveals a fundamental propriety: both the mean and fluctuating pressures depend on the velocity field's values at any given point and time. It emphasizes the relevance of investigating pressure effects to fully capture the proprieties of turbulence. Actually, advanced Reynolds stress models try to model those phenomena.
+
+\subsection{Single-phase RANS model equations}
+
+\subsubsection{First order models}
+
+For industrial purposes, two types of model are commonly used based on the previous equations. The first type is the first-order models, which aim to estimate turbulence by computing the equations for the scalars $k$ and $\varepsilon$, the turbulent kinetic energy and its dissipation respectively. They are often referred as the $k-\varepsilon$ models and follow a classical formulation for $k$: 
+\begin{equation}
+        \frac{\partial k}{\partial t}+\underbrace{U_{i}\frac{\partial k}{\partial x_{i}}}_{\color{mydarkorchid}\text{Advection}} = \underbrace{{\color{myteal}\text{Diffusion}}}_{\text{Model}} + \underbrace{{\color{myteal}\text{Production}}}_{\text{Model}} - \underbrace{{\color{myteal} \text{Dissipation}}}_{\text{Model}} + \underbrace{{\nu\frac{\partial^2 k}{\partial x_k \partial x_k}}}_{\color{mydarkorchid}\substack{\text{Molecular}\\\text{diffusion}}} .
+\end{equation}
+
+To close the problem, we use an analogy between the shear stress and the turbulent shear stress. As Stokes did for the shear stress, the turbulent shear stress is determined using a diagonal component equal to the turbulent kinetic energy (analogy with the pressure) and an extra diagonal component using the gradient of the \emph{mean} velocity. A new proportionality coefficient arises: the turbulent viscosity $\nu_t$. With this analogy, turbulence is seen as a strong diffusive phenomenon with a viscosity $\nu_t$. This analogy has been proposed by Joseph \textsc{Boussinesq} and is written as:
+\begin{equation}
+    R_{ij}=\underbrace{-2\nu_tS_{ij}}_{\color{myteal}\substack{\text{Diffusion}\\\text{Phenomenon}}} + \underbrace{\frac{2}{3}k\delta_{ij},}_{\color{myteal}\substack{\text{Fluctuacting}\\\text{contribution}\\\text{to pressure}}}
+\end{equation}
+with $S_{ij}=\frac{1}{2}\parent{\tfrac{\partial U_i}{\partial x_j}+\tfrac{\partial U_j}{\partial x_i}}$ and $k=\tfrac{1}{2}\overline{u_iu_i}$. By putting this expression in equation~\ref{eq:qdm-turbu}, we obtain:
+\begin{equation}\label{turbu}
+        \frac{\partial U_i}{\partial t}+\underbrace{U_i\frac{\partial U_i}{\partial x_k}}_{\color{mydarkorchid}\text{Advection}} = - \underbrace{\frac{\partial }{\partial x_i}\parent{\frac{\bar{P}}{\rho}+\frac{2}{3}k}}_{\color{mydarkorchid}\text{Modified pressure}} + \underbrace{\parent{\nu+\nu_t} \frac{\partial^2 U_i}{\partial x_k \partial x_k}}_{\color{myteal}\text{Diffusion}}.
+\end{equation}
+The turbulent viscosity is then evaluated by:
+\begin{equation}
+    \nu_t=C_\mu\frac{k^2}{\varepsilon},
+\end{equation}
+with $C_\mu$ a constant often taken as equal to 0.09.
+
+The advantage of this model is its reduced reliance on differential equations compared to second-order models, resulting in lower CPU costs. It offers ease of computation and excellent stability. It accurately predicts shear stress in free sheared flows and free flows with strong turbulence, addressing well-documented errors. However, due to its linear behavior, this model cannot effectively capture the interaction between a wake and a mix layer, flows with pronounced curvature, and boundary layers. Additionally, a significant drawback of this model is the inherent positivity of the production term, leading to the well-known issue of overestimating turbulent kinetic energy in boundary layers prior to a stagnation point.
+
+\subsubsection{Second order models}
+The second type of model is known as the second-order model or Reynolds Stress Model (RSM). These models directly incorporate equations for the Reynolds tensor and the dissipation rate. One key advantage of the RSM is its ability to accurately capture nonlinear phenomena and avoid stagnation point anomalies, thanks to an analytical production term. This term plays a crucial role in various turbulent phenomena. For instance, in turbulent flows around a cylinder, it induces the redistribution of velocities from turbulence to the mean flow. However, the RSM has some limitations compared to the linear model. It is numerically less robust, meaning it may encounter stability issues during computations. Calibration of the RSM is also more challenging due to its nonlinear behavior, requiring more intricate adjustments and fine-tuning. The general equation of the model is given by :
+\begin{equation}
+  \begin{aligned}
+    \frac{\partial }{\partial t}R_{ij}+\underbrace{U_k\frac{\partial R_{ij}}{\partial x_k}}_{\color{mydarkorchid}\text{Advection}} &= \underbrace{-R_{ik}\frac{\partial U_j}{\partial x_k}-R_{jk}\frac{\partial U_i}{\partial x_k}}_{_{\color{mydarkorchid}\text{Exchange with mean flow}}} + \underbrace{\nu \frac{\partial^2 R_{ij}}{\partial x_k \partial x_k}}_{\color{mydarkorchid}\text{Molecular diffusion}}  \\ &  - \underbrace{{\color{myteal}\text{Dissipation}}}_{\text{Model}} - \underbrace{{\color{myteal}\text{Triple correlation transport}}}_{\text{Model}} + \underbrace{{\color{myteal}\text{Pressure redistribution}}}_{\text{Model}}.
+ \end{aligned}
+\end{equation}
+
+\subsubsection{Near-wall region}
+
+In the simulation of turbulent flows, the near-wall region is a crucial area that raises challenges for modeling. In this region, turbulence is weaker compared to viscosity, involving standard turbulent models failure. To address this issue, two approaches are commonly used: near-wall functions and near-wall damping effects.
+
+The first approach involves implementing a law that describes the behavior of velocity in the near-wall region. It assumes the presence of a viscous boundary layer with a thickness denoted as $\delta$ for the dimensionless distance to the wall, $y^+=\frac{y}{\delta}$. Typically for $k-\epsilon$ models, it is recommended to ensure that the first cell size in the near-wall region satisfies the condition of $30 < y^+ < 100$, as the model cannot be directly integrated all the way to the wall. This condition is mandatory to be in the logarithmic layer shown in Figure \ref{fig:CL}.
+\begin{figure}[!ht]
+\centering
+\begin{tikzpicture}[scale=1.5]
+% Axe des abscisses logarithmique
+\draw[->] (0.1,0) -- (5,0) node[right] {$y^+$};
+\foreach \i in {0,1,2,3} {
+    \draw (\i+1,0.1) -- (\i+1,-0.1) node[below] {$10^{\i}$};
+}
+
+% Axe des ordonnées classique
+\draw[->] (0,0) -- (0,5) node[above] {$U^+$};
+\foreach \y in {0, 5,10,15,20} {
+    \draw (0.1,\y/5) -- (-0.1,\y/5) node[left] {\y};
+}
+
+% Droite pour relier les deux 
+\draw[dotted] (1,1/5) -- (2.7,2.8) node[left,font=\tiny] {Buffer layer} ;
+
+% Parabole pour la couche limite
+\draw[mydarkorchid, domain=0:1, samples=100, thick] plot (\x, {(\x)^2/5}) node[right,font=\tiny] {Viscous sublayer: $U^+=y^+$};
+
+% Droite pour la couche externe
+\draw[myteal, thick] (2.7,2.8) -- (4,4.4) node[right,font=\tiny] {Logarithmic layer};
+
+\end{tikzpicture}
+\caption{Principle of universal wall law.}
+\label{fig:CL}
+\end{figure}
+These models are typically referred to as high-Reynolds models. However, a significant challenge associated with this approach is the constraint it imposes on the flow's behavior near the wall, and the question of its universality for all flow configurations is still a topic of debate.
+
+The second solution involves introducing a damping function or a new term that becomes active near the wall to damp the turbulence in that region. This approach allows achieving $y^+\approx 1$, enabling the models to be integrated closer to the wall. Models that can be integrated all the way to the wall are typically referred to as Low-Reynolds models.

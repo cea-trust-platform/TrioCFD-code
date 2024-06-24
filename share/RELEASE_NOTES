@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.4 : Enhancements, modifications and corrected bugs since version 1.9.3 :
 --------------------------------------------------------------------------------------------------
+24/06/24 (TrioCFD) New Doc     : New documentation of CMFD module based on Pb_Multiphase
 13/05/24 (TrioCFD) New Feature : FT IJK - New shear periodic conditions
 29/04/24 (TrioCFD) New Feature : Algo QC - Decoupled saving raw data and statistics files
 08/04/24 (TrioCFD) Syntax      : Keyword 'Ecrire_fichier_xyz_valeur' new syntax is on the form: Ecrire_fichier_xyz_valeur { dt 5. fields 2 vitesse k_eps boundaries 1 PERIO }

@@ -1,0 +1,481 @@
+\chapter{Turbulence}
+\label{sec:turbulence}
+\hide{
+\begin{itemize}
+    \item structure des équations : terme insta + advection = diffusion + sources
+    \item rapide explication du fonctionnement des classes : sources génériques (i.e. classe base) dans src/Multiphase/CMFD/Turbulence/Sources et spécialisation par discrétisation dans src/Multiphase/CMFD/Turbulence/VDF/Sources et src/Multiphase/CMFD/Turbulence/PolyMAC/Sources
+    \item Rappel du JDD en début de section ?
+    \item décrire l'implicitation des termes si existant (section spécifique "time stepping" de la turbulence"
+    \item un mot sur les scalaires ?
+    \item idéalement, ajouter ce qu'on met dans chaque matrice et la formulation implicitée ou non des différents termes. Guide de la stratégie de modélisation pour ajout de futurs modèles.
+\end{itemize}
+}
+
+\section{Code structure}
+
+\todo{Translate files and class names in English}
+
+\hide{
+  taux_dissipation_turbulent
+  {
+    diffusion { turbulente SGDH { sigma 0.5 } }
+    convection { amont }
+    initial_conditions { omega Champ_Fonc_xyz dom 1 13.85 }
+    boundary_conditions
+    {
+      wall Cond_lim_omega_demi { }
+      bottom frontiere_ouverte omega_ext Champ_Front_Uniforme 1 13.85
+      top frontiere_ouverte omega_ext Champ_Front_Uniforme 1 13.85
+      symetrie paroi
+    }
+    sources
+    {
+      Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+      Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 } ,
+      Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+    }
+  }
+  energie_cinetique_turbulente
+  {
+    diffusion { turbulente SGDH { sigma 0.67 } }
+    convection { amont }
+    initial_conditions { k champ_fonc_xyz dom 1 0.0027 }
+    boundary_conditions
+    {
+      wall Cond_lim_k_complique_transition_flux_nul_demi
+      bottom frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.0027
+      top frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.0027
+      symetrie paroi
+    }
+    sources
+    {
+      Production_energie_cin_turb { } ,
+      Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+    }
+  }
+}
+
+All models are of the form: time derivative + advection + diffusion = production + dissipation + extra terms. This section describes the physical equations of the models, their implementation in the code, the constants values and a link to where they are defined. If their is any difference compared with the original model, it \emph{must} be emphasized.
+
+The turbulence model
+
+All available single phase models are two-equations models involving the turbulent kinetic energy $k$ equation. Thus all models share the same $k$ equation implementation. The source files are 
+\begin{itemize}
+\item Source_Production_energie_cin_turb.cpp
+\item Source_Dissipation_energie_cin_turb.cpp
+\end{itemize}
+No extra term to take buoyancy effect into account is available.
+
+The base source
+\begin{itemize}
+\item Source_Production_echelle_temp_taux_diss_turb.cpp
+\item Source_Dissipation_echelle_temp_taux_diss_turb.cpp
+\item Source_Diffusion_croisee_echelle_temp_taux_diss_turb.cpp
+
+\item Source_Diffusion_supplementaire_echelle_temp_turb.cpp
+\end{itemize}
+
+\section{Single-phase turbulence}
+
+\subsection{Eddy-viscosity models}
+All of the constants used in the models are user-defined in the calculation dataset. This enables an easy transition from one turbulence model to another. The models that one can use to launch a calculation are the following.
+
+\paragraph{1988 Wilcox $k-\omega$}\mbox{}
+
+The Wilcox version of the $k-\omega$ model is described in details by \textcite{Wilcox1988}. The turbulent viscosity is defined by $\nu_t = \frac{k}{\omega}$. The two equations are:
+
+\begin{align}
+		&\partial_t \rho_l k + \nabla \cdot ( \rho_l k \vec{u_l}) -  
+		\nabla\parent{ \rho_l(\nu_l + \sigma_k \nu_t) \underline{\nabla} k} =
+		  \underline{\underline{\tau_R}}::\underline{\underline{\nabla}}\vec{u_l} 
+		 - \beta_{k}\rho k \omega 
+		\\
+		&\partial_t  \rho_l \omega + \nabla \cdot \parent{\alpha_l \rho_l \omega \vec{u_l}} - \nabla\parent{\rho_l(\nu_l + \sigma_{\omega} \nu_t} \underline{\nabla} \omega) =
+		 \alpha_{\omega}  \frac{\omega}{k}\underline{\underline{\tau_R}}::\underline{\underline{\nabla}}\vec{u_l} 
+		 - \beta_{\omega}\rho \omega^2 
+\end{align}
+
+The default values of the constants are 
+\begin{itemize}
+    \item $\alpha_{\omega} = 0.55$,
+    \item $\beta_{k} = 0.09$,
+    \item $\beta_{\omega} = 0.075$,
+    \item $\sigma_k = 0.5$,
+    \item $\sigma_{\omega} = 0.5$.
+\end{itemize}
+
+\paragraph{Kok $k-\omega$}\mbox{}
+
+This model \cite{Kok1999} was introduced after the Menter SST $k-\omega$ model \cite{Menter1993, Menter2003} showed the importance of cross-diffusion. The differences with the 1988 Wilcox model reside in the addition of a cross-diffusion term (${ \sigma_d\frac{  \rho_l}{\omega} } \text{max}\left\{{\underline{\nabla}k \cdot \underline{\nabla} \omega}, 0\right\}  $) and a modification of the value of some constants. The turbulent equations are:
+
+\begin{align}
+	\label{eq_omega_Kok}
+		&\partial_t \rho_l k + \nabla \cdot \parent{\rho_l k \vec{u_l}} =  
+		\underline{\underline{\tau_R}}::\underline{\underline{\nabla}}\vec{u_l}
+		 - \beta_{k}\rho k \omega 
+		+ \nabla\parent{\rho_l(\nu_l + \sigma_k \nu_t) \underline{\nabla} k}
+		\\
+		&\begin{multlined}
+		\partial_t  \rho_l \omega + \nabla \cdot \parent{\alpha_l \rho_l \omega \vec{u_l}} =
+		 \alpha_{\omega} \frac{\omega}{k}\underline{\underline{\tau_R}}::\underline{\underline{\nabla}}\vec{u_l} 
+		 - \beta_{\omega}\rho \omega^2 
+		 +\nabla\parent{\rho_l\parent{\nu_l + \sigma_{\omega}\nu_t} \underline{\nabla} \omega} \\
+		 + \sigma_d\frac{\rho_l}{\omega} \text{max}\acco{\underline{\nabla}k \cdot \underline{\nabla} \omega,\ 0}
+		\end{multlined}
+\end{align}
+
+The values of the constants are	$\alpha_{\omega} = 0.5$, $\beta_{k} = 0.09$, $\beta_{\omega} = 0.075$, $\sigma_k = 2/3$, $\sigma_{\omega} = 0.5$ and $\sigma_d = 0.5$.
+
+\paragraph{Kok $k-\tau$}\mbox{}
+
+This is a variation of the 1999 Kok $k-\omega$. In this model \cite{Ktau2000}, the time scale $\tau = \frac{1}{\omega}$ is introduced. We therefore have $\nu_t = k\tau$. There is an additional diffusion term that comes out of the calculation ( $- 8  \rho_l(\nu_l + \sigma_{\omega} \nu_t) ||\underline{\nabla}\sqrt{\tau}||^2$). The turbulent equations become:
+
+\begin{align} \label{eq_tau}
+		&\partial_t \rho_l k + \nabla \cdot ( \rho_l k \vec{u_l}) 
+		=  \underline{\underline{\tau_R}}::\underline{\underline{\nabla}}\vec{u_l} 
+		- \frac{\beta_{k}\rho k}{\tau} 
+		+ \nabla( \rho_l(\nu_l + \sigma_k \nu_t) \underline{\nabla} k) \\
+		&\begin{multlined}
+		\partial_t  \rho_l \tau + \nabla \cdot ( \rho_l \tau \vec{u_l})
+		=  - \alpha_{\omega}  \frac{\tau}{k}\underline{\underline{\tau_R}}::\underline{\underline{\nabla}}\vec{u_l} 
+	  	 + \beta_{\omega}\rho 
+		 +\nabla( \rho_l(\nu_l + \sigma_{\omega} \nu_t) \underline{\nabla} \tau)\\
+ 		 + \sigma_d \rho_l \tau \times{} \text{min}\acco{\underline{\nabla}k \cdot \underline{\nabla} \tau,\ 0}
+ 		 - 8  \rho_l\parent{\nu_l + \sigma_{\omega} \nu_t} ||\underline{\nabla}\sqrt{\tau}||^2
+		\end{multlined}
+\end{align}
+
+The $- 8  \rho_l(\nu_l + \sigma_{\omega} \nu_t) ||\underline{\nabla}\sqrt{\tau}||^2$ term presents important numerical difficulties close to the wall. In order to limit these issues, we have tried to implicit this term in 3 different ways. \textbf{The comparison between these methods and the determination of the most robust solution is ongoing}.
+
+The constants are the same than in the 1999 Kok $k-\omega$ model: $\alpha_{\omega} = 0.5$, $\beta_{k} = 0.09$, $\beta_{\omega} = 0.075$, $\sigma_k = 2/3$, $\sigma_{\omega} = 0.5$, $\sigma_d = 0.5$.
+
+\paragraph{2006 Wilcox $k-\omega$}\mbox{}
+
+The 2006 Wilcox $k_\omega$ model \cite{Wilcox2006} is the same as the Kok $k-\omega$ with different coefficients. It is an update of the 1988 Wilcox $k-\omega$ model. The turbulent equations are the same as in equation \ref{eq_omega_Kok}. A notable difference is the introduction of a blending function for $\beta_{\omega}$. 
+
+The values of the constants are: $\alpha_{\omega} = 0.52$, $\beta_{k} = 0.09$, $\beta_{\omega} = 0.0705\cdot f(\Omega_{ij},S_{ij})$, $\sigma_k = 0.6$, $\sigma_{\omega} = 0.5$ , $\sigma_d = 0.125$.
+
+\begin{itemize}
+    \item expliciter la fonction de blending
+    \item ajouter implémentation de chaque terme
+    \item 
+\end{itemize}
+
+\subsection{Large-Eddy Simulation}
+
+Large-Eddy simulation using Pb_Multiphase is a work in progress. This section will be filled later.
+
+%% TWO-PHASE
+\section{Two-phase turbulence}
+
+\subsection{Eddy viscosity-like model}
+
+The Sato model \cite{Sato1981a} is added in \texttt{Viscosite_turbulente_sato.cpp}. The original formula is
+\begin{equation}
+\epsilon''=\parent{1-\exp\parent{-\frac{y^+}{A^+}}}^2 k_1 \alpha \frac{D_b}{2}U_B.
+\end{equation}
+with the coefficient $A^+=16$ and $k_1 = 1.2$. The bubble diameter $D_b$ is modeled to take the deformation of the bubble into account at the wall. The velocity $U_B$, defined in the article, is the relative velocity.\footnote{Very poor notation, in our humble opinion.} The following expression is defined:
+\begin{equation}
+    D_b = \begin{cases}
+    0\ \text{if}\ 0 < y < 20~\unit{\mu m},\\
+    4y\parent{\widehat{D_B}-y}/\widehat{D_B}\ \text{if}\ 20~\unit{\mu m} < y < \widehat{D_B}/2,\\
+    \widehat{D_B}\ \text{if}\ \widehat{D_B}/2 < y < R.
+    \end{cases}
+\end{equation}
+with $\widehat{D_B}$ the cross-sectional mean diameter of the bubbles.
+
+In TrioCFD, the squared coefficient depending on $y^+$ is not implemented. The bubble diameter is taken as is without the prescribed function. 
+
+\subsection{Bubble-induced turbulence model in two-equations model}
+
+The HZDR model is described in the paper of \textcite{Rzehak2013a,Rzehak2013b,Rzehak2015,Colombo2021}. Their approach is to add a production term $S_{k}^{\text{BI}}$ to the $k$ equation and a dissipation term $S_{\omega}^{\text{BI}}$ to the $\omega$ equation. The general assumption is to consider that \emph{all energy lost by the bubble to drag is converted to turbulent kinetic energy in the wake of the bubble}~\cite{Rzehak2013b}.
+
+In comparison with the current version of the code, they implemented those two additional terms in a $k-\omega$ SST turbulence model. In CMFD, only the production and dissipation terms have been extracted and implemented without (yet) the SST additional process. Thus the prescribed coefficient might not be well suited.
+
+The two terms are related by the expression
+\begin{equation}
+    S_{\omega}^{\text{BI}} = \frac{1}{C_{\mu} k_l} \mathcal{S}_{\varepsilon}^{\text{BI}} - \frac{\omega_L}{k_L}S_{k}^{\text{BI}}
+\end{equation}
+with
+\begin{equation}
+    \mathcal{S}_{\varepsilon}^{\text{BI}} = C_{\varepsilon B}\frac{S_{k}^{\text{BI}}}{\tau} = C_{\varepsilon B}\frac{S_{k}^{\text{BI}}\varepsilon_l}{k_l}
+\end{equation}
+
+% Dissip = Cepsilon/(Cnu*db*sqrt(k))*prodHZDR
+% avec ProdHZDR = Ck*3/4*Cd/diam*alpha_g/alpha_l*ur^3
+% Cd = 
+
+In the code, the added dissipation term takes the following form
+\begin{equation}
+    S_{\omega}^{\text{BI}} = \frac{C_{\varepsilon}}{C_{\nu}D_b\sqrt{k}}\mathcal{S}_{k}^{\text{BI}}
+\end{equation}
+with
+\begin{align}
+    &\mathcal{S}_{k}^{\text{BI}} = \frac{3}{4}C_k\frac{C_d}{D_b}\frac{\alpha_g}{\alpha_l}u_r^3\\
+    &C_d = \max\parent{\min\parent{\frac{16}{\mathit{Re}_b}\parent{1+0.15\mathit{Re}_b^{0.687}},\ \frac{48}{\mathit{Re}_b}},\ \frac{8\mathit{Eo}}{3\parent{\mathit{4+Eo}}}}\\
+    &\mathit{Eo} = \frac{g\norm{\rho_l - \rho_g}D_b^2}{\sigma}\\
+    &\mathit{Re}_b = \frac{D_b u_r}{\nu_l}
+\end{align}
+It is derived directly from Source_base and currently only implemented in PolyMAC. 
+
+The added production term in the turbulent kinetic energy equation is defined in Production_HZDR_PolyMAC_P0. The added term in the dissipation equation is defined in Source_Dissipation_HZDR_PolyMAC_P0. TODO: To avoid code duplication, the dissipation source term should call the production source term.
+
+\subsection{RSM-like model}\label{subsec:RSM}
+By two-phase turbulence, we mean the effect of the bubbles on the turbulence in the liquid phase. To model this, we implemented the models developed during the PhD of Antoine \textsc{du~Cluzeau} \cite{DuCluzeau2019, Cluzeau2019, Cluzeau2019a}. Following the work of \textcite{Risso2018}, the authors divide the velocity fluctuations caused by the movement of bubbles in the fluid in two parts: wake-induced turbulence and wake-induced fluctuations. The total Reynolds stress tensor is the sum of all single-phase (calculated using 2-equation turbulence models) and two-phase turbulence.
+
+\begin{equation}
+	\underline{\underline{\tau_R}} 	=
+	      \underline{\underline{\tau_R}}_{\text{single-phase}}
+		+ \underline{\underline{\tau_R}}_{\text{WIF}}
+		+ \underline{\underline{\tau_R}}_{\text{WIT}}
+\end{equation}
+This model is only available in PolyMAC, for now.
+
+\paragraph{Wake-induced fluctuations}\mbox{}
+
+Wake-induced fluctuations are the anisotropic effects of the average wake. These fluctuations are primarily in the direction of the liquid-gas velocity difference, i.e. in the vertical direction. No transport equation is necessary to model this term.
+\begin{equation}
+	\underline{\underline{\tau_R}}_{\text{WIF}} =
+	\alpha_v |\overrightarrow{u_v}-\overrightarrow{u_l}|^2
+	\begin{bmatrix}
+		3/20 & 0 & 0 \\
+		0 & 3/20 & 0 \\
+		0 & 0 & 1/5+3C_v/2
+	\end{bmatrix}
+\end{equation}
+with $C_v = 0.36$.
+
+During his internship, Moncef \textsc{El Moatamid} defined a new formulation using the work of \textcite{Biesheuvel1984}
+\begin{equation}
+	\underline{\underline{\tau_R}}_{\text{WIF}} =
+	\alpha_v \parent{\frac{3}{20}u_r^2 \underline{\underline{I}} + \parent{\frac{1}{20}+0.25\times{}\frac{3}{2}\gamma^3}\underline{u_r}\underline{u_r}}
+\end{equation}
+This formulation allows to have a tensor for the second part of the equation
+
+\paragraph{Wake-induced turbulence}\mbox{}
+
+Wake-induced turbulence is the isotropic contribution of bubbles to the velocity fluctuations. It comes from the instabilities of bubble wakes. It takes the shape of an additional transport equation for a specific kinetic energy $k_{WIT}$.
+
+\begin{align}
+	&\underline{\underline{\tau_R}}_{\text{WIT}} = k^{WIT}\frac{2}{3}\delta_{ij}\\
+	&\frac{D k^{WIT}}{Dt} = 
+			\underbrace{C_D\nabla^2 k^{WIT} }_\text{Diffusion} 
+				- \underbrace{\frac{2 \nu_l C_D' Re_b}{C_\Lambda^2 d_b^2}k^{WIT} }_\text{Dissipation}
+				+ \underbrace{\alpha_v \frac{(\rho_l-\rho_v)}{\rho_l} g |\vec{u_v}-\vec{u_l}|\left(0.9 - exp\left(-\frac{Re_b}{Re_b^c}\right)\right) }_\text{Production}
+\end{align}
+where $C_\Lambda = 2.7$, $Re_b^c = 170$, $C_D'$ is a user-inputted drag coefficient and $C_D$ is a turbulent diffusion coefficient.
+
+This model is implemented in \texttt{Energie_cinetique_turbulente_WIT.cpp} and inherits from \texttt{Convection_Diffusion_std}. The different terms of the right-hand side of the equations must be modeled. Thus, we have
+\begin{itemize}
+    \item Viscosite_turbulente_WIT
+    \item Dissipation_WIT_PolyMAC_P0
+    \item Production_WIT_PolyMAC_P0
+\end{itemize}
+
+As specified above, it is currently only available with PolyMAC. To take the WIT into account in the momentum equation, one must specify its presence in the diffusion term using\footnote{This syntax might evolve to avoid repeating the names.} 
+
+\begin{lstlisting}[language=c++]
+diffusion { 
+  turbulente multiple { 
+    k_omega k_omega { } 
+    WIT WIT { } 
+    WIF WIF { } 
+  } 
+}
+\end{lstlisting}
+
+Then, in the WIT equation bloc, the model for the turbulente diffusion of WIT is specified
+\begin{lstlisting}[language=c++]
+diffusion { turbulente SGDH_WIT { } }
+\end{lstlisting}
+
+For the turbulent viscosity, an additional diffusion term must be specified in the data file to model the turbulent transport of WIT. Two models are available, a single gradient diffusion one and a generalized gradient diffusion one. 
+
+
+
+\textbf{Production_WIT}
+\begin{equation}
+    \alpha{}g u_r\frac{\rho_l - \rho_g}{\rho_l}\parent{0.9 - \exp\parent{Re_b-Re_c}}
+\end{equation}
+with
+\begin{align}
+    \mathit{Re}_b = \frac{D_b u_r}{\nu_l}.
+\end{align}
+The Reynolds number $\mathit{Re}_c$ is a user parameter with a default value of 170~\cite{DuCluzeau2019}. Only the \texttt{secmem} matrix is filled.
+
+
+
+\textbf{Dissipation_WIT}
+Drag coefficient from Tomiyama, same than HZDR.
+\begin{equation}
+    \frac{2\nu C_d \mathit{Re}_b k_{\text{WIT}}}{C_{\lambda}^2 D_b^2}
+\end{equation}
+with
+\begin{align}
+    &C_d = \max\parent{\min\parent{\frac{16}{\mathit{Re}_b}\parent{1+0.15\mathit{Re}_b^{0.687}},\ \frac{48}{\mathit{Re}_b}},\ \frac{8\mathit{Eo}}{3\parent{\mathit{4+Eo}}}}\\
+    &\mathit{Eo} = \frac{g\norm{\rho_l - \rho_g}D_b^2}{\sigma}\\
+    &\mathit{Re}_b = \frac{D_b u_r}{\nu_l}
+\end{align}
+ Only the \texttt{secmem} matrix is filled.
+ 
+
+
+\textbf{Transport_turbulent_SGDH_WIT}
+It comes from the paper of \textcite{Almeras2014}.
+It computes a characteristic time scale of the form
+\begin{equation}
+    \tau = \frac{2}{3} \alpha_g u_r \frac{D_b}{\delta^3} \gamma^{2/3}
+\end{equation}
+with $\delta$ the wake size, $\gamma$ the bubble aspect ratio and $C_s$ a constant
+Then it modifies the viscosity as 
+\begin{equation}
+    \nu = \frac{\mu_0}{\nu_0}C_s \tau
+\end{equation}
+
+\begin{lstlisting}[language=c++]
+  Param param(que_suis_je());
+  param.ajouter("Aspect_ratio", &gamma_);   // rapport d'aspet des bulles
+  param.ajouter("Influence_area", &delta_); // paramètre modèle d'Alméras 2014 (taille du sillage)
+  param.ajouter("C_s", &C_s);               // paramètre modèle d'Alméras 2014
+\end{lstlisting}
+
+
+
+\textbf{Transport_turbulent_GGDH_WIT} Same as SGDH but works with $\nu(i, \text{liq. idx},$ $\text{dim I}, \text{dim J})$ and $R_{ij}$
+\begin{lstlisting}[language=c++]
+  param.ajouter("Aspect_ratio", &gamma_); // rapport d'aspet des bulles
+  param.ajouter("Influence_area", &delta_); // paramètre modèle d'Alméras 2014 (taille du sillage)
+  param.ajouter("C_s", &C_s); // paramètre modèle d'Alméras 2014
+  //param.ajouter("vitesse_rel_attendue", &ur_user, Param::REQUIRED); // valeur de ur à prendre si u_r(i,0)=0
+  param.ajouter("Limiteur_alpha", &limiteur_alpha_, Param::REQUIRED); // valeur minimal de (1-alpha) pour utiliser le modèle d'Alméras
+\end{lstlisting}
+
+
+\textbf{Viscosite_turbulente_WIT}
+With the Reynolds_stress method, it fills the diagonal with $2/3 \times k_{\text{WIT}}$.
+\begin{lstlisting}[language=c++]
+param.ajouter("limiter|limiteur", &limiter_);
+\end{lstlisting}
+
+
+\section{Boundary conditions}
+
+The algorithm for the boundary conditions is run independently in each near-wall cell. 
+It's steps are:
+\begin{enumerate}
+	\item Calculate $u_\parallel$
+	\item Calculate the friction viscosity $u_\tau$ using a Newton algorithm, to solve $\frac{u_\parallel}{u_\tau} = u_+(\frac{y u_\tau}{\nu})$
+	\item Calculate the shear stress $\tau_f = \rho u_\tau^2$
+	\item Obtain a friction coefficient at the wall $\alpha = \tau_f / u_\parallel$ that will be used to calculate the momentum flux boundary condition
+	\item If a thermal wall law is required, use the equation on the turbulent heat flux presented above to determine $q_{\text{wall}\rightarrow\text{phase~}n}$
+	\item Calculate one of the following BC's on $k$:
+	\begin{itemize}
+		\item Use $k=0$ (if wall-resolved, i.e. $y_+<5$)
+		\item Use $\partial_y k=0$ (if log-law region i.e. $y_+>30$)
+		\item Use equation a boundary condition that implements a blending between the two: Cond\_lim\_k\_simple\_flux\_nul. The blending function is presented in equation~\eqref{eq_k_blending}.
+		\item No longer used: use the equations on the turbulent quantities presented above to determine $k(y/2)$ in the first half-cell and use it as Dirichlet BC: Cond\_lim\_k\_complique\_transition\_flux\_nul\_demi
+	\end{itemize} 
+	\item Either:
+	\begin{itemize}
+		\item Calculate one of the following BC's on $\omega$:
+		\begin{itemize}
+			\item Use the equations on the turbulent quantities presented above to determine $\omega(y/2)$ in the first half-cell and use it as Dirichlet BC: Cond\_lim\_omega\_demi
+			\item Use the equations on the turbulent quantities presented above to determine $\omega(y)$ in the first cell and use 10 times this value as Dirichlet BC at the wall: Cond\_lim\_omega\_dix
+		\end{itemize}
+		\item Calculate one of the following BC's on $\tau$:
+		\begin{itemize}
+			\item Use $\tau = 0$
+		\end{itemize}
+	\end{itemize}
+	\item Iterate one time step of the complete system of equations (momentum, mass, energy, pressure, turbulent quantities)
+\end{enumerate}
+
+\subsection{Boundary condition on the turbulent kinetic energy}
+
+\subsubsection{Basic boundary conditions}
+
+This boundary condition is implemented in \texttt{Cond\_lim\_k\_simple\_flux\_nul.cpp} (and should get a new name).
+
+It implements a seamless transition from a $k=0$ at the wall for $y_+<5$ to a zero-flux condition for $y_+>30$ using a blending function.
+
+The value on the wall is always zero, and the exchange coefficient between the wall and the first cell is:
+\begin{equation}
+    h = \frac{\mu_\text{tot}}{y_\text{loc}} \times \parent{1 + \text{tanh}\parent{\frac{1}{10}\frac{y_\text{loc}u_{\tau}}{{{\nu_c}}^2}}}
+    \label{eq_k_blending}
+\end{equation}
+
+\subsubsection{More complex boundary conditions}
+It is implemented in \texttt{Cond\_lim\_k\_complique\_transition\_flux\_nul\_demi.cpp} but not used anymore. It is kept until an possible refactoring and cleaning operation.
+
+\begin{equation}
+    h = \frac{2\mu_\text{tot}}{y_\text{loc}} \times \parent{1 + \text{tanh}\parent{\frac{y_+^3}{50}}}
+\end{equation}
+
+The turbulent kinetic energy is then computed by
+\begin{equation}
+    k = u_{\tau}^2\times{}\max\croc{\parent{1-b_1}f_1 + b_1f_2, 0} \times{} \parent{1 - b_2} + b_2\times{}f_3 
+\end{equation}
+with
+\begin{align}
+    &b_1 = \text{tanh}\croc{\parent{\frac{y_+}{4}}^{10}}\\
+    &b_2 = \text{tanh}\croc{\parent{\frac{y_+}{2500}}^{1.4}}\\
+    &f_1 = \frac{\parent{y_+ - 1}^2}{30}\\
+    &f_2 = \frac{1}{\sqrt{\beta_k}} - 0.08\times{}\parent{\norm{4.6-\log\parent{y_+}}}^3\\
+    &f_3 = \frac{4}{\text{sqrt}\parent{\beta_k}}
+\end{align}
+
+\subsection{Boundary condition on the dissipation time scale equation}
+
+\subsubsection{Advanced boundary condition}
+
+It is implemented in \texttt{Cond\_lim\_omega\_demi.cpp}. It uses a virtual point at half the distance to the wall to impose the value of $\omega$.
+
+A blending function is used for the wall value of $\omega$ defined as
+\begin{equation}
+    \omega = f_{\text{b}} \omega_1 + (1-f_{\text{b}})\omega_2
+\end{equation}
+with
+\begin{align}
+    &y_p = \frac{y}{u_{\tau}{\nu}},\\
+    &\omega_{\text{vis}} = \frac{6\nu}{\beta_{\omega}y_{\text{loc}}^2},\\
+    &\omega_{\text{log}} = \frac{u_{\tau}}{\sqrt{\beta_k}\kappa y_{\text{loc}}},\\
+    &\omega_1 = \omega_{\text{vis}} + \omega_{\text{log}},\\
+    &\omega_2 = \parent{\parent{\omega_{\text{vis}}}^{1.2} + \parent{\omega_{\text{log}}}^{1.2}}^{1/1.2},\\
+    &f_{\text{b}} = \text{tanh}\parent{\croc{\frac{y_+}{10}}^4}.
+\end{align}
+
+The constants are the common ones of the $k-\omega$ models: $\beta_k = 0.09$ (called $C_{\mu}$ in $k-\varepsilon$ model), $\beta_{\omega} = 0.075$ and the \textsc{von Karman} constant $\kappa$ = 0.41.
+
+\subsubsection{Basic boundary condition}
+It is implemented in \texttt{Cond\_lim\_omega\_dix}.
+
+Set the wall value at $\omega_{\text{wall}} = C_{\text{wall}} \times 6\frac{\nu}{\beta_{\omega}y^2}$
+with 
+\begin{itemize}
+    \item $C_{\text{wall}} = 10$, a user parameter. Its default value is prescribed by \textcite{Wilcox2008}.
+    \item $y$ the wall distance of the elem
+    \item $\nu$ the viscosity
+\end{itemize}
+
+
+
+\subsection{Wall functions}
+\subsubsection{Adaptive wall function}
+\subsubsection{Ramstorfer wall function}
+\subsubsection{Adaptative wall flux}
+
+This function computes the wall heat flux based on Kader paper. 
+
+It computes a $\theta^+$ quantity defined as
+\begin{equation}
+    \mathit{Pr} y^+ \exp\parent{-\gamma} + \exp\parent{-1/\gamma} \times \parent{2.12 \log\parent{\frac{1.5 \times (1+y^+) (2-y_D)}{(1+2(1-y_D)^2)}} + \beta}
+\end{equation}
+with
+\begin{align}
+    & y_D = 0,\\
+    &\mathit{Pr} = \frac{\mu \mathit{Cp}}{\lambda},\\
+    &y^+ = \frac{\rho y u_{\tau}}{\mu},\\
+    &\beta = \parent{3.85\mathit{Pr}^{1/3}-1.3}^2 + 2.12\log(Pr),\\
+    &\gamma = \frac{0.01\times \parent{\mathit{Pr} y^+}^4}{1+5\mathit{Pr}^3y^+},
+\end{align}
+The value $y_D$ was at first defined as $y/D_h$ but lately set to zero.

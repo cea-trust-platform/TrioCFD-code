@@ -1,0 +1,387 @@
+\documentclass[a4paper,12pt]{report}
+%\usepackage[utf8]{inputenc}
+%\usepackage{fontspec}
+%\usepackage{polyglossia}
+\usepackage{underscore}
+\usepackage{xspace}
+\usepackage{microtype}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,stmaryrd,bbold,stackrel,dsfont,mathrsfs,soul,tcolorbox,verbatimbox,textcomp}
+%\usepackage{tabularx}
+\usepackage{mathtools}
+\usepackage{makecell} %
+\usepackage{booktabs}
+\usepackage{graphics,graphicx}
+\usepackage{fancyhdr}
+\usepackage{fancybox}
+\usepackage{fancyvrb}
+\usepackage{lastpage}
+\usepackage{cellspace}
+\usepackage{float}
+\usepackage{chngcntr}
+\usepackage{ae,aecompl}
+\usepackage{colortbl}
+\usepackage{pmboxdraw,multirow,array,multicol}
+\usepackage{siunitx} % pour les unités et le traitement des numbre en notation SI\num{1e6}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+\usetikzlibrary{mindmap,trees} 
+\usetikzlibrary{backgrounds}
+\usepackage[outline]{contour}
+\usepackage{pifont}
+\usepackage[margin = 2cm]{geometry}
+\usepackage{subcaption}
+\usepackage{colortbl}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[edges]{forest}
+\usepackage{dirtree}
+\usepackage[english]{babel} % To obtain English text with the blindtext package
+\usepackage{blindtext}
+\usepackage{pdflscape}
+\newcommand\ull[1]{\underline{\underline{#1}}}
+
+
+\usepackage{csquotes}
+\usepackage[
+backend=biber,      % On utilise biber pour la compilation biblatex
+citestyle=numeric,  % citation de la forme [1] ou pour plusieurs, [1], [2]
+bibstyle=numeric,   % complementaire à citestyle numeric pour la biblio finale
+sorting=nyt,        % Tri dans l'ordre : nom, année, titre.
+maxnames=2,         % Les citations dans le texte avec \textcite n'affiche que le nom du premier auteur et met un "et al.".n
+maxbibnames=99,     % Limite haute pour mettre tous les noms dans la biblio (ne met pas de et al. dans la bibliographie)
+giveninits=true,    % ne mets que les initiales
+language=french,    % test du français
+alldates=year,      % la date n'affiche que l'année
+isbn=false,         % Ne pas afficher l'isbn
+url=false,          % Ne pas afficher l'url
+doi=false,          % Ne pas afficher le lien DOI
+eprint=false,       % Ne pas afficher le numéro eprint
+%refsegment=chapter, % pour faire des bibliographies par chapitre
+backref=false       % Ajouter une mention renvoyant où la publication a été citée
+]{biblatex}
+\addbibresource{BiblioCMFDdiphasique.bib}
+
+%% AVANT DERNIER PACKAGE
+\usepackage[english]{babel} % use polyglossia
+
+%% DERNIER PACKAGE
+\usepackage{hyperref}
+\hypersetup{
+  % backref=true,               %% permet d'ajouter des liens dans...
+  % pagebackref=true,           %% ...les bibliographies ;
+  % hyperindex=true,            %% ajoute des liens dans les index ;
+  breaklinks=true,              %% permet le retour à la ligne dans les liens trop longs ;
+  colorlinks=true,              %% colorise les liens ;
+  urlcolor= blue,               %% couleur des hyperliens ;
+  linkcolor=blue,               %% couleur des liens internes ;
+  citecolor=blue,               %% couleur des liens de citations ;
+  % bookmarks=true,             %% créé des signets pour Acrobat ;
+  % bookmarksopen=true,         %% si les signets Acrobat sont créés, les afficher complètement ;
+  pdftitle={Reference Guide to the TRUST/TrioCFD Multiphase Framework},             %% informations apparaissant...
+  pdfauthor={Collective work},  %% ...dans les informations...
+  pdfsubject={TRUST/TrioCFD multiphase framework}, %% ...du document...
+  pdfkeywords={TRUST,TrioCFD,multiphase,CMFD,RANS},  %% ...dans le lecteur pdf.
+  pdfencoding={unicode}
+}
+
+
+
+%% == Déclaration de variables et commandes
+\DeclareGraphicsExtensions{.pdf}
+\graphicspath{{./}{src/}}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+%\newcommand\l|{\left|\left|} % use \vert
+%\newcommand\r|{\right|\right|} % use \vert
+\def\R{\mathds R} % Très mauvaise pratique !! Impossible à retrouver
+\def\P{\mathds P} % Très mauvaise pratique !! Impossible à retrouver
+\newcommand{\N}{\mathds N}
+\newcommand{\Z}{\mathds Z}
+\newcommand{\E}{\mathds E}
+\newcommand{\1}{\mathds 1}
+\newcommand{\T}{{\sf T}}
+\newcommand{\B}{{\sf B}}
+\renewcommand{\S}{{\sf S}}
+\renewcommand{\G}{{\sf G}}
+\newcommand{\Vect}{\mathrm{ Vect}}
+\renewcommand{\th}{\mathrm{\,th\,}}
+\newcommand{\ch}{\mathrm{\,ch\, }}
+\newcommand{\argth}{\mathrm{\,ath\, }}
+\newcommand{\sh}{\mathrm{\,sh\, }}
+\newcommand{\ve}{\varepsilon}
+\newcommand{\hZ}{\hat Z}
+\newcommand{\hpsi}{\hat \psi}
+\newcommand{\cM}{{\cal M}}
+\newcommand{\de}{{\rm d}}
+
+\newcommand{\parg}{\left(}
+\newcommand{\pard}{\right)}
+\newcommand{\crocg}{\left[}
+\newcommand{\crocd}{\right]}
+\newcommand{\accog}{\lbrace }
+\newcommand{\accod}{\rbrace }
+\newcommand{\chevg}{\left<}
+\newcommand{\chevd}{\right>}
+\newcommand {\parent} [1] {\parg #1 \pard}
+\newcommand {\croc} [1] {\crocg #1 \crocd}
+\newcommand {\acco} [1] {\accog #1 \accod}
+\newcommand {\chev} [1] {\chevg #1 \chevd}
+\newcommand {\norm} [1] {\vert #1 \vert}
+
+\renewcommand{\vec}{\overrightarrow}
+
+\newcommand{\todo}[1]{{\color{red}#1}}
+\newcommand{\hide}[1]{ }
+
+%\def\red{\color{red}}
+%\newcommand\pink{\color{pink}}
+%\def\blue{\color{blue}}
+%\def\green{\color{green}}
+%\def\gray{\color{gray}}
+%\def\white{\color{white}}
+\newcommand{\TT}[1]{\underline{\underline{#1}}}
+\newcommand{\la}{\left\langle}
+\newcommand{\ra}{\right\rangle}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\newcommand{\myel}{\mathit{el}\xspace{}}
+
+\newcommand{\pluseq}{\mathrel{+}=}
+\newcommand{\minuseq}{\mathrel{-}=}
+\newcommand{\timeseq}{\mathrel{*}=}
+
+
+\definecolor{codebackground}{RGB}{245, 245, 245}         % Gris clair pour le fond
+\definecolor{codeword}{RGB}{0, 0, 0}                     % Noir pour le fond
+\definecolor{codeborder}{RGB}{100, 100, 100}             % Gris pour la bordure
+\definecolor{codekeyword1}{RGB}{255, 140, 0}             % Orange pour la première classe de mots clés
+\definecolor{codekeyword2}{RGB}{22, 25, 237}             % bleu océan
+\definecolor{codekeyword3}{RGB}{ 146, 41, 223}           % purple
+\definecolor{codekeyword4}{RGB}{255, 50, 50}             % red
+
+\definecolor{codecomment}{RGB}{112, 142, 124}            % Vert olive pour les commentaires
+\definecolor{codestring}{RGB}{86, 156, 214}              % Turquoise pour les chaînes de caractères
+
+\definecolor{Orange}{RGB}{255, 140, 0} 
+\definecolor{Vert}{RGB}{0, 128, 0} 
+\definecolor{Rose}{RGB}{255, 105, 180}
+\definecolor{Bleu}{RGB}{156, 220, 254}
+\definecolor{Beige}{RGB}{255, 220, 209}
+
+
+\definecolor{mycrimson}{RGB}{220,20,60}
+\definecolor{myorange}{RGB}{255,128,0}
+\definecolor{mygoldenrod}{RGB}{218,165,32}
+\definecolor{mygreen}{RGB}{51,204,51}
+\definecolor{myolivegreen}{RGB}{85,107,47}
+\definecolor{myteal}{RGB}{0,128,128}
+\definecolor{myslateblue}{RGB}{106,90,205}
+\definecolor{mydarkorchid}{RGB}{153,50,204}
+\definecolor{OPblue}{RGB}{0, 102, 204}
+
+\newcommand{\colorboxed}[2]{%
+    \tikz[baseline=(m.base)]{
+        \node[draw=#1, thick, rectangle, inner sep=2pt] (m) {$\displaystyle#2$};
+    }%
+}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{codebackground},
+    frame=lines,
+    rulecolor=\color{codeborder},
+    keywordstyle={[1]\color{codekeyword1}},  % Style pour la première classe de mots clés
+    keywordstyle={[2]\color{codekeyword2}},
+    keywordstyle={[3]\color{codekeyword3}},
+    keywordstyle={[4]\color{codekeyword4}},
+    morekeywords=[1]{Dimension, Domaine, Mailler,Partition, Scatter, Schema_euler_implicite, Read, associate, Associate, Discretize, Lire, Postraitement, Resoudre, Fin,read_med},   % Première classe de mots clés
+    morekeywords=[2]{ Milieu_composite, correlations, QDM_Multiphase,Masse_Multiphase, Energie_Multiphase, taux_dissipation_turbulent, energie_cinetique_turbulente,solveur,milieu_composite}, 
+    morekeywords=[3]{VDF, PolyMAC_P0, taux_dissipation_turbulent, energie_cinetique_turbulente, criteres_convergence, evanescence, convection, diffusion, conditions_limites, initial_conditions, liquide_eau, boundary_conditions, sources, iter_min, seuil_convergence_implicite,solveur_pression,gaz_air,interface_eau_air},
+    morekeywords=[4]{Pb_Multiphase},
+    commentstyle=\color{codecomment},
+    stringstyle=\color{codestring},
+    basicstyle=\ttfamily\color{black},  % Police blanche
+    breaklines=true,
+    columns=fullflexible
+}
+
+\lstset{style=mystyle}
+\newcommand\codeVersion{1.9.4}
+
+%\input{conf.sty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% debut document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\thispagestyle{empty}
+%\cfoot{}
+%\renewcommand{\headrulewidth}{0pt}
+%\renewcommand{\footrulewidth}{0pt}
+\begin{multicols}{2}
+\includegraphics[scale=0.75]{Figure/cealogo.png}
+\begin{flushright}\Ovalbox{\begin{minipage}{8cm} \begin{center} \vspace{0.4cm}\Large{DES/ISAS/DM2S/STMF/LMSF}\vspace{0.4cm}\end{center}\end{minipage}}\end{flushright}
+\begin{flushright}\Ovalbox{\begin{minipage}{4cm} \begin{center} \vspace{0.4cm}\Large{\thepage/\pageref{LastPage}}\vspace{0.4cm}\end{center}\end{minipage}}\end{flushright}
+\end{multicols}
+\cornersize{.2}
+\Ovalbox{\begin{minipage}{16.2cm}
+\begin{center} \vspace{1.8cm}
+\parbox[t]{12cm}{\hspace{1.2cm}\huge{\textbf{USER DOCUMENTATION :}}
+\vspace{0.4cm}\\
+\hspace{2.8cm}\LARGE{\textbf{TRUST-TrioCFD : Multiphase Module v1.9.4}}}\end{center}
+\vspace{0.3cm}
+\begin{center}\includegraphics[scale=0.7]{Figure/TrioCFD.png} \end{center}
+\vspace{0.4cm}
+\setlength{\tabcolsep}{0.5cm}
+
+\begin{tabular}{ c|c|c|c }
+\hline
+ Version & Date & Code manager & Authors \\
+\hline
+v1.9.4 & 24 juin 2024   &               & A BURLOT \\
+             &          &  A DU CLUZEAU & C BAZIN \\
+             &          &               & A PEITAVY \\
+             &          &               & C REISS \\
+             &          &               & A GERSCHENFELD \\
+             &          &               & F PECQUERY \\
+\hline
+\multicolumn{2}{c|}{ } & \multicolumn{2}{l}{\textit{Input file : } TrioCFD\_Pb\_multiphase.tex } \\
+\multicolumn{2}{c|}{\textbf{DES/ISAS/DM2S} } & \multicolumn{2}{l}{\textit{Software : } TrioCFD } \\
+\multicolumn{2}{c|}{\textbf{CEA SACLAY} } & \multicolumn{2}{c}{ } \\
+\cline{3-4}
+\multicolumn{2}{c|}{\textbf{91191 GIF-SUR-YVETTE} } & \multicolumn{2}{c}{ } \\
+\multicolumn{2}{c|}{ } & \multicolumn{2}{l}{\large{\textbf{DES/ISAS/DM2S/STMF/LMSF/UD}} } \\
+\multicolumn{2}{c|}{ } & \multicolumn{2}{c}{ } \\
+\end{tabular}
+\end{minipage}}
+\newpage
+
+\tableofcontents
+
+\pagebreak
+
+\section*{Definition of dimensional and dimensionless variables}
+\begin{center}
+\begin{tabular}{|r|l|}
+	\hline Variable name & Expression \\ \hline \hline
+	Gas phase & $g$ \\ \hline
+	Liquid phase & $l$ \\ \hline
+	Distance to the wall & $y$ \\ \hline
+	Normal unit vector from the wall & $\overrightarrow{n}$ \\ \hline
+	Velocity of phase k & $\overrightarrow{u_k}$\\ \hline
+	Dynamic viscosity of phase k
+		& $\mu_k $ \\ \hline
+	Volume mass of phase k
+		& $\rho_k$ \\ \hline
+	Kinematic viscosity of phase k
+		& $\nu_k = \mu_k/\rho_k$ \\ \hline
+	Turbulent dynamic viscosity of the carrying phase
+		& $\mu_{t} $ \\ \hline
+	Turbulent kinematic viscosity of the carrying phase
+		& $\nu_t = \mu_t/\rho$ \\ \hline
+	Reynold's stress tensor of the carrying phase
+		& $\underline{\underline{\tau_R}} = - <u_iu_j>$ \\ \hline
+	Turbulent kinetic energy of the carrying phase
+		& $k$ \\ \hline
+	Turbulent dissipation of the carrying phase
+		& $\varepsilon$ \\ \hline	
+	Temperature of phase k
+		& $T_{k}$ \\ \hline
+	Temperature of the wall
+		& $T_\text{wall}$ \\ \hline
+	Thermal conductivity of phase k
+		& $\lambda_k $ \\ \hline
+	Heat capacity at constant volume of phase k
+		& $Cp_k$ \\ \hline
+	Forced convection heat transfer coefficient
+		& $h_{fc}$	\\ \hline
+	Liquid fraction 
+		& $\alpha_l $ \\ \hline
+	Void fraction 
+		& $\alpha_g $ \\ \hline
+	Internal energy of phase k
+		& $e_k $ \\ \hline
+	Mass transfer to phase k
+		& $\Gamma_k $ \\ \hline
+	Mass transfer to phase k
+		& $\Gamma_k $ \\ \hline
+	Interfacial forces applied to phase k
+		& $\vec{F}_{ki}$  \\ \hline
+	Volume forces applied to phase k (i.e. gravity)
+		& $\vec{F}_k$  \\ \hline
+	Interfacial heat flux to phase k
+		& $q_{ki}$ \\ \hline
+	Wall heat flux to phase k
+		& $q_{kp} $ \\ \hline
+	Interfacial area between phase $l$ and $v$
+		& $a_i$ \\ \hline
+	Bubble diameter of phase $v$
+		& $	d_b = \frac{6 \alpha_g}{a_i} $ \\ \hline
+	Bubble nucleation and departure from wall diameter
+		& $d_\text{dep}$ \\ \hline
+	Vapor/liquid saturation temperature
+		& $T_\text{sat}$ \\ \hline
+	Vapor/liquid latent heat
+		& $L_\text{vap}$ \\ \hline
+	Vapor/liquid surface tension
+		& $\sigma$ \\ \hline
+	Percentage of wall surface occupied by sliding bubbles
+		& $S_{sl}$ \\ \hline
+	Bubble Reynold's number
+		& $Re_b = \frac{||\overrightarrow{u_v}-\overrightarrow{u_l}|| d_b}{\nu_l}$ \\ \hline
+	Bubble turbulent fluctuation Weber number
+		& $We = \frac{(\varepsilon d_b)^{2/3} \rho_l d_b}{\sigma}$ \\ \hline
+	Eotvos number
+		&  $Eo = \frac{g(\rho_l-\rho_g)d^2}{\sigma}$ \\ \hline
+	Turbulent Prandtl number of the liquid 
+		& $Pr_t \sim 1 $ \\ \hline
+	Superheat Jacob number
+		& $Ja_\text{sup} = \frac{\rho_l Cp_l \cdot (T_\text{wall} - T_\text{sat})}{\rho_v L_\text{vap}}$ \\ \hline
+	Subcooling Jacob number	
+		& $Ja_\text{sub} = \frac{\rho_l Cp_l \cdot (T_\text{sat} - T_l)}{\rho_v L_\text{vap}}$ \\ \hline
+\end{tabular}
+\end{center}
+
+\pagebreak
+
+\input{./Sections/Introduction.tex}
+\cleardoublepage
+\input{./Sections/ModeleEDP.tex}
+\cleardoublepage
+
+% Description jdd
+\input{./Sections/Dataset.tex}
+\cleardoublepage
+
+% Informatique
+\input{./Sections/Architecture.tex}
+\cleardoublepage
+
+% Mix informatique/numérique
+\input{./Sections/Evanescence.tex}
+\cleardoublepage
+\input{./Sections/Timeschemes.tex}
+\cleardoublepage
+\input{./Sections/Spatialschemes.tex}
+\cleardoublepage
+
+% Physics
+\input{./Sections/Physicalmodeling.tex}
+\cleardoublepage
+\input{./Sections/Turbulence.tex}
+\cleardoublepage
+\input{./Sections/Mixturemodeling.tex}
+\cleardoublepage
+%\input{./Sections/ConjugateHeatTransfer.tex}
+%\cleardoublepage
+\input{./Sections/Postprocessing.tex}
+\cleardoublepage
+%\input{./Sections/Guidelines.tex}
+%\cleardoublepage
+\input{Sections/Appendix.tex}
+\cleardoublepage
+
+%\bibliographystyle{plain} 
+%\bibliography{BiblioCMFDdiphasique.bib}
+\printbibliography
+\end{document}

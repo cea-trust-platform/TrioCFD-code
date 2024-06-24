@@ -1,0 +1,78 @@
+
+\chapter{Appendices}
+
+\section{Matrix management}
+matrix(where it is derived, about which value it is derived. How is it stored?
+
+For fields stored at the center of the element: index = $N\times{}e + n$ with $N$ the number of phases of the equation unknown, $n$ the phase number and $e$ the element number. Be careful with turbulence, N might be different for turbulence.
+
+For momentum equation, it depends on the numerical scheme:
+\begin{itemize}
+\item[\small \textcolor{blue}{\ding{109}}]For VDF (velocity on faces): index = $N\times{}f + n$ with $N$ the number of phases of the equation unknown, $n$ the phase number and $f$ the face number
+\item[\small \textcolor{blue}{\ding{109}}]For PolyMAC\_P0: same as VDF for faces unknown and $N\times{}\parent{\mathit{nf}_{\text{tot}} + D\times{}e + d} + n$ for the element unknown with $\mathit{nf}_{\text{tot}}$ the total number of faces, $D$ the number of dimensions, $e$ the element number, $d$ the dimension and $n$ the phase number
+\item[\small \textcolor{blue}{\ding{109}}]For PolyVEF\_P0, only unknown on faces, index = $N\times{}\parent{D\times{}f + d} + n$
+\end{itemize}
+
+We sometimes use a magic index due to the triangular sup matrix:
+\begin{equation}
+    \parent{k(N-1) - (k-1)\frac{k}{2} + l-k-1}.
+\end{equation}
+
+\section{Suggestions and planned additions}
+\subsection{Potential models for future integration}
+Physical models for bi-fluid modeling: 
+\begin{itemize}
+    \item[\small \textcolor{blue}{\ding{109}}] Drag churn of Ishii
+    \item[\small \textcolor{blue}{\ding{109}}] Drag of droplets
+    \item[\small \textcolor{blue}{\ding{109}}] Lift of Hayashi et al.
+    \item[\small \textcolor{blue}{\ding{109}}] Added mass of Cai et Wallis
+    \item[\small \textcolor{blue}{\ding{109}}] Turbulent dispersion of Lavieville
+    \item[\small \textcolor{blue}{\ding{109}}] Particle model of Simmonin 
+    \item[\small \textcolor{blue}{\ding{109}}] Large interface reconstruction of Coste
+\end{itemize}
+
+\subsection{Turbulence}
+Planned additions:
+\begin{itemize}
+    \item Add SST extension for the $k-\omega$ model.
+    \item Add a Reynolds Stress Model
+\end{itemize}
+
+\section{TODO for the documentation}
+\subsection{Turbulence}
+\begin{itemize}
+    \item add modele\_turbulence\_longueur\_melange
+    \item add viscosite\_turbulente\_longueur\_melange
+    \item add Viscosite\_turbulente\_l\_melange
+    \item finish kader (flux parietal adaptatif)
+    \item add clarification on the $\omega$ condition \texttt{cond lim demi}
+\end{itemize}
+
+%
+\subsection{Time Schemes}
+\begin{itemize}
+    \item Increase detail level in the SETS and ICE scheme presentation
+\end{itemize}
+
+\clearpage
+
+\begin{landscape}
+\section{Nomenclature}
+This nomenclature is intended to allow developers to understand the code naming choices. It is required to use the same names everywhere. This table will be expended with the standardisation of the multiphase module.
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{cccc}
+        Variable name & Variable type & Variable value & Meaning \\
+        ne & const int & domaine.nb_elem() & Number of elements in the domain\\
+        D & const int & dimension & Dimension of the problem\\
+        N & const int & equation().inconnue()->valeurs().line_size() & Number of phases\\
+        %Na & const int & \texttt{sub_type(Pb_Multiphase, equation().probleme())
+    %? equation().probleme().get_champ("alpha").valeurs().line_size()
+    %: 1} & \\
+        pe & const DoubleVect & equation().milieu().porosite_elem() & Field of porosity \\
+        ve & const DoubleVect & domaine.volumes(); & field of volumes\\
+    \end{tabular}
+    \caption{Name, types values and meaning of common founded variables in the multiphase module.}
+    \label{tab:my_label}
+\end{table}
+\end{landscape}

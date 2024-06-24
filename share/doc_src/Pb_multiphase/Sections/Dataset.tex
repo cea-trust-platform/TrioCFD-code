@@ -1,0 +1,455 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Setting up data for a multiphase computation}\label{dataset}
+This chapter describes how to build and complete the data file in order to perform a TrioCFD-multiphase computation. This chapter and the data file share the same structure, starting with a description of the domain (section \ref{data:domaine}), then the choice of discretizations in space (section \ref{data:discretisation}) and time (section \ref{data:time}), which is then associated with the global problem \ref{data:problem} and the previously instantiated objects (section \ref{data:associate}), to pursue with the description of the chosen model (section \ref{data:model}) before solving it (section \ref{data:solve}). \\
+
+Trust/TrioCFD allows to perform a multiphase flow computation using its submodule CMFD. For this reason, CFMD simulations are run with the same command, after having sourced TrioCFD.
+\begin{verbatim}
+$ trust filename.data
+\end{verbatim}
+The file with the extension '.data' contains all the parameters that define the calculation. This file must comply with the TRUST data input file writing conventions~\cite{trustonline}. It is composed of keywords that will allow the creation of C++ objects. As a result, no C++ programming or compilation process is required to define a computation. \\
+To run a parallel simulation, the same command as in Trust is used:
+\begin{verbatim}
+$ trust -partition filename.data [nprocs]
+$ trust PAR_filename.data [nprocs]
+\end{verbatim}
+For clarity, this section refers to a test case available in TrioCFD library: \texttt{Tube_solution_analytique_turbulent}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Computation domain and mesh} \label{data:domaine}
+
+The keywords have to be declared in a specific order. The first one is corresponding to the spatial dimension of the simulation
+\begin{lstlisting}
+# Dimension can be 2D or 3D #
+Dimension n
+\end{lstlisting}
+where \textbf{n} can be equal to 2 or 3. Pseudo 1D simulations can be performed with a 2D domain one cell wide.\\
+In a second step, the user needs to create an instance of the \texttt{Domaine} class.
+\begin{lstlisting}
+# Domain definition #
+Domaine dom
+\end{lstlisting}
+In this example, the domain is named \textbf{dom}. \\
+Note that the case of the object names is important, but not the case of the object keywords. 
+After the \texttt{Domaine} declaration, it must be associated with a mesh. \\
+This can be done using the class Read\textunderscore MED to use an external mesh file defined in the MED format. 
+\begin{lstlisting}
+# Read the mesh from MED file #
+read_med { domain dom mesh mesh file 1_tube_analytique.med }
+\end{lstlisting}
+It is also possible to use the internal meshing tool from TRUST.\\
+To perform 2D axi-symmetrical simulations, the keyword \texttt{bidim\_axi} must be used before the mesh construction. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discretization}\label{data:discretisation}
+The discretization method is defined as follows.
+\begin{lstlisting}
+# Example of discretization on unstructured mesh #
+PolyMAC_P0 dis option_PolyMAC_P0 { traitement_axi }
+\end{lstlisting}
+Multiple different discretizations can be used in the TrioCFD multiphase solver.
+More details on the mathematical formulations of these discretizations can be found in chapter~\ref{sec:spatial_scheme}.\\
+The \texttt{VDF} scheme can be used with cartesian meshes and for 2D axi-symmetrical simulations. 
+It is recommended to add \texttt{option\_VDF { all_options}}.\\
+The \texttt{PolyMAC\_P0} scheme can be used with any polyhedral mesh.
+Stability issues can arise if meshes contain deformed tetrahedrons. The scheme is also less costly when using hexahedrons than when using tetrahedrons.
+\texttt{option\_PolyMAC\_P0 \{ traitement\_axi \}} can be used to ignore no-slip boundary conditions in the calculation of the time step. \\
+This can greatly increase the calculated time step in some situations.\\
+To launch parallel computations, a partitionning step is required to split the domain in several zones. 
+This step is managed with an external tool called metis.\\
+The following commented sections are required for the partition to happen without error, but must not be modified by the user:
+\begin{lstlisting}
+# BEGIN PARTITION
+Partition dom
+{
+  /* Choose Nb_parts so to have ~ 25000 cells per processor */
+  Partition_tool metis { nb_parts 4 }
+  Larg_joint 2
+  zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Define the time integration scheme}\label{data:time}
+The next step is the definition of the time scheme. In the example the Euler explicit scheme is used. An instance of \texttt{Scheme\_euler\_explicit} called \textbf{sch} is created. 
+\begin{lstlisting}
+Schema_euler_implicite sch
+Read sch
+{
+  tinit 0
+  tmax 8
+  dt_impr 1e-8
+  facsec 1
+  facsec_max 1
+  nb_pas_dt_max 100
+  seuil_statio 1e-3
+  dt_start dt_fixe 2.e-5
+  solveur SETS
+  {
+    criteres_convergence { alpha 1e-6 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 omega 1. }
+    iter_min 2
+    solveur petsc cholesky { quiet }
+    seuil_convergence_implicite 1e30
+    facsec_diffusion_for_sets 100
+  }
+}
+\end{lstlisting}
+
+Two solvers can be used in multiphase triocfd: \texttt{ICE} and \texttt{SETS}.
+The mathematical details of these solvers are given in chapter~\ref{sec:time_scheme}.
+In short, the time step in \texttt{ICE} is limited by diffusion and convection.
+The time step in \texttt{SETS} is limited by convection in multi-phase flow and doesn't have a clear limit in single-phase flow.
+For single-phase flow, the use of \texttt{SETS} with a \texttt{facsec} between 10 and 100 is recommended.
+For adiabatic multi-phase flow, the use of \texttt{SETS} with a \texttt{facsec} of 1 but a \texttt{facsec\_diffusion\_for\_sets} of 100, as in the case that is presented, is recommended.
+This enables the solver to ignore the diffusion stability limit and take only into account the limits on convection.
+For boiling flow, the use of \texttt{ICE} with a \texttt{facsec} of 1 is recommended. 
+There are still glitches to iron out in the thermal equation for it to be possible to use \texttt{SETS} with a \texttt{facsec} 1.
+It is essential to use a small \texttt{dt\_start}: the time step isn't always well calculated for the first time step as all variables aren't initialized.
+The convergence criteria can be adjusted to the situation. 
+For adiabatic flow the criterion on temperature is often very loose for example.
+In some cases, making the criteria stricter can be detrimental to convergence, in others it can help as it can reduce some numerical noise.
+This must be adjusted on a case-to-case basis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problem definition and object association}\label{data:problem}
+A Problem is an object that define the set of equations that is solved during the simulation. 
+Mutliphase TrioCFD simulations require the following keyword to build a two-fluid Euler-Euler set of equations.
+\begin{lstlisting}
+# Problem definition #
+Pb_Multiphase pb
+\end{lstlisting}
+\section{Assosciate the instantiated objects}\label{data:associate}
+At this point the mesh, the domain and the numerical schemes are defined. 
+It is necessary to link them through in the C++ executable, and discretize the problem:
+\begin{lstlisting}
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Complete model description}\label{data:model}
+The physical properties, choice of closure laws, equations to solve (including initial and boundary conditions) and post-treatments are associated with the problem through the C++ class \textbf{Read}. 
+\begin{lstlisting}
+# Problem description #
+Read pb
+{
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fluid properties}
+
+First, a composite medium is declared. 
+In this example, it consists of two incompressible phases and an interface with constant properties.
+
+\begin{lstlisting}
+  # Physical characteristcs of medium #
+  milieu_composite
+  {
+    liquide_eau Fluide_Incompressible
+    {
+      # Dynamic viscosity [kg/m/s] #
+      mu champ_uniforme 1 1.e-3
+      # Volumic mass [kg/m3] #
+      rho champ_uniforme 1 1.e3
+      # thermal conductivity [W/m/K] #
+      lambda Champ_Uniforme 1 0.604
+      # Heat capacity [J/m3/K] #
+      Cp Champ_Uniforme 1 75.366
+      # Thermal expansion (K-1) #
+      beta_th Champ_Uniforme 1 0
+    }
+    gaz_air Fluide_Incompressible
+    {
+      # Dynamic viscosity [kg/m/s] #
+      mu champ_uniforme 1 1.e-5
+      # Volumic mass [kg/m3] #
+      rho champ_uniforme 1 1.
+      # thermal conductivity [W/m/K] #
+      lambda Champ_Uniforme 1 0.023
+      # Heat capacity [J/m3/K] #
+      Cp Champ_Uniforme 1 1006
+      # Thermal expansion (K-1) #
+      beta_th Champ_Uniforme 1 0
+    }
+    interface_eau_air interface_sigma_constant
+    {
+      # surface tension J/m2
+      tension_superficielle 0.0728
+    }
+  }
+\end{lstlisting}
+
+When no external fluid properties are used, the units are free, but it is strongly recommended to use the units of the International System to avoid coherence problems in two-phase correlations that are not always dimensionless.
+However, when external fluid properties are used IS units must be chosen, apart from the temperatures that are defined in $^\circ$C.\\
+More details on the external fluid properties that can be used can be found in section~\ref{sec:fluid_properties}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choice of closure laws}
+
+The correlation bloc contains the list of all closure laws that can be used in the problem.
+In this example, we have:
+\begin{itemize}
+    \item[\small \textcolor{blue}{\ding{109}}] An adaptive wall law for the turbulent boundary conditions (see chapter~\ref{sec:turbulence}),
+    \item[\small \textcolor{blue}{\ding{109}}] A constant bubble diameter equal to 1mm,
+    \item[\small \textcolor{blue}{\ding{109}}] A constant interfacial heat flux (liquide_eau defines the coefficient from the liquid to the interface and gaz_air from the gas phase to the interface),
+    \item[\small \textcolor{blue}{\ding{109}}]A constant coefficient virtual mass,
+    \item[\small \textcolor{blue}{\ding{109}}]A constant coefficient interfacial friction,
+    \item[\small \textcolor{blue}{\ding{109}}] A constant coefficient interfacial lift force,
+    \item[\small \textcolor{blue}{\ding{109}}] A constant coefficient turbulent dispersion.
+\end{itemize} 
+Details on these physical models can be found in chapter~\ref{sec:phyical_modeling}.
+
+\begin{lstlisting}
+correlations
+{
+  loi_paroi adaptative { }
+  diametre_bulles champ champ_fonc_xyz dom 2 0 0.001
+  flux_interfacial coef_constant { liquide_eau 1e10 gaz_air 1e10 }
+  masse_ajoutee coef_constant { }
+  frottement_interfacial bulles_constant { coeff_derive 0.1 }
+  portance_interfaciale constante { Cl 0.03 }
+  dispersion_bulles constante { D_td_star 0.003 }
+}
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Momentum equation}
+
+The momentum equation contains an evanescence operator, that manages the momentum of a vanishing phase (see section~\ref{sec:evanescence}). For CFD applications, it is recommended to set alpha\_res between $10^{-5}$ and $10^{-6}$. The pressure solver is discussed below. An upwind convection scheme (named "amont" in french) is required for code stability.\\
+In VDF, the \texttt{amont\_vpoly} option must be implemented to handle the added mass term.\\
+In laminar flow, no option needs to be added to the diffusion term.\\
+In turbulent flow, the turbulence model must be specified.\\
+For two-phase liquid-gas flow, the initial condition on velocity follows the order $u_{lx}$, $u_{gx}$, $u_{ly}$, $u_{gy}$, $u_{lz}$, $u_{gz}$. The order of the phases is set by the fluid properties declaration.\\
+For complex geometries, it can be challenging to define an initial condition on velocity. In this case, the initial condition can be set to 0 and a velocity ramp enforced as a boundary condition. \texttt{Paroi\_frottante\_loi} boundary condition is used to enforce a velocity wall law. \texttt{Symetrie} is no-penetration slip boundary condition.\\
+A no-slip boundary condition can be enforced using the \texttt{paroi\_fixe} keyword. The sources that are listed here are gravity and the interfacial forces. \\
+Gravity is a momentum source, that is multiplied by $\alpha_k \rho_k$ before being put in the solver.\\
+The interfacial forces defined here all call the correlation bloc for the specific closures, apart from the Antal correction that is standalone (see chapter~\ref{sec:phyical_modeling}).
+
+\begin{lstlisting}
+  QDM_Multiphase
+  {
+    evanescence { homogene { alpha_res 1.e-5 alpha_res_min 5.e-6 } }
+    solveur_pression petsc cholesky { quiet }
+    convection { amont }
+    diffusion { turbulente k_omega { } }
+    initial_conditions
+    {
+      vitesse champ_fonc_xyz dom 6 0 0 0 0 0.52 0.52
+      pression Champ_Fonc_xyz dom 1 1e5
+    }
+    conditions_limites
+    {
+      wall paroi_frottante_loi { }
+      bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 6 0 0 0 0 0.52 0.52
+      top frontiere_ouverte_pression_imposee champ_front_uniforme 1 1e5
+      symetrie symetrie
+    }
+    sources
+    {
+      source_qdm Champ_Fonc_xyz dom 6 0 0 0 0 -9.81 -9.81 ,
+      frottement_interfacial { } ,
+      portance_interfaciale { beta 1 } ,
+      Dispersion_bulles { beta 1 } ,
+      Correction_Antal { }
+    }
+  }
+\end{lstlisting}
+
+The pressure solver is used to solve the pressure reduction step in ICE and SETS numerical schemes (see \ref{sec:time_scheme}). \texttt{Petsc cholesky}, used above, is a direct inversion method that yields results in parallel and sequential simulations that are identical to the numerical error, but is slower than iterative solvers.\\
+To reduce calculation time, it is recommended to use the following options:
+\begin{lstlisting}
+solveur_pression petsc cli_quiet
+{
+    -pc_type hypre
+    -pc_hypre_type boomeramg
+    -pc_hypre_boomeramg_strong_threshold 0.8
+    -pc_hypre_boomeramg_agg_nl 4
+    -pc_hypre_boomeramg_agg_num_paths 5
+    -pc_hypre_boomeramg_max_levels 25
+    -pc_hypre_boomeramg_coarsen_type PMIS
+    -pc_hypre_boomeramg_interp_type ext+i
+    -pc_hypre_boomeramg_P_max 2
+    -pc_hypre_boomeramg_truncfactor 0.5
+    -ksp_type fgmres
+}
+\end{lstlisting}
+
+\subsection{Mass equation}
+  
+The mass equation doesn't contain a diffusion operator. The sum of volume fractions of each phase must be equal to one at all points in the initial and boundary conditions. A \texttt{flux\_interfacial} source must be included in boiling flow. 
+
+\begin{lstlisting}
+  Masse_Multiphase
+  {
+    initial_conditions { alpha Champ_Fonc_xyz dom 2 0.9 0.1 }
+    convection { amont }
+    conditions_limites
+    {
+      wall paroi
+      bottom frontiere_ouverte a_ext Champ_Front_fonc_xyz 2 0.9 0.1
+      top frontiere_ouverte a_ext Champ_Front_fonc_xyz 2 0.9 0.1
+      symetrie paroi
+    }
+    sources { }
+  }
+\end{lstlisting}
+
+\subsection{Energy equation}
+
+The energy equation is a standard convection-diffusion equation. For now, it is always required in the dataset, even for adiabatic flows.
+
+\begin{lstlisting}
+  Energie_Multiphase
+  {
+    equation_non_resolue 1
+    diffusion { turbulente SGDH { sigma 0. } }
+    convection { amont }
+    initial_conditions { temperature Champ_Uniforme 2 0 0 }
+    boundary_conditions
+    {
+      wall paroi_adiabatique
+      bottom frontiere_ouverte T_ext Champ_Front_Uniforme 2 0 0
+      top frontiere_ouverte T_ext Champ_Front_Uniforme 2 0 0
+      symetrie paroi_adiabatique
+    }
+    sources
+    {
+      flux_interfacial
+    }
+  }
+\end{lstlisting}
+Some recommendations about this setup. In turbulent thermal flow, it it recommended to use \texttt{turbulente SGDH \{ pr_t 0.9 \}} for temperature diffusion.
+In boiling flow, the vapor temperature must be initialized at of over saturation temperature so that physical properties of the vapor can be calculated by the equations of state, even if the vapor fraction is zero at the beginning of the simulation. This is also true for boundary conditions.
+In multi-phase boiling flow, there are two possibilities for Neumann and Dirichlet boundary conditions at the wall. If no \texttt{flux\_parietal} correlation is defined in the correlation bloc, the number of phases in the boundary condition must be the same as the total number of phases. If a \texttt{flux\_parietal} correlation is defined, the boundary condition must have only one field though there are multiple phases. The \texttt{flux\_parietal} condition then transfers the heat flux towards the different phases. A \texttt{flux\_interfacial} source must be included in adiabatic flow for numerical stability, so that the temperature matrix has enough diagonal coefficients.
+In compressible or boiling flow, a \texttt{travail\_pression} source must also be included.
+
+\subsection{Optional equations}
+
+Optional equations can be included in addition to the momemtum, mass and energy balances.
+These include turbulence (see chapter~\ref{sec:turbulence}), interfacial area transport equations or population balance equations (see chapter~\ref{sec:IATE}).
+
+\begin{lstlisting}
+  taux_dissipation_turbulent
+  {
+    diffusion { turbulente SGDH { sigma 0.5 } }
+    convection { amont }
+    initial_conditions { omega Champ_Fonc_xyz dom 1 13.85 }
+    boundary_conditions
+    {
+      wall Cond_lim_omega_demi { }
+      bottom frontiere_ouverte omega_ext Champ_Front_Uniforme 1 13.85
+      top frontiere_ouverte omega_ext Champ_Front_Uniforme 1 13.85
+      symetrie paroi
+    }
+    sources
+    {
+      Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+      Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 } ,
+      Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+    }
+  }
+  energie_cinetique_turbulente
+  {
+    diffusion { turbulente SGDH { sigma 0.67 } }
+    convection { amont }
+    initial_conditions { k champ_fonc_xyz dom 1 0.0027 }
+    boundary_conditions
+    {
+      wall Cond_lim_k_complique_transition_flux_nul_demi
+      bottom frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.0027
+      top frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.0027
+      symetrie paroi
+    }
+    sources
+    {
+      Production_energie_cin_turb { } ,
+      Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+    }
+  }
+  
+\end{lstlisting}
+
+\subsection{Post-processing}
+
+The fields and quantities that can be post-processed are described in detail in chapter~\ref{sec:postprocessing}.
+The post-processing bloc includes three sections. The first is used to define additional fields that can be used in the post-treatment. The distance to the edge and the pressure gradient are often useful to interpret simulation results. The \texttt{operateur\_eqn} keyword can be used to record the value of source terms and operators. The output is divided by $\alpha_k \rho_k$. The first operator is diffusion and the second convection. The order of the sources is the same as in the sources bloc of the momentum equation. Fields can also be defined by arithmetic operations of other fields (see TRUST documentation~\cite{trustonline}).
+The second section concerns probes. 
+The probes can be used to obtain the local values of any quantity. 
+Their locations are written in the order $x_\text{start}$, $y_\text{start}$, $x_\text{end}$, $y_\text{end}$. 
+The outputs are written in csv format in text files. 
+The final section is the recording of complete fields. \texttt{lata}, \texttt{single\_lata}, \texttt{cgns} and \texttt{lml} formats can be selected. These can be chosen depending on the reading software used and the size of the simulation. Interesting fields to capture include the unkowns, the unkowns per phase, the unknown residuals, physical properties, turbulent viscosity and any user-defined field.
+
+\begin{lstlisting}
+  Postraitement
+  {
+    Definition_champs 	
+    {
+      d_paroi refChamp { Pb_champ pb distance_paroi_globale }
+      gradient_p refChamp { Pb_champ pb gradient_pression }	
+      diff operateur_eqn { numero_op 0 sources { refChamp { pb_champ pb vitesse } } }
+      grvv operateur_eqn { numero_source 0 sources { refChamp { pb_champ pb vitesse } } }
+    }
+    sondes
+    {
+      vitesse  vitesse periode 1.e-1 segment 10  0 1 0.01 1
+    }
+    format lata champs binaire dt_post 1.e-1
+    {
+      alpha elem
+      vitesse elem
+      vitesse_liquide_eau elem
+      vitesse_residu elem
+      pression elem
+      nu_turb_liquide_eau elem		
+      enthalpie elem
+    }
+  }
+\end{lstlisting}
+
+The final brace of the read must not be forgotten!
+\begin{lstlisting}
+}
+\end{lstlisting}
+
+\section{Solve the problem}\label{data:solve}
+The last step consists in solving the problem. This is done by including the following line.
+\begin{lstlisting}
+Solve pb
+\end{lstlisting}
+
+\begin{figure}[ht!]
+\centering
+\begin{tikzpicture}[grow cyclic,background rectangle/.style={fill=black!20,rounded corners,draw=black}, show background rectangle, text width=3cm, align=flush center,
+	level 1/.style={level distance=3cm,sibling angle=360/5},
+	level 2/.style={level distance=3cm,sibling angle=360/5}]
+  \path[ color=codekeyword4]
+    node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {Pb_Multiphase}
+    child[ color=codeword] { node[color=black] {Spatial scheme} 
+      child[ color=codekeyword3] { node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {PolyMAC_P0} }
+    }
+      child[ color=codeword] { node[] {Source Terms} 
+      child[ color=codekeyword2] { node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {correlations} }
+      child[ color=codekeyword3] { node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {sources} }     
+    }        
+    child[ color=codeword] {
+      node[] {Equations}
+      child[ color=codekeyword2] { node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {Masse_Multiphase} }
+      child[ color=codekeyword2] { node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {QDM_Multiphase} }
+      child[ color=codekeyword2] { node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {Energie_Multiphase} }
+    }
+    child[ color=codeword] { node[] {Environment}
+      child[ color=codekeyword2] { node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {milieu_composite} }    
+     }
+     child[ color=codeword] { node[] {Temporal scheme}
+      child[ color=codekeyword1] { node[fill=codebackground,rounded corners=2pt,inner sep=2pt] {Schema_euler_implicite} }    
+     };
+\end{tikzpicture}
+     \caption{Overview of the dataset}
+\end{figure}
+

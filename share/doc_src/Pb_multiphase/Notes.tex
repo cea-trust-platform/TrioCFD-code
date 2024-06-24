@@ -1,0 +1,44 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{conf}
+
+\title{Documentation CMFD}
+\author{Alan \textsc{Burlot} \and Clément \textsc{Bazin} \and Andrew \textsc{Peitavy} \and Corentin \textsc{Reiss} \and Antoine \textsc{Gerschenfeld}}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\section{Software architecture}
+Dans cette section, on décrit la structure informatique de Pb\_Multiphase. On parle du jdd, de la construction des correlations, de la structure des équations. On reprend la présentation d'Antoine qui décrit comment est codé Pb\_Multiphase et PolyMAC
+
+\section{Models descriptions}
+On reprend les modèles décrits dans le document déjà rédigé par Corentin. On l'étoffe. Idéalement, il faudrait flécher chaque modèle sur un cas-test.
+
+\section{Best practices}
+\subsection{How to add a physical model?}
+The steps to follow if one wants to add a new lift force model or a new something: where to go in the sources, how to manage matrices
+\subsection{How to handle discretization for sources?}
+The steps to follow
+\subsection{How to add a turbulence model?}
+The steps to follow
+\subsection{How to create a new field and postprocess it?}
+The steps to follow
+
+
+%%%%
+- remonter matrix filling et analytical terms as source terms dans architecture
+- coef de frottement dans Mixture modeling
+- chaleur et injection masse avant diamètre
+- corriger les * par \times
+- vérification : signe =, si possible \text{} autour des mots clefs trust/trio, mettre des \parent{} ou \croc{} 
+- mot clef trust en \texttt{}
+- physical modeling -> bifluid phys mod
+- ajouter des phrases/paragraphes en début de chapitre/section pour dire ce qu'il y a dans le chapitre/section
+
+
+\end{document}

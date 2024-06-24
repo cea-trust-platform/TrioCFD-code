@@ -1,0 +1,147 @@
+\chapter{Post-processing}
+\label{sec:postprocessing}
+This chapter is an introduction or a reminder on the types of post-processing available in TrioCFD/TRUST (section \ref{post:type}) as well as the various variables accessible (section \ref{post:variables}) for correctly visualizing the TrioCFD multiphase calculations.
+\section{Types of post-processing}\label{post:type}
+Regarding the case under study and the variables of interest, \texttt{TRUST} offers a range of options for post-processing :
+\begin{itemize}
+      \item[\small \textcolor{blue}{\ding{109}}] Individual points of interest ('\texttt{Point}' keyword),
+      \item[\small \textcolor{blue}{\ding{109}}] Distributed points along a linear path ( '\texttt{Segment}' keyword),
+      \item[\small \textcolor{blue}{\ding{109}}] Points arranged according to a predefined layout ('\texttt{Plan}' keyword),
+      \item[\small \textcolor{blue}{\ding{109}}] Points arranged within a parallelepiped structure ('\texttt{Volume}' keyword),
+       \item[\small \textcolor{blue}{\ding{109}}] Fields across the entire domain. The '\texttt{Fields}' keyword demands specifying the field's location on the mesh (faces, elements, or vertices), the field's name, the post-processing time, and a backup file,
+       \item[\small \textcolor{blue}{\ding{109}}] Statistical measurement can be applied to fields to compute the mean value, standard deviation, or correlation between two fields.The '\texttt{Statistics}' keyword requires defining a time window, time step, and the desired statistical methods.
+\end{itemize}
+
+\section{Variables easily accessible}\label{post:variables}
+In order to ease computation post-processing, some variables are already accessible with keywords. They are summarized in the following tables.
+ 
+\begin{table}[!ht]
+\begin{center}
+\begin{tabular}{c c c c } 
+\toprule
+Name & Notation &  Keyword & Unit \\
+\midrule
+\rowcolor[gray]{0.9} Cell volumes & $V_{cell}$ & \texttt{Volume_maille} & $m^3$ \\
+Stability time steps & $\Delta t$ &  \texttt{Pas_de_temps} & $s$ \\
+\rowcolor[gray]{0.9} Volumetric porosity & $\epsilon$  & \texttt{Porosite_volumique} & \\
+Distance to the wall & $y_w$ & \texttt{Distance_Paroi} & $m$ \\
+\rowcolor[gray]{0.9} Cell Courant number (VDF only) & $C_o=\frac{u\Delta t}{\Delta x}$ & \texttt{Courant_maille}  & \\
+Cell Reynolds number (VDF only) & $Re=\frac{u\Delta x}{\nu}$ & \texttt{Reynolds_maille} & \\ \bottomrule
+\end{tabular}
+\end{center}
+\caption{Cell keywords}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\begin{tabular}{c c c c } 
+\toprule
+Name & Notation & Keyword & Unit \\
+\midrule
+\rowcolor[gray]{0.9}Density & $\rho$ & \texttt{masse_volumique} & $kg.m^{-3}$ \\
+Void fraction & $\alpha$ & \texttt{Alpha} & dimensionless \\
+\rowcolor[gray]{0.9} Mass balance on each cell & \nabla \cdot u & \texttt{Divergence_U} & $m^3.s^{-1}$ \\ \bottomrule
+\end{tabular}
+\end{center}
+\caption{Mass equation keywords}
+\end{table}
+
+
+\begin{table}[!ht]
+\begin{center}
+\begin{tabular}{c c c c } 
+\toprule
+Name & Notation & Keyword & Unit \\
+\midrule
+\rowcolor[gray]{0.9} Velocity & $u$ & \texttt{Vitesse} or \texttt{Velocity} & $m.s^{-1}$ \\
+Velocity residual & $u_{res}$ & \texttt{Vitesse_residu} & $m.s^{-2}$ \\ 
+\rowcolor[gray]{0.9} Kinetic energy per elements & $\frac{1}{2}\rho u^2$ & \texttt{Energie_cinetique_elem} &  $kg.m^{-1}.s^{-2}$ \\
+Total kinetic energy & $\frac{1}{2}\rho u^2$ & \texttt{ Energie_cinetique_totale} & $kg.m^{-1}.s^{-2}$\\
+\rowcolor[gray]{0.9} Vorticity & $w=rotu$ & \texttt{Vorticite} & $s^{-1}$\\
+Pressure in incompressible flow &  $\frac{P}{\rho}+ gz$ &  \texttt{Pression} & $Pa.m^3.kg^{-1}$\\
+\rowcolor[gray]{0.9} Pressure in incompressible flow & $P+\rho$ gz & \texttt{Pression_pa} or \texttt{Pressure} & $Pa$\\
+Pressure in compressible flow & $P$ & \texttt{Pression} &  $Pa$\\
+\rowcolor[gray]{0.9} Hydrostatic pressure & $\rho gz$ & \texttt{Pression_hydrostatique} & $Pa $\\
+Total pressure & $P_{tot}$ & \texttt{Pression_tot} & $Pa$\\
+\rowcolor[gray]{0.9} Pressure gradient & $\nabla (\frac{P}{\rho}+ gz)$ & \texttt{Gradient_pression} & $m.s^{-2}$\\
+Velocity gradient & $\nabla u$ &  \texttt{gradient_vitesse} & $s^{-1}$\\
+\rowcolor[gray]{0.9} Local shear strain rate &  $\sqrt{2S_{ij}S_{Sij}}$ & \texttt{Taux_cisaillement} & $s^{-1}$\\
+Viscous force & & \texttt{Viscous_force}  & $kg.m^2.s^{-1}$\\
+\rowcolor[gray]{0.9}Pressure force &  & \texttt{Pressure_force} & $kg.m^2.s^{-1}$\\
+Total force &  & \texttt{Total_force} & $kg.m^2.s^{-1}$\\
+\rowcolor[gray]{0.9}Viscous force along X&  & \texttt{Viscous_force_x} & $kg.m^2.s^{-1}$\\
+Viscous force along Y&  & \texttt{Viscous_force_y} &  $kg.m^2.s^{-1}$\\
+\rowcolor[gray]{0.9}Viscous force along Z&  & \texttt{Viscous_force_z} &  $kg.m^2.s^{-1}$\\
+Pressure force along X&  & \texttt{Pressure_force_x} &  $kg.m^2.s^{-1}$\\
+\rowcolor[gray]{0.9}Pressure force along Y&  & \texttt{Pressure_force_y} &  $kg.m^2.s^{-1}$\\
+Pressure force along Z&  & \texttt{Pressure_force_z} & $kg.m^2.s^{-1}$\\
+\rowcolor[gray]{0.9}Total force along X&  & \texttt{Total_force_x} &   $kg.m^2.s^{-1}$\\
+Total force along Y&  & \texttt{Total_force_y} &   $kg.m^2.s^{-1}$\\
+\rowcolor[gray]{0.9}Total force along Z&  & \texttt{Total_force_z} &   $kg.m^2.s^{-1}$\\
+Component velocity along X & $u_X$  &  \texttt{VitesseX} & $m.s^{-1}$\\
+\rowcolor[gray]{0.9}Component velocity along Y & $u_Y$ &  \texttt{VitesseY}  & $m.s^{-1}$\\
+Component velocity along Z & $u_Z$ &  \texttt{VitesseZ} & $m.s^{-1}$\\
+\rowcolor[gray]{0.9}Source term in non Galinean referential& $a$ & \texttt{Acceleration_terme_source} & $m.s^{-2}$\\ \bottomrule
+\end{tabular}
+\end{center}
+\caption{Momentum equation keywords}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\begin{tabular}{c c c c } 
+\toprule
+Name & Notation & Keyword  & Unit \\
+\midrule
+\rowcolor[gray]{0.9} Temperature & $T$ & \texttt{Temperature} & $K$\\
+Temperature residual & $T_{res}$ &  \texttt{Temperature_residu} & $K.s^{-1}$\\
+\rowcolor[gray]{0.9} Temperature variance & $Var(T)$ & \texttt{Variance_Temperature} & $K^{2}$\\
+Temperature dissipation rate &  & \texttt{Taux_Dissipation_Temperature} & $K^2.s^{-1}$\\
+\rowcolor[gray]{0.9} Temperature gradient & $\nabla T$ & \texttt{Gradient_temperature} &  $K.m^{-1}$\\
+Heat exchange coefficient & $h$ & \texttt{H_echange_Tref} & $W.m^{-2}.K^{-1}$\\
+\rowcolor[gray]{0.9} Internal energy & $U$ & \texttt{energie_interne} & $J$\\
+Enthalpy & $H$ & \texttt{enthalpie} &  $J$\\
+\rowcolor[gray]{0.9} Irradiancy & $I$ & \texttt{Irradiance} & $W.m^{-2}$\\
+Volumic thermal power & $P_w$ & \texttt{Puissance_volumique} &  $W.m^{-3}$\\ \bottomrule
+\end{tabular}
+\end{center}
+\caption{Energy equation keywords}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\begin{tabular}{c c c c } 
+\toprule
+Name & Notation & Keyword & Unit \\
+\midrule
+\rowcolor[gray]{0.9} Turbulent viscosity & $\nu_t$ & \texttt{Viscosite_turbulente} & $m^2.s^{-1}$\\
+Turbulent dynamic viscosity & $\mu_t$ & \texttt{Viscosite_dynamique_turbulente} & $kg.m.s^{-1}$\\
+\rowcolor[gray]{0.9} Turbulent kinetic energy & $\rho k$ & \texttt{Energy} & $kg.m^2.s^{-2}$\\
+Turbulent dissipation rate & $\varepsilon$ & \texttt{Eps} & $m^2.s^{-3}$\\
+\rowcolor[gray]{0.9} Specific dissipation rate & $\omega$  & \texttt{omega} & $s^{-1}$\\
+Specific dissipation time scale & $\tau$ & \texttt{tau} & $s$\\
+\rowcolor[gray]{0.9} Q-criteria & $Q$ & \texttt{Critere_Q} & $s^{-1}$\\
+Distance to the wall & $y^+$ & \texttt{Y_plus} & \\
+\rowcolor[gray]{0.9} Friction velocity & $u^*$ & \texttt{U_star} & $m.s^{-1}$\\ 
+Turbulent heat flux &  & \texttt{Flux_Chaleur_Turbulente} & $m.K.s^{-1}$ \\ \bottomrule
+\end{tabular}
+\end{center}
+\caption{Turbulence equations keywords}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\begin{tabular}{c c c c } 
+\toprule
+Name & Notation & Keyword  & Unit \\
+\midrule
+\rowcolor[gray]{0.9} Drag force & $F_D$ & \texttt{Drag}  & $N.m^{-3}$\\
+Lift force & $F_L$ & \texttt{Lift} & $N.m^{-3}$\\
+\rowcolor[gray]{0.9} Dispersion force & $F_{Disp}$ & \texttt{Disp} & $N.m^{-3}$\\
+Lubrication force & $F_{Lub}$ & \texttt{Lub} & $N.m^{-3}$\\
+\rowcolor[gray]{0.9}Bubble diameter & $d_b$ & \texttt{d_bulles} & $m$\\ \bottomrule
+\end{tabular}
+\end{center}
+\caption{Two-phase models keywords}
+\end{table}
+Let’s notice that physical properties (conductivity, diffusivity, etc) can also be post-processed. Furthermore, the \texttt{Definition\textunderscore champs} keyword can be used to create new or more complex fields for advanced post-processing.
