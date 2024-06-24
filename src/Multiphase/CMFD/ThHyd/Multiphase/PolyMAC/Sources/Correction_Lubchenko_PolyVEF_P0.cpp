@@ -22,10 +22,10 @@
 
 #include <Correction_Lubchenko_PolyVEF_P0.h>
 #include <Pb_Multiphase.h>
-#include <Portance_interfaciale_PolyVEF_P0.h>
+#include <Portance_interfaciale_PolyVEF.h>
 #include <Portance_interfaciale_base.h>
-#include <Op_Diff_Turbulent_PolyVEF_P0_Face.h>
-#include <Dispersion_bulles_PolyVEF_P0.h>
+#include <Op_Diff_Turbulent_PolyVEF_Face.h>
+#include <Dispersion_bulles_PolyVEF.h>
 #include <Dispersion_bulles_base.h>
 #include <Champ_Face_PolyVEF_P0.h>
 #include <Milieu_composite.h>
