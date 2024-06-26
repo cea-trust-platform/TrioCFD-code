@@ -1420,9 +1420,9 @@ void IJK_FT_Post::ecrire_statistiques_rmf(int reset, const Nom& nom_cas, const d
 // les groupes a la fin). Sinon, les champs en ai, normale ou grad_I ne contiendront qu'un groupe.
 void IJK_FT_Post::update_stat_ft(const double dt)
 {
-  ArrOfDouble volume;
-  DoubleTab position;
-  interfaces_.calculer_volume_bulles(volume, position);
+  //ArrOfDouble volume;
+  //DoubleTab position;
+  //interfaces_.calculer_volume_bulles(volume, position);
   static Stat_Counter_Id updtstat_counter_ = statistiques().new_counter(2, "update statistiques");
   statistiques().begin_count(updtstat_counter_);
   if (disable_diphasique_)
