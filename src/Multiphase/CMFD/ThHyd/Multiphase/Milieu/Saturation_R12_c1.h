@@ -35,6 +35,7 @@ private:
   void dP_Hvs_(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
 
   void sigma_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override;
+  void sigma_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override { Cerr << "Saturation_R12_c1::" << __func__ << " NOT CODED ! " << finl; throw; }
 };
 
 #endif /* Saturation_R12_c1_included */

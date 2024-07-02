@@ -41,10 +41,21 @@ protected :
   void mu_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
 
+  void rho_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void dP_rho_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void dh_rho_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void T_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void dP_T_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void dh_T_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void cp_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void beta_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void mu_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+  void lambda_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_R12_c1_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
+
 private:
 #if HAVE_LIBC3
   int like_eos_ = 0;
 #endif
 };
 
-#endif /* Fluide_eau_c3_gaz_included */
+#endif /* Fluide_R12_c1_gaz_included */
