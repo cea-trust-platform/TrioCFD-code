@@ -211,20 +211,17 @@ void Source_Transport_K_Omega_VEF_Face::fill_resu(const DoubleVect& volumes_entr
   const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
   const double LeK_MIN = eqn_K_Omega->modele_turbulence().get_K_MIN();
 
-  for (int face = 0; face < le_dom_VEF->nb_faces(); face++)
+  for (int face = 0; face < le_dom_VEF->nb_faces_tot(); face++)
     {
-      resu(face, 0) += (ProdK(face) - BETA_K*K_Omega(face, 0)*K_Omega(face, 1))*volumes_entrelaces(face);
+      resu(face, 0) += (ProdK(face) - BETA_K*K_Omega(face, 0)*K_Omega(face, 1));
+      resu(face, 0) *= volumes_entrelaces(face);
       if (K_Omega(face, 0) >= LeK_MIN)
         {
-          double cALPHA = ALPHA_OMEGA;
-          double cBETA = BETA_OMEGA;
-          double cSIGMA = (gradKgradOmega(face) > 0) ? 1/8 : 0;
-          if (turbulence_model->get_model_variant() == "SST")
-            {
-              cALPHA = blender(GAMMA1, GAMMA2, face);
-              cBETA = blender(BETA1, BETA2, face);
-              cSIGMA = 2*(1 - turbulence_model->get_blenderF1()(face)*SIGMA_OMEGA2);
-            }
+          const double cALPHA = turbulence_model->is_SST() ? blender(GAMMA1, GAMMA2, face) : ALPHA_OMEGA;
+          const double cBETA = turbulence_model->is_SST() ? blender(BETA1, BETA2, face) : BETA_OMEGA;
+          const double cSIGMA = turbulence_model->is_SST()
+                                ? 2*(1 - turbulence_model->get_blenderF1()(face)*SIGMA_OMEGA2)
+                                : (gradKgradOmega(face) > 0)*1/8;
 
           resu(face, 1) += cALPHA*ProdK(face)*K_Omega(face, 1)/K_Omega(face, 0); // production
           resu(face, 1) += - cBETA*K_Omega(face, 1)*K_Omega(face, 1); // dissipation
