@@ -1838,11 +1838,12 @@ int Paroi_std_hyd_VEF::calculer_k_eps(double& k, double& eps , double yp, double
 {
   // PQ : 05/04/07 : formulation continue de k et epsilon
   //  assurant le bon comportement asymptotique
-  double u_star_carre = u_star * u_star;
-  k    = 0.07*yp*yp*(exp(-yp/9.))+(1./(sqrt(Cmu)))*pow((1.-exp(-yp/20.)),2);  // k_plus
+  const double u_star_carre = u_star * u_star;
+  k    = 0.07*yp*yp*(exp(-yp/9.));
+  k += 1./sqrt(Cmu)*(1. - exp(-yp/20.))*(1. - exp(-yp/20.));  // k_plus
   k   *= u_star_carre;
   // PL: 50625=15^4 on evite d'utiliser pow car lent
-  eps  = (1./(Kappa*pow(yp*yp*yp*yp+50625,0.25)));  // eps_plus
+  eps  = 1./(Kappa*pow(yp*yp*yp*yp+50625, 0.25));  // eps_plus
   eps *= u_star_carre*u_star_carre/d_visco;
 
   return 1;
