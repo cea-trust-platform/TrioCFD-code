@@ -239,12 +239,11 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face::ajouter(DoubleTab& resu) const
 void Source_Transport_K_Omega_VEF_Face::contribuer_a_avec(const DoubleTab& a,
                                                           Matrice_Morse& matrice) const
 {
-  const DoubleTab& K_Omega = equation().inconnue().valeurs();
   const double LeK_MIN = eqn_K_Omega->modele_turbulence().get_K_MIN();
+  const DoubleTab& K_Omega = equation().inconnue().valeurs();
   const DoubleVect& porosite_face = eqn_K_Omega->milieu().porosite_face();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
 
-  // cAlan: to be adapted for k_omega? Copy of the k-eps method
   for (int face = 0; face < K_Omega.dimension(0); face++)
     if (K_Omega(face, 0) >= LeK_MIN)
       {
