@@ -123,6 +123,8 @@ void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgrad
       double const arg2 = std::max(2.*tmp1, tmp2);
       fieldF2(face) = std::tanh(arg2*arg2);
     }
+  blenderF1.echange_espace_virtuel();
+  fieldF2.echange_espace_virtuel();
 }
 
 double Source_Transport_K_Omega_VEF_Face::blender(double const val1, double const val2,
@@ -167,6 +169,8 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   const Operateur_Grad& Op_Grad_komega = eqn_K_Omega->gradient_operator_komega();
   Op_Grad_komega.calculer(enerK, gradK_elem);
   Op_Grad_komega.calculer(omega, gradOmega_elem);
+  gradK_elem.echange_espace_virtuel();
+  gradOmega_elem.echange_espace_virtuel();
 
   DoubleTab& chmp_post = ref_cast_non_const(DoubleTab, grad_k_omega_->valeurs());
   for (int num_elem = 0; num_elem < le_dom_VEF->nb_elem_tot(); ++num_elem)
@@ -176,19 +180,23 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   // Interpolate from elem to face
   const Domaine_dis_base& domaine_dis = mon_equation->inconnue().domaine_dis_base();
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_dis);
+
   DoubleTab gradK_face;
   gradK_face.resize(velocity_field_face.dimension_tot(0), nbr_velocity_components);
   elem_to_face(domaine, gradK_elem, gradK_face);
-  //DoubleTab gradOmega_face(velocity_field_face);
+  gradK_face.echange_espace_virtuel();
+
   DoubleTab gradOmega_face;
   gradOmega_face.resize(velocity_field_face.dimension_tot(0), nbr_velocity_components);
   elem_to_face(domaine, gradOmega_elem, gradOmega_face);
+  gradOmega_face.echange_espace_virtuel();
 
   // Dot Product gradKgradOmega
   for (int num_face = 0; num_face < le_dom_VEF->nb_faces_tot(); ++num_face)
     for (int ncompo = 0; ncompo < nbr_velocity_components; ++ncompo)
       gradKgradOmega(num_face) +=
         gradK_face(num_face, ncompo) * gradOmega_face(num_face, ncompo);
+  gradKgradOmega.echange_espace_virtuel();
 }
 
 // cAlan: Tried to get a dedicated function to resize a tab. Make a function for this?
