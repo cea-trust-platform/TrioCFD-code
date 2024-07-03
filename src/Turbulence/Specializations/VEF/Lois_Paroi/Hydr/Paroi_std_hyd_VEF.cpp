@@ -1800,20 +1800,18 @@ void Paroi_std_hyd_VEF::compute_k(double& k, double yp, double u_star)
   // PQ : 05/04/07 : formulation continue de k et epsilon
   //  assurant le bon comportement asymptotique
 
-  const double u_star_carre = u_star*u_star;
   k = 0.07*yp*yp*exp(-yp/9.);
-  k += 1./sqrt(Cmu)*pow(1. - exp(-yp/20.), 2.);
-  k *= u_star_carre; // = k+ * u_star^2
+  k += 1./sqrt(Cmu)*(1. - exp(-yp/20.))*(1. - exp(-yp/20.));
+  k *= u_star*u_star; // = k+ * u_star^2
 }
 
 void Paroi_std_hyd_VEF::compute_epsilon(double& eps, double yp,
                                         double u_star, double d_visco)
 {
-
   double const u_star_squared = u_star*u_star;
 
   // 50625 = 15^4
-  eps  = (1./(Kappa*pow(yp*yp*yp*yp+50625, 0.25))); // eps_plus
+  eps  = 1./(Kappa*pow(yp*yp*yp*yp + 50625, 0.25)); // eps_plus
   eps *= u_star_squared*u_star_squared/d_visco;
 }
 
