@@ -108,13 +108,13 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& res
   const DoubleTab& velocity = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   // const DoubleTab& tab = get_cisaillement_paroi(); // voir les classes filles
-  const int nb_faces_ = le_dom_VEF->nb_faces_tot();
-  DoubleTrav production_TKE {nb_faces_};
+  const int nb_faces_tot = le_dom_VEF->nb_faces_tot();
+  DoubleTrav production_TKE {nb_faces_tot};
 
-  DoubleTab gradKgradOmega (nb_faces_);
+  DoubleTab gradKgradOmega(nb_faces_tot);
   compute_cross_diffusion(gradKgradOmega);
 
-  if (turbulence_model->get_model_variant() == "SST")
+  if (turbulence_model->is_SST())
     compute_blending_F1(gradKgradOmega);
 
   const DoubleTab& TKE = get_K_pour_production(); // voir les classes filles
@@ -125,7 +125,7 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& res
 
   fill_resu(volumes_entrelaces, production_TKE, gradKgradOmega, resu); // voir les classes filles
 
-  if (turbulence_model->get_model_variant() == "SST")
+  if (turbulence_model->is_SST())
     compute_enstrophy(le_dom_VEF, domaine_Cl_VEF, velocity,
                       ref_cast_non_const(DoubleTab, turbulence_model->get_enstrophy()));
 
