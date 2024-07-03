@@ -203,7 +203,7 @@ int Modele_turbulence_hyd_K_Omega::preparer_calcul()
 {
   eqn_transp_K_Omega().preparer_calcul();
   Modele_turbulence_hyd_RANS_K_Omega_base::preparer_calcul();
-  if (model_variant_ == "SST")
+  if (is_SST())
     init_F1_F2_enstrophy();
   calculate_limit_viscosity<MODELE_TYPE::K_OMEGA>(K_Omega(), -123. /* unused */ );
   Debog::verifier("Modele_turbulence_hyd_K_Omega::preparer_calcul la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
