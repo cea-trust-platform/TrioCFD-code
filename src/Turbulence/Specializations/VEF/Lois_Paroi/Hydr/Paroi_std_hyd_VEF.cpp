@@ -1518,24 +1518,28 @@ void Paroi_std_hyd_VEF::compute_turbulent_quantities(double& var1, double& var2,
   return;
 }
 
-double norm_vit_lp(const ArrOfDouble& vit,int face,const Domaine_VEF& domaine,ArrOfDouble& val)
+double norm_vit_lp(const ArrOfDouble& vit, int face, const Domaine_VEF& domaine, ArrOfDouble& val)
 {
   // A reverser dans VEF/Domaine (?)
 
   const DoubleTab& face_normale = domaine.face_normales();
-  int dim=Objet_U::dimension;
+  const int dim = Objet_U::dimension;
   ArrOfDouble r(dim);
-  double psc,norm_vit;
 
-  for(int i=0; i<dim; i++) r[i]=face_normale(face,i);
+  for(int i = 0; i < dim; i++)
+    r[i] = face_normale(face, i);
 
-  r/=norme_array(r);
-  psc = dotproduct_array(r,vit);
+  r /= norme_array(r);
+  const double psc = dotproduct_array(r, vit);
 
-  if(dim==3) norm_vit = vitesse_tangentielle(vit[0],vit[1],vit[2],r[0],r[1],r[2]);
-  else             norm_vit = vitesse_tangentielle(vit[0],vit[1],r[0],r[1]);
+  double norm_vit {0};
+  if (dim == 3)
+    norm_vit = vitesse_tangentielle(vit[0],vit[1],vit[2],r[0],r[1],r[2]);
+  else
+    norm_vit = vitesse_tangentielle(vit[0],vit[1],r[0],r[1]);
 
-  for(int i=0; i<dim; i++) val[i]=(vit[i]-psc*r[i])/(norm_vit+DMINFLOAT);
+  for(int i = 0; i < dim; i++)
+    val[i] = (vit[i] - psc*r[i])/(norm_vit + DMINFLOAT);
 
   return norm_vit;
 }
