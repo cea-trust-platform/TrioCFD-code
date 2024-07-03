@@ -1238,7 +1238,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
 
                       if (!is_u_star_impose_)
                         {
-                          if(u_plus)
+                          if((bool)u_plus)
                             {
                               u_star = norm_v/u_plus ;
                               d_plus = u_plus_d_plus/u_plus ;
@@ -1342,7 +1342,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
 
               if (!is_u_star_impose_)
                 {
-                  if(u_plus)
+                  if((bool)u_plus)
                     {
                       u_star = norm_v/u_plus ;
                       d_plus = u_plus_d_plus/u_plus ;
@@ -1481,7 +1481,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
           u_plus_d_plus = norm_v*distb/d_visco;
           u_plus = calculer_u_plus(face, u_plus_d_plus, stock_erugu[num_face]);
 
-          if(u_plus)
+          if((bool)u_plus)
             {
               u_star = norm_v/u_plus ;
               d_plus = u_plus_d_plus/u_plus ;
