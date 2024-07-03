@@ -1878,27 +1878,29 @@ double Paroi_std_hyd_VEF::calculer_u_plus(const int ind_face,const double u_plus
 
   double u_plus = u_plus_d_plus/100.;
   double r      = 1.;
-  double seuil  = 0.001;
+  const double seuil  = 0.001;
   int    iter   = 0;
-  int    itmax  = 25;
+  const int    itmax  = 25;
 
-  double A = (1/Kappa)*log(erugu/Kappa) ; //  (=7.44, contre 7.8 dans la loi d'origine)
+  const double A = (1/Kappa)*log(erugu/Kappa) ; //  (=7.44, contre 7.8 dans la loi d'origine)
   //  permettant d'avoir en l'infini la loi de
   //  Reichardt se calant sur : u+ = (1/Kappa).ln(Erugu.y+)
-  double d_plus,u_plus2;
 
-  while((iter++<itmax) && (r>seuil))
+  // Fixed point method for Reichardt equation
+  while((iter++ < itmax) && (r > seuil))
     {
-      d_plus  = u_plus_d_plus/ u_plus ;
-      u_plus2 = ((1./Kappa)*log(1.+Kappa*d_plus))+A*(1.-exp(-d_plus/11.)-exp(-d_plus/3.)*d_plus/11.); // Equation de Reichardt
-      u_plus  = 0.5*(u_plus+u_plus2);
-      r       = std::fabs(u_plus-u_plus2)/u_plus;
+      const double d_plus  = u_plus_d_plus/u_plus;
+      const double u_plus2 = (1./Kappa)*log(1. + Kappa*d_plus)
+                             + A*(1. - exp(-d_plus/11.) - exp(-d_plus/3.)*d_plus/11.);
+      u_plus  = 0.5*(u_plus + u_plus2);
+      r       = std::fabs(u_plus - u_plus2)/u_plus;
     }
 
   seuil_LP(ind_face) = r;
   iterations_LP(ind_face) = iter;
 
-  if (iter >= itmax) erreur_non_convergence();
+  if (iter >= itmax)
+    erreur_non_convergence();
 
   return u_plus;
 }
