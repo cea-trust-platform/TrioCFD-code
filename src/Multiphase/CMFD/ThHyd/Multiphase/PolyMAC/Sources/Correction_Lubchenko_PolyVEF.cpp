@@ -14,35 +14,38 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Correction_Lubchenko_PolyVEF_P0.cpp
+// File:        Correction_Lubchenko_PolyVEF.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Correction_Lubchenko_PolyVEF_P0.h>
+#include <Correction_Lubchenko_PolyVEF.h>
 #include <Pb_Multiphase.h>
 #include <Portance_interfaciale_PolyVEF.h>
 #include <Portance_interfaciale_base.h>
 #include <Op_Diff_Turbulent_PolyVEF_Face.h>
 #include <Dispersion_bulles_PolyVEF.h>
 #include <Dispersion_bulles_base.h>
-#include <Champ_Face_PolyVEF_P0.h>
+#include <Champ_Face_PolyVEF.h>
 #include <Milieu_composite.h>
 #include <Viscosite_turbulente_base.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
 #include <math.h>
 #include <Dispersion_bulles_turbulente_Burns.h>
+#include <Synonyme_info.h>
 
-Implemente_instanciable(Correction_Lubchenko_PolyVEF_P0, "Correction_Lubchenko_Face_PolyVEF_P0", Source_base);
+Implemente_instanciable(Correction_Lubchenko_PolyVEF, "Correction_Lubchenko_Face_PolyVEF_P0", Source_base);
+Add_synonym(Correction_Lubchenko_PolyVEF, "Correction_Lubchenko_Face_PolyVEF_P0P1");
+Add_synonym(Correction_Lubchenko_PolyVEF, "Correction_Lubchenko_Face_PolyVEF_P0P1NC");
 
-Sortie& Correction_Lubchenko_PolyVEF_P0::printOn(Sortie& os) const
+Sortie& Correction_Lubchenko_PolyVEF::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Correction_Lubchenko_PolyVEF_P0::readOn(Entree& is)
+Entree& Correction_Lubchenko_PolyVEF::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("beta_lift", &beta_lift_);
@@ -65,39 +68,39 @@ Entree& Correction_Lubchenko_PolyVEF_P0::readOn(Entree& is)
   return is;
 }
 
-void Correction_Lubchenko_PolyVEF_P0::completer() // We must wait for all readOn's to be sure that the bubble dispersion and lift correlations are created
+void Correction_Lubchenko_PolyVEF::completer() // We must wait for all readOn's to be sure that the bubble dispersion and lift correlations are created
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
 
   for (int i = 0 ; i < equation().sources().size() ; i++)
-    if sub_type(Portance_interfaciale_PolyVEF_P0, equation().sources()(i).valeur()) correlation_lift_ = ref_cast(Portance_interfaciale_PolyVEF_P0, equation().sources()(i).valeur()).correlation();
+    if sub_type(Portance_interfaciale_PolyVEF, equation().sources()(i).valeur()) correlation_lift_ = ref_cast(Portance_interfaciale_PolyVEF, equation().sources()(i).valeur()).correlation();
 
   for (int i = 0 ; i < equation().sources().size() ; i++)
-    if sub_type(Dispersion_bulles_PolyVEF_P0, equation().sources()(i).valeur()) correlation_dispersion_ = ref_cast(Dispersion_bulles_PolyVEF_P0, equation().sources()(i).valeur()).correlation();
+    if sub_type(Dispersion_bulles_PolyVEF, equation().sources()(i).valeur()) correlation_dispersion_ = ref_cast(Dispersion_bulles_PolyVEF, equation().sources()(i).valeur()).correlation();
 
-  if ( (!correlation_lift_.non_nul()) || (!correlation_dispersion_.non_nul()) ) Process::exit("Correction_Lubchenko_PolyVEF_P0::completer() : a dispersion_bulles and a portance_interfaciale force must be defined !");
+  if ( (!correlation_lift_.non_nul()) || (!correlation_dispersion_.non_nul()) ) Process::exit("Correction_Lubchenko_PolyVEF::completer() : a dispersion_bulles and a portance_interfaciale force must be defined !");
 
-  if sub_type(Op_Diff_Turbulent_PolyVEF_P0_Face, equation().operateur(0).l_op_base()) is_turb = 1;
+  if sub_type(Op_Diff_Turbulent_PolyVEF_Face, equation().operateur(0).l_op_base()) is_turb = 1;
 
-  if (!pbm.has_champ("diametre_bulles")) Process::exit("Correction_Lubchenko_PolyVEF_P0::completer() : a bubble diameter must be defined !");
+  if (!pbm.has_champ("diametre_bulles")) Process::exit("Correction_Lubchenko_PolyVEF::completer() : a bubble diameter must be defined !");
 }
 
 
-void Correction_Lubchenko_PolyVEF_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const // The necessary dimensionner_bloc is taken care of in the dispersion_bulles_PolyVEF_P0 and Portance_interfaciale_PolyVEF_P0 functions
+void Correction_Lubchenko_PolyVEF::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const // The necessary dimensionner_bloc is taken care of in the dispersion_bulles_PolyVEF and Portance_interfaciale_PolyVEF functions
 {
 }
 
-void Correction_Lubchenko_PolyVEF_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Correction_Lubchenko_PolyVEF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   ajouter_blocs_disp(matrices, secmem, semi_impl);
   ajouter_blocs_lift(matrices, secmem, semi_impl);
 }
 
-void Correction_Lubchenko_PolyVEF_P0::ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
+void Correction_Lubchenko_PolyVEF::ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Champ_Face_PolyVEF_P0& ch = ref_cast(Champ_Face_PolyVEF_P0, equation().inconnue().valeur());
-  const Domaine_PolyVEF_P0& domaine = ref_cast(Domaine_PolyVEF_P0, equation().domaine_dis().valeur());
+  const Champ_Face_PolyVEF& ch = ref_cast(Champ_Face_PolyVEF, equation().inconnue().valeur());
+  const Domaine_PolyVEF& domaine = ref_cast(Domaine_PolyVEF, equation().domaine_dis().valeur());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
@@ -120,7 +123,7 @@ void Correction_Lubchenko_PolyVEF_P0::ajouter_blocs_disp(matrices_t matrices, Do
       cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
 
   DoubleTrav nut(domaine.nb_elem_tot(), N); //viscosite turbulente
-  if (is_turb) ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyVEF_P0_Face, equation().operateur(0).l_op_base()).correlation().valeur()).eddy_viscosity(nut); //remplissage par la correlation
+  if (is_turb) ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyVEF_Face, equation().operateur(0).l_op_base()).correlation().valeur()).eddy_viscosity(nut); //remplissage par la correlation
 
   // Input-output
   const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_dispersion_->valeur());
@@ -251,11 +254,11 @@ void Correction_Lubchenko_PolyVEF_P0::ajouter_blocs_disp(matrices_t matrices, Do
 }
 
 
-void Correction_Lubchenko_PolyVEF_P0::ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
+void Correction_Lubchenko_PolyVEF::ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Champ_Face_PolyVEF_P0& ch = ref_cast(Champ_Face_PolyVEF_P0, equation().inconnue().valeur());
-  const Domaine_PolyVEF_P0& domaine = ref_cast(Domaine_PolyVEF_P0, equation().domaine_dis().valeur());
+  const Champ_Face_PolyVEF& ch = ref_cast(Champ_Face_PolyVEF, equation().inconnue().valeur());
+  const Domaine_PolyVEF& domaine = ref_cast(Domaine_PolyVEF, equation().domaine_dis().valeur());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl(), &e_f = domaine.elem_faces();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();

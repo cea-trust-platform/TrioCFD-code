@@ -14,31 +14,30 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dissipation_energie_cin_turb_PolyVEF_P0.h
-// Directory:   $TRUST_ROOT/src/PolyVEF_P0/Sources
-// Version:     /main/16
+// File:        Production_echelle_temp_taux_diss_turb_PolyVEF.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyVEF
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Dissipation_energie_cin_turb_PolyVEF_P0_included
-#define Dissipation_energie_cin_turb_PolyVEF_P0_included
+#ifndef Production_echelle_temp_taux_diss_turb_PolyVEF_included
+#define Production_echelle_temp_taux_diss_turb_PolyVEF_included
 
-#include <Source_Dissipation_energie_cin_turb.h>
+#include <Source_Production_echelle_temp_taux_diss_turb.h>
 
-class Convection_Diffusion_std;
-/*! @brief class Terme_dissipation_energie_cinetique_turbulente_Elem_PolyVEF_P0
+class Correlation;
+
+/*! @brief Classe Production_echelle_temp_taux_diss_turb_PolyVEF Cette classe implemente dans PolyVEF un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
  *
- *  Terme de dissipation -beta * (alpha * rho * k) * omega dans l'equation d'energie cinetique turbulente
  *
- *  la phase dont la turbulence est decrite avec le modele k-tau doit etre ecrite en premier dans le bloc phases { } du jeu de donnees
- *  Actuellement k est necessairement un scalaire.
- *  Si cela est amene a evolue pour permettre de la turbulence dans plusieurs phases, il faudra alors revoir cette classe en iterant sur les id_composites des phases turbulentes.
- *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
  *
+ * @sa Operateur_PolyVEF_base Operateur_base
  */
-class Dissipation_energie_cin_turb_PolyVEF_P0 : public Source_Dissipation_energie_cin_turb
+class Production_echelle_temp_taux_diss_turb_PolyVEF: public Source_Production_echelle_temp_taux_diss_turb
 {
-  Declare_instanciable(Dissipation_energie_cin_turb_PolyVEF_P0);
+  Declare_instanciable(Production_echelle_temp_taux_diss_turb_PolyVEF);
+public :
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 };
 
 #endif

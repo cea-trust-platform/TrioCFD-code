@@ -14,16 +14,30 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dissipation_echelle_temp_taux_diss_turb_PolyVEF_P0.cpp
-// Directory:   $TRUST_ROOT/src/Turbulence/PolyVEF_P0/Sources
-// Version:     /main/13
+// File:        Production_energie_cin_turb_PolyVEF.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyVEF
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Dissipation_echelle_temp_taux_diss_turb_PolyVEF_P0.h>
+#ifndef Production_energie_cin_turb_PolyVEF_included
+#define Production_energie_cin_turb_PolyVEF_included
 
-Implemente_instanciable(Dissipation_echelle_temp_taux_diss_turb_PolyVEF_P0,"Dissipation_echelle_temp_taux_diss_turb_Elem_PolyVEF_P0", Source_Dissipation_echelle_temp_taux_diss_turb);
-// XD Terme_dissipation_echelle_temporelle_turbulente_Elem_PolyVEF_P0 source_base Terme_dissipation_echelle_temporelle_turbulente_Elem_PolyVEF_P0 0 Source term which corresponds to the dissipation source term that appears in the transport equation for tau (in the k-tau turbulence model)
+#include <Source_Production_energie_cin_turb.h>
 
-Sortie& Dissipation_echelle_temp_taux_diss_turb_PolyVEF_P0::printOn(Sortie& os) const {  return Source_Dissipation_echelle_temp_taux_diss_turb::printOn(os); }
-Entree& Dissipation_echelle_temp_taux_diss_turb_PolyVEF_P0::readOn(Entree& is) { return Source_Dissipation_echelle_temp_taux_diss_turb::readOn(is); }
+class Correlation;
+
+/*! @brief Classe Production_energie_cin_turb_PolyVEF Cette classe implemente dans PolyVEF un operateur de production d'énergie cinetique turbulente k
+ *
+ *
+ *
+ * @sa Operateur_PolyVEF_base Operateur_base
+ */
+class Production_energie_cin_turb_PolyVEF: public Source_Production_energie_cin_turb
+{
+  Declare_instanciable(Production_energie_cin_turb_PolyVEF);
+public :
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+};
+
+#endif

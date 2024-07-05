@@ -14,32 +14,34 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Production_echelle_temp_taux_diss_turb_PolyVEF_P0.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyVEF_P0
+// File:        Production_echelle_temp_taux_diss_turb_PolyVEF.cpp
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyVEF
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Production_echelle_temp_taux_diss_turb_PolyVEF_P0.h>
+#include <Production_echelle_temp_taux_diss_turb_PolyVEF.h>
 
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
-#include <grad_Champ_Face_PolyVEF_P0.h>
-#include <Champ_Elem_PolyVEF_P0.h>
+#include <grad_Champ_Face_PolyVEF.h>
 #include <Navier_Stokes_std.h>
 #include <Pb_Multiphase.h>
 #include <Domaine_VF.h>
+#include <Synonyme_info.h>
 
-Implemente_instanciable(Production_echelle_temp_taux_diss_turb_PolyVEF_P0,"Production_echelle_temp_taux_diss_turb_Elem_PolyVEF_P0", Source_Production_echelle_temp_taux_diss_turb);
+Implemente_instanciable(Production_echelle_temp_taux_diss_turb_PolyVEF,"Production_echelle_temp_taux_diss_turb_Elem_PolyVEF_P0", Source_Production_echelle_temp_taux_diss_turb);
+Add_synonym(Production_echelle_temp_taux_diss_turb_PolyVEF, "Production_echelle_temp_taux_diss_turb_Elem_PolyVEF_P0P1");
+Add_synonym(Production_echelle_temp_taux_diss_turb_PolyVEF, "Production_echelle_temp_taux_diss_turb_Elem_PolyVEF_P0P1NC");
 
-Sortie& Production_echelle_temp_taux_diss_turb_PolyVEF_P0::printOn(Sortie& os) const { return Source_Production_echelle_temp_taux_diss_turb::printOn(os); }
-Entree& Production_echelle_temp_taux_diss_turb_PolyVEF_P0::readOn(Entree& is) { return Source_Production_echelle_temp_taux_diss_turb::readOn(is);}
+Sortie& Production_echelle_temp_taux_diss_turb_PolyVEF::printOn(Sortie& os) const { return Source_Production_echelle_temp_taux_diss_turb::printOn(os); }
+Entree& Production_echelle_temp_taux_diss_turb_PolyVEF::readOn(Entree& is) { return Source_Production_echelle_temp_taux_diss_turb::readOn(is);}
 
-void Production_echelle_temp_taux_diss_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Production_echelle_temp_taux_diss_turb_PolyVEF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_VF&                     domaine = ref_cast(Domaine_PolyVEF_P0, equation().domaine_dis().valeur());
-  const DoubleTab&                     tab_diss = ref_cast(Champ_Elem_PolyVEF_P0, equation().inconnue().valeur()).valeurs(); // tau ou omega selon l'equation
-  const DoubleTab&                    tab_pdiss = ref_cast(Champ_Elem_PolyVEF_P0, equation().inconnue().valeur()).passe(); // tau ou omega selon l'equation
+  const Domaine_VF&                     domaine = ref_cast(Domaine_PolyVEF, equation().domaine_dis().valeur());
+  const DoubleTab&                     tab_diss = equation().inconnue().valeurs(); // tau ou omega selon l'equation
+  const DoubleTab&                    tab_pdiss = equation().inconnue().passe(); // tau ou omega selon l'equation
   const DoubleTab&                     tab_grad = equation().probleme().get_champ("gradient_vitesse").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
   const Probleme_base&                     pb = ref_cast(Probleme_base, equation().probleme());

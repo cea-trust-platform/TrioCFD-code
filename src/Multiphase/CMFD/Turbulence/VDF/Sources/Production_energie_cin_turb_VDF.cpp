@@ -66,7 +66,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
   double nut_l = -10000., fac;
 
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),
-                   &palp = equation().probleme().get_champ("alpha").passe(),
+                   *palp = sub_type(Pb_Multiphase, pb) ? &equation().probleme().get_champ("alpha").passe() : nullptr,
                     &nu =  equation().probleme().get_champ("viscosite_cinematique").passe(),
                      &k = equation().probleme().get_champ("k").valeurs(),
                       &tab_grad = equation().probleme().get_champ("gradient_vitesse").passe(),
@@ -86,7 +86,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
                 secmem_en += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
-            secmem_en *= pe(e) * ve(e) * palp(e, n) * tab_rho(e, n) * nut(e, n) ;
+            secmem_en *= pe(e) * ve(e) * (palp ? (*palp)(e, n) : 1) * tab_rho(e, n) * nut(e, n) ;
 
             secmem(e, n) += std::max(secmem_en, 0.);
           }

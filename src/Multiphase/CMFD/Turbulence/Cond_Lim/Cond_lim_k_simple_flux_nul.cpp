@@ -25,6 +25,8 @@
 #include <Energie_cinetique_turbulente.h>
 #include <Op_Dift_Multiphase_VDF_Elem.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
+#include <Op_Diff_PolyMAC_P0P1NC_base.h>
+#include <Op_Diff_PolyVEF_base.h>
 #include <Loi_paroi_adaptative.h>
 #include <Domaine_VF.h>
 
@@ -62,8 +64,11 @@ void Cond_lim_k_simple_flux_nul::me_calculer()
 
   const int cvisc = visc_c.dimension(0) == 1, cmu = mu_visc.dimension(0) == 1;
   // On va chercher le mu turbulent de polymac et celui de vdf et on prend le bon dans la suite
-  const DoubleTab* mu_poly = domaine.que_suis_je().debute_par("Domaine_PolyMAC") ? &ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr,
-                   *mu_vdf = domaine.que_suis_je().debute_par("Domaine_VDF") ? &ref_cast(Op_Dift_Multiphase_VDF_Elem, domaine_Cl_dis().equation().operateur(0).l_op_base()).get_diffusivite_turbulente() : nullptr;
+  const Operateur_base& op = domaine_Cl_dis().equation().operateur(0).l_op_base();
+  const DoubleTab* mu_poly = sub_type(Op_Diff_PolyMAC_P0_base, op) ? &ref_cast(Op_Diff_PolyMAC_P0_base, op).nu()
+                             : sub_type(Op_Diff_PolyMAC_P0P1NC_base, op) ? &ref_cast(Op_Diff_PolyMAC_P0P1NC_base, op).nu()
+                             : sub_type(Op_Diff_PolyVEF_base, op) ? &ref_cast(Op_Diff_PolyVEF_base, op).nu() : nullptr,
+                             *mu_vdf = domaine.que_suis_je().debute_par("Domaine_VDF") ? &ref_cast(Op_Dift_Multiphase_VDF_Elem, op).get_diffusivite_turbulente() : nullptr;
   assert((mu_poly) || (mu_vdf));
 
   int nf = la_frontiere_dis->frontiere().nb_faces(), f1 = la_frontiere_dis->frontiere().num_premiere_face();

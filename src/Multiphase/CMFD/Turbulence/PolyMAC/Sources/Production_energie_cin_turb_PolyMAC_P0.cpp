@@ -29,13 +29,8 @@
 #include <Domaine_PolyMAC_P0.h>
 #include <Navier_Stokes_std.h>
 #include <Pb_Multiphase.h>
-#include <Synonyme_info.h>
 
-Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_Elem_PolyMAC_P0", Source_Production_energie_cin_turb);
-Add_synonym(Production_energie_cin_turb_PolyMAC_P0, "Production_energie_cin_turb_Elem_PolyMAC_P0P1NC");
-Add_synonym(Production_energie_cin_turb_PolyMAC_P0, "Production_energie_cin_turb_Elem_PolyVEF_P0");
-Add_synonym(Production_energie_cin_turb_PolyMAC_P0, "Production_energie_cin_turb_Elem_PolyVEF_P0P1");
-Add_synonym(Production_energie_cin_turb_PolyMAC_P0, "Production_energie_cin_turb_Elem_PolyVEF_P0P1NC");
+Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_Elem_PolyMAC_P0|Production_energie_cin_turb_Elem_PolyMAC_P0P1NC", Source_Production_energie_cin_turb);
 
 Sortie& Production_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const {return Source_Production_energie_cin_turb::printOn(os);}
 Entree& Production_energie_cin_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Production_energie_cin_turb::readOn(is);}

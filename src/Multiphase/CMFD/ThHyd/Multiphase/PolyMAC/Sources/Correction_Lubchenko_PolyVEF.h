@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Correction_Lubchenko_PolyVEF_P0.h
+// File:        Correction_Lubchenko_PolyVEF.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Correction_Lubchenko_PolyVEF_P0_included
-#define Correction_Lubchenko_PolyVEF_P0_included
+#ifndef Correction_Lubchenko_PolyVEF_included
+#define Correction_Lubchenko_PolyVEF_included
 
 #include <Source_base.h>
 #include <TRUST_Ref.h>
@@ -34,9 +34,9 @@ class Correlation;
  *
  *
  */
-class Correction_Lubchenko_PolyVEF_P0: public Source_base
+class Correction_Lubchenko_PolyVEF: public Source_base
 {
-  Declare_instanciable(Correction_Lubchenko_PolyVEF_P0);
+  Declare_instanciable(Correction_Lubchenko_PolyVEF);
 public :
   int has_interface_blocs() const override
   {
