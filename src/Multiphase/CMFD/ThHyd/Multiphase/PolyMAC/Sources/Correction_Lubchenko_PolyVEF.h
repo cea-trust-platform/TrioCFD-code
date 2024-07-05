@@ -14,19 +14,18 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Correction_Lubchenko_PolyVEF_P0.h
+// File:        Correction_Lubchenko_PolyVEF.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Correction_Lubchenko_PolyVEF_P0_included
-#define Correction_Lubchenko_PolyVEF_P0_included
+#ifndef Correction_Lubchenko_PolyVEF_included
+#define Correction_Lubchenko_PolyVEF_included
 
 #include <Source_base.h>
+#include <Correlation_base.h>
 #include <TRUST_Ref.h>
-
-class Correlation;
 
 /*! @brief classe Correction_Lubchenko_PolyMAC_P0 Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
  *
@@ -34,9 +33,9 @@ class Correlation;
  *
  *
  */
-class Correction_Lubchenko_PolyVEF_P0: public Source_base
+class Correction_Lubchenko_PolyVEF: public Source_base
 {
-  Declare_instanciable(Correction_Lubchenko_PolyVEF_P0);
+  Declare_instanciable(Correction_Lubchenko_PolyVEF);
 public :
   int has_interface_blocs() const override
   {
@@ -47,7 +46,7 @@ public :
   void check_multiphase_compatibility() const override {}; //of course
   void completer() override;
 
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:
@@ -56,8 +55,8 @@ protected:
 
   int n_l = -1; //phase liquide
   int is_turb = 0;
-  REF(Correlation) correlation_lift_;
-  REF(Correlation) correlation_dispersion_;
+  OWN_PTR(Correlation_base) correlation_lift_;
+  OWN_PTR(Correlation_base) correlation_dispersion_;
   double beta_lift_ =  1. ; // To adjust the force in .data
   double beta_disp_ =  1. ; // To adjust the force in .data
   double portee_disp_= 1. ; // To push further than the diameter

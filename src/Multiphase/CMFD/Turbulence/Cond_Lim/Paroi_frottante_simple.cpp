@@ -17,7 +17,7 @@
 
 #include <Op_Dift_Multiphase_VDF_Face.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
-#include <Op_Diff_PolyVEF_P0_base.h>
+#include <Op_Diff_PolyVEF_base.h>
 #include <Loi_paroi_adaptative.h>
 #include <Discretisation_base.h>
 #include <Frontiere_dis_base.h>
@@ -60,7 +60,7 @@ void Paroi_frottante_simple::liste_faces_loi_paroi(IntTab& tab)
     for (int n = 0 ; n<N ; n++)
       tab(f + f1, n) |= 1;
 
-  if (domaine_Cl_dis().equation().discretisation().is_polyvef_p0()) is_externe_ = 1;
+  if (domaine_Cl_dis().equation().discretisation().is_polyvef()) is_externe_ = 1;
   else if (domaine_Cl_dis().equation().discretisation().is_polymac_family()) is_externe_ = 0;
   else if (domaine_Cl_dis().equation().discretisation().is_vdf()) is_externe_ = 0;
   else Process::exit(que_suis_je() + " : the numerical scheme isn't supported !");
@@ -99,11 +99,11 @@ void Paroi_frottante_simple::me_calculer()
                       *alp = sub_type(Pb_Multiphase, domaine_Cl_dis().equation().probleme()) ? &domaine_Cl_dis().equation().probleme().get_champ("alpha").passe() : nullptr;
 
   const int cnu = nu_visc.dimension(0) == 1, cmu = mu_visc.dimension(0) == 1, cr = rho.dimension(0) == 1;
-  const bool is_polyvef_p0 = domaine_Cl_dis().equation().probleme().discretisation().is_polyvef_p0(), is_VDF = domaine_Cl_dis().equation().probleme().discretisation().is_vdf(), is_polymac_p0 = domaine_Cl_dis().equation().probleme().discretisation().is_polymac_p0();
+  const bool is_polyvef = domaine_Cl_dis().equation().probleme().discretisation().is_polyvef(), is_VDF = domaine_Cl_dis().equation().probleme().discretisation().is_vdf(), is_polymac_p0 = domaine_Cl_dis().equation().probleme().discretisation().is_polymac_p0();
 
   // On va chercher le mu turbulent de polymac/polyvef et celui de vdf et on prend le bon dans la suite
   const DoubleTab* mu_poly = is_polymac_p0    ? &ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu()
-                             : ( is_polyvef_p0 ? &ref_cast(Op_Diff_PolyVEF_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr),
+                             : ( is_polyvef ? &ref_cast(Op_Diff_PolyVEF_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr),
                              *mu_vdf = (is_VDF) ? &ref_cast(Op_Dift_Multiphase_VDF_Face, domaine_Cl_dis().equation().operateur(0).l_op_base()).get_diffusivite_turbulente() : nullptr;
   assert((mu_poly) || (mu_vdf));
 
@@ -136,7 +136,7 @@ void Paroi_frottante_simple::me_calculer()
           for (int d = 0 ; d < D ; d++) u_parallel(d) = pvit_elem(e, N*d+n) - u_orth*(-n_f(f_domaine,d))/fs(f_domaine) ;
           yloc = y_loc(f_domaine, n);
         }
-      else if (is_polyvef_p0) // PolyVEF_P0 case : vitesse chelou sur la face de bord
+      else if (is_polyvef) // PolyVEF case : vitesse chelou sur la face de bord
         {
           for (int d = 0; d < D; d++) u_orth -= vit(f_domaine, N * d + n) * n_f(f_domaine, d) / fs(f_domaine);
           for (int d = 0; d < D; d++) u_parallel(d) = vit(f_domaine, N * d + n) - u_orth * (-n_f(f_domaine, d)) / fs(f_domaine);

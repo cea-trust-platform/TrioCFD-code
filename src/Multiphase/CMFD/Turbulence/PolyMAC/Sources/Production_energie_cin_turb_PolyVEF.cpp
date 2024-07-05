@@ -14,34 +14,37 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Production_energie_cin_turb_PolyVEF_P0.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyVEF_P0
+// File:        Production_energie_cin_turb_PolyVEF.cpp
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyVEF
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Production_energie_cin_turb_PolyVEF_P0.h>
+#include <Production_energie_cin_turb_PolyVEF.h>
 
-#include <Op_Diff_Turbulent_PolyVEF_P0_Face.h>
+#include <Op_Diff_Turbulent_PolyVEF_Face.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
 #include <Viscosite_turbulente_base.h>
-#include <Domaine_PolyVEF_P0.h>
+#include <Domaine_PolyVEF.h>
 #include <Navier_Stokes_std.h>
 #include <Loi_paroi_base.h>
 #include <Pb_Multiphase.h>
+#include <Synonyme_info.h>
 
-Implemente_instanciable(Production_energie_cin_turb_PolyVEF_P0,"Production_energie_cin_turb_Elem_PolyVEF_P0", Source_Production_energie_cin_turb);
+Implemente_instanciable(Production_energie_cin_turb_PolyVEF,"Production_energie_cin_turb_Elem_PolyVEF_P0", Source_Production_energie_cin_turb);
+Add_synonym(Production_energie_cin_turb_PolyVEF, "Production_energie_cin_turb_Elem_PolyVEF_P0P1");
+Add_synonym(Production_energie_cin_turb_PolyVEF, "Production_energie_cin_turb_Elem_PolyVEF_P0P1NC");
 
-Sortie& Production_energie_cin_turb_PolyVEF_P0::printOn(Sortie& os) const {return Source_Production_energie_cin_turb::printOn(os);}
-Entree& Production_energie_cin_turb_PolyVEF_P0::readOn(Entree& is) { return Source_Production_energie_cin_turb::readOn(is);}
+Sortie& Production_energie_cin_turb_PolyVEF::printOn(Sortie& os) const {return Source_Production_energie_cin_turb::printOn(os);}
+Entree& Production_energie_cin_turb_PolyVEF::readOn(Entree& is) { return Source_Production_energie_cin_turb::readOn(is);}
 
-void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Production_energie_cin_turb_PolyVEF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_PolyVEF_P0&             domaine = ref_cast(Domaine_PolyVEF_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyVEF&             domaine = ref_cast(Domaine_PolyVEF, equation().domaine_dis());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
-  const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyVEF_P0_Face, eq_qdm.operateur(0).l_op_base()).correlation().valeur());
+  const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyVEF_Face, eq_qdm.operateur(0).l_op_base()).correlation());
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
   const IntTab& e_f = domaine.elem_faces();
 
@@ -53,11 +56,11 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
     }
 
   int D = dimension, Nph = pb.get_champ("vitesse").valeurs().dimension(1)/D, nb_elem = domaine.nb_elem() ;
-  int N = equation().inconnue()->valeurs().line_size();
+  int N = equation().inconnue().valeurs().line_size();
   int e, n;
 
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),
-                   &palp = equation().probleme().get_champ("alpha").passe(),
+                   *palp = sub_type(Pb_Multiphase, pb) ? &equation().probleme().get_champ("alpha").passe() : nullptr,
                     &nu =  equation().probleme().get_champ("viscosite_cinematique").passe(),
                      &k = equation().probleme().get_champ("k").valeurs(),
                       &pk = semi_impl.count("k")  ? semi_impl.at("k") : equation().probleme().get_champ("k").passe(),
@@ -65,7 +68,7 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
                         *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
                          *pdiss = semi_impl.count(Type_diss) ? &semi_impl.at(Type_diss) : (equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr );
 
-  const Loi_paroi_base& lp = ref_cast(Loi_paroi_base, ref_cast(Pb_Multiphase, pb).get_correlation("Loi_paroi").valeur());
+  const Loi_paroi_base& lp = ref_cast(Loi_paroi_base, pb.get_correlation("Loi_paroi").valeur());
   double limiter_ = visc_turb.limiteur();
 
   if (Type_diss == "")
@@ -81,7 +84,7 @@ void Production_energie_cin_turb_PolyVEF_P0::ajouter_blocs(matrices_t matrices, 
             for (int d_U = 0; d_U < D; d_U++)
               for (int d_X = 0; d_X < D; d_X++)
                 secmem_en += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
-            secmem_en *= pe(e) * ve(e) * palp(e, n) * tab_rho(e, n) * nut(e, n) ;
+            secmem_en *= pe(e) * ve(e) * (palp ? (*palp)(e, n) : 1) * tab_rho(e, n) * nut(e, n) ;
 
             secmem(e, n) += std::max(secmem_en, 0.);
           }
