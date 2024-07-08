@@ -17,7 +17,7 @@
 #define Operateur_IJK_base_included
 
 #include <IJK_Field.h>
-#include <IJK_Field_simd_tools.h>
+#include <IJK_ptr.h>
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_data_channel.h>
 #include <Corrige_flux_FT_base.h>

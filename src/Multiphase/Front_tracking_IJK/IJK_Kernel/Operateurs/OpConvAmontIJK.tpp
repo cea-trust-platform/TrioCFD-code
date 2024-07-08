@@ -16,7 +16,8 @@
 #ifndef OpConvAmontIJK_TPP_included
 #define OpConvAmontIJK_TPP_included
 
-#include <IJK_Field_simd_tools.h>
+#include <IJK_ptr.h>
+#include <Simd_template.h>
 
 /*! @brief compute fluxes in direction _DIR_ for velocity component _VCOMPO_ for the layer of fluxes k_layer
  *
@@ -73,7 +74,7 @@ void OpConvAmontIJK_double::compute_flux_(IJK_Field_local_double& resu, const in
 
             // Average of the convecting velocity (copied from Eval_Amont_VDF_Face : not weighted)
             Simd_double psc = (vconv0 + vconv1) * half_surface;
-            Simd_double upwind_velocity = select_double(psc, 0., vit_1 /* if psc < 0 */, vit_0 /* if psc > 0 */);
+            Simd_double upwind_velocity = SimdSelect<double>(psc, 0., vit_1 /* if psc < 0 */, vit_0 /* if psc > 0 */);
             Simd_double flux = psc * upwind_velocity;
             resu_ptr.put_val(i, flux);
           }

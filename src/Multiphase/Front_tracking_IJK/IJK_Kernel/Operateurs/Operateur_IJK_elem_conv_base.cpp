@@ -213,8 +213,8 @@ void Operateur_IJK_elem_conv_base_double::compute_curv_fram(DIRECTION _DIR_, int
           input_field.get_left_center_right(_DIR_, i, t0, t1, t2);
           Simd_double curv = (t2 - t1) * factor12 - (t1 - t0) * factor01;
           curv_values.put_val(i, curv);
-          Simd_double smin = min(t0, t2);
-          Simd_double smax = max(t0, t2);
+          Simd_double smin = SimdMin(t0, t2);
+          Simd_double smax = SimdMax(t0, t2);
           // Compared to original code (Eval_Quick_VDF_Elem.h), we first compute the 4th power,
           // then take the max (dabs is then useless)
           Simd_double zeroVec = 0.;
@@ -225,7 +225,7 @@ void Operateur_IJK_elem_conv_base_double::compute_curv_fram(DIRECTION _DIR_, int
           Simd_double sr = SimdSelect(dsabs, minVec, zeroVec, ((t1 - smin) / ds - 0.5) * 2.);
           sr *= sr;
           sr *= sr;
-          sr = min(sr, oneVec);
+          sr = SimdMin(sr, oneVec);
 
           fram_values.put_val(i, sr);
         }
