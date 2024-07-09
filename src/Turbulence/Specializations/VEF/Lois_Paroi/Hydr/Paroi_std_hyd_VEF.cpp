@@ -1513,7 +1513,8 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
 
           // calculer_k_eps(tab_k_eps(face,0),tab_k_eps(face,1),d_plus,u_star,d_visco,distb);
           // Evaluate the turbulent quantities
-          compute_turbulent_quantities(tab_2eq(face, 0), tab_2eq(face, 1), d_plus, u_star, d_visco, dist);
+          compute_turbulent_quantities(tab_2eq(face, 0), tab_2eq(face, 1),
+                                       d_plus, u_star, d_visco, distb);
         }
     }
 
