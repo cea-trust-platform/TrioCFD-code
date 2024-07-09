@@ -51,7 +51,7 @@ Entree& Modele_turbulence_hyd_K_Omega::readOn(Entree& s)
   is_SST_ = false;
   if (model_variant_ == "SST")
     {
-      Cerr << "SST model: initialize les distances paroi" << "\n";
+      Cout << "SST model: initialize wall distances." << "\n";
       Navier_Stokes_std& moneq = ref_cast(Navier_Stokes_std, equation());
       moneq.creer_champ("distance_paroi_globale");
       is_SST_ = true;
@@ -178,8 +178,9 @@ void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const int tab_K
       else
         {
           const double enerK = tab_K_Omega(i, 0);
-          turbulent_viscosity[i] = is_SST() ?
-                                   enerK*CST_A1/std::max(CST_A1*omega, get_enstrophy()[i]*get_fieldF2()[i])
+          turbulent_viscosity[i] = is_SST()
+                                   ? enerK*CST_A1/std::max(CST_A1*omega,
+                                                           get_enstrophy()[i]*get_fieldF2()[i])
                                    : enerK/omega;
         }
     }
