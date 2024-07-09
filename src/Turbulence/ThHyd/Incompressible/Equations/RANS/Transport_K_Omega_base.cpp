@@ -139,24 +139,24 @@ int Transport_K_Omega_base::controler_K_Omega()
       if (!sub_type(Champ_Inc_P0_base, le_champ_K_Omega.valeur()))
         {
           Cerr << "Unsupported K_Omega field in Transport_K_Omega_base::controler_K_Omega()" << finl;
-          Process::exit(-1);
+          Process::exit();
         }
       size = le_champ_K_Omega.valeur().equation().domaine_dis().domaine().nb_elem();
     }
 
   //int size_tot=mp_sum(size);
   // On estime pour eviter un mp_sum toujours couteux:
-  int size_tot = size * Process::nproc();
+  const int size_tot = size * Process::nproc();
   ArrOfInt neg(3);
   neg = 0;
   int control = 1;
-  int lquiet = modele_turbulence().get_lquiet(); // cAlan remonter ce lquiet dans modele_turbu
+  const int lquiet = modele_turbulence().get_lquiet(); // cAlan remonter ce lquiet dans modele_turbu
 
   // cAlan, le 20/01/2023 : on force les valeurs au min et max comme pour le K_Eps.
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
-  double OMEGA_MIN = modele_turbulence().get_OMEGA_MIN();
-  double OMEGA_MAX = modele_turbulence().get_OMEGA_MAX();
-  double K_MIN = modele_turbulence().get_K_MIN();
+  const double OMEGA_MIN = modele_turbulence().get_OMEGA_MIN();
+  const double OMEGA_MAX = modele_turbulence().get_OMEGA_MAX();
+  const double K_MIN = modele_turbulence().get_K_MIN();
   const IntTab& face_voisins = domaine_vf.face_voisins();
   const IntTab& elem_faces = domaine_vf.elem_faces();
   // PL on ne fixe au seuil minimum que si negatifs
@@ -176,8 +176,8 @@ int Transport_K_Omega_base::controler_K_Omega()
       double& omega = K_Omega(n, 1);
       if (enerK < 0 || omega < 0)
         {
-          neg[0] += (enerK<0 ? 1 : 0);
-          neg[1] += (omega<0 ? 1 : 0);
+          neg[0] += (enerK < 0 ? 1 : 0);
+          neg[1] += (omega < 0 ? 1 : 0);
 
           get_position_faces(position, n);
 
@@ -186,7 +186,7 @@ int Transport_K_Omega_base::controler_K_Omega()
           omega = 0;
           int nenerK = 0;
           int nomega = 0;
-          int nb_faces_elem = elem_faces.line_size();
+          const int nb_faces_elem = elem_faces.line_size();
           if (size == face_voisins.dimension(0))
             {
               // cAlan : faire une fonction dans Transport_RANS_2eq qui fait la même chose ?
@@ -220,10 +220,15 @@ int Transport_K_Omega_base::controler_K_Omega()
               nomega = 0; // omega -> omega_min
             } // fin de (size != face_voisins.dimension(0))
 
-          if (nenerK != 0) enerK /= nenerK;
-          else enerK = K_MIN;
-          if (nomega != 0) omega /= nomega;
-          else omega = OMEGA_MIN;
+          if (nenerK != 0)
+            enerK /= nenerK;
+          else
+            enerK = K_MIN;
+
+          if (nomega != 0)
+            omega /= nomega;
+          else
+            omega = OMEGA_MIN;
 
           if (schema_temps().limpr() && !lquiet)
             {
@@ -264,13 +269,17 @@ int Transport_K_Omega_base::controler_K_Omega()
               const double time = le_champ_K_Omega.temps();
               Cerr << "Values forced for k and omega because:" << finl;
               if (neg[0])
-                Cerr << "Negative values found for k on " << neg[0] << "/" << size_tot << " nodes at time " << time << finl;
+                Cerr << "Negative values found for k on "
+                     << neg[0] << "/" << size_tot << " nodes at time "
+                     << time << finl;
               if (neg[1])
-                Cerr << "Negative values found for omega on " << neg[1] << "/" << size_tot << " nodes at time " << time << finl;
+                Cerr << "Negative values found for omega on "
+                     << neg[1] << "/" << size_tot << " nodes at time "
+                     << time << finl;
               // Warning if more than 0.01% of nodes are values fixed
               // cAlan : mettre une variable "experte" dans le jdd pour ajuster ce seuil ?
-              double ratio_k = 100. * neg[0] / size_tot;
-              double ratio_omega = 100. * neg[1] / size_tot;
+              const double ratio_k = 100. * neg[0] / size_tot;
+              const double ratio_omega = 100. * neg[1] / size_tot;
               if ((ratio_k > 0.01 || ratio_omega > 0.01) && !lquiet)
                 {
                   // cAlan : adapter le texte pour omega
