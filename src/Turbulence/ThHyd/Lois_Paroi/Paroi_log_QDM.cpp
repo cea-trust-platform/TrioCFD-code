@@ -68,13 +68,12 @@ double Fdypar_direct(double lm_plus)
 
 double Fdypar(double d_plus, double kappa, double a_plus)
 {
-  double lm_plus = kappa*d_plus*(1-exp(-d_plus/a_plus));
+  const double lm_plus = kappa*d_plus*(1-exp(-d_plus/a_plus));
   return 2./(1+sqrt(1.0+4*lm_plus*lm_plus));
 }
 
 double integrale(double a, double b, double param1, double param2,
                  double (*pf) (double, double, double))
 {
-  double sum = 0.5*(pf(a, param1, param2) + pf(b, param1, param2))*(b - a);
-  return sum;
+  return 0.5*(pf(a, param1, param2) + pf(b, param1, param2))*(b - a);
 }
