@@ -33,7 +33,7 @@ Entree& Modele_turbulence_hyd_RANS_K_Omega_base::readOn(Entree& is) { return Mod
 void Modele_turbulence_hyd_RANS_K_Omega_base::set_param(Param& param)
 {
   Modele_turbulence_hyd_2_eq_base::set_param(param);
-  param.ajouter("omega_min", &OMEGA_MIN_); // XD_ADD_P double Lower limitation of omega (default value 1.e-10).
+  param.ajouter("omega_min", &OMEGA_MIN_); // XD_ADD_P double Lower limitation of omega (default value 1.e-20).
   param.ajouter("omega_max", &OMEGA_MAX_); // XD_ADD_P double Upper limitation of omega (default value 1.e+10).
 }
 
