@@ -427,18 +427,25 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
     }
 }
 
-void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_face_keps_impose_, IntVect& face_keps_imposee_, const Domaine_VEF& domaine_VEF,const REF(Domaine_Cl_VEF) le_dom_Cl_VEF,int is_champ_P1NC)
+void remplir_face_keps_imposee(int& flag_face_keps_imposee_,
+                               int methode_calcul_face_keps_impose_,
+                               IntVect& face_keps_imposee_,
+                               const Domaine_VEF& domaine_VEF,
+                               const REF(Domaine_Cl_VEF) le_dom_Cl_VEF,
+                               int is_champ_P1NC)
 {
   // Deja calcule, on quitte
-  if (flag_face_keps_imposee_==1)
+  if (flag_face_keps_imposee_ == 1)
     return;
-  if (methode_calcul_face_keps_impose_==-1)
+
+  if (methode_calcul_face_keps_impose_ == -1)
     {
-      if (Objet_U::dimension==2) methode_calcul_face_keps_impose_=1;
+      if (Objet_U::dimension == 2)
+        methode_calcul_face_keps_impose_ = 1;
       else
         {
-          assert(Objet_U::dimension==3);
-          methode_calcul_face_keps_impose_=5 ;
+          assert(Objet_U::dimension == 3);
+          methode_calcul_face_keps_impose_ = 5 ;
           // GF pour avoir comme dans la 156 decommenter la ligne suivante
           // methode_calcul_face_keps_impose_=1 ;
         }
@@ -456,17 +463,23 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_f
       // GF Les cas 0 2 3 sont appeles a disparaitre du code....
       Process::exit();
     }
-  if (flag_face_keps_imposee_==0)
+
+  if (flag_face_keps_imposee_ == 0)
     {
       domaine_VEF.creer_tableau_faces(face_keps_imposee_, RESIZE_OPTIONS::NOCOPY_NOINIT);
-      face_keps_imposee_=-2;
+      face_keps_imposee_ = -2;
     }
   if ((methode_calcul_face_keps_impose_==1) || (methode_calcul_face_keps_impose_==5))
-    remplir_face_keps_imposee_gen(flag_face_keps_imposee_, face_keps_imposee_, methode_calcul_face_keps_impose_, domaine_VEF, le_dom_Cl_VEF, is_champ_P1NC);
+    remplir_face_keps_imposee_gen(flag_face_keps_imposee_,
+                                  face_keps_imposee_,
+                                  methode_calcul_face_keps_impose_,
+                                  domaine_VEF,
+                                  le_dom_Cl_VEF,
+                                  is_champ_P1NC);
   else
     {
       // methode_calcul_face_keps_impose_=4
-      flag_face_keps_imposee_=1;
+      flag_face_keps_imposee_ = 1;
       const IntTab& face_voisins = domaine_VEF.face_voisins();
       // on parcourt les bords dirichlet, on cherche les voisins...
       for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
@@ -603,33 +616,33 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_f
                                               num3=n;
                                               dist3=d;
                                             }
-                                          if (dist1>0)
+                                          if (dist1 > 0)
                                             {
-                                              face_keps_imposee_[num1]=num_face;
+                                              face_keps_imposee_[num1] = num_face;
                                             }
-                                          if (dist2>0)
+                                          if (dist2 > 0)
                                             {
-                                              face_keps_imposee_[num2]=num_face;
+                                              face_keps_imposee_[num2] = num_face;
                                             }
                                         }
                                     }
                                 }
-                              else if (methode_calcul_face_keps_impose_==2)
-                                for (int dir=0; dir<nfac; dir++)
+                              else if (methode_calcul_face_keps_impose_ == 2)
+                                for (int dir = 0; dir < nfac; dir++)
                                   {
-                                    assert(methode_calcul_face_keps_impose_==2);
-                                    int num3=elem_faces(elem_voisin,dir);
-                                    if ((num3>0)&&(num3!=num0))
+                                    assert(methode_calcul_face_keps_impose_ == 2);
+                                    const int num3 = elem_faces(elem_voisin, dir);
+                                    if ((num3 > 0) && (num3 != num0))
                                       {
-                                        int face_asso=face_keps_imposee_[num3];
-                                        if (face_asso<0)
-                                          face_keps_imposee_[num3]=num_face;
+                                        int face_asso = face_keps_imposee_[num3];
+                                        if (face_asso < 0)
+                                          face_keps_imposee_[num3] = num_face;
 
                                         else
                                           {
                                             // face deja associe
                                             // quelle est la plus pres de face_asso et num_face ...  non fait pour l'instant
-                                            face_keps_imposee_[num3]=num_face;
+                                            face_keps_imposee_[num3] = num_face;
                                           }
                                       }
 
@@ -637,7 +650,7 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_f
                               else
                                 {
                                   // on ne rajoute pas de faces
-                                  assert(methode_calcul_face_keps_impose_==4);
+                                  assert(methode_calcul_face_keps_impose_ == 4);
                                 }
 
                             }
@@ -648,32 +661,34 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_f
         }
 
       // on reparcourt les bords pour remettre les bon flags
-      for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
+      for (int n_bord = 0; n_bord < domaine_VEF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          int ndeb = 0;
-          int nfin = le_bord.nb_faces_tot();
-          if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
-              (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
-              (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
+          const int ndeb = 0;
+          const int nfin = le_bord.nb_faces_tot();
+          if (sub_type(Dirichlet_paroi_fixe, la_cl.valeur())
+              || (sub_type(Dirichlet_paroi_defilante, la_cl.valeur()))
+              || (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
             {
-              for (int ind_face=ndeb; ind_face<nfin; ind_face++)
+              for (int ind_face = ndeb; ind_face < nfin; ind_face++)
                 {
-                  int num_face=le_bord.num_face(ind_face);
-                  face_keps_imposee_[num_face]=-1;
+                  const int num_face = le_bord.num_face(ind_face);
+                  face_keps_imposee_[num_face] = -1;
                 }
             }
-          else if (sub_type(Periodique,la_cl.valeur()) || sub_type(Neumann_sortie_libre,la_cl.valeur()) || sub_type(Symetrie,la_cl.valeur()))
+          else if (sub_type(Periodique, la_cl.valeur())
+                   || sub_type(Neumann_sortie_libre, la_cl.valeur())
+                   || sub_type(Symetrie, la_cl.valeur()))
             {
               //exit();
             }
           else
             {
-              for (int ind_face=ndeb; ind_face<nfin; ind_face++)
+              for (int ind_face = ndeb; ind_face < nfin; ind_face++)
                 {
-                  int num_face = le_bord.num_face(ind_face);
-                  face_keps_imposee_[num_face]=-2;
+                  const int num_face = le_bord.num_face(ind_face);
+                  face_keps_imposee_[num_face] = -2;
                 }
             }
         }
@@ -879,20 +894,20 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
       else if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
         {
           // Recuperation de la valeur Erugu
-          double erugu=Erugu;
+          const double erugu = Erugu;
 
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin,la_cl.valeur());
           const DoubleTab& normales = domaine_VEF.face_normales();
-          double delta = Paroi.get_delta();
+          const double delta = Paroi.get_delta();
 
           // Loop on real faces
-          int ndeb = 0;
-          int nfin = le_bord.nb_faces_tot();
+          const int ndeb = 0;
+          const int nfin = le_bord.nb_faces_tot();
           for (int ind_face=ndeb; ind_face<nfin; ind_face++)
             {
-              int num_face=le_bord.num_face(ind_face);
-              int elem=face_voisins(num_face,0);
+              const int num_face=le_bord.num_face(ind_face);
+              const int elem=face_voisins(num_face,0);
 
               double psc=0, norm=0;
               norm_v=0;
@@ -1093,7 +1108,6 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
-  int nfac = domaine.nb_faces_elem();
 
   double visco {-1};
   int l_unif {0};
@@ -1103,10 +1117,10 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
       l_unif = 1;
     }
 
-  if ((!l_unif) && (tab_visco.local_min_vect()<DMINFLOAT))
+  if ((!l_unif) && (tab_visco.local_min_vect() < DMINFLOAT))
     //   on ne doit pas changer tab_visco ici !
     {
-      Cerr<<" visco <=0 ?"<<finl;
+      Cerr << " visco <=0 ?" << finl;
       exit();
     }
   // tab_visco+=DMINFLOAT;
@@ -1122,20 +1136,21 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
                             face_keps_imposee_, domaine_VEF,
                             le_dom_Cl_VEF, !is_champ_Q1NC);
 
+  const int nfac = domaine.nb_faces_elem();
   IntVect num(nfac);
   ArrOfDouble stock_erugu(domaine_VEF.nb_faces_tot());
   ArrOfInt is_defilante_face(domaine_VEF.nb_faces_tot());
 
   // Loop on boundaries
-  int nb_bords = domaine_VEF.nb_front_Cl();
+  const int nb_bords = domaine_VEF.nb_front_Cl();
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
       // Only Dirichlet conditions:
-      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
-          (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
-          (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE") )
+      if (sub_type(Dirichlet_paroi_fixe, la_cl.valeur())
+          || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
+          || (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
         {
           int is_defilante = sub_type(Dirichlet_paroi_defilante, la_cl.valeur()) ;
 
@@ -1143,20 +1158,24 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
             is_defilante = (la_cl.valeur().que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE");
 
           // Recuperation de la valeur Erugu
-          double erugu = Erugu;
-          if (sub_type(Paroi_rugueuse, la_cl.valeur()))
-            erugu = ref_cast(Paroi_rugueuse, la_cl.valeur()).get_erugu();
+          // double erugu = Erugu;
+          // if (sub_type(Paroi_rugueuse, la_cl.valeur()))
+          //   erugu = ref_cast(Paroi_rugueuse, la_cl.valeur()).get_erugu();
+
+          const double erugu = sub_type(Paroi_rugueuse, la_cl.valeur())
+                               ? ref_cast(Paroi_rugueuse, la_cl.valeur()).get_erugu()
+                               : Erugu;
 
           const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
           const IntTab& elem_faces = domaine_VEF.elem_faces();
 
           // Loop on real faces
-          int ndeb = 0;
-          int nfin = le_bord.nb_faces_tot();
+          const int ndeb = 0;
+          const int nfin = le_bord.nb_faces_tot();
           for (int ind_face = ndeb; ind_face < nfin; ind_face++)
             {
-              int num_face = le_bord.num_face(ind_face);
-              int elem = face_voisins(num_face, 0);
+              const int num_face = le_bord.num_face(ind_face);
+              const int elem = face_voisins(num_face, 0);
 
               is_defilante_face[num_face] = is_defilante;
               stock_erugu[num_face] = erugu;
@@ -1166,7 +1185,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
                 num[nf2] = elem_faces(elem, nf2);
 
               // Maintenant on place le num_face en fin de tableau
-              for (int nf2 = 0; nf2 < nfac-1; nf2++)
+              for (int nf2 = 0; nf2 < nfac - 1; nf2++)
                 {
                   num[nf2] = elem_faces(elem, nf2);
                   if (num[nf2] == num_face)
@@ -1194,8 +1213,9 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
                         tab_2eq(num[nf], 1) = 0.;
                       else if (turbulence_model_type == 2) // second equation is omega
                         {
-                          // cAlan : c'est sale car on reprendre la valeur de d_visco et de dist de l'itération précédente. A améliorer quand on optimisera cette fonction.
-                          assert(dist > 0); // on vérifie quand même que dist n'est pas nulle...
+                          // cAlan : c'est sale car on reprend la valeur de d_visco et de dist de
+                          // l'itération précédente. A améliorer quand on optimisera cette fonction.
+                          assert(dist > 0);
                           tab_2eq(num[nf], 1) = 6*d_visco/(BETA_OMEGA*dist*dist);
                         }
                       int nk = 0;
@@ -1295,20 +1315,18 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
           const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
           const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin, la_cl.valeur());
           const DoubleTab& normales = domaine_VEF.face_normales();
-          double delta = Paroi.get_delta();
+          const double delta = Paroi.get_delta();
 
           // Loop on real faces
-          int ndeb = 0;
-          int nfin = le_bord.nb_faces_tot();
+          const int ndeb = 0;
+          const int nfin = le_bord.nb_faces_tot();
           for (int ind_face = ndeb; ind_face < nfin; ind_face++)
             {
-              int num_face = le_bord.num_face(ind_face);
-              int elem = face_voisins(num_face, 0);
+              const int num_face = le_bord.num_face(ind_face);
+              const int elem = face_voisins(num_face, 0);
 
               double psc = 0;
               double norm = 0;
-              norm_v = 0;
-
               for(int comp = 0; comp < dimension; comp++)
                 {
                   psc += vitesse(num_face, comp)*normales(num_face, comp);
@@ -1316,8 +1334,9 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
                 }
               // psc /= norm; // Fixed bug: Arithmetic exception
               if (std::fabs(norm) >= DMINFLOAT)
-                psc/=norm;
+                psc /= norm;
 
+              norm_v = 0;
               for(int comp = 0; comp < dimension; comp++)
                 {
                   val[comp] = vitesse(num_face, comp) - psc*normales(num_face, comp);
@@ -1366,7 +1385,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
                 Cisaillement_paroi_(num_face, j) = u_star*u_star*val[j];
 
               // cAlan : pourquoi recalcule-t-on ustar à partir de tau_w ?
-              double u_starbis=0;
+              double u_starbis = 0;
               for (int dir = 0; dir < dimension; dir++)
                 u_starbis += Cisaillement_paroi_(num_face, dir)*Cisaillement_paroi_(num_face, dir);
               u_starbis = sqrt(sqrt(u_starbis));
@@ -1447,14 +1466,14 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
 #endif
 
   // on recalcule partout ou c'est impose
-  int nb_faces_tot = domaine_VEF.nb_faces_tot();
+  const int nb_faces_tot = domaine_VEF.nb_faces_tot();
   for (int face = 0; face < nb_faces_tot; face++)
     {
-      int num_face = face_keps_imposee_[face];
+      const int num_face = face_keps_imposee_[face];
       if (num_face > -1)
         {
           // int elem_voisin;
-          int elem=face_voisins(num_face, 0);
+          const int elem = face_voisins(num_face, 0);
           //if (face_voisins(face,0)!=elem) elem_voisin=face_voisins(face,0);
           //else elem_voisin=face_voisins(face,1);
           //int elem_voisin=face_voisins(num_face,0);
@@ -1470,8 +1489,8 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
               distb = distance_face_elem(num_face, elem, domaine_VEF);
             }
 
-          norm_v=norm_vit_lp_k(vitesse, face, num_face, domaine_VEF,
-                               val, is_defilante_face[num_face]);
+          norm_v = norm_vit_lp_k(vitesse, face, num_face, domaine_VEF,
+                                 val, is_defilante_face[num_face]);
 
           if (l_unif)
             d_visco = visco;
@@ -1505,14 +1524,14 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
   return 1;
 }  // fin de calcul_hyd (K-eps)
 
-void Paroi_std_hyd_VEF::compute_turbulent_quantities(double& var1, double& var2,
-                                                     double d_plus, double u_star,
-                                                     double d_visco, double dist)
+void Paroi_std_hyd_VEF::compute_turbulent_quantities(double& tke, double& var2,
+                                                     const double d_plus, const double u_star,
+                                                     const double d_visco, const double dist)
 {
   if (turbulence_model_type == 1) // K-Epsilon model
-    calculer_k_eps(var1, var2, d_plus, u_star, d_visco, dist);
+    calculer_k_eps(tke, var2, d_plus, u_star, d_visco, dist);
   else if (turbulence_model_type == 2) // K-Omega model
-    compute_k_omega(var1, var2, d_plus, u_star, d_visco, dist);
+    compute_k_omega(tke, var2, d_plus, u_star, d_visco, dist);
   else
     Cerr << "The turbulence model is neither k-epsilon nor k-omega. Implementation required?\n";
   return;
@@ -1544,7 +1563,7 @@ double norm_vit_lp(const ArrOfDouble& vit, int face, const Domaine_VEF& domaine,
   return norm_vit;
 }
 
-
+// cAlan: unused function?
 int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
@@ -1691,12 +1710,12 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       else if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
         {
           // Recuperation de la valeur Erugu
-          double erugu=Erugu;
+          const double erugu = Erugu;
 
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin,la_cl.valeur());
           const DoubleTab& normales = domaine_VEF.face_normales();
-          double delta = Paroi.get_delta();
+          const double delta = Paroi.get_delta();
 
           // Loop on real faces
           int ndeb = 0;
@@ -1798,7 +1817,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   return 1;
 }  // fin du calcul_hyd (nu-t)
 
-void Paroi_std_hyd_VEF::compute_k(double& k, double yp, double u_star)
+void Paroi_std_hyd_VEF::compute_k(double& k, const double yp, const double u_star)
 {
   // Original comment:
   // PQ : 05/04/07 : formulation continue de k et epsilon
@@ -1809,8 +1828,8 @@ void Paroi_std_hyd_VEF::compute_k(double& k, double yp, double u_star)
   k *= u_star*u_star; // = k+ * u_star^2
 }
 
-void Paroi_std_hyd_VEF::compute_epsilon(double& eps, double yp,
-                                        double u_star, double d_visco)
+void Paroi_std_hyd_VEF::compute_epsilon(double& eps, const double yp,
+                                        const double u_star, const double d_visco)
 {
   double const u_star_squared = u_star*u_star;
 
@@ -1819,9 +1838,9 @@ void Paroi_std_hyd_VEF::compute_epsilon(double& eps, double yp,
   eps *= u_star_squared*u_star_squared/d_visco;
 }
 
-void Paroi_std_hyd_VEF::compute_omega(double& omega, double yp,
-                                      double u_star, double d_visco,
-                                      double dist)
+void Paroi_std_hyd_VEF::compute_omega(double& omega, const double yp,
+                                      const double u_star, const double d_visco,
+                                      const double dist)
 {
   // cAlan: à mutualiser avec le calcul du k_omega de Multiphase
   const double w_vis = 6.*d_visco/(BETA_OMEGA*dist*dist);
@@ -1833,8 +1852,9 @@ void Paroi_std_hyd_VEF::compute_omega(double& omega, double yp,
   omega = blending*w_1 + (1 - blending)*w_2;
 }
 
-int Paroi_std_hyd_VEF::calculer_k_eps(double& k, double& eps , double yp, double u_star,
-                                      double d_visco, double dist)
+int Paroi_std_hyd_VEF::calculer_k_eps(double& k, double& eps ,
+                                      const double yp, const double u_star,
+                                      const double d_visco, const double dist)
 {
   // PQ : 05/04/07 : formulation continue de k et epsilon
   //  assurant le bon comportement asymptotique
@@ -1868,20 +1888,22 @@ void Paroi_std_hyd_VEF::compute_k_omega(double& k, double& omega,
   return;
 }
 
-double Paroi_std_hyd_VEF::calculer_u_plus(const int ind_face,const double u_plus_d_plus,const double erugu)
+double Paroi_std_hyd_VEF::calculer_u_plus(const int ind_face,
+                                          const double u_plus_d_plus,
+                                          const double erugu)
 {
   // PQ : 05/04/07 : formulation continue de la loi de paroi
   // construite d'apres la loi de Reichardt
 
-  if(u_plus_d_plus<1.) return sqrt(u_plus_d_plus); // pour eviter de faire tourner la procedure iterative
+  if(u_plus_d_plus < 1.)
+    return sqrt(u_plus_d_plus); // pour eviter de faire tourner la procedure iterative
 
 
   double u_plus = u_plus_d_plus/100.;
-  double r      = 1.;
-  const double seuil  = 0.001;
-  int    iter   = 0;
-  const int    itmax  = 25;
-
+  double r = 1.;
+  const double seuil = 0.001;
+  int iter = 0;
+  const int itmax  = 25;
   const double A = (1/Kappa)*log(erugu/Kappa) ; //  (=7.44, contre 7.8 dans la loi d'origine)
   //  permettant d'avoir en l'infini la loi de
   //  Reichardt se calant sur : u+ = (1/Kappa).ln(Erugu.y+)

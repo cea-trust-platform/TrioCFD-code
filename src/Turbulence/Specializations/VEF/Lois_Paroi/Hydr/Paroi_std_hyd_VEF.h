@@ -69,11 +69,11 @@ public:
   virtual int calculer_k_eps(double& , double& , double , double , double , double);
 
   //
-  void compute_k(double& k, double yp, double u_star);
-  void compute_epsilon(double& epsilon, double yp, double u_star, double d_visco);
-  void compute_omega(double& omega, double yp, double u_star, double d_visco, double dist);
-  void compute_k_epsilon(double& k, double& epsilon, double yplus, double u_star, double d_visco, double dist);
-  void compute_k_omega(double& k, double& omega, double yplus, double u_star, double d_visco, double dist);
+  void compute_k(double& k, const double yp, const double u_star);
+  void compute_epsilon(double& epsilon, const double yp, const double u_star, const double d_visco);
+  void compute_omega(double& omega, const double yp, const double u_star, const double d_visco, const double dist);
+  void compute_k_epsilon(double& k, double& epsilon, const double yplus, const double u_star, const double d_visco, const double dist);
+  void compute_k_omega(double& k, double& omega, const double yplus, const double u_star, const double d_visco, const double dist);
 
 
 
