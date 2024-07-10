@@ -87,6 +87,12 @@ VAHL_DAVIS_TSM
 VEF_diffusion_P0_turbulent_stab
 WALE_Canal_VDF
 Wale_Prdt_Dyn
+VDF_KEPS_realisable
+VDF_KEPS_standard
+VEF_KEPS_realisable
+VEF_KEPS_standard
+VEF_KOMEGA_SST
+VEF_KOMEGA_standard
 3D_P0P1Pa_perio
 Boundary_field_keps_from_ud
 Canal_perio_3D
