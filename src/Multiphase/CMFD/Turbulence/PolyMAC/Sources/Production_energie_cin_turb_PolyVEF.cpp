@@ -70,6 +70,7 @@ void Production_energie_cin_turb_PolyVEF::ajouter_blocs(matrices_t matrices, Dou
 
   const Loi_paroi_base& lp = ref_cast(Loi_paroi_base, pb.get_correlation("Loi_paroi").valeur());
   double limiter_ = visc_turb.limiteur();
+  int c_nu = nu.dimension_tot(0) == 1;
 
   if (Type_diss == "")
     {
@@ -105,11 +106,11 @@ void Production_energie_cin_turb_PolyVEF::ajouter_blocs(matrices_t matrices, Dou
             int floc, cloc;
             for (cloc = 0 ; cloc < e_f.dimension(1) && (floc = e_f(e, cloc)) >= 0 ; cloc++)
               if (lp.get_utau(floc) > utau) utau = lp.get_utau(floc), yloc = domaine.dist_face_elem0(floc,e);
-            if      (Type_diss == "tau")   nut_p = pk(e, n) * (*pdiss)(e, n) + limiter_ * nu(e, n);
-            else if (Type_diss == "omega") nut_p = pk(e, n) / std::max((*pdiss)(e, n), omega_min_) + limiter_ * nu(e, n);
+            if      (Type_diss == "tau")   nut_p = pk(e, n) * (*pdiss)(e, n) + limiter_ * nu(!c_nu * e, n);
+            else if (Type_diss == "omega") nut_p = pk(e, n) / std::max((*pdiss)(e, n), omega_min_) + limiter_ * nu(!c_nu * e, n);
             else Process::exit(que_suis_je() + " : ajouter_blocs : probleme !!!") ;
 
-            fac += 0.5 * std::pow(utau,4)/(nut_p*nut_p) * pe(e) * ve(e) * std::tanh( std::pow(1./80. * utau*yloc/nu(e,n), 3) ) ;
+            fac += 0.5 * std::pow(utau,4)/(nut_p*nut_p) * pe(e) * ve(e) * std::tanh( std::pow(1./80. * utau*yloc/nu(!c_nu * e,n), 3) ) ;
 
             if (Type_diss == "tau")
               {
@@ -123,12 +124,11 @@ void Production_energie_cin_turb_PolyVEF::ajouter_blocs(matrices_t matrices, Dou
               }
             else if (Type_diss == "omega")
               {
-                secmem(e, n) += fac * k(e, n) / (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
+                secmem(e, n) += fac * k(e, n) / std::max((*pdiss)(e, n), omega_min_);
                 for (auto &&i_m : matrices)
                   {
                     Matrice_Morse& mat = *i_m.second;
-                    if (i_m.first == "omega")     mat(N * e + n,  N * e + n) += fac * k(e,n) / ((*pdiss)(e, n)*(*pdiss)(e, n));
-                    if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * 1./ (*pdiss)(e, n)*(2-(*diss)(e, n)/(*pdiss)(e, n)) ;
+                    if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac / std::max((*pdiss)(e, n), omega_min_);
                   }
               }
           }
