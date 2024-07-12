@@ -157,7 +157,7 @@ Lire pb
 					pression elem
                     k elem
                     omega elem
-                    nu_turb elem
+                    NU_TURBULENTE elem
                     omega_residu elem
                     k_residu elem
                     vitesse_residu elem
