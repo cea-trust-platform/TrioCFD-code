@@ -131,7 +131,7 @@ void Flux_parietal_OSV_lineaire::qp(const input_t& in, output_t& out) const
                 {
 
                   // Flux monophasique maximal
-                  const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
+                  const Loi_paroi_base& corr_loi_paroi = ref_cast(Loi_paroi_base, correlation_loi_paroi_.valeur());
                   const double u_tau = corr_loi_paroi.get_utau(in.f);
                   double theta_plus = std::max( 1., beta_ + 2.12 * std::log( corr_loi_paroi.get_y_plus(in.f) ) );
                   double h_mono_max = in.rho[0] * in.Cp[0] * u_tau / theta_plus ; // Cf flux parietal adaptatif

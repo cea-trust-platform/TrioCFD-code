@@ -39,7 +39,7 @@ void Flux_parietal_adaptatif::completer()
 
 void Flux_parietal_adaptatif::qp(const input_t& in, output_t& out) const
 {
-  const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur());
+  const Loi_paroi_base& corr_loi_paroi = ref_cast(Loi_paroi_base, correlation_loi_paroi_.valeur());
   const double u_tau = corr_loi_paroi.get_utau(in.f);
 
   double theta_plus = calc_theta_plus(in.y, u_tau, in.mu[0], in.lambda[0], in.rho[0], in.Cp[0], in.D_h),

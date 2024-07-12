@@ -68,7 +68,7 @@ void Cond_lim_omega_dix::completer()
 
 void Cond_lim_omega_dix::me_calculer()
 {
-  Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur());
+  Loi_paroi_base& corr_loi_paroi = ref_cast(Loi_paroi_base, correlation_loi_paroi_.valeur());
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&      nu_visc = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_pas_de_temps().passe();
