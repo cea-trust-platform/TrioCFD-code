@@ -38,12 +38,10 @@ public:
   void eddy_viscosity(DoubleTab& nu_t) const override;
   void reynolds_stress(DoubleTab& R_ij) const override;
   void k_over_eps(DoubleTab& k_sur_eps) const override;
-  inline double limiteur() const {return limiter_;};
   int gradu_required() const override {  return 1; };
   void eps(DoubleTab& eps) const override;
 
 private:
-  double limiter_ = 0.0; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, nu_visc * limiter_) ; a 0. par defaut car il y en a deja un pour la SPT
   double gamma_ = 1.; // rapport d'aspect moyen des bulles ; mis sous forme de daouble pour le moment ; possibilite d'ajouter une fermeture a l'avenir
 };
 

@@ -39,6 +39,7 @@ Sortie& Viscosite_turbulente_sato::printOn(Sortie& os) const
 Entree& Viscosite_turbulente_sato::readOn(Entree& is)
 {
   Param param(que_suis_je());
+  set_param(param);
   param.ajouter("coef_sato", &coef_sato);
   param.lire_avec_accolades_depuis(is);
 

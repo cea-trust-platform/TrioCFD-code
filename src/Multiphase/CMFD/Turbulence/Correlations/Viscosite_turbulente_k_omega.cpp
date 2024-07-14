@@ -39,7 +39,7 @@ Sortie& Viscosite_turbulente_k_omega::printOn(Sortie& os) const
 Entree& Viscosite_turbulente_k_omega::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("limiter|limiteur", &limiter_); // XD_ADD_P chaine not_set
+  set_param(param);
   param.ajouter("sigma", &sigma_); // XD_ADD_P floattant not_set
   param.ajouter("beta_k", &beta_k_); // XD_ADD_P floattant not_set
   param.ajouter("gas_turb", &gas_turb_); // XD_ADD_P flag not_set
@@ -72,10 +72,7 @@ void Viscosite_turbulente_k_omega::eddy_viscosity(DoubleTab& nu_t) const
   //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
   for (int i = 0; i < nu_t.dimension(0); i++)
     for (int n = 0; n < nu_t.dimension(1); n++)
-      //      nu_t(i, n) = sigma_ * ( (omega(i,n*(k.dimension(1)-1)) > 0.) ?
-      //                   std::max(k(i, n*(k.dimension(1)-1)) / omega(i, n*(k.dimension(1)-1)), limiter_ * nu(i, n)):
-      //                   limiter_ * nu(i, n) )  ;
-      nu_t(i, n) = (n<k.dimension(1)) ? sigma_ * ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(!cnu * i, n)): limiter_ * nu(!cnu * i, n) ) : 0. ;
+      nu_t(i, n) = (n<k.dimension(1)) ? sigma_ * ( (omega(i,n) > 0.) ? std::min(std::max(k(i, n) / omega(i, n), min_ev_ratio_ * nu(!cnu * i, n)), max_ev_ratio_ * nu(!cnu * i, n)) : min_ev_ratio_ * nu(!cnu * i, n) ) : 0. ;
 
   if (gas_turb_ && has_been_completer)
     {
@@ -106,7 +103,7 @@ void Viscosite_turbulente_k_omega::reynolds_stress(DoubleTab& R_ij) const // Ren
     for (n = 0; n < N; n++)
       {
         double sum_diag = 0.;
-        double nut_loc = n < Nk ? (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(!cnu * i, n)): limiter_ * nu(!cnu * i, n) : 0 ;
+        double nut_loc = n >= Nk ? 0 : omega(i,n) > 0 ? std::min(std::max(k(i, n) / omega(i, n), min_ev_ratio_ * nu(!cnu * i, n)), max_ev_ratio_ * nu(!cnu * i, n)) : min_ev_ratio_ * nu(!cnu * i, n);
         for (d = 0; d < D; d++) sum_diag += gu(i, d, D * n + d) ;
         for (d = 0; d < D; d++)
           for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k

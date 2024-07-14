@@ -41,12 +41,10 @@ public:
   void reynolds_stress(DoubleTab& R_ij) const override;
   void k_over_eps(DoubleTab& k_sur_eps) const override;
   void eps(DoubleTab& eps) const override;
-  inline double limiteur() const {return limiter_;};
   int gradu_required() const override {  return 1; };
   void completer() override ;
 
 private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k / omega, 0.01 * limiter_)
   double sigma_ = 1.;
   double beta_k_ = 0.09;
   int    gas_turb_ = 0 ; // Si 0, pas de turbulence dans la phase gazeuse ; si 1, il y en a
