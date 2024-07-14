@@ -62,7 +62,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
   int N = equation().inconnue()->valeurs().line_size();
   int e, n;
 
-  double limiter_ = visc_turb.limiteur();
+  double limiter_ = visc_turb.min_ev_ratio();
   double nut_l = -10000., fac;
 
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),

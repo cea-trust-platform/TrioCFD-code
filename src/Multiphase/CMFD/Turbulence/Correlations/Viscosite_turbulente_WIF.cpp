@@ -37,7 +37,7 @@ Sortie& Viscosite_turbulente_WIF::printOn(Sortie& os) const
 Entree& Viscosite_turbulente_WIF::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("limiter|limiteur", &limiter_);
+  set_param(param);
   param.ajouter("rapport_aspect_moyen|average_aspect_ratio", &gamma_);
   param.lire_avec_accolades_depuis(is);
   return is;

@@ -36,7 +36,7 @@ Sortie& Viscosite_turbulente_WIT::printOn(Sortie& os) const
 Entree& Viscosite_turbulente_WIT::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("limiter|limiteur", &limiter_);
+  set_param(param);
   param.lire_avec_accolades_depuis(is);
   return is;
 }

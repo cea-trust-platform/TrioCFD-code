@@ -138,23 +138,23 @@ void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, Dou
       {
         if (Type_diss == "tau")
           {
-            double inv_tau = (k(e, mk) * diss(e, mk) > visc_turb.limiteur() * nu(!cnu * e, mk))
+            double inv_tau = (k(e, mk) * diss(e, mk) > visc_turb.min_ev_ratio() * nu(!cnu * e, mk))
                              ? 1./diss(e,mk)
-                             : k(e, mk) / (visc_turb.limiteur() * nu(!cnu * e, mk)) ;
+                             : k(e, mk) / (visc_turb.min_ev_ratio() * nu(!cnu * e, mk)) ;
             secmem(e, mk) -= pe(e) * ve(e) * beta_k * alpha_rho_k(e,mk) * inv_tau;
             if (!(Ma==nullptr)) 	(*Ma)(Nk * e + mk, Na * e + mk)   	  += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("alpha") ?       der_alpha_rho_k.at("alpha")(e,mk) : 0 )        * inv_tau;	// derivee en alpha
             if (!(Mt==nullptr)) 	(*Mt)(Nk * e + mk, Nt * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("temperature") ? der_alpha_rho_k.at("temperature")(e, mk) : 0 ) * inv_tau;	// derivee par rapport a la temperature
             if (!(Mp==nullptr)) 	(*Mp)(Nk * e + mk, Np * e + mp)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("pression") ?    der_alpha_rho_k.at("pression")(e, mp) : 0 )    * inv_tau;		// derivee par rapport a la pression
             if (!(Mk==nullptr))
               {
-                if (k(e, mk) * diss(e,mk) > visc_turb.limiteur() * nu(!cnu * e, mk))
+                if (k(e, mk) * diss(e,mk) > visc_turb.min_ev_ratio() * nu(!cnu * e, mk))
                   (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : 0 ) * inv_tau; // derivee en k ; depend de l'activation ou non du limiteur
                 else
-                  (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * 2 * beta_k * alpha_rho_k(e, mk) / (visc_turb.limiteur() * nu(!cnu * e, mk)); // derivee en k
+                  (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * 2 * beta_k * alpha_rho_k(e, mk) / (visc_turb.min_ev_ratio() * nu(!cnu * e, mk)); // derivee en k
               }
             if (!(Mdiss==nullptr))
               {
-                if ( k(e, mk) * diss(e,mk) > visc_turb.limiteur() * nu(!cnu * e, mk))
+                if ( k(e, mk) * diss(e,mk) > visc_turb.min_ev_ratio() * nu(!cnu * e, mk))
                   (*Mdiss)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * alpha_rho_k(e, mk) * (-1)/(diss(e,mk)*diss(e,mk)); // derivee en tau  ; depend de l'activation ou non du limiteur
                 else
                   (*Mdiss)(Nk * e + mk, Nk * e + mk)       += 0*pdiss(e, mk);

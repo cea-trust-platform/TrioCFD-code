@@ -113,7 +113,7 @@ void Coalescence_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, D
   const Op_Diff_Turbulent_PolyMAC_P0_Face& op_diff 	= ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, equation().probleme().equation(0).operateur(0).l_op_base());
   const Viscosite_turbulente_base&   	visc_turb 		= ref_cast(Viscosite_turbulente_base, op_diff.correlation().valeur());
   visc_turb.eps(epsilon);  // Epsilon is in the past
-  double limiter = visc_turb.limiteur(), dh = 0;
+  double limiter = visc_turb.min_ev_ratio(), dh = 0;
 
   Matrice_Morse  *Ma = matrices.count("alpha") ? matrices.at("alpha") : nullptr,
                   *Mk = matrices.count("k") ? matrices.at("k") : nullptr,

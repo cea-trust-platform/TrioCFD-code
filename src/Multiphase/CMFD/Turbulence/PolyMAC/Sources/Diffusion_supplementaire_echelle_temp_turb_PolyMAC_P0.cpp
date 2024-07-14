@@ -34,12 +34,14 @@
 #include <Matrix_tools.h>
 #include <Array_tools.h>
 #include <Dirichlet.h>
+#include <Synonyme_info.h>
 
 #include <cmath>
 #include <vector>
 
 Implemente_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0,"Diffusion_supplementaire_lin_echelle_temp_turb_Elem_PolyMAC_P0|Diffusion_supplementaire_echelle_temp_turb_Elem_PolyMAC_P0", Source_Diffusion_supplementaire_echelle_temp_turb);
-
+Add_synonym(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0, "Diffusion_supplementaire_lin_echelle_temp_turb_Elem_PolyVEF_P0");
+Add_synonym(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0, "Diffusion_supplementaire_echelle_temp_turb_Elem_PolyVEF_P0");
 Sortie& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::printOn(Sortie& os) const {  return Source_Diffusion_supplementaire_echelle_temp_turb::printOn(os);}
 
 Entree& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::readOn(Entree& is) { return Source_Diffusion_supplementaire_echelle_temp_turb::readOn(is);}
