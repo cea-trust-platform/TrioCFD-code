@@ -1,0 +1,127 @@
+# Turbulent flow around 2 dimension cylinder at Re~17054 #
+dimension 2
+Pb_hydraulique_turbulent pb
+Domaine dom
+
+# Read the mesh #
+# BEGIN MESH #
+Mailler dom
+{
+  Pave bloc
+  {
+    Origine 0. 0.
+    Longueurs 1 1
+    Nombre_de_Noeuds 5 5
+    Facteurs 1. 1.
+  }
+  {
+    /* Definition and names of boundary conditions */
+    bord INLET  X = 0.   0. <= Y <= 1
+    bord WALL1  Y = 1.   0. <= X <= 1
+    bord WALL2  Y = 0.   0. <= X <= 1
+    bord OUTLT  X = 1.   0. <= Y <= 1
+  }
+}
+trianguler_h dom
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+  Partitionneur metis { Nb_parts 2 }
+  Larg_joint 2
+  Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+Schema_euler_explicite sch
+Read sch
+{
+  tinit 0.
+  nb_pas_dt_max 2
+  /* tinit important pour generation NR */
+  tmax 1
+  seuil_statio -1
+  residuals { relative 1 }
+  dt_impr 1.e0
+  facsec 1.
+}
+
+
+Associate pb dom
+Associate pb sch
+
+VEFPreP1B dis
+Discretize pb dis
+
+Read pb
+{
+
+  fluide_incompressible {
+    mu Champ_Uniforme 1 0.00129
+    rho Champ_Uniforme 1 1000.
+  }
+
+  Navier_Stokes_Turbulent
+  {
+    solveur_pression petsc cholesky { }
+    convection { ef_stab { alpha 0.2 } }
+    diffusion { }
+    conditions_initiales
+    {
+      vitesse Champ_Fonc_xyz dom 2 0.44 0.01*sin(x)
+    }
+    boundary_conditions
+    {
+      WALL1 paroi_fixe
+      WALL2 paroi_fixe
+      INLET frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 0.44 0.
+      OUTLT frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0
+
+    }
+
+    modele_turbulence K_Omega {
+      model_variant std
+      Transport_K_Omega
+      {
+        convection { amont }
+        diffusion { negligeable }
+        boundary_conditions {
+          WALL1 paroi
+          WALL2 paroi
+          INLET frontiere_ouverte_K_omega_impose Champ_front_Uniforme 2 .00004356 3.31439394
+          OUTLT frontiere_ouverte K_OMEGA_EXT Champ_Front_Uniforme 2 .00004356 3.31439394
+        }
+        conditions_initiales { k_omega Champ_Uniforme 2 .00004356 3.31439394 }
+      }
+      turbulence_paroi loi_standard_hydr
+    }
+  }
+  Postraitement
+  {
+    Sondes
+    {
+      sonde_pression pression periode 1.e-10 points 2 0. 0. 0. 1.
+    }
+
+    Format lata
+    Champs dt_post 1
+    {
+      vitesse elem
+      vitesse som
+      pression_pa elem
+      y_plus elem
+      viscosite_turbulente elem
+      k elem
+      omega elem
+    }
+  }
+}
+
+Solve pb
+End
