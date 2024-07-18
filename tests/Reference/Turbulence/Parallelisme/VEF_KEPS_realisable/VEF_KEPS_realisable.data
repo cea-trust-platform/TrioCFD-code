@@ -1,4 +1,5 @@
 # Turbulent flow around 2 dimension cylinder at Re~17054 #
+# PARALLEL OK 2 #
 dimension 2
 Pb_hydraulique_turbulent pb
 Domaine dom
@@ -109,7 +110,7 @@ Read pb
       sonde_pression pression periode 1.e-10 points 2 0. 0. 0. 1.
     }
 
-    Format lata
+    Format lml
     Champs dt_post 1
     {
       vitesse elem
