@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.5_beta : Enhancements, modifications and corrected bugs since version 1.9.4 :
 --------------------------------------------------------------------------------------------------
-
+18/07/24 (TrioCFD) Bug fix     : Turbulence - Fix a bug for k-omega which introduces differences between sequential and parallel calculation
+04/07/24 (TrioCFD) Bug fix     : FT IJK - stat_diph_gradUP_jdd1 test case in debug mode
 
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.4 : Enhancements, modifications and corrected bugs since version 1.9.3 :
