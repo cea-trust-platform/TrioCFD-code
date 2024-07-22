@@ -73,6 +73,18 @@ paroi_tble turbulence_paroi_base paroi_tble 1 Keyword for the Thin Boundary Laye
   attr sans_source_boussinesq rien sans_source_boussinesq 1 not_set
   attr alpha floattant alpha 1 not_set
   attr kappa floattant kappa 1 not_set
+fourfloat objet_lecture nul 0 Four reals.
+  attr a floattant a 0 First real.
+  attr b floattant b 0 Second real.
+  attr c floattant c 0 Third real.
+  attr d floattant d 0 Fourth real.
+twofloat objet_lecture nul 0 two reals.
+  attr a floattant a 0 First real.
+  attr b floattant b 0 Second real.
+sonde_tble objet_lecture nul 0 not_set
+  attr name chaine name 0 not_set
+  attr point un_point point 0 not_set
+liste_sonde_tble listobj nul 0 sonde_tble 0 not_set
 paroi_tble_scal turbulence_paroi_scalaire_base paroi_tble_scal 1 Keyword for the Thin Boundary Layer Equation thermal wall-model.
   attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
   attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
@@ -152,6 +164,7 @@ paroi_ft_disc_constant paroi_ft_disc_deriv constant 0 condition contact angle fi
   attr ch front_field_base ch 0 Boundary field type.
 paroi_echange_contact_vdf_ft paroi_echange_contact_vdf paroi_echange_contact_vdf_ft -1 This boundary condition is used between a conduction problem and a thermohydraulic problem with two phases flow (Front-Tracking method) to modelize heat exchange.
 milieu_v2_base objet_u milieu_v2_base -1 Basic class for medium (physics properties of medium) composed of constituents (fluids and solids).
+methode_transport_deriv objet_lecture methode_transport_deriv 0 Basic class for method of transport of interface.
 vitesse_imposee methode_transport_deriv vitesse_imposee -1 Class to specify that the speed of displacement of the nodes of the interfaces is imposed with an analytical formula.
   attr val listchainef val 0 Analytical formula.
 vitesse_interpolee methode_transport_deriv vitesse_interpolee -1 Class to specify that the interpolation will use the velocity field of the Navier-Stokes equation named val to compute the speed of displacement of the nodes of the interfaces.
@@ -338,4 +351,3 @@ contact_vdf_vef condlim_base contact_vdf_vef 0 Boundary condition in the case of
   attr champ front_field_base champ 0 Boundary field type.
 contact_vef_vdf condlim_base contact_vef_vdf 0 Boundary condition in the case of two problems (VEF -> VDF).
   attr champ front_field_base champ 0 Boundary field type.
-
