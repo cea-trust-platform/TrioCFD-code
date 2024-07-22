@@ -115,6 +115,8 @@ source_transport_k_eps_aniso_therm_concen source_transport_k_eps source_transpor
   attr c3_eps floattant c3_eps 1 Third constant.
 frontiere_ouverte_k_eps_impose condlim_base frontiere_ouverte_k_eps_impose -1 Turbulence condition imposed on an open boundary called bord (edge) (this situation corresponds to a fluid inlet). This condition must be associated with an imposed inlet velocity condition.
   attr ch front_field_base ch 0 Boundary field type.
+frontiere_ouverte_k_omega_impose condlim_base frontiere_ouverte_k_omega_impose -1 Turbulence condition imposed on an open boundary called bord (edge) (this situation corresponds to a fluid inlet). This condition must be associated with an imposed inlet velocity condition.
+  attr ch front_field_base ch 0 Boundary field type.
 boundary_field_uniform_keps_from_ud front_field_base boundary_field_uniform_keps_from_ud 1 field which allows to impose on a boundary K and EPS values derived from U velocity and D hydraulic diameter
   attr u floattant u 0 value of velocity
   attr d floattant d 0 value of hydraulic diameter
@@ -351,3 +353,5 @@ contact_vdf_vef condlim_base contact_vdf_vef 0 Boundary condition in the case of
   attr champ front_field_base champ 0 Boundary field type.
 contact_vef_vdf condlim_base contact_vef_vdf 0 Boundary condition in the case of two problems (VEF -> VDF).
   attr champ front_field_base champ 0 Boundary field type.
+methode_loi_horaire methode_transport_deriv loi_horaire -1 not_set
+  attr nom_loi ref_loi_horaire nom_loi 0 not_set
