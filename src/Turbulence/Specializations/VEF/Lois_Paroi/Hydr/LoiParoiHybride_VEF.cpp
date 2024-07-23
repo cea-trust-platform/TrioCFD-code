@@ -35,12 +35,12 @@ Sortie& LoiParoiHybride_VEF::printOn(Sortie& s) const
 
 Entree& LoiParoiHybride_VEF::readOn(Entree& s)
 {
-  const int nbord = le_dom_VEF.valeur().nb_front_Cl();
+  const int nbord = le_dom_VEF->nb_front_Cl();
   Noms noms(nbord);
   for (int ibord=0; ibord<nbord; ibord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(ibord);
-      noms[ibord] = la_cl.valeur().frontiere_dis().le_nom();
+      noms[ibord] = la_cl->frontiere_dis().le_nom();
     }
 
   LoiParoiHybride::lire(s,noms, mon_modele_turb_hyd.valeur());

@@ -407,7 +407,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calculer_grad_teta(const DoubleVect& te
       grad_teta_face(face) = (teta(n1) - teta(n0)) / (xp(n1, ori) - xp(n0, ori));
     }
   //Calcul du gradient aux elements
-  const IntTab& elem_faces = le_dom_VDF.valeur().elem_faces();
+  const IntTab& elem_faces = le_dom_VDF->elem_faces();
   int num0, num1, num2, num3, num4, num5;
   for (element_number = 0; element_number < nb_elem; element_number++)
     {

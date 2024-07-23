@@ -39,7 +39,7 @@ void Source_Transport_Eps_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
   Source_Transport_VDF_Elem_base::associer_pb(pb);
   mon_eq_transport_Eps = ref_cast(Transport_K_ou_Eps,equation());
-  mon_eq_transport_K = ref_cast(Transport_K_ou_Eps, mon_eq_transport_Eps.valeur().modele_turbulence().eqn_transp_K());
+  mon_eq_transport_K = ref_cast(Transport_K_ou_Eps, mon_eq_transport_Eps->modele_turbulence().eqn_transp_K());
 }
 
 const DoubleTab& Source_Transport_Eps_VDF_Elem::get_visc_turb() const

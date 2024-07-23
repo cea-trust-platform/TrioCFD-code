@@ -51,7 +51,7 @@ Entree& Source_Production_echelle_temp_taux_diss_turb::readOn(Entree& is)
 void Source_Production_echelle_temp_taux_diss_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const DoubleTab& k 	 = equation().inconnue().valeur().valeurs();
+  const DoubleTab& k 	 = equation().inconnue()->valeurs();
   const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = k.line_size();
 
   std::string Type_diss = ""; // omega or tau dissipation

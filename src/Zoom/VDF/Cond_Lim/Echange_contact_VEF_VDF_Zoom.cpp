@@ -132,7 +132,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
 
 
 
-      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() =="Raccord_distant_homogene")
         {
           //POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!
           Cerr<<"POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!"<<finl;

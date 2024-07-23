@@ -38,7 +38,7 @@ void Source_Transport_K_VEF_Face::associer_pb(const Probleme_base& pb)
 {
   Source_Transport_VEF_Face_base::associer_pb(pb);
   mon_eq_transport_K = ref_cast(Transport_K_ou_Eps, equation());
-  mon_eq_transport_Eps = ref_cast(Transport_K_ou_Eps, mon_eq_transport_K.valeur().modele_turbulence().eqn_transp_Eps());
+  mon_eq_transport_Eps = ref_cast(Transport_K_ou_Eps, mon_eq_transport_K->modele_turbulence().eqn_transp_Eps());
 }
 
 const DoubleTab& Source_Transport_K_VEF_Face::get_visc_turb() const
@@ -73,7 +73,7 @@ void Source_Transport_K_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, cons
 const Nom Source_Transport_K_VEF_Face::get_type_paroi() const
 {
   const Modele_turbulence_hyd_K_Eps_Bicephale& mod  = ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence());
-  return mod.loi_paroi().valeur().que_suis_je();
+  return mod.loi_paroi()->que_suis_je();
 }
 
 void Source_Transport_K_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco_turb, const DoubleTab& gradient_elem, DoubleTab& Re) const

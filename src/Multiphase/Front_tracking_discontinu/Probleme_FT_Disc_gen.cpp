@@ -322,7 +322,7 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
 
   if (la_chimie_.non_nul())
     {
-      dt = std::min(dt, la_chimie_.valeur().calculer_pas_de_temps());
+      dt = std::min(dt, la_chimie_->calculer_pas_de_temps());
       dt = mp_min(dt);
     }
   return dt;
@@ -343,7 +343,7 @@ void Probleme_FT_Disc_gen::mettre_a_jour(double temps)
       Pb_Fluide_base::mettre_a_jour(temps);
     }
   if (la_chimie_.non_nul())
-    la_chimie_.valeur().mettre_a_jour(temps);
+    la_chimie_->mettre_a_jour(temps);
 }
 
 void Probleme_FT_Disc_gen::completer(void)
@@ -352,8 +352,8 @@ void Probleme_FT_Disc_gen::completer(void)
 
   if (la_chimie_.non_nul())
     {
-      la_chimie_.valeur().discretiser(*this); /* XXX : Elie Saikali : j'ai retarde ca et mis ici ... */
-      la_chimie_.valeur().completer(*this);
+      la_chimie_->discretiser(*this); /* XXX : Elie Saikali : j'ai retarde ca et mis ici ... */
+      la_chimie_->completer(*this);
     }
 
   if (tcl_.is_activated()) tcl_.completer();

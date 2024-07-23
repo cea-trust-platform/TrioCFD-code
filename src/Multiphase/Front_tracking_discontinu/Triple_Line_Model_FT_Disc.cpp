@@ -228,12 +228,12 @@ void Triple_Line_Model_FT_Disc::initialize()
   // So we do it in the completer.
 
   // how to access fluid diphasique? Through (eq_ns or pb)? We have ns.
-  // const Milieu_base& milieu = ref_eq_temp_.valeur().milieu();
+  // const Milieu_base& milieu = ref_eq_temp_->milieu();
   // const Fluide_Diphasique& fluid_dipha = ref_cast(Fluide_Diphasique, milieu); -> no it's not a Fluide_diphasique
   // Or maybe we can give access to fluide_dipha_ from Convection_Diffusion_Temperature_FT_Disc.
   //
-  // int phase = ref_eq_temp_.valeur().get_phase();
-  // L_vap_ = fluide_dipha.valeur().chaleur_latente();
+  // int phase = ref_eq_temp_->get_phase();
+  // L_vap_ = fluide_dipha->chaleur_latente();
 
   // We may compute the true position here for old_xcl_
   // All of (integration_time_, instant_m_evap_, instant_vmicro_evap_, instant_vmeso_evap_,
@@ -267,7 +267,7 @@ int Triple_Line_Model_FT_Disc::get_any_tcl_face() const
 void Triple_Line_Model_FT_Disc::completer()
 {
   // Via the temperature transport equation, we directly get access to a Fluide_Incompressible:
-  const Milieu_base& milieu = ref_eq_temp_.valeur().milieu();
+  const Milieu_base& milieu = ref_eq_temp_->milieu();
   kl_cond_ = milieu.conductivite()(0,0);
   rhocpl_ =  milieu.masse_volumique()(0,0) * milieu.capacite_calorifique()(0,0);
 
@@ -369,8 +369,8 @@ void Triple_Line_Model_FT_Disc::completer()
   // const Fluide_Diphasique& fluid_dipha = ref_cast(Fluide_Diphasique, milieu); -> no it's not a Fluide_diphasique
   // Or maybe we can give access to fluide_dipha_ from Convection_Diffusion_Temperature_FT_Disc.
   //
-  // int phase = ref_eq_temp_.valeur().get_phase();
-  // L_vap_ = fluide_dipha.valeur().chaleur_latente();
+  // int phase = ref_eq_temp_->get_phase();
+  // L_vap_ = fluide_dipha->chaleur_latente();
 
   // We may compute the true position here for old_xcl_
   // All of (integration_time_, instant_m_evap_, instant_vmicro_evap_, instant_vmeso_evap_,
@@ -727,11 +727,11 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Domaine_VDF& zvdf, const
   in_out(1,1) = yr;
 }
 
-// const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_.valeur().domaine_dis().valeur());
+// const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis().valeur());
 // const IntTab& faces_elem = domaine_vf.face_voisins();
 // // One of the neighbours doesnot exist so it has "-1". We get the other elem by:
 // const int elem = faces_elem(num_face, 0) + faces_elem(num_face, 1) +1;
-//  const double d = compute_distance(ref_cast(Domaine_VF, ref_eq_temp_.valeur().domaine_dis().valeur()),
+//  const double d = compute_distance(ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis().valeur()),
 //                   num_face, elem);
 //
 // Computes the distance between a face centre and an element centre.
@@ -774,7 +774,7 @@ double Triple_Line_Model_FT_Disc::compute_Qint(const DoubleTab& in_out, const do
   const double yr = in_out(1,1);
   double Twall = 0.;
   double flux = 0.;
-  ref_eq_temp_.valeur().get_flux_and_Twall(num_wall_face, flux, Twall);
+  ref_eq_temp_->get_flux_and_Twall(num_wall_face, flux, Twall);
 
   const double ytop = std::fmax(yr,yl);
   const double ybot = std::fmin(yr,yl);
@@ -810,7 +810,7 @@ void Triple_Line_Model_FT_Disc::compute_approximate_interface_inout(const Domain
       Process::exit();
     }
   in_out.resize(2,dim);
-  const Maillage_FT_Disc& maillage = ref_eq_interf_.valeur().maillage_interface();
+  const Maillage_FT_Disc& maillage = ref_eq_interf_->maillage_interface();
   const IntTab& facettes = maillage.facettes();
   const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
   const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
@@ -1980,7 +1980,7 @@ void Triple_Line_Model_FT_Disc::set_wall_adjacent_temperature_according_to_TCL_m
     {
       const int elem = elems_[idx];
       const int num_face = boundary_faces_[idx];
-      const double Twall =ref_eq_temp_.valeur().get_Twall_at_face(num_face);
+      const double Twall =ref_eq_temp_->get_Twall_at_face(num_face);
       const double DeltaT = TSAT_CONSTANTE-Twall;
       const double Tbefore =  temperature(elem);
       temperature(elem) =Twall + 0.5*DeltaT;
@@ -2017,7 +2017,7 @@ void Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution(DoubleTab& temperat
   const int elem = 0; //closest_liquid_neighbour has to be determined;
   Cerr << "Code unfinished in Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution" << finl;
   Process::exit();
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_.valeur().domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis().valeur());
   const double vol = domaine_vf.volumes(elem);
   // Minus sign because we want to compensate the disequilibrium
   const double deltaT = -disequilibrium/(rhocpl_*vol);
@@ -2026,15 +2026,15 @@ void Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution(DoubleTab& temperat
 
 void Triple_Line_Model_FT_Disc::correct_wall_adjacent_temperature_according_to_TCL_fluxes(DoubleTab& temperature) const
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_.valeur().domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis().valeur());
   const int nb_contact_line_contribution = elems_.size_array();
   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
     {
       const int elem = elems_[idx];
       const int num_face = boundary_faces_[idx];
       double flux=0., Twall=0.;
-      ref_eq_temp_.valeur().get_flux_and_Twall(num_face,
-                                               flux, Twall);
+      ref_eq_temp_->get_flux_and_Twall(num_face,
+                                       flux, Twall);
       temperature(elem) =Twall;
     }
   // MEMO : remove the previous loop if num_faces is computed here.
@@ -2046,7 +2046,7 @@ void Triple_Line_Model_FT_Disc::correct_wall_adjacent_temperature_according_to_T
       // Get the distance between the center of the elem and the given face:
       const double d = compute_distance(domaine_vf, num_face, elem);
       double flux=0., Twall=0.;
-      ref_eq_temp_.valeur().get_flux_and_Twall(num_face, flux, Twall);
+      ref_eq_temp_->get_flux_and_Twall(num_face, flux, Twall);
       // It is the total flux, so It should simply be :
       temperature(elem) = Twall - flux*d/kl_cond_; // Can be done several times, no problem.
     }

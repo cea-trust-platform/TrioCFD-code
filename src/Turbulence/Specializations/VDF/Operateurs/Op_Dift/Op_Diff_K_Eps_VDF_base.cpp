@@ -163,7 +163,7 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
   const Modele_turbulence_hyd& mod_turb = eqn_hydr.modele_turbulence();
   const Turbulence_paroi& loipar = mod_turb.loi_paroi();
 
-  Nom type_loi = loipar.valeur().que_suis_je();
+  Nom type_loi = loipar->que_suis_je();
 
   if ( !(type_loi.debute_par("negligeable")) )
     {
@@ -301,7 +301,7 @@ void Op_Diff_K_Eps_VDF_base::ajouter_blocs(matrices_t matrices, DoubleTab& secme
   statistiques().begin_count(diffusion_counter_);
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
-  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue().valeur().valeurs();
+  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue()->valeurs();
 
   if(mat) iter->ajouter_contribution(inco, *mat);
   mettre_a_jour_diffusivite();

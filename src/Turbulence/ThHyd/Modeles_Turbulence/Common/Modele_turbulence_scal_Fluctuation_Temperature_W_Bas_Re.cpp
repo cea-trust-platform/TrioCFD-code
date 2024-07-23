@@ -79,8 +79,8 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::lire_motcle_non_sta
         Cerr << "Lecture du modele bas reynolds associe " << finl;
         mon_modele_fonc.associer_eqn(eqn_transport_Fluctu_Temp.valeur());
         s >> mon_modele_fonc;
-        mon_modele_fonc.valeur().discretiser();
-        Cerr << "mon_modele_fonc.que_suis_je() " << mon_modele_fonc.valeur().que_suis_je() << finl;
+        mon_modele_fonc->discretiser();
+        Cerr << "mon_modele_fonc.que_suis_je() " << mon_modele_fonc->que_suis_je() << finl;
         break;
       }
 

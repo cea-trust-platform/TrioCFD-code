@@ -109,7 +109,7 @@ bool Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_echange_ext_FT_TCL(const Ec
   const DoubleTab& donnee = semi_impl.count(nom_ch_inco_) ? semi_impl.at(nom_ch_inco_) : le_champ_convecte_ou_inc->valeurs();
   Type_Double flux(N), aii(N), ajj(N), aef(N);
   int boundary_index = -1;
-  if (le_dom.valeur().front_VF(num_cl).le_nom() == frontiere_dis.le_nom())
+  if (le_dom->front_VF(num_cl).le_nom() == frontiere_dis.le_nom())
     boundary_index = num_cl;
 
   int e, Mv = le_ch_v.non_nul() ? le_ch_v->valeurs().line_size() : N;
@@ -125,7 +125,7 @@ bool Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_echange_ext_FT_TCL(const Ec
 
   for (int face = ndeb; face < nfin; face++)
     {
-      const int local_face = le_dom.valeur().front_VF(boundary_index).num_local_face(face);
+      const int local_face = le_dom->front_VF(boundary_index).num_local_face(face);
       flux_evaluateur.flux_face(donnee, boundary_index, face, local_face, cl, ndeb, flux);
 #if TCL_MODEL
       if (sub_type(Convection_Diffusion_Temperature_FT_Disc, eq) && tcl && tcl->is_activated())
@@ -195,7 +195,7 @@ bool Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_echange_ext_FT_TCL(const Ec
       DoubleTab val_b = use_base_val_b_ ? le_champ_convecte_ou_inc->Champ_base::valeur_aux_bords() : le_champ_convecte_ou_inc->valeur_aux_bords();
       for (int face = ndeb; face < nfin; face++)
         {
-          const int local_face = le_dom.valeur().front_VF(boundary_index).num_local_face(face);
+          const int local_face = le_dom->front_VF(boundary_index).num_local_face(face);
           flux_evaluateur.coeffs_face_bloc_vitesse(donnee, val_b, boundary_index, face, local_face, cl, ndeb, aef);
 
           for (int i = 0; i < 2; i++)
@@ -208,7 +208,7 @@ bool Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_echange_ext_FT_TCL(const Ec
   if (mat || d_cc.size() > 0)
     for (int face = ndeb; face < nfin; face++)
       {
-        const int local_face = le_dom.valeur().front_VF(boundary_index).num_local_face(face);
+        const int local_face = le_dom->front_VF(boundary_index).num_local_face(face);
         flux_evaluateur.coeffs_face(boundary_index, face, local_face, ndeb, cl, aii, ajj);
         fill_coeffs_matrices(face, aii, ajj, mat, d_cc); // XXX : Attention Yannick pour d_cc c'est pas tout a fait comme avant ... N et M ...
       }

@@ -86,7 +86,7 @@ void Transport_K_Omega_base::discretiser_K_Omega(const Schema_Temps_base& sch,
   dis.discretiser_champ("temperature", z.valeur(), multi_scalaire,
                         noms, unit, 2, sch.nb_valeurs_temporelles(),
                         sch.temps_courant(), ch);
-  ch.valeur().nommer("K_Omega");
+  ch->nommer("K_Omega");
 }
 
 // cAlan : Mutualiser dans 2eq. Possibilité de faire un templace pour
@@ -141,7 +141,7 @@ int Transport_K_Omega_base::controler_K_Omega()
           Cerr << "Unsupported K_Omega field in Transport_K_Omega_base::controler_K_Omega()" << finl;
           Process::exit();
         }
-      size = le_champ_K_Omega.valeur().equation().domaine_dis().domaine().nb_elem();
+      size = le_champ_K_Omega->equation().domaine_dis().domaine().nb_elem();
     }
 
   //int size_tot=mp_sum(size);

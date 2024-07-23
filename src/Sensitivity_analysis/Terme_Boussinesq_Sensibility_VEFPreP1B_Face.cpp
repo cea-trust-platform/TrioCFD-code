@@ -156,7 +156,7 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
   else
     assert(0);
 
-  int nb_comp = le_scalaire.valeur().nb_comp(); // Vaut 1 si temperature, nb_constituents si concentration
+  int nb_comp = le_scalaire->nb_comp(); // Vaut 1 si temperature, nb_constituents si concentration
   IntVect les_polygones(nbpts);
   DoubleTab les_positions(nbpts,dimension);
   DoubleTab valeurs_scalaire(nbpts,nb_comp);

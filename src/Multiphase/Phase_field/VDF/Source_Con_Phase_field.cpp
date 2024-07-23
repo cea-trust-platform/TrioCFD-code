@@ -1726,7 +1726,7 @@ void Source_Con_Phase_field::premier_demi_dt()
                      }
 
                    // Resolution:
-                   solveur_.valeur().reinit();
+                   solveur_->reinit();
                    solveur_.resoudre_systeme(matrice_diffusion_CH,second_membre,x1);
 
                    // remplissage des resultats dans mutilde demi et cdemi
@@ -1905,7 +1905,7 @@ void Source_Con_Phase_field::premier_demi_dt()
                 }
 
               // Resolution:
-              solveur_.valeur().reinit();
+              solveur_->reinit();
               solveur_.resoudre_systeme(matrice_diffusion_CH,second_membre,x1);
 
               // remplissage des resultats dans mutilde demi et cdemi
@@ -4808,7 +4808,7 @@ void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& ch
       const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
       const Table& table = ch_champ_fonc_c.table();
       const int isfct = table.isfonction();
-      DoubleTab& mes_valeurs = champ_fonc_c.valeur().valeurs();
+      DoubleTab& mes_valeurs = champ_fonc_c->valeurs();
       // code ci-dessous adapte de Champ_Fonc_Tabule_P0_VDF.mettre_a_jour
       if (!(val_c.nb_dim() == mes_valeurs.nb_dim()))
         {

@@ -122,7 +122,7 @@ int Paroi_std_scal_hyd_EF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = le_modele.loi_paroi();
-  const DoubleVect& tab_u_star = loi.valeur().tab_u_star();
+  const DoubleVect& tab_u_star = loi->tab_u_star();
   const Equation_base& eqn = mon_modele_turb_scal->equation();
   // Recuperation de la diffusivite en fonction du type d'equation:
   int schmidt = (sub_type(Convection_Diffusion_Concentration,eqn) ? 1 : 0);

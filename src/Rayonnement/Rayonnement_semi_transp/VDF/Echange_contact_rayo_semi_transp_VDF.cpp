@@ -93,7 +93,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_temperature_bord(double temp
       T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
       Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
-      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() !="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene")
         verifier_correspondance();
     }
 
@@ -187,12 +187,12 @@ void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
           exit();
         }
 
-      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis().valeur().frontiere_dis(frontiere_dis().le_nom()));
+      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis()->frontiere_dis(frontiere_dis().le_nom()));
       num_premiere_face_dans_pb_fluide=frontvf.num_premiere_face();
 
       Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
-      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() !="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene")
         verifier_correspondance();
     }
 

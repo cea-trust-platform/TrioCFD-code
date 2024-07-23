@@ -58,7 +58,7 @@ static True_int fonction_tri_lexicographique_3_colonnes(const void *ptr1,
 
 void Connectivite_frontieres::remplir_def_face_aretes(const Domaine_VF& domaine_vf)
 {
-  const Nom& nom_elem = domaine_vf.domaine().type_elem().valeur().que_suis_je();
+  const Nom& nom_elem = domaine_vf.domaine().type_elem()->que_suis_je();
 
   // Definition des aretes si la face est un segment
   static const int segment[2][2] = { { 0, -1 },

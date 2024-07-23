@@ -284,8 +284,8 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
       // <REF(Champ_Inc_base)> = <Champ_Inc_base>
       Probleme_base& pb = ref_cast(Probleme_base,pbc.probleme(i));
       inconnues[i] = pb.equation(0).inconnue().valeur();
-      qNSi[i] = inconnues[i].valeur().valeurs();
-      qNSj[i] = inconnues[i].valeur().valeurs();
+      qNSi[i] = inconnues[i]->valeurs();
+      qNSj[i] = inconnues[i]->valeurs();
     }
 
   //ss pas de temps 1
@@ -323,8 +323,8 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
       double accroissement_max_abs=qNSi[i].mp_max_abs_vect();
       set_stationnaire_atteint() *= ( accroissement_max_abs < seuil_statio_ );
 
-      inconnues[i].valeur().futur() = inconnues[i].valeur().valeurs();
-      inconnues[i].valeur().futur().ajoute_sans_ech_esp_virt(b1 * dt_, qNSi[i], VECT_ALL_ITEMS);
+      inconnues[i]->futur() = inconnues[i]->valeurs();
+      inconnues[i]->futur().ajoute_sans_ech_esp_virt(b1 * dt_, qNSi[i], VECT_ALL_ITEMS);
 
       if (pbc.probleme(i).que_suis_je() == "Probleme_FT_Disc_gen")
         {
@@ -368,8 +368,8 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
       Probleme_base& pb = ref_cast(Probleme_base,pbc.probleme(i));
       pb.equation(0).derivee_en_temps_inco(qNSj[i]);
       qNSj[i].ajoute_sans_ech_esp_virt(a2, qNSi[i]);
-      inconnues[i].valeur().futur() = inconnues[i].valeur().valeurs();
-      inconnues[i].valeur().futur().ajoute(b2 * dt_, qNSj[i], VECT_ALL_ITEMS);
+      inconnues[i]->futur() = inconnues[i]->valeurs();
+      inconnues[i]->futur().ajoute(b2 * dt_, qNSj[i], VECT_ALL_ITEMS);
       if (pbc.probleme(i).que_suis_je() == "Probleme_FT_Disc_gen")
         {
           Transport_Interfaces_FT_Disc& equ_int=
@@ -414,8 +414,8 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
       Probleme_base& pb = ref_cast(Probleme_base,pbc.probleme(i));
       pb.equation(0).derivee_en_temps_inco(qNSi[i]);
       qNSi[i].ajoute_sans_ech_esp_virt(a3, qNSj[i], VECT_ALL_ITEMS);
-      inconnues[i].valeur().futur() = inconnues[i].valeur().valeurs();
-      inconnues[i].valeur().futur().ajoute_sans_ech_esp_virt(b3 * dt_, qNSi[i], VECT_ALL_ITEMS);
+      inconnues[i]->futur() = inconnues[i]->valeurs();
+      inconnues[i]->futur().ajoute_sans_ech_esp_virt(b3 * dt_, qNSi[i], VECT_ALL_ITEMS);
       if (pbc.probleme(i).que_suis_je() == "Probleme_FT_Disc_gen")
         {
           Transport_Interfaces_FT_Disc& equ_int=
@@ -439,7 +439,7 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
       if ( pb.que_suis_je() == "Probleme_FT_Disc_gen")
         {
           // pour ne pas deplacer les interfaces:
-          inconnues[i].valeur().valeurs() = 0;
+          inconnues[i]->valeurs() = 0;
           // on tourne la roue juste apres donc on s'en fout de perdre les valeurs.
           pb.equation(1).mettre_a_jour(temps_courant_);
         }

@@ -98,7 +98,7 @@ DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_IndGros& connect, Restr
   //TENONS COMPTE DU NOMBRE DE COMPOSANTES DE L'INCONNUE
 
   /* --> JR */
-  nb_compo = eq_fine.inconnue().valeur().nb_comp();
+  nb_compo = eq_fine.inconnue()->nb_comp();
   /* <-- JR */
 
   if(nb_compo == 1)

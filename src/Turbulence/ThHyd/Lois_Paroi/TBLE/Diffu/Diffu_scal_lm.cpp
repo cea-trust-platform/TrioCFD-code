@@ -62,7 +62,7 @@ double Diffu_scal_lm::calculer_a_local(int ind)
     }
   else
     {
-      a = diffusivite_thermique + (visco_tot.valeur().calculer_a_local(ind)-visco_cin)/getPrandtl();
+      a = diffusivite_thermique + (visco_tot->calculer_a_local(ind)-visco_cin)/getPrandtl();
     }
   return a;
 }

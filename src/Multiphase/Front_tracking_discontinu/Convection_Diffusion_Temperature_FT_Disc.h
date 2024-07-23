@@ -67,7 +67,7 @@ public:
 
   const DoubleTab& get_mpoint() const
   {
-    return mpoint_.valeur().valeurs();
+    return mpoint_->valeurs();
   };
 
   const Transport_Interfaces_FT_Disc& get_eq_interface() const

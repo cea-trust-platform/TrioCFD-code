@@ -140,7 +140,7 @@ int message_erreur_turb(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_turb, 
 {
   Cerr << "The hydraulic and turbulent boundary conditions are not consitent on border:" << finl;
   Cerr << "Boundary conditions number " << num_Cl << " \"" << la_cl_turb.frontiere_dis().le_nom() << "\" have been assigned to : " << finl;
-  Cerr << la_cl_hydr.valeur().que_suis_je() << " and " << la_cl_turb.valeur().que_suis_je() << " !! " << finl;
+  Cerr << la_cl_hydr->que_suis_je() << " and " << la_cl_turb->que_suis_je() << " !! " << finl;
   Process::exit();
   return 1;
 }

@@ -50,7 +50,7 @@ void Source_Diffusion_supplementaire_echelle_temp_turb::completer()
 void Source_Diffusion_supplementaire_echelle_temp_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const DoubleTab& tau 	 = equation().inconnue().valeur().valeurs();
+  const DoubleTab& tau 	 = equation().inconnue()->valeurs();
   const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = tau.line_size();
 
   for (auto &&n_m : matrices)

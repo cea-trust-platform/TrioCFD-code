@@ -480,7 +480,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(rang);
       if (!sub_type(Entree_fluide_vitesse_imposee_ALE,la_cl.valeur()))
         {
-          Cerr <<"Bord mobile ALE:  replace  " <<la_cl.valeur().que_suis_je()<<" on the boundary "<< le_nom_bord_ALE <<" with: Frontiere_ouverte_vitesse_imposee_ALE "<< finl;
+          Cerr <<"Bord mobile ALE:  replace  " <<la_cl->que_suis_je()<<" on the boundary "<< le_nom_bord_ALE <<" with: Frontiere_ouverte_vitesse_imposee_ALE "<< finl;
           Process::exit();
         }
     }
@@ -529,8 +529,8 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
       const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
       int rang=rang_frontiere(le_nom_bord_ALE);
       const Frontiere_dis_base& la_fr_dis=le_domaine_dis.frontiere_dis(rang);
-      les_champs_front[n].valeur().associer_fr_dis_base(la_fr_dis);
-      const Nom& le_nom_ch_front_courant=les_champs_front[n].valeur().que_suis_je();
+      les_champs_front[n]->associer_fr_dis_base(la_fr_dis);
+      const Nom& le_nom_ch_front_courant=les_champs_front[n]->que_suis_je();
       if (le_nom_ch_front_courant == "Champ_front_ALE")
         {
           ref_cast(Champ_front_ALE, les_champs_front[n].valeur()).remplir_vit_som_bord_ALE(temps);
@@ -622,7 +622,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
       else
         {
           Cerr << "Un champ front de type : "
-               << les_champs_front[n].valeur().le_nom()
+               << les_champs_front[n]->le_nom()
                << " ne peut etre utilise pour un probleme ALE pour le moment...."
                << finl;
           Process::exit();

@@ -33,7 +33,7 @@ void Source_Transport_Eps_Realisable_VDF_Elem::associer_pb(const Probleme_base& 
 {
   Source_Transport_Realisable_VDF_Elem_base::associer_pb(pb);
   eqn_eps_Rea = ref_cast(Transport_K_ou_Eps_Realisable,equation());
-  eqn_k_Rea = ref_cast(Transport_K_ou_Eps_Realisable,eqn_eps_Rea.valeur().modele_turbulence().eqn_transp_K());
+  eqn_k_Rea = ref_cast(Transport_K_ou_Eps_Realisable,eqn_eps_Rea->modele_turbulence().eqn_transp_K());
 }
 
 const DoubleTab& Source_Transport_Eps_Realisable_VDF_Elem::get_visc_turb() const

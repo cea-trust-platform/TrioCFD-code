@@ -111,7 +111,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
   resu -= gradP;
 
   eqnNS.assembler_avec_inertie(matrice,current,resu);
-  le_solveur_.valeur().reinit();
+  le_solveur_->reinit();
   Debog::verifier("Implicit_steady::iterer_NS resu apres assembler_avec_inertie",resu);
 
   //Definition de matrice_en_pression_2
@@ -168,14 +168,14 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
 
 
   //Construction de matrice_en_pression_2 = B*dt_locaux*M-1Bt
-  eqnNS.assembleur_pression().valeur().assembler_mat(matrice_en_pression_2,m_dt,1,1);
-  solveur_pression_.valeur().reinit();
+  eqnNS.assembleur_pression()->assembler_mat(matrice_en_pression_2,m_dt,1,1);
+  solveur_pression_->reinit();
   //Resolution du systeme (B*dt_locaux*M-1Bt)P' = Bu*
   solveur_pression_.resoudre_systeme(matrice_en_pression_2.valeur(),
                                      secmem,correction_en_pression);
   correction_en_pression.echange_espace_virtuel();
   //Calcul de M^-1BtP'=gradP
-  gradient.valeur().multvect(correction_en_pression,gradP);
+  gradient->multvect(correction_en_pression,gradP);
   eqn.solv_masse().appliquer(gradP);
   //Calcul de Un+1 = U* -dt_locaux*gradP -M*dt_locaux*deltaU/dt
   //dt = pas de temps global
@@ -232,7 +232,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
   //Calcul de Pn+1 = Pn + P'
   pression += correction_en_pression;
   Debog::verifier("Implicit_steady::iterer_NS pression fin", pression);
-  eqnNS.assembleur_pression().valeur().modifier_solution(pression);
+  eqnNS.assembleur_pression()->modifier_solution(pression);
   pression.echange_espace_virtuel();
   return;
 }

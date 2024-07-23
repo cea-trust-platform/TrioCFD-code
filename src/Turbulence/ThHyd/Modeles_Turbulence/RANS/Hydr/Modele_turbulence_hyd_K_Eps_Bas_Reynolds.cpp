@@ -60,8 +60,8 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::lire_motcle_non_standard(const Mot
     {
       mon_modele_fonc_.associer_eqn(eqn_transp_K_Eps());
       is >> mon_modele_fonc_;
-      mon_modele_fonc_.valeur().discretiser();
-      Cerr << "Low Reynolds number model type " << mon_modele_fonc_.valeur().que_suis_je() << finl;
+      mon_modele_fonc_->discretiser();
+      Cerr << "Low Reynolds number model type " << mon_modele_fonc_->que_suis_je() << finl;
       return 1;
     }
   else

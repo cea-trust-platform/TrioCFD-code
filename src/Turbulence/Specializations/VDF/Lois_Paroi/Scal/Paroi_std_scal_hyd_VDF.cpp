@@ -124,7 +124,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
-  const DoubleVect& tab_u_star = loi.valeur().tab_u_star();
+  const DoubleVect& tab_u_star = loi->tab_u_star();
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const IntVect& orientation = domaine_VDF.orientation();
 

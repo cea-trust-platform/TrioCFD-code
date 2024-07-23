@@ -112,7 +112,7 @@ int Convection_Diffusion_Concentration_FT_Disc::lire_motcle_non_standard(const M
     {
       Nom nom;
       is >> nom;
-      ref_eq_transport_ = mon_probleme.valeur().get_equation_by_name(nom);
+      ref_eq_transport_ = mon_probleme->get_equation_by_name(nom);
       if (!sub_type(Transport_Interfaces_FT_Disc,ref_eq_transport_.valeur()))
         {
           Cerr << " Error: the equation indicated for keyword equation_interface "<<finl;
@@ -270,9 +270,9 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
     }
 
   Probleme_base& pb = mon_probleme.valeur();
-  DoubleTab& champ1 = pb.getset_equation_by_name(equations_source_chimie_[0]).inconnue().valeur().valeurs();
-  DoubleTab& champ2 = pb.getset_equation_by_name(equations_source_chimie_[1]).inconnue().valeur().valeurs();
-  DoubleTab& champ3 = inconnue().valeur().valeurs();
+  DoubleTab& champ1 = pb.getset_equation_by_name(equations_source_chimie_[0]).inconnue()->valeurs();
+  DoubleTab& champ2 = pb.getset_equation_by_name(equations_source_chimie_[1]).inconnue()->valeurs();
+  DoubleTab& champ3 = inconnue()->valeurs();
 
   const double dt = pb.schema_temps().pas_de_temps();
   const int nb_faces = champ1.dimension(0);
@@ -287,7 +287,7 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
       champ_nu_t = &(le_modele.viscosite_turbulente().valeurs());
     }
 
-  const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant().valeur().valeurs();
+  const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant()->valeurs();
   double coeff_diffusivite = tab_diffusivite(0,0);
   const DoubleVect& volumes_entrelaces = ref_cast(Domaine_VF, domaine_dis().valeur()).volumes_entrelaces();
   const int dim = Objet_U::dimension;
@@ -295,14 +295,14 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
   const Fluide_Diphasique& fluide = ref_cast(Fluide_Diphasique, pb.milieu());
   const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-  const DoubleTab& tab_nu_phase_0 = phase_0.viscosite_cinematique().valeur().valeurs();
-  const DoubleTab& tab_nu_phase_1 = phase_1.viscosite_cinematique().valeur().valeurs();
+  const DoubleTab& tab_nu_phase_0 = phase_0.viscosite_cinematique()->valeurs();
+  const DoubleTab& tab_nu_phase_1 = phase_1.viscosite_cinematique()->valeurs();
   const double nu_phase_0 = tab_nu_phase_0(0,0);
   const double nu_phase_1 = tab_nu_phase_1(0,0);
   const double delta_nu = nu_phase_1 - nu_phase_0;
 
   DoubleTab indic_faces;
-  calculer_indicatrice_comme(ref_eq_transport_.valeur().inconnue().valeur(),
+  calculer_indicatrice_comme(ref_eq_transport_->inconnue().valeur(),
                              indic_faces, inconnue().valeur());
 
   for (int face = 0; face < nb_faces; face++)
@@ -442,7 +442,7 @@ void Convection_Diffusion_Concentration_FT_Disc::marquer_faces_sous_domaine(cons
   const int nb_faces_elem = elem_faces.dimension(1);
   marqueur.resize_array(nb_faces_tot);
   marqueur = 0;
-  const Sous_Domaine& sous_domaine = domaine_dis().valeur().domaine().ss_domaine(nom_sous_domaine);
+  const Sous_Domaine& sous_domaine = domaine_dis()->domaine().ss_domaine(nom_sous_domaine);
   const int nb_elem_sous_domaine = sous_domaine.nb_elem_tot();
   const DoubleVect& volumes_cl = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur()).volumes_entrelaces_Cl();
   int i;
@@ -468,7 +468,7 @@ void Convection_Diffusion_Concentration_FT_Disc::marquer_faces_sous_domaine(cons
  */
 void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
 {
-  Debog::verifier("Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour c1", inconnue().valeur().valeurs());
+  Debog::verifier("Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour c1", inconnue()->valeurs());
   Convection_Diffusion_Concentration::mettre_a_jour(temps);
 
   switch(option_)
@@ -503,7 +503,7 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
     }
   {
     DoubleTab indic_faces;
-    calculer_indicatrice_comme(ref_eq_transport_.valeur().inconnue().valeur(),
+    calculer_indicatrice_comme(ref_eq_transport_->inconnue().valeur(),
                                indic_faces, inconnue().valeur());
     const Domaine_VEF&     domaine_vef = ref_cast(Domaine_VEF, domaine_dis().valeur());
     const DoubleVect& volumes = domaine_vef.volumes_entrelaces();
@@ -539,5 +539,5 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
                integrale_sortie / dt);
       f << s << finl;
     }
-  Debog::verifier("Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour c2", inconnue().valeur().valeurs());
+  Debog::verifier("Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour c2", inconnue()->valeurs());
 }

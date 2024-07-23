@@ -210,7 +210,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
       const Frontiere& frontiereF =champ_frontF.frontiere_dis().frontiere();
 
       /* ---> On remplit ici les valeurs de la vitesse imposee en prenant celles de la grille grossiere prolongee */
-      DoubleTab& vitesse_imposeeF = CL_vitesse_imposeeF.champ_front().valeur().valeurs();
+      DoubleTab& vitesse_imposeeF = CL_vitesse_imposeeF.champ_front()->valeurs();
       const int nb_faces_bords    = frontiereF.nb_faces();//eqF.domaine_Cl_dis().nb_faces_Cl();
       const int nb_faces_bords_tot    = eqF.domaine_Cl_dis().nb_faces_Cl();
 

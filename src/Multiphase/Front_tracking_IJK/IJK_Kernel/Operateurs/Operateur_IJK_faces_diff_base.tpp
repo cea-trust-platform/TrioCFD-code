@@ -53,7 +53,7 @@ void Operateur_IJK_faces_diff_base_double::compute_flux_(IJK_Field_local_double&
   const int first_global_k_layer = channel_data_.first_global_k_layer_flux(icompo, idir);
   const int last_global_k_layer = channel_data_.last_global_k_layer_flux(icompo, idir);
 
-  Boundary_Conditions::BCType bc_type = ref_bc_.valeur().get_bctype_k_min();
+  Boundary_Conditions::BCType bc_type = ref_bc_->get_bctype_k_min();
 
   // for mixte_shear boundary condition >> need to localize to and bottom boundary even if perio_k
   if(!perio_k_ || bc_type == Boundary_Conditions::Mixte_shear)
@@ -65,12 +65,12 @@ void Operateur_IJK_faces_diff_base_double::compute_flux_(IJK_Field_local_double&
           // We are at bottom wall: z=0
           if (global_k_layer == first_global_k_layer-1)
             {
-              bc_type = ref_bc_.valeur().get_bctype_k_min();
+              bc_type = ref_bc_->get_bctype_k_min();
               bottom_wall = 1;
             }
           if (global_k_layer == last_global_k_layer + 1)
             {
-              bc_type = ref_bc_.valeur().get_bctype_k_max();
+              bc_type = ref_bc_->get_bctype_k_max();
               top_wall = 1;
             }
 
@@ -290,7 +290,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_different_dir_compo_(int i,
   else
     {
 
-      Boundary_Conditions::BCType bc_type = ref_bc_.valeur().get_bctype_k_min();
+      Boundary_Conditions::BCType bc_type = ref_bc_->get_bctype_k_min();
       // Interpolate diffusion coefficient from values at elements:
       Simd_double m_nu1, m_nu2, m_nu3, m_nu4;
       molecular_nu.get_left_center_c1c2(_DIR_, _VCOMPO_, i, m_nu1, m_nu2, m_nu3, m_nu4);
@@ -333,7 +333,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_different_dir_compo_(int i,
         {
           if(_VCOMPO_ == DIRECTION::X)
             {
-              v4 = ref_bc_.valeur().get_vx_kmax();
+              v4 = ref_bc_->get_vx_kmax();
             }
           else
             {
@@ -344,7 +344,7 @@ void Operateur_IJK_faces_diff_base_double::flux_loop_different_dir_compo_(int i,
         {
           if(_VCOMPO_ == DIRECTION::X)
             {
-              v3 = ref_bc_.valeur().get_vx_kmin();
+              v3 = ref_bc_->get_vx_kmin();
             }
           else
             {

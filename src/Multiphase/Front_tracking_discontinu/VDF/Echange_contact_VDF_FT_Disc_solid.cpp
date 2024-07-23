@@ -85,7 +85,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
     nb_comp = le_milieu.conductivite()->nb_comp();
     assert(nb_comp==1);
   }
-  const DoubleTab& I = indicatrice_.valeur().valeurs_au_temps(temps);
+  const DoubleTab& I = indicatrice_->valeurs_au_temps(temps);
 
   int is_pb_fluide=0;
 
@@ -188,7 +188,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
             }
 
           Nom nom_racc1=frontiere_dis().frontiere().le_nom();
-          if (mon_dom_cl_dis -> domaine().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
+          if (mon_dom_cl_dis -> domaine().raccord(nom_racc1)->que_suis_je() =="Raccord_distant_homogene")
             {
               // front_vf.frontiere ().trace_elem_distant (autre_phi, mon_phi);
               front_vf.frontiere ().trace_elem_distant (phi_filed, mon_phi);

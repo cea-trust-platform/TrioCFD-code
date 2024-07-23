@@ -78,8 +78,8 @@ void Energie_cinetique_turbulente::discretiser()
   Cerr << "Turbulent kinetic energy discretization" << finl;
   //On utilise temperature pour la directive car discretisation identique
   dis.discretiser_champ("temperature",domaine_dis(),"k","J/kg", 1,nb_valeurs_temp,temps,l_inco_ch);//une seule compo, meme en multiphase
-  l_inco_ch.valeur().fixer_nature_du_champ(scalaire);
-  l_inco_ch.valeur().fixer_nom_compo(0, Nom("k"));
+  l_inco_ch->fixer_nature_du_champ(scalaire);
+  l_inco_ch->fixer_nom_compo(0, Nom("k"));
   champs_compris_.ajoute_champ(l_inco_ch);
   Equation_base::discretiser();
   Cerr << "Energie_cinetique_turbulente::discretiser() ok" << finl;

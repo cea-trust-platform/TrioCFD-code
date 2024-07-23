@@ -54,13 +54,13 @@ void Loi_paroi_Ramstorfer::completer()
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : This is a two-phase wall law!");
 
-  DoubleTab const * d_bulles = (pb_.valeur().has_champ("diametre_bulles")) ? &pb_.valeur().get_champ("diametre_bulles").valeurs() : nullptr ;
+  DoubleTab const * d_bulles = (pb_->has_champ("diametre_bulles")) ? &pb_->get_champ("diametre_bulles").valeurs() : nullptr ;
   if (!d_bulles) Process::exit(que_suis_je() + " : you must define a bubble diameter ! This is a two-phase wall law.");
 }
 
 void Loi_paroi_Ramstorfer::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
 {
-  Domaine_VF& domaine = ref_cast(Domaine_VF, pb_.valeur().domaine_dis().valeur());
+  Domaine_VF& domaine = ref_cast(Domaine_VF, pb_->domaine_dis().valeur());
   DoubleTab& u_t = valeurs_loi_paroi_["u_tau"], &y_p = valeurs_loi_paroi_["y_plus"];
   const DoubleTab& n_f = domaine.face_normales();
   const DoubleVect& fs = domaine.face_surfaces();

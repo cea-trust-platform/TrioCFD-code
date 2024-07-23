@@ -146,13 +146,13 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
 
       eqn_NS_ = ref_cast(Navier_Stokes_Turbulent,eqn);
 
-      const Modele_turbulence_hyd& modele_turbulence = eqn_NS_.valeur().modele_turbulence();
+      const Modele_turbulence_hyd& modele_turbulence = eqn_NS_->modele_turbulence();
 
       const Modele_turbulence_hyd_K_Eps& modele_turbulence_keps = ref_cast(Modele_turbulence_hyd_K_Eps,modele_turbulence.valeur());
 
       modele_K_Eps_ = modele_turbulence_keps;
 
-      eqn_transport_K_Eps_ = ref_cast(Transport_K_Eps,modele_K_Eps_.valeur().eqn_transp_K_Eps());
+      eqn_transport_K_Eps_ = ref_cast(Transport_K_Eps,modele_K_Eps_->eqn_transp_K_Eps());
     }
 }
 
@@ -162,7 +162,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_domaines(const Domaine_dis& dom
   le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
   le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
 
-  nelem_ = le_dom_VDF.valeur().nb_elem();
+  nelem_ = le_dom_VDF->nb_elem();
 }
 
 
@@ -334,10 +334,10 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::calculer(DoubleTab& resu) const
 
 void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
 {
-  int nb_elem_tot = le_dom_VDF.valeur().nb_elem_tot();
-  int nb_faces_tot = le_dom_VDF.valeur().nb_faces_tot();
-  const IntTab& face_vois = le_dom_VDF.valeur().face_voisins();
-  const DoubleVect& volumes = le_dom_VDF.valeur().volumes();
+  int nb_elem_tot = le_dom_VDF->nb_elem_tot();
+  int nb_faces_tot = le_dom_VDF->nb_faces_tot();
+  const IntTab& face_vois = le_dom_VDF->face_voisins();
+  const DoubleVect& volumes = le_dom_VDF->volumes();
 
   DoubleTab valeurs_source(nb_elem_tot,dimension);
   valeurs_source = 0;
@@ -382,9 +382,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
           }
     }
 
-  const IntTab& elem_faces   = le_dom_VDF.valeur().elem_faces();
-  const IntTab& face_voisins = le_dom_VDF.valeur().face_voisins();
-  const DoubleVect& inverse_vol  = le_dom_VDF.valeur().inverse_volumes();
+  const IntTab& elem_faces   = le_dom_VDF->elem_faces();
+  const IntTab& face_voisins = le_dom_VDF->face_voisins();
+  const DoubleVect& inverse_vol  = le_dom_VDF->inverse_volumes();
   const int nb_faces_elem=elem_faces.line_size();
 
   int facei;
@@ -404,7 +404,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
 
               for (int j=0; j<Objet_U::dimension; j++)
                 {
-                  div+=signe*le_dom_VDF.valeur().face_normales(facei,j)*tenseur_reynolds_faces(facei,i,j);
+                  div+=signe*le_dom_VDF->face_normales(facei,j)*tenseur_reynolds_faces(facei,i,j);
                 }
             }
           div*= inverse_vol(elem);

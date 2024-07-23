@@ -70,7 +70,7 @@ void  Operateur_Conv_sensibility_VEF::associer (const Domaine_dis& domaine_dis ,
 
   le_dom_vef = zvef;
   la_zcl_vef = zclvef;
-  le_dom_vef.valeur().creer_tableau_faces(fluent);
+  le_dom_vef->creer_tableau_faces(fluent);
   Operateur_Conv_sensibility::associer(domaine_dis,domaine_cl_dis,inco);
 }
 

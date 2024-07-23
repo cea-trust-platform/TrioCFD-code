@@ -297,7 +297,7 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Domaine_VF& domaine_dis, const Domaine
       Cerr << "Vous devez preciser a la fois mu et lambda dans les options de TBLE" << finl;
       Process::exit();
     }
-  mu_lambda.valeur().initialiser(getPbBase().milieu());
+  mu_lambda->initialiser(getPbBase().milieu());
 
 
   // associer les "Eq_couch_lim" a "MuLambda_TBLE"

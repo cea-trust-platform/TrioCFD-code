@@ -94,8 +94,8 @@ void Echelle_temporelle_turbulente::discretiser()
   Cerr << "Turbulent time scale discretization" << finl;
   //On utilise temperature pour la directive car discretisation identique
   dis.discretiser_champ("temperature",domaine_dis(),"tau","s", 1,nb_valeurs_temp,temps,l_inco_ch);//une seule compo, meme en multiphase
-  l_inco_ch.valeur().fixer_nature_du_champ(scalaire);
-  l_inco_ch.valeur().fixer_nom_compo(0, Nom("tau"));
+  l_inco_ch->fixer_nature_du_champ(scalaire);
+  l_inco_ch->fixer_nom_compo(0, Nom("tau"));
   champs_compris_.ajoute_champ(l_inco_ch);
   Equation_base::discretiser();
   Cerr << "Echelle_temporelle_turbulente::discretiser() ok" << finl;

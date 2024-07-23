@@ -70,9 +70,9 @@ int Modele_turbulence_hyd_K_Eps::lire_motcle_non_standard(const Motcle& mot, Ent
       mon_modele_fonc_.associer_eqn(eqn_transp_K_Eps());
       is >> mon_modele_fonc_;
       Cerr << "mon_modele_fonc.que_suis_je() avant discretisation " << mon_modele_fonc_.que_suis_je() << finl;
-      mon_modele_fonc_.valeur().discretiser();
-      Cerr << "mon_modele_fonc.que_suis_je() " << mon_modele_fonc_.valeur().que_suis_je() << finl;
-      mon_modele_fonc_.valeur().lire_distance_paroi();
+      mon_modele_fonc_->discretiser();
+      Cerr << "mon_modele_fonc.que_suis_je() " << mon_modele_fonc_->que_suis_je() << finl;
+      mon_modele_fonc_->lire_distance_paroi();
       return 1;
     }
   else
@@ -134,14 +134,14 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
           mon_modele_fonc_.Calcul_Cmu(Cmu, le_dom_dis, le_dom_Cl_dis, vitesse, tab_K_Eps, EPS_MIN_);
 
           /*Paroi*/
-          Nom lp = eqn_transp_K_Eps().modele_turbulence().loi_paroi().valeur().que_suis_je();
+          Nom lp = eqn_transp_K_Eps().modele_turbulence().loi_paroi()->que_suis_je();
           if (lp != "negligeable_VEF")
             {
               DoubleTab visco_tab(visco_turb.dimension_tot(0));
               assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
               visco_tab = tab_visco(0, 0);
               const int idt = mon_equation_->schema_temps().nb_pas_dt();
-              const DoubleTab& tab_paroi = loi_paroi().valeur().Cisaillement_paroi();
+              const DoubleTab& tab_paroi = loi_paroi()->Cisaillement_paroi();
               mon_modele_fonc_.Calcul_Cmu_Paroi(Cmu, le_dom_dis, le_dom_Cl_dis, visco_tab, visco_turb, tab_paroi, idt, vitesse, tab_K_Eps, EPS_MIN_);
             }
         }
@@ -266,7 +266,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps::get_champ(const Motcle& nom) cons
     {
       try
         {
-          return mon_modele_fonc_.valeur().get_champ(nom);
+          return mon_modele_fonc_->get_champ(nom);
         }
       catch (Champs_compris_erreur&)
         {
@@ -279,12 +279,12 @@ void Modele_turbulence_hyd_K_Eps::get_noms_champs_postraitables(Noms& nom, Optio
 {
   Modele_turbulence_hyd_RANS_K_Eps_base::get_noms_champs_postraitables(nom, opt);
   if (mon_modele_fonc_.non_nul())
-    mon_modele_fonc_.valeur().get_noms_champs_postraitables(nom, opt);
+    mon_modele_fonc_->get_noms_champs_postraitables(nom, opt);
 
 }
 void Modele_turbulence_hyd_K_Eps::verifie_loi_paroi()
 {
-  Nom lp = loipar_.valeur().que_suis_je();
+  Nom lp = loipar_->que_suis_je();
   if (lp == "negligeable_VEF" || lp == "negligeable_VDF")
     if (!associe_modele_fonction().non_nul())
       {

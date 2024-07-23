@@ -52,7 +52,7 @@ void Sonde_IJK::completer_IJK(const IJK_FT_double& ijk_ft)
   ref_ijk_field_ = ijk_ft.get_IJK_field(nom_champ_lu_);
 
   // A quoi sert ce bidon ? IJK compile meme en commentant les trois lignes suivantes
-  const IJK_Splitting& splitting = ref_ijk_ft_.valeur().get_splitting_ft();
+  const IJK_Splitting& splitting = ref_ijk_ft_->get_splitting_ft();
   post_bidon_.associer_nom_et_pb_base(bidon, ijk_ft.probleme(splitting));
   mon_post=post_bidon_;
   // Recherche du champ sonde
@@ -469,8 +469,8 @@ void Sonde_IJK::initialiser()
   if(elem_.size() != nbre_points)
     elem_.resize(nbre_points);
 
-  const IJK_Splitting& splitting = ref_ijk_ft_.valeur().get_splitting_ft();
-  const Domaine& domaine_geom = ref_ijk_ft_.valeur().probleme(splitting).domaine();
+  const IJK_Splitting& splitting = ref_ijk_ft_->get_splitting_ft();
+  const Domaine& domaine_geom = ref_ijk_ft_->probleme(splitting).domaine();
   if ( numero_elem_==-1)
     {
       int nb_som = domaine_geom.type_elem().nb_som();
@@ -478,7 +478,7 @@ void Sonde_IJK::initialiser()
       if (nb_coord+1>nb_som)
         {
           Cerr << "You can't specify the probe named " << nom_ << " with "<< nb_coord << " coordinates on the domain named " <<domaine_geom.le_nom()<<finl;
-          Cerr << "which is constituted with cells of kind " << domaine_geom.type_elem().valeur().que_suis_je() << "." << finl;
+          Cerr << "which is constituted with cells of kind " << domaine_geom.type_elem()->que_suis_je() << "." << finl;
           Cerr << "Change the probe coordinates or use numero_elem_sur_maitre keyword (see documentation)" << finl;
           Cerr << "to specify a cell containing the probe and not its coordinates." << finl;
           Process::exit();
@@ -723,7 +723,7 @@ void Sonde_IJK::initialiser()
                  << " z= " << les_positions_(idx, 2) << finl;
 
             if ((field_splitting != splitting) &&
-                (ref_ijk_ft_.valeur().get_splitting_extension() != 0))
+                (ref_ijk_ft_->get_splitting_extension() != 0))
               {
                 // Les 2 splittings ne sont pas identiques il faut changer l'elem :
                 for (int i = 0; i < 3; i++)
@@ -731,8 +731,8 @@ void Sonde_IJK::initialiser()
                     //Cerr << " " << (field_geom.get_origin(i)-geom.get_origin(i))/delta[i] << finl;
                     if (geom.get_periodic_flag(i))
                       {
-                        //assert(int((field_geom.get_origin(i)-geom.get_origin(i))/delta[i]) == ref_ijk_ft_.valeur().get_splitting_extension());
-                        new_ijk[i] -= ref_ijk_ft_.valeur().get_splitting_extension();
+                        //assert(int((field_geom.get_origin(i)-geom.get_origin(i))/delta[i]) == ref_ijk_ft_->get_splitting_extension());
+                        new_ijk[i] -= ref_ijk_ft_->get_splitting_extension();
                       }
                   }
                 const int new_num_elem =  field_splitting.convert_ijk_cell_to_packed(new_ijk[0], new_ijk[1], new_ijk[2]);
@@ -800,7 +800,7 @@ void Sonde_IJK::initialiser()
 
   envoyer_broadcast(prop, 0);
 
-  reprise = ref_ijk_ft_.valeur().get_reprise();
+  reprise = ref_ijk_ft_->get_reprise();
   les_positions_sondes_=les_positions_;
 
   nbre_points_tot=nbre_points;
@@ -948,7 +948,7 @@ void Sonde_IJK::postraiter()
             }
         }
 
-      double temps_courant = ref_ijk_ft_.valeur().get_current_time();
+      double temps_courant = ref_ijk_ft_->get_current_time();
 
       if (dim==0 || dim==1)
         {

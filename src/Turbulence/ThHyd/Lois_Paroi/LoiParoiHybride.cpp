@@ -117,7 +117,7 @@ void LoiParoiHybride::associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcl)
     {
       vect_lp[ilp]->associer(zd, zcl);
     }
-  lp_bord.resize(zd.valeur().nb_front_Cl());
+  lp_bord.resize(zd->nb_front_Cl());
 }
 
 

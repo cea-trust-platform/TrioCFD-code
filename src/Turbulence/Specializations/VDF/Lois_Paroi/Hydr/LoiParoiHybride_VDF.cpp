@@ -34,12 +34,12 @@ Sortie& LoiParoiHybride_VDF::printOn(Sortie& s) const
 
 Entree& LoiParoiHybride_VDF::readOn(Entree& s)
 {
-  const int nbord = le_dom_VDF.valeur().nb_front_Cl();
+  const int nbord = le_dom_VDF->nb_front_Cl();
   Noms noms(nbord);
   for (int ibord=0; ibord<nbord; ibord++)
     {
       const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(ibord);
-      noms[ibord] = la_cl.valeur().frontiere_dis().le_nom();
+      noms[ibord] = la_cl->frontiere_dis().le_nom();
     }
 
   LoiParoiHybride::lire(s,noms, mon_modele_turb_hyd.valeur());
@@ -59,7 +59,7 @@ int LoiParoiHybride_VDF::init_lois_paroi()
   if (!Cisaillement_paroi_.get_md_vector().non_nul())
     {
       Cisaillement_paroi_.resize(0, dimension);
-      le_dom_VDF.valeur().creer_tableau_faces_bord(Cisaillement_paroi_);
+      le_dom_VDF->creer_tableau_faces_bord(Cisaillement_paroi_);
     }
   return 1;
 }

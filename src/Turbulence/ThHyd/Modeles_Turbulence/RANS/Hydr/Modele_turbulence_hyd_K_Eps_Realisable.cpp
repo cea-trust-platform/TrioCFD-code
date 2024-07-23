@@ -197,7 +197,7 @@ void Modele_turbulence_hyd_K_Eps_Realisable::get_noms_champs_postraitables(Noms&
 
 void Modele_turbulence_hyd_K_Eps_Realisable::verifie_loi_paroi()
 {
-  Nom lp = loipar_.valeur().que_suis_je();
+  Nom lp = loipar_->que_suis_je();
   if (lp == "negligeable_VEF" || lp == "negligeable_VDF")
     if (!associe_modele_fonction().non_nul())
       {

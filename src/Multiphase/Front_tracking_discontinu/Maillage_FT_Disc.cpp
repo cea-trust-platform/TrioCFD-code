@@ -3623,7 +3623,7 @@ void Maillage_FT_Disc::deplacer_sommets(const ArrOfInt& liste_sommets_initiale,
   if (Comm_Group::check_enabled()) check_mesh(1,0,skip_facettes);
 
   const int dimension3 = (Objet_U::dimension == 3);
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_->valeur());
   const Parcours_interface& parcours = refparcours_interface_.valeur();
   const IntTab& face_voisins = domaine_vf.face_voisins();
 

@@ -816,7 +816,7 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
  */
 int Transport_Interfaces_FT_Disc::verif_Cl() const
 {
-  const Conds_lim& les_cl = le_dom_Cl_dis.valeur().les_conditions_limites();
+  const Conds_lim& les_cl = le_dom_Cl_dis->les_conditions_limites();
   const int n = les_cl.size();
   int i;
   for (i = 0; i < n; i++)
@@ -1143,7 +1143,7 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
         }
     }
   // Met a jour l'indicatrice de phase:
-  DoubleTab& indic = variables_internes_->indicatrice_cache.valeur().valeurs();
+  DoubleTab& indic = variables_internes_->indicatrice_cache->valeurs();
   for (int i = 0; i < nb_elem; i++)
     {
       const int compo = num_compo[i];
@@ -1279,7 +1279,7 @@ Entree& Transport_Interfaces_FT_Disc::lire_cond_init(Entree& is)
                 // (items communs correctement initialises).
                 int ignorer_collision = (rang==2);
                 const int ok = marching_cubes().construire_iso(expression, 0., maillage_tmp,
-                                                               variables_internes_->indicatrice_cache.valeur().valeurs(),
+                                                               variables_internes_->indicatrice_cache->valeurs(),
                                                                phase,
                                                                variables_internes_->distance_interface_sommets,
                                                                ignorer_collision);
@@ -1595,7 +1595,7 @@ int Transport_Interfaces_FT_Disc::preparer_calcul(void)
   const double temps = schema_temps().temps_courant();
   // La ligne suivante doit figurer avant le premier remaillage
   // car le remaillage utilise les angles de contact (lissage courbure)
-  le_dom_Cl_dis.valeur().initialiser(temps);
+  le_dom_Cl_dis->initialiser(temps);
 
   if (probleme().reprise_effectuee())
     {
@@ -1685,7 +1685,7 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
   const int tag = maillage_interface().get_mesh_tag();
   if (tag != variables_internes_->indicatrice_cache_tag)
     {
-      DoubleVect& valeurs_indicatrice = variables_internes_->indicatrice_cache.valeur().valeurs();
+      DoubleVect& valeurs_indicatrice = variables_internes_->indicatrice_cache->valeurs();
       maillage_interface().parcourir_maillage();
       maillage_interface().calcul_indicatrice(valeurs_indicatrice,
                                               valeurs_indicatrice);
@@ -2439,7 +2439,7 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
                       else
                         vit_imposee(i,j) = f*vit_imposee(i,j) + (1.-f)*vitesse(i,j)/rho_faces(i);
 
-                      vitesse_imp_interp_.valeur().valeurs()(i,j)= vit_imposee( i,j ) ;
+                      vitesse_imp_interp_->valeurs()(i,j)= vit_imposee( i,j ) ;
                     }
 
                 }
@@ -3407,7 +3407,7 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_distance_interface_fa
 
   const DoubleTab& dist_elem = get_update_distance_interface().valeurs();
   const DoubleTab& normale_elem = get_update_normale_interface().valeurs();
-  DoubleTab&        dist_face = variables_internes_->distance_interface_faces.valeur().valeurs();
+  DoubleTab&        dist_face = variables_internes_->distance_interface_faces->valeurs();
 
   calculer_distance_interface_faces(dist_elem, normale_elem, dist_face);
   return variables_internes_->distance_interface_faces.valeur();
@@ -3854,8 +3854,8 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
   ///----- variables pour post-traitement
   for( i_face=0 ; i_face<nfaces ; i_face++ )
     {
-      variables_internes_->distance_interface_faces_corrigee.valeur().valeurs()(i_face) = dist_face_cor(i_face) ;
-      variables_internes_->distance_interface_faces_difference.valeur().valeurs()(i_face) = dist_face_cor(i_face) - distance_interface_faces(i_face) ;
+      variables_internes_->distance_interface_faces_corrigee->valeurs()(i_face) = dist_face_cor(i_face) ;
+      variables_internes_->distance_interface_faces_difference->valeurs()(i_face) = dist_face_cor(i_face) - distance_interface_faces(i_face) ;
     }
 
   if( variables_internes_-> type_vitesse_imposee == Transport_Interfaces_FT_Disc_interne::ANALYTIQUE
@@ -4562,11 +4562,11 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
                   champ(i_face) += d * grad ;
                 }
             }
-          vitesse_imp_interp_.valeur().valeurs()(i_face)= champ( i_face ) ;
+          vitesse_imp_interp_->valeurs()(i_face)= champ( i_face ) ;
         }
       else
         {
-          vitesse_imp_interp_.valeur().valeurs()(i_face)=-3e30;
+          vitesse_imp_interp_->valeurs()(i_face)=-3e30;
         }
     }
   champ.echange_espace_virtuel() ;
@@ -6492,11 +6492,11 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
         Navier_Stokes_FT_Disc& ns = ref_cast_non_const(Navier_Stokes_FT_Disc, eqn_hydraulique);
 
         DoubleVect dI_dt;
-        domaine_dis().valeur().domaine().creer_tableau_elements(dI_dt);
+        domaine_dis()->domaine().creer_tableau_elements(dI_dt);
         ns.calculer_dI_dt(dI_dt);
         dI_dt.echange_espace_virtuel();
 #if DEBUG_CONSERV_VOLUME
-        const int nb_elem = domaine_dis().valeur().nb_elem();
+        const int nb_elem = domaine_dis()->nb_elem();
         double sum_before_rm = 0.;
         double sum_before_rm_dvol = 0.;
         for (int i = 0; i < nb_elem; i++)
@@ -6573,7 +6573,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
             {
               const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
               const DoubleVect& volumes = domaine_vf.volumes();
-              const Sous_Domaine& sous_domaine = domaine_dis().valeur().domaine().ss_domaine(variables_internes_->nom_domaine_volume_impose_);
+              const Sous_Domaine& sous_domaine = domaine_dis()->domaine().ss_domaine(variables_internes_->nom_domaine_volume_impose_);
               const int nb_elem_sous_domaine = sous_domaine.nb_elem_tot();
               const DoubleTab& indic = indicatrice_.valeurs();
               const int nb_elem = domaine_vf.nb_elem();
@@ -6737,7 +6737,7 @@ double Transport_Interfaces_FT_Disc::suppression_interfaces(const IntVect& num_c
   Maillage_FT_Disc& maillage = maillage_interface();
   const double volume = topologie_interface().suppression_interfaces(num_compo,
                                                                      flags_compo_a_supprimer, maillage,
-                                                                     variables_internes_->indicatrice_cache.valeur().valeurs());
+                                                                     variables_internes_->indicatrice_cache->valeurs());
   return volume;
 }
 
@@ -6778,7 +6778,7 @@ void Transport_Interfaces_FT_Disc::test_suppression_interfaces_sous_domaine()
       mp_sum_for_each_item(flags_compo_a_supprimer);
       Maillage_FT_Disc& maillage = maillage_interface();
       topologie_interface().suppression_interfaces(num_compo, flags_compo_a_supprimer, maillage,
-                                                   variables_internes_->indicatrice_cache.valeur().valeurs());
+                                                   variables_internes_->indicatrice_cache->valeurs());
 
       // Parcours de toutes les equations du probleme,
       // Pour les equations "temperature FT" on appelle la methode "suppression_interfaces"
@@ -6924,10 +6924,10 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
           maillage_tmp.associer_equation_transport(*this);
           Maillage_FT_Disc::AjoutPhase phase = variables_internes_->injection_interfaces_phase_[i]
                                                ? Maillage_FT_Disc::AJOUTE_PHASE1 : Maillage_FT_Disc::AJOUTE_PHASE0;
-          DoubleTab sauvegarde(variables_internes_->indicatrice_cache.valeur().valeurs());
+          DoubleTab sauvegarde(variables_internes_->indicatrice_cache->valeurs());
           const int ok = marching_cubes().construire_iso(expr[i],
                                                          0., maillage_tmp,
-                                                         variables_internes_->indicatrice_cache.valeur().valeurs(),
+                                                         variables_internes_->indicatrice_cache->valeurs(),
                                                          phase,
                                                          variables_internes_->distance_interface_sommets);
 
@@ -6941,7 +6941,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
               double unused_vol_phase_0 = 0.;
               const double volume_phase_1_old = calculer_integrale_indicatrice(sauvegarde, unused_vol_phase_0);
               unused_vol_phase_0= 0.;
-              const double volume_phase_1 = calculer_integrale_indicatrice(variables_internes_->indicatrice_cache.valeur().valeurs(), unused_vol_phase_0);
+              const double volume_phase_1 = calculer_integrale_indicatrice(variables_internes_->indicatrice_cache->valeurs(), unused_vol_phase_0);
               double volume = volume_phase_1-volume_phase_1_old;
               // pow(-1,1-phase) ne compile pas avec xlC sur AIX car n'a que pow(double,int)
               volume*=pow(-1.,1-phase);
@@ -6950,7 +6950,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
           else
             {
               Cerr << " failure: collision" << finl;
-              variables_internes_->indicatrice_cache.valeur().valeurs() = sauvegarde;
+              variables_internes_->indicatrice_cache->valeurs() = sauvegarde;
             }
         }
       if (i == n)
@@ -7151,7 +7151,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
     const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
     const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
     const ArrOfInt& index_elem = intersections.index_elem();
-    DoubleTab& surface = variables_internes_->surface_interface.valeur().valeurs();
+    DoubleTab& surface = variables_internes_->surface_interface->valeurs();
     const int nb_elements = surface.dimension(0);
     for (int element = 0; element < nb_elements; element++)
       {
@@ -7761,8 +7761,8 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_distance_interface() 
   const int tag = maillage_interface().get_mesh_tag();
   if (tag != variables_internes_->distance_normale_cache_tag)
     {
-      DoubleTab& distance = variables_internes_->distance_interface.valeur().valeurs();
-      DoubleTab& normale  = variables_internes_->normale_interface.valeur().valeurs();
+      DoubleTab& distance = variables_internes_->distance_interface->valeurs();
+      DoubleTab& normale  = variables_internes_->normale_interface->valeurs();
       calculer_distance_interface(maillage_interface(),
                                   distance,
                                   normale,
@@ -7780,8 +7780,8 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_normale_interface() c
   const int tag = maillage_interface().get_mesh_tag();
   if (tag != variables_internes_->distance_normale_cache_tag)
     {
-      DoubleTab& distance = variables_internes_->distance_interface.valeur().valeurs();
-      DoubleTab& normale  = variables_internes_->normale_interface.valeur().valeurs();
+      DoubleTab& distance = variables_internes_->distance_interface->valeurs();
+      DoubleTab& normale  = variables_internes_->normale_interface->valeurs();
       calculer_distance_interface(maillage_interface(),
                                   distance,
                                   normale,

@@ -37,7 +37,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::associer_pb(const Probleme_base& 
 {
   Source_Transport_Realisable_VEF_Face_base::associer_pb(pb);
   eqn_eps_Rea = ref_cast(Transport_K_ou_Eps_Realisable, equation());
-  eqn_k_Rea = ref_cast(Transport_K_ou_Eps_Realisable, eqn_eps_Rea.valeur().modele_turbulence().eqn_transp_K());
+  eqn_k_Rea = ref_cast(Transport_K_ou_Eps_Realisable, eqn_eps_Rea->modele_turbulence().eqn_transp_K());
 }
 
 const DoubleTab& Source_Transport_Eps_Realisable_VEF_Face::get_visc_turb() const
@@ -87,7 +87,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
   assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
   visco_tab = tab_visco(0, 0);
   const int idt = eq_hydraulique->schema_temps().nb_pas_dt();
-  const DoubleTab& tab_paroi = mod_turb.loi_paroi().valeur().Cisaillement_paroi();
+  const DoubleTab& tab_paroi = mod_turb.loi_paroi()->Cisaillement_paroi();
 
   const Domaine_Cl_dis& zcl_keps = eqn_k_Rea->domaine_Cl_dis();
   const Domaine_dis& domaine_dis_keps = eqn_k_Rea->domaine_dis();

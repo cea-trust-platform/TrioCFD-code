@@ -640,7 +640,7 @@ double Topologie_Maillage_FT::suppression_interfaces(const IntVect& num_compo,
   //flags_compo_front_a_supprimer = 0;
 
   double variation_indicatrice = 0.;
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, maillage.refdomaine_dis_.valeur().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, maillage.refdomaine_dis_->valeur());
   const DoubleVect& volumes = domaine_vf.volumes();
   for (int i = 0; i < n; i++)
     {

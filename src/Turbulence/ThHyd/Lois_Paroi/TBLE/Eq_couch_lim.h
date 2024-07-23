@@ -119,7 +119,7 @@ public :
   void set_diffu(Motcle modele)
   {
     a.typer(modele);
-    a.valeur().associer_eqn(*this);
+    a->associer_eqn(*this);
   };
 
   void set_dt(double delta_t)

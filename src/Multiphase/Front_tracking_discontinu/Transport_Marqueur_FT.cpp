@@ -324,7 +324,7 @@ void Transport_Marqueur_FT::completer()
 {
   les_sources.completer();
   ////le_dom_Cl_dis->completer();
-  const Domaine& domaine = le_dom_dis.valeur().domaine();
+  const Domaine& domaine = le_dom_dis->domaine();
 
   Maillage_FT_Disc& ens_points = maillage_interface();
   ens_points.associer_domaine(domaine);

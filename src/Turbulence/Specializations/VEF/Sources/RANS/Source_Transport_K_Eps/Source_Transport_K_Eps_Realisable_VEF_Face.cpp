@@ -88,7 +88,7 @@ void Source_Transport_K_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
   assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
   visco_tab = tab_visco(0, 0);
   const int idt = eq_hydraulique->schema_temps().nb_pas_dt();
-  const DoubleTab& tab_paroi = mod_turb.loi_paroi().valeur().Cisaillement_paroi();
+  const DoubleTab& tab_paroi = mod_turb.loi_paroi()->Cisaillement_paroi();
 
   const Domaine_Cl_dis& zcl_keps = eqn_keps_Rea->domaine_Cl_dis();
   const Domaine_dis& domaine_dis_keps = eqn_keps_Rea->domaine_dis();

@@ -58,7 +58,7 @@ Entree& Schema_Phase_field::readOn(Entree& s)
  */
 int Schema_Phase_field::nb_valeurs_temporelles() const
 {
-  return std::max(sch2.valeur().nb_valeurs_temporelles(),sch3.valeur().nb_valeurs_temporelles());
+  return std::max(sch2->nb_valeurs_temporelles(),sch3->nb_valeurs_temporelles());
 }
 
 /*! @brief Renvoie le nombre de valeurs temporelles futures.
@@ -68,8 +68,8 @@ int Schema_Phase_field::nb_valeurs_temporelles() const
  */
 int Schema_Phase_field::nb_valeurs_futures() const
 {
-  int n=sch2.valeur().nb_valeurs_futures();
-  assert (n==sch3.valeur().nb_valeurs_futures());
+  int n=sch2->nb_valeurs_futures();
+  assert (n==sch3->nb_valeurs_futures());
   return n;
 }
 
@@ -80,8 +80,8 @@ int Schema_Phase_field::nb_valeurs_futures() const
  */
 double Schema_Phase_field::temps_futur(int i) const
 {
-  double t=sch2.valeur().temps_futur(i);
-  assert(est_egal(t,sch3.valeur().temps_futur(i),pas_temps_min()));
+  double t=sch2->temps_futur(i);
+  assert(est_egal(t,sch3->temps_futur(i),pas_temps_min()));
   return t;
 }
 
@@ -92,8 +92,8 @@ double Schema_Phase_field::temps_futur(int i) const
  */
 double Schema_Phase_field::temps_defaut() const
 {
-  double t=sch2.valeur().temps_defaut();
-  assert(est_egal(t,sch3.valeur().temps_defaut(),pas_temps_min()));
+  double t=sch2->temps_defaut();
+  assert(est_egal(t,sch3->temps_defaut(),pas_temps_min()));
   return t;
 }
 
@@ -106,15 +106,15 @@ double Schema_Phase_field::temps_defaut() const
 
 void Schema_Phase_field::initialize()
 {
-  sch2.valeur().initialize();
-  sch3.valeur().initialize();
+  sch2->initialize();
+  sch3->initialize();
   Schema_Temps_base::initialize();
 }
 
 bool Schema_Phase_field::initTimeStep(double dt)
 {
-  sch2.valeur().initTimeStep(dt);
-  sch3.valeur().initTimeStep(dt);
+  sch2->initTimeStep(dt);
+  sch3->initTimeStep(dt);
   return Schema_Temps_base::initTimeStep(dt);
 }
 
@@ -124,8 +124,8 @@ bool Schema_Phase_field::initTimeStep(double dt)
  */
 int Schema_Phase_field::mettre_a_jour()
 {
-  sch2.valeur().mettre_a_jour();
-  sch3.valeur().mettre_a_jour();
+  sch2->mettre_a_jour();
+  sch3->mettre_a_jour();
 
   return Schema_Temps_base::mettre_a_jour();
 }
@@ -137,8 +137,8 @@ int Schema_Phase_field::mettre_a_jour()
  */
 void Schema_Phase_field::changer_temps_courant(const double t)
 {
-  sch2.valeur().changer_temps_courant(t);
-  sch3.valeur().changer_temps_courant(t);
+  sch2->changer_temps_courant(t);
+  sch3->changer_temps_courant(t);
 
   Schema_Temps_base::changer_temps_courant(t);
 }
@@ -155,8 +155,8 @@ void Schema_Phase_field::changer_temps_courant(const double t)
  */
 int Schema_Phase_field::stop() const
 {
-  int ls2 = sch2.valeur().stop();
-  int ls3 = sch3.valeur().stop();
+  int ls2 = sch2->stop();
+  int ls3 = sch3->stop();
 
   return (ls2 | ls3 | Schema_Temps_base::stop());
 }
@@ -168,8 +168,8 @@ int Schema_Phase_field::stop() const
  */
 void Schema_Phase_field::imprimer(Sortie& os) const
 {
-  sch2.valeur().imprimer(os);
-  sch3.valeur().imprimer(os);
+  sch2->imprimer(os);
+  sch3->imprimer(os);
 
   Schema_Temps_base::imprimer(os);
 }
@@ -182,8 +182,8 @@ void Schema_Phase_field::imprimer(Sortie& os) const
  */
 bool Schema_Phase_field::corriger_dt_calcule(double& dt) const
 {
-  bool ok=sch2.valeur().corriger_dt_calcule(dt);
-  ok = ok && sch3.valeur().corriger_dt_calcule(dt);
+  bool ok=sch2->corriger_dt_calcule(dt);
+  ok = ok && sch3->corriger_dt_calcule(dt);
   ok = ok && Schema_Temps_base::corriger_dt_calcule(dt);
   return ok;
 }
@@ -295,9 +295,9 @@ int Schema_Phase_field::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
     {
       Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,eqn);
       eq_ns.calculer_rho();
-      sch3.valeur().set_dt()=pas_de_temps();
-      sch3.valeur().faire_un_pas_de_temps_eqn_base(eqn);
-      set_stationnaire_atteint()=sch3.valeur().isStationary();
+      sch3->set_dt()=pas_de_temps();
+      sch3->faire_un_pas_de_temps_eqn_base(eqn);
+      set_stationnaire_atteint()=sch3->isStationary();
       return 1;
     }
 }
@@ -384,13 +384,13 @@ int Schema_Phase_field::deuxieme_dt(Convection_Diffusion_Phase_field& eq_c)
   DoubleTab intermediaire(present);
   intermediaire = present;
 
-  sch2.valeur().set_dt()=pas_de_temps();
+  sch2->set_dt()=pas_de_temps();
 
   present=eq_c.get_c_demi();
   //Cerr << "present = "<<present<<finl;
 
-  sch2.valeur().faire_un_pas_de_temps_eqn_base(eq_c);
-  set_stationnaire_atteint()=sch2.valeur().isStationary();
+  sch2->faire_un_pas_de_temps_eqn_base(eq_c);
+  set_stationnaire_atteint()=sch2->isStationary();
   present=intermediaire;
   //Cerr << "present apres = "<<present<<finl;
 

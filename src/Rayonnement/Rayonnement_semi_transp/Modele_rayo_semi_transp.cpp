@@ -227,8 +227,8 @@ void Modele_rayo_semi_transp::preparer_calcul()
       for(int num_source = 0; num_source < les_sources.size(); num_source++)
         {
           if (  (sub_type(Source_rayo_semi_transp_base,les_sources[num_source].valeur()))
-                || (les_sources[num_source].valeur().que_suis_je() == "Source_rayo_semi_transp_QC_VDF_P0_VDF")
-                || (les_sources[num_source].valeur().que_suis_je() == "Source_rayo_semi_transp_QC_VEF_P1NC") )
+                || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VDF_P0_VDF")
+                || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VEF_P1NC") )
             {
               contient_source_rayo_semi_transp = 1;
             }

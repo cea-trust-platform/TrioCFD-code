@@ -43,8 +43,8 @@ Entree& Source_injection_masse_base::readOn(Entree& is)
   for (int n = 0; n < nb_comp; n++) flux_masse_->fixer_nom_compo(n, ch_flux_masse_lu_.le_nom() + (nb_comp > 1 ? Nom(n) :""));
   equation().discretisation().nommer_completer_champ_physique(equation().domaine_dis(),ch_flux_masse_lu_.le_nom(),"1/s",flux_masse_lu_,equation().probleme());
   equation().discretisation().nommer_completer_champ_physique(equation().domaine_dis(),ch_flux_masse_lu_.le_nom(),"1/s",flux_masse_,equation().probleme());
-  flux_masse_.valeur().valeurs() = 0;
-  flux_masse_.valeur().affecter(flux_masse_lu_);
+  flux_masse_->valeurs() = 0;
+  flux_masse_->affecter(flux_masse_lu_);
 
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
   int N = pb.nb_phases();

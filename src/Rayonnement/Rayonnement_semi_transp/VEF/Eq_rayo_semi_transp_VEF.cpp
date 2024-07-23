@@ -116,10 +116,10 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
   // On met a jour les champs associes aux conditions aux limites
   // avant d'evaluer leur contribution dans la matrice de discretisation
   evaluer_cl_rayonnement(temps);
-  terme_diffusif.valeur().contribuer_au_second_membre(secmem);
+  terme_diffusif->contribuer_au_second_membre(secmem);
   secmem.echange_espace_virtuel();
 
-  if (solveur.valeur().que_suis_je() == "Solv_GCP")
+  if (solveur->que_suis_je() == "Solv_GCP")
     if (sub_type(Champ_Uniforme,fluide().kappa().valeur()))
       {
         Matrice matrice_tmp;
@@ -137,7 +137,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
         Cerr<<"n'est pas symetrique"<<finl;
         exit();
       }
-  else if (solveur.valeur().que_suis_je() == "Solv_Gmres")
+  else if (solveur->que_suis_je() == "Solv_Gmres")
     if (Process::nproc() == 1)
       solveur.resoudre_systeme(la_matrice,secmem,irradiance_.valeurs());
     else
@@ -353,7 +353,7 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
   // Prise en compte de la partie div((1/3K)grad(irradiance)) dans la matrice
   // de discretisation.
 
-  terme_diffusif.valeur().contribuer_a_avec(irradi,la_matrice);
+  terme_diffusif->contribuer_a_avec(irradi,la_matrice);
 
 
   // Modification de la matrice pour prendre en compte le second membre en K*irradiance
@@ -394,7 +394,7 @@ void Eq_rayo_semi_transp_VEF::completer()
   for (ii =0; ii<n; ii++)
     {
       const Frontiere_dis_base& la_fr_dis = un_domaine_dis.frontiere_dis(ii);
-      le_dom_Cl_dis.valeur().les_conditions_limites(ii)->associer_fr_dis_base(la_fr_dis);
+      le_dom_Cl_dis->les_conditions_limites(ii)->associer_fr_dis_base(la_fr_dis);
     }
 
   Equation_rayonnement_base::completer();

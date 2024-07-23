@@ -875,7 +875,7 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(const int
 
   const int distance_interface_elem = distance_interface_element_eulerien_[elem];
 
-  assert(volume_perdu_.dimension_tot(0)==domaine_dis(maillage).valeur().domaine().nb_elem_tot());
+  assert(volume_perdu_.dimension_tot(0)==domaine_dis(maillage)->domaine().nb_elem_tot());
 
   const double volume_perdu_elem = volume_perdu_[elem];
   const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
@@ -883,7 +883,7 @@ int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(const int
   //Boucle sur les faces qui traversent l'element:
   //ATTENTION : en parallele, le tableau "index_elem" est dimensionne
   //a nb_elem() et pas a nb_elem_tot()
-  assert(elem<domaine_dis(maillage).valeur().domaine().nb_elem());
+  assert(elem<domaine_dis(maillage)->domaine().nb_elem());
   int index = index_elem[elem];
 
   const double somme_coefs = surface_interface_elements_voisins_[elem];
@@ -987,7 +987,7 @@ double  Remailleur_Collision_FT_Thomas::surface_intersection(const int elem, con
   // Boucle sur les faces qui traversent l'element:
   //ATTENTION : en parallele, le tableau "index_elem" est dimensionne
   //a nb_elem() et pas a nb_elem_tot()
-  assert(elem<domaine_dis(maillage).valeur().domaine().nb_elem());
+  assert(elem<domaine_dis(maillage)->domaine().nb_elem());
   int index = index_elem[elem];
 
   while (index >= 0)

@@ -48,7 +48,7 @@ Entree& Senseur_Interface::readOn(Entree& is)
       Cerr << "Error: wrong segments dimension or nb_points_tests" << finl;
       exit();
     }
-  equation_ = ref_cast(Transport_Interfaces_FT_Disc, probleme_.valeur().get_equation_by_name(equation_interface_));
+  equation_ = ref_cast(Transport_Interfaces_FT_Disc, probleme_->get_equation_by_name(equation_interface_));
 
   return is;
 }
@@ -80,7 +80,7 @@ int Senseur_Interface::calculer_position(ArrOfDouble& pos) const
         }
     }
   IntVect num_element(nb_points_tests_);
-  const Domaine& domaine = eq.domaine_dis().valeur().domaine();
+  const Domaine& domaine = eq.domaine_dis()->domaine();
   domaine.chercher_elements(positions, num_element);
   //DoubleVect dist(nb_points_tests_);
   // Invalide le numero d'element pour les elements virtuels

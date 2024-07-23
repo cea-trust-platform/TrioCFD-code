@@ -157,7 +157,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
   int nombre_faces_rayonnantes=domaine.nb_bords()+domaine.nb_raccords();
   for (i=0; i<nombre_faces_rayonnantes; i++)
     {
-      const IntTab& som=(i<domaine.nb_bords()?domaine.bord(i).faces().les_sommets():domaine.raccord(i-domaine.nb_bords()).valeur().faces().les_sommets());
+      const IntTab& som=(i<domaine.nb_bords()?domaine.bord(i).faces().les_sommets():domaine.raccord(i-domaine.nb_bords())->faces().les_sommets());
       int nb_faces=som.dimension(0);
       for (j=0; j<nb_faces; j++)
         {
@@ -382,7 +382,7 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
           num_globale=0;
           for (i=0; i<nombre_faces_rayonnantes; i++)
             {
-              const IntTab& som=(i<domaine.nb_bords()?domaine.bord(i).faces().les_sommets():domaine.raccord(i-domaine.nb_bords()).valeur().faces().les_sommets());
+              const IntTab& som=(i<domaine.nb_bords()?domaine.bord(i).faces().les_sommets():domaine.raccord(i-domaine.nb_bords())->faces().les_sommets());
               int nb_faces=som.dimension(0);
               fic<<"ESEL,S,,,"<<num_globale+1<<","<<num_globale+nb_faces<<finl;
               fic<<"CM,B"<<i<<",ELEM"<<finl;

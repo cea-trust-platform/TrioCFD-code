@@ -82,7 +82,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   T_autre_pb().mettre_a_jour(temps);
   indicatrice_.mettre_a_jour(temps);
 
-  const DoubleTab& I = indicatrice_.valeur().valeurs_au_temps(temps);
+  const DoubleTab& I = indicatrice_->valeurs_au_temps(temps);
 
   Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
   // le_milieu =  SOLID
@@ -395,9 +395,9 @@ int Echange_contact_VDF_FT_Disc::initialiser(double temps)
 void Echange_contact_VDF_FT_Disc::set_temps_defaut(double temps)
 {
   if (Ti_wall_.non_nul())
-    Ti_wall_.valeur().set_temps_defaut(temps);
+    Ti_wall_->set_temps_defaut(temps);
   if (indicatrice_.non_nul())
-    indicatrice_.valeur().set_temps_defaut(temps);
+    indicatrice_->set_temps_defaut(temps);
   Echange_global_impose::set_temps_defaut(temps);
 }
 double Echange_contact_VDF_FT_Disc::Ti_wall(int i) const

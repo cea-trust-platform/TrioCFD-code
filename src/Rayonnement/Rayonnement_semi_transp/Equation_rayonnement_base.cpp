@@ -138,9 +138,9 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
     if (fluide().kappa().non_nul())
       {
         const Champ_Don& long_rayo = fluide().longueur_rayo();
-        terme_diffusif.valeur().associer_diffusivite(long_rayo);
+        terme_diffusif->associer_diffusivite(long_rayo);
         terme_diffusif.completer();
-        terme_diffusif.valeur().dimensionner(la_matrice);
+        terme_diffusif->dimensionner(la_matrice);
       }
     else
       {
@@ -364,9 +364,9 @@ void Equation_rayonnement_base::discretiser()
   // d'associer tout la bonne discretisation au champ de l'irradiance
   // toutefois, il faut modifier certaines grandeurs telles que le nom ou l'unite
   // de l'irradiance.
-  irradiance_.valeur().fixer_nb_valeurs_temporelles(1);
-  irradiance_.valeur().nommer("irradiance");
-  irradiance_.valeur().fixer_unite("w/m2");
+  irradiance_->fixer_nb_valeurs_temporelles(1);
+  irradiance_->nommer("irradiance");
+  irradiance_->fixer_unite("w/m2");
   champs_compris_.ajoute_champ(irradiance_);
   //
   // Fin de discretisation de l'equation de rayonnement

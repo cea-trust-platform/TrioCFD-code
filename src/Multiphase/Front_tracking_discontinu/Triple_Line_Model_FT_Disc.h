@@ -96,7 +96,7 @@ public :
 
   inline const ArrOfInt& elems() const
   {
-    assert(tag_tcl() == ref_eq_interf_.valeur().maillage_interface().get_mesh_tag());
+    assert(tag_tcl() == ref_eq_interf_->maillage_interface().get_mesh_tag());
     return elems_;
   }
 
@@ -104,7 +104,7 @@ public :
 
   inline const ArrOfInt& boundary_faces() const
   {
-    assert(tag_tcl() == ref_eq_interf_.valeur().maillage_interface().get_mesh_tag());
+    assert(tag_tcl() == ref_eq_interf_->maillage_interface().get_mesh_tag());
     return boundary_faces_;
   }
 

@@ -107,7 +107,7 @@ protected:
 inline double Paroi_std_hyd_VDF::tau_tang(int face, int k) const
 {
   if(face >= Cisaillement_paroi_.dimension(0))
-    face -= le_dom_VDF.valeur().nb_faces_internes();
+    face -= le_dom_VDF->nb_faces_internes();
 
   if(face >= Cisaillement_paroi_.dimension_tot(0))
     {

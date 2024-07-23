@@ -112,11 +112,11 @@ void Transport_K_ou_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
 
   if ( transporte_K_ )
     {
-      ch.valeur().nommer("K");
+      ch->nommer("K");
     }
   else
     {
-      ch.valeur().nommer("Eps");
+      ch->nommer("Eps");
     }
 }
 
@@ -181,7 +181,7 @@ int Transport_K_ou_Eps_base::controler_variable()
   if (size<0)
     {
       if (sub_type(Champ_Inc_P0_base, le_champ_.valeur()))
-        size = le_champ_.valeur().equation().domaine_dis().domaine().nb_elem();
+        size = le_champ_->equation().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_ou_Eps field in Transport_K_ou_Eps_base::controler_variable()" << finl;

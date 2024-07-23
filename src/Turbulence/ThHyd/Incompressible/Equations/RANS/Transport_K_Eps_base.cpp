@@ -86,7 +86,7 @@ void Transport_K_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
 
   const Discretisation_base& dis = discretisation();
   dis.discretiser_champ("temperature",z.valeur(),multi_scalaire,noms,unit,2,sch.nb_valeurs_temporelles(),sch.temps_courant(),ch);
-  ch.valeur().nommer("K_Eps");
+  ch->nommer("K_Eps");
 }
 
 // For VEF-like scheme
@@ -134,7 +134,7 @@ int Transport_K_Eps_base::controler_K_Eps()
   if (size < 0)
     {
       if (sub_type(Champ_Inc_P0_base, le_champ_K_Eps.valeur()))
-        size = le_champ_K_Eps.valeur().equation().domaine_dis().domaine().nb_elem();
+        size = le_champ_K_Eps->equation().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_Eps field in Transport_K_Eps_base::controler_K_Eps()" << finl;

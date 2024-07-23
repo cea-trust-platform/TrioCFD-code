@@ -148,10 +148,10 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
           const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
           la_surface_libre_ = ref_cast(Front_VF,les_cls[num_cl].frontiere_dis());
           trouve=1;
-          int nb_faces=la_surface_libre_.valeur().nb_faces();
+          int nb_faces=la_surface_libre_->nb_faces();
           for (int ind_face=0; ind_face<nb_faces; ind_face++)
             {
-              int face = la_surface_libre_.valeur().num_face(ind_face);
+              int face = la_surface_libre_->num_face(ind_face);
               if (domaine_VF.face_normales(face,0)!=0 || domaine_VF.face_normales(face,1)) error("The free surface should be normal to Z on all faces.");
             }
         }
@@ -168,12 +168,12 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
 
   // Vorticite dans le jeu de donnees si AREVA
   if (calculer_critere_areva_)
-    mon_equation.valeur().creer_champ("vorticite");
+    mon_equation->creer_champ("vorticite");
   // && !ref_cast(Navier_Stokes_std,mon_equation.valeur()).vorticite().non_nul()) error("The vorticity should be postreated in the datafile for the AREVA criterion.");
 
   // CritereQ dans le jeu de donnees si CEA_JAEA
   if (calculer_critere_cea_jaea_ )
-    mon_equation.valeur().creer_champ("critere_Q");
+    mon_equation->creer_champ("critere_Q");
   //&& !ref_cast(Navier_Stokes_std,mon_equation.valeur()).critereQ().non_nul()) error("The Q criterion should be postreated in the datafile for the CEA/JAEA criterion.");
 }
 
@@ -197,7 +197,7 @@ void Traitement_particulier_NS_CEG::critere_areva()
 {
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
-  const DoubleTab& vorticite = mon_equation.valeur().get_champ("vorticite").valeurs();
+  const DoubleTab& vorticite = mon_equation->get_champ("vorticite").valeurs();
   const Navier_Stokes_Turbulent& eqn = ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0));
   const DoubleTab& KEps = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base,eqn.modele_turbulence().valeur()).equation_k_eps(0).inconnue().valeurs();
 
@@ -205,12 +205,12 @@ void Traitement_particulier_NS_CEG::critere_areva()
   double K_max_local=0;
   ArrOfDouble centre_vortex(3);
   int nb_face_par_elem = domaine_VF.elem_faces().dimension(1);
-  int nb_faces=la_surface_libre_.valeur().nb_faces();
+  int nb_faces=la_surface_libre_->nb_faces();
 
   // On boucle sur les faces reelles
   for (int ind_face=0; ind_face<nb_faces; ind_face++)
     {
-      int face = la_surface_libre_.valeur().num_face(ind_face);
+      int face = la_surface_libre_->num_face(ind_face);
       // On recupere chaque maille adjacente
       int elem = domaine_VF.face_voisins(face,0);
       if (elem<0) elem = domaine_VF.face_voisins(face,1);
@@ -273,7 +273,7 @@ int Traitement_particulier_NS_CEG::lpost(double temps_courant, double dt_post) c
 void Traitement_particulier_NS_CEG::critere_cea_jaea()
 {
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
-  int nb_faces=la_surface_libre_.valeur().nb_faces();
+  int nb_faces=la_surface_libre_->nb_faces();
   int nb_elem=domaine_VF.nb_elem();
 
   IntVect elements_surface_libre(nb_faces);	// Tableau donnant les elements au contact des faces de la surface libre
@@ -285,14 +285,14 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
   // GF on laisse faire NS...
   // DoubleTab critereQ(nb_elem);
   //ref_cast(Champ_P1NC,mon_equation->inconnue().valeur()).calcul_critere_Q(critereQ);
-  const DoubleTab& critereQ = mon_equation.valeur().get_champ("critere_Q").valeurs();
+  const DoubleTab& critereQ = mon_equation->get_champ("critere_Q").valeurs();
 
 
   // On boucle sur les faces reelles
   // ou Q>0 (domaine potentielle de vortex)
   for (int ind_face=0; ind_face<nb_faces; ind_face++)
     {
-      int face = la_surface_libre_.valeur().num_face(ind_face);
+      int face = la_surface_libre_->num_face(ind_face);
       // On recupere chaque maille adjacente
       int elem = domaine_VF.face_voisins(face,0);
       if (elem<0) elem = domaine_VF.face_voisins(face,1);
@@ -346,7 +346,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
       // on le communique a tous les processeurs
       if (pe==pe_mp_max)
         {
-          int face_centre_fortex = la_surface_libre_.valeur().num_face(ind_face_centre_vortex);
+          int face_centre_fortex = la_surface_libre_->num_face(ind_face_centre_vortex);
           int elem_centre_vortex = elements_surface_libre(ind_face_centre_vortex);
           vortex_potentiel(elem_centre_vortex)=0; // Ne sera plus evalue plus tard
           taille_vortex=1;
@@ -481,7 +481,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               //if (e>=0) Cerr << "Sur process " << Process::me() << " critere_Q=" << critereQ(e) << finl;
             }
           // On evalue la vitesse aux points:
-          mon_equation->inconnue().valeur().valeur_aux(points,u);
+          mon_equation->inconnue()->valeur_aux(points,u);
           double alpha=0;
           double gamma=0;
           // On integre sur le cercle pour calcul alpha et gamma:

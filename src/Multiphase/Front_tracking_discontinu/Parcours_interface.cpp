@@ -144,7 +144,7 @@ void Parcours_interface::associer_domaine_dis(const Domaine_dis& domaine_dis)
         equations_plans_faces_(i, 3) = d;
       }
   }
-  const Nom& nom_elem = domaine_vf.domaine().type_elem().valeur().que_suis_je();
+  const Nom& nom_elem = domaine_vf.domaine().type_elem()->que_suis_je();
   if (nom_elem == "Rectangle")
     type_element_ = RECTANGLE;
   else if (nom_elem == "Rectangle_2D_axi")
@@ -2244,7 +2244,7 @@ void Parcours_interface::projeter_vecteur_sur_face(const int num_face,
 void Parcours_interface::calculer_normale_face_bord(int num_face, double x, double y, double z,
                                                     double& nx_, double& ny_, double& nz_) const
 {
-  const IntTab& face_voisins = refdomaine_vf_.valeur().face_voisins();
+  const IntTab& face_voisins = refdomaine_vf_->face_voisins();
   double signe;
   if (face_voisins(num_face, 0) < 0)
     signe = 1.;

@@ -209,7 +209,7 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
               Process::exit(-1);
             }
 
-          size = le_champ_K_Eps_ou_Omega.valeur().equation().domaine_dis().domaine().nb_elem();
+          size = le_champ_K_Eps_ou_Omega->equation().domaine_dis().domaine().nb_elem();
 
           if (IS_K_EPS_BICEPHALE)
             {
@@ -218,7 +218,7 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
                   Cerr << "Unsupported field in Modele_turbulence_hyd_RANS_Gen::imprimer_evolution()" << finl;
                   Process::exit(-1);
                 }
-              assert (size == (*le_champ_Eps).valeur().equation().domaine_dis().domaine().nb_elem());
+              assert (size == (*le_champ_Eps)->equation().domaine_dis().domaine().nb_elem());
             }
         }
 

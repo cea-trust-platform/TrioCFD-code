@@ -306,7 +306,7 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
   parser.parseString();
 
   // Construction d'un tableau de valeurs aux sommets euleriens
-  const Domaine& domaine = ref_domaine_vf_.valeur().domaine();
+  const Domaine& domaine = ref_domaine_vf_->domaine();
   const int nb_sommets = domaine.nb_som();
 
   for (int i = 0; i < nb_sommets; i++)
@@ -570,7 +570,7 @@ void Marching_Cubes::calculer_signe(const DoubleVect& valeurs_sommets,
 {
   int i;
 
-  const int nb_sommets = ref_domaine_vf_.valeur().nb_som();
+  const int nb_sommets = ref_domaine_vf_->nb_som();
   assert(valeurs_sommets.size() == nb_sommets);
   signe.resize_array(nb_sommets);
   signe = 0;
@@ -602,7 +602,7 @@ int Marching_Cubes::construire_noeuds_et_facettes(const ArrOfBit& signe,
   int resultat_ok = 1; // Valeur de retour de la fonction
   int arete, elem, sommet;
 
-  const Domaine& domaine = ref_domaine_vf_.valeur().domaine();
+  const Domaine& domaine = ref_domaine_vf_->domaine();
   // Pour chaque element virtuel, numero du PE proprietaire :
   const IntTab& elem_virt_pe_num = domaine.elem_virt_pe_num();
   // Raccourci vers les numeros des sommets des elements
@@ -1244,7 +1244,7 @@ void Marching_Cubes::calculer_coord_noeuds(const DoubleVect& valeurs_sommets,
                                            Maillage_FT_Disc& maillage) const
 {
   // Raccourci vers les coordonnees des sommets du maillage eulerien
-  const DoubleTab& coord_ = ref_domaine_vf_.valeur().domaine().coord_sommets();
+  const DoubleTab& coord_ = ref_domaine_vf_->domaine().coord_sommets();
   const int nb_noeuds = def_noeud.dimension(0);
   DoubleTab& coord_noeuds = maillage.sommets_;
   coord_noeuds.resize(nb_noeuds, dimension);

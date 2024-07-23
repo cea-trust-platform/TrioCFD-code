@@ -79,7 +79,7 @@ Entree& Paroi_FT_disc::readOn(Entree& is)
   else
     {
       le_champ_front.typer("Champ_Front_Uniforme");
-      le_champ_front.valeur().fixer_nb_comp(0);
+      le_champ_front->fixer_nb_comp(0);
     }
 
   return is;

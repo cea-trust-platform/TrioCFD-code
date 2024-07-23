@@ -192,8 +192,8 @@ void IJK_Thermals::initialize(const IJK_Splitting& splitting, int& nalloc)
     }
   for (auto& itr : (*this))
     {
-      lata_step_reprise_.push_back(itr.valeur().get_latastep_reprise());
-      lata_step_reprise_ini_.push_back(itr.valeur().get_latastep_reprise_ini());
+      lata_step_reprise_.push_back(itr->get_latastep_reprise());
+      lata_step_reprise_ini_.push_back(itr->get_latastep_reprise_ini());
     }
 }
 
@@ -447,7 +447,7 @@ void IJK_Thermals::set_latastep_reprise(const bool stop)
 {
   if (stop)
     for (auto& itr : (*this))
-      itr.valeur().set_latastep_reprise(ref_ijk_ft_->get_tstep() + 1);
+      itr->set_latastep_reprise(ref_ijk_ft_->get_tstep() + 1);
 }
 
 void IJK_Thermals::thermal_subresolution_outputs(const int& dt_post_thermals_probes)
@@ -484,7 +484,7 @@ void IJK_Thermals::thermal_subresolution_outputs(const int& dt_post_thermals_pro
           const int nb_dt_max = ref_ijk_ft_->get_nb_timesteps();
           if ((ref_ijk_ft_->get_tstep() + dt_post_thermals_probes) >= nb_dt_max)
             latastep_reprise = nb_dt_max + 1;
-          itr.valeur().set_latastep_reprise(latastep_reprise);
+          itr->set_latastep_reprise(latastep_reprise);
           rank++;
         }
     }

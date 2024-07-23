@@ -56,7 +56,7 @@ public:
   bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const override
   {
     if (associe_modele_fonction().non_nul() && associe_modele_fonction().Calcul_is_Reynolds_stress_isotrope()==0)
-      return associe_modele_fonction().valeur().calcul_tenseur_Re(nu_turb, grad, Re);
+      return associe_modele_fonction()->calcul_tenseur_Re(nu_turb, grad, Re);
     else
       return false;
   }

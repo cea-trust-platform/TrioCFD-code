@@ -114,7 +114,7 @@ void Champ_front_zoom::creer(Nom& nom_pbMG,
       if (sub_type(Champ_Inc_base,rch.valeur()))
         {
           l_inconnueF=ref_cast(Champ_Inc_base, rch.valeur()) ;
-          fixer_nb_comp(rch.valeur().nb_comp());
+          fixer_nb_comp(rch->nb_comp());
         }
       else
         {
@@ -125,7 +125,7 @@ void Champ_front_zoom::creer(Nom& nom_pbMG,
       if (sub_type(Champ_Inc_base,rch.valeur()))
         {
           l_inconnue=ref_cast(Champ_Inc_base, rch.valeur()) ;
-          fixer_nb_comp(rch.valeur().nb_comp());
+          fixer_nb_comp(rch->nb_comp());
         }
       else
         {

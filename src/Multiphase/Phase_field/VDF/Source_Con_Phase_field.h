@@ -159,7 +159,7 @@ inline const int& Source_Con_Phase_field::get_type_systeme_naire()
 }
 inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 {
-  const DoubleTab& tab = drhodc_.valeur().valeurs();
+  const DoubleTab& tab = drhodc_->valeurs();
   if (tab.dimension(0)==1)
     {
       int dim = tab.nb_dim();

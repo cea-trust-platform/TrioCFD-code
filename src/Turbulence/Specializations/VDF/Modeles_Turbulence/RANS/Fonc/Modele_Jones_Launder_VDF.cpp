@@ -205,7 +205,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D(DoubleTab& D,const Domaine_dis& do
         }
       else
         {
-          Cerr<<la_cl.valeur().que_suis_je()<< "not implemented in calculer_D"<<finl;
+          Cerr<<la_cl->que_suis_je()<< "not implemented in calculer_D"<<finl;
           exit();
         }
     }
@@ -1448,7 +1448,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis
         }
       else
         {
-          Cerr<<la_cl.valeur().que_suis_je()<< "not implemented in calculer_D"<<finl;
+          Cerr<<la_cl->que_suis_je()<< "not implemented in calculer_D"<<finl;
           exit();
         }
     }

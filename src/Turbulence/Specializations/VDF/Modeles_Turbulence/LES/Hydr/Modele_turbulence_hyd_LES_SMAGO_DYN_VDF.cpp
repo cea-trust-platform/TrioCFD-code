@@ -924,7 +924,7 @@ void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::stabilise_moyenne_euler_lagrange(c
   static DoubleTrav haut_moy;
   static DoubleTrav bas_moy;
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
-  DoubleVect& model_coeff = coeff_field_.valeur().valeurs();
+  DoubleVect& model_coeff = coeff_field_->valeurs();
 
   if (init == 1)
     {

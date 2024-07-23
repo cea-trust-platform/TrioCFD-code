@@ -112,7 +112,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
   //
   for (I=0; I<nombre_faces_rayonnantes; I++)
     {
-      Faces& faces=(I<domaine.nb_bords()?domaine.bord(I).faces():domaine.raccord(I-domaine.nb_bords()).valeur().faces());
+      Faces& faces=(I<domaine.nb_bords()?domaine.bord(I).faces():domaine.raccord(I-domaine.nb_bords())->faces());
       int nb_faces=faces.nb_faces();
       // Calcul des surfaces de chaque face
       DoubleVect Si;
@@ -138,7 +138,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
           for (J=0; J<nombre_faces_rayonnantes; J++)
             {
               double FiJ=0;
-              int nombre_faces=(J<domaine.nb_bords()?domaine.bord(J).faces().nb_faces():domaine.raccord(J-domaine.nb_bords()).valeur().faces().nb_faces());
+              int nombre_faces=(J<domaine.nb_bords()?domaine.bord(J).faces().nb_faces():domaine.raccord(J-domaine.nb_bords())->faces().nb_faces());
               if (deja_regroupe_dans_ansys)
                 nombre_faces=1;
               for (j=0; j<nombre_faces; j++)

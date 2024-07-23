@@ -104,7 +104,7 @@ Entree& Champ_Fonc_reprise_IJK::readOn(Entree& s)
 
   associer_domaine_dis_base(pb.domaine_dis());
   // on cree un champ comme le ch_ref;
-  vrai_champ_.typer(ref_ch.valeur().que_suis_je());
+  vrai_champ_.typer(ref_ch->que_suis_je());
   const Champ_Inc_base& ch_inc=ref_cast(Champ_Inc_base,ref_ch.valeur());
   Champ_Inc_base& v_champ=vrai_champ_.valeur();
   le_champ().associer_domaine_dis_base(pb.domaine_dis());
@@ -330,7 +330,7 @@ void Champ_Fonc_reprise_IJK::reprendre_IJK(Entree& fich, Champ_base& ch)
       Cerr << "Champ_Fonc_reprise_IJK::reprendre_IJK: error, cannot read intno an array with no metadata" << finl;
       Process::exit();
     }
-  const int nb_items_seq = md.valeur().nb_items_seq_tot();
+  const int nb_items_seq = md->nb_items_seq_tot();
   if (nb_items_seq == 0)
     return;
 

@@ -58,8 +58,8 @@ int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
   const Fluide_Incompressible& phase_0 = le_fluide.fluide_phase(0);
   const Champ_Don& ch_visco_cin_ph1 = phase_1.viscosite_cinematique();
   const Champ_Don& ch_visco_cin_ph0 = phase_0.viscosite_cinematique();
-  const DoubleTab& tab_visco_ph1 = phase_1.viscosite_cinematique().valeur().valeurs();
-  const DoubleTab& tab_visco_ph0 = phase_0.viscosite_cinematique().valeur().valeurs();
+  const DoubleTab& tab_visco_ph1 = phase_1.viscosite_cinematique()->valeurs();
+  const DoubleTab& tab_visco_ph0 = phase_0.viscosite_cinematique()->valeurs();
   const double delta_nu = tab_visco_ph1(0,0) - tab_visco_ph0(0,0);
 
   // One way to get the Transport equation to pass the indicator DoubleTab

@@ -80,13 +80,13 @@ int Navier_Stokes_std_ALE::reprendre(Entree& is)
   Champ_Inc JacobianOld = vitesse(); // Initialize with same discretization
   JacobianOld->nommer("JacobianOld");
   Nom field_tag_JOld(JacobianOld->le_nom());
-  field_tag_JOld += JacobianOld.valeur().que_suis_je();
+  field_tag_JOld += JacobianOld->que_suis_je();
   field_tag_JOld += probleme().domaine().le_nom();
   field_tag_JOld += Nom(probleme().schema_temps().temps_courant(),probleme().reprise_format_temps());
   Champ_Inc JacobianNew = vitesse(); // Initialize with same discretization
   JacobianNew->nommer("JacobianNew");
   Nom field_tag_JNew(JacobianNew->le_nom());
-  field_tag_JNew += JacobianNew.valeur().que_suis_je();
+  field_tag_JNew += JacobianNew->que_suis_je();
   field_tag_JNew += probleme().domaine().le_nom();
   field_tag_JNew += Nom(probleme().schema_temps().temps_courant(),probleme().reprise_format_temps());
 
@@ -197,11 +197,11 @@ void Navier_Stokes_std_ALE::discretiser()
   Cerr << "Mesh Velocity discretization" << finl;
   dis.discretiser_champ("vitesse", domaine_dis().valeur(), "ALEMeshVelocity","m/s", dimension,1,schema_temps().temps_courant(), ALEMeshVelocity_);
   champs_compris_.ajoute_champ(ALEMeshVelocity_);
-  ALEMeshVelocity_.valeur().add_synonymous(Nom("ALEMeshVelocity"));
+  ALEMeshVelocity_->add_synonymous(Nom("ALEMeshVelocity"));
   Cerr << "Mesh Velocity discretization" << finl;
   dis.discretiser_champ("vitesse",domaine_dis().valeur(),"ALEMeshTotalDisplacement","m/s",dimension,1,schema_temps().temps_courant(),ALEMeshTotalDisplacement_);
   champs_compris_.ajoute_champ(ALEMeshTotalDisplacement_);
-  ALEMeshTotalDisplacement_.valeur().add_synonymous(Nom("ALEMeshTotalDisplacement"));
+  ALEMeshTotalDisplacement_->add_synonymous(Nom("ALEMeshTotalDisplacement"));
 }
 
 void Navier_Stokes_std_ALE::mettre_a_jour(double temps)

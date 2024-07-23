@@ -45,7 +45,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
   if(sub_type(Champ_front_zoom, T_ext().valeur()))
     {
       Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext().valeur());
-      DoubleTab& Text_valeurs = T_ext().valeur().valeurs_au_temps(temps);
+      DoubleTab& Text_valeurs = T_ext()->valeurs_au_temps(temps);
 
       int elemG;
       REF(Pb_2G) le_pb2G;
@@ -101,14 +101,14 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
       //Cerr << "Domaine : "<<domaine_dis1.domaine().domaine().le_nom()<<finl;
       //Cerr << "On traite le raccord de nom " << nom_racc1 << finl;
-      int nb_faces_raccord1 = domaine_dis1.domaine().raccord(nom_racc1).valeur().nb_faces();
+      int nb_faces_raccord1 = domaine_dis1.domaine().raccord(nom_racc1)->nb_faces();
       tab.resize(nb_faces_raccord1,nb_comp);
       //Cerr<<"nb_faces_raccord1 = "<<nb_faces_raccord1<<finl;
       //Cerr << "Nb faces raccord 1: "<<nb_faces_raccord1<<finl;
 
 
 
-      if (domaine_dis1.domaine().raccord(nom_racc1).valeur().que_suis_je() =="Raccord_distant_homogene")
+      if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() =="Raccord_distant_homogene")
         {
           //POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!
           Cerr<<"POUR LE MOMENT ON NE TRAITE PAS CE CAS !!!!!!!!!"<<finl;

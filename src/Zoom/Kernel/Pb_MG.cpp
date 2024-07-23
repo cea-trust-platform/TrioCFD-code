@@ -172,7 +172,7 @@ void Pb_MG::initialiser_champ_front_zoom()
               int nb_cond;
               for(nb_cond=0; nb_cond<nbCond; nb_cond++)
                 {
-                  Champ_front_base& champFront = domaineF.les_conditions_limites(nb_cond).valeur().champ_front();
+                  Champ_front_base& champFront = domaineF.les_conditions_limites(nb_cond)->champ_front();
 
                   if(sub_type(Champ_front_zoom, champFront))
                     {

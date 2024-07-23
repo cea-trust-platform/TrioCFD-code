@@ -66,7 +66,7 @@ void Viscosite_turbulente_sato::reynolds_stress(DoubleTab& R_ij) const // Renvoi
 
   // Récupère les champs de vitesse - alpha - d_bulles (diamètre des bulles) - grad vitesse
   const Pb_Multiphase* pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr ;
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, pb_.valeur().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, pb_->domaine_dis().valeur());
   const DoubleTab& tab_u = pb_->get_champ("vitesse").passe();
   const DoubleTab& d_bulles = pb_->get_champ("diametre_bulles").passe();
   const DoubleTab& alpha = pb_->get_champ("alpha").passe();

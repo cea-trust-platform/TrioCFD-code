@@ -188,7 +188,7 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
     {
       terme_diffusif.typer(type);
       terme_diffusif.l_op_base().associer_eqn(*this);
-      Cerr << terme_diffusif.valeur().que_suis_je() << finl;
+      Cerr << terme_diffusif->que_suis_je() << finl;
       terme_diffusif->associer_diffusivite(terme_diffusif.diffusivite());
     }
   else if (motbidon=="stab")
@@ -215,7 +215,7 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
         }
       terme_diffusif.typer(type);
       terme_diffusif.l_op_base().associer_eqn(*this);
-      Cerr << terme_diffusif.valeur().que_suis_je() << finl;
+      Cerr << terme_diffusif->que_suis_je() << finl;
       terme_diffusif->associer_diffusivite(terme_diffusif.diffusivite());
     }
   return is;
@@ -231,7 +231,7 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
 int Navier_Stokes_Turbulent_ALE::preparer_calcul()
 {
 
-  Turbulence_paroi& loipar=le_modele_turbulence.valeur().loi_paroi();
+  Turbulence_paroi& loipar=le_modele_turbulence->loi_paroi();
   if (loipar.non_nul())
     loipar.init_lois_paroi();
 
@@ -275,7 +275,7 @@ int Navier_Stokes_Turbulent_ALE::reprendre(Entree& is)
 {
   Navier_Stokes_std_ALE::reprendre(is);
   double temps = schema_temps().temps_courant();
-  Nom ident_modele(le_modele_turbulence.valeur().que_suis_je());
+  Nom ident_modele(le_modele_turbulence->que_suis_je());
   ident_modele += probleme().domaine().le_nom();
   ident_modele += Nom(temps,probleme().reprise_format_temps());
 

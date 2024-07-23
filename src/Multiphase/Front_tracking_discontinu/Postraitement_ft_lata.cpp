@@ -32,7 +32,7 @@ Implemente_instanciable(Postraitement_ft_lata,"Postraitement_ft_lata",Postraitem
 Entree& Postraitement_ft_lata::readOn(Entree& is)
 {
   // Verification du type du probleme
-  const Nom& type_pb =  mon_probleme.valeur().que_suis_je();
+  const Nom& type_pb =  mon_probleme->que_suis_je();
   if ( (!sub_type(Probleme_FT_Disc_gen, mon_probleme.valeur()))
        && (type_pb!="Pb_Thermohydraulique_Especes_QC")
        && (type_pb!="Pb_Thermohydraulique_Especes_Turbulent_QC") )
@@ -190,7 +190,7 @@ void Postraitement_ft_lata::lire_champ_interface(Entree& is)
  */
 int Postraitement_ft_lata::filter_out_virtual_fa7(IntTab& new_fa7)
 {
-  const Maillage_FT_Disc& mesh = refequation_interfaces.valeur().maillage_interface_pour_post();
+  const Maillage_FT_Disc& mesh = refequation_interfaces->maillage_interface_pour_post();
   const IntTab& fa7 = mesh.facettes();
   int nl=fa7.dimension(0), nc=fa7.dimension(1);
   new_fa7.resize(0, nc);
@@ -235,10 +235,10 @@ int Postraitement_ft_lata::ecrire_maillage_ft_disc()
     id_domaine_ = "INTERFACES";
   else
     {
-      Cerr<<"Type "<<refequation_interfaces.valeur().que_suis_je()<<" not recognized"<<finl;
+      Cerr<<"Type "<<refequation_interfaces->que_suis_je()<<" not recognized"<<finl;
       exit();
     }
-  const Maillage_FT_Disc& mesh = refequation_interfaces.valeur().maillage_interface_pour_post();
+  const Maillage_FT_Disc& mesh = refequation_interfaces->maillage_interface_pour_post();
   const DoubleTab& sommets = mesh.sommets();
   const IntTab& fa7 = mesh.facettes();
   int dim = mesh.sommets().dimension(1);

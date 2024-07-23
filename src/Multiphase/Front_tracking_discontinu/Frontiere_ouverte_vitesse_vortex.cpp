@@ -80,7 +80,7 @@ void Frontiere_ouverte_vitesse_vortex::mettre_a_jour(double temps)
       const double v = volume(elem);
       integrale += x * v;
     }
-  DoubleTab& val = le_champ_front.valeur().valeurs();
+  DoubleTab& val = le_champ_front->valeurs();
 
   double facteur = integrale - integrale_reference_;
   if (facteur * signe_ < 0.)
