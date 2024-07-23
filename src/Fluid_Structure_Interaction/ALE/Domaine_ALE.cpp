@@ -657,7 +657,6 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
                     for(int isom=0; isom<dimension; isom++)
                       {
                         int som=domaine_VEF.face_sommets(face,isom);
-                        som=get_renum_som_perio(som);
                         tag_nodes_bords[som] = 1 ;
                       }
                   }
@@ -1591,12 +1590,13 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       // Update mid-step velocities, displacements and coordinates
       for (int i=0; i<nbSom; i++)
         {
+          int ii = get_renum_som_perio(i) ; // to get imposed velocity from periodic boundaries if any
           for (int j=0; j<dimension; j++)
             {
               str_mesh_model->vp(i,j) = str_mesh_model->v(i,j) + 0.5 * Dt * str_mesh_model->a(i,j) ;
               if (imposedVelocityTag[i] == 1)
                 {
-                  str_mesh_model->vp(i,j) = imposedVelocity(i,j) ; // Apply imposed velocity from the boundary
+                  str_mesh_model->vp(i,j) = imposedVelocity(ii,j) ; // Apply imposed velocity from the boundary
                 }
               double du = Dt * str_mesh_model->vp(i,j) ;
               str_mesh_model->u(i,j) += du ;
@@ -1628,7 +1628,7 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
         {
           for (int i=0; i< nbn; i++)
             {
-              elnodes[i] = get_renum_som_perio(sommets(elem,i)) ;
+              elnodes[i] = sommets(elem,i) ;
             }
 
           str_mesh_model->checkElemOrientation(elnodes, elem) ; // check orientation to ensure a positive element volume
@@ -1655,7 +1655,6 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
 
           if (scaleMass > 0.)
             {
-              Cerr << "scaleMass: " << scaleMass << finl ;
               totalScaleMass += scaleMass ;
               for (int i=0; i< nbn; i++)
                 {

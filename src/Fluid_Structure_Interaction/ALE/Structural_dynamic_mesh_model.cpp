@@ -141,11 +141,15 @@ void Structural_dynamic_mesh_model::initMfrontBehaviour()
               s1MaterialProperties[vOffset + i] = it->second[i];
             }
         }
-      else
+      else // missing property: set its value(s) to zero with a warning
         {
-          Cerr << "Error with input for Mfront behaviour " << f_ << finl ;
-          Cerr << "Missing data for for property " << mps.name << finl ;
-          exit();
+          Cerr << "Warning with input for Mfront behaviour " << f_ << finl ;
+          Cerr << "Missing data for for property " << mps.name << ", default value(s) set to zero" << finl ;
+          for (size_t i = 0; i < vSize; ++i)
+            {
+              s0MaterialProperties[vOffset + i] = 0;
+              s1MaterialProperties[vOffset + i] = 0;
+            }
         }
     }
   double *rho = new double[1];
