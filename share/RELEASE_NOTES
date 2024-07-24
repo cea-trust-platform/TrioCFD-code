@@ -1,6 +1,27 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.5_beta : Enhancements, modifications and corrected bugs since version 1.9.4 :
 --------------------------------------------------------------------------------------------------
+24/07/24 (TrioCFD) Major Change: FTD - Equations to be solved in a Front-Tracking-discontinu problem should not be read and associated to the problem. It should be read at the begining of each problem in a solved_equations bloc. New syntax is:
+   Probleme_FT_Disc_gen pb
+   ...
+   read pb {
+      solved_equations { Navier_stokes_FT_disc hydraulique
+                         Transport_interfaces_FT_disc interf
+      }
+      Fluide_diphasique {
+          fluide0 Fluide_incompressible { mu ... rho ... }
+          fluide1 Fluide_incompressible { mu ... rho ... }
+          sigma ...
+          gravite ...
+      }
+      hydraulique { ... }
+      interf { ... }
+      ...
+   }
+   solve pb
+
+24/07/24 (TrioCFD) Major Change: FTD - Medium (Fluide_Diphasique, Fluid_Incompressible, solid, constituent, ...) is no more read and associated to a Front-Tracking-discontinu problem. It should be read at the begining of each problem bloc.
+24/07/24 (TrioCFD) Major Change: FTD - Gravity is no more read and associated to a medium for Front-Tracking-Discontinu datafiles. It is read directly in the medium.
 18/07/24 (TrioCFD) Bug fix     : Turbulence - Fix a bug for k-omega which introduces differences between sequential and parallel calculation
 04/07/24 (TrioCFD) Bug fix     : FT IJK - stat_diph_gradUP_jdd1 test case in debug mode
 

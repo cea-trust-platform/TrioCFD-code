@@ -45,7 +45,7 @@ Schema_Euler_explicite  sch
 Lire sch
 {
     tinit 0.
-    tmax  20
+    # tmax  20 #
     tmax 1
     facsec 1
     dt_min 1.e-7
