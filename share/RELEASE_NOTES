@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.5_beta : Enhancements, modifications and corrected bugs since version 1.9.4 :
 --------------------------------------------------------------------------------------------------
+25/07/24 (TrioCFD) Bug fix     : FT IJK - valgrind issue in shear periodic conditions fixed
 25/07/24 (TrioCFD) Bug fix     : FT IJK - Performance regression since v1.9.4 ('New shear periodic conditions') fixed
 25/07/24 (TrioCFD) Major Change: FTD - Equations to be solved in a Front-Tracking-discontinu problem should not be read and associated to the problem. It should be read at the begining of each problem in a solved_equations bloc. New syntax is:
    Probleme_FT_Disc_gen pb
