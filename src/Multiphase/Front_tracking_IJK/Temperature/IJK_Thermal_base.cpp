@@ -297,8 +297,8 @@ Sortie& IJK_Thermal_base::printOn( Sortie& os ) const
   return os;
 }
 
-// XD thermique listobj thermique -1 thermique_bloc 1 to add energy equation resolution if needed
-// XD thermique_bloc interprete nul 1 not_set
+// X_D thermique listobj thermique -1 thermique_bloc 1 to add energy equation resolution if needed
+// X_D thermique_bloc interprete nul 1 not_set
 Entree& IJK_Thermal_base::readOn( Entree& is )
 {
   /*
@@ -319,17 +319,17 @@ void IJK_Thermal_base::set_fichier_reprise(const char *lataname)
 
 void IJK_Thermal_base::set_param(Param& param)
 {
-  param.ajouter("fo", &fo_); // XD_ADD_P floattant not_set
-  param.ajouter("cp_liquid", &cp_liquid_, Param::REQUIRED); // XD_ADD_P floattant Liquid specific heat at constant pressure
-  param.ajouter("lambda_liquid", &lambda_liquid_, Param::REQUIRED); // XD_ADD_P floattant Liquid thermal conductivity
-  param.ajouter("cp_vapour", &cp_vapour_); // XD_ADD_P floattant Liquid specific heat at constant pressure
-  param.ajouter("lambda_vapour", &lambda_vapour_); // XD_ADD_P floattant Liquid thermal conductivity
-  param.ajouter("expression_T_init", &expression_T_init_); // XD_ADD_P chaine Expression of initial temperature (parser of x,y,z)
-  param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED); // XD_ADD_P bloc_lecture boundary conditions
-  param.ajouter("type_T_source", &type_T_source_); // XD_ADD_P chaine(into=["dabiri","patch_dabiri","unweighted_dabiri"]) source term
-  param.ajouter("expression_source_temperature", &expression_source_temperature_); // XD_ADD_P chaine source terms
+  param.ajouter("fo", &fo_); // X_D_ADD_P floattant not_set
+  param.ajouter("cp_liquid", &cp_liquid_, Param::REQUIRED); // X_D_ADD_P floattant Liquid specific heat at constant pressure
+  param.ajouter("lambda_liquid", &lambda_liquid_, Param::REQUIRED); // X_D_ADD_P floattant Liquid thermal conductivity
+  param.ajouter("cp_vapour", &cp_vapour_); // X_D_ADD_P floattant Liquid specific heat at constant pressure
+  param.ajouter("lambda_vapour", &lambda_vapour_); // X_D_ADD_P floattant Liquid thermal conductivity
+  param.ajouter("expression_T_init", &expression_T_init_); // X_D_ADD_P chaine Expression of initial temperature (parser of x,y,z)
+  param.ajouter("boundary_conditions", &boundary_conditions_, Param::REQUIRED); // X_D_ADD_P bloc_lecture boundary conditions
+  param.ajouter("type_T_source", &type_T_source_); // X_D_ADD_P chaine(into=["dabiri","patch_dabiri","unweighted_dabiri"]) source term
+  param.ajouter("expression_source_temperature", &expression_source_temperature_); // X_D_ADD_P chaine source terms
   param.ajouter_flag("lambda_variable", &lambda_variable_);
-  param.ajouter_flag("wall_flux", &wall_flux_); // XD_ADD_P rien not_set
+  param.ajouter_flag("wall_flux", &wall_flux_); // X_D_ADD_P rien not_set
   param.ajouter("kl_source", &kl_);
   param.ajouter("kv_source", &kv_);
   param.ajouter("T0l_source", &T0l_);
@@ -337,11 +337,11 @@ void IJK_Thermal_base::set_param(Param& param)
   param.ajouter("fichier_reprise_temperature", &fichier_reprise_temperature_);
   param.ajouter("timestep_reprise_temperature", &timestep_reprise_temperature_);
   param.ajouter("latastep_reprise", &latastep_reprise_ini_);
-  param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // XD_ADD_P rien neglect temperature convection
-  param.ajouter_flag("diff_temperature_negligible", &diff_temperature_negligible_); // XD_ADD_P rien neglect temperature diffusion
+  param.ajouter_flag("conv_temperature_negligible", &conv_temperature_negligible_); // X_D_ADD_P rien neglect temperature convection
+  param.ajouter_flag("diff_temperature_negligible", &diff_temperature_negligible_); // X_D_ADD_P rien neglect temperature diffusion
   param.ajouter("temperature_diffusion_op", &temperature_diffusion_op_);
   param.ajouter("temperature_convection_op", &temperature_convection_op_);
-  param.ajouter("expression_T_ana", &expression_T_ana_); // XD_ADD_P chaine Analytical expression T=f(x,y,z,t) for post-processing only
+  param.ajouter("expression_T_ana", &expression_T_ana_); // X_D_ADD_P chaine Analytical expression T=f(x,y,z,t) for post-processing only
   param.ajouter("calculate_local_energy", &calculate_local_energy_);
   param.ajouter("upstream_temperature", &upstream_temperature_);
   param.ajouter("nb_diam_upstream", &nb_diam_upstream_);

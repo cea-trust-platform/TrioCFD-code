@@ -227,8 +227,8 @@ Ou pas a saturation:
 }
 
 sauvegarde binaire lata.sauv
-sauvegarde xyz lata.xyz
-# Resume_last_time xyz restart.xyz #
+# sauvegarde xyz lata.xyz
+Resume_last_time xyz restart.xyz #
 Reprise xyz restart.xyz
 
 }

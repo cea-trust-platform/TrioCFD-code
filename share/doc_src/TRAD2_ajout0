@@ -67,7 +67,7 @@ paroi_tble turbulence_paroi_base paroi_tble 1 Keyword for the Thin Boundary Laye
   attr stats twofloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 2 values are required : the starting time and ending time of the statistics computation.
   attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
   attr restart rien restart 1 not_set
-  attr stationnaire entierfloat stationnaire 1 not_set
+  attr stationnaire floatfloat stationnaire 1 not_set
   attr lambda chaine lambda_u 1 not_set
   attr mu chaine mu 1 not_set
   attr sans_source_boussinesq rien sans_source_boussinesq 1 not_set
@@ -202,6 +202,7 @@ convection_diffusion_temperature_ft_disc convection_diffusion_temperature convec
   attr stencil_width entier stencil_width 1 distance in mesh elements over which the temperature field should be extrapolated in the opposite phase.
   attr maintien_temperature objet_lecture_maintien_temperature maintien_temperature 1 maintien_temperature SOUS_ZONE_NAME VALUE : experimental, this acts as a dynamic source term that heats or cools the fluid to maintain the average temperature to VALUE within the specified region. At this time, this is done by multiplying the temperature within the SOUS_ZONE by an appropriate uniform value at each timestep. This feature might be implemented in a separate source term in the future.
   attr prescribed_mpoint floattant prescribed_mpoint 1 User defined value of the phase-change rate (override the value computed based on the temperature field)
+  attr correction_mpoint_diff_conv_energy list correction_mpoint_diff_conv_energy 1 not_set 
 interpolation_champ_face_deriv objet_lecture interpolation_champ_face_deriv -1 not_set
 type_indic_faces_deriv objet_lecture type_indic_faces_deriv -1 not_set
 type_indic_faces_standard type_indic_faces_deriv standard 0 not_set
@@ -275,6 +276,7 @@ navier_stokes_ft_disc navier_stokes_turbulent navier_stokes_ft_disc -1 Two-phase
   attr new_mass_source rien new_mass_source 1 Flag for localised computation of velocity jump based on interfacial area AI (advanced option)
   attr interpol_indic_pour_dI_dt chaine(into=["interp_ai_based","interp_standard","interp_modifiee"]) interpol_indic_pour_dI_dt 1 Specific interpolation of phase indicator function in VoF mass-preserving method (advanced option)
   attr OutletCorrection_pour_dI_dt chaine(into=["CORRECTION_GHOST_INDIC"]) OutletCorrection_pour_dI_dt 1 not_set
+  attr boussinesq_approximation rien boussinesq_approximation 1 not_set
 source_trainee source_base trainee 0 drag effect
 source_flottabilite source_base flottabilite 0 buoyancy effect
 source_masse_ajoutee source_base masse_ajoutee 0 weight added effect

@@ -40,6 +40,7 @@ Implemente_instanciable(Probleme_FT_Disc_gen, "Probleme_FT_Disc_gen|Pb_FrontTrac
 // XD attr fluide_incompressible fluide_incompressible fluide_incompressible 1 The fluid medium associated with the problem.
 // XD attr fluide_diphasique fluide_diphasique fluide_diphasique 1 The diphasic fluid medium associated with the problem.
 // XD attr constituant constituant constituant 1 Constituent.
+// XD attr Triple_Line_Model_FT_Disc Triple_Line_Model_FT_Disc Triple_Line_Model_FT_Disc 1 not_set
 
 Sortie& Probleme_FT_Disc_gen::printOn(Sortie& os) const { return os; }
 Entree& Probleme_FT_Disc_gen::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
