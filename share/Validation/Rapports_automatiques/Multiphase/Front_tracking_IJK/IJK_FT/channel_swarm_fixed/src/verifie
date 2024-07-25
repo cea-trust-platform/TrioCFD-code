@@ -2,5 +2,15 @@
 lata=`ls channel_swarm_fixed_jdd*lata 2>/dev/null`
 tar xzf ref.tar.gz
 compare_lata $lata  ref/$lata
-exit $?
+err=$?
+if [ "$HOST" = "$TRUST_HOST_ADMIN" ] && [ ! -f $1.TU.ref_$HOST_BUILD ]
+then
+   echo "==========================="
+   echo "Error: There is no reference on machine $TRUST_HOST_ADMIN"
+   echo "You should add a reference for $1 on $TRUST_HOST_ADMIN"
+   echo "==========================="
+   exit -1
+fi
+compare_TU $1 || exit -1
+exit $err
 
