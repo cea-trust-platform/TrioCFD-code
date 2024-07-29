@@ -1,20 +1,30 @@
 @DSL DefaultFiniteStrain;
 @Behaviour Ogden;
-@Author Thomas Helfer;
-@Date 20/12/2016;
 @Description{
 }
 
-/*@Parameter alpha =     28.8;
+/*@Parameter alpha_1 =     28.8;
 // 2*0.4e6/28.8
-@Parameter mu    =    27778;
+@Parameter mu_1      =    27778;
 // 2*0.4e6/28.8*2.5e3
-@Parameter K     = 69444444;*/
-@MaterialProperty real alpha ;
-@MaterialProperty real mu ;
+@Parameter K         = 69444444;*/
+@MaterialProperty real alpha_1 ;
+@MaterialProperty real alpha_2 ;
+@MaterialProperty real alpha_3 ;
+@MaterialProperty real alpha_4 ;
+@MaterialProperty real mu_1 ;
+@MaterialProperty real mu_2 ;
+@MaterialProperty real mu_3 ;
+@MaterialProperty real mu_4 ;
 @MaterialProperty stress K ;
-alpha.setEntryName("Ogden_alpha") ;
-mu.setEntryName("Ogden_mu") ;
+alpha_1.setEntryName("Ogden_alpha_1") ;
+alpha_2.setEntryName("Ogden_alpha_2") ;
+alpha_3.setEntryName("Ogden_alpha_3") ;
+alpha_4.setEntryName("Ogden_alpha_4") ;
+mu_1.setEntryName("Ogden_mu_1") ;
+mu_2.setEntryName("Ogden_mu_2") ;
+mu_3.setEntryName("Ogden_mu_3") ;
+mu_4.setEntryName("Ogden_mu_4") ;
 K.setEntryName("Ogden_K") ;
 
 @LocalVariable StiffnessTensor dS_dC;
@@ -22,7 +32,28 @@ K.setEntryName("Ogden_K") ;
 @LocalVariable real jac;
 
 @Integrator{
-  const auto a   = alpha/2;
+  real a ;
+  real c ;
+  tvector<3u,real> pwv ;
+  tvector<3u,real> dfv ;
+  real fv ;
+  StressStensor df_dC ;
+  StressStensor St ;
+  tvector<3u,real> d2fv ;
+  StiffnessTensor d2f_dC2 ;  
+  int N = 4 ; // Maximum number of Ogden parameters in the current implementation
+  if (alpha_4 == 0) {
+     N = 3 ;
+     if (alpha_3 == 0) {
+        N = 2 ;
+        if (alpha_2 == 0) {
+           N = 1 ;
+        }
+     }
+  }
+  const tvector<4u,real> alpha = {alpha_1,alpha_2,alpha_3,alpha_4};     
+  const tvector<4u,real> mu    = {mu_1,mu_2,mu_3,mu_4};
+
   const auto id  = Stensor::Id();
   const auto J   = det(F1);
   const auto C   = computeRightCauchyGreenTensor(F1);
@@ -39,44 +70,52 @@ K.setEntryName("Ogden_K") ;
   /* iscochoric part */
   // I1b = J^{-2/3}*I1 = I1/(sqrt[3]{I3})     = I1*iJb
   // I2b = J^{-4/9}*I2 = I2/(sqrt[3]{I3})^{2} = I2*iJb*iJb
-  const auto iJb        =  1/cbrt(I3);
-  const auto iJb2       =  power<2>(iJb);
-  const auto iJb4       =  iJb2*iJb2;
-  const auto iJb7       =  iJb4*power<3>(iJb);
-  const auto c          = pow(iJb,a-2);
-  // derivatives
-  const auto diJb_dI3   = -iJb4/3;
-  const auto diJb_dC    = diJb_dI3*dI3_dC;
+  const auto iJb      =  1/cbrt(I3);
+  const auto iJb2     =  power<2>(iJb);
+  const auto iJb4     =  iJb2*iJb2;
+  const auto iJb7     =  iJb4*power<3>(iJb);
   // eigen values
   tvector<3u,real> vp;
   tmatrix<3u,3u,real> m;
   std::tie(vp,m) = C.computeEigenVectors();
-  const tvector<3u,real> pwv  = {pow(vp(0),a-2),pow(vp(1),a-2),pow(vp(2),a-2)};
-  const tvector<3u,real> dfv  = {a*vp(0)*pwv(0),a*vp(1)*pwv(1),a*vp(2)*pwv(2)};
-  const auto fv    = vp(0)*vp(0)*pwv(0)+vp(1)*vp(1)*pwv(1)+vp(2)*vp(2)*pwv(2);
-  const auto df_dC = Stensor::computeIsotropicFunction(dfv,m);
-  const StressStensor Si = mu*c*iJb*((fv*diJb_dC+(iJb/a)*df_dC));
+  // derivatives
+  const auto diJb_dI3   = -iJb4/3;
+  const auto diJb_dC    = diJb_dI3*dI3_dC;
+  //
+  St = Sv ;
+  for (unsigned short i=0;i!=N;++i){
+     a     = alpha(i)/2 ;
+     c     = pow(iJb,a-2);
+     pwv   = {pow(vp(0),a-2),pow(vp(1),a-2),pow(vp(2),a-2)};
+     dfv   = {a*vp(0)*pwv(0),a*vp(1)*pwv(1),a*vp(2)*pwv(2)};
+     fv    = vp(0)*vp(0)*pwv(0)+vp(1)*vp(1)*pwv(1)+vp(2)*vp(2)*pwv(2);
+     df_dC = Stensor::computeIsotropicFunction(dfv,m);
+     St   += mu(i)*c*iJb*((fv*diJb_dC+(iJb/a)*df_dC));
+  }
   // The Cauchy Stress
-  sig = convertSecondPiolaKirchhoffStressToCauchyStress(Sv+Si,F1);
+  sig = convertSecondPiolaKirchhoffStressToCauchyStress(St,F1);
+  //
   if(computeTangentOperator_){
     const auto d2I3_dC2   = computeDeterminantSecondDerivative(C);
+    const auto d2iJb_dI32 = 4*iJb7/9;
+    const auto d2iJb_dC2  = d2iJb_dI32*(dI3_dC^dI3_dC)+ diJb_dI3*d2I3_dC2 ;
     /* volumetric part */
     const auto d2Pv_dJ2 = K;
     dS_dC = ((d2Pv_dJ2-dPv_dJ/J)/(2*I3)*(dI3_dC^dI3_dC)+
 	     dPv_dJ/J*d2I3_dC2);
     /* isochoric part */
     // second derivative of f
-    const tvector<3u,real> d2fv = {a*(a-1)*pwv(0),a*(a-1)*pwv(1),a*(a-1)*pwv(2)};
-    const auto d2f_dC2 =
-      Stensor::computeIsotropicFunctionDerivative(dfv,d2fv,vp,m,1.e-12);
-    // computation of dSi_dC
-    const auto d2iJb_dI32 = 4*iJb7/9;
-    const auto d2iJb_dC2  =
-      d2iJb_dI32*(dI3_dC^dI3_dC)+ diJb_dI3*d2I3_dC2;
-    dS_dC += mu*c*((a-1)*fv*(diJb_dC^diJb_dC)+
-		   iJb*(fv*d2iJb_dC2+
-			((diJb_dC^df_dC)+(df_dC^diJb_dC))+
-			iJb/a*d2f_dC2));
+    for (unsigned short i=0;i!=N;++i){
+      a       = alpha(i)/2 ;
+      c       = pow(iJb,a-2);
+      d2fv    = {a*(a-1)*pwv(0),a*(a-1)*pwv(1),a*(a-1)*pwv(2)};
+      d2f_dC2 = Stensor::computeIsotropicFunctionDerivative(dfv,d2fv,vp,m,1.e-12);
+      // computation of dSi_dC
+      dS_dC  += mu(i)*c*((a-1)*fv*(diJb_dC^diJb_dC)+
+		         iJb*(fv*d2iJb_dC2+
+			 ((diJb_dC^df_dC)+(df_dC^diJb_dC))+
+			 iJb/a*d2f_dC2));
+    }
   }
   // Computations for speed of sound evaluation 
   // (taken from EPX implementation using principal stretches computed above)
@@ -89,24 +128,33 @@ K.setEntryName("Ogden_K") ;
   const tvector<3u,real> prstr  = {lambda(0)-1,lambda(1)-1,lambda(2)-1};
   // 2. Transformation into "lambda_star"
   jac = lambda(0)*lambda(1)*lambda(2);
-  const auto t   = 1/cbrt(jac);
+  const auto t = 1/cbrt(jac);
   const tvector<3u,real> lambda_star = {lambda(0)*t,lambda(1)*t,lambda(2)*t};
   // 3. Principal stresses
   real tt;
-  const tvector<3u,real> lpow = {pow(lambda_star(0),alpha),pow(lambda_star(1),alpha),pow(lambda_star(2),alpha)};
-  const auto s = lpow(0)+lpow(1)+lpow(2);
-  tvector<3u,real> sig_pri;
-  for (unsigned short i=0;i!=3;++i){
-     tt = lpow(i);
-     sig_pri(i) = mu/jac*(tt-s/3)+K*(jac-1)/jac;
+  tvector<3u,real> lpow;
+  real s;
+  tvector<3u,real> sig_pri={0, 0, 0};
+  for (unsigned short i=0;i!=N;++i){
+    lpow = {pow(lambda_star(0),alpha(i)),pow(lambda_star(1),alpha(i)),pow(lambda_star(2),alpha(i))};
+    s = lpow(0)+lpow(1)+lpow(2);
+    for (unsigned short i=0;i!=3;++i){
+      tt = lpow(i);
+      sig_pri(i) += mu(i)/jac*(tt-s/3)+K*(jac-1)/jac;
+    }
   }
   // 4. Computation of elastic tensor and first stiffness computation
-  const tvector<3u,real> w1 = {mu*pow(lambda_star(0),alpha-1),
-                               mu*pow(lambda_star(1),alpha-1),
-                               mu*pow(lambda_star(2),alpha-1)};
-  const tvector<3u,real> w2 = {mu*(alpha-1)*pow(lambda_star(0),alpha-2),
-                               mu*(alpha-1)*pow(lambda_star(1),alpha-2),
-                               mu*(alpha-1)*pow(lambda_star(2),alpha-2)};
+  tvector<3u,real> w1 = {0, 0, 0} ;
+  tvector<3u,real> w2 = {0, 0, 0} ;
+  for (unsigned short i=0;i!=N;++i){
+     w1(0) += mu(i)*pow(lambda_star(0),alpha(i)-1);
+     w1(1) += mu(i)*pow(lambda_star(1),alpha(i)-1);
+     w1(2) += mu(i)*pow(lambda_star(2),alpha(i)-1);
+     w2(0) += mu(i)*(alpha(i)-1)*pow(lambda_star(0),alpha(i)-2);
+     w2(1) += mu(i)*(alpha(i)-1)*pow(lambda_star(1),alpha(i)-2);
+     w2(2) += mu(i)*(alpha(i)-1)*pow(lambda_star(2),alpha(i)-2);
+  }
+  //
   real a0 = 0 ;
   real a02 ;
   real a021 ;
@@ -137,8 +185,7 @@ K.setEntryName("Ogden_K") ;
         a02 = max(abs(a021),abs(a022)) ;
         a0  = max(a0,a02) ; 
      }
-  }
-  const auto Cstiff0 = a0;
+  }  const auto Cstiff0 = a0;
   // 5. Second stiffness computation
   real Cstiff1 = 0;
   if ((abs(prstr(0)) < tole && abs(prstr(1)) < tole && abs(prstr(2)) < tole) ||
@@ -157,6 +204,7 @@ K.setEntryName("Ogden_K") ;
      }
      Cstiff1 = abs(sig_pri(dir)/prstr(dir));
   }
+  Cstiff1=max(Cstiff1,K);
   Cstiff=max(Cstiff0,Cstiff1);
 }
 
