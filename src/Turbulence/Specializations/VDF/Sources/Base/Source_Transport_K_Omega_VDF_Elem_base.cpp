@@ -41,8 +41,8 @@ Entree& Source_Transport_K_Omega_VDF_Elem_base::readOn( Entree& is ) { return So
 // cAlan : mutualisable
 void Source_Transport_K_Omega_VDF_Elem_base::associer_domaines(const Domaine_dis& domaine_dis, const Domaine_Cl_dis&  domaine_Cl_dis)
 {
-  la_domaine_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
-  la_domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  le_domaine_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  le_domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 }
 
 void Source_Transport_K_Omega_VDF_Elem_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
@@ -55,7 +55,7 @@ DoubleTab& Source_Transport_K_Omega_VDF_Elem_base::calculer(DoubleTab& resu) con
 
 DoubleTab& Source_Transport_K_Omega_VDF_Elem_base::ajouter_komega(DoubleTab& resu) const
 {
-  const Domaine_VDF& domaine_VDF = la_domaine_VDF.valeur();
+  const Domaine_VDF& domaine_VDF = le_domaine_VDF.valeur();
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF, eq_hydraulique->inconnue().valeur());

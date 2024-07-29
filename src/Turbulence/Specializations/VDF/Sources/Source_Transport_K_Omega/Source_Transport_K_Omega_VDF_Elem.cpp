@@ -50,17 +50,17 @@ const DoubleTab& Source_Transport_K_Omega_VDF_Elem::get_visc_turb() const
 void Source_Transport_K_Omega_VDF_Elem::calculer_terme_production(const Champ_Face_VDF& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleVect& P) const
 {
   const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
-  if (axi) calculer_terme_production_K_Axi(la_domaine_VDF.valeur(), vitesse, P, K_Omega, visco_turb);
-  else calculer_terme_production_K_for_komega(la_domaine_VDF.valeur(), la_domaine_Cl_VDF.valeur(), P, K_Omega, vit, vitesse, visco_turb);
+  if (axi) calculer_terme_production_K_Axi(le_domaine_VDF.valeur(), vitesse, P, K_Omega, visco_turb);
+  else calculer_terme_production_K_for_komega(le_domaine_VDF.valeur(), le_domaine_Cl_VDF.valeur(), P, K_Omega, vit, vitesse, visco_turb);
 }
 
 void Source_Transport_K_Omega_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& resu) const
 {
-  const DoubleVect& volumes = la_domaine_VDF->volumes();
-  const DoubleVect& porosite_vol = la_domaine_Cl_VDF->equation().milieu().porosite_elem();
+  const DoubleVect& volumes = le_domaine_VDF->volumes();
+  const DoubleVect& porosite_vol = le_domaine_Cl_VDF->equation().milieu().porosite_elem();
   const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
   // const double K_MIN = eqn_K_Omega->modele_turbulence().get_K_MIN();
-  for (int elem = 0; elem < la_domaine_VDF->nb_elem(); elem++)
+  for (int elem = 0; elem < le_domaine_VDF->nb_elem(); elem++)
     {
       // cAlan : enfin. A adapter.
       double volporo = volumes(elem)*porosite_vol(elem);
@@ -81,7 +81,7 @@ void Source_Transport_K_Omega_VDF_Elem::ajouter_blocs(matrices_t matrices, Doubl
   if(!mat) return;
 
   const DoubleTab& val = equation().inconnue().valeurs();
-  const DoubleVect& porosite = la_domaine_Cl_VDF->equation().milieu().porosite_elem(), &volumes = la_domaine_VDF->volumes();
+  const DoubleVect& porosite = le_domaine_Cl_VDF->equation().milieu().porosite_elem(), &volumes = le_domaine_VDF->volumes();
   const int size = val.dimension(0);
   // on implicite le -eps et le -eps^2/k
   // cAlan : impliciter omega ?
