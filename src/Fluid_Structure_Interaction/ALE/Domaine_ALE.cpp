@@ -149,8 +149,8 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       IntTab& elem_faces=le_dom_VF.elem_faces();
       IntTab& face_voisins=le_dom_VF.face_voisins();
 
-      ::calculer_centres_gravite(xv, type_face,
-                                 sommets_, face_sommets);
+      Faces::Calculer_centres_gravite(xv, type_face,
+                                      sommets_, face_sommets);
 
       /* if(sub_type(Domaine_VDF, le_dom_VF))
          {
