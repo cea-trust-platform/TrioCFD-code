@@ -180,7 +180,6 @@ Read pb
         collisions
         {
             active
-            juric_pour_tout
             type_remaillage Juric { source_isovaleur indicatrice }
         }
         # Boundary condition, variable contact angle is possible #

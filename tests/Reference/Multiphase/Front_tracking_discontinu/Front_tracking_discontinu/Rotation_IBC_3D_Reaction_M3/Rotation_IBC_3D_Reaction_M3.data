@@ -130,7 +130,6 @@ If this does not solve the problem, try to stabilize a bit the flow by adding
 
         collisions {
             active
-            juric_pour_tout
             type_remaillage Juric { source_isovaleur indicatrice }
         }
 

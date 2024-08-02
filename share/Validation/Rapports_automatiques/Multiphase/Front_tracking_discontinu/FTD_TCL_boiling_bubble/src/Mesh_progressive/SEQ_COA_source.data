@@ -196,7 +196,6 @@ Lire pb
         collisions
         {
             active
-            juric_pour_tout
             juric_local  phase_continue 1
             type_remaillage Juric { source_isovaleur indicatrice }
         }

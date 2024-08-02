@@ -91,7 +91,7 @@ Read pb
             nb_iter_correction_volume 5
             seuil_dvolume_residuel 1e-12
         }
-        collisions { active juric_pour_tout type_remaillage Juric { source_isovaleur indicatrice } }
+        collisions { active type_remaillage Juric { source_isovaleur indicatrice } }
         boundary_conditions
         {
             paroi_defaut paroi_ft_disc symetrie

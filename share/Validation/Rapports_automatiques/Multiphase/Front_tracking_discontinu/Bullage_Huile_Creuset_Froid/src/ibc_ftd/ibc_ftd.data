@@ -198,7 +198,6 @@ Read pb
         n_iterations_distance 3
         collisions {
             active
-            juric_pour_tout
             juric_local phase_continue 0
             type_remaillage Juric { source_isovaleur indicatrice }
         }

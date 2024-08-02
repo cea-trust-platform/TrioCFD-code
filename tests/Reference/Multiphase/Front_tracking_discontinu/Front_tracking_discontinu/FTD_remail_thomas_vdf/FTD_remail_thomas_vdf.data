@@ -139,7 +139,6 @@ seuil_dvolume_residuel 1e-15
 collisions
 {
 active
-juric_pour_tout
 type_remaillage Thomas { distance_interface_element_max 2 }
 }
 boundary_conditions

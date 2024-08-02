@@ -282,7 +282,6 @@ Lire pb1
         collisions
         {
             active
-            juric_pour_tout
             juric_local  phase_continue 1
             type_remaillage Juric { source_isovaleur indicatrice }
         }
@@ -302,7 +301,7 @@ Lire pb1
         {
             solveur petsc gcp { precond block_jacobi_ilu { level 0 } rtol 1.e-13 impr }
         }
-        # Pb quand on fait ça, il ne calcul pas le dt_stab de convection en FTD?? #
+        # Pb quand on fait ca, il ne calcul pas le dt_stab de convection en FTD?? #
         # Parametre_equation parametre_implicite { resolution_explicite } #
         equation_interface interf
         equation_navier_stokes hydraulique
@@ -326,7 +325,7 @@ Lire pb1
         {
             solveur petsc gcp { precond block_jacobi_ilu { level 0 } rtol 1.e-13 impr }
         }
-        # Pb quand on fait ça, il ne calcul pas le dt_stab de convection en FTD?? #
+        # Pb quand on fait ca, il ne calcul pas le dt_stab de convection en FTD?? #
         # Parametre_equation parametre_implicite { resolution_explicite } #
         equation_interface interf
         equation_navier_stokes hydraulique

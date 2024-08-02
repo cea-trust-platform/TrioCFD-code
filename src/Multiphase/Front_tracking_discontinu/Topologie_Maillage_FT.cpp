@@ -69,7 +69,9 @@ Entree& Topologie_Maillage_FT::readOn(Entree& is)
 
   if (juric_pour_tout)
     {
-      Cerr<<"Warning : juric_pour_tout is obsolete "<<finl;
+      Cerr<<"Error : juric_pour_tout is obsolete and does noting since v1.7.0"<<finl;
+      Cerr<<"remove juric_pour_tout from your datafile"<<finl;
+      Process::exit();
     }
   // Verifications qu'on a bien tout lu :
   if (!active_)

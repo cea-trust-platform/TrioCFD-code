@@ -141,7 +141,6 @@ Lire pb
         }
         collisions {
             active
-            juric_pour_tout
             type_remaillage Juric { source_isovaleur fonction_distance }
         }
         boundary_conditions
