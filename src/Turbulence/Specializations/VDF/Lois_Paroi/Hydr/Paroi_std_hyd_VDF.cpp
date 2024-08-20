@@ -90,7 +90,7 @@ int Paroi_std_hyd_VDF::init_lois_paroi()
 // Remplissage de la table
 int Paroi_std_hyd_VDF::init_lois_paroi_hydraulique()
 {
-  Cmu = mon_modele_turb_hyd->get_Cmu();
+  Cmu_ = mon_modele_turb_hyd->get_Cmu();
   init_lois_paroi_hydraulique_(); // dans Paroi_log_QDM
   return 1;
 }
@@ -401,7 +401,7 @@ int Paroi_std_hyd_VDF::initialize_wall_law_komega(DoubleTab& field_komega)
 {
   uplus_.resize(le_dom_VDF->nb_faces_bord());
   init_lois_paroi_();
-  Cmu = mon_modele_turb_hyd->get_Cmu();
+  Cmu_ = mon_modele_turb_hyd->get_Cmu();
   init_lois_paroi_hydraulique_();
   set_yplus_komega();
   return 1;
@@ -413,7 +413,7 @@ void Paroi_std_hyd_VDF::set_yplus_komega()
   double yplus = 11;
 
   for (int iter = 0; iter < 10; ++iter)
-    yplus = log(std::max(Erugu*yplus, 1.))/Kappa;
+    yplus = log(std::max(Erugu*yplus, 1.))/Kappa_;
 
   ypluslam = yplus;
 }
@@ -526,7 +526,7 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
               // cAlan : make them private et use functions ?
               const double Rey = dist*sqrt(field_komega(elem, 0))/d_visco;
               const double yplus = Cmu025*Rey;
-              // const double uplus = (1/Kappa)*log(Erugu*yplus);
+              // const double uplus = (1/Kappa_)*log(Erugu*yplus);
               double uStar {0};
               // u_plus_d_plus = norm_v*dist/d_visco;
 
@@ -539,12 +539,12 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
                   uStar = sqrt(fracLaminar*d_visco*magnitudeGradUw
                                + fracTurbu*sCmu*field_komega(elem, 0));
                   const double omegaVis = 6.*d_visco/(BETA1*sqrt(dist));
-                  const double omegaLog = sqrt(field_komega(elem, 0))/(Cmu025*Kappa*dist);
+                  const double omegaLog = sqrt(field_komega(elem, 0))/(Cmu025*Kappa_*dist);
 
                   field_komega(elem, 1) = sqrt(pow(omegaVis, 2.) + pow(omegaLog, 2.));
                   // prodOmegaWall(elem) = (fracLaminar*prodOmega
                   //                        + fracTurbu*sqrt(ustar*magnitudeGradUw*dist/uplus)
-                  //                        /(d_visco*Kappa*yplus))
+                  //                        /(d_visco*Kappa_*yplus))
                 }
               else
                 {
@@ -558,11 +558,11 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
                   else
                     {
                       uStar = sqrt(sCmu*field_komega(elem, 0));
-                      const double omegaLog = sqrt(field_komega(elem, 0))/(Cmu025*Kappa*dist);
+                      const double omegaLog = sqrt(field_komega(elem, 0))/(Cmu025*Kappa_*dist);
 
                       field_komega(elem, 1) = omegaLog;
                       // prodOmegaWall(elem) = sqrt(ustar*magnitudeGradUw*dist/uplus)
-                      // /(d_visco*Kappa*yplus)
+                      // /(d_visco*Kappa_*yplus)
                     }
                 }
 
@@ -660,7 +660,7 @@ int Paroi_std_hyd_VDF::compute_buffer_layer(DoubleTab& field_komega, double dist
   field_komega(elem, 0) = u_star_carre/sCmu;
 
   const double omega_vis = 6.*viscosity/(BETA1*dist_y);
-  const double omega_log = sqrt(field_komega(elem, 0))/(Cmu025*Kappa*dist_y);
+  const double omega_log = sqrt(field_komega(elem, 0))/(Cmu025*Kappa_*dist_y);
   field_komega(elem, 1) = sqrt(pow(omega_vis, 2.) + pow(omega_log, 2.));
   return 1;
 }
@@ -670,8 +670,8 @@ int Paroi_std_hyd_VDF::compute_log_layer(DoubleTab& field_komega, double dist_y,
   double u_star = tab_u_star(face);
   double u_star_carre = u_star*u_star;
 
-  field_komega(elem, 0) = u_star_carre/sqrt(Cmu);
-  field_komega(elem, 1) = sqrt(field_komega(elem, 0))/(Cmu025*Kappa*dist_y);
+  field_komega(elem, 0) = u_star_carre/sqrt(Cmu_);
+  field_komega(elem, 1) = sqrt(field_komega(elem, 0))/(Cmu025*Kappa_*dist_y);
 
   return 1;
 }
@@ -911,19 +911,19 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_tampon(DoubleTab& K_eps, double d_vi
 
   // Dans la sous couche tampon :
   //
-  //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu)
+  //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu_)
   //
   //              2
-  //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu)/nu
+  //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu_)/nu
   //
 
-  //   K_eps(elem,0) = std::max( K_eps(elem,0) , x*x/sqrt(Cmu) );
+  //   K_eps(elem,0) = std::max( K_eps(elem,0) , x*x/sqrt(Cmu_) );
 
-  //K_eps(elem,1) = std::max( K_eps(elem,1) , (K_eps(elem,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco );
+  //K_eps(elem,1) = std::max( K_eps(elem,1) , (K_eps(elem,0)*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco );
 
 
-  K_eps(elem,0) = x*x/sqrt(Cmu) ;
-  K_eps(elem,1) = (K_eps(elem,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+  K_eps(elem,0) = x*x/sqrt(Cmu_) ;
+  K_eps(elem,1) = (K_eps(elem,0)*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
 
   return 1;
 }
@@ -942,18 +942,18 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_tampon(DoubleTab& nu_t,DoubleTab& ta
 
   // Dans la sous couche tampon :
   //
-  //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu)
+  //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu_)
   //
   //              2
-  //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu)/nu
+  //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu_)/nu
   //
   //  nu_t = Cmu*k*k/eps
   //
 
-  double k = x*x/sqrt(Cmu);
-  double eps = (k*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+  double k = x*x/sqrt(Cmu_);
+  double eps = (k*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
   tab_k(elem,0) = k;
-  nu_t(elem) = Cmu*k*k/eps;
+  nu_t(elem) = Cmu_*k*k/eps;
   return 1;
 }
 
@@ -1010,7 +1010,7 @@ int Paroi_std_hyd_VDF::calculer_u_star_sous_couche_log(double norm_vit, double d
   //  const double Xpini = 200.;
   const int itmax  = 25;
   const double seuil = 0.01;
-  const double c1 = Kappa*norm_vit;
+  const double c1 = Kappa_*norm_vit;
   const double c2 = log(Erugu*dist/d_visco);  // log = logarithme neperien
 
   double u_star = Xpini*d_visco/dist;
@@ -1033,14 +1033,14 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_log(DoubleTab& K_eps, double dist,
   // K et Eps sont donnes par les formules suivantes:
   //
   //          2                      3
-  //    k = u*/sqrt(Cmu)  et eps = u* / Kd
+  //    k = u*/sqrt(Cmu_)  et eps = u* / Kd
   //
 
   double u_star = tab_u_star(face);
   double u_star_carre = u_star*u_star;
 
-  K_eps(elem, 0) = u_star_carre/sqrt(Cmu);
-  K_eps(elem, 1) = u_star_carre*u_star/(Kappa*dist);
+  K_eps(elem, 0) = u_star_carre/sqrt(Cmu_);
+  K_eps(elem, 1) = u_star_carre*u_star/(Kappa_*dist);
 
   return 1;
 }
@@ -1052,14 +1052,14 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_log(DoubleTab& nu_t, DoubleTab& tab_
   //  nu_t = Cmu*k*k/eps
   //
   //                      2                      3
-  //  En utilisant  k = u*/sqrt(Cmu)  et eps = u* / Kd
+  //  En utilisant  k = u*/sqrt(Cmu_)  et eps = u* / Kd
   //
   //  on calcule nu_t en fonction de u*
 
   double u_star = tab_u_star(face);
 
-  tab_k(elem,0) = u_star*u_star/sqrt(Cmu);
-  nu_t(elem) = u_star*Kappa*dist;
+  tab_k(elem,0) = u_star*u_star/sqrt(Cmu_);
+  nu_t(elem) = u_star*Kappa_*dist;
 
   return 1;
 }
@@ -1355,22 +1355,22 @@ void Paroi_std_hyd_VDF::modifs_valeurs_turb(int num_elem, int type_cou,
 
       // Dans la sous couche tampon :
       //
-      //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu)
+      //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu_)
       //
       //              2
-      //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu)/nu
+      //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu_)/nu
       //
       //  nu_t = Cmu*k*k/eps
 
-      double k = x*x/sqrt(Cmu);
-      double eps = (k*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+      double k = x*x/sqrt(Cmu_);
+      double eps = (k*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
       tab_k(num_elem) = k;
-      tab_nu_t(num_elem) = Cmu*k*k/eps;
+      tab_nu_t(num_elem) = Cmu_*k*k/eps;
     }
   else if (type_cou == 2)
     {
-      tab_k(num_elem) = u_star*u_star/sqrt(Cmu);
-      tab_nu_t(num_elem) = u_star*Kappa*dist ;
+      tab_k(num_elem) = u_star*u_star/sqrt(Cmu_);
+      tab_nu_t(num_elem) = u_star*Kappa_*dist ;
     }
   else
     {
@@ -1517,15 +1517,15 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
                   // Dans la sous couche tampon :
                   //
-                  //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu)
+                  //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu_)
                   //
                   //              2
-                  //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu)/nu
+                  //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu_)/nu
                   //
 
 
-                  tab_k(elem,0) = x*x/sqrt(Cmu) ;
-                  tab_eps(elem,1) = (tab_k(elem)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+                  tab_k(elem,0) = x*x/sqrt(Cmu_) ;
+                  tab_eps(elem,1) = (tab_k(elem)*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
 
                 }
 
@@ -1536,14 +1536,14 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                   // K et Eps sont donnes par les formules suivantes:
                   //
                   //          2                      3
-                  //    k = u*/sqrt(Cmu)  et eps = u* / Kd
+                  //    k = u*/sqrt(Cmu_)  et eps = u* / Kd
                   //
 
                   double u_star= tab_u_star(num_face);
                   double u_star_carre = u_star*u_star;
 
-                  tab_k(elem)   = u_star_carre/sqrt(Cmu);
-                  tab_eps(elem) = u_star_carre*u_star/(Kappa*dist);
+                  tab_k(elem)   = u_star_carre/sqrt(Cmu_);
+                  tab_eps(elem) = u_star_carre*u_star/(Kappa_*dist);
                 }
 
               // Calcul de la contrainte tangentielle

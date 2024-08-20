@@ -45,7 +45,7 @@ public:
 
   inline void set_kappa(double& val)
   {
-    Kappa=val;
+    Kappa_=val;
   };
   inline void set_A_plus(double& val)
   {
@@ -59,8 +59,8 @@ public:
 protected:
 
   double A_plus;
-  double Cmu;
-  double Kappa; // Constante de Karman
+  double Cmu_;
+  double Kappa_; // Constante de Karman
   double Erugu; // La valeur du parametre Erugu depend de la rugosite de la paroi
 
   Table table_hyd;  // table qui contient les valeurs de U+d+ en fonction de d+.

@@ -153,7 +153,7 @@ int ParoiVEF_TBLE::init_lois_paroi()
             {
               Eq_couch_lim& equation_vitesse = eq_vit[compteur_faces_paroi];
               Diffu_totale_hyd_base& diffu_hyd = ref_cast_non_const(Diffu_totale_hyd_base, equation_vitesse.get_diffu()); //modele de viscosite turbulente
-              diffu_hyd.setKappa(Kappa);
+              diffu_hyd.setKappa(Kappa_);
 
               int num_face = le_bord.num_face(ind_face);
               elem = face_voisins(num_face,0);
@@ -1274,10 +1274,10 @@ int ParoiVEF_TBLE::calculer_k_eps(double& k, double& eps , double yp, double u_s
 {
   // PQ : 05/04/07 : formulation continue de k et epsilon
   //  assurant le bon comportement asymptotique
-  k    = 0.07*yp*yp*(exp(-yp/9.))+(1./(sqrt(Cmu)))*pow((1.-exp(-yp/20.)),2);  // k_plus
+  k    = 0.07*yp*yp*(exp(-yp/9.))+(1./(sqrt(Cmu_)))*pow((1.-exp(-yp/20.)),2);  // k_plus
   k   *= u_star*u_star;
   // PL: 50625=15^4 on evite d'utiliser pow car lent
-  eps  = (1./(Kappa*pow(yp*yp*yp*yp+50625,0.25)));  // eps_plus
+  eps  = (1./(Kappa_*pow(yp*yp*yp*yp+50625,0.25)));  // eps_plus
   eps *= pow(u_star,4)/d_visco;
 
   return 1;

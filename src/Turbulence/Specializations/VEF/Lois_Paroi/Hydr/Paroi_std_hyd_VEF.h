@@ -84,8 +84,8 @@ protected:
 
   DoubleVect uplus_;
 
-  DoubleVect seuil_LP;
-  IntVect iterations_LP;
+  DoubleVect seuil_LP_;
+  IntVect iterations_LP_;
 
   double u_star_impose_;
   int is_u_star_impose_;
@@ -96,6 +96,9 @@ protected:
   static constexpr double BETA_OMEGA {0.075};
   static constexpr double BETA_K {0.09};  // equals to Cmu
 };
+
+KOKKOS_FUNCTION
+double calculer_u_plus(const int ind_face, const double u_plus_d_plus, const double erugu, const double Kappa, DoubleArrView seuil_LP, IntArrView iterations_LP);
 
 /*! @brief Returns an integer value depending on the turbulence model.
  *

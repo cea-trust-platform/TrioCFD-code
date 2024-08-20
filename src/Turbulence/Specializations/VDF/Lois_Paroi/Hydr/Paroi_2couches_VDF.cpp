@@ -75,7 +75,7 @@ int Paroi_2couches_VDF::init_lois_paroi()
 
 int Paroi_2couches_VDF::init_lois_paroi_hydraulique()
 {
-  Cmu = mon_modele_turb_hyd->get_Cmu();
+  Cmu_ = mon_modele_turb_hyd->get_Cmu();
   init_lois_paroi_hydraulique_();
   return 1;
 }

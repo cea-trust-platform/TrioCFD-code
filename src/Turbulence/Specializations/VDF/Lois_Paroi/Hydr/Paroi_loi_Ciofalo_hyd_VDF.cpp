@@ -57,8 +57,8 @@ int Paroi_loi_Ciofalo_hyd_VDF::init_lois_paroi_hydraulique()
 {
   // Initialisations des constantes du modele :
   Y0=11.81 ;
-  Cmu = mon_modele_turb_hyd->get_Cmu();
-  Erugu =  ( exp ( Kappa * Y0) ) / Y0 ;
+  Cmu_ = mon_modele_turb_hyd->get_Cmu();
+  Erugu =  ( exp ( Kappa_ * Y0) ) / Y0 ;
   return 1;
 }
 
@@ -450,7 +450,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_local(double u_plus_d_plus,double d_visc
       psi_P= sqrt( tab_k(elem) )/ norm_vit ;
 
       if (u_plus_d_plus <= valmin )
-        psi_E=1/(Y0*pow (Cmu, 1./4.) ) ;
+        psi_E=1/(Y0*pow (Cmu_, 1./4.) ) ;
 
       else
         // on va calculer la valeur de psi_E pour une couche limite a l'equilibre
@@ -459,7 +459,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_local(double u_plus_d_plus,double d_visc
 
           const int itmax  = 25;
           const double seuil = 0.001;
-          const double c1 = Kappa*norm_vit;
+          const double c1 = Kappa_*norm_vit;
           const double c2 = log(Erugu*dist/d_visco);  // log = logarithme neperien
           double u_star,u_star1;
           double F,F_;
@@ -484,14 +484,14 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_local(double u_plus_d_plus,double d_visc
           // valeur de u_star
           u_star=u_star1;
 
-          psi_E= Kappa / (log (Erugu*dist*u_star/d_visco)* pow (Cmu, 1./4.) ) ;
+          psi_E= Kappa_ / (log (Erugu*dist*u_star/d_visco)* pow (Cmu_, 1./4.) ) ;
 
         }
 
       // calcul de Y_nu
       Y_nu = Y0*pow( (psi_P/psi_E) , -c );
       // calcul de la nouvelle constante pour la loi log
-      E_ = ( exp ( Kappa * Y_nu) ) / Y_nu ;
+      E_ = ( exp ( Kappa_ * Y_nu) ) / Y_nu ;
 
       if (u_plus_d_plus <= Y_nu*Y_nu)
         {
@@ -544,7 +544,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_u_star_couche_log(double norm_vit,double
 
   const int itmax  = 25;
   const double seuil = 0.001;
-  const double c1 = Kappa*norm_vit;
+  const double c1 = Kappa_*norm_vit;
   const double c2 = log(E_*dist/d_visco);  // log = logarithme neperien
   double u_star,u_star1;
   double F,F_;

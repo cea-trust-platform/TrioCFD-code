@@ -190,7 +190,7 @@ int ParoiVDF_TBLE::init_lois_paroi()
                     dist = domaine_VDF.dist_norm_bord(num_face);
 
                   Diffu_totale_hyd_base& diffu_hyd = ref_cast_non_const(Diffu_totale_hyd_base, eq_vit[corresp[num_face]].get_diffu()); //modele de viscosite turbulente
-                  diffu_hyd.setKappa(Kappa);
+                  diffu_hyd.setKappa(Kappa_);
 
                   eq_vit[corresp[num_face]].set_y0(0.); //ordonnee de la paroi
                   eq_vit[corresp[num_face]].set_yn(dist); //ordonnee du 1er centre de maille
@@ -625,14 +625,14 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                       double lm_plus = calcul_lm_plus(y_plus);
                       double  deriv = Fdypar_direct(lm_plus);
                       double x = lm_plus*u_star*deriv;
-                      tab_k(elem)   = x*x/sqrt(Cmu) ;
-                      tab_eps(elem) = (tab_k(elem)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+                      tab_k(elem)   = x*x/sqrt(Cmu_) ;
+                      tab_eps(elem) = (tab_k(elem)*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
                     }
                   else if (y_plus>30)
                     {
                       double us2 = tab_u_star(num_face)*tab_u_star(num_face);
-                      tab_k(elem)  =us2/sqrt(Cmu);
-                      tab_eps(elem)=us2*tab_u_star(num_face)/Kappa/dist;
+                      tab_k(elem)  =us2/sqrt(Cmu_);
+                      tab_eps(elem)=us2*tab_u_star(num_face)/Kappa_/dist;
                     }
 
 
@@ -855,14 +855,14 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                       double lm_plus = calcul_lm_plus(y_plus);
                       double  deriv = Fdypar_direct(lm_plus);
                       double x = lm_plus*u_star*deriv;
-                      tab_k(elem)   = x*x/sqrt(Cmu);
-                      tab_eps(elem) = (tab_k(elem)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+                      tab_k(elem)   = x*x/sqrt(Cmu_);
+                      tab_eps(elem) = (tab_k(elem)*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
                     }
                   else if (y_plus>30)
                     {
                       double us2 = tab_u_star(num_face)*tab_u_star(num_face);
-                      tab_k(elem)=us2/sqrt(Cmu);
-                      tab_eps(elem)=us2*tab_u_star(num_face)/Kappa/dist;
+                      tab_k(elem)=us2/sqrt(Cmu_);
+                      tab_eps(elem)=us2*tab_u_star(num_face)/Kappa_/dist;
                     }
 
                   compteur_faces_paroi++;
@@ -1185,14 +1185,14 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                           double lm_plus = calcul_lm_plus(y_plus);
                           double  deriv = Fdypar_direct(lm_plus);
                           double x = lm_plus*u_star*deriv;
-                          tab1(elem,0) = x*x/sqrt(Cmu) ;
-                          tab1(elem,1) = (tab1(elem,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+                          tab1(elem,0) = x*x/sqrt(Cmu_) ;
+                          tab1(elem,1) = (tab1(elem,0)*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
                         }
                       else if (y_plus>30)
                         {
                           double us2 = tab_u_star(num_face)*tab_u_star(num_face);
-                          tab1(elem,0)=us2/sqrt(Cmu);
-                          tab1(elem,1)=us2*tab_u_star(num_face)/Kappa/dist;
+                          tab1(elem,0)=us2/sqrt(Cmu_);
+                          tab1(elem,1)=us2*tab_u_star(num_face)/Kappa_/dist;
                         }
                     }
 
@@ -1431,14 +1431,14 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                           double lm_plus = calcul_lm_plus(y_plus);
                           double  deriv = Fdypar_direct(lm_plus);
                           double x = lm_plus*u_star*deriv;
-                          tab1(elem,0) = x*x/sqrt(Cmu);
-                          tab1(elem,1) = (tab1(elem,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+                          tab1(elem,0) = x*x/sqrt(Cmu_);
+                          tab1(elem,1) = (tab1(elem,0)*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
                         }
                       else if (y_plus>30)
                         {
                           double us2 = tab_u_star(num_face)*tab_u_star(num_face);
-                          tab1(elem,0)=us2/sqrt(Cmu);
-                          tab1(elem,1)=us2*tab_u_star(num_face)/Kappa/dist;
+                          tab1(elem,0)=us2/sqrt(Cmu_);
+                          tab1(elem,1)=us2*tab_u_star(num_face)/Kappa_/dist;
                         }
                     }
 

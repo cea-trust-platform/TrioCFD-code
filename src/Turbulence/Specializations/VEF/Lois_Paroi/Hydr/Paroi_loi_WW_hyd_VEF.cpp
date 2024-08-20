@@ -62,7 +62,7 @@ void Paroi_loi_WW_hyd_VEF::set_param(Param& param)
 // Remplissage de la table
 int Paroi_loi_WW_hyd_VEF::init_lois_paroi_hydraulique()
 {
-  Cmu = mon_modele_turb_hyd->get_Cmu();
+  Cmu_ = mon_modele_turb_hyd->get_Cmu();
   A= 8.3 ;
   B= 1./7. ;
   Y0= 11.81 ;
@@ -351,14 +351,14 @@ int Paroi_loi_WW_hyd_VEF::calculer_couche_puissance(DoubleTab& nu_t,DoubleTab& t
   //  nu_t = Cmu*k*k/eps
   //
   //                          2                       3
-  //  En utilisant  k =     u*/sqrt(Cmu)  et eps = u* / Kd
+  //  En utilisant  k =     u*/sqrt(Cmu_)  et eps = u* / Kd
   //
   //  on calcule nu_t en fonction de u*
 
   double u_star = tab_u_star(face);
 
-  tab_k(elem) = u_star*u_star/sqrt(Cmu);
-  nu_t(elem) =  u_star*Kappa*dist ;
+  tab_k(elem) = u_star*u_star/sqrt(Cmu_);
+  nu_t(elem) =  u_star*Kappa_*dist ;
 
   return 1;
 }

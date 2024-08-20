@@ -61,8 +61,8 @@ int Paroi_std_hyd_VEF_3couches::calculer_k_eps(double& k, double& eps , double y
     {
       double u_star_carre = u_star*u_star;
 
-      k   = u_star_carre/sqrt(Cmu);
-      eps = u_star_carre*u_star/(Kappa*dist);
+      k   = u_star_carre/sqrt(Cmu_);
+      eps = u_star_carre*u_star/(Kappa_*dist);
     }
   else
     {
@@ -70,8 +70,8 @@ int Paroi_std_hyd_VEF_3couches::calculer_k_eps(double& k, double& eps , double y
       double deriv = Fdypar_direct(lm_plus);
       double x = lm_plus*u_star*deriv;
 
-      k   = x*x/sqrt(Cmu);
-      eps = (k*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+      k   = x*x/sqrt(Cmu_);
+      eps = (k*u_star*u_star*deriv)*sqrt(Cmu_)/d_visco;
     }
 
   return 1;

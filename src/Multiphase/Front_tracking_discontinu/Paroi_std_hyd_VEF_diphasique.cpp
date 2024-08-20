@@ -207,7 +207,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
               // Remplissage des tableaux (dans le cas de Longueur de melange on laisse la viscosite telle quelle)
               tab_k(elem) = k;
 
-              if((!LM) && (!COMB)) tab_nu_t(elem) = Cmu*k*k/(eps+DMINFLOAT);
+              if((!LM) && (!COMB)) tab_nu_t(elem) = Cmu_*k*k/(eps+DMINFLOAT);
 
               uplus_(num_face) = u_plus;
               tab_d_plus_(num_face) = d_plus;
@@ -305,7 +305,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
               // Remplissage des tableaux (dans le cas de Longueur de melange on laisse la viscosite telle quelle)
               tab_k(elem) = k;
 
-              if((!LM) && (!COMB)) tab_nu_t(elem) = Cmu*k*k/(eps+DMINFLOAT);
+              if((!LM) && (!COMB)) tab_nu_t(elem) = Cmu_*k*k/(eps+DMINFLOAT);
 
               uplus_(num_face) = u_plus;
               tab_d_plus_(num_face) = d_plus;

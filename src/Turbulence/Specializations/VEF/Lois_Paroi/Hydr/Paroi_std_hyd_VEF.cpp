@@ -106,6 +106,86 @@ void Paroi_std_hyd_VEF::set_param(Param& param)
 //  Implementation des fonctions de la classe Paroi_std_hyd_VEF
 //
 /////////////////////////////////////////////////////////////////////
+bool compute_u_plus(const int ind_face,
+                    const double u_plus_d_plus,
+                    const double erugu,
+                    const double Kappa,
+                    double& r, int& iter, double& u_plus)
+{
+  // PQ : 05/04/07 : formulation continue de la loi de paroi
+  // construite d'apres la loi de Reichardt
+  if(u_plus_d_plus < 1.)
+    {
+      u_plus = sqrt(u_plus_d_plus); // pour eviter de faire tourner la procedure iterative
+      return true;
+    }
+  u_plus = u_plus_d_plus/100.;
+  r = 1.;
+  const double seuil = 0.001;
+  iter = 0;
+  const int itmax  = 25;
+  const double A = (1/Kappa)*log(erugu/Kappa) ; //  (=7.44, contre 7.8 dans la loi d'origine)
+  //  permettant d'avoir en l'infini la loi de
+  //  Reichardt se calant sur : u+ = (1/Kappa).ln(Erugu.y+)
+
+  // Fixed point method for Reichardt equation
+  while((iter++ < itmax) && (r > seuil))
+    {
+      const double d_plus  = u_plus_d_plus/u_plus;
+      const double u_plus2 = (1./Kappa)*log(1. + Kappa*d_plus)
+                             + A*(1. - exp(-d_plus/11.) - exp(-d_plus/3.)*d_plus/11.);
+      u_plus  = 0.5*(u_plus + u_plus2);
+      r       = std::fabs(u_plus - u_plus2)/u_plus;
+    }
+  return (iter < itmax);
+}
+
+KOKKOS_FUNCTION
+double calculer_u_plus_kokkos(const int ind_face, const double u_plus_d_plus, const double erugu, const double Kappa, DoubleArrView seuil_LP, IntArrView iterations_LP)
+{
+  double r, u_plus;
+  int iter;
+  if (!compute_u_plus(ind_face, u_plus_d_plus, erugu, Kappa, r, iter, u_plus))
+#ifdef KOKKOS
+    Kokkos::abort("The iterative process of u* did not converge!");
+#else
+    Process::exit("The iterative process of u* did not converge!");
+#endif
+  seuil_LP(ind_face) = r;
+  iterations_LP(ind_face) = iter;
+  return u_plus;
+}
+
+KOKKOS_FUNCTION
+int compute_k_eps(double& k, double& eps ,
+                  const double yp, const double u_star,
+                  const double d_visco, const double dist, const double Cmu, const double Kappa)
+{
+  // PQ : 05/04/07 : formulation continue de k et epsilon
+  //  assurant le bon comportement asymptotique
+  const double u_star_carre = u_star * u_star;
+  k    = 0.07*yp*yp*(exp(-yp/9.));
+  k += 1./sqrt(Cmu)*(1. - exp(-yp/20.))*(1. - exp(-yp/20.));  // k_plus
+  k   *= u_star_carre;
+  // PL: 50625=15^4 on evite d'utiliser pow car lent
+  eps  = 1./(Kappa*pow(yp*yp*yp*yp+50625, 0.25));  // eps_plus
+  eps *= u_star_carre*u_star_carre/d_visco;
+
+  return 1;
+}
+
+double Paroi_std_hyd_VEF::calculer_u_plus(const int ind_face,
+                                          const double u_plus_d_plus,
+                                          const double erugu)
+{
+  double r, u_plus;
+  int iter;
+  if (!compute_u_plus(ind_face, u_plus_d_plus, erugu, Kappa_, r, iter, u_plus))
+    erreur_non_convergence();
+  seuil_LP_(ind_face) = r;
+  iterations_LP_(ind_face) = iter;
+  return u_plus;
+}
 
 int Paroi_std_hyd_VEF::init_lois_paroi()
 {
@@ -117,8 +197,8 @@ int Paroi_std_hyd_VEF::init_lois_paroi()
       Cisaillement_paroi_.resize(0, dimension);
       le_dom_VEF->creer_tableau_faces(Cisaillement_paroi_);
     }
-  seuil_LP.resize(le_dom_VEF->nb_faces_tot());
-  iterations_LP.resize(le_dom_VEF->nb_faces_tot());
+  seuil_LP_.resize(le_dom_VEF->nb_faces_tot());
+  iterations_LP_.resize(le_dom_VEF->nb_faces_tot());
 
   check_turbulence_model();
 
@@ -129,7 +209,7 @@ int Paroi_std_hyd_VEF::init_lois_paroi()
 
 int Paroi_std_hyd_VEF::init_lois_paroi_hydraulique()
 {
-  Cmu = mon_modele_turb_hyd->get_Cmu();
+  Cmu_ = mon_modele_turb_hyd->get_Cmu();
   init_lois_paroi_hydraulique_();
   return 1;
 }
@@ -1538,6 +1618,36 @@ void Paroi_std_hyd_VEF::compute_turbulent_quantities(double& tke, double& var2,
   return;
 }
 
+KOKKOS_FUNCTION  // A reverser dans VEF/Domaine (?)
+double norm_vit_lp(int dim, const double* v, int fac, CDoubleTabView face_normale, double* val)
+{
+  double r[3] {};
+  double norme = 0;
+  for(int i = 0; i < dim; i++)
+    {
+      r[i] = face_normale(fac, i);
+      norme += r[i] * r[i];
+    }
+  norme = sqrt(norme);
+  for(int i = 0; i < dim; i++)
+    r[i] /= norme;
+
+  double sum_carre=0;
+  double psc=0;
+  for (int i=0; i<dim; i++)
+    {
+      sum_carre += carre(v[i]);
+      psc += v[i] * r[i];
+    }
+  double norm_vit = sqrt(std::fabs(sum_carre-carre(psc)));
+
+  // val1,val2 val3 sont les vitesses tangentielles
+  for(int i = 0; i < dim; i++)
+    val[i] = (v[i] - psc*r[i])/(norm_vit + DMINFLOAT);
+
+  return norm_vit;
+}
+
 double norm_vit_lp(const ArrOfDouble& vit, int face, const Domaine_VEF& domaine, ArrOfDouble& val)
 {
   // A reverser dans VEF/Domaine (?)
@@ -1568,20 +1678,19 @@ double norm_vit_lp(const ArrOfDouble& vit, int face, const Domaine_VEF& domaine,
 int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
-  const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
 
-  double visco=-1;
+  double visco0=-1;
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = std::max(tab_visco(0,0),DMINFLOAT);
+      visco0 = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -1594,11 +1703,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
     }
   //tab_visco+=DMINFLOAT;
 
-  double dist=-1,d_visco=-1;
-  double u_plus_d_plus,u_plus,d_plus,u_star;
-  double k,eps;
-  ArrOfDouble val(dimension);
-  ArrOfDouble vit(dimension);
+
   Cisaillement_paroi_=0;
 
   double dist_corr=1.;
@@ -1609,8 +1714,9 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       coef_vit=nfac-1;
     }
 
-  bool LM   =(sub_type(Modele_turbulence_hyd_Longueur_Melange_base,mon_modele_turb_hyd.valeur()) ? 1 : 0); // Longueur de Melange
-  bool COMB =(sub_type(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur()) ? 1 : 0);  //Modele Combinaison (fonction analytique et (ou) dependance a des champs sources)
+  bool LM   = sub_type(Modele_turbulence_hyd_Longueur_Melange_base,mon_modele_turb_hyd.valeur()); // Longueur de Melange
+  bool COMB = sub_type(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur());  //Modele Combinaison (fonction analytique et (ou) dependance a des champs sources)
+  int nombre_sources = COMB ? ref_cast(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur()).nombre_sources() : -1;
 
   // Loop on boundaries
   int nb_bords=domaine_VEF.nb_front_Cl();
@@ -1618,194 +1724,133 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
     {
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
 
-      // Only Dirichlet conditions:
-      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())) ||
-          (la_cl->que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
+      bool dirichlet = sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) || la_cl->que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE";
+      bool robin = sub_type(Paroi_decalee_Robin,la_cl.valeur());
+      // Only Dirichlet or Robin conditions:
+      if (dirichlet || robin)
         {
-          // Recuperation de la valeur Erugu
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          // Loop on real faces
+          int ndeb = 0;
+          int nfin = le_bord.nb_faces_tot();
+          int dim = Objet_U::dimension;
+          double Cmu = Cmu_;
+          double Kappa = Kappa_;
+          int is_u_star_impose = is_u_star_impose_;
+          double u_star_impose = u_star_impose_;
+          const double delta = robin ? ref_cast(Paroi_decalee_Robin,la_cl.valeur()).get_delta() : 0;
           double erugu=Erugu;
           if (sub_type(Paroi_rugueuse,la_cl.valeur()))
             erugu=ref_cast(Paroi_rugueuse,la_cl.valeur()).get_erugu();
+          // Lecture
+          CIntArrView le_bord_num_face = le_bord.num_face().view_ro();
+          CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
+          CIntTabView elem_faces = domaine_VEF.elem_faces().view_ro();
+          CDoubleTabView vitesse = eqn_hydr.inconnue().valeurs().view_ro();
+          CDoubleTabView face_normales = domaine_VEF.face_normales().view_ro();
+          CDoubleTabView xp = domaine_VEF.xp().view_ro();
+          CDoubleTabView xv = domaine_VEF.xv().view_ro();
+          CDoubleTabView visco = tab_visco.view_ro();
+          // Ecriture
+          DoubleArrView seuil_LP = seuil_LP_.view_wo();
+          IntArrView iterations_LP = iterations_LP_.view_wo();
+          DoubleArrView uplus = uplus_.view_wo();
+          DoubleArrView tab_d_plus = tab_d_plus_.view_wo();
+          DoubleArrView tab_u_star = tab_u_star_.view_wo();
+          DoubleArrView nu_t = static_cast<ArrOfDouble&>(tab_nu_t).view_wo();
+          DoubleArrView k = static_cast<ArrOfDouble&>(tab_k).view_wo();
+          DoubleTabView Cisaillement_paroi = Cisaillement_paroi_.view_wo();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), Kokkos::RangePolicy<>(ndeb, nfin), KOKKOS_LAMBDA (const int ind_face)
+          {
+            double val[3] {};
+            double vit[3] {};
+            int num_face = le_bord_num_face(ind_face);
+            int elem = face_voisins(num_face,0);
 
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          const IntTab& elem_faces = domaine_VEF.elem_faces();
+            double dist=0, norm_v=0;
+            if (dirichlet)
+              {
+                // Dirichlet
+                for (int j = 0; j < dim; j++)
+                  vit[j] = 0.;
+                for (int i = 0; i < nfac; i++)
+                  {
+                    int face = elem_faces(elem, i);
+                    for (int j = 0; j < dim; j++)
+                      vit[j] += (vitesse(face, j) -
+                                 vitesse(num_face, j)); // permet de soustraire la vitesse de glissement eventuelle
+                  }
+                for (int j = 0; j < dim; j++)
+                  vit[j] /= coef_vit;
 
-          // Loop on real faces
-          int ndeb = 0;
-          int nfin = le_bord.nb_faces_tot();
-          for (int ind_face=ndeb; ind_face<nfin; ind_face++)
-            {
-              int num_face=le_bord.num_face(ind_face);
-              int elem = face_voisins(num_face,0);
+                dist = distance(dim, num_face, elem, xp, xv, face_normales);
+                dist *= dist_corr; // pour passer du centre de gravite au milieu des faces en P1NC
 
-              vit=0.;
-              for (int i=0; i<nfac; i++)
-                {
-                  int face=elem_faces(elem,i);
-                  for (int j=0; j<dimension; j++)
-                    vit[j]+=(vitesse(face,j)-vitesse(num_face,j)); // permet de soustraire la vitesse de glissement eventuelle
-                }
-              vit   /= coef_vit;
-              dist   = distance_face_elem(num_face,elem,domaine_VEF);
-              dist  *= dist_corr; // pour passer du centre de gravite au milieu des faces en P1NC
+                norm_v = norm_vit_lp(dim, vit, num_face, face_normales, val);
+              }
+            else
+              {
+                // Robin
+                double psc=0, norm=0;
+                for(int comp=0; comp<dim; comp++)
+                  {
+                    psc += vitesse(num_face,comp)*face_normales(num_face,comp);
+                    norm += face_normales(num_face,comp)*face_normales(num_face,comp);
+                  }
+                // psc /= norm; // Fixed bug: Arithmetic exception
+                if (std::fabs(norm)>=DMINFLOAT) psc/=norm;
 
-              double norm_v = norm_vit_lp(vit,num_face,domaine_VEF,val);
+                for(int comp=0; comp<dim; comp++)
+                  {
+                    val[comp]=vitesse(num_face,comp)-psc*face_normales(num_face,comp);
+                    norm_v += val[comp]*val[comp];
+                  }
+                norm_v = sqrt(norm_v);
+                for (int j = 0; j < dim; j++)
+                  val[j] /= norm_v;
+                dist = delta;
+              }
 
-              if (l_unif)
-                d_visco = visco;
-              else
-                d_visco = tab_visco(elem,0);
+            double d_visco = l_unif ? visco0 : visco(elem,0);
 
-              u_plus_d_plus = norm_v*dist/d_visco;
+            double u_plus_d_plus = norm_v*dist/d_visco;
 
-              u_plus = calculer_u_plus(ind_face,u_plus_d_plus,erugu);
+            double u_plus = calculer_u_plus_kokkos(ind_face,u_plus_d_plus,erugu,Kappa,seuil_LP,iterations_LP);
 
-              if (!is_u_star_impose_)
-                {
-                  if(u_plus)
-                    {
-                      u_star = norm_v/u_plus ;
-                      d_plus = u_plus_d_plus/u_plus ;
-                    }
-                  else
-                    {
-                      u_star = 0.;
-                      d_plus = 0.;
-                    }
-                }
-              else
-                {
-                  u_star = u_star_impose_;
-                  d_plus = 0.;
-                }
+            double u_star, d_plus;
+            if (is_u_star_impose)
+              {
+                u_star = u_star_impose;
+                d_plus = 0.;
+              }
+            else
+              {
+                u_star = u_plus ? norm_v/u_plus : 0.;
+                d_plus = u_plus ? u_plus_d_plus/u_plus : 0.;
+              }
+            double eps;
+            compute_k_eps(k(elem),eps,d_plus,u_star,d_visco,dist, Cmu, Kappa);
 
-              calculer_k_eps(k,eps,d_plus,u_star,d_visco,dist);
+            // Calcul de la contrainte tangentielle
+            for (int j=0; j<dim; j++)
+              Cisaillement_paroi(num_face,j) = u_star*u_star*val[j];
 
-              // Calcul de la contrainte tangentielle
-              for (int j=0; j<dimension; j++)
-                Cisaillement_paroi_(num_face,j) = u_star*u_star*val[j];
+            // Remplissage des tableaux (dans le cas de Longueur de melange on laisse la viscosite telle quelle)
+            if((!LM) && (!COMB)) nu_t(elem) = Cmu*k(elem)*k(elem)/(eps+DMINFLOAT);
 
-              // Remplissage des tableaux (dans le cas de Longueur de melange on laisse la viscosite telle quelle)
-              tab_k(elem) = k;
+            uplus(num_face) = u_plus;
+            tab_d_plus(num_face) = d_plus;
+            tab_u_star(num_face) = u_star;
 
-              if((!LM) && (!COMB)) tab_nu_t(elem) = Cmu*k*k/(eps+DMINFLOAT);
+            // Modification de nu_t (et par consequent lambda_t) pour exploiter la valeur de nu_t (lambda_t) en y=deq_lam.
+            // La valeur de dist_corr n est valable que dans le cas particuler ou nu_t est fonction lineaire de y
+            if (COMB && nombre_sources==0)
+              nu_t(elem) *= dist_corr;
 
-              uplus_(num_face) = u_plus;
-              tab_d_plus_(num_face) = d_plus;
-              tab_u_star_(num_face) = u_star;
+          }); // End loop on real faces
+          end_gpu_timer(Objet_U::computeOnDevice, __KERNEL_NAME__);
 
-              // Modification de nu_t (et par consequent lambda_t) pour exploiter la valeur de nu_t (lambda_t) en y=deq_lam.
-              // La valeur de dist_corr n est valable que dans le cas particuler ou nu_t est fonction lineaire de y
-              if (COMB)
-                {
-                  Modele_turbulence_hyd_combinaison& modele_turb = ref_cast(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur());
-                  if (modele_turb.nombre_sources()==0)
-                    tab_nu_t(elem) *= dist_corr;
-                }
-
-            } // End loop on real faces
-
-        } // End Dirichlet conditions
-
-      // Robin condition:
-      else if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
-        {
-          // Recuperation de la valeur Erugu
-          const double erugu = Erugu;
-
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-          const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin,la_cl.valeur());
-          const DoubleTab& normales = domaine_VEF.face_normales();
-          const double delta = Paroi.get_delta();
-
-          // Loop on real faces
-          int ndeb = 0;
-          int nfin = le_bord.nb_faces_tot();
-          for (int ind_face=ndeb; ind_face<nfin; ind_face++)
-            {
-              int num_face = le_bord.num_face(ind_face);
-              int elem = face_voisins(num_face,0);
-
-              double psc=0, norm=0;
-              double norm_v=0;
-
-              for(int comp=0; comp<dimension; comp++)
-                {
-                  psc += vitesse(num_face,comp)*normales(num_face,comp);
-                  norm += normales(num_face,comp)*normales(num_face,comp);
-                }
-              // psc /= norm; // Fixed bug: Arithmetic exception
-              if (std::fabs(norm)>=DMINFLOAT) psc/=norm;
-
-              for(int comp=0; comp<dimension; comp++)
-                {
-                  val[comp]=vitesse(num_face,comp)-psc*normales(num_face,comp);
-                  norm_v += val[comp]*val[comp];
-                }
-
-              norm_v = sqrt(norm_v);
-              val /= norm_v;
-              dist = delta;
-
-              // Common to Dirichlet
-
-              if (l_unif)
-                d_visco = visco;
-              else
-                d_visco = tab_visco(elem,0);
-
-              u_plus_d_plus = norm_v*dist/d_visco;
-
-              u_plus = calculer_u_plus(ind_face,u_plus_d_plus,erugu);
-
-              if (!is_u_star_impose_)
-                {
-                  if(u_plus)
-                    {
-                      u_star = norm_v/u_plus ;
-                      d_plus = u_plus_d_plus/u_plus ;
-                    }
-                  else
-                    {
-                      u_star = 0.;
-                      d_plus = 0.;
-                    }
-                }
-              else
-                {
-                  u_star = u_star_impose_;
-                  d_plus = 0.;
-                }
-
-              calculer_k_eps(k,eps,d_plus,u_star,d_visco,dist);
-
-              // Calcul de la contrainte tangentielle
-              for (int j=0; j<dimension; j++)
-                Cisaillement_paroi_(num_face,j) = u_star*u_star*val[j];
-
-              // Remplissage des tableaux (dans le cas de Longueur de melange on laisse la viscosite telle quelle)
-              tab_k(elem) = k;
-
-              if((!LM) && (!COMB)) tab_nu_t(elem) = Cmu*k*k/(eps+DMINFLOAT);
-
-              uplus_(num_face) = u_plus;
-              tab_d_plus_(num_face) = d_plus;
-              tab_u_star_(num_face) = u_star;
-
-              // Modification de nu_t (et par consequent lambda_t) pour exploiter la valeur de nu_t (lambda_t) en y=deq_lam.
-              // La valeur de dist_corr n est valable que dans le cas particuler ou nu_t est fonction lineaire de y
-              if (COMB)
-                {
-                  Modele_turbulence_hyd_combinaison& modele_turb = ref_cast(Modele_turbulence_hyd_combinaison,mon_modele_turb_hyd.valeur());
-                  if (modele_turb.nombre_sources()==0)
-                    tab_nu_t(elem) *= dist_corr;
-                }
-
-              // End common to Dirichlet
-
-            } // End loop on real faces
-
-        } // End Robin condition
+        } // End BC conditions
 
     } // End loop on boundaries
 
@@ -1825,7 +1870,7 @@ void Paroi_std_hyd_VEF::compute_k(double& k, const double yp, const double u_sta
   //  assurant le bon comportement asymptotique
 
   k = 0.07*yp*yp*exp(-yp/9.);
-  k += 1./sqrt(Cmu)*(1. - exp(-yp/20.))*(1. - exp(-yp/20.));
+  k += 1./sqrt(Cmu_)*(1. - exp(-yp/20.))*(1. - exp(-yp/20.));
   k *= u_star*u_star; // = k+ * u_star^2
 }
 
@@ -1835,7 +1880,7 @@ void Paroi_std_hyd_VEF::compute_epsilon(double& eps, const double yp,
   double const u_star_squared = u_star*u_star;
 
   // 50625 = 15^4
-  eps  = 1./(Kappa*pow(yp*yp*yp*yp + 50625, 0.25)); // eps_plus
+  eps  = 1./(Kappa_*pow(yp*yp*yp*yp + 50625, 0.25)); // eps_plus
   eps *= u_star_squared*u_star_squared/d_visco;
 }
 
@@ -1845,7 +1890,7 @@ void Paroi_std_hyd_VEF::compute_omega(double& omega, const double yp,
 {
   // cAlan: à mutualiser avec le calcul du k_omega de Multiphase
   const double w_vis = 6.*d_visco/(BETA_OMEGA*dist*dist);
-  const double w_log = u_star/(std::sqrt(BETA_K)*Kappa*dist);
+  const double w_log = u_star/(std::sqrt(BETA_K)*Kappa_*dist);
   const double w_1 = w_vis + w_log ;
   const double w_2 = std::pow(std::pow(w_vis, 1.2) + std::pow(w_log, 1.2), 1./1.2);
   const double blending = std::tanh(yp/10*yp/10*yp/10*yp/10);
@@ -1857,17 +1902,7 @@ int Paroi_std_hyd_VEF::calculer_k_eps(double& k, double& eps ,
                                       const double yp, const double u_star,
                                       const double d_visco, const double dist)
 {
-  // PQ : 05/04/07 : formulation continue de k et epsilon
-  //  assurant le bon comportement asymptotique
-  const double u_star_carre = u_star * u_star;
-  k    = 0.07*yp*yp*(exp(-yp/9.));
-  k += 1./sqrt(Cmu)*(1. - exp(-yp/20.))*(1. - exp(-yp/20.));  // k_plus
-  k   *= u_star_carre;
-  // PL: 50625=15^4 on evite d'utiliser pow car lent
-  eps  = 1./(Kappa*pow(yp*yp*yp*yp+50625, 0.25));  // eps_plus
-  eps *= u_star_carre*u_star_carre/d_visco;
-
-  return 1;
+  return compute_k_eps(k, eps, yp, u_star, d_visco, dist, Cmu_, Kappa_);
 }
 
 
@@ -1887,45 +1922,6 @@ void Paroi_std_hyd_VEF::compute_k_omega(double& k, double& omega,
   compute_k(k, yp, u_star);
   compute_omega(omega, yp, u_star, d_visco, dist);
   return;
-}
-
-double Paroi_std_hyd_VEF::calculer_u_plus(const int ind_face,
-                                          const double u_plus_d_plus,
-                                          const double erugu)
-{
-  // PQ : 05/04/07 : formulation continue de la loi de paroi
-  // construite d'apres la loi de Reichardt
-
-  if(u_plus_d_plus < 1.)
-    return sqrt(u_plus_d_plus); // pour eviter de faire tourner la procedure iterative
-
-
-  double u_plus = u_plus_d_plus/100.;
-  double r = 1.;
-  const double seuil = 0.001;
-  int iter = 0;
-  const int itmax  = 25;
-  const double A = (1/Kappa)*log(erugu/Kappa) ; //  (=7.44, contre 7.8 dans la loi d'origine)
-  //  permettant d'avoir en l'infini la loi de
-  //  Reichardt se calant sur : u+ = (1/Kappa).ln(Erugu.y+)
-
-  // Fixed point method for Reichardt equation
-  while((iter++ < itmax) && (r > seuil))
-    {
-      const double d_plus  = u_plus_d_plus/u_plus;
-      const double u_plus2 = (1./Kappa)*log(1. + Kappa*d_plus)
-                             + A*(1. - exp(-d_plus/11.) - exp(-d_plus/3.)*d_plus/11.);
-      u_plus  = 0.5*(u_plus + u_plus2);
-      r       = std::fabs(u_plus - u_plus2)/u_plus;
-    }
-
-  seuil_LP(ind_face) = r;
-  iterations_LP(ind_face) = iter;
-
-  if (iter >= itmax)
-    erreur_non_convergence();
-
-  return u_plus;
 }
 
 void Paroi_std_hyd_VEF::imprimer_ustar(Sortie& os) const
@@ -2011,8 +2007,8 @@ void Paroi_std_hyd_VEF::imprimer_ustar(Sortie& os) const
               upmoy +=uplus_(num_face);
               dpmoy +=tab_d_plus(num_face);
               utaumoy +=tab_u_star(num_face);
-              seuil_moy += seuil_LP(num_face);
-              iter_moy += iterations_LP(num_face);
+              seuil_moy += seuil_LP_(num_face);
+              iter_moy += iterations_LP_(num_face);
               compt +=1;
             }
           Ustar.syncfile();
