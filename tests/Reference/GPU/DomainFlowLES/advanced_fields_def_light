@@ -1,0 +1,44 @@
+					tparoi Tparoi_VEF { source refChamp { Pb_champ pb_dom temperature } }
+					  
+					  	# Derivees de vitesse dui/dxj #
+							du_dx		transformation	{ methode composante numero 0 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							du_dy		transformation	{ methode composante numero 1 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							du_dz		transformation	{ methode composante numero 2 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							dv_dx		transformation	{ methode composante numero 3 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							dv_dy		transformation	{ methode composante numero 4 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							dv_dz		transformation	{ methode composante numero 5 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							dw_dx		transformation	{ methode composante numero 6 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							dw_dy		transformation	{ methode composante numero 7 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							dw_dz		transformation	{ methode composante numero 8 localisation elem sources { refChamp { Pb_champ pb_dom gradient_vitesse } } }
+							
+						   	# Ca ne marchera pas tant qu'on est en VDF car gardient_temperature n'est pas défini #
+							dT_dx		transformation	{ methode composante numero 0 localisation elem sources {  Gradient {
+		                 												   source refChamp { Pb_champ pb_dom temperature }
+		         													       } } }
+							dT_dy		transformation	{ methode composante numero 1 localisation elem sources {  Gradient {
+		                 												   source refChamp { Pb_champ pb_dom temperature }
+		         													       } } }
+							dT_dz		transformation	{ methode composante numero 2 localisation elem sources {  Gradient {
+		                 												   source refChamp { Pb_champ pb_dom temperature }
+		                 												   	} } }
+               
+							pi_q	transformation	{
+											methode formule
+											expression 1 (CONDUCTIVITE_NATIF_DOM/(TEMPERATURE_NATIF_DOM^2))*(dT_dx^2+dT_dy^2+dT_dz^2)
+											localisation elem
+											sources_reference { dT_dx , dT_dy , dT_dz , TEMPERATURE_NATIF_DOM }
+											sources {  refChamp { Pb_champ pb_dom CONDUCTIVITE } }
+											}
+											
+							pi_nu	transformation	{
+											methode formule
+											expression 1 (VISCOSITE_DYNAMIQUE_NATIF_DOM/TEMPERATURE_NATIF_DOM)*(2*(du_dx^2+dv_dy^2+dw_dz^2)+(du_dy+dv_dx)*du_dy+(du_dz+dw_dx)*du_dz+(dv_dx+du_dy)*dv_dx+(dv_dz+dw_dy)*dv_dz+(dw_dx+du_dz)*dw_dx+(dw_dy+dv_dz)*dw_dy)
+											
+											sources_reference { TEMPERATURE_NATIF_DOM , du_dx , du_dy , du_dz , dv_dx , dv_dy , dv_dz , dw_dx , dw_dy , dw_dz } 
+											sources {  refChamp { Pb_champ pb_dom viscosite_dynamique } }
+										 }
+										 
+										 
+											
+
+								
