@@ -7,6 +7,7 @@ Pas de remaillage ni de lissage car non parallele.
 
 PARALLEL OK 4
 #
+# OPENMP NOT #
 
 dimension 3
 Probleme_FT_Disc_gen pb

@@ -1,4 +1,6 @@
 # Test Turbulent reaction of type A+B=>C #
+# OPENMP NOT #
+
 dimension 3
 Probleme_FT_Disc_gen pb
 Domaine DOM

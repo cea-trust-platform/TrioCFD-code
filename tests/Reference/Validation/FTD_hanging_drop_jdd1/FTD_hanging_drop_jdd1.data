@@ -1,4 +1,5 @@
 # Hydraulique 3D laminaire : schema upwind #
+# OPENMP NOT #
 dimension 3
 Probleme_FT_Disc_gen pb1
 Domaine dom_pb1

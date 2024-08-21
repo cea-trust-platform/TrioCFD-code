@@ -1,4 +1,5 @@
 # PARALLEL NOT #
+# OPENMP NOT #
 
 Dimension $dimension
 $bidim_axi

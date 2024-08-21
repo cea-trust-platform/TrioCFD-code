@@ -2,6 +2,7 @@
 # par un pb FT_Disc_gen avec Champ_front_calc_recycl_champ en VDF  #
 
 # PARALLEL RUNS #
+# OPENMP NOT #
 
 dimension 3
 Domaine DOM

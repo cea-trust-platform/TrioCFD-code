@@ -22,6 +22,7 @@ ne sont pas strictement equivalents entre sequentiel et parallele.
 Il y a donc des ecarts entre le sequentiel et le parallele.
 PARALLEL RUNS
 #
+# OPENMP NOT #
 
 dimension 3
 Probleme_FT_Disc_gen pb

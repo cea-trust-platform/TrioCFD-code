@@ -1,5 +1,7 @@
 # Thermohydraulique 3D turbulent sous maille et Boussinesq #
 # PARALLEL OK 3 #
+# OPENMP NOT #
+
 dimension 3
 Pb_Thermohydraulique_Turbulent pb
 Domaine dom

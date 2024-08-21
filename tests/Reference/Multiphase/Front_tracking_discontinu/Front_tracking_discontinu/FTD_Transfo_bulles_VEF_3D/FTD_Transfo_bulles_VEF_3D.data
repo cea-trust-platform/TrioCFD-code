@@ -3,6 +3,7 @@
 # dans la sous zone zone_transfo1 ou dont le diametre #
 # est inferieur a diametre_min sont supprimees #
 # PARALLEL OK #
+# OPENMP NOT #
 
 dimension 3
 

@@ -1,6 +1,7 @@
 # Two clamped-free beams lined up.  Beam time scheme: Newmark mean acceleration #
 # Turbulent flow: LES model with wall law #
 # Warning: very coarse mesh.  This is a numerical test case, we do not look at physical aspects in detail here #
+# OPENMP NOT #
 Dimension 3
 Pb_Hydraulique_turbulent_ALE pb
 Domaine_ALE dom

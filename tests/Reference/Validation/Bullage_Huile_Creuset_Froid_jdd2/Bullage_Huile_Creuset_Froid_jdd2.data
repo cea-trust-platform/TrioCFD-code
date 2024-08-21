@@ -1,6 +1,7 @@
 # Reacteur avec agitateur CFD et bullage #
 # PARALLEL NOT #
 # VALGRIND NOT #
+# OPENMP NOT #
 
 dimension 3
 Probleme_FT_Disc_gen pb
