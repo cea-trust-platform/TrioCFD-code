@@ -122,7 +122,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
             while (i<nb_eq)
               {
                 const Equation_base& eq_test = Pb.equation(i);
-                if ((eq_test.inconnue().le_nom() == mon_champ_inc.le_nom()))
+                if ((eq_test.inconnue()->le_nom() == mon_champ_inc.le_nom()))
                   {
                     numero_eq_=i;
                     break;
@@ -134,7 +134,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
                       {
                         const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_test.get_modele(TURBULENCE).valeur());
                         const Transport_K_Eps_base& transportkeps = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-                        if ((transportkeps.inconnue().le_nom() == mon_champ_inc.le_nom()))
+                        if ((transportkeps.inconnue()->le_nom() == mon_champ_inc.le_nom()))
                           {
                             numero_eq_=i;
                             iskeps = true;
@@ -145,7 +145,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
                       {
                         const Modele_turbulence_hyd_RANS_K_Omega_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Omega_base, eq_test.get_modele(TURBULENCE).valeur());
                         const Transport_K_Omega_base& transportkomega = ref_cast(Transport_K_Omega_base, le_mod_RANS.eqn_transp_K_Omega());
-                        if ((transportkomega.inconnue().le_nom() == mon_champ_inc.le_nom()))
+                        if ((transportkomega.inconnue()->le_nom() == mon_champ_inc.le_nom()))
                           {
                             numero_eq_ = i;
                             iskomega = true;
@@ -186,7 +186,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
 
   int ok=0;
   const Equation_base& eqn=ref_eq_.valeur();
-  const MD_Vector& mdf = eqn.inconnue().valeurs().get_md_vector(),
+  const MD_Vector& mdf = eqn.inconnue()->valeurs().get_md_vector(),
                    md = sub_type(MD_Vector_composite, mdf.valeur()) ? ref_cast(MD_Vector_composite, mdf.valeur()).get_desc_part(0) : mdf;
   const Domaine_VF& zvf= ref_cast( Domaine_VF,ref_eq_->domaine_dis().valeur());
   if (md== zvf.face_sommets().get_md_vector())
@@ -256,7 +256,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
   // On commence par construire le champ vectoriel complet
   Champ espace_stockage_complet;
   espace_stockage_complet = get_champ_without_evaluation(espace_stockage_complet);
-  DoubleTab& es = (espace_stockage_complet.valeurs());
+  DoubleTab& es = (espace_stockage_complet->valeurs());
 
   //if (ref_eq_->schema_temps().temps_courant()!=0)
   {
@@ -264,7 +264,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
       {
         // certains calculer  sont faux !!!! il faudrait tous les recoder en res =0 ajouter();
         es=0;
-        Operateur().ajouter(ref_eq_->operateur(numero_op_).mon_inconnue().valeurs(),es);
+        Operateur().ajouter(ref_eq_->operateur(numero_op_).mon_inconnue()->valeurs(),es);
       }
     else if (numero_source_!=-1)
       ref_eq_->sources()(numero_source_).calculer(es);
@@ -288,7 +288,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
       // on prepare l'espace de stockage pour une composante
       Champ espace_stockage_compo;
       espace_stockage_compo = get_champ_compo_without_evaluation(espace_stockage_compo);
-      DoubleTab& es_compo = (espace_stockage_compo.valeurs());
+      DoubleTab& es_compo = (espace_stockage_compo->valeurs());
       int nb_pos = es.dimension(0);
       for (int i=0; i<nb_pos; i++)
         {

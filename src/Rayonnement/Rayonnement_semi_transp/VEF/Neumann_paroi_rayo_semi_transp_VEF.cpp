@@ -47,12 +47,12 @@ void Neumann_paroi_rayo_semi_transp_VEF::mettre_a_jour(double temps)
 
 double Neumann_paroi_rayo_semi_transp_VEF::flux_impose(int i) const
 {
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom())->valeurs();
 
-  if (le_champ_front.valeurs().size()==1)
-    return le_champ_front(0,0)-flux_radiatif(i,0);
-  else if (le_champ_front.valeurs().dimension(1)==1)
-    return le_champ_front(i,0)-flux_radiatif(i,0);
+  if (le_champ_front->valeurs().size()==1)
+    return le_champ_front->valeurs()(0,0)-flux_radiatif(i,0);
+  else if (le_champ_front->valeurs().dimension(1)==1)
+    return le_champ_front->valeurs()(i,0)-flux_radiatif(i,0);
   else
     Cerr << "Neumann_paroi_rayo_semi_transp_VEF::flux_impose erreur" << finl;
 
@@ -62,12 +62,12 @@ double Neumann_paroi_rayo_semi_transp_VEF::flux_impose(int i) const
 
 double Neumann_paroi_rayo_semi_transp_VEF::flux_impose(int i,int j) const
 {
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom())->valeurs();
 
-  if (le_champ_front.valeurs().dimension(0)==1)
-    return le_champ_front(0,j)-flux_radiatif(i);
+  if (le_champ_front->valeurs().dimension(0)==1)
+    return le_champ_front->valeurs()(0,j)-flux_radiatif(i);
   else
-    return le_champ_front(i,j)-flux_radiatif(i);
+    return le_champ_front->valeurs()(i,j)-flux_radiatif(i);
 }
 
 
@@ -76,14 +76,13 @@ const Cond_lim_base& Neumann_paroi_rayo_semi_transp_VEF::la_cl() const
   return (*this);
 }
 
-
 void Neumann_paroi_rayo_semi_transp_VEF::calculer_temperature_bord(double temps)
 {
   // Cerr<<"Neumann_paroi_rayo_semi_transp_VEF::calculer_temperature_bord() : Debut"<<finl;
   // Pour une discretisation VEF, la temperature est codee sur les faces
   // des elements, il suffit donc ici  de recuperer les valeurs des temperatures
   // sur les faces de bord.
-  DoubleTab& temperature = domaine_Cl_dis().equation().inconnue().valeurs();
+  DoubleTab& temperature = domaine_Cl_dis().equation().inconnue()->valeurs();
   DoubleTab& tab = temperature_bord_->valeurs_au_temps(temps);
 
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());

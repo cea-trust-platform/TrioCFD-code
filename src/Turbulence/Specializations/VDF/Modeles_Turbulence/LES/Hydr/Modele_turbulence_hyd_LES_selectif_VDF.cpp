@@ -108,9 +108,9 @@ void Modele_turbulence_hyd_LES_selectif_VDF::cutoff()
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   int nb_poly = domaine_VDF.domaine().nb_elem();
-  DoubleTab& vorticite = la_vorticite_.valeurs();
+  DoubleTab& vorticite = la_vorticite_->valeurs();
 
-  la_vorticite_.mettre_a_jour(vitesse.temps());
+  la_vorticite_->mettre_a_jour(vitesse.temps());
   vorticite.echange_espace_virtuel();
 
   int elx0, elx1, ely0, ely1, elz0, elz1, i;

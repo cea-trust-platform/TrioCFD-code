@@ -183,7 +183,7 @@ DoubleTab& Modele_Shih_Zhu_Lumley_VEF::calcul_tenseur_face(DoubleTab& Tenseur_fa
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 

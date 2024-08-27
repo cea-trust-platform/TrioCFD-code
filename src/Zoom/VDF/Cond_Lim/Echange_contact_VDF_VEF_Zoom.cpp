@@ -197,7 +197,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
           if(!sub_type(Champ_Uniforme,le_milieu->conductivite().valeur()))
             {
               //Cerr << "raccord local homogene et conductivite non uniforme" << finl;
-              const DoubleTab& lambda = le_milieu->conductivite().valeurs();
+              const DoubleTab& lambda = le_milieu->conductivite()->valeurs();
               assert(h_paroi!=0.);
 
               if (lambda.nb_dim() == 1)
@@ -254,7 +254,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
           else  // la conductivite est un Champ uniforme
             {
               assert(h_paroi!=0.);
-              const DoubleTab& lambda = le_milieu->conductivite().valeurs();
+              const DoubleTab& lambda = le_milieu->conductivite()->valeurs();
               for(i=0; i<nb_comp; i++)
                 assert(lambda(0,i)!=0.); // juste des asserts
 

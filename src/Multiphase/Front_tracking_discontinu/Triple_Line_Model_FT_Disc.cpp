@@ -268,8 +268,8 @@ void Triple_Line_Model_FT_Disc::completer()
 {
   // Via the temperature transport equation, we directly get access to a Fluide_Incompressible:
   const Milieu_base& milieu = ref_eq_temp_->milieu();
-  kl_cond_ = milieu.conductivite()(0,0);
-  rhocpl_ =  milieu.masse_volumique()(0,0) * milieu.capacite_calorifique()(0,0);
+  kl_cond_ = milieu.conductivite()->valeurs()(0,0);
+  rhocpl_ =  milieu.masse_volumique()->valeurs()(0,0) * milieu.capacite_calorifique()->valeurs()(0,0);
 
   if ((n_ext_meso_ != 1)and(ymeso_>DMINFLOAT))
     {
@@ -308,7 +308,7 @@ void Triple_Line_Model_FT_Disc::completer()
       if (num_bord<0)
         Process::exit( "[TCL: ymeso]: !!! NO WALL-TYPE BOUNDARY WAS FOUND IN THE DOMAINE, PLESEASE CHECK JDD" );
 
-      const Frontiere& fr=zcldis.les_conditions_limites(num_bord).frontiere_dis().frontiere();
+      const Frontiere& fr=zcldis.les_conditions_limites(num_bord)->frontiere_dis().frontiere();
       const int nb_face = fr.nb_faces();
       const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
       // get TCL cells
@@ -348,7 +348,7 @@ void Triple_Line_Model_FT_Disc::completer()
       if (num_bord<0)
         Process::exit( "[TCL: Re-injection]: !!! NO WALL-TYPE BOUNDARY WAS FOUND IN THE DOMAINE, PLESEASE CHECK JDD" );
 
-      const Frontiere& fr=zcldis.les_conditions_limites(num_bord).frontiere_dis().frontiere();
+      const Frontiere& fr=zcldis.les_conditions_limites(num_bord)->frontiere_dis().frontiere();
       const int nb_face = fr.nb_faces();
       const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
       // supposing deltax = deltay in the first thermal layer
@@ -1061,8 +1061,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   const Fluide_Diphasique& fluide = ns.fluide_diphasique();
   const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
-  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
   const double rho_phase_0 = tab_rho_phase_0(0,0);
   const double rho_phase_1 = tab_rho_phase_1(0,0);
   const double jump_inv_rho = 1./rho_phase_1 - 1./rho_phase_0;
@@ -1148,7 +1148,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     for (int i=0; i<zcldis.nb_cond_lim(); i++)
       {
         const Cond_lim& la_cl = zcldis.les_conditions_limites(i);
-        const Nom& bc_name = la_cl.frontiere_dis().le_nom();
+        const Nom& bc_name = la_cl->frontiere_dis().le_nom();
         // For each BC, we check its type to see if it's a wall:
         // BC for hydraulic equation
         bool is_wall = sub_type(Dirichlet_paroi_fixe,la_cl.valeur())
@@ -1167,10 +1167,10 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     if (num_bord<0)
       Process::exit( "[TCL]: !!! NO WALL-TYPE BOUNDARY WAS FOUND IN THE DOMAINE, PLESEASE CHECK JDD" );
 
-    const Frontiere& fr=zcldis.les_conditions_limites(num_bord).frontiere_dis().frontiere();
+    const Frontiere& fr=zcldis.les_conditions_limites(num_bord)->frontiere_dis().frontiere();
     const int nb_first_face = fr.num_premiere_face();
     const int nb_face = fr.nb_faces();
-    const DoubleTab& indica = eq_transport.inconnue ().valeurs ();
+    const DoubleTab& indica = eq_transport.inconnue ()->valeurs ();
 
     // get TCL cells
     for (int ii = 0; ii < nb_face; ii++)
@@ -2105,7 +2105,7 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
                                             Domaine_Cl_dis_base, ref_eq_temp_->domaine_Cl_dis ().valeur ());
       const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
       const Cond_lim& la_cl = zclvdf.la_cl_de_la_face (num_face);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       const int ndeb = le_bord.num_premiere_face();
       if (sub_type(Echange_contact_VDF_FT_Disc, la_cl.valeur ()))
         {

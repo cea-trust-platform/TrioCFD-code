@@ -13,6 +13,7 @@
 *
 *****************************************************************************/
 #include <Cond_lim.h>
+#include <Domaine_Cl_dis.h>
 
 /*! @brief Interface du module ThHyd.
  *
@@ -25,8 +26,6 @@
  *
  * @sa Fonction de librairie hors classe
  */
-class Domaine_Cl_dis;
-
 // Fonctions qui servent a tester la coherence des conditions aux limites
 
 int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& , const Domaine_Cl_dis& );

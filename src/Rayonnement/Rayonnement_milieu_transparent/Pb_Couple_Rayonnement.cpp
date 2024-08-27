@@ -251,9 +251,9 @@ void Pb_Couple_Rayonnement::completer()
       for (int j=0; j<le_pb.nombre_d_equations(); j++)
         {
           Domaine_Cl_dis& la_zcl = le_pb.equation(j).domaine_Cl_dis();
-          for (int num_cl=0; num_cl<la_zcl.nb_cond_lim(); num_cl++)
+          for (int num_cl=0; num_cl<la_zcl->nb_cond_lim(); num_cl++)
             {
-              Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
+              Cond_lim_base& la_cl = la_zcl->les_conditions_limites(num_cl).valeur();
 
               Cond_Lim_Rayo* la_cl_rayo;
               if (is_la_cl_rayo(la_cl,la_cl_rayo))
@@ -268,7 +268,7 @@ void Pb_Couple_Rayonnement::completer()
                         {
 
 
-                          if (mod_rayo.face_rayonnante(i).nom_bord_rayo()==la_zcl.les_conditions_limites(num_cl).frontiere_dis().le_nom())
+                          if (mod_rayo.face_rayonnante(i).nom_bord_rayo()==la_zcl->les_conditions_limites(num_cl)->frontiere_dis().le_nom())
                             //if (la_cl.frontiere_dis().frontiere().nb_faces()!=0)
                             {
                               if (mod_rayo.face_rayonnante(i).emissivite()!=-1)
@@ -280,7 +280,7 @@ void Pb_Couple_Rayonnement::completer()
                         }
                       if (ok==0)
                         {
-                          Cerr<<"La condition limite de nom "<<la_zcl.les_conditions_limites(num_cl).frontiere_dis().le_nom()<<" est definie comme rayonnante, mais n'est pas dans la liste des faces rayonnantes ou son emissivite vaut -1"<<finl;
+                          Cerr<<"La condition limite de nom "<<la_zcl->les_conditions_limites(num_cl)->frontiere_dis().le_nom()<<" est definie comme rayonnante, mais n'est pas dans la liste des faces rayonnantes ou son emissivite vaut -1"<<finl;
                           exit();
                         }
                     }

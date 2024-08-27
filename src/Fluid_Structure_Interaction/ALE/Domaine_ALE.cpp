@@ -169,7 +169,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
           int nb_faces_tot=face_sommets.dimension_tot(0);
           le_dom_VEF.calculer_h_carre();
-          const Elem_VEF& type_elem=le_dom_VEF.type_elem();
+          const Elem_VEF_base& type_elem=le_dom_VEF.type_elem();
 
           /*          for (int i=0; i<nb_faces_tot; i++)
                       {
@@ -202,7 +202,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
                 {
                   const Cond_lim_base& cl = la_cl.valeur();
                   const Periodique& la_cl_period = ref_cast(Periodique,cl);
-                  const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+                  const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
                   int ndeb = 0;
                   int nfin = le_bord.nb_faces_tot();
                   for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -528,7 +528,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
       int rang=rang_frontiere(le_nom_bord_ALE);
-      const Frontiere_dis_base& la_fr_dis=le_domaine_dis.frontiere_dis(rang);
+      const Frontiere_dis_base& la_fr_dis=le_domaine_dis->frontiere_dis(rang);
       les_champs_front[n]->associer_fr_dis_base(la_fr_dis);
       const Nom& le_nom_ch_front_courant=les_champs_front[n]->que_suis_je();
       if (le_nom_ch_front_courant == "Champ_front_ALE")
@@ -751,7 +751,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
       {
         //for n_bord
         const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-        const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+        const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
         bool bord_cl_neumann=false;
         for(int i=0; i<nb_cl_Neumann; i++)
@@ -795,7 +795,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
         {
           //for n_bord
           const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           bool bord_cl_neumann=false;
           for(int i=0; i<nb_cl_Neumann; i++)
             if(le_bord.le_nom()==name_boundary_with_Neumann_BC[i])  { bord_cl_neumann=true; }
@@ -1345,9 +1345,9 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
   double norme_op_diff=mp_norme_vect(flux_bords_diff);
   if(resumption && norme_op_diff==0. )
     {
-      DoubleTab resu=eqn_hydr.vitesse().valeurs();
+      DoubleTab resu=eqn_hydr.vitesse()->valeurs();
       resu=0.;
-      op_diff.ajouter(eqn_hydr.vitesse().valeurs(),resu);
+      op_diff.ajouter(eqn_hydr.vitesse()->valeurs(),resu);
     }
   //end resumption
 

@@ -33,7 +33,7 @@ Entree& Modele_turbulence_hyd_LES_Smago_filtre_VEF::readOn(Entree& s) { return M
 
 void Modele_turbulence_hyd_LES_Smago_filtre_VEF::calculer_S_barre()
 {
-  const DoubleTab& la_vitesse = mon_equation_->inconnue().valeurs();
+  const DoubleTab& la_vitesse = mon_equation_->inconnue()->valeurs();
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, le_dom_Cl_.valeur());
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const int nb_elem = domaine_VEF.nb_elem();

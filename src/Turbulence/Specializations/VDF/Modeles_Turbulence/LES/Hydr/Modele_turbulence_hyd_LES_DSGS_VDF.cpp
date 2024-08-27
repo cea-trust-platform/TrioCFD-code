@@ -56,15 +56,15 @@ void Modele_turbulence_hyd_LES_DSGS_VDF::associer(const Domaine_dis& domaine_dis
   coeff.fixer_unite("adim");
   coeff.changer_temps(0.);
 
-  model_coeff.ref(coeff_field.valeurs());
+  model_coeff.ref(coeff_field->valeurs());
   champs_compris_.ajoute_champ(coeff_field);
   // model_coeff.resize(le_dom_VDF->nb_elem_tot());
 }
 
 Champ_Fonc& Modele_turbulence_hyd_LES_DSGS_VDF::calculer_viscosite_turbulente()
 {
-  double temps = mon_equation_->inconnue().temps();
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  double temps = mon_equation_->inconnue()->temps();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   int nb_elem = ref_cast(Domaine_VDF, le_dom_VF_.valeur()).nb_elem();
   int nb_elem_tot = ref_cast(Domaine_VDF, le_dom_VF_.valeur()).nb_elem_tot();
 
@@ -100,15 +100,15 @@ Champ_Fonc& Modele_turbulence_hyd_LES_DSGS_VDF::calculer_viscosite_turbulente()
 
   Debog::verifier("Modele_turbulence_hyd_LES_DSGS_VDF::calculer_viscosite_turbulente visco_turb 1", visco_turb);
 
-  coeff_field.changer_temps(temps);
+  coeff_field->changer_temps(temps);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
 void Modele_turbulence_hyd_LES_DSGS_VDF::calculer_cell_cent_vel(DoubleTab& cell_cent_vel)
 {
-  const DoubleTab& vitesse = mon_equation_->inconnue().valeurs();
+  const DoubleTab& vitesse = mon_equation_->inconnue()->valeurs();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   const IntTab& elem_faces = domaine_VDF.elem_faces();

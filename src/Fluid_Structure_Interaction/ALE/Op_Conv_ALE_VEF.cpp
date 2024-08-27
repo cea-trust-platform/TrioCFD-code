@@ -219,7 +219,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   // En bref pour un polyedre le traitement de la convection depend
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
-  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -239,7 +239,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           nb_faces_perio+=le_bord.nb_faces();
         }
     }
@@ -256,7 +256,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
@@ -296,7 +296,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
       for (n_bord=0; n_bord<nb_bord; n_bord++)
         {
           const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           if (sub_type(Periodique,la_cl.valeur()))
@@ -389,7 +389,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   //                         -la premiere avec le schema choisi et une ponderation de alpha
   //                         -la seconde avec le schema centre et une ponderation de 1-alpha
   Champ_Inc vit_maillage_ALE = equation().inconnue();
-  vit_maillage_ALE.valeurs() = vitesse_face_absolue;
+  vit_maillage_ALE->valeurs() = vitesse_face_absolue;
   double alpha = alpha_;
   int nombre_passes = (alpha==1 ? 1 : 2);
   for (int passe=1; passe<=nombre_passes; passe++)
@@ -658,7 +658,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
           const Neumann_sortie_libre& la_sortie_libre = ref_cast(Neumann_sortie_libre, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
@@ -697,7 +697,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
       else if (sub_type(Periodique,la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           ArrOfInt fait(le_bord.nb_faces());
@@ -766,10 +766,10 @@ double Op_Conv_ALE_VEF::calculer_dt_stab() const
            ||
            (sub_type(Dirichlet_homogene,la_cl.valeur()))
          )
-        ;
+        { /* Do nothing */ }
       else
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -814,8 +814,8 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 //old const Champ_Inc_base& la_vitesse=vitesse_.valeur();
 //old const DoubleTab& tab_vitesse=la_vitesse.valeurs();
-//new DoubleTab velocity= equation().inconnue().valeurs();
-  const DoubleTab& tab_vitesse= equation().inconnue().valeurs();
+//new DoubleTab velocity= equation().inconnue()->valeurs();
+  const DoubleTab& tab_vitesse= equation().inconnue()->valeurs();
   const DoubleTab& tab_vitesse_faces_ALE = ref_cast(Domaine_ALE, dom.valeur()).vitesse_faces();
 
   const DoubleTab& face_normales=domaine_VEF.face_normales();
@@ -889,7 +889,7 @@ void Op_Conv_ALE_VEF::calculateALEMeshVelocityGradientOnFaces( DoubleTab& ALE_Me
       for (int num_cl=0; num_cl<nb_cl; num_cl++)
         {
           const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(num_cl);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int nb_faces_bord=le_bord.nb_faces();
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + nb_faces_bord;
@@ -966,7 +966,7 @@ void Op_Conv_ALE_VEF::calculateALEMeshVelocityGradientOnFaces( DoubleTab& ALE_Me
       for (int num_cl=0; num_cl<nb_cl; num_cl++)
         {
           const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(num_cl);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int nb_faces_bord=le_bord.nb_faces();
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + nb_faces_bord;
@@ -1043,7 +1043,7 @@ void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
   const int nb_faces_tot = domaine_VEF.nb_faces_tot();
   DoubleTab ALEmeshVelocityGradient(nb_faces_tot,dimension,dimension);
   //jacobianALE.resize(nb_faces_tot,dimension);
-  jacobianALE= equation().inconnue().valeurs();
+  jacobianALE= equation().inconnue()->valeurs();
   jacobianALE=1.;
   calculateALEMeshVelocityGradientOnFaces(ALEmeshVelocityGradient);
 

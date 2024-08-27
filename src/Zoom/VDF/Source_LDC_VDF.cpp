@@ -77,11 +77,11 @@ void Source_LDC_VDF::associer_domaines(const Domaine_dis& domaine_dis,
 DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_IndGros& connect, Restriction_base& restriction, Equation_base& eq_fine)
 {
   Equation_base& eq = equation();
-  DoubleTab& passe = eq.inconnue().passe();
+  DoubleTab& passe = eq.inconnue()->passe();
   double dtgros = eq.schema_temps().pas_de_temps();
-  DoubleTab& present = eq.inconnue().valeurs();
-  DoubleTab& present_fin = eq_fine.inconnue().valeurs();
-  DoubleTab& passe_fin = eq_fine.inconnue().passe();
+  DoubleTab& present = eq.inconnue()->valeurs();
+  DoubleTab& present_fin = eq_fine.inconnue()->valeurs();
+  DoubleTab& passe_fin = eq_fine.inconnue()->passe();
   double dt = eq_fine.schema_temps().pas_de_temps();
   const Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eq.domaine_dis().valeur());
   const Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eq_fine.domaine_dis().valeur());

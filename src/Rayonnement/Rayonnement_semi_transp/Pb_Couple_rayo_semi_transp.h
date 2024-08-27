@@ -23,9 +23,9 @@
 #ifndef Pb_Couple_rayo_semi_transp_included
 #define Pb_Couple_rayo_semi_transp_included
 
+#include <Schema_Temps_base.h>
 #include <Probleme_Couple.h>
 #include <Domaine.h>
-#include <Schema_Temps.h>
 #include <TRUST_Ref.h>
 
 class Modele_rayo_semi_transp;

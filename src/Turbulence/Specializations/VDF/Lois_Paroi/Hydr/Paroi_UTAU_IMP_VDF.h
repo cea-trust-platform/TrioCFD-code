@@ -26,10 +26,9 @@
 
 #include <Paroi_hyd_base_VDF.h>
 #include <Paroi_UTAU_IMP_Impl.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Champ_Fonc_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 
 /*! @brief CLASS: Paroi_UTAU_IMP_VDF
  *

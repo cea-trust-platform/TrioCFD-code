@@ -135,11 +135,11 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
     {
       if (alpha_uniforme)
         {
-          double d_alpha = alpha(0,0);
-          assert(ref_cast(Convection_Diffusion_Concentration,eqn).constituant().nb_constituants()==alpha.valeurs().line_size());
-          for (int nc=0; nc<alpha.valeurs().line_size(); nc++)
+          double d_alpha = alpha->valeurs()(0,0);
+          assert(ref_cast(Convection_Diffusion_Concentration,eqn).constituant().nb_constituants()==alpha->valeurs().line_size());
+          for (int nc=0; nc<alpha->valeurs().line_size(); nc++)
             {
-              if (d_alpha!=alpha(0,nc))
+              if (d_alpha!=alpha->valeurs()(0,nc))
                 {
                   Cerr << "Error!" << finl;
                   Cerr << "Law of the wall are not implemented yet for constituants with different diffusion coefficients." << finl;
@@ -149,12 +149,12 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
         }
       else
         {
-          for (int elem=0; elem<alpha.valeurs().dimension(0); elem++)
+          for (int elem=0; elem<alpha->valeurs().dimension(0); elem++)
             {
-              double d_alpha = alpha(elem,0);
-              for (int nc=0; nc<alpha.valeurs().line_size(); nc++)
+              double d_alpha = alpha->valeurs()(elem,0);
+              for (int nc=0; nc<alpha->valeurs().line_size(); nc++)
                 {
-                  if (d_alpha!=alpha(elem,nc))
+                  if (d_alpha!=alpha->valeurs()(elem,nc))
                     {
                       Cerr << "Error!" << finl;
                       Cerr << "Law of the wall are not implemented yet for constituants with different diffusion coefficients." << finl;
@@ -177,7 +177,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
            || (sub_type(Symetrie,la_cl.valeur()))
            || (sub_type(Paroi_decalee_Robin,la_cl.valeur())) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int size=le_bord.nb_faces();
           DoubleVect& dist_equiv = equivalent_distance_[n_bord];
 
@@ -211,7 +211,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
               // Alex. C. : 11/04/2003
               double u_star = tab_u_star(num_face);
-              double d_alpha = (alpha_uniforme ? alpha(0,0) : alpha(elem,0) );
+              double d_alpha = (alpha_uniforme ? alpha->valeurs()(0,0) : alpha->valeurs()(elem,0) );
               if (u_star == 0 || d_alpha==0)
                 {
                   dist_equiv[ind_face] = dist;

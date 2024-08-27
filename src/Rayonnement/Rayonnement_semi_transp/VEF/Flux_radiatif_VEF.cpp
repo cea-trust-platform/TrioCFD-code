@@ -68,15 +68,15 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
                                                const Champ_Don& indice,const Domaine_VF& zvf,
                                                const double sigma, double temps)
 {
-  const DoubleTab& n = indice.valeurs();
-  const DoubleTab& epsilon = emissivite().valeurs();
+  const DoubleTab& n = indice->valeurs();
+  const DoubleTab& epsilon = emissivite()->valeurs();
 
   //  int nb_elem = zvf.nb_elem();
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
   //  const IntTab& face_voisins=zvf.face_voisins();
 
   // On dimensionne le DoubleTab associe a le_champ_front
-  assert(le_champ_front.nb_comp() == 1);
+  assert(le_champ_front->nb_comp() == 1);
   DoubleTab& tab = le_champ_front->valeurs_au_temps(temps);
 
   // Boucle sur les faces de le_bord
@@ -86,14 +86,14 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
   for(face = ndeb; face<nfin; face++)
     {
       double epsi;
-      assert(emissivite().nb_comp() == 1);
+      assert(emissivite()->nb_comp() == 1);
       if(sub_type(Champ_front_uniforme,emissivite().valeur()))
         epsi = epsilon(0,0);
       else
         epsi = epsilon(face-ndeb,0);
 
       double nn;
-      assert(indice.nb_comp() == 1);
+      assert(indice->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,indice.valeur()))
         nn = n(0,0);
       else
@@ -101,9 +101,9 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
 
 
       double T;
-      assert(Tb.nb_comp() == 1);
+      assert(Tb->nb_comp() == 1);
       if(sub_type(Champ_front_uniforme,Tb.valeur()))
-        T = Tb.valeurs()(0,0);
+        T = Tb->valeurs()(0,0);
       else
         T = Tb->valeurs_au_temps(temps)(face-ndeb,0);
 
@@ -123,14 +123,14 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = le_bord.nb_faces();
   REF(Champ_front) Tb;
-  const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
+  const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites();
   int num_cl_temp = 0;
 
   int test_nom=0;
   for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
     {
-      const Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites(num_cl_temp);
-      Nom nom_cl_temp = la_cl_temp.frontiere_dis().le_nom();
+      const Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites(num_cl_temp);
+      Nom nom_cl_temp = la_cl_temp->frontiere_dis().le_nom();
       if(nom_cl_temp == frontiere_dis().le_nom())
         {
           test_nom = 1;
@@ -174,12 +174,12 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
     }
   //  Tb contient les temperatures de bord
   // Calcul du flux radiatif
-  DoubleTab& Flux = flux_radiatif().valeurs();
+  DoubleTab& Flux = flux_radiatif()->valeurs();
   Flux.resize(le_bord.nb_faces(),1);
   Eq_rayo_semi_transp_VEF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VEF,domaine_Cl_dis().equation());
   Fluide_base& fluide = eq_rayo.fluide();
-  DoubleTab& indice = fluide.indice().valeurs();
-  DoubleTab& irradiance = eq_rayo.inconnue().valeurs();
+  DoubleTab& indice = fluide.indice()->valeurs();
+  DoubleTab& irradiance = eq_rayo.inconnue()->valeurs();
 
   const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_Cl_dis().domaine_dis().valeur());
   //  const IntTab& face_voisins = zvef.face_voisins();
@@ -193,24 +193,24 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   for(face=0; face<nb_faces; face++)
     {
       double epsi;
-      assert(emissivite().nb_comp() == 1);
+      assert(emissivite()->nb_comp() == 1);
       if (sub_type(Champ_front_uniforme,emissivite().valeur()))
-        epsi = emissivite()(0,0);
+        epsi = emissivite()->valeurs()(0,0);
       else
-        epsi = emissivite()(face,0);
+        epsi = emissivite()->valeurs()(face,0);
       double n;
-      assert(fluide.indice().nb_comp() == 1);
+      assert(fluide.indice()->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide.indice().valeur()))
         n = indice(0,0);
       else
         n = indice(face+ndeb,0);
       double sigma = eq_rayo.Modele().valeur_sigma();
       double Tbord;
-      assert(Tb->nb_comp() == 1);
+      assert(Tb.valeur()->nb_comp() == 1);
       if(sub_type(Champ_front_uniforme,Tb->valeur()))
-        Tbord = Tb->valeurs()(0,0);
+        Tbord = Tb.valeur()->valeurs()(0,0);
       else
-        Tbord = Tb->valeurs()(face,0);
+        Tbord = Tb.valeur()->valeurs()(face,0);
       double irra = irradiance(face+ndeb);
 
       double denum = A()*(2-epsi);

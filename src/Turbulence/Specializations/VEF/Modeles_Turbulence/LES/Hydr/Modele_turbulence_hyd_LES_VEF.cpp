@@ -39,8 +39,8 @@ Champ_Fonc& Modele_turbulence_hyd_LES_VEF::calculer_viscosite_turbulente()
   static const double Csm1 = CSM1;
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, le_dom_Cl_.valeur());
-  double temps = mon_equation_->inconnue().temps();
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  double temps = mon_equation_->inconnue()->temps();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   const int nb_face = domaine_VEF.nb_faces();
   const int nb_face_tot = domaine_VEF.nb_faces_tot();
   const int nb_elem = domaine_VEF.nb_elem();
@@ -67,7 +67,7 @@ Champ_Fonc& Modele_turbulence_hyd_LES_VEF::calculer_viscosite_turbulente()
   for (i = 0; i < les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];
-      const Front_VF& la_front_dis = ref_cast(Front_VF, la_cl.frontiere_dis());
+      const Front_VF& la_front_dis = ref_cast(Front_VF, la_cl->frontiere_dis());
       int ndeb = la_front_dis.num_premiere_face();
       int nfin = ndeb + la_front_dis.nb_faces();
 
@@ -101,13 +101,13 @@ Champ_Fonc& Modele_turbulence_hyd_LES_VEF::calculer_viscosite_turbulente()
 
   visco_turb /= (domaine_VEF.domaine().nb_faces_elem());
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
 void Modele_turbulence_hyd_LES_VEF::calculer_fonction_structure()
 {
-  const DoubleTab& la_vitesse = mon_equation_->inconnue().valeurs();
+  const DoubleTab& la_vitesse = mon_equation_->inconnue()->valeurs();
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, le_dom_Cl_.valeur());
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
 
@@ -130,7 +130,7 @@ void Modele_turbulence_hyd_LES_VEF::calculer_fonction_structure()
   for (int num_cl = 0; num_cl < les_cl.size(); num_cl++)
     {
       const Cond_lim& la_cl = les_cl[num_cl];
-      const Front_VF& la_front_dis = ref_cast(Front_VF, la_cl.frontiere_dis());
+      const Front_VF& la_front_dis = ref_cast(Front_VF, la_cl->frontiere_dis());
       int ndeb = la_front_dis.num_premiere_face();
       int nfin = ndeb + la_front_dis.nb_faces();
       IntVect faces_elem_loc(dimension + 1);

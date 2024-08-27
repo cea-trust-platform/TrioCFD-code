@@ -27,7 +27,8 @@
 #include <Domaine_Cl_dis.h>
 #include <Param.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 #define A1 3.9
 #define CNL1 0.8
 #define CNL2 11.
@@ -43,8 +44,6 @@ Rodney C. Schmidt and Suhas V. Patankar
 */
 #define BR_EPS 1.e-20
 
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 

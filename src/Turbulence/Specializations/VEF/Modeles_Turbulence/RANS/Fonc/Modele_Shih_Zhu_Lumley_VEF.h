@@ -27,12 +27,11 @@
 #include <Domaine_Cl_dis.h>
 #include <Param.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 
 #define BR_EPS 1.e-20
 
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 

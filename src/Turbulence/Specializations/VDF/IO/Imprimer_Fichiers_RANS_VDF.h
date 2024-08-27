@@ -26,9 +26,8 @@
 #include <Domaine_VDF.h>
 #include <Equation_base.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
 class Champ_Fonc_base;
-class Domaine_dis;
 
 class Imprimer_Fichiers_RANS_VDF : public Interprete
 {

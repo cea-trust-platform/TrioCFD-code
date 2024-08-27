@@ -73,7 +73,7 @@ void Echange_contact_Rayo_transp_VDF::completer()
   // calcul de Teta_i 0
 
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-  const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+  const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 
@@ -110,7 +110,7 @@ void Echange_contact_Rayo_transp_VDF::mettre_a_jour(double temps)
   if (num_premiere_face_dans_pb_fluide==-1)
     {
       Cerr<<"fin de construction dans "<<que_suis_je()<<finl;
-      T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
+      T_autre_pb()->associer_fr_dis_base(T_ext()->frontiere_dis());
       // on regarde qui est le pb fluide
       const Equation_base* eqn = nullptr;
       const Equation_base& mon_eqn = domaine_Cl_dis().equation();
@@ -153,10 +153,9 @@ void Echange_contact_Rayo_transp_VDF::mettre_a_jour(double temps)
     }
   else
     {
-      //Cerr<<T_autre_pb().valeurs()<<finl;
       // exit();
     }
-  T_autre_pb().mettre_a_jour(temps);
+  T_autre_pb()->mettre_a_jour(temps);
 
   assert(nb_comp==1);
   int is_pb_fluide=0;
@@ -203,7 +202,7 @@ void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
   // Tautre=Text;
   //  Tw=(autr_h*Tautre+mon_h*monT)/(autr_h+mon_h)
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-  const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+  const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 

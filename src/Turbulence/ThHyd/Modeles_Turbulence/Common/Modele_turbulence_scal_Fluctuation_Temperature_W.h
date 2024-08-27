@@ -22,14 +22,14 @@
 #ifndef Modele_turbulence_scal_Fluctuation_Temperature_W_included
 #define Modele_turbulence_scal_Fluctuation_Temperature_W_included
 
-#include <Equation.h>
+#include <Equation_base.h>
 #include <Transport_K_Eps_Bas_Reynolds.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Transport_Fluctuation_Temperature_W.h>
 #include <TRUST_Ref.h>
+#include <Champ_Fonc.h>
 
 class Transport_Fluctuation_Temperature_W;
-class Champ_Fonc;
 
 
 class Modele_turbulence_scal_Fluctuation_Temperature_W :  public Modele_turbulence_scal_base
@@ -71,7 +71,7 @@ private :
 
 
 protected :
-  Equation eqn;
+  OWN_PTR(Equation_base) eqn;
   REF(Champ_Fonc) la_viscosite_turbulente;
   // nous n'avons plus alpha_turb = visco_turb/Prdt_turb
 

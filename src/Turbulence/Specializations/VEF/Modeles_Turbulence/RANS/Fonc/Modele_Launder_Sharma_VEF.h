@@ -27,8 +27,7 @@
 #include <Domaine_Cl_dis.h>
 #include <Param.h>
 #include <TRUST_Ref.h>
-
-class Domaine_dis;
+#include <Domaine_dis.h>
 class Domaine_Cl_VEF;
 
 class Modele_Launder_Sharma_VEF : public Modele_Lam_Bremhorst_VEF

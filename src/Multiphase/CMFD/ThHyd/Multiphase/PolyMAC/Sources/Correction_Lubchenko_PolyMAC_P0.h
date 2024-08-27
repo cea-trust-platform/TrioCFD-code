@@ -23,10 +23,9 @@
 #ifndef Correction_Lubchenko_PolyMAC_P0_included
 #define Correction_Lubchenko_PolyMAC_P0_included
 
+#include <Correlation_base.h>
 #include <Source_base.h>
 #include <TRUST_Ref.h>
-
-class Correlation;
 
 /*! @brief classe Correction_Lubchenko_PolyMAC_P0 Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
  *

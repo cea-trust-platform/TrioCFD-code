@@ -22,8 +22,9 @@
 
 #ifndef Dispersion_bulles_turbulente_Burns_included
 #define Dispersion_bulles_turbulente_Burns_included
+
 #include <Dispersion_bulles_base.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 #include <TRUST_Ref.h>
 
 /*! @brief classe Dispersion_bulles_turbulente_Burns

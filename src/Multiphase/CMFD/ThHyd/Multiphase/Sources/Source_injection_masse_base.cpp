@@ -48,7 +48,7 @@ Entree& Source_injection_masse_base::readOn(Entree& is)
 
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
   int N = pb.nb_phases();
-  if (N != flux_masse_.valeurs().line_size()) Process::exit(que_suis_je() + " : you must input as many fluxes as there are phases !!");
+  if (N != flux_masse_->valeurs().line_size()) Process::exit(que_suis_je() + " : you must input as many fluxes as there are phases !!");
 
   return is;
 }
@@ -60,7 +60,7 @@ void Source_injection_masse_base::ajouter_blocs(matrices_t matrices, DoubleTab& 
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
   const DoubleTab& rho = pb.get_champ("masse_volumique").passe(),
-                   &tab_inj = flux_masse_.valeurs();
+                   &tab_inj = flux_masse_->valeurs();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
   int cI = (tab_inj.dimension(0)==1), cR = (rho.dimension(0)==1), N =rho.line_size();
   int e, k;

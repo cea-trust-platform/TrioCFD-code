@@ -43,7 +43,7 @@ Entree& Dispersion_bulles_turbulente_Bertodano::readOn(Entree& is)
   if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
 
   if (pbm->has_correlation("frottement_interfacial")) correlation_drag_ = pbm->get_correlation("frottement_interfacial"); //correlation fournie par le bloc correlation
-  else correlation_drag_.typer_lire(*pbm, "frottement_interfacial", is); //sinon -> on la lit
+  else Correlation_base::typer_lire_correlation(correlation_drag_, *pbm, "frottement_interfacial", is); //sinon -> on la lit
 
   return is;
 }

@@ -61,13 +61,13 @@ void MuLambda_TBLE_Fcts_T::initialiser(const Milieu_base& milieu)
       Cerr << "Variable volume mass is not possible yet with TBLE law." << finl;
       exit();
     }
-  rho = milieu.masse_volumique().valeurs()(0,0);
+  rho = milieu.masse_volumique()->valeurs()(0,0);
   if (!sub_type(Champ_Uniforme,milieu.capacite_calorifique().valeur()))
     {
       Cerr << "Variable capacity heat exchange is not possible yet with TBLE law." << finl;
       exit();
     }
-  rhoCp = rho*milieu.capacite_calorifique().valeurs()(0,0);
+  rhoCp = rho*milieu.capacite_calorifique()->valeurs()(0,0);
 }
 
 double MuLambda_TBLE_Fcts_T::getNu(REF(Eq_couch_lim) eq_T, int ind)

@@ -60,7 +60,7 @@ void  Modele_Launder_Sharma_VDF::associer(const Domaine_dis& domaine_dis,
 DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
@@ -113,7 +113,7 @@ DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_
 DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);

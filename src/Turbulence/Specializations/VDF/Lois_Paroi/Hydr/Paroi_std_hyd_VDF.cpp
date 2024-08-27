@@ -118,7 +118,7 @@ int Paroi_std_hyd_VDF::preparer_calcul_hyd(DoubleTab& tab)
       if ((sub_type(Dirichlet_paroi_fixe, la_cl.valeur()))
           || (sub_type(Dirichlet_paroi_defilante, la_cl.valeur())))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -171,7 +171,7 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1, int isKeps, DoubleTab& tab2
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco = -1;
   int l_unif {0};
@@ -207,7 +207,7 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1, int isKeps, DoubleTab& tab2
       // aux voisinages des parois
 
       const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
       ndeb = le_bord.num_premiere_face();
       nfin = ndeb + le_bord.nb_faces();
 
@@ -340,7 +340,7 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1, int isKeps, DoubleTab& tab2
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
       {
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
       ndeb = le_bord.num_premiere_face();
 
@@ -426,7 +426,7 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco = -1;
 
@@ -467,7 +467,7 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
 
       // cAlan : remplaçable par un tableau rempli en début de calcul ?
       const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
       ndeb = le_bord.num_premiere_face();
       nfin = ndeb + le_bord.nb_faces();
 
@@ -1081,7 +1081,7 @@ void Paroi_std_hyd_VDF::imprimer_ustar(Sortie& os) const
       if ((sub_type(Dirichlet_paroi_fixe, la_cl.valeur())) ||
           (sub_type(Dirichlet_paroi_defilante, la_cl.valeur())))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           if(je_suis_maitre())
             {
               Ustar << finl;
@@ -1181,7 +1181,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -1237,7 +1237,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
 
       if (sub_type(Dirichlet_paroi_fixe, la_cl.valeur()) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           int paroi;
@@ -1398,7 +1398,7 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco = -1;
   int l_unif {0};
@@ -1437,7 +1437,7 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
       // aux voisinages des parois
 
       const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       ndeb = le_bord.num_premiere_face();
       nfin = ndeb + le_bord.nb_faces();
 

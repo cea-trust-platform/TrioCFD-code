@@ -1282,7 +1282,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
   const Operateur_Div& opdiv=eq_ns.operateur_divergence();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  //const DoubleTab& c=eq_c.inconnue().valeurs();
+  //const DoubleTab& c=eq_c.inconnue()->valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
   //const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
@@ -1299,7 +1299,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
 
       DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
       if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
+        prov_face=eq_ns.inconnue()->valeurs();
       prov_face=0.;
       // Grad(F)
       opgrad.calculer(F,prov_face);
@@ -1326,7 +1326,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
       //     }
       //   Cerr << "Fin multiplication mobilite" << finl;
       // Application solveur masse
-      eq_ns.solv_masse().appliquer(prov_face);
+      eq_ns.solv_masse()->appliquer(prov_face);
       //Cerr <<"opgrad dans laplacien"<<prov_face<<finl;
 
       // Div(M*Grad(F))
@@ -1340,7 +1340,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
 
       /*DoubleTab& temp_prov_face= ref_cast_non_const(DoubleTab,prov_face_);
       if (temp_prov_face.size()==0)
-        temp_prov_face=eq_ns.inconnue().valeurs();
+        temp_prov_face=eq_ns.inconnue()->valeurs();
       temp_prov_face=0.;
 
       DoubleTab prov_face(temp_prov_face.dimension_tot(0),F.line_size());
@@ -1361,14 +1361,14 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
               prov_face(k,j)=temp_prov_face(k,0);
             }
         }
-      eq_ns.solv_masse().appliquer(prov_face);
+      eq_ns.solv_masse()->appliquer(prov_face);
       //Cerr <<"opgrad dans laplacien"<<prov_face<<finl;
 
       // Div(alpha*Grad(F))
       opdiv.calculer(prov_face,resu);*/
       DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
       if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
+        prov_face=eq_ns.inconnue()->valeurs();
       prov_face=0.;
       // Grad(F)
       DoubleTab temp_resu(resu.dimension_tot(0),1);
@@ -1384,7 +1384,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
           opgrad.calculer(temp_F,prov_face);
 
           // Application solveur masse
-          eq_ns.solv_masse().appliquer(prov_face);
+          eq_ns.solv_masse()->appliquer(prov_face);
 
           // Laplacien = Div(Grad(F))
           opdiv.calculer(prov_face,temp_resu);
@@ -1406,7 +1406,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
   const Operateur_Div& opdiv=eq_ns.operateur_divergence();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
@@ -1416,7 +1416,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
 
   DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
   if (prov_face.size()==0)
-    prov_face=eq_ns.inconnue().valeurs();
+    prov_face=eq_ns.inconnue()->valeurs();
   prov_face=0.;
   resu=0.;
 
@@ -1443,7 +1443,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
         }
 
       // Application solveur masse (/M)
-      eq_ns.solv_masse().appliquer(prov_face);
+      eq_ns.solv_masse()->appliquer(prov_face);
 
       // Div(Kappa*Grad(F))
       opdiv.calculer(prov_face,resu);
@@ -1507,7 +1507,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
         }
 
       // Application solveur masse (/M)
-      eq_ns.solv_masse().appliquer(temp_prov_face2);
+      eq_ns.solv_masse()->appliquer(temp_prov_face2);
 
       // Div(Kappa*Grad(F))
       for (int j=0; j<nb_comp; j++)
@@ -1551,7 +1551,7 @@ void Source_Con_Phase_field::mettre_a_jour(double temps)
 
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   Champ_Fonc& ch=eq_c.set_mutilde_();
-  ch.mettre_a_jour(temps);
+  ch->mettre_a_jour(temps);
 }
 
 
@@ -1564,9 +1564,9 @@ void Source_Con_Phase_field::premier_demi_dt()
   const int nb_elem = domaine_VDF.nb_elem_tot();
 
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  DoubleTab& c=eq_c.inconnue().valeurs();
+  DoubleTab& c=eq_c.inconnue()->valeurs();
 
-  DoubleTab& mutilde=eq_c.set_mutilde_().valeurs();
+  DoubleTab& mutilde=eq_c.set_mutilde_()->valeurs();
   DoubleTab& mutilde_demi=eq_c.set_mutilde_demi();
   DoubleTab& c_demi=eq_c.set_c_demi();
 
@@ -2118,7 +2118,7 @@ void Source_Con_Phase_field::premier_demi_dt()
       //   prov_elem*=-kappa;
 
       accr+=prov_elem;
-      //eq_c.solv_masse().appliquer(prov_elem);
+      //eq_c.solv_masse()->appliquer(prov_elem);
       //Cerr<<"masse de la force sur c "<<prov_elem.max_abs()<<finl;
 
       // Utile pour pouvoir utiliser n'importe quel dt - voir Schema_Phase_Field
@@ -2138,30 +2138,30 @@ void Source_Con_Phase_field::premier_demi_dt()
 void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC) const
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
   const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
   const Operateur_Div& opdiv= eq_ns.operateur_divergence();
 
   //const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  //const DoubleTab& c=eq_c.inconnue().valeurs();
+  //const DoubleTab& c=eq_c.inconnue()->valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
   if (type_systeme_naire_==0)
     {
       DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
       if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
+        prov_face=eq_ns.inconnue()->valeurs();
       prov_face=0.;
 
       // Grad(C)
       opgrad.calculer(c,prov_face);
-      eq_ns.solv_masse().appliquer(prov_face);
+      eq_ns.solv_masse()->appliquer(prov_face);
       prov_face *= alpha;
 
       // Div(alpha*Grad(c))
       opdiv.calculer(prov_face,div_alpha_gradC);
-      eq_c.solv_masse().appliquer(div_alpha_gradC);
+      eq_c.solv_masse()->appliquer(div_alpha_gradC);
       //Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
 
     }
@@ -2170,7 +2170,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
       /*
        DoubleTab& temp_prov_face= ref_cast_non_const(DoubleTab,prov_face_);
        if (temp_prov_face.size()==0)
-         temp_prov_face=eq_ns.inconnue().valeurs();
+         temp_prov_face=eq_ns.inconnue()->valeurs();
        temp_prov_face=0.;
 
        DoubleTab prov_face(temp_prov_face.dimension_tot(0),c.line_size());
@@ -2207,7 +2207,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
                prov_face(k,j)=temp_prov_face(k,0);
              }
          }
-       eq_ns.solv_masse().appliquer(prov_face);
+       eq_ns.solv_masse()->appliquer(prov_face);
 
        // alpha*Grad(C)
        DoubleTab temp_prov_face2 = prov_face;
@@ -2229,13 +2229,13 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
 
        // Div(alpha*Grad(c))
        opdiv.calculer(prov_face,div_alpha_gradC);
-       eq_c.solv_masse().appliquer(div_alpha_gradC);
+       eq_c.solv_masse()->appliquer(div_alpha_gradC);
        //Cerr << "div_alpha_gradC apres solv_masse.appliquer "<<div_alpha_gradC<<finl;
        Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
       */
       DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
       if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
+        prov_face=eq_ns.inconnue()->valeurs();
       prov_face=0.;
       DoubleTab temp_prov_face2 (prov_face.dimension(0),nb_comp);
       temp_prov_face2 = 0;
@@ -2253,7 +2253,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
           opgrad.calculer(temp_c,prov_face);
 
           // Application solveur masse
-          eq_ns.solv_masse().appliquer(prov_face);
+          eq_ns.solv_masse()->appliquer(prov_face);
 
           // alpha*Grad(C)
 
@@ -2276,7 +2276,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
           // Div(Grad(c))
           opdiv.calculer(prov_face,temp_resu);
           //opdiv.calculer(temp_prov_face2,div_alpha_gradC);
-          eq_c.solv_masse().appliquer(temp_resu);
+          eq_c.solv_masse()->appliquer(temp_resu);
 
           for (int i=0; i<temp_resu.dimension(0); i++)
             {
@@ -2296,7 +2296,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
 void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_rho_gradC) const
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
   const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
   const Operateur_Div& opdiv= eq_ns.operateur_divergence();
@@ -2313,14 +2313,14 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
     {
       DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
       if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
+        prov_face=eq_ns.inconnue()->valeurs();
       prov_face=0.;
 
       // Grad(C)
       opgrad.calculer(c,prov_face);
-      eq_ns.solv_masse().appliquer(prov_face);
+      eq_ns.solv_masse()->appliquer(prov_face);
 
-      const DoubleTab rhoPF=eq_ns.rho().valeurs();
+      const DoubleTab rhoPF=eq_ns.rho()->valeurs();
       double rho_face;
 
       if (boussi_==1)
@@ -2343,7 +2343,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 
       // Div(alpha*rho*Grad(c))
       opdiv.calculer(prov_face,div_alpha_rho_gradC);
-      eq_c.solv_masse().appliquer(div_alpha_rho_gradC);
+      eq_c.solv_masse()->appliquer(div_alpha_rho_gradC);
     }
 }
 
@@ -2354,7 +2354,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice_diffusion_CH)
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
 
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
@@ -4247,7 +4247,7 @@ l5naire:
 void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
   const DoubleTab& div_alpha_gradC=eq_c.get_div_alpha_gradC();
 
   // Calcul de mutilde
@@ -4341,17 +4341,17 @@ void Source_Con_Phase_field::calculer_mutilde_demi(DoubleTab& mutilde_demi, Doub
     {
       DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
       if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
+        prov_face=eq_ns.inconnue()->valeurs();
       prov_face=0.;
 
       // Grad(C)
       opgrad.calculer(c_demi,prov_face);
-      eq_ns.solv_masse().appliquer(prov_face);
+      eq_ns.solv_masse()->appliquer(prov_face);
       prov_face *= alpha;
 
       // Div(alpha*Grad(c))
       opdiv.calculer(prov_face,mutilde_demi);
-      eq_c.solv_masse().appliquer(mutilde_demi);
+      eq_c.solv_masse()->appliquer(mutilde_demi);
       //Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
 
       mutilde_demi *= -1.;
@@ -4370,7 +4370,7 @@ void Source_Con_Phase_field::calculer_mutilde_demi(DoubleTab& mutilde_demi, Doub
     {
       DoubleTab& prov_face=ref_cast_non_const(DoubleTab, prov_face_);
       if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
+        prov_face=eq_ns.inconnue()->valeurs();
       prov_face=0.;
       DoubleTab temp_prov_face2 (prov_face.dimension(0),nb_comp);
       temp_prov_face2 = 0;
@@ -4388,7 +4388,7 @@ void Source_Con_Phase_field::calculer_mutilde_demi(DoubleTab& mutilde_demi, Doub
           opgrad.calculer(temp_c,prov_face);
 
           // Application solveur masse
-          eq_ns.solv_masse().appliquer(prov_face);
+          eq_ns.solv_masse()->appliquer(prov_face);
 
           // alpha*Grad(C)
 
@@ -4411,7 +4411,7 @@ void Source_Con_Phase_field::calculer_mutilde_demi(DoubleTab& mutilde_demi, Doub
           // Div(Grad(c))
           opdiv.calculer(prov_face,temp_resu);
           //opdiv.calculer(temp_prov_face2,div_alpha_gradC);
-          eq_c.solv_masse().appliquer(temp_resu);
+          eq_c.solv_masse()->appliquer(temp_resu);
 
           for (int i=0; i<temp_resu.dimension(0); i++)
             {
@@ -4545,8 +4545,8 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
 {
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& u=eq_ns.inconnue().valeurs();
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& u=eq_ns.inconnue()->valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
 
   DoubleVect u2;
 
@@ -4627,17 +4627,17 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
 
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
   const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
 
   DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
   if (prov_face.size()==0)
-    prov_face=eq_ns.inconnue().valeurs();
+    prov_face=eq_ns.inconnue()->valeurs();
   prov_face=0.;
 
   // On calcule Grad(c) que l'on met dans prov_face
   opgrad.calculer(c,prov_face);
-  eq_ns.solv_masse().appliquer(prov_face);
+  eq_ns.solv_masse()->appliquer(prov_face);
 
   // On calcule (Grad(c))^2 sur les faces que l'on met dans gradc2
   DoubleVect gradc2;
@@ -4660,7 +4660,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
   /*
     DoubleTab& temp_prov_face= ref_cast_non_const(DoubleTab,prov_face_);
     if (temp_prov_face.size()==0)
-      temp_prov_face=eq_ns.inconnue().valeurs();
+      temp_prov_face=eq_ns.inconnue()->valeurs();
     temp_prov_face=0.;
 
     DoubleTab prov_face(temp_prov_face.dimension(0),c.line_size());
@@ -4682,8 +4682,8 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
           }
       }
 
-    eq_ns.solv_masse().appliquer(prov_face);
-    Cerr<<"prov_face apres eq_ns.solv_masse().appliquer"<<prov_face<<finl;
+    eq_ns.solv_masse()->appliquer(prov_face);
+    Cerr<<"prov_face apres eq_ns.solv_masse()->appliquer"<<prov_face<<finl;
 
 
     // On calcule (Grad(c))^2 sur les faces que l'on met dans gradc2
@@ -4775,12 +4775,12 @@ void Source_Con_Phase_field::calculer_pression_thermo(DoubleTab& pression_thermo
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
   const DoubleTab& div_alpha_gradC=eq_c.get_div_alpha_gradC();
 
   // Recuperation de la pression en Pascal de l'etape de projection
   //---------------------------------------------------------------
-  const DoubleTab& P_Pa=eq_ns.pression_pa().valeurs();
+  const DoubleTab& P_Pa=eq_ns.pression_pa()->valeurs();
 
   const int taille = pression_thermo.size();
 
@@ -4842,7 +4842,7 @@ void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& ch
 const DoubleTab& Source_Con_Phase_field::get_terme_non_lineaire(DoubleTab& non_lineaire)
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
 
   non_lineaire(c);
 

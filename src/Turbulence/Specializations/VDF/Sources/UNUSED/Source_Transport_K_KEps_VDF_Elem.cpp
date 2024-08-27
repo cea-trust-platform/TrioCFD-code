@@ -49,9 +49,9 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const Domaine_VDF& domaine_VDF_NS = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
   const Domaine_Cl_VDF& domaine_Cl_VDF_NS = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis().valeur());
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
-  const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente().valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
+  const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente()->valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
@@ -97,7 +97,7 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
       const Cond_lim& la_cl = domaine_Cl_VDF_NS.les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
           if (dimension == 2 )

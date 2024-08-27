@@ -60,8 +60,8 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Domaine_dis_base& doma
 {
   const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
-  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
   const double rho_phase_0 = tab_rho_phase_0(0, 0);
   const double rho_phase_1 = tab_rho_phase_1(0, 0);
   const double delta_rho = rho_phase_1 - rho_phase_0;
@@ -150,7 +150,7 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis,
 
   if (sub_type(Champ_Uniforme,champ_rho_elem_.valeur()) && (sub_type(Champ_Uniforme, champ_nu_.valeur())))
     {
-      const DoubleTab& tab_rho_phase_0 = fluide.masse_volumique().valeurs();
+      const DoubleTab& tab_rho_phase_0 = fluide.masse_volumique()->valeurs();
       const double rho = tab_rho_phase_0(0, 0);
       const DoubleTab& tab_nu_phase_0 = fluide.viscosite_cinematique()->valeurs();
       const double nu = tab_nu_phase_0(0, 0);
@@ -718,7 +718,7 @@ void Navier_Stokes_FT_Disc::discretiser()
   champs_compris_.ajoute_champ(variables_internes().potentiel_elements);
   dis.discretiser_champ("vitesse", mon_dom_dis, "vitesse_delta_interface", "m/s", -1 /* nb composantes par defaut */, 1, temps, variables_internes().delta_u_interface);
   // Pour pouvoir faire filtrer_L2:
-  variables_internes().delta_u_interface.associer_eqn(*this);
+  variables_internes().delta_u_interface->associer_eqn(*this);
   champs_compris.add(variables_internes().delta_u_interface.valeur());
   champs_compris_.ajoute_champ(variables_internes().delta_u_interface);
   dis.discretiser_champ("pression", mon_dom_dis, "pression_laplacien_d", "", 1 /* composante */, temps, variables_internes().laplacien_d);
@@ -743,7 +743,7 @@ void Navier_Stokes_FT_Disc::discretiser()
   // Velocity jump "u0" computed for phase 0 :
   Nom nom = Nom("vitesse_jump0_") + le_nom();
   dis.discretiser_champ("vitesse", mon_dom_dis, nom, "m/s", -1 /* nb composantes par defaut */, 1, temps, variables_internes().vitesse_jump0_);
-  variables_internes().vitesse_jump0_.associer_eqn(*this);
+  variables_internes().vitesse_jump0_->associer_eqn(*this);
   champs_compris.add(variables_internes().vitesse_jump0_.valeur());
   champs_compris_.ajoute_champ(variables_internes().vitesse_jump0_);
 }
@@ -795,7 +795,7 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
   Cerr << "Navier_Stokes_FT_Disc::preparer_calcul()" << finl;
   Equation_base::preparer_calcul();
 
-  le_modele_turbulence.preparer_calcul();
+  le_modele_turbulence->preparer_calcul();
 
   {
     // Si le mot cle equation_interfaces_proprietes_fluide a ete specifie,
@@ -835,7 +835,7 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
     //   on ne fait rien.
   }
 
-  DoubleTab& tab_vitesse = inconnue().valeurs();
+  DoubleTab& tab_vitesse = inconnue()->valeurs();
 
   // On assemble la matrice de pression pour la premiere fois.
   assembleur_pression()->assembler_rho_variable(matrice_pression_, champ_rho_faces_.valeur());
@@ -844,22 +844,22 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
   // Calcul du second membre :
   //  div(vpoint) a l'interieur du domaine,
   //  prise en compte des conditions aux limites de pression/vitesse
-  DoubleTab& secmem = variables_internes().second_membre_projection.valeurs();
+  DoubleTab& secmem = variables_internes().second_membre_projection->valeurs();
   divergence.calculer(tab_vitesse, secmem);
   secmem *= -1;
   // Il faut faire ceci car on ne resout pas en "increment de pression":
   assembleur_pression_->modifier_secmem(secmem);
 
   // Ajout pour la sauvegarde au premier pas de temps si reprise
-  la_pression.changer_temps(schema_temps().temps_courant());
+  la_pression->changer_temps(schema_temps().temps_courant());
 
   // Resolution du systeme en pression : calcul de la_pression
-  solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmem, la_pression.valeurs());
-  assembleur_pression_.modifier_solution(la_pression->valeurs());
+  solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmem, la_pression->valeurs());
+  assembleur_pression_->modifier_solution(la_pression->valeurs());
   // Calcul d(u)/dt = vpoint + 1/rho*grad(P)
-  DoubleTab& gradP = variables_internes().gradient_pression.valeurs();
+  DoubleTab& gradP = variables_internes().gradient_pression->valeurs();
   gradient.calculer(la_pression->valeurs(), gradP);
-  solveur_masse.appliquer(gradP);
+  solveur_masse->appliquer(gradP);
   // Correction de la vitesse :
   if (projection_a_faire()) // Temporaire pour permettre de ne pas resoudre NS avec mettant operateurs nuls et projection_initiale 0
     {
@@ -879,7 +879,7 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
     {
       if (le_traitement_particulier->support_ok())
         le_traitement_particulier->associer_champ_masse_volumique(champ_rho_faces_.valeur());
-      le_traitement_particulier.preparer_calcul_particulier();
+      le_traitement_particulier->preparer_calcul_particulier();
     }
 
   return 1;
@@ -923,10 +923,10 @@ void Navier_Stokes_FT_Disc::mettre_a_jour(double temps)
 {
   Navier_Stokes_Turbulent::mettre_a_jour(temps);
 
-  champ_rho_elem_.mettre_a_jour(temps);
-  champ_rho_faces_.mettre_a_jour(temps);
-  champ_mu_.mettre_a_jour(temps);
-  champ_nu_.mettre_a_jour(temps);
+  champ_rho_elem_->mettre_a_jour(temps);
+  champ_rho_faces_->mettre_a_jour(temps);
+  champ_mu_->mettre_a_jour(temps);
+  champ_nu_->mettre_a_jour(temps);
 }
 
 const SolveurSys& Navier_Stokes_FT_Disc::get_solveur_pression() const
@@ -1006,8 +1006,8 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
       {
         if (milieu().a_gravite())
           {
-            const double rho_0 = fluide_dipha.fluide_phase(0).masse_volumique().valeurs()(0, 0);
-            const double rho_1 = fluide_dipha.fluide_phase(1).masse_volumique().valeurs()(0, 0);
+            const double rho_0 = fluide_dipha.fluide_phase(0).masse_volumique()->valeurs()(0, 0);
+            const double rho_1 = fluide_dipha.fluide_phase(1).masse_volumique()->valeurs()(0, 0);
             const double delta_rho = rho_1 - rho_0;
 
             // Pour l'instant : gravite uniforme g => phi(s) = - x scalaire g
@@ -1370,7 +1370,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(const Champ_base& indi
       // a besoin pour le calcul des valeurs aux sommets.
       for (i = 0; i < nb_elem_tot; i++)
         {
-          indic_p1b(i) = indicatrice(i);
+          indic_p1b(i) = indicatrice.valeurs()(i);
         }
 #if 0
       // Premiere version : pas terrible parce que le stencil est tres large
@@ -1502,7 +1502,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(const Champ_base& indi
 
           const Cond_lim& la_cl = zcldis.les_conditions_limites(n_bord);
           Cerr << que_suis_je() << "::calculer_gradient_indicatrice() correction du gradient a la CL : " << la_cl.valeur() << finl;
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -1608,7 +1608,7 @@ void Navier_Stokes_FT_Disc::correct_at_exit_bad_gradient(DoubleTab& u0) const
       // Si face de Dirichlet ou de Symetrie on ne fait rien
       // Si face de Neumann on calcule la contribution au terme source
       const Cond_lim& la_cl = zcldis.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
       const int ndeb = le_bord.num_premiere_face();
       const int nfin = ndeb + le_bord.nb_faces();
       if ((sub_type(Dirichlet, la_cl.valeur())) || (sub_type(Neumann_sortie_libre, la_cl.valeur())) || (sub_type(Dirichlet_homogene, la_cl.valeur())))
@@ -1680,8 +1680,8 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0, int
   const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
   const Fluide_Incompressible& phase_0 = fluide_dipha.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide_dipha.fluide_phase(1);
-  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
-  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
   const double rho_0 = tab_rho_phase_0(0, 0);
   const double rho_1 = tab_rho_phase_1(0, 0);
   //const double delta_un_sur_rho = 1. / rho_1 - 1. / rho_0;
@@ -1693,7 +1693,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0, int
 
   // Pour permettre de calculer mpoint, mais sans l'utiliser pour le deplacement de l'interface,
   // il suffit de ne pas mettre le mot cle " equation_temperature_mpoint temp" dans le jdd.
-  const int nn = variables_internes().second_membre_projection.valeurs().dimension(0); // nombre d'elems
+  const int nn = variables_internes().second_membre_projection->valeurs().dimension(0); // nombre d'elems
   DoubleTab mpoint;
   mpoint.resize(nn);
   mpoint = 0.; //pour initialiser
@@ -2001,7 +2001,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0, int
       }
   }
   u0.echange_espace_virtuel();
-  solveur_masse.appliquer(u0);
+  solveur_masse->appliquer(u0);
 }
 
 double calculer_indicatrice_face_privilegie_pure(const DoubleTab& indicatrice, const IntTab& face_voisins, const int num_face)
@@ -2142,15 +2142,15 @@ void correct_indicatrice_face_bord(const int num_face, const Maillage_FT_Disc& m
 // INTERP_MODIFIEE et AI_BASED qui recalculent indicatrice_faces.
 void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
 {
-  const double rho_0 = fluide_diphasique().fluide_phase(0).masse_volumique().valeurs()(0, 0);
-  const double rho_1 = fluide_diphasique().fluide_phase(1).masse_volumique().valeurs()(0, 0);
+  const double rho_0 = fluide_diphasique().fluide_phase(0).masse_volumique()->valeurs()(0, 0);
+  const double rho_1 = fluide_diphasique().fluide_phase(1).masse_volumique()->valeurs()(0, 0);
   const double delta_rho = rho_0 - rho_1;
 
   double rho_0_sur_delta_rho = 0.;
   if (delta_rho != 0)
     rho_0_sur_delta_rho = rho_0 / delta_rho;
 
-  const DoubleTab& tab_vitesse = inconnue().valeurs();
+  const DoubleTab& tab_vitesse = inconnue()->valeurs();
   const IntTab& face_voisins = domaine_dis()->face_voisins();
 
   REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
@@ -2166,7 +2166,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
 
   // On cree un tableau avec la meme structure que la pression
   DoubleTab resu;
-  resu.copy(variables_internes().second_membre_projection.valeurs(), RESIZE_OPTIONS::NOCOPY_NOINIT);
+  resu.copy(variables_internes().second_membre_projection->valeurs(), RESIZE_OPTIONS::NOCOPY_NOINIT);
   resu = 0.;
 
   //On utilise un operateur de divergence temporaire et pas celui porte par l equation
@@ -2187,7 +2187,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
         {
           calculer_delta_u_interface(variables_internes().vitesse_jump0_, 0, variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
           // u+u0 = champ de vitesse de la phase 0
-          tmp += variables_internes().vitesse_jump0_.valeurs();
+          tmp += variables_internes().vitesse_jump0_->valeurs();
         }
     }
   if ((variables_internes_.type_interpol_indic_pour_dI_dt_ == Navier_Stokes_FT_Disc_interne::INTERP_STANDARD_UIEXT)
@@ -2200,7 +2200,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
         {
           calculer_delta_u_interface(variables_internes().delta_u_interface, -1, variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
           // u-dui = champ de vitesse d'interface
-          tmp -= variables_internes().delta_u_interface.valeurs();
+          tmp -= variables_internes().delta_u_interface->valeurs();
 
           // Question: il y a un assert_espace_virtuel_vect dans divergence.calculer,
           //  mais l'operateur n'a normalement pas besoin de l'espace virtuel !
@@ -2379,7 +2379,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
             // Si face de Neumann on calcule la contribution au terme source
             const Cond_lim& la_cl = zclvdf.les_conditions_limites(n_bord);
             //Cerr << que_suis_je() << "::calculer_dI_dt() correction du dIdt a la CL : " <<  la_cl.valeur() << finl;
-            const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+            const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
             ndeb = le_bord.num_premiere_face();
             nfin = ndeb + le_bord.nb_faces();
 
@@ -2475,8 +2475,8 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
           const Fluide_Diphasique& fluide = fluide_diphasique();
           const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
           const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-          const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
-          const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+          const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
+          const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
           const double rho_phase_0 = tab_rho_phase_0(0,0);
           const double rho_phase_1 = tab_rho_phase_1(0,0);
           const double jump_inv_rho = 1./rho_phase_1 - 1./rho_phase_0;
@@ -2687,7 +2687,7 @@ void Navier_Stokes_FT_Disc::compute_boussinesq_additional_gravity(const Convecti
   const int phase_eq = eq.get_phase();
   const DoubleTab& temperature_eq = eq.inconnue()->valeurs();
   const Fluide_Incompressible& fluide_phase_eq = fluide_dipha.fluide_phase(phase_eq);
-  const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t().valeurs();
+  const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t()->valeurs();
   const double beta_th_phase_eq = tab_beta_th_phase_eq(0, 0);
 
   for (int face = 0; face < gravite_face.dimension(0); face++)
@@ -2759,8 +2759,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   //                div (mu * (grad(v)+tr(grad(v))))
   //                (on a associe "mu" a la "diffusivite" de l'operateur,
   //                 voir Navier_Stokes_FT_Disc::lire)
-  terme_diffusif.calculer(la_vitesse.valeurs(), variables_internes().terme_diffusion->valeurs());
-  solveur_masse.appliquer(variables_internes().terme_diffusion->valeurs());
+  terme_diffusif.calculer(la_vitesse->valeurs(), variables_internes().terme_diffusion->valeurs());
+  solveur_masse->appliquer(variables_internes().terme_diffusion->valeurs());
 
   // Termes sources : gravite et tension de surface,
   // valeurs discretes homogenes a
@@ -2789,10 +2789,10 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       }
     else
       {
-        variables_internes().terme_source_interfaces.valeurs() = 0;
+        variables_internes().terme_source_interfaces->valeurs() = 0.;
       }
   }
-  solveur_masse.appliquer(variables_internes().terme_source_interfaces->valeurs());
+  solveur_masse->appliquer(variables_internes().terme_source_interfaces->valeurs());
 
   // Autres termes sources (acceleration / repere mobile)
   //  Valeurs homogenes a
@@ -2802,7 +2802,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   // (voir "preparer_calcul", commentaire sources().associer_rho...)
   variables_internes().terme_source->valeurs() = 0.;
   les_sources.ajouter(variables_internes().terme_source->valeurs());
-  solveur_masse.appliquer(variables_internes().terme_source->valeurs());
+  solveur_masse->appliquer(variables_internes().terme_source->valeurs());
 
   // Operateur de convection : valeurs discretes homogenes a
   //                                             / d       \          //
@@ -2820,13 +2820,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   if (schema_temps().diffusion_implicite() && !calcul_explicite)
     {
       terme_convection_valeurs = 0;
-      derivee_en_temps_conv(terme_convection_valeurs, la_vitesse.valeurs());
+      derivee_en_temps_conv(terme_convection_valeurs, la_vitesse->valeurs());
     }
   else
     {
-      terme_convectif.calculer(la_vitesse.valeurs(), terme_convection_valeurs);
+      terme_convectif.calculer(la_vitesse->valeurs(), terme_convection_valeurs);
     }
-  solveur_masse.appliquer(variables_internes().terme_convection->valeurs());
+  solveur_masse->appliquer(variables_internes().terme_convection->valeurs());
 
   // Ajout des differentes contributions a vpoint :
   const DoubleTab& tab_rho_faces = champ_rho_faces_->valeurs();
@@ -2839,7 +2839,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   const int nbdim1 = (vpoint.line_size() == 1);
   const int m = vpoint.line_size();
 
-  DoubleTab gravite_face(inconnue().valeurs());
+  DoubleTab gravite_face(inconnue()->valeurs());
   if (milieu().a_gravite())
     {
       ArrOfDouble g(dimension);
@@ -2915,7 +2915,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
               gravite_face = 0.; // En gradI, on ne prend pas directement la gravite
             }
         }
-      solveur_masse.appliquer(gravite_face);
+      solveur_masse->appliquer(gravite_face);
     }
   else
     {
@@ -2927,12 +2927,12 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   IntTab coef_TSF(n);
   coef_TSF = 1;
   int flag_diff;
-  DoubleTab& gradP = variables_internes().gradient_pression.valeurs();
+  DoubleTab& gradP = variables_internes().gradient_pression->valeurs();
   if (schema_temps().diffusion_implicite())
     {
       //on calcule gradP (pour le qdm)
       gradient.calculer(la_pression->valeurs(), gradP);
-      solveur_masse.appliquer(gradP);
+      solveur_masse->appliquer(gradP);
       // si variables_internes().is_penalized=1 alors variables_internes().is_explicite=0
       if (variables_internes().is_penalized)
         flag_gradP = 0; //(grad P raide)
@@ -3037,13 +3037,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   //  si terme forcage vitesse explicite => J'ai tout, je peux resoudre (Gradient_conjugue_diff_impl)
   if (schema_temps().diffusion_implicite() && !calcul_explicite && variables_internes().is_explicite)
     {
-      DoubleTab derivee(la_vitesse.valeurs());
+      DoubleTab derivee(la_vitesse->valeurs());
       // on indique au solveur masse de diviser par rho en plus du volume car l'operateur de diffusion renvoit qqqc en rho d u/dt
       solveur_masse->set_name_of_coefficient_temporel(champ_rho_faces_->le_nom());
 
       DoubleTrav tt(vpoint);
       tt = vpoint;
-      derivee = inconnue().valeurs();
+      derivee = inconnue()->valeurs();
       Equation_base::Gradient_conjugue_diff_impl(tt, derivee);
 
       solveur_masse->set_name_of_coefficient_temporel("no_coeff");
@@ -3116,7 +3116,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                   vpoint(i, j) -= diffusion(i, j) / rho_faces(i);
 
               vpoint.echange_espace_virtuel();
-              DoubleTab derivee(la_vitesse.valeurs());
+              DoubleTab derivee(la_vitesse->valeurs());
               // on indique au solveur masse de diviser par rho en plus du volume car l'operateur de diffusion renvoit qqqc en rho d u/dt
               {
                 solveur_masse->set_name_of_coefficient_temporel(champ_rho_faces_->le_nom());
@@ -3229,8 +3229,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   //  div(vpoint) a l'interieur du domaine,
   //  prise en compte des conditions aux limites de pression/vitesse
 
-  DoubleTab& secmem = variables_internes().second_membre_projection.valeurs();
-  DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_.valeurs();
+  DoubleTab& secmem = variables_internes().second_membre_projection->valeurs();
+  DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_->valeurs();
   const int nb_elem = secmem2.dimension(0);
   const double dt = schema_temps().pas_de_temps();
   const DoubleTab& inco = inconnue()->valeurs();
@@ -3294,8 +3294,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       const Fluide_Diphasique& fluide_diph = fluide_diphasique();
       const Fluide_Incompressible& phase_0 = fluide_diph.fluide_phase(0);
       const Fluide_Incompressible& phase_1 = fluide_diph.fluide_phase(1);
-      const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
-      const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
+      const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
+      const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
       const double rho_phase_0 = tab_rho_phase_0(0, 0);
       const double rho_phase_1 = tab_rho_phase_1(0, 0);
       const double jump_inv_rho = 1. / rho_phase_1 - 1. / rho_phase_0;
@@ -3315,7 +3315,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
           const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 #if NS_VERBOSE
-          const DoubleTab& indicatrice = eq_transport.inconnue().valeurs();
+          const DoubleTab& indicatrice = eq_transport.inconnue()->valeurs();
 #endif
           // Distance a l'interface discretisee aux elements:
           const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
@@ -3535,10 +3535,10 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           Matrice_Morse_Sym& matrice_valeurs = (vpoint.line_size() == 1 ? ref_cast(Matrice_Morse_Sym, (ref_cast(Matrice_Bloc, matrice_pression_.valeur())).get_bloc(0,0).valeur()) // VDF (1)
                                                 :
                                                 ref_cast(Matrice_Morse_Sym, matrice_pression_.valeur()));                                              // VEF (>1)
-          DoubleTab& pressu = la_pression.valeurs();
+          DoubleTab& pressu = la_pression->valeurs();
           assert(nb_elem == champ_rho_elem_->valeurs().dimension(0));
           const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
-          const Domaine& mon_dom = domaine_dis().domaine();
+          const Domaine& mon_dom = domaine_dis()->domaine();
           const IntTab& elem_faces = domaine_vf.elem_faces();
           const int nb_faces_elem = elem_faces.line_size();
           const int nb_sommet = mon_dom.nb_som_elem();
@@ -3627,11 +3627,11 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   assembleur_pression_->modifier_secmem(secmem);
 
   // Resolution du systeme en pression : calcul de la_pression
-  solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmem, la_pression.valeurs());
-  assembleur_pression_.modifier_solution(la_pression->valeurs());
+  solveur_pression_->resoudre_systeme(matrice_pression_.valeur(), secmem, la_pression->valeurs());
+  assembleur_pression_->modifier_solution(la_pression->valeurs());
   // Calcul d(u)/dt = vpoint + 1/rho*grad(P)
   gradient.calculer(la_pression->valeurs(), gradP);
-  solveur_masse.appliquer(gradP);
+  solveur_masse->appliquer(gradP);
 
   // Correction de vpoint :
   if (projection_a_faire()) // Temporaire pour permettre de ne pas resoudre NS avec mettant operateurs nuls et projection_initiale 0
@@ -3662,13 +3662,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       // Terme de diffusion
       terme_diffusif.calculer(vv, variables_internes().terme_diffusion->valeurs());
       variables_internes().terme_diffusion->valeurs().echange_espace_virtuel();
-      solveur_masse.appliquer(variables_internes().terme_diffusion->valeurs());
+      solveur_masse->appliquer(variables_internes().terme_diffusion->valeurs());
       const DoubleTab& diffusion = variables_internes().terme_diffusion->valeurs();
       // Terme de convection
       DoubleTrav trav(variables_internes().terme_convection->valeurs());
-      derivee_en_temps_conv(trav, la_vitesse.valeurs());
+      derivee_en_temps_conv(trav, la_vitesse->valeurs());
       variables_internes().terme_convection->valeurs() = trav;
-      solveur_masse.appliquer(variables_internes().terme_convection->valeurs());
+      solveur_masse->appliquer(variables_internes().terme_convection->valeurs());
       const DoubleTab& convection = variables_internes().terme_convection->valeurs();
       const int nbis = vpoint.dimension(0);
       const int mbis = vpoint.line_size();
@@ -3709,7 +3709,7 @@ Probleme_FT_Disc_gen& Navier_Stokes_FT_Disc::probleme_ft()
  */
 void Navier_Stokes_FT_Disc::calculer_la_pression_en_pa()
 {
-  la_pression_en_pa.valeurs() = la_pression.valeurs();
+  la_pression_en_pa->valeurs() = la_pression->valeurs();
 }
 
 const Navier_Stokes_FT_Disc_interne& Navier_Stokes_FT_Disc::variables_internes() const
@@ -3745,7 +3745,7 @@ const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
   const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();
 
   DoubleTab& phi = variables_internes().laplacien_d->valeurs();
-  DoubleTab u0(inconnue().valeurs());
+  DoubleTab u0(inconnue()->valeurs());
 
   //  static const Stat_Counter_Id count = statistiques().new_counter(1, "calculer_div_normale", 0);
   //  statistiques().begin_count(count);
@@ -3766,7 +3766,7 @@ const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
   //  statistiques().end_count(count2);
   //  static const Stat_Counter_Id count4 = statistiques().new_counter(1, "calculer_solveur_masse", 0);
   //  statistiques().begin_count(count4);
-  solveur_masse.appliquer(u0);
+  solveur_masse->appliquer(u0);
   //  statistiques().end_count(count4);
 
   // Calcul de integrale(div(u0)) sur les mailles:

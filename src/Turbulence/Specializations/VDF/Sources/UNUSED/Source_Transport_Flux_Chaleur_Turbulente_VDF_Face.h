@@ -37,6 +37,9 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
+#include <Champ_Don.h>
 
 class Convection_Diffusion_Temperature;
 class Equation_base;
@@ -45,10 +48,7 @@ class Modele_turbulence_hyd_K_Eps_Bas_Reynolds;
 
 class Probleme_base;
 class Champ_Don_base;
-class Champ_Don;
-class Domaine_dis;
 class Domaine_VDF;
-class Domaine_Cl_dis;
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 

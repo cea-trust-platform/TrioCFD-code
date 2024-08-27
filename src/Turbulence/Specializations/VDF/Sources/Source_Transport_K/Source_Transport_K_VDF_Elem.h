@@ -24,6 +24,7 @@
 
 #include <Source_Transport_VDF_Elem_base.h>
 #include <TRUST_Ref.h>
+#include <Champ_Don.h>
 
 class Transport_K_ou_Eps;
 

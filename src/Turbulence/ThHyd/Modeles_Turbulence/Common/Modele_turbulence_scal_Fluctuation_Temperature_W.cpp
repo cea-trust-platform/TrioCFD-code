@@ -92,7 +92,7 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W::preparer_calcul()
   eqn_transport_Fluctu_Temp->preparer_calcul();
   Modele_turbulence_scal_base::preparer_calcul();
   calculer_diffusivite_turbulente();
-  diffusivite_turbulente_.valeurs().echange_espace_virtuel();
+  diffusivite_turbulente_->valeurs().echange_espace_virtuel();
   return 1;
 }
 
@@ -103,18 +103,18 @@ bool Modele_turbulence_scal_Fluctuation_Temperature_W::initTimeStep(double dt)
 
 Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W::calculer_diffusivite_turbulente()
 {
-  DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();
-  const DoubleTab& mu_t = la_viscosite_turbulente->valeurs();
-  double temps = la_viscosite_turbulente->temps();
+  DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
+  const DoubleTab& mu_t = la_viscosite_turbulente.valeur()->valeurs();
+  double temps = la_viscosite_turbulente.valeur()->temps();
   const Champ_base& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeur();
 
   const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,modele_turbulence.valeur());
   const Transport_K_Eps_base& eqBasRe = mod_turb_hydr.eqn_transp_K_Eps();
-  const DoubleTab& K_eps_Bas_Re = eqBasRe.inconnue().valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqBasRe.inconnue()->valeurs();
 
-  if (temps != diffusivite_turbulente_.temps())
+  if (temps != diffusivite_turbulente_->temps())
     {
       static const double C_Lambda = 0.11;
       int n= alpha_t.size();
@@ -126,8 +126,8 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W::calculer_diffusivi
         }
 
       for (int i=0; i<n; i++)
-        if (  (K_eps_Bas_Re(i,1) > 1.e-3 ) && (chFluctuTemp(i,1) > 1.e-3)  && (K_eps_Bas_Re(i,0) > 1.e-3 ) && (chFluctuTemp(i,0) > 1.e-3))
-          alpha_t[i] =C_Lambda*K_eps_Bas_Re(i,0)*sqrt((K_eps_Bas_Re(i,0)/K_eps_Bas_Re(i,1))*(chFluctuTemp(i,0)/(2*chFluctuTemp(i,1))));
+        if (  (K_eps_Bas_Re(i,1) > 1.e-3 ) && (chFluctuTemp.valeurs()(i,1) > 1.e-3)  && (K_eps_Bas_Re(i,0) > 1.e-3 ) && (chFluctuTemp.valeurs()(i,0) > 1.e-3))
+          alpha_t[i] =C_Lambda*K_eps_Bas_Re(i,0)*sqrt((K_eps_Bas_Re(i,0)/K_eps_Bas_Re(i,1))*(chFluctuTemp.valeurs()(i,0)/(2*chFluctuTemp.valeurs()(i,1))));
         else
           {
             Cerr << " !!!! Eps ou EpsTeta est nul !!!! " << finl;
@@ -135,7 +135,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W::calculer_diffusivi
             alpha_t[i] = 0.0000001;
           }
 
-      diffusivite_turbulente_.changer_temps(temps);
+      diffusivite_turbulente_->changer_temps(temps);
     }
 
   return diffusivite_turbulente_;
@@ -145,13 +145,13 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::mettre_a_jour(double temp
 {
   Schema_Temps_base& sch1 = eqn_transport_Fluctu_Temp->schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_Fluctu_Temp->domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transport_Fluctu_Temp->domaine_Cl_dis()->mettre_a_jour(temps);
   sch1.faire_un_pas_de_temps_eqn_base(eqn_transport_Fluctu_Temp.valeur());
   //eqn_transport_Fluctu_Temp->inconnue().mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp->mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp->controler_grandeur();
   calculer_diffusivite_turbulente();
-  diffusivite_turbulente_.valeurs().echange_espace_virtuel();
+  diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature_W::completer()

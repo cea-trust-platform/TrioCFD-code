@@ -25,11 +25,8 @@
 
 #include <Remailleur_Collision_FT_Juric.h>
 #include <Transport_Interfaces_FT_Disc.h>
-
+#include <Domaine_dis.h>
 #include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
-class Domaine_dis;
 class Domaine_dis_base;
 
 /*! @brief : class Remailleur_Collision_FT_Thomas Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :

@@ -67,12 +67,12 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i) const
     elem = face_voisins(ndeb+i,1);
 
   double signe = 1;
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom())->valeurs();
 
-  if (le_champ_front.valeurs().size()==1)
-    return signe * le_champ_front(0,0)-flux_radiatif(i,0);
-  else if (le_champ_front.valeurs().dimension(1)==1)
-    return signe * (le_champ_front(i,0) - flux_radiatif(i,0));
+  if (le_champ_front->valeurs().size()==1)
+    return signe * le_champ_front->valeurs()(0,0)-flux_radiatif(i,0);
+  else if (le_champ_front->valeurs().dimension(1)==1)
+    return signe * (le_champ_front->valeurs()(i,0) - flux_radiatif(i,0));
   else
     Cerr << "Neumann_paroi_rayo_semi_transp_VDF::flux_impose erreur" << finl;
 
@@ -91,12 +91,12 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i,int j) const
   if (elem == -1)
     elem = face_voisins(ndeb+i,1);
 
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom())->valeurs();
 
-  if (le_champ_front.valeurs().dimension(0)==1)
-    return le_champ_front(0,j)-flux_radiatif(i);
+  if (le_champ_front->valeurs().dimension(0)==1)
+    return le_champ_front->valeurs()(0,j)-flux_radiatif(i);
   else
-    return le_champ_front(i,j)-flux_radiatif(i);
+    return le_champ_front->valeurs()(i,j)-flux_radiatif(i);
 }
 
 
@@ -114,12 +114,12 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = front_vf.nb_faces();
   int ndeb = front_vf.num_premiere_face();
-  const DoubleTab& rho = le_milieu.masse_volumique().valeurs();
-  const DoubleTab& Cp = le_milieu.capacite_calorifique().valeurs();
-  const DoubleTab& Lambda= le_milieu.conductivite().valeurs();
+  const DoubleTab& rho = le_milieu.masse_volumique()->valeurs();
+  const DoubleTab& Cp = le_milieu.capacite_calorifique()->valeurs();
+  const DoubleTab& Lambda= le_milieu.conductivite()->valeurs();
 
-  assert(le_milieu.capacite_calorifique().nb_comp() == 1);
-  assert(le_milieu.masse_volumique().nb_comp() == 1);
+  assert(le_milieu.capacite_calorifique()->nb_comp() == 1);
+  assert(le_milieu.masse_volumique()->nb_comp() == 1);
   double d_Cp, d_rho, d_Lambda;
   if (Cp.get_md_vector().non_nul() || rho.get_md_vector().non_nul() || Lambda.get_md_vector().non_nul())
     {
@@ -148,10 +148,10 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
   //  Cerr<<"Nom du bord : "<<front_vf.le_nom()<<finl;
   ////double d_Lambda = Lambda(0,0);
 
-  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
+  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue()->valeurs();
   DoubleTab& T_b = temperature_bord_->valeurs_au_temps(temps);
 
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom())->valeurs();
 
   int face=0;
   int num_face;
@@ -168,11 +168,11 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
       //      Cerr << "omega=" << omega << finl;
       if (sub_type(Champ_front_uniforme,le_champ_front.valeur()))
         {
-          T_b(face,0) = omega*(T_f(elem) + (le_champ_front(0,0) - flux_radiatif(face,0))/(d_Lambda/eF))
+          T_b(face,0) = omega*(T_f(elem) + (le_champ_front->valeurs()(0,0) - flux_radiatif(face,0))/(d_Lambda/eF))
                         + (1-omega) * T_b(face,0);
         }
       else
-        T_b(face,0) = omega*(T_f(elem) + (le_champ_front(face,0) - flux_radiatif(face,0))/(d_Lambda/eF))
+        T_b(face,0) = omega*(T_f(elem) + (le_champ_front->valeurs()(face,0) - flux_radiatif(face,0))/(d_Lambda/eF))
                       + (1-omega) * T_b(face,0);
     }
 }
@@ -211,7 +211,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::completer()
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   int ndeb = front_vf.num_premiere_face();
   const IntTab& face_voisins = zvdf.face_voisins();
-  const DoubleTab& T = mon_dom_cl_dis->equation().inconnue().valeurs();
+  const DoubleTab& T = mon_dom_cl_dis->equation().inconnue()->valeurs();
   int face=0;
   //
   // Debut de la boucle sur les faces de bord

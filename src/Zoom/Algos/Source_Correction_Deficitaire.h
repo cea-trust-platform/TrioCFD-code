@@ -23,17 +23,14 @@
 #ifndef Source_Correction_Deficitaire_included
 #define Source_Correction_Deficitaire_included
 
-
-
 #include <Source_base.h>
 #include <Connectivites_IndGros.h>
 #include <Restriction_base.h>
 #include <Prolongement.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Equation_base;
 class Probleme_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 
 //////////////////////////////////////////////////////////////////////////////
 //

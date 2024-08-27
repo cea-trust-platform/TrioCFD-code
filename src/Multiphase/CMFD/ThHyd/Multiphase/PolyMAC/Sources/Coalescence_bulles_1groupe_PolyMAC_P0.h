@@ -22,8 +22,9 @@
 
 #ifndef Coalescence_bulles_1groupe_PolyMAC_P0_included
 #define Coalescence_bulles_1groupe_PolyMAC_P0_included
+
+#include <Correlation_base.h>
 #include <Source_base.h>
-#include <Correlation.h>
 #include <math.h>
 
 /*! @brief classe Coalescence_bulles_1groupe_PolyMAC_P0

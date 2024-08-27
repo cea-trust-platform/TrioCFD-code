@@ -19,9 +19,8 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Transport_K_Eps_Realisable.h>
 #include <Modele_Fonc_Realisable.h>
-
-class Domaine_Cl_dis;
-class Domaine_dis;
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
 
 /*! @brief class Modele_turbulence_hyd_K_Eps_Realisable
  *

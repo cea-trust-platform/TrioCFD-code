@@ -21,7 +21,7 @@
 
 #include <Navier_Stokes_std_sensibility.h>
 #include <Probleme_base.h>
-#include <Schema_Temps.h>
+#include <Schema_Temps_base.h>
 #include <Param.h>
 #include <Debog.h>
 #include <LecFicDiffuse.h>

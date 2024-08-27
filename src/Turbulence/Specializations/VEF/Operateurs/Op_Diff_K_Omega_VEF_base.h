@@ -27,15 +27,15 @@
 #include <Op_Diff_K_Omega_base.h>
 #include <Op_VEF_Face.h>
 #include <TRUST_Ref.h>
+#include <Champ_Fonc.h>
+#include <Champ_Inc.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
 
 class Domaine_Cl_VEF;
 class Domaine_VEF;
-class Champ_Fonc;
 class Champ_P1NC;
 class Champ_Don_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
-class Champ_Inc;
 class Modele_turbulence_hyd_K_Omega;
 
 //////////////////////////////////////////////////////////////////////////////

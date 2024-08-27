@@ -77,7 +77,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
   // Physical properties of both phases
   const Fluide_Diphasique& le_fluide = ref_cast(Fluide_Diphasique, eqn_hydr.milieu());
   const Fluide_Incompressible& phase_1 = le_fluide.fluide_phase(1);
@@ -92,7 +92,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
   const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis().valeur();
   const Equation_base& eqn_trans = domaine_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
   const Transport_Interfaces_FT_Disc& eqn_interf = ref_cast(Transport_Interfaces_FT_Disc, eqn_trans);
-  const DoubleTab& indic = eqn_interf.inconnue().valeurs();
+  const DoubleTab& indic = eqn_interf.inconnue()->valeurs();
 
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
@@ -145,7 +145,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
           if (sub_type(Paroi_rugueuse,la_cl.valeur()))
             erugu=ref_cast(Paroi_rugueuse,la_cl.valeur()).get_erugu();
 
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           const IntTab& elem_faces = domaine_VEF.elem_faces();
 
           // Loop on real faces
@@ -232,7 +232,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
           // Recuperation de la valeur Erugu
           double erugu=Erugu;
 
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin,la_cl.valeur());
           const DoubleTab& normales = domaine_VEF.face_normales();
           double delta = Paroi.get_delta();

@@ -132,7 +132,7 @@ void Transport_K_Omega_base::get_position_cells(Nom& position, int& n)
  */
 int Transport_K_Omega_base::controler_K_Omega()
 {
-  DoubleTab& K_Omega = le_champ_K_Omega.valeurs();
+  DoubleTab& K_Omega = le_champ_K_Omega->valeurs();
   int size = K_Omega.dimension(0);
   if (size < 0)
     {
@@ -141,7 +141,7 @@ int Transport_K_Omega_base::controler_K_Omega()
           Cerr << "Unsupported K_Omega field in Transport_K_Omega_base::controler_K_Omega()" << finl;
           Process::exit();
         }
-      size = le_champ_K_Omega->equation().domaine_dis().domaine().nb_elem();
+      size = le_champ_K_Omega->equation().domaine_dis()->domaine().nb_elem();
     }
 
   //int size_tot=mp_sum(size);
@@ -266,7 +266,7 @@ int Transport_K_Omega_base::controler_K_Omega()
         {
           if (Process::je_suis_maitre())
             {
-              const double time = le_champ_K_Omega.temps();
+              const double time = le_champ_K_Omega->temps();
               Cerr << "Values forced for k and omega because:" << finl;
               if (neg[0])
                 Cerr << "Negative values found for k on "
@@ -299,7 +299,7 @@ int Transport_K_Omega_base::controler_K_Omega()
         {
           if (Process::je_suis_maitre())
             {
-              const double time = le_champ_K_Omega.temps();
+              const double time = le_champ_K_Omega->temps();
               Cerr << "Values forced for omega because:" << finl;
               Cerr << "Maximum values found for omega on " << neg[2] << "/" << size_tot << " nodes at time " << time << finl;
             }

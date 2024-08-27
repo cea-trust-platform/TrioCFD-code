@@ -28,9 +28,8 @@
 #include <Champ_Fonc.h>
 #include <TRUSTTab.h>
 #include <TRUST_Ref.h>
-
-class Domaine_dis;
-class Domaine_Cl_dis;
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 

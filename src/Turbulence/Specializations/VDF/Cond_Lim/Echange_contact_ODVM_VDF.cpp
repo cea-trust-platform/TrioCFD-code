@@ -43,7 +43,7 @@ Entree& Echange_contact_ODVM_VDF::readOn(Entree& s )
 void Echange_contact_ODVM_VDF::calculer_Teta_equiv(DoubleTab& La_T_ext,const DoubleTab& mon_h,const DoubleTab& lautre_h,int i,double temps)
 {
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-  const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+  const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
   DoubleTab& t_autre=T_autre_pb()->valeurs_au_temps(temps);

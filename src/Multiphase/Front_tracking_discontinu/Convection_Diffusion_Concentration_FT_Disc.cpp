@@ -284,7 +284,7 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
       const Equation_base& eq =pb.get_equation_by_name(nom_equation_nu_t_);
       const RefObjU& modele_turbulence_hydr = eq.get_modele(TURBULENCE);
       const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-      champ_nu_t = &(le_modele.viscosite_turbulente().valeurs());
+      champ_nu_t = &(le_modele.viscosite_turbulente()->valeurs());
     }
 
   const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant()->valeurs();
@@ -498,7 +498,7 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
       ArrOfBit marqueur;
       marquer_faces_sous_domaine(nom_domaine_sortie_, marqueur,
                                  0 /* annuler les valeurs sur les faces non std */);
-      DoubleTab& tab = inconnue().valeurs();
+      DoubleTab& tab = inconnue()->valeurs();
       multiplier_valeurs_faces(marqueur, 0., integrale_sortie, tab);
     }
   {
@@ -511,7 +511,7 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
     const int nb_faces = domaine_vef.nb_faces();
     const int nb_faces_non_std = domaine_vef.nb_faces_non_std();
     const ArrOfInt& faces_doubles = domaine_vef.faces_doubles();
-    const DoubleTab& inco = inconnue().valeurs();
+    const DoubleTab& inco = inconnue()->valeurs();
     for (int i = 0; i < nb_faces; i++)
       {
         double vol = (i < nb_faces_non_std) ? volumes_cl[i] : volumes[i];

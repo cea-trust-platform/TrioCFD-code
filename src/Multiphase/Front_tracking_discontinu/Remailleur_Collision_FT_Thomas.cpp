@@ -1044,7 +1044,7 @@ void  Remailleur_Collision_FT_Thomas::tester_interface(const Maillage_FT_Disc& m
 
   const DoubleVect& volumes_elements_euleriens = domaine_VF.volumes();
   const DoubleTab& indicatrice =
-    maillage.equation_transport().inconnue().valeurs();
+    maillage.equation_transport().inconnue()->valeurs();
 
   const int nb_elements_euleriens = domaine.nb_elem();
 

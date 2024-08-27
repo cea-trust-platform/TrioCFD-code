@@ -26,12 +26,12 @@
 
 #include <Source_base.h>
 #include <TRUST_Ref.h>
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 
 class Probleme_base;
 class Domaine_Cl_VDF;
 class Domaine_VDF;
-class Domaine_Cl_dis;
-class Domaine_dis;
 
 
 /*! @brief class  Source_Gravite_PF_VDF

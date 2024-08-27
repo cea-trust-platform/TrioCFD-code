@@ -117,7 +117,7 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_D(DoubleTab& D,const Domai
       if ( sub_type(Dirichlet,la_cl.valeur()) )
         {
           const Dirichlet_entree_fluide& la_cl_typee = ref_cast(Dirichlet_entree_fluide,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -209,7 +209,7 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_E(DoubleTab& E,const Domai
       if ( sub_type(Dirichlet,la_cl.valeur()) )
         {
           const Dirichlet_entree_fluide& la_cl_typee = ref_cast(Dirichlet_entree_fluide,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 

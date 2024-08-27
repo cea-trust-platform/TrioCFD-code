@@ -23,7 +23,6 @@
 #include <Schema_Temps_base.h>
 #include <Modifier_pour_fluide_dilatable.h>
 #include <Probleme_base.h>
-#include <Schema_Temps.h>
 #include <stat_counters.h>
 #include <Param.h>
 
@@ -68,7 +67,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
   const Champ_base& chK_Eps = eqn_transport_K_Eps_.inconnue().valeur();
   Nom type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
 
   // K_Eps(i,0) = K au noeud i
   // K_Eps(i,1) = Epsilon au noeud i
@@ -92,7 +91,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
   else
     fill_turbulent_viscosity_tab(n, tab_K_Eps, visco_turb);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
@@ -112,8 +111,8 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::preparer_calcul()
   eqn_transp_K_Eps().preparer_calcul();
   calculer_viscosite_turbulente(equation().schema_temps().temps_courant());
   Modele_turbulence_hyd_base::preparer_calcul();
-  calculer_viscosite_turbulente(K_Eps().temps());
-  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
+  calculer_viscosite_turbulente(K_Eps()->temps());
+  la_viscosite_turbulente_->valeurs().echange_espace_virtuel();
   return 1;
 }
 
@@ -133,7 +132,7 @@ bool Modele_turbulence_hyd_K_Eps_2_Couches::initTimeStep(double dt)
 void Modele_turbulence_hyd_K_Eps_2_Couches::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transport_K_Eps_.schema_temps();
-  eqn_transport_K_Eps_.domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transport_K_Eps_.domaine_Cl_dis()->mettre_a_jour(temps);
   sch.faire_un_pas_de_temps_eqn_base(eqn_transport_K_Eps_);
   eqn_transport_K_Eps_.mettre_a_jour(temps);
 

@@ -23,17 +23,17 @@
 #define Modele_Fonc_Bas_Reynolds_Base_included
 
 
-#include <Champ_Fonc.h>
-#include <Champs_compris.h>
 #include <Champs_compris_interface.h>
+#include <Champs_compris.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
+#include <Champ_Fonc.h>
 #include <Champ_Don.h>
+#include <Champ_Inc.h>
 #include <TRUST_Ref.h>
 
-class Champ_Inc;
 class Fluide_base;
 class Motcle;
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Equation_base;
 class Probleme_base;
 class Discretisation_base;

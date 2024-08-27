@@ -23,14 +23,11 @@
 #ifndef Source_LDC_VDF_NS_included
 #define Source_LDC_VDF_NS_included
 
-
-
 #include <Source_Correction_Deficitaire.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 
 class Probleme_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 
 //////////////////////////////////////////////////////////////////////////////
 //

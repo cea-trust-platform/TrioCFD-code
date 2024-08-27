@@ -58,7 +58,7 @@ void TCV::antisym_loop_edge_faces(const Domaine_VEF& dom_VEF,
   for (int n_edge = 0; n_edge < dom_VEF.nb_front_Cl(); ++n_edge)
     {
       const Cond_lim& current_BC = dom_BC_VEF.les_conditions_limites(n_edge);
-      const Front_VF& the_edge = ref_cast(Front_VF, current_BC.frontiere_dis());
+      const Front_VF& the_edge = ref_cast(Front_VF, current_BC->frontiere_dis());
 
       if (sub_type(Periodique, current_BC.valeur()))
         antisym_loop_edges_periodiqueBC(dom_VEF, the_edge, gradient_elem, enstrophy);

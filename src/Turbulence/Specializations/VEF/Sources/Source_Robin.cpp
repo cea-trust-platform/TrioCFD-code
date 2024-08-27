@@ -74,9 +74,9 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
   const Domaine_VEF& domaine_VEF             = le_dom_VEF.valeur();
   const Domaine_Cl_VEF& domaine_Cl_VEF       = le_dom_Cl_VEF.valeur();
   const Navier_Stokes_Turbulent& eq_ns = ref_cast(Navier_Stokes_Turbulent,equation());
-  const DoubleTab& cisaillement        = eq_ns.modele_turbulence().loi_paroi()->Cisaillement_paroi();
+  const DoubleTab& cisaillement        = eq_ns.modele_turbulence()->loi_paroi()->Cisaillement_paroi();
 //  const DoubleVect& u_star             = eq_ns.modele_turbulence().loi_paroi()->tab_u_star();
-//  double temps = mon_equation->inconnue().temps();
+//  double temps = mon_equation->inconnue()->temps();
 //  static double temps_dernier_post = -1;
 //  const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
 //  double nu = fluide.viscosite_cinematique().valeurs()(0,0);
@@ -90,7 +90,7 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
       if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
         {
           //ArrOfDouble acc_loc_tot(dimension);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
 

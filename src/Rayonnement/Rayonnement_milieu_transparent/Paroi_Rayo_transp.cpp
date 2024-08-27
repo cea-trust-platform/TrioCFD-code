@@ -47,10 +47,10 @@ double Paroi_Rayo_transp::flux_impose(int i) const
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   double flux_radia=le_modele_rayo->flux_radiatif(i+ndeb);
-  if (le_champ_front.valeurs().size()==1)
-    return le_champ_front(0,0)-flux_radia;
-  else if (le_champ_front.valeurs().dimension(1)==1)
-    return le_champ_front(i,0)-flux_radia;
+  if (le_champ_front->valeurs().size()==1)
+    return le_champ_front->valeurs()(0,0)-flux_radia;
+  else if (le_champ_front->valeurs().dimension(1)==1)
+    return le_champ_front->valeurs()(i,0)-flux_radia;
   else
     Cerr << "Paroi_Rayo_transp::flux_impose erreur" << finl;
   exit();
@@ -62,6 +62,6 @@ double Paroi_Rayo_transp::flux_impose(int i,int j) const
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   double flux_radia=le_modele_rayo->flux_radiatif(i+ndeb);
-  const int k = (le_champ_front.valeurs().size() == 1) ? 0 : i;
-  return le_champ_front(k, j)-flux_radia;
+  const int k = (le_champ_front->valeurs().size() == 1) ? 0 : i;
+  return le_champ_front->valeurs()(k, j)-flux_radia;
 }

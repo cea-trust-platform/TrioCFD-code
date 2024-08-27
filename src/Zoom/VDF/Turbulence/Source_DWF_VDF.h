@@ -23,14 +23,11 @@
 #ifndef Source_DWF_VDF_included
 #define Source_DWF_VDF_included
 
-
-
 #include <Source_base.h>
 #include <Domaine_VDF.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Probleme_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 
 //////////////////////////////////////////////////////////////////////////////
 //

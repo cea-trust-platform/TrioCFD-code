@@ -36,7 +36,7 @@ DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTa
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const Modele_Fonc_Realisable_base& mon_modele_fonc = get_modele_fonc(); // voir les classes filles
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -58,7 +58,7 @@ DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTa
 
 void Source_Transport_Realisable_VDF_Elem_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const std::string& nom_inco = equation().inconnue().le_nom().getString();
+  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
   Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
   if(!mat) return;
 

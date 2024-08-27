@@ -41,7 +41,7 @@ Sortie& Sortie_libre_rho_variable::printOn(Sortie& os) const
  */
 double Sortie_libre_rho_variable::flux_impose(int i) const
 {
-  const DoubleTab& tab = le_champ_front.valeurs();
+  const DoubleTab& tab = le_champ_front->valeurs();
   double pimpose = 0.;
 
   if (tab.size()==1)    // Champ uniforme ?

@@ -195,7 +195,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
 
           if (sub_type(Periodique,la_cl.valeur()))
             {
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               ndeb = le_bord.num_premiere_face();
               nfin = ndeb + le_bord.nb_faces();
 
@@ -210,7 +210,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
           else if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
             {
               //              const Neumann_sortie_libre& la_cl_neumann = ref_cast(Neumann_sortie_libre,la_cl.valeur());
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               ndeb = le_bord.num_premiere_face();
               nfin = ndeb + le_bord.nb_faces();
 
@@ -265,7 +265,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
             {
 
               //            const Neumann_sortie_libre& la_cl_neumann = ref_cast(Neumann_sortie_libre,la_cl.valeur());
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               ndeb = le_bord.num_premiere_face();
               nfin = ndeb + le_bord.nb_faces();
 
@@ -295,7 +295,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
           else if (sub_type(Periodique,la_cl.valeur()))
             {
               double s_face;
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               ndeb = le_bord.num_premiere_face();
               nfin = ndeb + le_bord.nb_faces();
               for (num_face=ndeb; num_face<nfin; num_face++)
@@ -441,7 +441,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
   DoubleTab lambda_4(nb_elem_tot);
   DoubleTab lambda_5(nb_elem_tot);
 
-  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue().valeurs();
+  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue()->valeurs();
 
   DoubleTab S_etoile(nb_elem_tot,dimension,dimension);
   DoubleTab R_etoile(nb_elem_tot,dimension,dimension);
@@ -631,7 +631,7 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::Calcul_Tenseur_Reynolds(DoubleTab&
 {
   DoubleTab bij = Calcul_bij_TBNN(resu);
 
-  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue().valeurs();
+  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue()->valeurs();
 
   for (int elem=0; elem<nelem_; elem++)
     {

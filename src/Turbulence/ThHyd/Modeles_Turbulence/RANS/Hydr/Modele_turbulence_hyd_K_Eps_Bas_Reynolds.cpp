@@ -23,7 +23,6 @@
 #include <Schema_Temps_base.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
-#include <Schema_Temps.h>
 #include <Debog.h>
 #include <stat_counters.h>
 #include <Param.h>
@@ -77,7 +76,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
   Nom type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente K_Eps", tab_K_Eps);
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_transp_K_Eps().milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   int n = tab_K_Eps.dimension(0);
@@ -116,7 +115,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
   else
     fill_turbulent_viscosity_tab(n, tab_K_Eps, Fmu, visco_turb);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
@@ -139,13 +138,13 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::preparer_calcul()
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
-  eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_K_Eps().domaine_Cl_dis()->mettre_a_jour(temps);
   sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
   eqn_transp_K_Eps().mettre_a_jour(temps);
 
   statistiques().begin_count(nut_counter_);
   calculate_limit_viscosity<MODELE_TYPE::K_EPS_BAS_REYNOLDS>(K_Eps(), -123. /* unused */);
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_->valeurs());
   statistiques().end_count(nut_counter_);
 }
 

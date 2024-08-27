@@ -27,9 +27,8 @@
 #include <Operateur_negligeable.h>
 #include <Matrice_Morse.h>
 #include <TRUST_Deriv.h>
-
-class Champ_Fonc;
-class Champ_Don;
+#include <Champ_Don.h>
+#include <Champ_Fonc.h>
 #include <TRUSTTabs_forward.h>
 
 /*! @brief class Op_Diff_Fluctu_Temp_Base Sert a modeliser le terme diffusif dans l'equation de transport

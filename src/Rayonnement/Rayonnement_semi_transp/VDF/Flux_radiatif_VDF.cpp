@@ -67,10 +67,10 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
                                                const Champ_Don& indice,const Domaine_VF& zvf, const double sigma, double temps)
 {
   //  Cerr<<"Flux_radiatif_VDF::evaluer_cl_rayonnement() : Debut"<<finl;
-  const DoubleTab& l_rayo = longueur_rayo.valeurs();
-  const DoubleTab& n = indice.valeurs();
-  const DoubleTab& epsilon = emissivite().valeurs();
-  const DoubleTab& kappa = coeff_abs.valeurs();
+  const DoubleTab& l_rayo = longueur_rayo->valeurs();
+  const DoubleTab& n = indice->valeurs();
+  const DoubleTab& epsilon = emissivite()->valeurs();
+  const DoubleTab& kappa = coeff_abs->valeurs();
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,zvf);
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
@@ -79,9 +79,9 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
   //  const DoubleTab& xv = zvdf.xv();
 
   // On dimensionne le_champ_front
-  assert(le_champ_front.nb_comp() == 1);
+  assert(le_champ_front->nb_comp() == 1);
   DoubleTab& tab = le_champ_front->valeurs_au_temps(temps);
-  tab.resize(le_bord.nb_faces(),le_champ_front.nb_comp());
+  tab.resize(le_bord.nb_faces(),le_champ_front->nb_comp());
 
   // Boucle sur les faces de le_bord
   int ndeb = le_bord.num_premiere_face();
@@ -105,21 +105,21 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
       double eF = zvdf.dist_norm_bord(face);
 
       double nn;
-      assert(indice.nb_comp() == 1);
+      assert(indice->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,indice.valeur()))
         nn = n(0,0);
       else
         nn = n(elem,0);
 
       double l_r;
-      assert(longueur_rayo.nb_comp() == 1);
+      assert(longueur_rayo->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,longueur_rayo.valeur()))
         l_r = l_rayo(0,0);
       else
         l_r = l_rayo(elem,0);
 
       double k;
-      assert(coeff_abs.nb_comp() == 1);
+      assert(coeff_abs->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,coeff_abs.valeur()))
         k = kappa(0,0);
       else
@@ -128,16 +128,16 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
       // determination de la temperature de paroi en fonction
       // de la face consideree
       double T;
-      assert(Tb.nb_comp() == 1);
+      assert(Tb->nb_comp() == 1);
       if (sub_type(Champ_front_uniforme,Tb.valeur()))
-        T = Tb.valeurs()(0,0);
+        T = Tb->valeurs()(0,0);
       else
         T = Tb->valeurs_au_temps(temps)(face-ndeb,0);
 
       // Determination de l'emissivite de paroi en fonction
       // de la face consideree
       double epsi;
-      assert(emissivite().nb_comp() == 1);
+      assert(emissivite()->nb_comp() == 1);
       if (sub_type(Champ_front_uniforme,emissivite().valeur()))
         epsi = epsilon(0,0);
       else
@@ -170,14 +170,14 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = le_bord.nb_faces();
   REF(Champ_front) Tb;
-  const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
+  const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites();
   int num_cl_temp = 0;
 
   int test_nom = 0;
   for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
     {
-      const Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites(num_cl_temp);
-      Nom nom_cl_temp = la_cl_temp.frontiere_dis().le_nom();
+      const Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites(num_cl_temp);
+      Nom nom_cl_temp = la_cl_temp->frontiere_dis().le_nom();
       if(nom_cl_temp == frontiere_dis().le_nom())
         {
           test_nom = 1;
@@ -232,14 +232,14 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
   //  Tb contient les temperatures de bord
   //  Cerr<<"Tb = "<<Tb->valeurs()<<finl;
   // Calcul du flux radiatif
-  DoubleTab& Flux = flux_radiatif_.valeurs();
+  DoubleTab& Flux = flux_radiatif_->valeurs();
   Flux.resize(le_bord.nb_faces(),1);
   Eq_rayo_semi_transp_VDF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VDF,domaine_Cl_dis().equation());
   Fluide_base& fluide = eq_rayo.fluide();
-  DoubleTab& kappa = fluide.kappa().valeurs();
-  DoubleTab& indice = fluide.indice().valeurs();
+  DoubleTab& kappa = fluide.kappa()->valeurs();
+  DoubleTab& indice = fluide.indice()->valeurs();
 
-  DoubleTab& irradiance = eq_rayo.inconnue().valeurs();
+  DoubleTab& irradiance = eq_rayo.inconnue()->valeurs();
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
@@ -259,20 +259,20 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
 
       double G_F = irradiance(elem);
       double kappa_F;
-      assert(fluide.kappa().nb_comp()==1);
+      assert(fluide.kappa()->nb_comp()==1);
       if(sub_type(Champ_Uniforme,fluide.kappa().valeur()))
         kappa_F = kappa(0,0);
       else
         kappa_F = kappa(elem,0);
       double epsi;
-      assert(emissivite().nb_comp() == 1);
+      assert(emissivite()->nb_comp() == 1);
       if (sub_type(Champ_front_uniforme,emissivite().valeur()))
-        epsi = emissivite()(0,0);
+        epsi = emissivite()->valeurs()(0,0);
       else
-        epsi = emissivite()(face,0);
+        epsi = emissivite()->valeurs()(face,0);
       double eF = zvdf.dist_norm_bord(face+ndeb);
       double n;
-      assert(fluide.indice().nb_comp() == 1);
+      assert(fluide.indice()->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide.indice().valeur()))
         n = indice(0,0);
       else
@@ -281,11 +281,11 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
       double sigma = eq_rayo.Modele().valeur_sigma();
       double Tbord;
 
-      assert(Tb->nb_comp() == 1);
+      assert(Tb->valeur().nb_comp() == 1);
       if(sub_type(Champ_front_uniforme,Tb->valeur()))
-        Tbord = Tb->valeurs()(0,0);
+        Tbord = Tb->valeur().valeurs()(0,0);
       else
-        Tbord = Tb->valeurs()(face,0);
+        Tbord = Tb->valeur().valeurs()(face,0);
 
       double denum = A()*(2-epsi);
       denum /= 3*kappa_F*epsi;

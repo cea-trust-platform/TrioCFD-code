@@ -102,7 +102,7 @@ int Paroi_2couches_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco=-1.;
   Modele_turbulence_hyd_K_Eps_2_Couches& mod_2couches = ref_cast(Modele_turbulence_hyd_K_Eps_2_Couches,mon_modele_turb_hyd.valeur());
@@ -156,7 +156,7 @@ int Paroi_2couches_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k_eps)
       //      Cerr << "n = " << n_bord << " = " << la_cl.valeur() << finl;
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -364,7 +364,7 @@ int Paroi_2couches_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k_eps)
       else if (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) )
         {
           const Dirichlet_paroi_defilante& cl_diri = ref_cast(Dirichlet_paroi_defilante,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
           DoubleTab vitesse_imposee_face_bord(le_bord.nb_faces(),dimension);
@@ -707,7 +707,7 @@ void Paroi_2couches_VDF::imprimer_ustar(Sortie& os) const
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           if(je_suis_maitre())
             {
               Ustar << finl;

@@ -130,7 +130,7 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
-  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
 
@@ -160,7 +160,7 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   //tab_visco+=DMINFLOAT;
 
   bool dh_constant=sub_type(Champ_Uniforme,diam_hydr.valeur())?true:false;
-  double dh_valeur=diam_hydr(0,0);
+  double dh_valeur=diam_hydr->valeurs()(0,0);
 
   int elem;
   double d_visco;
@@ -180,7 +180,7 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
            || (sub_type(Symetrie,la_cl.valeur())) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int size=le_bord.nb_faces();
           for (int ind_face=0; ind_face<size; ind_face++)
             {
@@ -195,13 +195,13 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
               double d_alpha=0.;
               if (sub_type(Champ_Uniforme,alpha.valeur()))
-                d_alpha = alpha(0,0);
+                d_alpha = alpha->valeurs()(0,0);
               else
                 {
-                  if (alpha.nb_comp()==1)
-                    d_alpha = alpha(elem);
+                  if (alpha->nb_comp()==1)
+                    d_alpha = alpha->valeurs()(elem);
                   else
-                    d_alpha = alpha(elem,0);
+                    d_alpha = alpha->valeurs()(elem,0);
                 }
               double Pr = d_visco/d_alpha;
 
@@ -261,15 +261,15 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& conductivite = le_fluide.conductivite();
-  const DoubleTab& temperature = eqn.probleme().equation(1).inconnue().valeurs();
+  const DoubleTab& temperature = eqn.probleme().equation(1).inconnue()->valeurs();
 
-  const DoubleTab& conductivite_turbulente =  mon_modele_turb_scal->conductivite_turbulente().valeurs();
+  const DoubleTab& conductivite_turbulente =  mon_modele_turb_scal->conductivite_turbulente()->valeurs();
 
   EcrFicPartage Nusselt;
   ouvrir_fichier_partage(Nusselt,"Nusselt");
 
   bool dh_constant=sub_type(Champ_Uniforme,diam_hydr.valeur())?true:false;
-  double dh_valeur=diam_hydr(0,0);
+  double dh_valeur=diam_hydr->valeurs()(0,0);
   DoubleVect pos(dimension);
 
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
@@ -281,7 +281,7 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
         {
           const Domaine_Cl_VEF& domaine_Cl_VEF_th = ref_cast(Domaine_Cl_VEF, eqn.probleme().equation(1).domaine_Cl_dis().valeur());
           const Cond_lim& la_cl_th = domaine_Cl_VEF_th.les_conditions_limites(n_bord);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
           if(je_suis_maitre())
             {
@@ -346,13 +346,13 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
               if (elem == -1)
                 elem = face_voisins(num_face,1);
               if (sub_type(Champ_Uniforme,conductivite.valeur()))
-                lambda = conductivite(0,0);
+                lambda = conductivite->valeurs()(0,0);
               else
                 {
-                  if (conductivite.nb_comp()==1)
-                    lambda = conductivite(elem);
+                  if (conductivite->nb_comp()==1)
+                    lambda = conductivite->valeurs()(elem);
                   else
-                    lambda = conductivite(elem,0);
+                    lambda = conductivite->valeurs()(elem,0);
                 }
 
               lambda_t=conductivite_turbulente(elem);

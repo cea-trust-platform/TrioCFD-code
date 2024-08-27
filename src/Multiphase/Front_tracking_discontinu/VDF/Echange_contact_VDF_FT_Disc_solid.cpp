@@ -75,9 +75,9 @@ Entree& Echange_contact_VDF_FT_Disc_solid::readOn( Entree& s )
 void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 {
   // update T_autre pb1/2
-  T2_autre_pb_.mettre_a_jour(temps);
-  T_autre_pb_.mettre_a_jour(temps);
-  indicatrice_.mettre_a_jour(temps);
+  T2_autre_pb_->mettre_a_jour(temps);
+  T_autre_pb_->mettre_a_jour(temps);
+  indicatrice_->mettre_a_jour(temps);
   int nb_comp;
   {
     Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
@@ -170,7 +170,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 
 
           const Equation_base& autre_eqn = ref_cast(Equation_base, ch.domaine_Cl_dis().equation());
-          const DoubleTab& autre_inco =autre_eqn.inconnue ().valeurs ();
+          const DoubleTab& autre_inco =autre_eqn.inconnue ()->valeurs ();
 
           DoubleTab phi_filed(autre_inco);
           phi_filed = 0.;
@@ -201,7 +201,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
         }
 
       const Equation_base& mon_eqn = domaine_Cl_dis ().equation ();
-      const DoubleTab& mon_inco = mon_eqn.inconnue ().valeurs ();
+      const DoubleTab& mon_inco = mon_eqn.inconnue ()->valeurs ();
       const IntTab& face_voisins = le_dom.face_voisins ();
 
       // replace mon_h and mon_Ti;
@@ -231,7 +231,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   numero_T_=0;
   // put in the end: to make sure to update the *modified* h_imp_, phi_ext_, and Text
   Echange_global_impose::mettre_a_jour(temps);
-  Ti_wall_.mettre_a_jour(temps);
+  Ti_wall_->mettre_a_jour(temps);
 
 
   // print Twall
@@ -314,7 +314,7 @@ void Echange_contact_VDF_FT_Disc_solid::completer()
 
   ch.creer(nom_autre_pb_, nom_bord_oppose_, nom_champ_T2_autre_pb_);
 
-  ch.associer_fr_dis_base(T_ext().frontiere_dis());
+  ch.associer_fr_dis_base(T_ext()->frontiere_dis());
   ch.completer();
   int nb_cases=domaine_Cl_dis().equation().schema_temps().nb_valeurs_temporelles();
   ch.fixer_nb_valeurs_temporelles(nb_cases);

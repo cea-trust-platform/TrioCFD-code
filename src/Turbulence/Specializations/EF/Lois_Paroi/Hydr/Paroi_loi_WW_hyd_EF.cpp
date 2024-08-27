@@ -94,7 +94,7 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco=-1;
   int l_unif;
@@ -144,7 +144,7 @@ int Paroi_loi_WW_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
           // Loop on real faces
           ndeb = 0;

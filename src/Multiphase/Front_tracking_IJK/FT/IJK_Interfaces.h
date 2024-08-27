@@ -38,10 +38,10 @@
 #include <TRUST_Ref.h>
 #include <Intersection_Interface_ijk.h>
 #include <IJK_Composantes_Connex.h>
+#include <Domaine_dis.h>
 
 class IJK_FT_double;
 class Switch_FT_double;
-class Domaine_dis;
 
 #define VERIF_INDIC 0
 

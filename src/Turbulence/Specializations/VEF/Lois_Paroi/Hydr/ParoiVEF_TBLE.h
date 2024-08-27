@@ -28,12 +28,11 @@
 #include <Eq_couch_lim.h>
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <Paroi_log_QDM.h>
 
 class Champ_Fonc_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Param;
 
 /*! @brief CLASS: ParoiVEF_TBLE

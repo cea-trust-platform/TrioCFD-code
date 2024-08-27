@@ -29,7 +29,6 @@
 #include <Modele_turbulence_hyd_null.h>
 #include <Discretisation_base.h>
 #include <Schema_Temps_base.h>
-#include <Schema_Temps.h>
 #include <Discret_Thyd.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
@@ -93,7 +92,7 @@ int Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard(const Motcle& mot, Ent
   else if (mot=="modele_turbulence")
     {
       Cerr << "Reading and typing of the turbulence model :" ;
-      le_modele_turbulence.associer_eqn(*this);
+      le_modele_turbulence->associer_eqn(*this);
       is >> le_modele_turbulence;
       // Si on vient de lire un modele de turbulence nul et que l'operateur
       // de diffusion a deja ete lu, alors on s'est plante d'operateur,
@@ -110,7 +109,7 @@ int Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard(const Motcle& mot, Ent
                " first for the data of Navier_Stokes_Turbulent_ALE { ... }\n";
           exit();
         }
-      le_modele_turbulence.discretiser();
+      le_modele_turbulence->discretiser();
       RefObjU le_modele;
       le_modele = le_modele_turbulence.valeur();
       liste_modeles_.add_if_not(le_modele);
@@ -233,10 +232,10 @@ int Navier_Stokes_Turbulent_ALE::preparer_calcul()
 
   Turbulence_paroi& loipar=le_modele_turbulence->loi_paroi();
   if (loipar.non_nul())
-    loipar.init_lois_paroi();
+    loipar->init_lois_paroi();
 
   Navier_Stokes_std_ALE::preparer_calcul();
-  le_modele_turbulence.preparer_calcul();
+  le_modele_turbulence->preparer_calcul();
   return 1;
 }
 
@@ -294,7 +293,7 @@ int Navier_Stokes_Turbulent_ALE::reprendre(Entree& is)
 void Navier_Stokes_Turbulent_ALE::completer()
 {
   Navier_Stokes_std_ALE::completer();
-  le_modele_turbulence.completer();
+  le_modele_turbulence->completer();
 }
 
 
@@ -305,7 +304,7 @@ void Navier_Stokes_Turbulent_ALE::completer()
 void Navier_Stokes_Turbulent_ALE::mettre_a_jour(double temps)
 {
   Navier_Stokes_std_ALE::mettre_a_jour(temps);
-  le_modele_turbulence.mettre_a_jour(temps);
+  le_modele_turbulence->mettre_a_jour(temps);
 }
 
 void Navier_Stokes_Turbulent_ALE::creer_champ(const Motcle& motlu)
@@ -322,7 +321,7 @@ const Champ_base& Navier_Stokes_Turbulent_ALE::get_champ(const Motcle& nom) cons
     {
       return Navier_Stokes_std_ALE::get_champ(nom);
     }
-  catch (Champs_compris_erreur)
+  catch (Champs_compris_erreur&)
     {
     }
   if (le_modele_turbulence.non_nul())
@@ -330,7 +329,7 @@ const Champ_base& Navier_Stokes_Turbulent_ALE::get_champ(const Motcle& nom) cons
       {
         return le_modele_turbulence->get_champ(nom);
       }
-    catch (Champs_compris_erreur)
+    catch (Champs_compris_erreur&)
       {
       }
   throw Champs_compris_erreur();
@@ -349,7 +348,7 @@ void Navier_Stokes_Turbulent_ALE::get_noms_champs_postraitables(Noms& nom,Option
 void Navier_Stokes_Turbulent_ALE::imprimer(Sortie& os) const
 {
   Navier_Stokes_std_ALE::imprimer(os);
-  le_modele_turbulence.imprimer(os);
+  le_modele_turbulence->imprimer(os);
 }
 
 const RefObjU& Navier_Stokes_Turbulent_ALE::get_modele(Type_modele type) const

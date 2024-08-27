@@ -55,12 +55,12 @@ Entree& Traitement_particulier_NS_THI_VDF::readOn(Entree& is)
 void Traitement_particulier_NS_THI_VDF::init_calc_spectre()
 {
   const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis.domaine();
+  const Domaine& domaine = zdis->domaine();
   int nb_som = domaine.nb_som();
   calcul_nb_som_dir(domaine);
   DoubleTab vit(nb_som,dimension);
   double Ec=0.,D=0;
-  double temps_crt = mon_equation->inconnue().temps();
+  double temps_crt = mon_equation->inconnue()->temps();
 
   if (Process::nproc()==1)
     {
@@ -79,10 +79,10 @@ void Traitement_particulier_NS_THI_VDF::init_calc_spectre()
 void Traitement_particulier_NS_THI_VDF::calcul_spectre(void)
 {
   const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis.domaine();
+  const Domaine& domaine = zdis->domaine();
   int nb_som = domaine.nb_som();
   DoubleTab vit(nb_som,dimension);
-  double temps_crt = mon_equation->inconnue().temps();
+  double temps_crt = mon_equation->inconnue()->temps();
   double Eccoup=0.,D=0;
 
   if (Process::nproc()==1)
@@ -106,7 +106,7 @@ void Traitement_particulier_NS_THI_VDF::sorties_globales(void)
   //const Domaine& domaine = zdis.domaine();
   //int nb_som = domaine.nb_som();
   //DoubleTab vit(nb_som,dimension);
-  double temps_crt = mon_equation->inconnue().temps();
+  double temps_crt = mon_equation->inconnue()->temps();
 
   // dans ce fichier : il y aura : tps_crt, Ec, D, Skewness
   double skewness=0., Ec=0., D=0.;
@@ -124,7 +124,7 @@ void Traitement_particulier_NS_THI_VDF::sorties_globales(void)
 void Traitement_particulier_NS_THI_VDF::renorm_Ec(void)
 {
   double Ec=0,D=0;
-  DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   Cerr << "Renormalisation pour les premiers instants de la turb_grille" << finl;
   if (fac_init==0)
     {
@@ -133,10 +133,10 @@ void Traitement_particulier_NS_THI_VDF::renorm_Ec(void)
   else
     {
       const Domaine_dis& zdis = mon_equation->domaine_dis();
-      const Domaine& domaine = zdis.domaine();
+      const Domaine& domaine = zdis->domaine();
       int nb_som = domaine.nb_som();
       DoubleTab vit(nb_som,dimension);
-      double temps_crt = mon_equation->inconnue().temps();
+      double temps_crt = mon_equation->inconnue()->temps();
       double dD=0;
 
       ch_vit_pour_fft(vit);
@@ -164,14 +164,14 @@ void Traitement_particulier_NS_THI_VDF::renorm_Ec(void)
  */
 void Traitement_particulier_NS_THI_VDF::calcul_Ec_D(double& Ec, double& D)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
   const Domaine& domaine = zdisbase.domaine();
   const int nb_elem=domaine.nb_elem();
 
   const Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF,mon_equation->inconnue().valeur());
   //  Calcul de l'Energie cinetique et de l enstrophie
-  const DoubleVect& vitesse =mon_equation->inconnue().valeurs();
+  const DoubleVect& vitesse =mon_equation->inconnue()->valeurs();
   const int dim = Objet_U::dimension;
   DoubleTab vorticite(nb_elem, dim);
   vit.calculer_rotationnel_ordre2_centre_element(vorticite);
@@ -237,15 +237,15 @@ void Traitement_particulier_NS_THI_VDF::calcul_Ec_D(double& Ec, double& D)
 
 void Traitement_particulier_NS_THI_VDF::ch_vit_pour_fft(DoubleTab& vit)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VDF& domaine_vdf=ref_cast(Domaine_VDF, zdisbase);
-  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   const Domaine& domaine_geom = domaine_vdf.domaine();
   const IntVect& orientation = domaine_vdf.orientation();
   const IntTab& face_sommets = domaine_vdf.face_sommets();
   const int nb_faces_ =  domaine_vdf.nb_faces();
   const int nb_som = domaine_geom.nb_som();
-  double temps_crt = mon_equation->inconnue().temps();
+  double temps_crt = mon_equation->inconnue()->temps();
   const char* methode_actuelle="Traitement_particulier_NS_THI_VDF::ch_vit_pour_fft";
 
   IntTab compteur(nb_som,dimension);
@@ -365,13 +365,13 @@ void Traitement_particulier_NS_THI_VDF::calcul_skewness_ordre_2(double& Skewness
 {
   // Calcul du skewness : -<(du1/dx1)~3>/(<(du1/dx1)~2>)~(3/2)
   // ce calcul n est valable que pour une periodicite en x
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VDF& domaine_vdf=ref_cast(Domaine_VDF, zdisbase);
 
   const Domaine_Cl_dis& zcldis = mon_equation->domaine_Cl_dis();
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcldis.valeur());
 
-  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   const IntTab& face_voisins = domaine_vdf.face_voisins();
   const IntTab& elem_faces = domaine_vdf.elem_faces();
   const IntVect& orientation = domaine_vdf.orientation();
@@ -461,14 +461,14 @@ void Traitement_particulier_NS_THI_VDF::calcul_skewness_ordre_2(double& Skewness
 void Traitement_particulier_NS_THI_VDF::calcul_spectre_operateur(int nb_op, DoubleTab& u, DoubleTab& u_av, double dt)
 {
   const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis.domaine();
+  const Domaine& domaine = zdis->domaine();
   int nb_som = domaine.nb_som();
   calcul_nb_som_dir(domaine);
   DoubleTab vit(nb_som,dimension);
 
-  double temps_crt = mon_equation->inconnue().temps();
+  double temps_crt = mon_equation->inconnue()->temps();
 
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
   const int nb_faces_ = domaine_VDF.nb_faces();
   const DoubleVect& volumes_entrelaces = domaine_VDF.volumes_entrelaces();
@@ -530,7 +530,7 @@ void Traitement_particulier_NS_THI_VDF::calcul_spectre_operateur(int nb_op, Doub
 
 void Traitement_particulier_NS_THI_VDF::ch_vit_pour_fft_operateur(DoubleTab& u, DoubleTab& vit)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VDF& domaine_vdf=ref_cast(Domaine_VDF, zdisbase);
   const Domaine& domaine_geom = domaine_vdf.domaine();
   const IntVect& orientation = domaine_vdf.orientation();

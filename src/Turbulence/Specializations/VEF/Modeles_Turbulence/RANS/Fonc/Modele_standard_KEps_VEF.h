@@ -27,9 +27,8 @@
 #include <Domaine_Cl_dis.h>
 #include <Param.h>
 #include <TRUST_Ref.h>
-
-class Domaine_dis;
-class Domaine_Cl_dis;
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Domaine_Cl_VEF;
 
 class Modele_standard_KEps_VEF : public Modele_Lam_Bremhorst_VEF

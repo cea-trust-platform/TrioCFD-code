@@ -25,10 +25,10 @@
 
 #include <Triple_Line_Model_FT_Disc.h>
 #include <Pb_Fluide_base.h>
+#include <Equation_base.h>
 #include <TRUST_Vector.h>
 #include <TRUST_List.h>
 #include <TRUST_Ref.h>
-#include <Equation.h>
 
 class Chimie;
 class Equation_base;
@@ -64,11 +64,11 @@ public:
   const Triple_Line_Model_FT_Disc& tcl() const { return tcl_; }
   Triple_Line_Model_FT_Disc& tcl() { return tcl_; }
 
-  inline const LIST(Equation)& get_list_equations() const { return equations_; }
+  inline const LIST(OWN_PTR(Equation_base))& get_list_equations() const { return equations_; }
 
 private:
   void add_FT_equation(const Nom& , const Nom& );
-  LIST(Equation) equations_; // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces, puis ConvDiff.
+  LIST(OWN_PTR(Equation_base)) equations_; // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces, puis ConvDiff.
   REF(Chimie) la_chimie_;
   Triple_Line_Model_FT_Disc tcl_;
 };

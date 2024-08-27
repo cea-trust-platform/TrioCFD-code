@@ -170,7 +170,7 @@ Entree& Traitement_particulier_NS_THI_VEF::lire(Entree& is)
               case 1 :
                 {
                   is >> periode_calc_spectre;
-                  double temps_courant = mon_equation->inconnue().temps();
+                  double temps_courant = mon_equation->inconnue()->temps();
                   compteur_perio_spectre = (int)(temps_courant / periode_calc_spectre) + 1;
                   if (calc_sp_3D)
                     {
@@ -291,7 +291,7 @@ void Traitement_particulier_NS_THI_VEF::init_calc_spectre(void)
 // Appelle les fonctions qui a priori ne doivent etre lancees qu'une fois
 // (sauf si le domaine de calcul change, raffinement, ...)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const int nb_faces = domaine_VEF.nb_faces();
   IntTab tab_domaine;
@@ -331,7 +331,7 @@ void Traitement_particulier_NS_THI_VEF::renorm_Ec(void)
   // Ajuste les valeurs du champ de vitesse pour retrouver une energie definie.
   // La renormalisation peut se faire sur l'energie de l'espace physique ou
   // sur l'energie de l'espace spectral (3D ou 1D).
-  DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   double Ec;
 
   switch (fac_init)
@@ -392,10 +392,10 @@ void Traitement_particulier_NS_THI_VEF::renorm_Ec(void)
 
 void Traitement_particulier_NS_THI_VEF::calcul_spectre(void)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const int nb_faces = domaine_VEF.nb_faces();
-  const DoubleTab& vitesse = mon_equation->inconnue().valeurs(); // vitesse aux faces
+  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs(); // vitesse aux faces
   //  const Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
   Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
 
@@ -419,7 +419,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre(void)
 
 
 
-  double temps = mon_equation->inconnue().temps();
+  double temps = mon_equation->inconnue()->temps();
 
   if(je_suis_maitre())
     Cerr << finl << "temps = " << temps << finl << finl;
@@ -485,12 +485,12 @@ void Traitement_particulier_NS_THI_VEF::sorties_globales(void)
 {
   // Pour les traitements effectues a chaque pas de temps
 
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const int nb_faces = domaine_VEF.nb_faces();
-  const DoubleTab& vitesse = mon_equation->inconnue().valeurs(); // vitesse aux faces
+  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs(); // vitesse aux faces
   const Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
-  double temps = mon_equation->inconnue().temps();
+  double temps = mon_equation->inconnue()->temps();
 
 
   DoubleTab vitesse_bar(vitesse);
@@ -591,7 +591,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_dom
 // Effet de bord : remplit le tableau tab_calc_fft_3D
 
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const int nb_faces = domaine_VEF.nb_faces();
   const DoubleTab& coord_centre = domaine_VEF.xv();
@@ -1131,7 +1131,7 @@ void Traitement_particulier_NS_THI_VEF::ch_pour_fft_VEF_1D(const DoubleTab& tab_
 
 void Traitement_particulier_NS_THI_VEF::calcul_spectre_3D(const DoubleTab& vitesse, Nom ext, double& Ec_spectre)
 {
-  double temps = mon_equation->inconnue().temps();
+  double temps = mon_equation->inconnue()->temps();
   temps /= temps_retournement;
 
   //    Cerr << "Spectre d'energie en 3D." << finl; ;
@@ -1230,7 +1230,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre_3D(const DoubleTab& vites
 void Traitement_particulier_NS_THI_VEF::calcul_spectre_1D(const DoubleTab& vitesse, Nom ext, double& Ec_spectre)
 {
 
-  double temps = mon_equation->inconnue().temps();
+  double temps = mon_equation->inconnue()->temps();
   temps /= temps_retournement;
   //  Nom fichier_data = Nom("data_spectre_1D_") + ext + Nom("_") + Nom(temps) + Nom("_");
   Nom fichier_spectre = Nom("spectre_1D_") + ext + Nom("_") + Nom(temps) + Nom("_");
@@ -1488,7 +1488,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre_1D(const DoubleTab& vites
 void Traitement_particulier_NS_THI_VEF::calcul_correlations(const DoubleTab& vitesse)
 
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const int nb_faces = domaine_VEF.nb_faces();
   const Champ_P1NC& champ_vitesse = ref_cast(Champ_P1NC,mon_equation->inconnue().valeur());
@@ -1575,7 +1575,7 @@ void Traitement_particulier_NS_THI_VEF::isotropie(const DoubleTab& vitesse, Nom 
 
       if (je_suis_maitre())
         {
-          double temps = mon_equation->inconnue().temps();
+          double temps = mon_equation->inconnue()->temps();
           temps /= temps_retournement;
           Nom fichier_uu = fichier + Nom("_uu");
           SFichier fic_uu (fichier_uu, ios::app);
@@ -1616,7 +1616,7 @@ void Traitement_particulier_NS_THI_VEF::isotropie(const DoubleTab& vitesse, Nom 
 double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vitesse, Nom ext)
 {
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   const int nb_faces = domaine_VEF.nb_faces();
@@ -1635,7 +1635,7 @@ double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vit
   for (int num_cl=0; num_cl<nb_cl; num_cl++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(num_cl);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int nb_faces_bord=le_bord.nb_faces();
       int num1 = le_bord.num_premiere_face();
       int num2 = num1 + nb_faces_bord;
@@ -1708,7 +1708,7 @@ double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vit
       Nom fichier = Nom("Sorties_Ec_") + ext + Nom("_spatial");
       SFichier fic (fichier,ios::app);
       fic.precision(8);
-      double temps = mon_equation->inconnue().temps();
+      double temps = mon_equation->inconnue()->temps();
       temps /= temps_retournement;
       fic << temps << " " << Ec << " " << Ec_max << " " << Ec_min  << finl;
 
@@ -1721,7 +1721,7 @@ double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vit
 
 void Traitement_particulier_NS_THI_VEF::calcul_Df_spatial(double& Df)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes = domaine_VEF.volumes();
   const int nb_elem = domaine_VEF.nb_elem();
@@ -1786,7 +1786,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_Df_spatial(double& Df)
       Nom fichier = Nom("Sorties_Df_tot_spatial");
       SFichier fic (fichier,ios::app);
       fic.precision(8);
-      double temps = mon_equation->inconnue().temps();
+      double temps = mon_equation->inconnue()->temps();
       temps /= temps_retournement;
       fic << temps << " " << Df << " " << Df_max << " " << Df_min << " " << Df+Df_ecart_type <<  " " << Df-Df_ecart_type << finl;
 
@@ -1800,7 +1800,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_Df_spatial(double& Df)
 void Traitement_particulier_NS_THI_VEF::calcul_Sk(DoubleTab& Sk)
 {
   // calcul du facteur de dissymetrie (skewness)
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes = domaine_VEF.volumes();
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
@@ -1856,7 +1856,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_Sk(DoubleTab& Sk)
       Nom fichier = Nom("Sorties_Sk_tot_spatial");
       SFichier fic (fichier,ios::app);
       fic.precision(8);
-      double temps = mon_equation->inconnue().temps();
+      double temps = mon_equation->inconnue()->temps();
       temps /= temps_retournement;
       fic << temps ;
       for (int dim=0; dim<dimension; dim++)
@@ -1871,12 +1871,12 @@ void Traitement_particulier_NS_THI_VEF::calcul_Sk(DoubleTab& Sk)
 
 void Traitement_particulier_NS_THI_VEF::calcul_nu_t(void)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes = domaine_VEF.volumes();
   const int nb_elem = domaine_VEF.nb_elem();
   const Navier_Stokes_Turbulent& N_S_Turb  = ref_cast(Navier_Stokes_Turbulent,mon_equation.valeur());
-  const DoubleTab& visc_turb = N_S_Turb.viscosite_turbulente().valeurs();
+  const DoubleTab& visc_turb = N_S_Turb.viscosite_turbulente()->valeurs();
 
   double nu_t = 0;
   double nu_t_min = 1e+20;
@@ -1923,7 +1923,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_nu_t(void)
       Nom fichier = Nom("Sorties_nu_t") ;
       SFichier fic (fichier,ios::app);
       fic.precision(8);
-      double temps = mon_equation->inconnue().temps();
+      double temps = mon_equation->inconnue()->temps();
       temps /= temps_retournement;
       fic << temps << " " << nu_t << " " << nu_t_max << " " << nu_t_min << " " << nu_t+nu_t_ecart_type << " " << nu_t-nu_t_ecart_type << finl;
 
@@ -1937,10 +1937,10 @@ void Traitement_particulier_NS_THI_VEF::calcul_nu_t(void)
 void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& tab_global , DoubleVect& moyenne)
 {
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
-  //  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  //  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   const int nb_faces = domaine_VEF.nb_faces();
   const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
@@ -1955,7 +1955,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& 
   for (int num_cl=0; num_cl<nb_cl; num_cl++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(num_cl);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int nb_faces_bord=le_bord.nb_faces();
       int num1 = le_bord.num_premiere_face();
       int num2 = num1 + nb_faces_bord;
@@ -2017,10 +2017,10 @@ void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& 
 void Traitement_particulier_NS_THI_VEF::calcul_moyenne(const DoubleTab& tab_global , double& moyenne)
 {
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
-  //  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  //  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   const int nb_faces = domaine_VEF.nb_faces();
   const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
@@ -2033,7 +2033,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_moyenne(const DoubleTab& tab_glob
   for (int num_cl=0; num_cl<nb_cl; num_cl++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(num_cl);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int nb_faces_bord=le_bord.nb_faces();
       int num1 = le_bord.num_premiere_face();
       int num2 = num1 + nb_faces_bord;
@@ -2088,7 +2088,7 @@ void Traitement_particulier_NS_THI_VEF::impression_moyenne(void)
       Nom fichier = Nom("Sorties_vitesse_moyenne") ;
       SFichier fic (fichier,ios::app);
       fic.precision(8);
-      double temps = mon_equation->inconnue().temps();
+      double temps = mon_equation->inconnue()->temps();
       temps /= temps_retournement;
       fic << temps;
       for (int dim=0; dim<dimension; dim ++)
@@ -2116,9 +2116,9 @@ void Traitement_particulier_NS_THI_VEF::suppression_vitesse_moyenne(void)
 // Supprime la composante moyenne de la vitesse dans chaque direction,
 // travaille avec les vitesses aux faces
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase);
-  DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   const int nb_faces = domaine_VF.nb_faces();
 
 
@@ -2145,9 +2145,9 @@ void Traitement_particulier_NS_THI_VEF::conservation_Ec(void)
 // force la conservation de l'energie cinetique (THI forcee
 // par opposition a THI en decroissance libre)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase);
-  DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   const int nb_faces = domaine_VF.nb_faces();
 
 
@@ -2199,8 +2199,8 @@ int Traitement_particulier_NS_THI_VEF::pgcd(int a, int b)
 
 void Traitement_particulier_NS_THI_VEF::preparer_calcul_particulier()
 {
-  double temps_courant = mon_equation->inconnue().temps();
-  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  double temps_courant = mon_equation->inconnue()->temps();
+  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
 
   moyennes_scal.resize(nb_champs_scalaires); //les scalaires : moyenne = 1 double par scalaire
   moyenne_vitesse.resize(dimension);
@@ -2243,8 +2243,8 @@ void Traitement_particulier_NS_THI_VEF::preparer_calcul_particulier()
 
 void Traitement_particulier_NS_THI_VEF::post_traitement_particulier()
 {
-  double temps_courant = mon_equation->inconnue().temps();
-  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  double temps_courant = mon_equation->inconnue()->temps();
+  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
 
   calcul_vitesse_moyenne(vitesse, moyenne_vitesse);
 
@@ -2259,7 +2259,7 @@ void Traitement_particulier_NS_THI_VEF::post_traitement_particulier()
 
 double Traitement_particulier_NS_THI_VEF::calcul_volume_elem(void)
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase);
   const DoubleVect& volumes = domaine_VF.volumes();
   const int nb_elem = domaine_VF.nb_elem();

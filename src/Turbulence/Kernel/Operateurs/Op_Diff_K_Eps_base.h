@@ -29,12 +29,10 @@
 #include <TRUST_Deriv.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
+#include <Champ_Don.h>
+#include <Champ_Fonc.h>
 
-class Champ_Don;
-class Champ_Fonc;
 class Champ_base;
-
-
 
 /*! @brief classe Op_Diff_K_Eps_base Classe de base de la hierarchie des operateurs de diffusion
  *

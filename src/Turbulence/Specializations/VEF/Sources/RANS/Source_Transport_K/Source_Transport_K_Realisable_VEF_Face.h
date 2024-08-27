@@ -38,7 +38,7 @@ protected :
   REF(Transport_K_ou_Eps_Realisable) eqn_k_Rea, eqn_eps_Rea;
 
 private:
-  inline int get_size_k_eps() const override { return eqn_k_Rea->inconnue().valeurs().dimension(0); }
+  inline int get_size_k_eps() const override { return eqn_k_Rea->inconnue()->valeurs().dimension(0); }
   void fill_coeff_matrice(const int , const DoubleVect& , const DoubleVect& , const double , Matrice_Morse& ) const override;
 };
 

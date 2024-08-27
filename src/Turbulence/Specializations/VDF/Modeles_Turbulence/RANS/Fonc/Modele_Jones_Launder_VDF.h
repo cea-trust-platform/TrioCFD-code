@@ -27,11 +27,10 @@
 #include <Domaine_Cl_dis.h>
 #include <Equation_base.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Domaine_Cl_VDF;
 class Domaine_VDF;
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Champ_Face_VDF;
 
 class Modele_Jones_Launder_VDF : public Modele_Fonc_Bas_Reynolds_Base

@@ -202,7 +202,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
   //  eq_k_U_W.dimensionner(le_dom_VDF->nb_faces_bord());
   int compteur_faces_paroi = 0;
   DoubleVect corresp(le_dom_VDF->nb_faces_bord());
@@ -233,7 +233,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -273,7 +273,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
             {
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               ndeb = le_bord.num_premiere_face();
               nfin = ndeb + le_bord.nb_faces();
 
@@ -318,7 +318,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -545,7 +545,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   int itmax=0;
 
   double vmoy = 0., ts0 =0., ts1=0.,gradient_de_pression0=0., gradient_de_pression1 = 0.;
-  const DoubleTab& vit = eqn_hydr.inconnue().valeurs(); //vitesse
+  const DoubleTab& vit = eqn_hydr.inconnue()->valeurs(); //vitesse
   DoubleVect grad_vit_elemx;
   DoubleVect grad_vit_elem_moyx;
   DoubleVect grad_vit_elemz;
@@ -574,7 +574,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   const Navier_Stokes_std& eqnNS = ref_cast(Navier_Stokes_std, eqn_hydr);
 
   DoubleTab grad_p(vit);
-  const DoubleTab& p = eqnNS.pression().valeurs();
+  const DoubleTab& p = eqnNS.pression()->valeurs();
   const Operateur_Grad& gradient = eqnNS.operateur_gradient();
   gradient.calculer(p, grad_p);  // Calcul du gradient de pression
 
@@ -603,7 +603,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -635,7 +635,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -1467,7 +1467,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   int itmax=0;
 
   double vmoy = 0., ts0 =0., ts1=0.,gradient_de_pression0=0., gradient_de_pression1 = 0.;
-  const DoubleTab& vit = eqn_hydr.inconnue().valeurs(); //vitesse
+  const DoubleTab& vit = eqn_hydr.inconnue()->valeurs(); //vitesse
   DoubleVect grad_vit_elemx;
   DoubleVect grad_vit_elem_moyx;
   DoubleVect grad_vit_elemz;
@@ -1496,7 +1496,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   const Navier_Stokes_std& eqnNS = ref_cast(Navier_Stokes_std, eqn_hydr);
 
   DoubleTab grad_p(vit);
-  const DoubleTab& p = eqnNS.pression().valeurs();
+  const DoubleTab& p = eqnNS.pression()->valeurs();
   const Operateur_Grad& gradient = eqnNS.operateur_gradient();
   gradient.calculer(p, grad_p);  // Calcul du gradient de pression
 
@@ -1525,7 +1525,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -1557,7 +1557,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -2346,7 +2346,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
 void ParoiVDF_TBLE_LRM::imprimer_ustar(Sortie& os) const
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const double tps = eqn_hydr.inconnue().temps();
+  const double tps = eqn_hydr.inconnue()->temps();
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const IntVect& orientation = domaine_VDF.orientation();
 

@@ -30,10 +30,11 @@
 #include <Beam_model.h>
 #include <Champs_front_ALE_projection.h>
 #include <TRUST_Ref.h>
+#include <Domaine_dis.h>
 
 class Equation_base;
-class Domaine_dis;
 class Beam_model;
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION

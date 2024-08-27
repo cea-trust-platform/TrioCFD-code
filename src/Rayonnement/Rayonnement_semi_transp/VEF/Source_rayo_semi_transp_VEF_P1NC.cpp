@@ -57,28 +57,28 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
   int nb_faces = zvef.nb_faces();
 
   const Fluide_base& fluide = eq_rayo.fluide();
-  const DoubleTab& kappa = fluide.kappa().valeurs();
-  const DoubleTab& indice = fluide.indice().valeurs();
-  const DoubleTab& G = eq_rayo.inconnue().valeurs();
+  const DoubleTab& kappa = fluide.kappa()->valeurs();
+  const DoubleTab& indice = fluide.indice()->valeurs();
+  const DoubleTab& G = eq_rayo.inconnue()->valeurs();
 
   const DoubleVect& volumes_entrelaces =  zvef.volumes_entrelaces();
 
   double sigma = Modele().valeur_sigma();
 
-  const DoubleTab& temperature = equation().inconnue().valeurs();
+  const DoubleTab& temperature = equation().inconnue()->valeurs();
 
   // boucle sur les elements
   int face=0;
   for(face=0; face<nb_faces; face++)
     {
       double n,k;
-      assert(fluide.indice().nb_comp() == 1);
+      assert(fluide.indice()->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide.indice().valeur()))
         n = indice(0,0);
       else
         n = indice(face,0);
 
-      assert(fluide.kappa().nb_comp() == 1);
+      assert(fluide.kappa()->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide.kappa().valeur()))
         k = kappa(0,0);
       else

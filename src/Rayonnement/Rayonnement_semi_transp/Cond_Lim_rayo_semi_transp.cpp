@@ -45,13 +45,13 @@ void Cond_Lim_rayo_semi_transp::recherche_emissivite_et_A()
   int num_cl_rayo=0;
 
   Equation_rayonnement_base& eq_rayo = modele().eq_rayo();
-  Conds_lim& les_cl_rayo = eq_rayo.domaine_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl_rayo = eq_rayo.domaine_Cl_dis()->les_conditions_limites();
 
   int test_nom=0;
   for(num_cl_rayo = 0; num_cl_rayo<les_cl_rayo.size(); num_cl_rayo++)
     {
-      Cond_lim& la_cl_rayo = eq_rayo.domaine_Cl_dis().les_conditions_limites(num_cl_rayo);
-      Nom nom_cl_rayo = la_cl_rayo.frontiere_dis().le_nom();
+      Cond_lim& la_cl_rayo = eq_rayo.domaine_Cl_dis()->les_conditions_limites(num_cl_rayo);
+      Nom nom_cl_rayo = la_cl_rayo->frontiere_dis().le_nom();
       Nom nom_cl_temp = la_cl().frontiere_dis().le_nom();
       if(nom_cl_temp == nom_cl_rayo)
         {
@@ -60,7 +60,7 @@ void Cond_Lim_rayo_semi_transp::recherche_emissivite_et_A()
             {
               const Flux_radiatif_base& la_cl_rayon = ref_cast(Flux_radiatif_base,la_cl_rayo.valeur());
               emissivite_ = la_cl_rayon.emissivite();
-              emissivite_.associer_fr_dis_base(la_cl_rayon.frontiere_dis());
+              emissivite_->associer_fr_dis_base(la_cl_rayon.frontiere_dis());
               A_ = la_cl_rayon.A();
             }
           else if (sub_type(Symetrie,la_cl_rayo.valeur()))

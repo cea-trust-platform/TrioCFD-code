@@ -26,8 +26,8 @@
 #include <Equation_base.h>
 #include <Modele_turbulence_hyd_RANS_Bicephale_base.h>
 #include <TRUST_Ref.h>
+#include <Champ_Inc.h>
 
-class Champ_Inc;
 class Milieu_base;
 class Champ_Inc_base;
 

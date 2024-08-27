@@ -96,7 +96,7 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
             while (i<nb_eq)
               {
                 const Equation_base& eq_test = Pb.equation(i);
-                if ((eq_test.inconnue().le_nom() == mon_champ_inc.le_nom()))
+                if ((eq_test.inconnue()->le_nom() == mon_champ_inc.le_nom()))
                   {
                     numero_eq_=i;
                     break;
@@ -108,7 +108,7 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
                       {
                         const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_test.get_modele(TURBULENCE).valeur());
                         const Transport_K_Eps_base& transportkeps = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-                        if ((transportkeps.inconnue().le_nom() == mon_champ_inc.le_nom()))
+                        if ((transportkeps.inconnue()->le_nom() == mon_champ_inc.le_nom()))
                           {
                             numero_eq_=i;
                             iskeps = true;
@@ -123,7 +123,7 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
                       {
                         const Modele_turbulence_hyd_RANS_K_Omega_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Omega_base, eq_test.get_modele(TURBULENCE).valeur());
                         const Transport_K_Omega_base& transportkomega = ref_cast(Transport_K_Omega_base, le_mod_RANS.eqn_transp_K_Omega());
-                        if ((transportkomega.inconnue().le_nom() == mon_champ_inc.le_nom()))
+                        if ((transportkomega.inconnue()->le_nom() == mon_champ_inc.le_nom()))
                           {
                             numero_eq_=i;
                             iskomega = true;
@@ -227,7 +227,7 @@ const Champ_base& Champ_Generique_Morceau_Equation::get_champ(Champ& espace_stoc
 
   espace_stockage = creer_espace_stockage(nature,nb_comp,es_tmp);
   morceau().calculer_pour_post(espace_stockage,option_,compo_);
-  DoubleTab& es_val = espace_stockage.valeurs();
+  DoubleTab& es_val = espace_stockage->valeurs();
   es_val.echange_espace_virtuel();
   return espace_stockage.valeur();
 }
@@ -279,12 +279,12 @@ const Noms Champ_Generique_Morceau_Equation::get_property(const Motcle& query) c
         else if (Motcle(option_).debute_par("FLUX_"))
           {
             // Tres incomplet mais bon...:
-            if (ref_eq_->inconnue().le_nom()=="vitesse")
+            if (ref_eq_->inconnue()->le_nom()=="vitesse")
               {
                 if (numero_morceau_<2) unites[0]="N";
                 else if (numero_morceau_==3) unites[0]=(dimension==2 ? "m2/s" : "m3/s");
               }
-            else if (ref_eq_->inconnue().le_nom()=="temperature") unites[0]="W";
+            else if (ref_eq_->inconnue()->le_nom()=="temperature") unites[0]="W";
             if (Motcle(option_)==Motcle("flux_surfacique_bords"))
               unites[0]+="/m2";
           }

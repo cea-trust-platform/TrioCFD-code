@@ -38,12 +38,11 @@
 #include <Transport_Flux_Chaleur_Turbulente.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 
 class Probleme_base;
 class Champ_Don_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 

@@ -82,24 +82,24 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_
 
   // on divise par rho en QC pour revenir a K et Eps/Omega
   if (z_class->equation().probleme().is_dilatable())
-    diviser_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
+    diviser_par_rho_si_dilatable(ch_K_Eps_ou_Omega->valeurs(), mil);
 
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 1);
 
-  z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
+  z_class->loi_paroi()->calculer_hyd(ch_K_Eps_ou_Omega);
   z_class->controler();
-  z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
+  z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega->temps());
   z_class->limiter_viscosite_turbulente();
 
   // on remultiplie par rho
   if (z_class->equation().probleme().is_dilatable())
     {
-      multiplier_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
+      multiplier_par_rho_si_dilatable(ch_K_Eps_ou_Omega->valeurs(), mil);
       if (!IS_K_OMEGA)
         correction_nut_et_cisaillement_paroi_si_qc(*z_class);
     }
 
-  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
+  z_class->viscosite_turbulente()->valeurs().echange_espace_virtuel();
 
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 0);
 }
@@ -116,27 +116,27 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_
   // on divise par rho en QC pour revenir a K et Eps/Omega
   if (z_class->equation().probleme().is_dilatable())
     {
-      diviser_par_rho_si_dilatable(ch_K.valeurs(), mil);
-      diviser_par_rho_si_dilatable(ch_Eps.valeurs(), mil);
+      diviser_par_rho_si_dilatable(ch_K->valeurs(), mil);
+      diviser_par_rho_si_dilatable(ch_Eps->valeurs(), mil);
     }
 
   if (!IS_K_EPS_REALISABLE_BICEPHALE)
     print_evolution<M_TYPE>(ch_K, z_class->equation().schema_temps(), LeCmu, 1, &ch_Eps);
 
-  z_class->loi_paroi().calculer_hyd_BiK(ch_K, ch_Eps);
+  z_class->loi_paroi()->calculer_hyd_BiK(ch_K->valeurs(), ch_Eps->valeurs());
   z_class->controler();
-  z_class->calculer_viscosite_turbulente(ch_K.temps());
+  z_class->calculer_viscosite_turbulente(ch_K->temps());
   z_class->limiter_viscosite_turbulente();
 
   // on remultiplie par rho
   if (z_class->equation().probleme().is_dilatable())
     {
-      multiplier_par_rho_si_dilatable(ch_K.valeurs(), mil);
-      multiplier_par_rho_si_dilatable(ch_Eps.valeurs(), mil);
+      multiplier_par_rho_si_dilatable(ch_K->valeurs(), mil);
+      multiplier_par_rho_si_dilatable(ch_Eps->valeurs(), mil);
       correction_nut_et_cisaillement_paroi_si_qc(*z_class);
     }
 
-  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
+  z_class->viscosite_turbulente()->valeurs().echange_espace_virtuel();
 
   if (!IS_K_EPS_REALISABLE_BICEPHALE)
     print_evolution<M_TYPE>(ch_K, z_class->equation().schema_temps(), LeCmu, 0, &ch_Eps);
@@ -153,20 +153,20 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_
 
   // on divise par rho en QC pour revenir a K et Eps/Omega
   if (z_class->equation().probleme().is_dilatable())
-    diviser_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
+    diviser_par_rho_si_dilatable(ch_K_Eps_ou_Omega->valeurs(), mil);
 
-  z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
-  z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
+  z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega->temps());
+  z_class->loi_paroi()->calculer_hyd(ch_K_Eps_ou_Omega);
   z_class->limiter_viscosite_turbulente();
 
   // on remultiplie par rho
   if (z_class->equation().probleme().is_dilatable())
     {
-      multiplier_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
+      multiplier_par_rho_si_dilatable(ch_K_Eps_ou_Omega->valeurs(), mil);
       correction_nut_et_cisaillement_paroi_si_qc(*z_class);
     }
 
-  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
+  z_class->viscosite_turbulente()->valeurs().echange_espace_virtuel();
 }
 
 template<typename MODELE> template<MODELE_TYPE M_TYPE>
@@ -175,9 +175,9 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc& ch_
 {
   auto *z_class = static_cast<MODELE*>(this); // CRTP --> I love you :*
   z_class->controler();
-  z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
+  z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega->temps());
   z_class->limiter_viscosite_turbulente();
-  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
+  z_class->viscosite_turbulente()->valeurs().echange_espace_virtuel();
 }
 
 template <typename MODELE> template <MODELE_TYPE M_TYPE>
@@ -194,7 +194,7 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
 
   if (sch.nb_pas_dt() == 0 || sch.limpr())
     {
-      const DoubleTab& K_Eps_ou_Omega = le_champ_K_Eps_ou_Omega.valeurs();
+      const DoubleTab& K_Eps_ou_Omega = le_champ_K_Eps_ou_Omega->valeurs();
       double k_min = DMAXFLOAT, eps_ou_omega_min = DMAXFLOAT, nut_min = DMAXFLOAT;
       double k_max = 0, eps_ou_omega_max = 0, nut_max = 0;
       int loc_k_min = -1, loc_eps_ou_omega_min = -1, loc_nut_min = -1;
@@ -209,7 +209,7 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
               Process::exit(-1);
             }
 
-          size = le_champ_K_Eps_ou_Omega->equation().domaine_dis().domaine().nb_elem();
+          size = le_champ_K_Eps_ou_Omega->equation().domaine_dis()->domaine().nb_elem();
 
           if (IS_K_EPS_BICEPHALE)
             {
@@ -218,14 +218,14 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
                   Cerr << "Unsupported field in Modele_turbulence_hyd_RANS_Gen::imprimer_evolution()" << finl;
                   Process::exit(-1);
                 }
-              assert (size == (*le_champ_Eps)->equation().domaine_dis().domaine().nb_elem());
+              assert (size == (*le_champ_Eps)->equation().domaine_dis()->domaine().nb_elem());
             }
         }
 
       for (int n = 0; n < size; n++)
         {
           const double k = IS_K_EPS_BICEPHALE ? K_Eps_ou_Omega(n) : K_Eps_ou_Omega(n, 0);
-          const double epsOuomega = IS_K_EPS_BICEPHALE ? (*le_champ_Eps).valeurs()(n) : K_Eps_ou_Omega(n, 1);
+          const double epsOuomega = IS_K_EPS_BICEPHALE ? (*le_champ_Eps)->valeurs()(n) : K_Eps_ou_Omega(n, 1);
           double nut = 0;
 
           const double num = IS_K_OMEGA ? k : LeCmu * k * k;
@@ -290,7 +290,7 @@ void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc& le
       // ecriture
       if (Process::je_suis_maitre())
         {
-          Cout << finl << "K_Eps/Omega evolution (" << (avant ? "before" : "after") << " law of the wall applies) at time " << le_champ_K_Eps_ou_Omega.temps() << ":" << finl;
+          Cout << finl << "K_Eps/Omega evolution (" << (avant ? "before" : "after") << " law of the wall applies) at time " << le_champ_K_Eps_ou_Omega->temps() << ":" << finl;
           Cout << "std::min(k)=" << k_min;
           if (Process::is_sequential()) Cout << " located at node " << loc_k_min;
           Cout << finl;

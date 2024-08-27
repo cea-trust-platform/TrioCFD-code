@@ -25,6 +25,7 @@
 
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Echange_externe_impose.h>
+#include <Champ_front.h>
 
 /*! @brief classe Echange_externe_impose_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
  *

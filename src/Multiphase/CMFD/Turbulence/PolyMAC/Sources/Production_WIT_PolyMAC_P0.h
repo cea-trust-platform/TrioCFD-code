@@ -27,8 +27,6 @@
 #include <TRUSTTab.h>
 #include <TRUST_Ref.h>
 
-class Correlation;
-
 /*! @brief Classe Production_WIT_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 la production de l'equation de WIT
  *
  *

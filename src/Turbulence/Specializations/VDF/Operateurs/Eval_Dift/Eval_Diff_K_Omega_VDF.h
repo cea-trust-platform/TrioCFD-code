@@ -57,13 +57,13 @@ public:
   inline void associer(const Champ_base& diffu)
   {
     diffusivite_ =  diffu;
-    if (sub_type(Champ_Uniforme, diffu))  db_diffusivite = diffu(0,0);
+    if (sub_type(Champ_Uniforme, diffu))  db_diffusivite = diffu.valeurs()(0,0);
   }
 
   inline virtual void mettre_a_jour()
   {
-    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs());
-    if (sub_type(Champ_Uniforme, diffusivite_.valeur())) db_diffusivite = diffusivite_.valeur()(0,0);
+    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeur().valeurs());
+    if (sub_type(Champ_Uniforme, diffusivite_.valeur())) db_diffusivite = diffusivite_->valeurs()(0,0);
   }
 
   inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }

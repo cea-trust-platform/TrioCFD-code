@@ -23,10 +23,8 @@
 #define Modele_Launder_Sharma_VDF_included
 
 #include <Modele_Jones_Launder_VDF.h>
-
-class Domaine_dis;
-class Domaine_Cl_dis;
-#include <TRUSTTabs_forward.h>
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <TRUSTTabs_forward.h>
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;

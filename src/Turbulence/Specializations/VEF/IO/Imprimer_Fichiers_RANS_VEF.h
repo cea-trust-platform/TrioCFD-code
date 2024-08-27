@@ -28,12 +28,10 @@
 #include <Equation_base.h>
 #include <TRUSTVect.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
 class Domaine_Cl_VEF;
 class Domaine_VEF;
-
 class Champ_Fonc_base;
-class Domaine_dis;
 
 class Imprimer_Fichiers_RANS_VEF : public Interprete
 {

@@ -111,10 +111,10 @@ void Modele_turbulence_hyd_LES_1elt_selectif_mod_VEF::cutoff()
   //  const Domaine& domaine = domaine_VEF.domaine();
   //  int nfac = domaine.nb_faces_elem();
   //  int nfac = 4; // en 3D 4 faces!!!
-  DoubleTab& vorticite = la_vorticite_.valeurs();
+  DoubleTab& vorticite = la_vorticite_->valeurs();
   const DoubleTab& xp = domaine_VEF.xp();
 
-  la_vorticite_.mettre_a_jour(vitesse.temps());
+  la_vorticite_->mettre_a_jour(vitesse.temps());
   vorticite.echange_espace_virtuel();
 
   //  int el0,el1,el2,el3;

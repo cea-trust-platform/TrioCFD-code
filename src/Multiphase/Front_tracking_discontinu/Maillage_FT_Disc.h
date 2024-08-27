@@ -21,10 +21,10 @@
 #include <Descripteur_FT.h>
 #include <Intersections_Elem_Facettes_Data.h>
 #include <TRUSTTabs_forward.h>
+#include <Domaine_dis.h>
 #include <TRUST_Deriv.h>
 #include <TRUST_Ref.h>
 
-class Domaine_dis;
 class Transport_Interfaces_FT_Disc;
 class Remaillage_FT;
 class Topologie_Maillage_FT;

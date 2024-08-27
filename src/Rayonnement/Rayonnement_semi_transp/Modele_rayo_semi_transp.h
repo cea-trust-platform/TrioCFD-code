@@ -23,13 +23,13 @@
 #ifndef Modele_rayo_semi_transp_included
 #define Modele_rayo_semi_transp_included
 
-#include <Probleme_base.h>
 #include <Equation_rayonnement.h>
+#include <Probleme_base.h>
+#include <Champ_front.h>
+#include <Champ_Inc.h>
+
 class Nom;
 class Probleme_base;
-class Champ_front;
-class Champ_Inc;
-
 
 /*! @brief Le Modele_rayo_semi_transp est un Probleme_base qui a 4 particularites : * Son equation doit etre typee en fonction de la dicretisation.
  *

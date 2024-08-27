@@ -26,13 +26,12 @@
 #include <Transport_Fluctuation_Temperature_W_Bas_Re.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 class Fluide_base;
 class Transport_K_Eps_Bas_Reynolds;
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Champ_Don_base;
 class Champ_Face_VDF;
 

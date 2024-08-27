@@ -66,7 +66,7 @@ void Frontiere_ouverte_vitesse_vortex::mettre_a_jour(double temps)
   const Domaine_Cl_dis_base& domaine_Cl_dis_base = domaine_Cl_dis();
   const Equation_base& equation = domaine_Cl_dis_base.equation().probleme().get_equation_by_name(nom_equation_);
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc, equation);
-  const DoubleTab& indic = eq.inconnue().valeurs();
+  const DoubleTab& indic = eq.inconnue()->valeurs();
   const Sous_Domaine& sous_domaine = domaine_Cl_dis_base.domaine().ss_domaine(nom_sous_domaine_);
   const DoubleVect& volume = ref_cast(Domaine_VF, domaine_Cl_dis_base.domaine_dis().valeur()).volumes();
 
@@ -89,7 +89,7 @@ void Frontiere_ouverte_vitesse_vortex::mettre_a_jour(double temps)
   for (i = 0; i < dimension; i++)
     val(0, i) = coeff_vitesse_[i] * facteur;
 
-  le_champ_front.mettre_a_jour(temps);
+  le_champ_front->mettre_a_jour(temps);
   Cerr << "Frontiere_ouverte_vitesse_vortex integrale=" << integrale << " vitesse="
        << val(0,0) << " " << val(0,1) << " " << ((dimension==3)?val(0,2):0.) << finl;
 }

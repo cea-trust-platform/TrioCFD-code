@@ -289,7 +289,7 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
         if (sub_type(Periodique,la_cl.valeur()))
           {
             const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
-            const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+            const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
             int nb_faces_bord=le_bord.nb_faces();
             IntVect fait(nb_faces_bord);
             fait = 0;

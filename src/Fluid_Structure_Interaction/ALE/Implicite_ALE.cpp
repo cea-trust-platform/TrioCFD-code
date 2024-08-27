@@ -84,7 +84,7 @@ void Implicite_ALE::second_special_treatment(Equation_base& eqn,DoubleTab& curre
   DoubleTrav deltaJMdtUn(resu); // copie de la structure, initialise a zero. To hold (M/dt)Un.
   double timestep=eqn.probleme().schema_temps().pas_de_temps();
   int pen=0;
-  eqn.solv_masse().ajouter_masse(timestep,deltaJMdtUn,eqn.inconnue().passe(),pen);
+  eqn.solv_masse()->ajouter_masse(timestep,deltaJMdtUn,eqn.inconnue()->passe(),pen);
   // Obtaining (M/dt)Un end.
 
   DoubleTab ALEjacobian_Old=dom_ale.getOldJacobian();

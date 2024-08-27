@@ -132,7 +132,7 @@ DoubleTab& Source_Reaction_Particules_VEF::ajouter(DoubleTab& resu) const
   for (num_cl=0 ; num_cl<zdis.nb_front_Cl() ; num_cl++)
     {
       const Cond_lim& la_cl = zcldis.les_conditions_limites(num_cl);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
       if (sub_type(Dirichlet,la_cl.valeur()) || sub_type(Dirichlet_homogene,la_cl.valeur()))

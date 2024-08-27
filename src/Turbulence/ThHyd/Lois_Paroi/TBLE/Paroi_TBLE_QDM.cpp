@@ -31,7 +31,9 @@
 #include <SFichier.h>
 #include <Champ_Fonc_Fonction.h>
 #include <Fluide_base.h>
+#include <Domaine_Cl_dis_base.h>
 #include <Param.h>
+#include <Cond_lim.h>
 
 Paroi_TBLE_QDM::Paroi_TBLE_QDM()
 {
@@ -202,7 +204,7 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Domaine_VF& domaine_dis, const Domaine
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           compteur_faces_paroi += le_bord.nb_faces();
         }
     }
@@ -238,7 +240,7 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Domaine_VF& domaine_dis, const Domaine
 
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
             {
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb = le_bord.num_premiere_face();
               int nfin = ndeb + le_bord.nb_faces();
 
@@ -363,7 +365,7 @@ int Paroi_TBLE_QDM::reprendre(Entree&, const Domaine_dis_base& domaine_dis, cons
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
 
             {
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               compteur_faces_paroi+=le_bord.nb_faces();
             }
         }
@@ -376,7 +378,7 @@ int Paroi_TBLE_QDM::reprendre(Entree&, const Domaine_dis_base& domaine_dis, cons
           const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
             {
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb = le_bord.num_premiere_face();
               int nfin = ndeb + le_bord.nb_faces();
               for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -418,7 +420,7 @@ int Paroi_TBLE_QDM::sauvegarder(Sortie&, const Domaine_dis_base& domaine_dis, co
       const Cond_lim& la_cl = le_dom_Cl.les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int num_face=ndeb; num_face<nfin; num_face++)

@@ -23,13 +23,11 @@
 #include <Flux_parietal_Kurul_Podowski.h>
 #include <Flux_parietal_adaptatif.h>
 #include <Loi_paroi_adaptative.h>
-#include <Correlation.h>
 #include <Pb_Multiphase.h>
 #include <Domaine_dis.h>
 #include <TRUSTTrav.h>
 #include <Milieu_composite.h>
 #include <Saturation_base.h>
-
 #include <math.h>
 
 Implemente_instanciable(Flux_parietal_Kurul_Podowski, "Flux_parietal_Kurul_Podowski", Flux_parietal_base);
@@ -39,7 +37,7 @@ Sortie& Flux_parietal_Kurul_Podowski::printOn(Sortie& os) const { return Flux_pa
 Entree& Flux_parietal_Kurul_Podowski::readOn(Entree& is)
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, pb_.valeur());
-  correlation_monophasique_.typer_lire(pbm, "Flux_parietal", is);
+  Correlation_base::typer_lire_correlation(correlation_monophasique_, pbm, "Flux_parietal", is);
   Cout << que_suis_je() << " : single-phase wall heat flux is " << correlation_monophasique_->que_suis_je() << finl;
 
   Param param(que_suis_je());

@@ -70,7 +70,7 @@ void Fluide_Diphasique::verifier_coherence_champs(int& err, Nom& msg)
     }
   else
     {
-      if (sigma_(0, 0) < 0)
+      if (sigma_->valeurs()(0, 0) < 0)
         {
           msg += "The surface tension sigma is not positive. \n";
           err = 1;
@@ -95,7 +95,7 @@ const Fluide_Incompressible& Fluide_Diphasique::fluide_phase(int phase) const
 
 double Fluide_Diphasique::sigma() const
 {
-  return sigma_(0, 0);
+  return sigma_->valeurs()(0, 0);
 }
 
 double Fluide_Diphasique::chaleur_latente() const
@@ -105,7 +105,7 @@ double Fluide_Diphasique::chaleur_latente() const
       Cerr << "Fluide_Diphasique::chaleur_latente() : The latent heat has not been specified." << finl;
       exit();
     }
-  return chaleur_latente_(0, 0);
+  return chaleur_latente_->valeurs()(0, 0);
 }
 
 // These values are used in the switch of Navier_Stokes_FT_Disc::FT_disc_calculer_champs_rho_mu_nu_dipha

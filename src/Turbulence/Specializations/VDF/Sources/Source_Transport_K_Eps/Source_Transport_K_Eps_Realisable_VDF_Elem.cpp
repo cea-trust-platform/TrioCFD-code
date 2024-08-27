@@ -37,7 +37,7 @@ void Source_Transport_K_Eps_Realisable_VDF_Elem::associer_pb(const Probleme_base
 
 const DoubleTab& Source_Transport_K_Eps_Realisable_VDF_Elem::get_visc_turb() const
 {
-  return eqn_keps_Rea->modele_turbulence().viscosite_turbulente().valeurs();
+  return eqn_keps_Rea->modele_turbulence().viscosite_turbulente()->valeurs();
 }
 
 const Modele_Fonc_Realisable_base& Source_Transport_K_Eps_Realisable_VDF_Elem::get_modele_fonc() const
@@ -48,7 +48,7 @@ const Modele_Fonc_Realisable_base& Source_Transport_K_Eps_Realisable_VDF_Elem::g
 
 void Source_Transport_K_Eps_Realisable_VDF_Elem::calculer_terme_production_real(const Champ_Face_VDF& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleTrav& P) const
 {
-  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
+  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue()->valeurs();
 
   if (axi) calculer_terme_production_K_Axi(le_dom_VDF.valeur(),vitesse,P,K_eps_Rea,visco_turb);
   else calculer_terme_production_K(le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),P,K_eps_Rea,vit,vitesse,visco_turb);
@@ -56,7 +56,7 @@ void Source_Transport_K_Eps_Realisable_VDF_Elem::calculer_terme_production_real(
 
 void Source_Transport_K_Eps_Realisable_VDF_Elem::fill_resu_real(const int is_visco_const, const DoubleTab& tab_visco, const DoubleTrav& P, const DoubleTrav& CC1, const DoubleTrav& S, double& visco, DoubleTab& resu) const
 {
-  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
+  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue()->valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_keps_Rea->modele_turbulence());
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
@@ -73,7 +73,7 @@ void Source_Transport_K_Eps_Realisable_VDF_Elem::fill_resu_real(const int is_vis
 
 void Source_Transport_K_Eps_Realisable_VDF_Elem::mettre_a_jour(double temps)
 {
-  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
+  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue()->valeurs(), &vit = eq_hydraulique->inconnue()->valeurs();
   const double epsilon_minimum = eqn_keps_Rea->modele_turbulence().get_EPS_MIN();
   Modele_Fonc_Realisable_base& mon_modele_fonc = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_keps_Rea->modele_turbulence()).associe_modele_fonction();
   mon_modele_fonc.Contributions_Sources(eqn_keps_Rea ->domaine_dis(),eqn_keps_Rea->domaine_Cl_dis(),vit,K_eps_Rea,epsilon_minimum);
@@ -82,7 +82,7 @@ void Source_Transport_K_Eps_Realisable_VDF_Elem::mettre_a_jour(double temps)
 
 void Source_Transport_K_Eps_Realisable_VDF_Elem::fill_coeff_matrice(const int is_visco_const, const DoubleTab& tab_visco, const DoubleVect& volumes, const DoubleVect& porosite, double& visco, Matrice_Morse& matrice) const
 {
-  const DoubleTab& val = equation().inconnue().valeurs();
+  const DoubleTab& val = equation().inconnue()->valeurs();
   for (int c = 0; c < val.dimension(0); c++)
     {
       if (!is_visco_const) visco = tab_visco(c);

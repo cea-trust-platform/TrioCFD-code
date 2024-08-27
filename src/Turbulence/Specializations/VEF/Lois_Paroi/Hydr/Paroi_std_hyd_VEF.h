@@ -33,10 +33,9 @@
 #include <Paroi_log_QDM.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Champ_Fonc_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 
 /*! @brief CLASS: Paroi_std_hyd_VEF
  *

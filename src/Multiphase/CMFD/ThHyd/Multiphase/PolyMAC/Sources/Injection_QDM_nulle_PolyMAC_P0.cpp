@@ -67,7 +67,7 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
   const Champ_Elem_PolyMAC_P0& cha= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().equation(1).inconnue().valeur()); // volume fraction
   const Domaine_PolyMAC_P0&     domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  const Conds_lim&           clsa = cha.domaine_Cl_dis().les_conditions_limites();
+  const Conds_lim&           clsa = cha.domaine_Cl_dis()->les_conditions_limites();
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
   const IntTab&  fcl = ch.fcl(),
@@ -79,7 +79,7 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir();
 
   const DoubleTab& vit = ch.valeurs(),
-                   &rho   = equation().milieu().masse_volumique().passe(), // passe car qdm
+                   &rho   = equation().milieu().masse_volumique()->passe(), // passe car qdm
                     &alpha = cha.passe();
 
   Matrice_Morse *mat = matrices.count(ch.le_nom().getString()) ? matrices.at(ch.le_nom().getString()) : nullptr; // Derivee locale/QDM

@@ -76,10 +76,10 @@ void Dissipation_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& s
   const DoubleTab&                          vit = equation().probleme().get_champ("vitesse").passe();
   const DoubleTab&                         diam = equation().probleme().get_champ("diametre_bulles").valeurs();
   const DoubleTab&                           nu = equation().probleme().get_champ("viscosite_cinematique").passe();
-  const DoubleTab&                        k_WIT = equation().inconnue().passe();
+  const DoubleTab&                        k_WIT = equation().inconnue()->passe();
 
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
-  int Nk = equation().inconnue().valeurs().dimension(1), N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne = domaine.nb_elem(), nf_tot = domaine.nb_faces_tot(), D = dimension ;
+  int Nk = equation().inconnue()->valeurs().dimension(1), N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne = domaine.nb_elem(), nf_tot = domaine.nb_faces_tot(), D = dimension ;
   if (Nk!=1) Process::exit("WIT is only in the liquid phase");
   if (D!=3) Process::exit("WIT is only coded for 3 dimensions");
 

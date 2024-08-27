@@ -63,9 +63,9 @@
 int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& domaine_Cl_hydr, const Domaine_Cl_dis& domaine_Cl_turb)
 {
 
-  int nb_Cl = domaine_Cl_hydr.nb_cond_lim();
+  int nb_Cl = domaine_Cl_hydr->nb_cond_lim();
 
-  if (domaine_Cl_turb.nb_cond_lim() != nb_Cl)
+  if (domaine_Cl_turb->nb_cond_lim() != nb_Cl)
     {
       Cerr << "The two objects of Domaine_Cl_dis type don't have" << finl;
       Cerr << "the same number of boundary conditions." << finl;
@@ -74,8 +74,8 @@ int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& domaine_Cl_hydr, const 
 
   for (int num_Cl=0; num_Cl<nb_Cl; num_Cl++)
     {
-      const Cond_lim& la_cl_turb = domaine_Cl_turb.les_conditions_limites(num_Cl);
-      const Cond_lim& la_cl_hydr = domaine_Cl_hydr.les_conditions_limites(num_Cl);
+      const Cond_lim& la_cl_turb = domaine_Cl_turb->les_conditions_limites(num_Cl);
+      const Cond_lim& la_cl_hydr = domaine_Cl_hydr->les_conditions_limites(num_Cl);
 
       // on teste si une des deux CL est periodique
       // et s'il y en a une, on verifie que les CL des deux eq sont periodiques
@@ -139,7 +139,7 @@ int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& domaine_Cl_hydr, const 
 int message_erreur_turb(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_turb, int& num_Cl)
 {
   Cerr << "The hydraulic and turbulent boundary conditions are not consitent on border:" << finl;
-  Cerr << "Boundary conditions number " << num_Cl << " \"" << la_cl_turb.frontiere_dis().le_nom() << "\" have been assigned to : " << finl;
+  Cerr << "Boundary conditions number " << num_Cl << " \"" << la_cl_turb->frontiere_dis().le_nom() << "\" have been assigned to : " << finl;
   Cerr << la_cl_hydr->que_suis_je() << " and " << la_cl_turb->que_suis_je() << " !! " << finl;
   Process::exit();
   return 1;

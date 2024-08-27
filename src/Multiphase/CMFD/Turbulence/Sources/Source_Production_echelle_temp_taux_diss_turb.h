@@ -25,8 +25,6 @@
 
 #include <Sources_Multiphase_base.h>
 
-class Correlation;
-
 /*! @brief Classe Source_Production_echelle_temp_taux_diss_turb Classe de base pour un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
  *
  *

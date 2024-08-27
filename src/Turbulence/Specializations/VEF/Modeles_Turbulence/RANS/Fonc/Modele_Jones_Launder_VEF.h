@@ -25,9 +25,8 @@
 #include <Modele_Fonc_Bas_Reynolds_Base.h>
 #include <Domaine_Cl_dis.h>
 #include <TRUST_Ref.h>
-
-class Domaine_dis;
-class Domaine_Cl_dis;
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 #include <TRUSTTabs_forward.h>
 class Domaine_Cl_VEF;
 class Domaine_VEF;

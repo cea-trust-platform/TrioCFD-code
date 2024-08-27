@@ -90,7 +90,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
 
   // la vitesse resolue par l'equation hydr
-  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco=-1.;
 
@@ -146,7 +146,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -275,7 +275,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
         {
 
           const Dirichlet_paroi_defilante& cl_diri = ref_cast(Dirichlet_paroi_defilante,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
           DoubleTab vitesse_imposee_face_bord(le_bord.nb_faces(),dimension);

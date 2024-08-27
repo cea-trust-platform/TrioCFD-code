@@ -29,7 +29,6 @@
 #include <communications.h>
 #include <Probleme_base.h>
 #include <stat_counters.h>
-#include <Schema_Temps.h>
 #include <TRUSTTrav.h>
 #include <Param.h>
 #include <Debog.h>
@@ -84,7 +83,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
   const Nom& type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente K_Eps", tab_K_Eps);
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
 
   int n = tab_K_Eps.dimension(0);
 
@@ -112,7 +111,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
   else
     fill_turbulent_viscosity_tab(n, tab_K_Eps, visco_turb);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
@@ -141,15 +140,15 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
 void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
-  eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_K_Eps().domaine_Cl_dis()->mettre_a_jour(temps);
   if (!eqn_transp_K_Eps().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
   eqn_transp_K_Eps().mettre_a_jour(temps);
 
   statistiques().begin_count(nut_counter_);
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente_->valeurs());
   calculate_limit_viscosity<MODELE_TYPE::K_EPS_REALISABLE>(K_Eps(), LeCmu_);
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_->valeurs());
   statistiques().end_count(nut_counter_);
 }
 

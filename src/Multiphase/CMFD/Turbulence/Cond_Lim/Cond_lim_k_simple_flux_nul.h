@@ -26,17 +26,12 @@
 #include <Echange_global_impose_turbulent.h>
 #include <TRUST_Ref.h>
 
-class Correlation;
-
 /*! @brief Classe Cond_lim_k_simple_flux_nul:
  *
  */
 class Cond_lim_k_simple_flux_nul  : public Echange_global_impose_turbulent
-
 {
-
   Declare_instanciable(Cond_lim_k_simple_flux_nul);
-
 public :
   void completer() override;
   int initialiser(double temps) override;
@@ -45,8 +40,6 @@ protected :
   void me_calculer() override ;
 
   double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero
-
 };
-
 
 #endif

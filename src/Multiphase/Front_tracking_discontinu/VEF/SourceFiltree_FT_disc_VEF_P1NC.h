@@ -26,6 +26,7 @@
 #include <Source_base.h>
 #include <SourceFiltree_FT_disc_base.h>
 #include <TRUST_Ref.h>
+#include <Champ_Inc.h>
 
 class Domaine_Cl_VEF;
 class Domaine_VEF;

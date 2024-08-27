@@ -130,8 +130,8 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           if(uncertain_var=="CP")
             {
               double lambda_div_Cp=-1.;
-              const double Cp = eq.fluide().capacite_calorifique().valeurs()(0, 0);
-              const double lambda = eq.fluide().conductivite().valeurs()(0, 0);
+              const double Cp = eq.fluide().capacite_calorifique()->valeurs()(0, 0);
+              const double lambda = eq.fluide().conductivite()->valeurs()(0, 0);
               lambda_div_Cp*=(lambda/Cp);
               add_diffusion_scalar_term(temperature_state, resu,lambda_div_Cp);
             }
@@ -309,7 +309,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   // En bref pour un polyedre le traitement de la convection depend
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
-  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -329,7 +329,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           nb_faces_perio+=le_bord.nb_faces();
         }
     }
@@ -346,7 +346,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
@@ -386,7 +386,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
       for (n_bord=0; n_bord<nb_bord; n_bord++)
         {
           const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           if (sub_type(Periodique,la_cl.valeur()))
@@ -741,7 +741,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
           const Neumann_sortie_libre& la_sortie_libre = ref_cast(Neumann_sortie_libre, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
@@ -780,7 +780,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
       else if (sub_type(Periodique,la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           ArrOfInt fait(le_bord.nb_faces());
@@ -905,7 +905,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   // En bref pour un polyedre le traitement de la convection depend
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
-  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -924,7 +924,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           nb_faces_perio+=le_bord.nb_faces();
         }
     }
@@ -941,7 +941,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
@@ -1136,7 +1136,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
           const Neumann_sortie_libre& la_sortie_libre = ref_cast(Neumann_sortie_libre, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
@@ -1179,7 +1179,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
       else if (sub_type(Periodique,la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           ArrOfInt fait(le_bord.nb_faces());
@@ -1298,7 +1298,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   // En bref pour un polyedre le traitement de la convection depend
   // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
 
-  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -1317,7 +1317,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           nb_faces_perio+=le_bord.nb_faces();
         }
     }
@@ -1334,7 +1334,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
@@ -1530,7 +1530,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
           const Neumann_sortie_libre& la_sortie_libre = ref_cast(Neumann_sortie_libre, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
@@ -1569,7 +1569,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
       else if (sub_type(Periodique,la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           ArrOfInt fait(le_bord.nb_faces());
@@ -1805,7 +1805,7 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
   DoubleVect& fluent_ = tab_fluent;
 
 
-  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem().valeur();
+  const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem();
   int istetra=0;
   Nom nom_elem=type_elemvef.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
@@ -1944,7 +1944,7 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1b = le_bord.num_premiere_face();
           int num2b = num1b + le_bord.nb_faces();
           for (num_face=num1b; num_face<num2b; num_face++)
@@ -1985,7 +1985,7 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
         ;
       else
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -2058,7 +2058,7 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
   for (n_bord0=0; n_bord0<nb_bords; n_bord0++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord0);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       // const IntTab& elemfaces = domaine_VEF.elem_faces();
       int num1 = 0;
       int num2 = le_bord.nb_faces_tot();
@@ -2176,7 +2176,7 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Symetrie,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)
@@ -2232,7 +2232,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       //const IntTab& elemfaces = domaine_VEF.elem_faces();
       int num1=0;
       int num2=le_bord.nb_faces_tot();
@@ -2352,7 +2352,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
       if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
           const Neumann_paroi& la_cl_paroi = ref_cast(Neumann_paroi, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)
@@ -2365,7 +2365,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
       else if (sub_type(Echange_externe_impose,la_cl.valeur()))
         {
           const Echange_externe_impose& la_cl_paroi = ref_cast(Echange_externe_impose, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)
@@ -2379,7 +2379,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
                || sub_type(Symetrie,la_cl.valeur())
                || sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)

@@ -27,8 +27,6 @@
 #include <TRUSTTab.h>
 #include <TRUST_Ref.h>
 
-class Correlation;
-
 /*! @brief Classe Source_BIF_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 un terme source qui ajoute la contribution du BIF au second membre de la QDM
  *
  *

@@ -24,9 +24,10 @@
 #define Flux_radiatif_VEF_included
 
 #include <Flux_radiatif_base.h>
+#include <Champ_Don.h>
+#include <Champ_front.h>
+
 class Domaine_VF;
-class Champ_Don;
-class Champ_front;
 
 /*! @brief Decrire ici la classe Flux_radiatif_VEF
  *

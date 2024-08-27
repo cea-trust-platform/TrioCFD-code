@@ -185,7 +185,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::calculer_Prod_ut
       if (sub_type(Entree_fluide_temperature_imposee,la_cl.valeur()) )
         {
           const Entree_fluide_temperature_imposee& la_cl_diri=ref_cast(Entree_fluide_temperature_imposee,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (face=ndeb; face<nfin; face++)
@@ -345,7 +345,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::calculer_u_teta_
       if (sub_type(Entree_fluide_temperature_imposee,la_cl.valeur()) )
         {
           const Entree_fluide_temperature_imposee& la_cl_diri=ref_cast(Entree_fluide_temperature_imposee,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (face=ndeb; face<nfin; face++)
@@ -373,7 +373,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::calculer_u_teta_
 
   const DoubleTab& g = gravite_->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleTab& tab_beta = ch_beta.valeurs();
+  const DoubleTab& tab_beta = ch_beta->valeurs();
 
   //on calcule gteta2 pour corriger u_teta confermement au modele de Wrobel
   if (sub_type(Champ_Uniforme,ch_beta.valeur()))
@@ -387,7 +387,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::calculer_u_teta_
   for (n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl_VDF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
       for (num_face=ndeb; num_face<nfin; num_face++)
@@ -580,16 +580,16 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::ajouter(DoubleTa
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& modele_bas_Re = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,le_modele);
   const Transport_K_Eps_base& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.eqn_transp_K_Eps();
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
-  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue().valeurs();
-  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleTab& visco_turb = le_modele.viscosite_turbulente().valeurs();
-  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue().valeurs();
+  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue()->valeurs();
+  const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& visco_turb = le_modele.viscosite_turbulente()->valeurs();
+  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue()->valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
   const Modele_turbulence_scal_base& le_modele_scalaire =
     ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
+  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs();
   const DoubleTab& g = gravite_->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
   int nb_elem = domaine_VDF.nb_elem();
@@ -604,7 +604,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::ajouter(DoubleTa
 
   // calculer_u_teta_W(domaine_VDF,domaine_Cl_VDF,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,utet);
 
-  const DoubleTab& tab_beta = ch_beta.valeurs();
+  const DoubleTab& tab_beta = ch_beta->valeurs();
 
 
   calculer_Prod_uteta_T(domaine_VDF,domaine_Cl_VDF,scalaire,utet,uteta_T);

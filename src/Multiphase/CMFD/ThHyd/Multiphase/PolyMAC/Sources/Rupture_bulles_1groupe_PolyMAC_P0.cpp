@@ -53,7 +53,7 @@ Entree& Rupture_bulles_1groupe_PolyMAC_P0::readOn(Entree& is)
   if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
 
   if (pbm->has_correlation("Rupture_bulles_1groupe")) correlation_ = pbm->get_correlation("Rupture_bulles_1groupe"); //correlation fournie par le bloc correlation
-  else correlation_.typer_lire(*pbm, "Rupture_bulles_1groupe", is); //sinon -> on la lit
+  else Correlation_base::typer_lire_correlation(correlation_, *pbm, "Rupture_bulles_1groupe", is); //sinon -> on la lit
 
   return is;
 }
@@ -61,7 +61,7 @@ Entree& Rupture_bulles_1groupe_PolyMAC_P0::readOn(Entree& is)
 void Rupture_bulles_1groupe_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
+  const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue()->valeurs().line_size();
 
   for (auto &&n_m : matrices)
     if (n_m.first == "alpha" || n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega" || n_m.first == "interfacial_area")
@@ -91,13 +91,13 @@ void Rupture_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, Doubl
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const DoubleTab& inco = equation().inconnue().valeurs(),
+  const DoubleTab& inco = equation().inconnue()->valeurs(),
                    &d_bulles_p = equation().probleme().get_champ("diametre_bulles").passe(),
-                    &alpha = pbm.equation_masse().inconnue().valeurs(),
-                     &alpha_p = pbm.equation_masse().inconnue().passe(),
-                      &press_p = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
-                       &temp_p  = pbm.equation_energie().inconnue().passe(),
-                        &rho_p   = equation().milieu().masse_volumique().passe(),
+                    &alpha = pbm.equation_masse().inconnue()->valeurs(),
+                     &alpha_p = pbm.equation_masse().inconnue()->passe(),
+                      &press_p = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression()->passe(),
+                       &temp_p  = pbm.equation_energie().inconnue()->passe(),
+                        &rho_p   = equation().milieu().masse_volumique()->passe(),
                          &nu_p = equation().probleme().get_champ("viscosite_cinematique").passe(),
                           *tab_k_p = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").passe() : nullptr,
                            *tab_k = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").valeurs() : nullptr,

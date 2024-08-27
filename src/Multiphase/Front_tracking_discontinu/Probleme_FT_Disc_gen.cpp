@@ -183,7 +183,7 @@ Entree& Probleme_FT_Disc_gen::lire_equations(Entree& is, Motcle& dernier_mot)
 
 void Probleme_FT_Disc_gen::add_FT_equation(const Nom& eq_name, const Nom& eq_type)
 {
-  equations_.add(Equation());
+  equations_.add(OWN_PTR(Equation_base)());
   equations_.dernier().typer(eq_type);
   Equation_base& eq = equations_.dernier().valeur();
   eq.associer_pb_base(*this);

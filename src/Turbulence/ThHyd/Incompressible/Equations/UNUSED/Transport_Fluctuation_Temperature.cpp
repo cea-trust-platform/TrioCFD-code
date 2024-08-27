@@ -100,7 +100,7 @@ void Transport_Fluctuation_Temperature::completer()
   // Source t;
   //   Source& so=les_sources.add(t);
   les_sources.completer();
-  inconnue().associer_eqn(*this);
+  inconnue()->associer_eqn(*this);
   for(int i=0; i<nombre_d_operateurs(); i++)
     {
       operateur(i).completer();
@@ -235,7 +235,7 @@ void Transport_Fluctuation_Temperature::associer_modele_turbulence(const Modele_
 int Transport_Fluctuation_Temperature::controler_grandeur()
 {
   static const double LIM = 1.e-10;
-  DoubleTab& fluctuation = le_champ_Fluctu_Temperature.valeurs();
+  DoubleTab& fluctuation = le_champ_Fluctu_Temperature->valeurs();
   int size=fluctuation.dimension(0);
   for (int n=0; n<size; n++)
     {

@@ -27,15 +27,14 @@
 #include <Champs_compris.h>
 #include <Champs_compris_interface.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Champ_base;
 class Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re;
 class Transport_Fluctuation_Temperature_W_Bas_Re;
 
 
 class Motcle;
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Equation_base;
 class Probleme_base;
 class Modele_Fonc_Bas_Reynolds_Thermique_Base : public Champs_compris_interface, public Objet_U

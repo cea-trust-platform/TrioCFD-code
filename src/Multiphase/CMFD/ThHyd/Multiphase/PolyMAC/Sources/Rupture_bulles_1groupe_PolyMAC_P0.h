@@ -23,7 +23,7 @@
 #ifndef Rupture_bulles_1groupe_PolyMAC_P0_included
 #define Rupture_bulles_1groupe_PolyMAC_P0_included
 #include <Source_base.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 #include <math.h>
 
 /*! @brief classe Rupture_bulles_1groupe_PolyMAC_P0

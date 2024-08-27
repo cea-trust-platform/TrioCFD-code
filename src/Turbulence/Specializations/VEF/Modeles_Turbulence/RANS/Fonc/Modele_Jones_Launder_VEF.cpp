@@ -78,7 +78,7 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_D(DoubleTab& D,const Domaine_dis& do
                                               const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
@@ -171,7 +171,7 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_D(DoubleTab& D,const Domaine_dis& do
 DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
@@ -466,7 +466,7 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
 DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
@@ -547,7 +547,7 @@ void  Modele_Jones_Launder_VEF::mettre_a_jour(double temps)
 DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
@@ -649,7 +649,7 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis
                                                   const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);

@@ -25,9 +25,8 @@
 
 #include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
+#include <Correlation_base.h>
 #include <TRUST_Ref.h>
-
-class Correlation;
 
 /*! @brief classe Flux_parietal_adaptatif classe qui implemente une correlation de flux parietal monophasique
  *

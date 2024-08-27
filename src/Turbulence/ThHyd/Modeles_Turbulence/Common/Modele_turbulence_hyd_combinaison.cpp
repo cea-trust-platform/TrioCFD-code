@@ -98,9 +98,9 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
 {
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
   const DoubleTab& xp = domaine_VF.xp();
-  DoubleTab& viscosite_valeurs = la_viscosite_turbulente_.valeurs();
+  DoubleTab& viscosite_valeurs = la_viscosite_turbulente_->valeurs();
   const Probleme_base& mon_pb = equation().probleme();
-  double temps = equation().inconnue().temps();
+  double temps = equation().inconnue()->temps();
   int nb_ddl = domaine_VF.nb_elem();
   double x = 0;
   double y = 0;
@@ -226,7 +226,7 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
         }
       viscosite_valeurs(i) = fxyz_[0].eval();
     }
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
 
   return la_viscosite_turbulente_;
 }

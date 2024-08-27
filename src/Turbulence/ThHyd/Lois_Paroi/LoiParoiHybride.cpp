@@ -27,6 +27,8 @@
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Front_VF.h>
+#include <Cond_lim.h>
+#include <Domaine_Cl_dis_base.h>
 
 
 
@@ -53,7 +55,7 @@ Entree& LoiParoiHybride::lire(Entree& is, const Noms& noms_bord, const Modele_tu
       Cerr << "Avec LoiParoiHybride, vous devez rentrer obligatoirement une loi de paroi par defaut  !"<< finl;
       Process::exit();
     }
-  vect_lp[0].associer_modele(mod);
+  vect_lp[0]->associer_modele(mod);
   is >> vect_lp[0];
 
   is >> motlu;
@@ -67,7 +69,7 @@ Entree& LoiParoiHybride::lire(Entree& is, const Noms& noms_bord, const Modele_tu
     {
       int m;
 
-      vect_lp[i].associer_modele(mod);
+      vect_lp[i]->associer_modele(mod);
       if (lp_lue==0)
         is >> vect_lp[i];
       else // C est un peu tordu cette histoire de lecture des lois de paroi seulement si un "{" est lu
@@ -160,7 +162,7 @@ int LoiParoiHybride::calculer_hyd(DoubleTab& tab1, const Domaine_dis_base& zd, c
   for (int n_bord=0; n_bord<zd.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur() ))
@@ -208,7 +210,7 @@ int LoiParoiHybride::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2, const Domain
   for (int n_bord=0; n_bord<zd.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur() ))
@@ -257,7 +259,7 @@ int LoiParoiHybride::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps, Doma
   for (int n_bord=0; n_bord<zd.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur() ))

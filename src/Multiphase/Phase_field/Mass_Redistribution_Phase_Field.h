@@ -25,7 +25,6 @@
 
 #include <Domaine_VDF.h>
 #include <Domaine_Cl_VDF.h>
-#include <Equation.h>
 #include <Process.h>
 #include <vector>
 #include <MD_Vector_tools.h>

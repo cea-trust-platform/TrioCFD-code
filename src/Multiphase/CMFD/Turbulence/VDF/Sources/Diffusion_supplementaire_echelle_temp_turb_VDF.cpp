@@ -47,7 +47,7 @@ void Diffusion_supplementaire_echelle_temp_turb_VDF::ajouter_blocs(matrices_t ma
   const Champ_Inc_P0_base&                  tau = ref_cast(Champ_Inc_P0_base, equation().inconnue().valeur());
   const DoubleTab& tab_tau = semi_impl.count("tau") ? semi_impl.at("tau") : tau.passe(),
                    &nu_turb = ref_cast(Op_Dift_Multiphase_VDF_Elem, equation().operateur(0).l_op_base()).get_diffusivite_turbulente(),
-                    &nu_visc  = ref_cast(Convection_Diffusion_std, equation()).diffusivite_pour_transport().passe();
+                    &nu_visc  = ref_cast(Convection_Diffusion_std, equation()).diffusivite_pour_transport()->passe();
 
   const DoubleTab& xp = domaine.xp(), &xv = domaine.xv();
 
@@ -72,7 +72,7 @@ void Diffusion_supplementaire_echelle_temp_turb_VDF::ajouter_blocs(matrices_t ma
     for (int k=0; k<N; k++)
       {
         const Cond_lim& la_cl = zcl.les_conditions_limites(n_bord);
-        const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+        const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
         const int ndeb = le_bord.num_premiere_face(), nfin = ndeb + le_bord.nb_faces();
 
         if (sub_type(Dirichlet,la_cl.valeur())) // Cas CL Dirichlet

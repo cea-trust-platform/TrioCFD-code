@@ -24,7 +24,7 @@
 #define Flux_parietal_Kommajosyula_included
 #include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 #include <Param.h>
 
 /*! @brief classe Flux_parietal_Kommajosyula classe qui implemente une correlation de flux parietal monophasique

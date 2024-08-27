@@ -159,7 +159,7 @@ void Transport_Flux_Chaleur_Turbulente::completer()
 {
   Cerr << "Method Transport_Flux_Chaleur_Turbulente::completer() " << finl;
   les_sources.completer();
-  inconnue().associer_eqn(*this);
+  inconnue()->associer_eqn(*this);
   for(int i=0; i<nombre_d_operateurs(); i++)
     {
       operateur(i).completer();
@@ -228,7 +228,7 @@ const Motcle& Transport_Flux_Chaleur_Turbulente::domaine_application() const
 int Transport_Flux_Chaleur_Turbulente::controler_grandeur()
 {
   static const double LIM = 1.e+2;
-  DoubleTab& chaleur = le_Flux_Chaleur_Turbulente.valeurs();
+  DoubleTab& chaleur = le_Flux_Chaleur_Turbulente->valeurs();
   int size= chaleur.dimension(0);
   for (int n=0; n<size; n++)
     {

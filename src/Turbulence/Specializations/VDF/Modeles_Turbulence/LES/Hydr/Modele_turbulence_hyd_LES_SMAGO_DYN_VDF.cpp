@@ -175,19 +175,19 @@ void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::mettre_a_jour(double temps)
   Debog::verifier("model_coeff", coeff_field_->valeurs());
   calculer_viscosite_turbulente(S_grid_scale_norme, l);
   calculer_energie_cinetique_turb(S_grid_scale_norme, l);
-  loipar_->calculer_hyd(la_viscosite_turbulente_, energie_cinetique_turbulente());
+  loipar_->calculer_hyd(la_viscosite_turbulente_->valeurs(), energie_cinetique_turbulente()->valeurs());
   limiter_viscosite_turbulente();
   controler_grandeurs_turbulentes();
-  coeff_field_.changer_temps(temps);
-  la_viscosite_turbulente_.valeurs().echange_espace_virtuel();
-  Debog::verifier("la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
+  coeff_field_->changer_temps(temps);
+  la_viscosite_turbulente_->valeurs().echange_espace_virtuel();
+  Debog::verifier("la_viscosite_turbulente", la_viscosite_turbulente_->valeurs());
 
   statistiques().end_count(nut_counter_);
 }
 
 void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_cell_cent_vel(DoubleTab& cell_cent_vel, const Domaine_VDF& domaine_VDF, Champ_Inc& inco)
 {
-  const DoubleTab& vitesse = inco.valeurs();
+  const DoubleTab& vitesse = inco->valeurs();
   int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   int element_number;
@@ -587,8 +587,8 @@ Champ_Fonc& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_viscosite_turbulen
 {
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   DoubleVect& model_coeff = coeff_field_->valeurs();
-  double temps = mon_equation_->inconnue().temps();
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  double temps = mon_equation_->inconnue()->temps();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   int nb_elem = domaine_VDF.domaine().nb_elem();
 
   if (visco_turb.size() != domaine_VDF.domaine().nb_elem())
@@ -604,7 +604,7 @@ Champ_Fonc& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_viscosite_turbulen
 
   Debog::verifier("Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_viscosite_turbulente visco_turb 1", visco_turb);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
@@ -617,8 +617,8 @@ Champ_Fonc& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_energie_cinetique_
 {
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   DoubleVect& model_coeff = coeff_field_->valeurs();
-  double temps = mon_equation_->inconnue().temps();
-  DoubleVect& k = energie_cinetique_turb_.valeurs();
+  double temps = mon_equation_->inconnue()->temps();
+  DoubleVect& k = energie_cinetique_turb_->valeurs();
   int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   static double co_mu = 1. / (0.094 * 0.094);
 
@@ -627,7 +627,7 @@ Champ_Fonc& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_energie_cinetique_
       k[elem] = co_mu * model_coeff[elem] * model_coeff[elem] * l[elem] * l[elem] * SMA_barre[elem];
     }
 
-  energie_cinetique_turb_.changer_temps(temps);
+  energie_cinetique_turb_->changer_temps(temps);
   return energie_cinetique_turb_;
 }
 
@@ -641,8 +641,8 @@ void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::controler_grandeurs_turbulentes()
   static const double Cmu = CMU;
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
-  DoubleVect& energie_turb = energie_cinetique_turb_.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
+  DoubleVect& energie_turb = energie_cinetique_turb_->valeurs();
   double k, eps;
 
   for (int elem = 0; elem < nb_elem_tot; elem++)
@@ -673,7 +673,7 @@ void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_S_norme(const DoubleTab& 
 void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_Sij(DoubleTab& Sij, const Domaine_VDF& domaine_VDF, const Domaine_Cl_VDF& domaine_Cl_VDF, Champ_Inc& inco)
 {
   Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, inco.valeur());
-  const DoubleTab& vitesse = inco.valeurs();
+  const DoubleTab& vitesse = inco->valeurs();
   const int nb_elem_tot = domaine_VDF.nb_elem_tot();
   const int nb_elem = domaine_VDF.nb_elem();
   assert(vitesse.line_size() == 1);

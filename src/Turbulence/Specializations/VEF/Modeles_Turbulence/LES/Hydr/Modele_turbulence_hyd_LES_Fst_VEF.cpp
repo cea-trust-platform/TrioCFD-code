@@ -43,8 +43,8 @@ Champ_Fonc& Modele_turbulence_hyd_LES_Fst_VEF::calculer_viscosite_turbulente()
 {
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
-  double temps = mon_equation_->inconnue().temps();
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  double temps = mon_equation_->inconnue()->temps();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   const int nb_elem = domaine_VEF.nb_elem();
 
   Racine_.resize(nb_elem_tot);
@@ -64,13 +64,13 @@ Champ_Fonc& Modele_turbulence_hyd_LES_Fst_VEF::calculer_viscosite_turbulente()
 
   Debog::verifier("Modele_turbulence_hyd_LES_Fst_VEF::calculer_viscosite_turbulente visco_turb 1", visco_turb);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
 void Modele_turbulence_hyd_LES_Fst_VEF::calculer_racine()
 {
-  const DoubleTab& la_vitesse = mon_equation_->inconnue().valeurs();
+  const DoubleTab& la_vitesse = mon_equation_->inconnue()->valeurs();
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, le_dom_Cl_.valeur());
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const int nb_elem = domaine_VEF.nb_elem();

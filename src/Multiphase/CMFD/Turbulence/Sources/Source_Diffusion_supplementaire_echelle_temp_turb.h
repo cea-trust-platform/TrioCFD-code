@@ -25,7 +25,6 @@
 
 #include <Sources_Multiphase_base.h>
 
-class Correlation;
 
 /*! @brief Classe Source_Diffusion_supplementaire_echelle_temp_turb Cette classe implemente la diffusion supplementaire venant de l'introduction du temps tau
  *

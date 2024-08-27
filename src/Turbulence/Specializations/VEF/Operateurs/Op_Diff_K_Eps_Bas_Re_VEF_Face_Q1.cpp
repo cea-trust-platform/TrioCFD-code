@@ -135,8 +135,8 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, 
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   //  int nb_elem = domaine_VEF.domaine().nb_elem();
   double valA,valA_bis, d_mu;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
-  double nu=(diffusivite_.valeur())(0,0);
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  double nu=diffusivite_->valeurs()(0,0);
 
   // A la paroi les conditions sont:
   // Pour k on a 0
@@ -156,7 +156,7 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
       if (sub_type(Periodique,la_cl.valeur()))
@@ -317,7 +317,7 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, 
       if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
           const Neumann_paroi& la_cl_paroi = ref_cast(Neumann_paroi, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)
@@ -358,8 +358,8 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::ajouter_contribution(const DoubleTab& tra
   int elem;
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double valA, valA_bis, d_mu,Prdt;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
-  double nu=(diffusivite_.valeur())(0,0);
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  double nu=diffusivite_->valeurs()(0,0);
   Cerr << "Dans Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution( nu = " << nu << finl;
 
   IntVect& tab1 = matrice.get_set_tab1();
@@ -372,7 +372,7 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::ajouter_contribution(const DoubleTab& tra
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
       if (sub_type(Periodique,la_cl.valeur()))
@@ -538,7 +538,7 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1::contribue_au_second_membre(DoubleTab& res
       if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
           const Neumann_paroi& la_cl_paroi = ref_cast(Neumann_paroi, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int face=ndeb; face<nfin; face++)

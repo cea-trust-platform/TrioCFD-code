@@ -225,7 +225,7 @@ int Transport_Fluctuation_Temperature_W::controler_grandeur()
 {
   //        Cerr << "Controler grandeur dans Transport_Fluctuation_Temperature_W" << finl;
   static const double LIM = 1.e-10;
-  DoubleTab& fluctuation = le_champ_Fluctu_Temperature.valeurs();
+  DoubleTab& fluctuation = le_champ_Fluctu_Temperature->valeurs();
   int size=fluctuation.dimension(0);
   for (int n=0; n<size; n++)
     {

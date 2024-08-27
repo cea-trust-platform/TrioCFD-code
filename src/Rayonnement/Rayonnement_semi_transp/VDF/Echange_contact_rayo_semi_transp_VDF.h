@@ -25,6 +25,7 @@
 
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Echange_contact_VDF.h>
+#include <Champ_front.h>
 
 /*! @brief classe Echange_contact_rayo_semi_transp_VDF Cette classe est utilisee pour realiser un couplage entre une
  *

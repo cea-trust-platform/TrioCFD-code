@@ -53,7 +53,7 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Domaine_Cl_VEF& domaine_Cl_VEF, 
   const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis().valeur();
   const Equation_base& eqn_trans = domaine_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
   const Transport_Interfaces_FT_Disc& eqn_interf = ref_cast(Transport_Interfaces_FT_Disc, eqn_trans);
-  const DoubleTab& indic = eqn_interf.inconnue().valeurs();
+  const DoubleTab& indic = eqn_interf.inconnue()->valeurs();
 
   if (sub_type(Champ_Uniforme,ch_visco_cin_ph1.valeur()) && sub_type(Champ_Uniforme, ch_visco_cin_ph0.valeur()))
     {
@@ -92,7 +92,7 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Domaine_Cl_VEF& domaine_Cl_VEF, 
 
       if (sub_type(Dirichlet_paroi_fixe, la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 

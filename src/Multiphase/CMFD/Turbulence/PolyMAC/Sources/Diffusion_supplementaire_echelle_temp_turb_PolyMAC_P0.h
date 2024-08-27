@@ -25,8 +25,6 @@
 
 #include <Source_Diffusion_supplementaire_echelle_temp_turb.h>
 
-class Correlation;
-
 /*! @brief Classe Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 la diffusion supplementaire venant de l'introduction du temps tau
  *
  *

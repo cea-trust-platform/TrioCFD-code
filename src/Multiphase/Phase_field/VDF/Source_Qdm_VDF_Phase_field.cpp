@@ -148,7 +148,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   const DoubleVect& volumes = domaine_VDF.volumes();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
   const int nb_comp = eq_c.constituant().nb_constituants();
 
   double cface;
@@ -158,7 +158,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   double vol0,vol1;
 
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
-  DoubleTab rhoPF=eq_ns.rho().valeurs();
+  DoubleTab rhoPF=eq_ns.rho()->valeurs();
   double rho_face;
 
   // Forme en c*Grad(mutilde)
@@ -193,7 +193,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   if (type_systeme_naire==0)
     {
       DoubleTab& grad_mutilde=ref_cast_non_const(DoubleTab, grad_mutilde_);
-      if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue().valeurs();
+      if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue()->valeurs();
       grad_mutilde=0.;
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
       opgrad.calculer(mutilde_NS,grad_mutilde);
@@ -225,7 +225,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
       ///// Kim2012 terme source somme c.Grad(mutilde)
 
       DoubleTab& grad_mutilde=ref_cast_non_const(DoubleTab,  grad_mutilde_);
-      if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue().valeurs();
+      if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue()->valeurs();
       grad_mutilde=0.;
       DoubleTab temp_mutilde_NS(mutilde_NS.dimension_tot(0),1);
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
@@ -274,7 +274,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
   const DoubleVect& volumes = domaine_VDF.volumes();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
 
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
 
@@ -297,12 +297,12 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
     {
       const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
       DoubleTab& grad_div_alpha_rho_gradC=ref_cast_non_const(DoubleTab,  grad_div_alpha_rho_gradC_);
-      if (grad_div_alpha_rho_gradC.size()==0) grad_div_alpha_rho_gradC=eq_ns.inconnue().valeurs();
+      if (grad_div_alpha_rho_gradC.size()==0) grad_div_alpha_rho_gradC=eq_ns.inconnue()->valeurs();
       grad_div_alpha_rho_gradC=0.;
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
       opgrad.calculer(div_alpha_rho_gradC, grad_div_alpha_rho_gradC);
 
-      DoubleTab rhoPF=eq_ns.rho().valeurs();
+      DoubleTab rhoPF=eq_ns.rho()->valeurs();
       double rho_face;
 
       // Division par rho0 necessaire dans le cas incompressible
@@ -357,7 +357,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
   const DoubleVect& volumes = domaine_VDF.volumes();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
 
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
 
@@ -380,12 +380,12 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
     {
       const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
       DoubleTab& grad_div_alpha_rho_gradC=ref_cast_non_const(DoubleTab,  grad_div_alpha_rho_gradC_);
-      if (grad_div_alpha_rho_gradC.size()==0) grad_div_alpha_rho_gradC=eq_ns.inconnue().valeurs();
+      if (grad_div_alpha_rho_gradC.size()==0) grad_div_alpha_rho_gradC=eq_ns.inconnue()->valeurs();
       grad_div_alpha_rho_gradC=0.;
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
       opgrad.calculer(div_alpha_rho_gradC, grad_div_alpha_rho_gradC);
 
-      DoubleTab rhoPF=eq_ns.rho().valeurs();
+      DoubleTab rhoPF=eq_ns.rho()->valeurs();
       double rho_face;
 
       // Division par rho0 necessaire dans le cas incompressible
@@ -413,7 +413,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
 
       const DoubleTab& alpha_gradC_carre=eq_c.get_alpha_gradC_carre();
       DoubleTab& grad_alpha_gradC_carre=ref_cast_non_const(DoubleTab,  grad_alpha_gradC_carre_);
-      if (grad_alpha_gradC_carre.size()==0) grad_alpha_gradC_carre=eq_ns.inconnue().valeurs();
+      if (grad_alpha_gradC_carre.size()==0) grad_alpha_gradC_carre=eq_ns.inconnue()->valeurs();
       grad_alpha_gradC_carre=0.;
       opgrad.calculer(alpha_gradC_carre,grad_alpha_gradC_carre);
 
@@ -469,7 +469,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
   const DoubleVect& volumes = domaine_VDF.volumes();
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
+  const DoubleTab& c=eq_c.inconnue()->valeurs();
 
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
 
@@ -490,14 +490,14 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
   if (type_systeme_naire==0)
     {
       DoubleTab& gradC=ref_cast_non_const(DoubleTab,  gradC_);
-      if (gradC.size()==0) gradC=eq_ns.inconnue().valeurs();
+      if (gradC.size()==0) gradC=eq_ns.inconnue()->valeurs();
       gradC=0.;
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
       opgrad.calculer(c,gradC);
       const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
       double div_alpha_rho_gradCface;
 
-      DoubleTab rhoPF=eq_ns.rho().valeurs();
+      DoubleTab rhoPF=eq_ns.rho()->valeurs();
       double rho_face;
 
       if((compressible==0 && boussi_==1) || boussi_==0)
@@ -570,7 +570,7 @@ void Source_Qdm_VDF_Phase_field::mettre_a_jour(double temps)
 {
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
 
-  const DoubleTab& inco=eq_ns.inconnue().valeurs();
+  const DoubleTab& inco=eq_ns.inconnue()->valeurs();
   // GF a revoir car ne sert a rien en ce moment
   if (0)
     {

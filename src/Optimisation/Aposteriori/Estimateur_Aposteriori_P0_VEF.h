@@ -18,9 +18,9 @@
 
 #include <Champ_Fonc_P0_VEF.h>
 #include <TRUST_Ref.h>
+#include <Champ_Don.h>
 
 class Champ_P1NC;
-class Champ_Don;
 class Champ_P1_isoP1Bulle;
 class Domaine_Cl_VEF;
 

@@ -29,11 +29,11 @@
 #include <Paroi_loi_WW_scal_VDF.h>
 #include <Probleme_Couple.h>
 #include <TRUST_Ref.h>
+#include <Champ_Fonc.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
 
-class Champ_Fonc;
 class Champ_Fonc_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 
 /*! @brief class Paroi_DWF_hyd_VDF cette classe derive de turbulence_paroi_base
  *

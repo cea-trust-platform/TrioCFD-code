@@ -26,11 +26,11 @@
 #include <Modele_turbulence_hyd_RANS_K_Omega_base.h>
 #include <Transport_2eq_base.h>
 #include <TRUST_Ref.h>
+#include <Champ_Inc.h>
 
 class Modele_turbulence_hyd_RANS_K_Omega_base;
 class Champ_Inc_base;
 class Milieu_base;
-class Champ_Inc;
 
 /*! @brief Classe Transport_K_Omega_base Classe de base pour les equations
  *

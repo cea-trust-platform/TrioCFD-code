@@ -29,11 +29,11 @@
 #include <TRUSTTabs_forward.h>
 #include <Milieu_base.h>
 #include <TRUST_Ref.h>
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 
 class Convection_Diffusion_std;
 class Champ_Fonc_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 
 /*! @brief CLASS: Paroi_ODVM_scal_VDF
  *

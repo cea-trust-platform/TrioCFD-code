@@ -105,7 +105,7 @@ DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& res
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,
                                                   eq_hydraulique->domaine_Cl_dis().valeur());
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
-  const DoubleTab& velocity = eq_hydraulique->inconnue().valeurs();
+  const DoubleTab& velocity = eq_hydraulique->inconnue()->valeurs();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   // const DoubleTab& tab = get_cisaillement_paroi(); // voir les classes filles
   const int nb_faces_tot = le_dom_VEF->nb_faces_tot();

@@ -26,12 +26,12 @@
 
 #include <Op_Diff_K_Eps_VEF_base.h>
 #include <TRUST_Ref.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
+#include <Champ_Inc.h>
 
 class Champ_Q1NC;
 
-class Domaine_dis;
-class Domaine_Cl_dis;
-class Champ_Inc;
 
 
 //////////////////////////////////////////////////////////////////////////////

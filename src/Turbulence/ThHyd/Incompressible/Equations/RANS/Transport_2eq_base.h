@@ -30,7 +30,6 @@
 class Modele_turbulence_hyd_2_eq_base;
 class Champ_Inc_base;
 class Milieu_base;
-class Champ_Inc;
 
 /*! @brief Classe Transport_2eq_base Classe de base pour les equations
  *

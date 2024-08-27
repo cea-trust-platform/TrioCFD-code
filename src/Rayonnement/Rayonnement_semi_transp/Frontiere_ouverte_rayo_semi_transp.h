@@ -25,7 +25,7 @@
 #define Frontiere_ouverte_rayo_semi_transp_included
 
 #include <Cond_Lim_rayo_semi_transp.h>
-class Champ_front;
+#include <Champ_front.h>
 
 /*! @brief classe Frontiere_ouverte_rayo_semi_transp
  *

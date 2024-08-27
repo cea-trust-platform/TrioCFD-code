@@ -596,7 +596,7 @@ void Maillage_FT_Disc::associer_domaine_dis_parcours(const Domaine_dis& domaine_
 
   // On recupere la liste des PE voisins
   ArrOfIntFT pe_list;
-  for (const auto& itr : domaine_dis.domaine().faces_joint())
+  for (const auto& itr : domaine_dis->domaine().faces_joint())
     {
       const Joint& joint = itr;
       const int pe_voisin = joint.PEvoisin();
@@ -879,7 +879,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
   statistiques().begin_count(stat_counter);
 
   const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine& ladomaine = domaine_dis.domaine();
+  const Domaine& ladomaine = domaine_dis->domaine();
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
   const int nb_elem = ladomaine.nb_elem();
   const int nb_elem_tot = ladomaine.nb_elem_tot();
@@ -1967,7 +1967,7 @@ int Maillage_FT_Disc::calculer_voisinage_facettes(IntTab& fa7Voisines,
   ArrOfIntFT fa7s_elem;
   int i, nb_fa7, ifa70,ifa71,fa70,fa71, iarete0,iarete1;
   const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine& ladomaine = domaine_dis.domaine();
+  const Domaine& ladomaine = domaine_dis->domaine();
   const int nb_elem = ladomaine.nb_elem(); // Nombre d'elements reels
   for (i=0 ; i<nb_elem ; i++)
     {
@@ -2510,7 +2510,7 @@ void Maillage_FT_Disc::echanger_sommets_PE(const ArrOfInt& liste_sommets,
   // Creation des noeuds virtuels sur le processeur d'arrivee s'ils n'existent
   // pas encore.
   const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine& ladomaine = domaine_dis.domaine();
+  const Domaine& ladomaine = domaine_dis->domaine();
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
   const IntTab& elem_virt_pe_num = ladomaine.elem_virt_pe_num();
   const IntTab& face_virt_pe_num = domaine_vf.face_virt_pe_num();
@@ -3113,7 +3113,7 @@ void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
   static ArrOfIntFT liste_pe_dest;
 
   const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine& le_dom = domaine_dis.domaine();
+  const Domaine& le_dom = domaine_dis->domaine();
   const int nb_elem = le_dom.nb_elem(); // Nombre d'elements reels
   {
     liste_pe_dest.resize_array(nb_facettes_envoi);
@@ -4802,7 +4802,7 @@ void Maillage_FT_Disc::nettoyer_phase(const Nom& nom_eq, const int phase)
   sommets_utilises=0;
   const Equation_base& eq = equation_transport().probleme().get_equation_by_name(nom_eq);
   Transport_Interfaces_FT_Disc& eq_interf = ref_cast_non_const(Transport_Interfaces_FT_Disc,eq);
-  const DoubleTab& indic =  eq_interf.inconnue().valeurs();
+  const DoubleTab& indic =  eq_interf.inconnue()->valeurs();
   double phase_reelle = double(phase);
   int elem;
 

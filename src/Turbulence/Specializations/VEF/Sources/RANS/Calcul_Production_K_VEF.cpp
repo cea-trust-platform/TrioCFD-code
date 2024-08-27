@@ -110,7 +110,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_production_K(
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 
@@ -366,7 +366,7 @@ calculer_terme_production_K_BiK(const Domaine_VEF& domaine_VEF,const Domaine_Cl_
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 
@@ -591,7 +591,7 @@ calculer_terme_production_K_EASM(const Domaine_VEF& domaine_VEF,const Domaine_Cl
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zcl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 
@@ -759,12 +759,12 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
   int dimension=Objet_U::dimension;
   //DoubleVect coef(Objet_U::dimension);
 
-  const DoubleTab& tab_beta = ch_beta.valeurs();
+  const DoubleTab& tab_beta = ch_beta->valeurs();
   G = 0;
 
   if ( ! sub_type(Champ_Uniforme,ch_beta.valeur()) )
     {
-      nb_compo=ch_beta.nb_comp() ;
+      nb_compo=ch_beta->nb_comp() ;
     }
 
   if (nb_consti==0 || nb_consti==1)
@@ -783,7 +783,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
           for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb                = le_bord.num_premiere_face();
               int nfin                = ndeb + le_bord.nb_faces();
               if (sub_type(Periodique,la_cl.valeur()))
@@ -832,7 +832,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
           for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb                = le_bord.num_premiere_face();
               int nfin                = ndeb + le_bord.nb_faces();
               if (sub_type(Periodique,la_cl.valeur()))
@@ -881,7 +881,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
           for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb                = le_bord.num_premiere_face();
               int nfin                = ndeb + le_bord.nb_faces();
               if (sub_type(Periodique,la_cl.valeur()))
@@ -959,7 +959,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
           for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb                = le_bord.num_premiere_face();
               int nfin                = ndeb + le_bord.nb_faces();
               if (sub_type(Periodique,la_cl.valeur()))
@@ -1015,7 +1015,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
           for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb                = le_bord.num_premiere_face();
               int nfin                = ndeb + le_bord.nb_faces();
               if (sub_type(Periodique,la_cl.valeur()))
@@ -1071,7 +1071,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
           for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl   = zcl_VEF.les_conditions_limites(n_bord);
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb                = le_bord.num_premiere_face();
               int nfin                = ndeb + le_bord.nb_faces();
               if (sub_type(Periodique,la_cl.valeur()))
@@ -1168,7 +1168,7 @@ DoubleTab& Calcul_Production_K_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face,
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 

@@ -146,7 +146,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   const IntTab& face_voisins = domaine_VDF.face_voisins();
 
   const Equation_base& eqn_temp = mon_modele_turb_scal->equation();
-  const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
+  const DoubleTab& Temp = eqn_temp.inconnue()->valeurs();
   const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis().valeur());
 
   const double t0 = eqn_temp.schema_temps().temps_courant();
@@ -156,9 +156,9 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   const Champ_Don& ch_lambda = le_milieu_fluide.conductivite();
   const Champ_Don& ch_Cp = le_milieu_fluide.capacite_calorifique();
   const Champ& ch_rho = le_milieu_fluide.masse_volumique();
-  const DoubleTab& lambda_f = ch_lambda.valeurs();
-  const DoubleTab& Cp_f     = ch_Cp.valeurs();
-  const DoubleTab& rho_f    = ch_rho.valeurs();
+  const DoubleTab& lambda_f = ch_lambda->valeurs();
+  const DoubleTab& Cp_f     = ch_Cp->valeurs();
+  const DoubleTab& rho_f    = ch_rho->valeurs();
 
   int lambda_unif = 0;
   int Cp_unif = 0;
@@ -214,7 +214,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -252,9 +252,9 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
               const Echange_contact_VDF& la_cl_couplee = ref_cast(Echange_contact_VDF,la_cl_th.valeur());
               const Champ_front_calc& ch_solide = ref_cast(Champ_front_calc, la_cl_couplee.T_autre_pb().valeur());
               const Milieu_base& le_milieu_solide=ch_solide.milieu();
-              const DoubleTab& lambda_s = le_milieu_solide.conductivite().valeurs();
-              const DoubleTab& Cp_s     = le_milieu_solide.capacite_calorifique().valeurs();
-              const DoubleTab& rho_s    = le_milieu_solide.masse_volumique().valeurs();
+              const DoubleTab& lambda_s = le_milieu_solide.conductivite()->valeurs();
+              const DoubleTab& Cp_s     = le_milieu_solide.capacite_calorifique()->valeurs();
+              const DoubleTab& rho_s    = le_milieu_solide.masse_volumique()->valeurs();
 
               double K;
               for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -326,8 +326,8 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Fluide_base& le_fluide   = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin            = le_fluide.viscosite_cinematique();
   const Milieu_base& le_milieu_fluide      = eqn_hydr.milieu();
-  const DoubleTab& lambda_f                = le_milieu_fluide.conductivite().valeurs();
-  const double rhoCp = le_milieu_fluide.capacite_calorifique().valeurs()(0, 0) * le_milieu_fluide.masse_volumique().valeurs()(0, 0);
+  const DoubleTab& lambda_f                = le_milieu_fluide.conductivite()->valeurs();
+  const double rhoCp = le_milieu_fluide.capacite_calorifique()->valeurs()(0, 0) * le_milieu_fluide.masse_volumique()->valeurs()(0, 0);
 
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems,1);
@@ -401,7 +401,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   if (sub_type(Convection_Diffusion_Concentration,eqn_temp)) schmidt = 1;
   const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn_temp).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
-  const DoubleVect& Temp = eqn_temp.inconnue().valeurs();
+  const DoubleVect& Temp = eqn_temp.inconnue()->valeurs();
   const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis().valeur());
 
 
@@ -417,7 +417,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
           const Cond_lim& la_cl_th = domaine_Cl_VDF_th.les_conditions_limites(n_bord);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
@@ -437,11 +437,11 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                   if ((elem = face_voisins(num_face,0)) == -1) elem = face_voisins(num_face,1);
                   if (l_unif) visco_cin = visco;
                   else visco_cin = tab_visco[elem];
-                  if (sub_type(Champ_Uniforme,alpha.valeur())) diff = alpha(0,0);
+                  if (sub_type(Champ_Uniforme,alpha.valeur())) diff = alpha->valeurs()(0,0);
                   else
                     {
-                      if (alpha.nb_comp()==1) diff = alpha(elem);
-                      else diff = alpha(elem,0);
+                      if (alpha->nb_comp()==1) diff = alpha->valeurs()(elem);
+                      else diff = alpha->valeurs()(elem,0);
                     }
                   T0 = la_cl_ech.T_ext(num_face-ndeb);
                   if(compt) eq_odvm[num_face].set_U_tau(tab_ustar(num_face),1);
@@ -524,11 +524,11 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                   if ((elem = face_voisins(num_face,0)) == -1) elem = face_voisins(num_face,1);
                   if (l_unif) visco_cin = visco;
                   else visco_cin = tab_visco[elem];
-                  if (sub_type(Champ_Uniforme,alpha.valeur())) diff = alpha(0,0);
+                  if (sub_type(Champ_Uniforme,alpha.valeur())) diff = alpha->valeurs()(0,0);
                   else
                     {
-                      if (alpha.nb_comp()==1) diff = alpha(elem);
-                      else diff = alpha(elem,0);
+                      if (alpha->nb_comp()==1) diff = alpha->valeurs()(elem);
+                      else diff = alpha->valeurs()(elem,0);
                     }
 
                   const double Temp_solid = t_autre(num_face-ndeb,0);

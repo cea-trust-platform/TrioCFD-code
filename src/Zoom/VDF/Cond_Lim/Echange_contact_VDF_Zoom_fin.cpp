@@ -255,7 +255,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
 
               //ON DOIT RECUPERER LE lambda DU MILIEU GROSSIER !!
-              const DoubleTab& lambda = le_milieu.conductivite().valeurs();
+              const DoubleTab& lambda = le_milieu.conductivite()->valeurs();
 
 
               assert(h_paroi!=0.);
@@ -303,8 +303,8 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
                   //    Cerr << "Dans Contact Zoom fin h = " << 1./(e(num_faceG)/le_milieu.conductivite()(0,0)+1./h_paroi) << finl;
                   for(i=0; i<nb_comp; i++)
                     {
-                      assert(le_milieu.conductivite()(0,i)!=0.);
-                      tab(face-ndeb,i) = 1./(e(num_faceG-ndebG)/le_milieu.conductivite()(0,i)+1./h_paroi);
+                      assert(le_milieu.conductivite()->valeurs()(0,i)!=0.);
+                      tab(face-ndeb,i) = 1./(e(num_faceG-ndebG)/le_milieu.conductivite()->valeurs()(0,i)+1./h_paroi);
                     }
                 }
             }

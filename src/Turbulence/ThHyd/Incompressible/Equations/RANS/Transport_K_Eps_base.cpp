@@ -129,12 +129,12 @@ void Transport_K_Eps_base::get_position_cells(Nom& position, int& n)
  */
 int Transport_K_Eps_base::controler_K_Eps()
 {
-  DoubleTab& K_Eps = le_champ_K_Eps.valeurs();
+  DoubleTab& K_Eps = le_champ_K_Eps->valeurs();
   int size = K_Eps.dimension(0);
   if (size < 0)
     {
       if (sub_type(Champ_Inc_P0_base, le_champ_K_Eps.valeur()))
-        size = le_champ_K_Eps->equation().domaine_dis().domaine().nb_elem();
+        size = le_champ_K_Eps->equation().domaine_dis()->domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_Eps field in Transport_K_Eps_base::controler_K_Eps()" << finl;
@@ -332,7 +332,7 @@ int Transport_K_Eps_base::controler_K_Eps()
         {
           if (Process::je_suis_maitre())
             {
-              const double time = le_champ_K_Eps.temps();
+              const double time = le_champ_K_Eps->temps();
               Cerr << "Values forced for k and eps because:" << finl;
               if (neg[0])
                 Cerr << "Negative values found for k on " << neg[0] << "/" << size_tot << " nodes at time " << time << finl;
@@ -369,7 +369,7 @@ int Transport_K_Eps_base::controler_K_Eps()
         {
           if (Process::je_suis_maitre())
             {
-              const double time = le_champ_K_Eps.temps();
+              const double time = le_champ_K_Eps->temps();
               Cerr << "Values forced for eps because:" << finl;
               Cerr << "Maximum values found for eps on " << neg[2] << "/" << size_tot << " nodes at time " << time << finl;
             }

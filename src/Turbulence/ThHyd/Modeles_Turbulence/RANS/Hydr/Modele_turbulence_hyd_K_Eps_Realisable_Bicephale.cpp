@@ -28,7 +28,6 @@
 #include <Champ_Uniforme.h>
 #include <stat_counters.h>
 #include <Probleme_base.h>
-#include <Schema_Temps.h>
 #include <TRUSTTrav.h>
 #include <Param.h>
 #include <Debog.h>
@@ -81,7 +80,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
   const DoubleTab& tab_Eps = chEps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente K", tab_K);
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente Epsilon", tab_Eps);
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   int n = tab_K.dimension(0);
 
   // dans le cas d'un domaine nul on doit effectuer le dimensionnement
@@ -108,7 +107,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
   else
     fill_turbulent_viscosity_tab(n, tab_K, tab_Eps, visco_turb);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
@@ -139,7 +138,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::preparer_calcul()
 void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K().schema_temps();
-  eqn_transp_K().domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_K().domaine_Cl_dis()->mettre_a_jour(temps);
   if (!eqn_transp_K().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K());
   eqn_transp_K().mettre_a_jour(temps);
@@ -148,9 +147,9 @@ void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour(double temp
   eqn_transp_Eps().mettre_a_jour(temps);
 
   statistiques().begin_count(nut_counter_);
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente_->valeurs());
   calculate_limit_viscosity<MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE>(K(), Eps(), -123. /* unused */);
-  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente", la_viscosite_turbulente_->valeurs());
   statistiques().end_count(nut_counter_);
 }
 

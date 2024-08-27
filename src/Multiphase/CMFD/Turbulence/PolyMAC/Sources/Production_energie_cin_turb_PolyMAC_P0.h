@@ -25,7 +25,6 @@
 
 #include <Source_Production_energie_cin_turb.h>
 
-class Correlation;
 
 /*! @brief Classe Production_energie_cin_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 un operateur de production d'énergie cinetique turbulente k
  *

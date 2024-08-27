@@ -25,15 +25,15 @@
 
 #include <Source_base.h>
 #include <Terme_Source_Qdm.h>
-#include <Equation.h>
+#include <Equation_base.h>
 #include <TBNN.h>
 #include <TRUST_Ref.h>
+#include <Domaine_Cl_dis.h>
 
 class Modele_turbulence_hyd_K_Eps;
 class Navier_Stokes_Turbulent;
 class Transport_K_Eps;
 class Domaine_Cl_VDF;
-class Domaine_Cl_dis;
 class Domaine_VDF;
 class Probleme_base;
 

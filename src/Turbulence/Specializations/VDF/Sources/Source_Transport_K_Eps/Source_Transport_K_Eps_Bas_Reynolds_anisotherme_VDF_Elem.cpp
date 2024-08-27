@@ -56,10 +56,10 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(mat
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl.valeur());
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
-  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs(), &scalaire = eq_thermique->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente().valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs(), &scalaire = eq_thermique->inconnue()->valeurs(), &vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(), &g = gravite->valeurs();
+  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs(), &g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
   const DoubleVect& volumes = domaine_VDF.volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
@@ -79,7 +79,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(mat
   else calculer_terme_production_K(domaine_VDF,domaine_Cl_VDF,P,K_eps_Bas_Re,vit,vitesse,visco_turb);
 
   // C'est l'objet de type domaine_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
-  const DoubleTab& tab_beta = ch_beta.valeurs();
+  const DoubleTab& tab_beta = ch_beta->valeurs();
   // Nous utilisons le modele de fluctuation thermique pour le calcul du terme de destruction G.
   if (sub_type(Champ_Uniforme,ch_beta.valeur())) calculer_terme_destruction_K(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
   else calculer_terme_destruction_K(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);
@@ -110,10 +110,10 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(
   const Domaine_dis& z = eq_hydraulique->domaine_dis();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,z.valeur());
   const Domaine_Cl_VDF& zcl_VDF = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis().valeur());
-  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs(), &K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs(), &K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_dyn = fluide.viscosite_dynamique();
-  const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente().valeurs();
+  const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente()->valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const int nb_elem_tot = domaine_VDF.nb_elem_tot(), nb_elem = domaine_VDF.nb_elem();
 

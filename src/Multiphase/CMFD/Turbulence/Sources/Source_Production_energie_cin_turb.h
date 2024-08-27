@@ -25,8 +25,6 @@
 
 #include <Sources_Multiphase_base.h>
 
-class Correlation;
-
 /*! @brief Classe Source_Production_energie_cin_turb Classe de base pour les operateur de production d'énergie cinetique turbulente k
  *
  *

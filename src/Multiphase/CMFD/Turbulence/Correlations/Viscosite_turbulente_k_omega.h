@@ -24,7 +24,7 @@
 #define Viscosite_turbulente_k_omega_included
 #include <TRUSTTab.h>
 #include <Viscosite_turbulente_base.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 
 /*! @brief classe Viscosite_turbulente_k_omega Viscosite turbulente pour un modele "k-omega" : nu_t = k / omega
  *

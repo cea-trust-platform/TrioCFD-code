@@ -28,10 +28,9 @@
 #include <Param.h>
 #include <Equation_base.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
 #define BR_EPS 1.e-20
 
-class Domaine_dis;
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 

@@ -26,7 +26,7 @@
 
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Dirichlet_entree_fluide_leaves.h>
-class Champ_front;
+#include <Champ_front.h>
 
 /*! @brief classe Frontiere_ouverte_temperature_imposee_rayo_semi_transp
  *

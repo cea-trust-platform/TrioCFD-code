@@ -112,7 +112,7 @@ DoubleTab& Op_Diff_K_Omega_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTa
 
   const int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   const int nb_front = domaine_VEF.nb_front_Cl();
-  const DoubleTab& mu_turb = diffusivite_turbulente_->valeurs();
+  const DoubleTab& mu_turb = diffusivite_turbulente_->valeur().valeurs();
   // double inverse_Prdt_K = 1.0/Prdt_K;
   //double inverse_Prdt_Omega = 1.0/Prdt_Omega;
 
@@ -120,7 +120,7 @@ DoubleTab& Op_Diff_K_Omega_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTa
   for (int n_bord = 0; n_bord < nb_front; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());;
+      const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());;
       int num1 = 0;
       int num2 = le_bord.nb_faces_tot();
 
@@ -246,7 +246,7 @@ DoubleTab& Op_Diff_K_Omega_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTa
       if (sub_type(Neumann_paroi, la_cl.valeur()))
         {
           const Neumann_paroi& la_cl_paroi = ref_cast(Neumann_paroi, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
 
@@ -293,7 +293,7 @@ void Op_Diff_K_Omega_VEF_Face::ajouter_contribution(const DoubleTab& transporte,
   ArrOfDouble inv_Prdt(2),diffu_tot(2);
   inv_Prdt[0]=1./Prdt_K;
   inv_Prdt[1]=1./Prdt_Omega;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
 
   const int is_mu_unif=sub_type(Champ_Uniforme,diffusivite_.valeur());
   const DoubleTab& mu=diffusivite_->valeurs();
@@ -306,7 +306,7 @@ void Op_Diff_K_Omega_VEF_Face::ajouter_contribution(const DoubleTab& transporte,
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int num1 = 0;
       int num2 = le_bord.nb_faces_tot();
       int nb_faces_bord_reel = le_bord.nb_faces();
@@ -468,7 +468,7 @@ void Op_Diff_K_Omega_VEF_Face::contribue_au_second_membre(DoubleTab& resu) const
       if (sub_type(Neumann_paroi, la_cl.valeur()))
         {
           const Neumann_paroi& la_cl_paroi = ref_cast(Neumann_paroi, la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (int face = ndeb; face < nfin; face++)
@@ -487,7 +487,7 @@ void Op_Diff_K_Omega_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
 {
   // on recupere le tableau
   const Transport_K_Omega& eqn_k_omega = ref_cast(Transport_K_Omega, equation());
-  const DoubleTab& val = equation().inconnue().valeurs();
+  const DoubleTab& val = equation().inconnue()->valeurs();
   const Turbulence_paroi& mod = eqn_k_omega.modele_turbulence().loi_paroi();
   const Paroi_hyd_base_VEF& paroi = ref_cast(Paroi_hyd_base_VEF, mod.valeur());
   const ArrOfInt& face_komega_imposee = paroi.face_keps_imposee();

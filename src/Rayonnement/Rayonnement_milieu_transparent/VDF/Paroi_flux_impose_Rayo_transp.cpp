@@ -61,7 +61,7 @@ void Paroi_flux_impose_Rayo_transp::completer()
       // initialisation de Teta_i
       const Domaine_VDF& zvdf = domaine_VDF.valeur();
 
-      const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
+      const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue()->valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
       int ndeb = la_frontiere_VF.num_premiere_face();
       int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -81,7 +81,7 @@ void Paroi_flux_impose_Rayo_transp::completer()
   else
     {
       // initialisation de Teta_i en VEF
-      const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
+      const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue()->valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
       int ndeb = la_frontiere_VF.num_premiere_face();
       int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -110,7 +110,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
   const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
   ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
   ////double d_Lambda = Lambda(0,0);
-  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
+  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue()->valeurs();
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -124,9 +124,9 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
   double d_Lambda=0;
   double d_Cp =0;
 
-  const DoubleTab& rho=le_milieu.masse_volumique().valeurs();
-  const DoubleTab& Lambda = le_milieu.conductivite().valeurs();
-  const DoubleTab& Cp = le_milieu.capacite_calorifique().valeurs();
+  const DoubleTab& rho=le_milieu.masse_volumique()->valeurs();
+  const DoubleTab& Lambda = le_milieu.conductivite()->valeurs();
+  const DoubleTab& Cp = le_milieu.capacite_calorifique()->valeurs();
 
   if (sub_type(Champ_Uniforme,le_milieu.masse_volumique().valeur()))
     {
@@ -184,15 +184,15 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
       //      Cerr<<"omega = "<<omega<<finl;
       double flux_radia=le_modele_rayo->flux_radiatif(numfa+ndeb);
 
-      if (le_champ_front.valeurs().size()==1)
+      if (le_champ_front->valeurs().size()==1)
         {
-          Teta_i(numfa) = omega*((le_champ_front(0,0)-flux_radia)
+          Teta_i(numfa) = omega*((le_champ_front->valeurs()(0,0)-flux_radia)
                                  /(d_Lambda/e) + T_f(elem))+(1-omega)*Teta_i(numfa);
         }
-      else if (le_champ_front.valeurs().dimension(1)==1)
+      else if (le_champ_front->valeurs().dimension(1)==1)
         {
 //      MR : T_f(elem) a la place de T_f(elem,0) !!!
-          Teta_i(numfa) = omega*((le_champ_front(numfa,0)-flux_radia)
+          Teta_i(numfa) = omega*((le_champ_front->valeurs()(numfa,0)-flux_radia)
                                  /(d_Lambda/e) + T_f(elem))+(1-omega)*Teta_i(numfa);
         }
       else
@@ -213,7 +213,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 
 void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VEF()
 {
-  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
+  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue()->valeurs();
   double Temp;
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();

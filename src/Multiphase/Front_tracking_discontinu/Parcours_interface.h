@@ -27,10 +27,10 @@
 #include <Maillage_FT_Disc.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
+#include <Domaine_dis.h>
 
 class Zone_VF;
 class Maillage_FT_Disc;
-class Domaine_dis;
 class Connectivite_frontieres;
 
 class Parcours_interface : public Objet_U

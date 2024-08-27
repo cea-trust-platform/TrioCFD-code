@@ -75,7 +75,7 @@ Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is )
       ind++;
     }
 
-  if(local_min_vect(h_imp_.valeurs()) < 1.e9)
+  if(local_min_vect(h_imp_->valeurs()) < 1.e9)
     {
       Cerr<<"Erreur sur l'utilisation de la condition a la limite"<<finl;
       Cerr<<"Echange_externe_impose_rayo_transp. Celle ci ne peut"<<finl;

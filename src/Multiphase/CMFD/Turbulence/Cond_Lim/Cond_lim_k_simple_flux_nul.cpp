@@ -39,7 +39,7 @@ Entree& Cond_lim_k_simple_flux_nul::readOn(Entree& s ) {return Echange_global_im
 void Cond_lim_k_simple_flux_nul::completer()
 {
   if (!sub_type(Energie_cinetique_turbulente, domaine_Cl_dis().equation())) Process::exit("Cond_lim_k_simple : equation must be k !");
-  if (domaine_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
+  if (domaine_Cl_dis().equation().inconnue()->valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
 }
 
 int Cond_lim_k_simple_flux_nul::initialiser(double temps)
@@ -58,7 +58,7 @@ void Cond_lim_k_simple_flux_nul::me_calculer()
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&  visc_c = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_pas_de_temps().passe(),
-                    &mu_visc  = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_transport().passe();
+                    &mu_visc  = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_transport()->passe();
 
   // On va chercher le mu turbulent de polymac et celui de vdf et on prend le bon dans la suite
   const DoubleTab* mu_poly = domaine.que_suis_je().debute_par("Domaine_PolyMAC") ? &ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr,

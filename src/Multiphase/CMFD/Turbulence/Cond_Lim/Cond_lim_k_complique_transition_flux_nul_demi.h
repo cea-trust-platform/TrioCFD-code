@@ -26,8 +26,6 @@
 #include <Echange_global_impose_turbulent.h>
 #include <TRUST_Ref.h>
 
-class Correlation;
-
 
 /*! @brief Classe Cond_lim_k_complique_transition_flux_nul_demi:
  *

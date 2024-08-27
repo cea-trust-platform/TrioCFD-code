@@ -139,9 +139,9 @@ void Navier_Stokes_std_ALE::renewing_jacobians( DoubleTab& derivee )
   Cerr << "Adding ALE contribution..." << finl;
   Op_Conv_ALE& opale=ref_cast(Op_Conv_ALE, terme_convectif.valeur());
   DoubleTrav ALE(derivee); // copie de la structure, initialise a zero
-  opale.ajouterALE(la_vitesse.valeurs(), ALE);
+  opale.ajouterALE(la_vitesse->valeurs(), ALE);
   ALE.echange_espace_virtuel();
-  solveur_masse.appliquer(ALE);
+  solveur_masse->appliquer(ALE);
   ALE.echange_espace_virtuel();
   derivee+=ALE; // M-1(F + ALEconvectiveTerm - BtP(n))=derivee_withALEconvectiveTerm
   derivee.echange_espace_virtuel();
@@ -172,12 +172,11 @@ void Navier_Stokes_std_ALE::div_ale_derivative( DoubleTrav& deriveeALE, double t
   secmemP.echange_espace_virtuel();
   //Debog::verifier("secmemP  modifier Navier_Stokes_std::corriger_derivee_impl",secmemP);
   // Correction du second membre d'apres les conditions aux limites :
-  assembleur_pression_.modifier_secmem(secmemP);
+  assembleur_pression_->modifier_secmem(secmemP);
   secmemP.echange_espace_virtuel();
 
   Debog::verifier("secmemP Navier_Stokes_std::corriger_derivee_impl",secmemP);
 }
-
 
 void Navier_Stokes_std_ALE::update_pressure_matrix( void )
 {
@@ -185,7 +184,7 @@ void Navier_Stokes_std_ALE::update_pressure_matrix( void )
   Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
   if(dom_ale.update_or_not_matrix_coeffs() == 0)
     {
-      assembleur_pression_.assembler(matrice_pression_); // Here B M-1 Bt is assembled.
+      assembleur_pression_->assembler(matrice_pression_); // Here B M-1 Bt is assembled.
       solveur_pression_->reinit();
     }
 }
@@ -211,7 +210,7 @@ void Navier_Stokes_std_ALE::mettre_a_jour(double temps)
     {
       const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
       const DoubleTab& ALEMeshVelocity= dom_ale.vitesse_faces();//we access the mesh speed
-      ALEMeshVelocity_.valeurs()= ALEMeshVelocity;
+      ALEMeshVelocity_->valeurs()= ALEMeshVelocity;
       double dt = schema_temps().pas_de_temps();
       DoubleTab ALEMeshVelocity_dt= ALEMeshVelocity;
       for(int dim=0; dim<dimension; dim++)
@@ -222,14 +221,11 @@ void Navier_Stokes_std_ALE::mettre_a_jour(double temps)
             }
         }
       ALEMeshVelocity_dt.echange_espace_virtuel();
-      ALEMeshTotalDisplacement_.valeurs() +=ALEMeshVelocity_dt;
-      //ALEMeshTotalDisplacement_.valeurs().echange_espace_virtuel();
-      //ALEMeshVelocity_.valeurs().echange_espace_virtuel();
-      ALEMeshVelocity_.mettre_a_jour(temps);
-      ALEMeshTotalDisplacement_.mettre_a_jour(temps);
+      ALEMeshTotalDisplacement_->valeurs() +=ALEMeshVelocity_dt;
+      //ALEMeshTotalDisplacement_->valeurs().echange_espace_virtuel();
+      //ALEMeshVelocity_->valeurs().echange_espace_virtuel();
+      ALEMeshVelocity_->mettre_a_jour(temps);
+      ALEMeshTotalDisplacement_->mettre_a_jour(temps);
 
     }
-
-
 }
-

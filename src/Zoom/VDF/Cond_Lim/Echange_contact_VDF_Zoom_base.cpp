@@ -51,7 +51,7 @@ Entree& Echange_contact_VDF_Zoom_base::readOn(Entree& s )
         case 0:
           {
             s >> h_imp_;
-            h_paroi = h_imp_(0,0);
+            h_paroi = h_imp_->valeurs()(0,0);
             break;
           }
         case 1:

@@ -76,7 +76,7 @@ void Source_Transport_K_Omega_VEF_Face::associer_pb(const Probleme_base& pb)
 }
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_visc_turb() const
 {
-  return eqn_K_Omega->modele_turbulence().viscosite_turbulente().valeurs();
+  return eqn_K_Omega->modele_turbulence().viscosite_turbulente()->valeurs();
 }
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_cisaillement_paroi() const
@@ -86,7 +86,7 @@ const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_cisaillement_paroi() con
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_K_pour_production() const
 {
-  return eqn_K_Omega->inconnue().valeurs();
+  return eqn_K_Omega->inconnue()->valeurs();
 }
 
 const Nom Source_Transport_K_Omega_VEF_Face::get_type_paroi() const
@@ -96,7 +96,7 @@ const Nom Source_Transport_K_Omega_VEF_Face::get_type_paroi() const
 
 void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgradOmega) const
 {
-  const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
+  const DoubleTab& K_Omega = eqn_K_Omega->inconnue()->valeurs();
   const DoubleTab& kinematic_viscosity = get_visc_turb();
   const DoubleTab& distmin = le_dom_VEF->y_faces(); // Minimum distance to the edge
 
@@ -138,7 +138,7 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   // Same structure than Source_WC_Chaleur_VEF.cpp in TRUST
 
   // = First, store K and Omega in two separated Tab for the gradient computation, not ideal
-  const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
+  const DoubleTab& K_Omega = eqn_K_Omega->inconnue()->valeurs();
   DoubleTab enerK; // field on faces
   DoubleTab omega; // field on faces
   enerK.resize(K_Omega.dimension_tot(0));
@@ -156,7 +156,7 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
   const Navier_Stokes_Turbulent& eqHyd = ref_cast(Navier_Stokes_Turbulent,
                                                   ref_cast(Pb_Hydraulique_Turbulent,
                                                            mon_equation->probleme()).equation(0));
-  const DoubleTab& velocity_field_face = eqHyd.vitesse().valeurs(); // Velocity on faces
+  const DoubleTab& velocity_field_face = eqHyd.vitesse()->valeurs(); // Velocity on faces
   const int nbr_velocity_components = velocity_field_face.dimension(1); // dimension_tot ?
   DoubleTab gradK_elem; // field on elements
   DoubleTab gradOmega_elem; // field on elements
@@ -174,7 +174,7 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
       chmp_post(num_elem) += gradK_elem(num_elem, ncompo) * gradOmega_elem(num_elem, ncompo);
 
   // Interpolate from elem to face
-  const Domaine_dis_base& domaine_dis = mon_equation->inconnue().domaine_dis_base();
+  const Domaine_dis_base& domaine_dis = mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_dis);
 
   DoubleTab gradK_face;
@@ -199,7 +199,7 @@ void Source_Transport_K_Omega_VEF_Face::compute_cross_diffusion(DoubleTab& gradK
 //                                                   mon_equation->probleme().equation(0));
 //   const DoubleTab& la_vitesse = eqHyd.vitesse().valeurs();
 //   const int nb_compo = la_vitesse.line_size();
-//   const DoubleTab& pressure = eqHyd.pression().valeurs();
+//   const DoubleTab& pressure = eqHyd.pression()->valeurs();
 //   const int nb_tot = pressure.size_totale(); // find a better name than nb_tot
 //   grad.resize(nb_tot, nb_compo);
 // }
@@ -209,7 +209,7 @@ void Source_Transport_K_Omega_VEF_Face::fill_resu(const DoubleVect& volumes_entr
                                                   const DoubleTab& gradKgradOmega,
                                                   DoubleTab& resu) const
 {
-  const DoubleTab& K_Omega = eqn_K_Omega->inconnue().valeurs();
+  const DoubleTab& K_Omega = eqn_K_Omega->inconnue()->valeurs();
   const double LeK_MIN = eqn_K_Omega->modele_turbulence().get_K_MIN();
 
   for (int face = 0; face < le_dom_VEF->nb_faces_tot(); face++)
@@ -241,7 +241,7 @@ void Source_Transport_K_Omega_VEF_Face::contribuer_a_avec(const DoubleTab& a,
                                                           Matrice_Morse& matrice) const
 {
   const double LeK_MIN = eqn_K_Omega->modele_turbulence().get_K_MIN();
-  const DoubleTab& K_Omega = equation().inconnue().valeurs();
+  const DoubleTab& K_Omega = equation().inconnue()->valeurs();
   const DoubleVect& porosite_face = eqn_K_Omega->milieu().porosite_face();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
 

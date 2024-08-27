@@ -116,7 +116,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
-  const DoubleTab& wall_length = BR_wall_length_.valeurs();
+  const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
@@ -138,7 +138,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 
@@ -271,13 +271,13 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
 DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
-  const DoubleTab& wall_length = BR_wall_length_.valeurs();
+  const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
@@ -297,7 +297,7 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_d
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 
@@ -431,7 +431,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 
@@ -551,9 +551,9 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem(const Discretisation_
   for (int elem=0; elem<nelem; elem++)
     {
       double kseps;
-      if (K_Eps(elem,1) <= BR_EPS)
+      if (K_Eps.valeurs()(elem,1) <= BR_EPS)
         {
-          kseps = K_Eps(elem,0)/BR_EPS;
+          kseps = K_Eps.valeurs()(elem,0)/BR_EPS;
         }
       else
         {
@@ -615,9 +615,9 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem_BiK(const Discretisat
   for (int elem=0; elem<nelem; elem++)
     {
       double kseps;
-      if (Eps(elem,0) <= BR_EPS)
+      if (Eps.valeurs()(elem,0) <= BR_EPS)
         {
-          kseps = K(elem,0)/BR_EPS;
+          kseps = K.valeurs()(elem,0)/BR_EPS;
         }
       else
         {
@@ -710,9 +710,9 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem_shih(const Discretisa
   for (int elem=0; elem<nelem; elem++)
     {
       double kseps;
-      if (K_Eps(elem,1) <= BR_EPS)
+      if (K_Eps.valeurs()(elem,1) <= BR_EPS)
         {
-          kseps = K_Eps(elem,0)/BR_EPS;
+          kseps = K_Eps.valeurs()(elem,0)/BR_EPS;
         }
       else
         {
@@ -755,7 +755,7 @@ void Modele_Lam_Bremhorst_VEF::lire_distance_paroi( )
   // PQ : 25/02/04 recuperation de la distance a la paroi dans Wall_length.xyz
 
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
-  DoubleTab& wall_length = BR_wall_length_.valeurs();
+  DoubleTab& wall_length = BR_wall_length_->valeurs();
   wall_length=-1.;
 //  return;
 
@@ -1007,13 +1007,13 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_Paroi_BiK(DoubleTab& Cmu,
 DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco.valeurs();
+  const DoubleTab& tab_visco=ch_visco->valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
-  const DoubleTab& wall_length = BR_wall_length_.valeurs();
+  const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
@@ -1033,7 +1033,7 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domai
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 
@@ -1169,7 +1169,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
-  const DoubleTab& wall_length = BR_wall_length_.valeurs();
+  const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
   DoubleTab Pderive(0);
@@ -1191,7 +1191,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine
   for (int n_bord=0; n_bord<nb_cl; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
 

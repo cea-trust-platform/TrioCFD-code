@@ -24,7 +24,7 @@
 #define Flux_parietal_Kurul_Podowski_included
 #include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 #include <Param.h>
 
 /*! @brief classe Flux_parietal_Kurul_Podowski classe qui implemente une correlation de flux parietal diphasique

@@ -19,9 +19,9 @@
 #include <TRUSTTab.h>
 #include <Frottement_global_impose.h>
 #include <Cond_lim_base.h>
+#include <Correlation_base.h>
 #include <TRUST_Ref.h>
 
-class Correlation;
 
 /*! @brief Classe Paroi_frottante_simple Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
  *

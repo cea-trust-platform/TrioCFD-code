@@ -90,7 +90,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_temperature_bord(double temp
 {
   if (T_autre_pb()->valeurs_au_temps(temps).size()==0)
     {
-      T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
+      T_autre_pb()->associer_fr_dis_base(T_ext()->frontiere_dis());
       Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
       if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene")
@@ -133,7 +133,7 @@ void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
   if (num_premiere_face_dans_pb_fluide==-1)
     {
       Cerr<<"fin de construction dans "<<que_suis_je()<<finl;
-      T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
+      T_autre_pb()->associer_fr_dis_base(T_ext()->frontiere_dis());
       // on regarde qui est le pb fluide
       const Equation_base* eqn = nullptr;
       const Equation_base& mon_eqn = domaine_Cl_dis().equation();
@@ -196,7 +196,7 @@ void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
         verifier_correspondance();
     }
 
-  T_autre_pb().mettre_a_jour(temps);
+  T_autre_pb()->mettre_a_jour(temps);
   assert(nb_comp==1);
 
   DoubleTab& mon_h= h_imp_->valeurs();
@@ -258,7 +258,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_p
   // Tautre=Text;
   //  Tw=(autr_h*Tautre+mon_h*monT)/(autr_h+mon_h)
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-  const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+  const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 
@@ -272,7 +272,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_p
   DoubleTab& t_autre=T_autre_pb()->valeurs_au_temps(temps);
 
   const Modele_rayo_semi_transp& le_modele = modele();
-  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom())->valeurs();
   for (int numfa=0; numfa<nb_faces_bord; numfa++)
     {
       ind_fac = numfa+ndeb;
@@ -313,7 +313,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_equiv(DoubleTab& Teta_e
   assert(Teta_eq.dimension(0)==nb_faces_bord);
   assert(Teta_eq.dimension(1)==1);
   const Modele_rayo_semi_transp& le_modele = modele();
-  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom())->valeurs();
   DoubleTab& t_autre=T_autre_pb()->valeurs_au_temps(temps);
   for (int numfa=0; numfa<nb_faces_bord; numfa++)
     Teta_eq(numfa,0) = t_autre(numfa,0) - (1/lautre_h(numfa,0))*flux_radiatif(numfa,0);
@@ -332,7 +332,7 @@ Echange_contact_rayo_semi_transp_VDF& Echange_contact_rayo_semi_transp_VDF::la_C
   for (int i=0; i<zcld.nb_cond_lim(); i++)
     {
       const Cond_lim& lacl=zcld.les_conditions_limites(i);
-      if (lacl.frontiere_dis().le_nom()==frontiere_dis().le_nom())
+      if (lacl->frontiere_dis().le_nom()==frontiere_dis().le_nom())
         return ref_cast_non_const(Echange_contact_rayo_semi_transp_VDF,lacl.valeur());
     }
 

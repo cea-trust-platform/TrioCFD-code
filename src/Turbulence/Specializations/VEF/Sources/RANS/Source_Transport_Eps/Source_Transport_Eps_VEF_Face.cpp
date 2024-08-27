@@ -43,7 +43,7 @@ void Source_Transport_Eps_VEF_Face::associer_pb(const Probleme_base& pb)
 
 const DoubleTab& Source_Transport_Eps_VEF_Face::get_visc_turb() const
 {
-  return mon_eq_transport_K->modele_turbulence().viscosite_turbulente().valeurs();
+  return mon_eq_transport_K->modele_turbulence().viscosite_turbulente()->valeurs();
 }
 
 const DoubleTab& Source_Transport_Eps_VEF_Face::get_cisaillement_paroi() const
@@ -54,7 +54,7 @@ const DoubleTab& Source_Transport_Eps_VEF_Face::get_cisaillement_paroi() const
 
 const DoubleTab& Source_Transport_Eps_VEF_Face::get_K_pour_production() const
 {
-  return mon_eq_transport_K->inconnue().valeurs();
+  return mon_eq_transport_K->inconnue()->valeurs();
 }
 
 const Modele_Fonc_Bas_Reynolds& Source_Transport_Eps_VEF_Face::get_modele_fonc_bas_reyn() const
@@ -65,7 +65,7 @@ const Modele_Fonc_Bas_Reynolds& Source_Transport_Eps_VEF_Face::get_modele_fonc_b
 void Source_Transport_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don& ch_visco_cin, const Champ_base& ch_visco_cin_ou_dyn,
                                                          DoubleTab& D, DoubleTab& E, DoubleTab& F1, DoubleTab& F2) const
 {
-  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
   get_modele_fonc_bas_reyn().Calcul_E_BiK(E, mon_eq_transport_Eps->domaine_dis(), mon_eq_transport_Eps->domaine_Cl_dis(), vit, K, Eps, ch_visco_cin, visco_turb);
   E.echange_espace_virtuel();
   get_modele_fonc_bas_reyn().Calcul_F1_BiK(F1, mon_eq_transport_Eps->domaine_dis(), mon_eq_transport_Eps->domaine_Cl_dis(), P, K, Eps, ch_visco_cin_ou_dyn);
@@ -85,7 +85,7 @@ void Source_Transport_Eps_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco_t
 
 void Source_Transport_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
 {
-  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
   const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_K_MIN();
   for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     if (K(fac) >= LeK_MIN)
@@ -94,7 +94,7 @@ void Source_Transport_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_
 
 void Source_Transport_Eps_VEF_Face::fill_resu(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, DoubleTab& resu) const
 {
-  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
   const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_K_MIN();
   for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     if (K(fac) >= LeK_MIN)

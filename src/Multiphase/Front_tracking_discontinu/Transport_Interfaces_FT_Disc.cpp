@@ -325,7 +325,7 @@ Entree& Transport_Interfaces_FT_Disc::readOn(Entree& is)
     {
       Cerr << "Name of subdomaine for interfaces deletion: " << suppression_interfaces_sous_domaine_ << finl;
       // Juste un test pour verifier que le nom existe:
-      domaine_dis().domaine().ss_domaine(suppression_interfaces_sous_domaine_);
+      domaine_dis()->domaine().ss_domaine(suppression_interfaces_sous_domaine_);
     }
   return is;
 }
@@ -1385,7 +1385,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
                         1 /* composantes */, nb_valeurs_temps,
                         temps,
                         indicatrice_);
-  indicatrice_.associer_eqn(*this);
+  indicatrice_->associer_eqn(*this);
   //Nouvelle formulation
   champs_compris_.ajoute_champ(indicatrice_);
   //champs_compris_.liste_noms_compris()[0]+le_nom();
@@ -1397,7 +1397,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
                         1 /* composantes */, 1 /* valeur temporelle */,
                         temps,
                         variables_internes_->indicatrice_cache);
-  variables_internes_->indicatrice_cache.associer_eqn(*this);
+  variables_internes_->indicatrice_cache->associer_eqn(*this);
   champs_compris_.ajoute_champ(variables_internes_->indicatrice_cache);
   //champs_compris_.liste_noms_compris()[1]+le_nom();
 
@@ -1408,7 +1408,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
                         1 /* composantes */, nb_valeurs_temps,
                         temps,
                         indicatrice_faces_);
-  indicatrice_faces_.associer_eqn(*this);
+  indicatrice_faces_->associer_eqn(*this);
   champs_compris_.ajoute_champ(indicatrice_faces_);
 
   fieldname = "VITESSE_FILTREE";
@@ -1418,7 +1418,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
                         Objet_U::dimension /* composantes */, 1, /* valeur temporelle */
                         temps,
                         variables_internes_->vitesse_filtree);
-  variables_internes_->vitesse_filtree.associer_eqn(*this);
+  variables_internes_->vitesse_filtree->associer_eqn(*this);
   champs_compris_.ajoute_champ(variables_internes_->vitesse_filtree);
   //champs_compris_.liste_noms_compris()[2]+le_nom();
 
@@ -1498,7 +1498,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
   // Construction de la structure du tableau avec l'espace virtuel:
   {
     DoubleTab& d = variables_internes_->distance_interface_sommets;
-    const Domaine& dom = domaine_dis().domaine();
+    const Domaine& dom = domaine_dis()->domaine();
     d.resize(0);
     dom.creer_tableau_sommets(d);
   }
@@ -1610,23 +1610,23 @@ int Transport_Interfaces_FT_Disc::preparer_calcul(void)
     }
 
   // Ajout pour la sauvegarde au premier pas de temps si reprise
-  indicatrice_.changer_temps(temps);
-  variables_internes_->indicatrice_cache.changer_temps(temps);
-  indicatrice_faces_.changer_temps(temps);
-  variables_internes_->vitesse_filtree.changer_temps(temps);
-  variables_internes_->tmp_flux.changer_temps(temps);
-  variables_internes_->index_element.changer_temps(temps);
-  variables_internes_->nelem_par_direction.changer_temps(temps);
-  variables_internes_->distance_interface.changer_temps(temps);
-  variables_internes_->distance_interface_faces.changer_temps(temps);
-  variables_internes_->distance_interface_faces_corrigee.changer_temps(temps);
-  variables_internes_->distance_interface_faces_difference.changer_temps(temps);
-  vitesse_imp_interp_.changer_temps(temps);
-  variables_internes_->normale_interface.changer_temps(temps);
-  variables_internes_->surface_interface.changer_temps(temps);
+  indicatrice_->changer_temps(temps);
+  variables_internes_->indicatrice_cache->changer_temps(temps);
+  indicatrice_faces_->changer_temps(temps);
+  variables_internes_->vitesse_filtree->changer_temps(temps);
+  variables_internes_->tmp_flux->changer_temps(temps);
+  variables_internes_->index_element->changer_temps(temps);
+  variables_internes_->nelem_par_direction->changer_temps(temps);
+  variables_internes_->distance_interface->changer_temps(temps);
+  variables_internes_->distance_interface_faces->changer_temps(temps);
+  variables_internes_->distance_interface_faces_corrigee->changer_temps(temps);
+  variables_internes_->distance_interface_faces_difference->changer_temps(temps);
+  vitesse_imp_interp_->changer_temps(temps);
+  variables_internes_->normale_interface->changer_temps(temps);
+  variables_internes_->surface_interface->changer_temps(temps);
 
   //calcul de l'indicatrice
-  indicatrice_.valeurs() = get_update_indicatrice().valeurs();
+  indicatrice_->valeurs() = get_update_indicatrice().valeurs();
   get_update_distance_interface();
   get_update_normale_interface();
 
@@ -1646,7 +1646,7 @@ int Transport_Interfaces_FT_Disc::preparer_calcul(void)
   //                                                  Maillage_FT_Disc::MINIMAL);
 
   //Ajout TF : gestion de la derivee en temps
-  if (calculate_time_derivative()) derivee_en_temps().changer_temps(temps);
+  if (calculate_time_derivative()) derivee_en_temps()->changer_temps(temps);
   //Fin TF
   return 1;
 }
@@ -2232,12 +2232,12 @@ void Transport_Interfaces_FT_Disc::calculer_scalaire_interpole(
                   ref_cast(Champ_P1NC, champ_scal).filtrer_L2(scal_filtre_val);
                 else if (sub_type(Champ_Fonc_P1NC, champ_scal))
                   ref_cast(Champ_Fonc_P1NC, champ_scal).filtrer_L2(scal_filtre_val);
-                champ_scal_interp.valeurs() = scal_filtre_val;
+                champ_scal_interp->valeurs() = scal_filtre_val;
               }
 
           }
         else if (sub_type(Champ_Fonc_P0_base, champ_scal))
-          champ_scal_interp.valeurs() = champ_scal.valeurs();
+          champ_scal_interp->valeurs() = champ_scal.valeurs();
 
         else
           {
@@ -2483,7 +2483,7 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
 void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& indicatrice,
                                                             const IntTab& face_voisins)
 {
-  DoubleTab& indicatrice_faces = indicatrice_faces_.valeurs();
+  DoubleTab& indicatrice_faces = indicatrice_faces_->valeurs();
   const int nfaces = face_voisins.dimension_tot(0);
   for (int i = 0; i < nfaces; i++)
     {
@@ -2547,7 +2547,7 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
             const DoubleTab& interfacial_area = ns.get_interfacial_area();
             const DoubleTab& normale_elements = get_update_normale_interface().valeurs();
 
-            const int dim = ns.inconnue().valeurs().line_size();
+            const int dim = ns.inconnue()->valeurs().line_size();
             const int vef = (dim == 2);
             if (vef)
               {
@@ -2655,7 +2655,7 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
                 if (indic_face >1.)
                   indic_face=1.;
 
-                indicatrice_faces_(face) = indic_face;
+                indicatrice_faces_->valeurs()(face) = indic_face;
               }
           }
         else
@@ -2832,7 +2832,7 @@ void Transport_Interfaces_FT_Disc::modifie_source(DoubleTab& termes_sources_face
       termes_sources_face(face,dim)=vol_entrelaces(face)*source_val(face,dim);
 
   termes_sources_face.echange_espace_virtuel() ; // CI
-  un_solv_masse.appliquer(termes_sources_face);
+  un_solv_masse->appliquer(termes_sources_face);
 
   if (!is_QC)
     {
@@ -2960,7 +2960,7 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
       for(int k=0; k<dimension; k++)
         Force << espace << force_[k];
       Force << finl;
-      const Domaine& domaine=domaine_dis().domaine();
+      const Domaine& domaine=domaine_dis()->domaine();
       const int impr_mom = domaine.moments_a_imprimer();
       if (impr_mom)
         {
@@ -2981,8 +2981,8 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
 void Transport_Interfaces_FT_Disc::update_critere_statio()
 {
   Schema_Temps_base& sch_tps = schema_temps();
-  const DoubleTab& present = inconnue().valeurs();
-  const DoubleTab& passe = inconnue().passe();
+  const DoubleTab& present = inconnue()->valeurs();
+  const DoubleTab& passe = inconnue()->passe();
   const double dt = sch_tps.pas_de_temps();
   DoubleTab tab_critere(present);
 
@@ -3036,14 +3036,14 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
       }
 
   termes_sources_face.echange_espace_virtuel() ;
-  le_solveur_masse.appliquer(termes_sources_face);
+  le_solveur_masse->appliquer(termes_sources_face);
 
   // Impression des efforts exerces par le fluide sur l'interface
   {
     ArrOfDouble dforce(dimension);
     force_=0;
     moment_=0;
-    const Domaine& domaine=domaine_dis().domaine();
+    const Domaine& domaine=domaine_dis()->domaine();
     const int impr_mom = domaine.moments_a_imprimer();
     const ArrOfDouble& centre_gravite = domaine.cg_moments();
     const DoubleTab& centre_faces = ref_cast(Domaine_VF,domaine_dis().valeur()).xv();
@@ -6568,14 +6568,14 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
 //        volume_sous_domaine   ->   values(1)
 //        volume_phase_0     ->   values(2)
           if (variables_internes_->nom_domaine_volume_impose_ == "??")
-            values(0) = calculer_integrale_indicatrice(indicatrice_.valeurs(), values(2));
+            values(0) = calculer_integrale_indicatrice(indicatrice_->valeurs(), values(2));
           else
             {
               const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
               const DoubleVect& volumes = domaine_vf.volumes();
               const Sous_Domaine& sous_domaine = domaine_dis()->domaine().ss_domaine(variables_internes_->nom_domaine_volume_impose_);
               const int nb_elem_sous_domaine = sous_domaine.nb_elem_tot();
-              const DoubleTab& indic = indicatrice_.valeurs();
+              const DoubleTab& indic = indicatrice_->valeurs();
               const int nb_elem = domaine_vf.nb_elem();
               for (int i = 0; i < nb_elem_sous_domaine; i++)
                 {
@@ -6747,7 +6747,7 @@ void Transport_Interfaces_FT_Disc::test_suppression_interfaces_sous_domaine()
     return;
 
   const DoubleTab& indicatrice = get_update_indicatrice().valeurs();
-  const Sous_Domaine& sous_domaine = domaine_dis().domaine().ss_domaine(suppression_interfaces_sous_domaine_);
+  const Sous_Domaine& sous_domaine = domaine_dis()->domaine().ss_domaine(suppression_interfaces_sous_domaine_);
   // Construction de la liste des elements de la sous-domaine contenant la phase a supprimer
   ArrOfInt liste_elems_sous_domaine;
   int i;
@@ -7033,10 +7033,10 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
 
   // Attention: get_update_indicatrice renvoie une ref a indicatrice_cache.
   //  C'est ici qu'on copie le contenu de indicatrice_cache dans indicatrice :
-  indicatrice_.valeurs() = get_update_indicatrice().valeurs();
+  indicatrice_->valeurs() = get_update_indicatrice().valeurs();
 
-  variables_internes_->indicatrice_cache.changer_temps(temps);
-  indicatrice_.changer_temps(temps);
+  variables_internes_->indicatrice_cache->changer_temps(temps);
+  indicatrice_->changer_temps(temps);
 
   update_critere_statio();
 
@@ -7045,7 +7045,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
 
   {
     double volume_phase_0 = 0.;
-    const double volume_phase_1 = calculer_integrale_indicatrice(indicatrice_.valeurs(), volume_phase_0);
+    const double volume_phase_1 = calculer_integrale_indicatrice(indicatrice_->valeurs(), volume_phase_0);
     if (Process::je_suis_maitre())
       {
         Cerr << "Volume_phase_0 " << Nom(volume_phase_0, "%20.14g") << " time " << temps << finl;
@@ -7077,7 +7077,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
     // Calcul du centre de gravite des phases 0 et 1 a partir de l'indicatrice
     // indicatrice de phase:
     const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
-    const DoubleTab& indic = indicatrice_.valeurs();
+    const DoubleTab& indic = indicatrice_->valeurs();
     // centre de gravite des elements euleriens:
     const DoubleTab& xp = domaine_vf.xp();
     // volumes des elements euleriens:
@@ -7167,12 +7167,12 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
         surface[element] = surface_totale;
       }
     surface.echange_espace_virtuel();
-    variables_internes_->surface_interface.mettre_a_jour(temps);
+    variables_internes_->surface_interface->mettre_a_jour(temps);
   }
   // Fin de GB
 
   //TF : Gestion de l avancee en temps de la derivee
-  if (calculate_time_derivative()) derivee_en_temps().changer_temps(temps);
+  if (calculate_time_derivative()) derivee_en_temps()->changer_temps(temps);
   //Fin de TF
 }
 
@@ -7200,9 +7200,9 @@ void Transport_Interfaces_FT_Disc::transporter_sans_changement_topologie(DoubleT
                                           maillage.desc_sommets());
   //ajout pour postraiter ss pas de tps RK3_FT
   maillage.changer_temps(temps);
-  indicatrice_.valeurs()=get_update_indicatrice().valeurs();
-  variables_internes_->indicatrice_cache.changer_temps(temps);
-  indicatrice_.changer_temps(temps);
+  indicatrice_->valeurs()=get_update_indicatrice().valeurs();
+  variables_internes_->indicatrice_cache->changer_temps(temps);
+  indicatrice_->changer_temps(temps);
   get_update_distance_interface();
   get_update_normale_interface();
 }
@@ -7373,7 +7373,7 @@ int Transport_Interfaces_FT_Disc::sauvegarder(Sortie& os) const
   {
     int special, afaire;
     const int format_xyz = EcritureLectureSpecial::is_ecriture_special(special, afaire);
-    double temps=inconnue().temps();
+    double temps=inconnue()->temps();
     Nom mon_ident("variables_internes_transport");
     mon_ident += Nom(temps,"%e");
     if (format_xyz)

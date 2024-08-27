@@ -77,7 +77,7 @@ void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_domaines(const Domaine_dis&
 
 void Source_rayo_semi_transp_QC_VDF_P0_VDF::mettre_a_jour(double temps)
 {
-  le_source_rayo.mettre_a_jour(temps);
+  le_source_rayo->mettre_a_jour(temps);
 }
 
 void Source_rayo_semi_transp_QC_VDF_P0_VDF::completer()
@@ -85,6 +85,6 @@ void Source_rayo_semi_transp_QC_VDF_P0_VDF::completer()
   Source_base::completer();
   le_source_rayo.typer_direct("Source_rayo_semi_transp_VDF_P0_VDF");
   le_source_rayo->associer_eqn(equation());
-  le_source_rayo.completer();
+  le_source_rayo->completer();
 }
 

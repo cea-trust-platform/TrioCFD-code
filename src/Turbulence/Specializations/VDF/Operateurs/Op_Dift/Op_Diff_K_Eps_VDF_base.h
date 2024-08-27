@@ -26,16 +26,15 @@
 #include <Op_Diff_K_Eps_base.h>
 #include <Iterateur_VDF_Elem.h>
 #include <Op_VDF_Elem.h>
-
-class Domaine_Cl_dis;
-class Domaine_dis;
-class Champ_Inc;
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
+#include <Champ_Inc.h>
 
 class Op_Diff_K_Eps_VDF_base : public Op_Diff_K_Eps_base, public Op_VDF_Elem
 {
   Declare_base(Op_Diff_K_Eps_VDF_base);
 public:
-  Op_Diff_K_Eps_VDF_base(const Iterateur_VDF_base& iter_base) : iter(iter_base) { }
+  Op_Diff_K_Eps_VDF_base(const Iterateur_VDF_base& iter_base)  { iter = iter_base;}
 
   void completer() override;
   void associer_diffusivite(const Champ_base& ch_diff) override;
@@ -52,7 +51,7 @@ public:
     return iter->calculer(inco, resu);
   }
 
-  inline Iterateur_VDF& get_iter() { return iter; }
+  inline OWN_PTR(Iterateur_VDF_base)& get_iter() { return iter; }
 
   inline int has_interface_blocs() const override { return 1; }
 
@@ -60,7 +59,7 @@ public:
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected:
-  Iterateur_VDF iter;
+  OWN_PTR(Iterateur_VDF_base) iter;
 };
 
 // one for all !
@@ -82,7 +81,7 @@ protected:
   }
 
 private:
-  inline Iterateur_VDF& iter_() { return static_cast<OP_TYPE *>(this)->get_iter(); } // CRTP pour recuperer l'iter
+  inline OWN_PTR(Iterateur_VDF_base)& iter_() { return static_cast<OP_TYPE *>(this)->get_iter(); } // CRTP pour recuperer l'iter
 };
 
 #endif /* Op_Diff_K_Eps_VDF_base_included */

@@ -83,7 +83,7 @@ void Paroi_frottante_simple::me_calculer()
 
   const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces du domaine
   const DoubleTab& nu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().passe(),
-                   &mu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_transport().passe(),
+                   &mu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_transport()->passe(),
                     &vit   = domaine_Cl_dis().equation().probleme().get_champ("vitesse").passe(),
                      &rho = domaine_Cl_dis().equation().probleme().get_champ("masse_volumique").passe(),
                       *alp = sub_type(Pb_Multiphase, domaine_Cl_dis().equation().probleme()) ? &domaine_Cl_dis().equation().probleme().get_champ("alpha").passe() : nullptr;
@@ -94,7 +94,7 @@ void Paroi_frottante_simple::me_calculer()
   assert((mu_poly) || (mu_vdf));
 
   int nf = la_frontiere_dis->frontiere().nb_faces(), nf_tot = domaine.nb_faces_tot(), f1 = la_frontiere_dis->frontiere().num_premiere_face();
-  int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size(), D = dimension;
+  int N = domaine_Cl_dis().equation().inconnue()->valeurs().line_size(), D = dimension;
 
   const DoubleTab& n_f = domaine.face_normales();
   const DoubleVect& fs = domaine.face_surfaces();

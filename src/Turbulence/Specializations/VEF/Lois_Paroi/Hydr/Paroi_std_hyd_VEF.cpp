@@ -38,7 +38,7 @@
 #include <Paroi_rugueuse.h>
 #include <SFichier.h>
 #include <Paroi_decalee_Robin.h>
-#include <Schema_Temps.h>
+#include <Schema_Temps_base.h>
 #include <communications.h>
 
 // methode_calcul_face_keps_impose_ value:
@@ -248,7 +248,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
               (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
               (la_cl->que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
             {
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               int ndeb = 0;
               int nfin = le_bord.nb_faces_tot();
               // On traite les faces de bord reelles.
@@ -314,7 +314,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
                   (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
                   (la_cl->que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
                 {
-                  const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+                  const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
                   const IntTab& elem_faces = domaine_VEF.elem_faces();
                   int ndeb = 0;
                   int nfin = le_bord.nb_faces_tot();
@@ -477,7 +477,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
       for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = 0;
           int nfin = le_bord.nb_faces_tot();
           if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
@@ -569,7 +569,7 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,
               (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ) ||
               (la_cl->que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
             {
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               const IntTab& elem_faces = domaine_VEF.elem_faces();
               int ndeb = 0;
               int nfin = le_bord.nb_faces_tot();
@@ -744,7 +744,7 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,
       for (int n_bord = 0; n_bord < domaine_VEF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           const int ndeb = 0;
           const int nfin = le_bord.nb_faces_tot();
           if (sub_type(Dirichlet_paroi_fixe, la_cl.valeur())
@@ -788,7 +788,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
@@ -848,7 +848,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
           if (sub_type(Paroi_rugueuse,la_cl.valeur()))
             erugu=ref_cast(Paroi_rugueuse,la_cl.valeur()).get_erugu();
 
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           const IntTab& elem_faces = domaine_VEF.elem_faces();
 
           // Loop on real faces
@@ -976,7 +976,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
           // Recuperation de la valeur Erugu
           const double erugu = Erugu;
 
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin,la_cl.valeur());
           const DoubleTab& normales = domaine_VEF.face_normales();
           const double delta = Paroi.get_delta();
@@ -1185,7 +1185,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
 
@@ -1246,7 +1246,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
                                ? ref_cast(Paroi_rugueuse, la_cl.valeur()).get_erugu()
                                : Erugu;
 
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           const IntTab& elem_faces = domaine_VEF.elem_faces();
 
           // Loop on real faces
@@ -1392,7 +1392,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
           // Recuperation de la valeur Erugu
           double erugu = Erugu;
 
-          const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin, la_cl.valeur());
           const DoubleTab& normales = domaine_VEF.face_normales();
           const double delta = Paroi.get_delta();
@@ -1681,7 +1681,6 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
@@ -1729,7 +1728,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       // Only Dirichlet or Robin conditions:
       if (dirichlet || robin)
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           // Loop on real faces
           int ndeb = 0;
           int nfin = le_bord.nb_faces_tot();
@@ -1746,7 +1745,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
           CIntArrView le_bord_num_face = le_bord.num_face().view_ro();
           CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
           CIntTabView elem_faces = domaine_VEF.elem_faces().view_ro();
-          CDoubleTabView vitesse = eqn_hydr.inconnue().valeurs().view_ro();
+          CDoubleTabView vitesse = eqn_hydr.inconnue()->valeurs().view_ro();
           CDoubleTabView face_normales = domaine_VEF.face_normales().view_ro();
           CDoubleTabView xp = domaine_VEF.xp().view_ro();
           CDoubleTabView xv = domaine_VEF.xv().view_ro();
@@ -1951,7 +1950,7 @@ void Paroi_std_hyd_VEF::imprimer_ustar(Sortie& os) const
            (sub_type(Paroi_decalee_Robin,la_cl.valeur()) ) ||
            (la_cl->que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           if(je_suis_maitre())
             {
               Ustar << finl;

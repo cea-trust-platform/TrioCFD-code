@@ -59,7 +59,7 @@ DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const DoubleTab& xv = domaine_VEF.xv();
-  const DoubleTab& Indicatrice = Indic_->valeurs();
+  const DoubleTab& Indicatrice = Indic_->valeur().valeurs();
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
   const int nb_front_Cl = domaine_VEF.nb_front_Cl();
@@ -75,7 +75,7 @@ DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Neumann_sortie_libre,la_cl.valeur())||sub_type(Symetrie,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
           for (face=ndeb; face<nfin; face++)
@@ -108,7 +108,7 @@ DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
         }
       else if (sub_type(Periodique,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
           for (face=ndeb; face<nfin; face++)

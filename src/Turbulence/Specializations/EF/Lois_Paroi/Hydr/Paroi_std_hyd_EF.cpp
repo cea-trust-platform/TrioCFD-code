@@ -37,7 +37,7 @@
 #include <Paroi_rugueuse.h>
 #include <SFichier.h>
 #include <Paroi_decalee_Robin.h>
-#include <Schema_Temps.h>
+#include <Schema_Temps_base.h>
 #include <communications.h>
 #include <Equation_base.h>
 
@@ -143,7 +143,7 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int nsom = domaine_EF.nb_som_face();
   int nsom_elem = domaine_EF.domaine().nb_som_elem();
@@ -197,7 +197,7 @@ int Paroi_std_hyd_EF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
           if (sub_type(Paroi_rugueuse,la_cl.valeur()))
             erugu=ref_cast(Paroi_rugueuse,la_cl.valeur()).get_erugu();
 
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
           // Loop on real faces
           //ArrOfDouble vit_face_loc(dimension);
@@ -380,7 +380,7 @@ void Paroi_std_hyd_EF::imprimer_ustar(Sortie& os) const
            (sub_type(Paroi_decalee_Robin,la_cl.valeur()) ) ||
            (la_cl->que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE"))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           if(je_suis_maitre())
             {
               Ustar << finl;

@@ -42,7 +42,7 @@ void Source_Transport_Eps_anisotherme_VEF_Face::associer_pb(const Probleme_base&
 
 void Source_Transport_Eps_anisotherme_VEF_Face::fill_resu_anisotherme(const DoubleVect& G, const DoubleVect& volumes_entrelaces, DoubleTab& resu) const
 {
-  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
   double C3_loc, LeK_MIN = mon_eq_transport_K->modele_turbulence().get_K_MIN();
 
   for (int face = 0; face < le_dom_VEF->nb_faces(); face++)

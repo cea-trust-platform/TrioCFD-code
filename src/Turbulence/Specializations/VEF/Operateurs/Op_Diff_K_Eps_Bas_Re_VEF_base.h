@@ -27,14 +27,14 @@
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
 #include <Op_VEF_Face.h>
 #include <TRUST_Ref.h>
+#include <Champ_Fonc.h>
+#include <Champ_Inc.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
 
 class Domaine_Cl_VEF;
 class Domaine_VEF;
-class Champ_Fonc;
 class Champ_P1NC;
-class Domaine_dis;
-class Domaine_Cl_dis;
-class Champ_Inc;
 
 //////////////////////////////////////////////////////////////////////////////
 //

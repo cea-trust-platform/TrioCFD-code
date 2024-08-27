@@ -23,7 +23,7 @@
 #include <Champ_Fonc_reprise_IJK.h>
 #include <Probleme_base.h>
 #include <EcritureLectureSpecial.h>
-#include <Champ_Generique.h>
+#include <Champ_Generique_base.h>
 #include <Entree_complete.h>
 #include <LecFicDistribueBin.h>
 #include <EFichierBin.h>

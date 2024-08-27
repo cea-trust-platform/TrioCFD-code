@@ -83,7 +83,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   le_terme_source = src;
   DoubleTab gradient_elem(nb_elem_tot,dim,dim);
   gradient_elem=0.;
-  const DoubleTab tabnu=viscosite_cinematique_->valeurs();
+  const DoubleTab tabnu=viscosite_cinematique_->valeur().valeurs();
   int sz=tabnu.size();
 
   DoubleVect visc(nb_elem);

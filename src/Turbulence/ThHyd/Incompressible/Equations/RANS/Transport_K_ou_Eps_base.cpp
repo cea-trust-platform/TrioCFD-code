@@ -176,12 +176,12 @@ void Transport_K_ou_Eps_base::associer(const Equation_base& eqn_hydr)
  */
 int Transport_K_ou_Eps_base::controler_variable()
 {
-  DoubleTab& K_ou_Eps = le_champ_.valeurs();
+  DoubleTab& K_ou_Eps = le_champ_->valeurs();
   int size=K_ou_Eps.dimension(0);
   if (size<0)
     {
       if (sub_type(Champ_Inc_P0_base, le_champ_.valeur()))
-        size = le_champ_->equation().domaine_dis().domaine().nb_elem();
+        size = le_champ_->equation().domaine_dis()->domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_ou_Eps field in Transport_K_ou_Eps_base::controler_variable()" << finl;
@@ -359,7 +359,7 @@ int Transport_K_ou_Eps_base::controler_variable()
         {
           if (Process::je_suis_maitre())
             {
-              const double time = le_champ_.temps();
+              const double time = le_champ_->temps();
               Cerr << "Values forced for k or eps because:" << finl;
               if (neg[0])
                 Cerr << "Negative values found for k or eps on " << neg[0] << "/" << size_tot << " nodes at time " << time
@@ -406,7 +406,7 @@ int Transport_K_ou_Eps_base::controler_variable()
         {
           if (Process::je_suis_maitre())
             {
-              const double time = le_champ_.temps();
+              const double time = le_champ_->temps();
               Cerr << "Values forced for eps because:" << finl;
               Cerr << "Maximum values found for eps on " << neg[1] << "/" << size_tot << " nodes at time " << time
                    << finl;

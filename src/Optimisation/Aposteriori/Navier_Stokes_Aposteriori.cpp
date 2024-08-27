@@ -103,5 +103,5 @@ void Navier_Stokes_Aposteriori::estimateur_aposteriori()
   ch.fixer_nb_comp(1);
   ch.fixer_nb_valeurs_nodales(domaine_vef.nb_elem());
   ch.fixer_unite("sans");
-  ch.changer_temps(la_vitesse.temps());
+  ch.changer_temps(la_vitesse->temps());
 }

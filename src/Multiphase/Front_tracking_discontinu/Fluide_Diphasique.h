@@ -26,7 +26,7 @@
 #include <Fluide_Incompressible.h>
 #include <Milieu_base.h>
 #include <Objet_U.h>
-#include <Milieu.h>
+#include <Milieu_base.h>
 
 class Fluide_Diphasique: public Milieu_base
 {
@@ -64,7 +64,7 @@ public:
   Champ_Don& beta_t() override { return invalid_<Champ_Don&>(__func__); }
 
 private:
-  Milieu phase0_, phase1_;
+  OWN_PTR(Milieu_base) phase0_, phase1_;
   Champ_Don sigma_; // Tension de surface (J/m^2)
   Champ_Don chaleur_latente_; // Enthalpie de changement de phase h(phase1_) - h(phase0_) (J/kg/K)
   Motcle formule_mu_; // Formule utilisee pour le calcul de la moyenne de mu

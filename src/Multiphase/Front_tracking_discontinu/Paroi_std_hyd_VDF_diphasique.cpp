@@ -50,7 +50,7 @@ int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
   const IntVect& orientation = domaine_VDF.orientation();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
 
   // Physical properties of both phases
   const Fluide_Diphasique& le_fluide = ref_cast(Fluide_Diphasique, eqn_hydr.milieu());
@@ -66,7 +66,7 @@ int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
   const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis().valeur();
   const Equation_base& eqn_trans = domaine_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
   const Transport_Interfaces_FT_Disc& eqn_interf = ref_cast(Transport_Interfaces_FT_Disc, eqn_trans);
-  const DoubleTab& indic = eqn_interf.inconnue().valeurs();
+  const DoubleTab& indic = eqn_interf.inconnue()->valeurs();
 
   double visco_ph0=-1;
   int l_unif;
@@ -106,7 +106,7 @@ int Paroi_std_hyd_VDF_diphasique::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
       // aux voisinages des parois
 
       const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       ndeb = le_bord.num_premiere_face();
       nfin = ndeb + le_bord.nb_faces();
 

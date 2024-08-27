@@ -25,9 +25,7 @@
 
 #include <Pb_Fluide_base.h>
 #include <Navier_Stokes_Turbulent_ALE.h>
-
-class Champ_Fonc;
-
+#include <Champ_Fonc.h>
 
 
 /*! @brief classe Pb_Hydraulique_Turbulent_ALE Cette classe represente un probleme d'hydraulique turbulent dans

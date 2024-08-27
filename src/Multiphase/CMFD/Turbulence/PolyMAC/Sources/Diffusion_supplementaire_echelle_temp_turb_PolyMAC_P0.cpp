@@ -53,7 +53,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(m
 
   if (!matrices.count("tau") || semi_impl.count("tau")) return;
 
-  int N = equation().inconnue().valeurs().line_size(), ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot() ;
+  int N = equation().inconnue()->valeurs().line_size(), ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot() ;
 
   tau.init_grad(0);
   const IntTab& fg_d = tau.fgrad_d, &fg_e = tau.fgrad_e, &e_f = domaine.elem_faces();             // Tables used in domaine_PolyMAC_P0::fgrad

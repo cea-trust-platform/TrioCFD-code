@@ -79,8 +79,8 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   //  par default distant_= 1
   //  trace the value corresponding from champ inconnu
   //   Champ_Inc_P0_base::trace(), trace the element from distant
-  T_autre_pb().mettre_a_jour(temps);
-  indicatrice_.mettre_a_jour(temps);
+  T_autre_pb()->mettre_a_jour(temps);
+  indicatrice_->mettre_a_jour(temps);
 
   const DoubleTab& I = indicatrice_->valeurs_au_temps(temps);
 
@@ -202,7 +202,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
                 {
                   if (!est_egal(mon_phi(ii, jj), 0.))
                     {
-                      mon_Ti(ii, jj) = T_ext().valeurs()(ii, jj) - mon_phi(ii, jj) /autre_h(ii) ;
+                      mon_Ti(ii, jj) = T_ext()->valeurs()(ii, jj) - mon_phi(ii, jj) /autre_h(ii) ;
                       mon_h(ii,jj) = 0.;
                     }
                 }
@@ -214,7 +214,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   mon_h.echange_espace_virtuel();
   Echange_global_impose::mettre_a_jour(temps);
   mon_Ti.echange_espace_virtuel();
-  Ti_wall_.mettre_a_jour(temps);
+  Ti_wall_->mettre_a_jour(temps);
 
 
   // check if to inject a new nuclateion seed
@@ -287,7 +287,7 @@ void Echange_contact_VDF_FT_Disc::completer()
   // changer distant = 0; for indicatrice_...
   // par default, 1;
   ch.set_distant(distant);
-  ch.associer_fr_dis_base(T_ext().frontiere_dis());
+  ch.associer_fr_dis_base(T_ext()->frontiere_dis());
   ch.completer();
   int nb_cases=domaine_Cl_dis().equation().schema_temps().nb_valeurs_temporelles();
   ch.fixer_nb_valeurs_temporelles(nb_cases);
@@ -308,12 +308,12 @@ void Echange_contact_VDF_FT_Disc::completer()
       derivee_phi_ext_.typer ("Champ_front_fonc");
       derivee_phi_ext_->fixer_nb_comp (1);
       derivee_phi_ext_->associer_fr_dis_base (frontiere_dis ());
-      derivee_phi_ext_.valeurs ().resize (nb_faces_raccord1, 1);
+      derivee_phi_ext_->valeurs ().resize (nb_faces_raccord1, 1);
 
       phi_ext_.typer ("Champ_front_fonc");
       phi_ext_->fixer_nb_comp (1);
       phi_ext_->associer_fr_dis_base (frontiere_dis ());
-      phi_ext_.valeurs ().resize (nb_faces_raccord1, 1);
+      phi_ext_->valeurs ().resize (nb_faces_raccord1, 1);
     }
 
 
@@ -321,7 +321,7 @@ void Echange_contact_VDF_FT_Disc::completer()
   Ti_wall_.typer ("Champ_front_fonc");
   Ti_wall_->fixer_nb_comp (1);
   Ti_wall_->associer_fr_dis_base (frontiere_dis ());
-  Ti_wall_.valeurs ().resize (nb_faces_raccord1, 1);
+  Ti_wall_->valeurs().resize (nb_faces_raccord1, 1);
   Ti_wall_-> fixer_nb_valeurs_temporelles(nb_cases);
 
 }
@@ -403,10 +403,10 @@ void Echange_contact_VDF_FT_Disc::set_temps_defaut(double temps)
 double Echange_contact_VDF_FT_Disc::Ti_wall(int i) const
 {
 
-  if (Ti_wall_.valeurs().size() == 1)
-    return Ti_wall_(0, 0);
-  else if (Ti_wall_.valeurs().dimension(1) == 1)
-    return Ti_wall_(i, 0);
+  if (Ti_wall_->valeurs().size() == 1)
+    return Ti_wall_->valeurs()(0, 0);
+  else if (Ti_wall_->valeurs().dimension(1) == 1)
+    return Ti_wall_->valeurs()(i, 0);
   else
     Cerr << "Echange_contact_VDF_FT_Disc::Ti_wall_ erreur" << finl;
   exit();

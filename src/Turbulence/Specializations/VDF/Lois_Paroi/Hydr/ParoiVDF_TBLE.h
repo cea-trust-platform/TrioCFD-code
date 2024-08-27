@@ -29,10 +29,9 @@
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM.h>
 #include <Paroi_log_QDM.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Champ_Fonc_base;
-class Domaine_dis;
-class Domaine_Cl_dis;
 class Param;
 
 /*! @brief CLASS: ParoiVDF_TBLE

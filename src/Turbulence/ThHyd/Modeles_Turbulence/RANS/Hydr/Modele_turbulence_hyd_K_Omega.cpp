@@ -30,7 +30,6 @@
 #include <TRUSTTab_parts.h>
 #include <Probleme_base.h>
 #include <stat_counters.h>
-#include <Schema_Temps.h>
 #include <Fluide_base.h>
 #include <TRUSTTrav.h>
 #include <Param.h>
@@ -92,7 +91,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
   const Champ_base& chK_Omega = eqn_transp_K_Omega().inconnue().valeur();
   const Nom type = chK_Omega.que_suis_je();
   const DoubleTab& tab_K_Omega = chK_Omega.valeurs();
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
 
   // K_Omega(i, 0) = K on node i
   // K_Omega(i, 1) = Omega on node i
@@ -108,14 +107,14 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
                << finl;
           Process::exit();
         }
-      komega_size_real = eqn_transp_K_Omega().domaine_dis().domaine().nb_elem();
+      komega_size_real = eqn_transp_K_Omega().domaine_dis()->domaine().nb_elem();
     }
 
   // cAlan, le 20/01/2023 : sortir cette partie et en faire une fonction à
   // part ? dans le cas d'une domaine nulle on doit effectuer le
   // dimensionnement
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente before",
-                  la_viscosite_turbulente_.valeurs());
+                  la_viscosite_turbulente_->valeurs());
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente tab_K_Omega",
                   tab_K_Omega);
   double non_prepare = (visco_turb.size() == komega_size_real) ? 0 : 1;
@@ -150,7 +149,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
   else
     fill_turbulent_viscosity_tab(komega_size_real, tab_K_Omega, visco_turb);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente la_viscosite_turbulente after",
                   visco_turb);
   return la_viscosite_turbulente_;
@@ -194,7 +193,7 @@ void Modele_turbulence_hyd_K_Omega::fill_turbulent_viscosity_tab(const int tab_K
  */
 void Modele_turbulence_hyd_K_Omega::init_F1_F2_enstrophy()
 {
-  int const n = K_Omega().valeurs().dimension_tot(0);
+  int const n = K_Omega()->valeurs().dimension_tot(0);
 
   blenderF1_.resize(n);
   fieldF2_.resize(n);
@@ -213,7 +212,7 @@ int Modele_turbulence_hyd_K_Omega::preparer_calcul()
   if (is_SST())
     init_F1_F2_enstrophy();
   calculate_limit_viscosity<MODELE_TYPE::K_OMEGA>(K_Omega(), -123. /* unused */ );
-  Debog::verifier("Modele_turbulence_hyd_K_Omega::preparer_calcul la_viscosite_turbulente", la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::preparer_calcul la_viscosite_turbulente", la_viscosite_turbulente_->valeurs());
   return 1;
 }
 
@@ -232,14 +231,14 @@ bool Modele_turbulence_hyd_K_Omega::initTimeStep(double dt)
 void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K_Omega().schema_temps();
-  eqn_transp_K_Omega().domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_K_Omega().domaine_Cl_dis()->mettre_a_jour(temps);
   if (!eqn_transp_K_Omega().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Omega());
   eqn_transp_K_Omega().mettre_a_jour(temps);
 
   statistiques().begin_count(nut_counter_);
-  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente before", la_viscosite_turbulente_->valeurs());
   calculate_limit_viscosity<MODELE_TYPE::K_OMEGA>(K_Omega(), -123. /* unused */ );
-  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente after", la_viscosite_turbulente_.valeurs());
+  Debog::verifier("Modele_turbulence_hyd_K_Omega::mettre_a_jour la_viscosite_turbulente after", la_viscosite_turbulente_->valeurs());
   statistiques().end_count(nut_counter_);
 }

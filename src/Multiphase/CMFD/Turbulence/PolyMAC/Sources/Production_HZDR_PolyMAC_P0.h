@@ -27,7 +27,6 @@
 #include <TRUSTTab.h>
 #include <TRUST_Ref.h>
 
-class Correlation;
 
 /*! @brief Classe Production_HZDR_PolyMAC_P0 : Cette classe implemente, dans PolyMAC_P0, la production de BIA dans l'equation de k.
  * L'agitation induite par les bulles (BIA) est prise en compte dans l'équation de k grace à un terme de production.

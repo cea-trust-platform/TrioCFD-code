@@ -24,11 +24,10 @@
 
 #include <Source_base.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine_dis.h>
+#include <Domaine_Cl_dis.h>
 class Domaine_Cl_VEF;
 class Domaine_VEF;
-class Domaine_Cl_dis;
-class Domaine_dis;
 
 class Convection_Diffusion_std;
 

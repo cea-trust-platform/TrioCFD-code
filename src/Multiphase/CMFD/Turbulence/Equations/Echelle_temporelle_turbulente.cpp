@@ -104,7 +104,7 @@ void Echelle_temporelle_turbulente::discretiser()
 void Echelle_temporelle_turbulente::calculer_tau(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
   const Equation_base& eqn = ref_cast(Equation_base, obj);
-  const DoubleTab& tau = eqn.inconnue().valeurs();
+  const DoubleTab& tau = eqn.inconnue()->valeurs();
 
   /* valeurs du champ */
   int i, n, N = val.line_size(), Nl = val.dimension_tot(0);

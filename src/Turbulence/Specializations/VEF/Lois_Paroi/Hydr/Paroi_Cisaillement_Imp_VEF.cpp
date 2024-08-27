@@ -82,7 +82,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& vit = eqn_hydr.inconnue()->valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
@@ -130,7 +130,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
       const Cond_lim& la_cl = le_dom_Cl_VEF->les_conditions_limites(n_bord);
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           const IntTab& elem_faces = domaine_VEF.elem_faces();
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();

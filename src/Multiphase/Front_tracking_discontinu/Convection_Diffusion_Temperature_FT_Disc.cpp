@@ -80,7 +80,7 @@ Entree& Convection_Diffusion_Temperature_FT_Disc::readOn(Entree& is)
   // Ne pas faire assert(fluide non nul)
   Convection_Diffusion_std::readOn(is);
   solveur_masse->set_name_of_coefficient_temporel("rho_cp_comme_T");
-  Nom num=inconnue().le_nom(); // On prevoir le cas d'equation de scalaires passifs
+  Nom num=inconnue()->le_nom(); // On prevoir le cas d'equation de scalaires passifs
   num.suffix("temperature_thermique");
   Nom nom="Convection_chaleur";
   nom+=num;
@@ -525,7 +525,7 @@ void Convection_Diffusion_Temperature_FT_Disc::calculer_mpoint(Champ_base& mpoin
     if (val[i] < invalid_test)
       val[i] = 0;
 
-  const double k = fluide_dipha_->fluide_phase(phase_).conductivite()(0,0);
+  const double k = fluide_dipha_->fluide_phase(phase_).conductivite()->valeurs()(0,0);
   const double L = fluide_dipha_->chaleur_latente();
   // L est la chaleur latente de changement de phase pour passer de
   // la phase 0 a la phase 1.
@@ -599,7 +599,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
   Cerr << "Work in progress and widly incorrect. " << finl;
   Cerr << "Wait and see for further improvements. Exit" << finl;
   Process::exit();
-  if (inconnue().nb_valeurs_temporelles() == 1)
+  if (inconnue()->nb_valeurs_temporelles() == 1)
     {
       Cerr << "You need at least 2 positions to the wheel... Contact TRUST support. " << finl;
       Process::exit();
@@ -607,14 +607,14 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
   Transport_Interfaces_FT_Disc& eq_interface_ = ref_eq_interface_.valeur();
   //const Champ_base& ch_indic = ref_cast(Champ_Inc,eq_interface_.get_update_indicatrice());
   //const DoubleTab& indicatrice = ch_indic.valeurs();
-  const DoubleTab& indicatrice = eq_interface_.inconnue().valeurs();
-  const DoubleTab& indicatrice_passe = eq_interface_.inconnue().passe();
+  const DoubleTab& indicatrice = eq_interface_.inconnue()->valeurs();
+  const DoubleTab& indicatrice_passe = eq_interface_.inconnue()->passe();
   const double& dt = schema_temps().pas_de_temps();
   //const DoubleTab& indicatrice_passe = ch_indic.passe();
   DoubleTab& temperature = inconnue()->valeurs();
-  const DoubleTab& temperature_passe = inconnue().passe();
-  const double rhocp = fluide_dipha_->fluide_phase(phase_).masse_volumique()(0,0)
-                       * fluide_dipha_->fluide_phase(phase_).capacite_calorifique()(0,0);
+  const DoubleTab& temperature_passe = inconnue()->passe();
+  const double rhocp = fluide_dipha_->fluide_phase(phase_).masse_volumique()->valeurs()(0,0)
+                       * fluide_dipha_->fluide_phase(phase_).capacite_calorifique()->valeurs()(0,0);
 
   const int nb_elem = mixed_elems_.size_array();
   //assert(mixed_elems_diffu_.size_array()==nb_elem);
@@ -913,7 +913,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
 void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_extension()
 {
   Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, ref_eq_ns_.valeur());
-  vitesse_convection_.valeurs() = ns.inconnue().valeurs();
+  vitesse_convection_->valeurs() = ns.inconnue()->valeurs();
   // Projection of the convective field :
   //SolveurSys solveur_pression(ns.get_solveur_pression());
   Solveur_Masse solveur_masse_fictitious(ns.solv_masse()); // Copy the operator to change the coeff
@@ -963,9 +963,9 @@ void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_
 
   // RHS for this pressure solveur : div(delta_u)
   // We need to create a table sized as temperature to store the rhs :
-  DoubleTab& secmem = divergence_delta_U.valeurs();
-  //secmem.copy(inconnue().valeurs(), RESIZE_OPTIONS::NOCOPY_NOINIT);
-  div_tmp->calculer(vitesse_convection_.valeurs(),secmem);
+  DoubleTab& secmem = divergence_delta_U->valeurs();
+  //secmem.copy(inconnue()->valeurs(), RESIZE_OPTIONS::NOCOPY_NOINIT);
+  div_tmp->calculer(vitesse_convection_->valeurs(),secmem);
 
   // On ne conserve que la divergence des elements proches de l'interface, et supprime quand la distance est invalide
   if (0) // Cela pourrait etre utile si on construisait le saut de vitesse delta u_0 mais
@@ -1014,17 +1014,17 @@ void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_
   // Correction du second membre d'apres les conditions aux limites :
   assembleur_pression_->modifier_secmem(secmem);
   // Ajout pour la sauvegarde au premier pas de temps si reprise
-  la_pression.changer_temps(schema_temps().temps_courant());
+  la_pression->changer_temps(schema_temps().temps_courant());
 
   // Resolution du systeme en pression : calcul de la_pression
   solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),
                                      secmem,
-                                     la_pression.valeurs()
+                                     la_pression->valeurs()
                                     );
-  assembleur_pression_.modifier_solution(la_pression.valeurs());
+  assembleur_pression_->modifier_solution(la_pression->valeurs());
   // Calcul d(u)/dt = vpoint + 1/rho*grad(P)
 
-  DoubleTab& gradP = gradient_pression_.valeurs();
+  DoubleTab& gradP = gradient_pression_->valeurs();
   // Can I re-use a gradient from NS?
   Operateur_Grad gradient_tmp;
   gradient_tmp.associer_eqn(ns);//*this);
@@ -1036,12 +1036,12 @@ void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_
   gradient_tmp.l_op_base().associer(domaine_dis(), zcl_fictitious_, vitesse_convection_); // Quel champ inco pour le gradP? A quoi sert-elle?
   gradient_tmp.calculer(la_pression->valeurs(), gradP);
   // I don't wanna divide by rho_face :
-  solveur_masse_fictitious.appliquer(gradP); // divide by cell_volume
+  solveur_masse_fictitious->appliquer(gradP); // divide by cell_volume
 
   // Correction of vitesse : "+=" seems the good sign, though I don't understand why...
   {
     int i, j;
-    DoubleTab& vc = vitesse_convection_.valeurs();
+    DoubleTab& vc = vitesse_convection_->valeurs();
     const int n = vc.dimension(0);
     if (vc.nb_dim() == 1)
       {
@@ -1089,7 +1089,7 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
     {
       ns.calculer_delta_u_interface(vitesse_convection_, phase_, correction_courbure_ordre_);
       //vitesse_convection_.valeurs() += vitesse_ns.valeurs();
-      vitesse_convection_.valeurs() += vitesse_ns.futur(); // avec les jeux d'avancer reculer et les equations, il faut prendre futur pour avoir u^n ici
+      vitesse_convection_->valeurs() += vitesse_ns->futur(); // avec les jeux d'avancer reculer et les equations, il faut prendre futur pour avoir u^n ici
       //Cerr << inconnue()->temps()  << " =! " << vitesse_ns.temps() << " " << vitesse_convection_.temps() << finl;
       //Process::exit();
     }
@@ -1177,7 +1177,7 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
   }
   //  statistiques().end_count(count3);
 
-  solveur_masse.appliquer(derivee);
+  solveur_masse->appliquer(derivee);
   if (schema_temps().diffusion_implicite() && !calcul_explicite)
     {
       Convection_Diffusion_Temperature::derivee_en_temps_inco(derivee);
@@ -1264,7 +1264,7 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
       //
       // Correct the field mpoint in wall-adjacent cells to account for TCL model:
       // ---> It cannot be done before because it would disturbs the solution via delta u!
-      tcl.corriger_mpoint(mpoint_.valeurs());
+      tcl.corriger_mpoint(mpoint_->valeurs());
 
       // Correct the phase-change in wall adjacent cells:
       // The mean cell-temperature is simply derived from the TCL solution.
@@ -1280,7 +1280,7 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
 void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
 {
   Convection_Diffusion_Temperature::mettre_a_jour(temps);
-  vitesse_convection_.mettre_a_jour(temps);
+  vitesse_convection_->mettre_a_jour(temps);
   // GB : Debut du maintien artificiel de la temperature.
   if (maintien_temperature_)
     {
@@ -1400,7 +1400,7 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser_assembleur_pression()
   //type += "_homogene";
   Cerr << "Navier_Stokes_std::discretiser_assembleur_pression : type="<< type << finl;
   assembleur_pression_.typer(type);
-  assembleur_pression_.associer_domaine_dis_base(domaine_dis().valeur());
+  assembleur_pression_->associer_domaine_dis_base(domaine_dis().valeur());
 }
 
 void Convection_Diffusion_Temperature_FT_Disc::completer()
@@ -1467,8 +1467,8 @@ void Convection_Diffusion_Temperature_FT_Disc::completer()
 
       // Associate to the newly created zcl :
       // required because It's not a good plan to use ns.domaine_Cl_dis().valeur() because of outlet_BC
-      assembleur_pression_.associer_domaine_cl_dis_base(zcl_fictitious_.valeur());
-      assembleur_pression_.completer(ns); // Should it be associated to (*this) or ns?
+      assembleur_pression_->associer_domaine_cl_dis_base(zcl_fictitious_.valeur());
+      assembleur_pression_->completer(ns); // Should it be associated to (*this) or ns?
       //                                        I think it does not matter because Assembleur_base::completer is called and does nothing
       // On assemble la matrice de pression une seule et unique fois (puisqu'elle ne depend pas de rho...).
       assembleur_pression_->assembler(matrice_pression_);
@@ -1526,16 +1526,16 @@ void Convection_Diffusion_Temperature_FT_Disc::suppression_interfaces(const IntV
   if (nouvelle_phase != phase_)
     return;
 
-  const int n = domaine_dis().domaine().nb_elem();
+  const int n = domaine_dis()->domaine().nb_elem();
   assert(num_compo.size() == n);
-  const int nb_valeurs_temporelles = inconnue().nb_valeurs_temporelles();
+  const int nb_valeurs_temporelles = inconnue()->nb_valeurs_temporelles();
   // Il faut traiter toutes les cases temporelles:
   //  selon l'ordre des equations dans le probleme, la roue a deja ete tournee ou pas...
   // Note B.M. est ce que c'est compatible avec la spec de ICOCO ? (modif
   //  du temps n autorisee ???)
   for (int t = 0; t < nb_valeurs_temporelles; t++)
     {
-      DoubleTab& temp = inconnue().futur(t);
+      DoubleTab& temp = inconnue()->futur(t);
       for (int i = 0; i < n; i++)
         {
           const int c = num_compo[i];
@@ -1563,8 +1563,8 @@ double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_
     }
   const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
   const Cond_lim& la_cl = zclvdf.la_cl_de_la_face(num_face);
-  const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-  const Nom& bc_name = la_cl.frontiere_dis().le_nom();
+  const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
+  const Nom& bc_name = la_cl->frontiere_dis().le_nom();
   const int ndeb = le_bord.num_premiere_face();
 //  Cerr <<  " BC: " << la_cl.valeur() << " name: " << bc_name << finl;
 //  Cerr << "Dealing with face " << num_face <<  " belonging to BC " << la_cl.valeur();
@@ -1577,7 +1577,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_
     {
       Cerr << "paroi_flux_impose" << finl;
       const Neumann_paroi& la_cl_typee = ref_cast(Neumann_paroi, la_cl.valeur());
-      double phi_imp = la_cl_typee.champ_front().valeur()(num_face-ndeb); // Should it be valeurs instead of ?
+      double phi_imp = la_cl_typee.champ_front()->valeurs()(num_face-ndeb); // Should it be valeurs instead of ?
       return phi_imp;
     }
   else if (sub_type(Echange_impose_base, la_cl.valeur()))
@@ -1668,8 +1668,8 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
     }
   const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
   const Cond_lim& la_cl = zclvdf.la_cl_de_la_face(num_face);
-  const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-  const Nom& bc_name = la_cl.frontiere_dis().le_nom();
+  const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
+  const Nom& bc_name = la_cl->frontiere_dis().le_nom();
   const int ndeb = le_bord.num_premiere_face();
 // Cerr <<  " BC: " << la_cl.valeur() << " name: " << bc_name << finl;
 // Cerr << "Dealing with face " << num_face <<  " belonging to BC " << la_cl.valeur();
@@ -1685,7 +1685,7 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
     {
       Cerr << "paroi_flux_impose" << finl;
       const Neumann_paroi& la_cl_typee = ref_cast(Neumann_paroi, la_cl.valeur());
-      flux = la_cl_typee.champ_front().valeur()(num_face-ndeb); // Should it be valeurs instead of ?
+      flux = la_cl_typee.champ_front()->valeurs()(num_face-ndeb); // Should it be valeurs instead of ?
       //
       Cerr << "How can we set Twall when temperature(elem) is not valid? Or is it?" << finl;
       Process::exit();
@@ -1772,7 +1772,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall(const int num_face) c
     d += (xyz_face[i] - P[i])*(xyz_face[i] - P[i]);
   d= sqrt(d);
   const double flux = get_flux_to_face(num_face);
-  const double k = fluide_dipha_->fluide_phase(phase_).conductivite()(0,0);
+  const double k = fluide_dipha_->fluide_phase(phase_).conductivite()->valeurs()(0,0);
 //  Cerr << "flux/d/k" <<  flux << " " << d << " " << k <<  finl;
   // flux is incoming. So "-flux" is needed.
   const double Twall = temperature(elem) - d/k*flux;

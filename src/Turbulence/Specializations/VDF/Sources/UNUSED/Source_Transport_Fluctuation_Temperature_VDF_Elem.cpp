@@ -185,7 +185,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::calculer_Prod_utet
       if (sub_type(Entree_fluide_temperature_imposee,la_cl.valeur()) )
         {
           const Entree_fluide_temperature_imposee& la_cl_diri=ref_cast(Entree_fluide_temperature_imposee,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (face=ndeb; face<nfin; face++)
@@ -238,15 +238,15 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& modele_bas_Re = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,le_modele);
   const Transport_K_Eps_base& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.eqn_transp_K_Eps();
-  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue().valeurs();
-  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleTab& visco_turb = le_modele.viscosite_turbulente().valeurs();
-  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue().valeurs();
+  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue()->valeurs();
+  const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& visco_turb = le_modele.viscosite_turbulente()->valeurs();
+  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_Fluctuation_Temperature& modele_Flux_Chaleur = ref_cast(Modele_turbulence_scal_Fluctuation_Temperature,le_modele_scalaire);
   const Transport_Flux_Chaleur_Turbulente& mon_eq_transport_Flux_Chaleur_Turb =  modele_Flux_Chaleur.equation_Chaleur();
-  const DoubleTab& Flux_Chaleur_Turb = mon_eq_transport_Flux_Chaleur_Turb.inconnue().valeurs();
+  const DoubleTab& Flux_Chaleur_Turb = mon_eq_transport_Flux_Chaleur_Turb.inconnue()->valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
   const DoubleTab& g = gravite->valeurs();
@@ -276,7 +276,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
   // C'est l'objet de type domaine_Cl_dis de l'equation thermique
   // qui est utilise dans le calcul de G
 
-  const DoubleTab& tab_beta = ch_beta.valeurs();
+  const DoubleTab& tab_beta = ch_beta->valeurs();
   if (sub_type(Champ_Uniforme,ch_beta.valeur()))
     // calculer_terme_g(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
     {

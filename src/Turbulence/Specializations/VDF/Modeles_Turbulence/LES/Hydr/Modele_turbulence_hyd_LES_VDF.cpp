@@ -82,8 +82,8 @@ int Modele_turbulence_hyd_LES_VDF::lire_motcle_non_standard(const Motcle& mot, E
 Champ_Fonc& Modele_turbulence_hyd_LES_VDF::calculer_viscosite_turbulente()
 {
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
-  double temps = mon_equation_->inconnue().temps();
-  DoubleTab& visco_turb = la_viscosite_turbulente_.valeurs();
+  double temps = mon_equation_->inconnue()->temps();
+  DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   int nb_poly = domaine_VDF.domaine().nb_elem();
   int nb_poly_tot = domaine_VDF.domaine().nb_elem_tot();
 
@@ -104,14 +104,14 @@ Champ_Fonc& Modele_turbulence_hyd_LES_VDF::calculer_viscosite_turbulente()
 
   Debog::verifier("Modele_turbulence_hyd_LES_VDF::calculer_viscosite_turbulente visco_turb 1", visco_turb);
 
-  la_viscosite_turbulente_.changer_temps(temps);
+  la_viscosite_turbulente_->changer_temps(temps);
   return la_viscosite_turbulente_;
 }
 
 void Modele_turbulence_hyd_LES_VDF::calculer_energie_cinetique_turb()
 {
-  double temps = mon_equation_->inconnue().temps();
-  DoubleVect& k = energie_cinetique_turb_.valeurs();
+  double temps = mon_equation_->inconnue()->temps();
+  DoubleVect& k = energie_cinetique_turb_->valeurs();
   int nb_poly = ref_cast(Domaine_VDF, le_dom_VF_.valeur()).domaine().nb_elem();
 
   if (k.size() != nb_poly)
@@ -123,13 +123,13 @@ void Modele_turbulence_hyd_LES_VDF::calculer_energie_cinetique_turb()
   for (int elem = 0; elem < nb_poly; elem++)
     k[elem] = Csm2_ * F2_[elem];
 
-  energie_cinetique_turb_.changer_temps(temps);
+  energie_cinetique_turb_->changer_temps(temps);
 }
 
 void Modele_turbulence_hyd_LES_VDF::calculer_fonction_structure()
 {
 
-  const DoubleTab& vitesse = mon_equation_->inconnue().valeurs();
+  const DoubleTab& vitesse = mon_equation_->inconnue()->valeurs();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   int nb_poly = domaine_VDF.domaine().nb_elem();
   int nb_poly_tot = domaine_VDF.domaine().nb_elem_tot();
@@ -457,7 +457,7 @@ void Modele_turbulence_hyd_LES_VDF::calculer_fonction_structure()
           const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
           if (sub_type(Dirichlet_entree_fluide, la_cl.valeur()))
             {
-              const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
               ndeb = le_bord.num_premiere_face();
               nfin = ndeb + le_bord.nb_faces();
               for (num_face = ndeb; num_face < nfin; num_face++)
@@ -475,7 +475,7 @@ void Modele_turbulence_hyd_LES_VDF::calculer_fonction_structure()
             }
           else if (sub_type(Neumann_sortie_libre, la_cl.valeur()))
             {
-              const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
               ndeb = le_bord.num_premiere_face();
               nfin = ndeb + le_bord.nb_faces();
               for (num_face = ndeb; num_face < nfin; num_face++)
@@ -501,7 +501,7 @@ void Modele_turbulence_hyd_LES_VDF::calculer_fonction_structure()
             }
           else
             {
-              const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
+              const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
               ndeb = le_bord.num_premiere_face();
               nfin = ndeb + le_bord.nb_faces();
               for (num_face = ndeb; num_face < nfin; num_face++)

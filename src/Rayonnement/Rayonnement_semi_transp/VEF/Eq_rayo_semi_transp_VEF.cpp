@@ -80,29 +80,29 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
   //            temps
 
   //calcul du second membre
-  DoubleTrav secmem(inconnue().valeurs());
+  DoubleTrav secmem(inconnue()->valeurs());
   Probleme_base& pb = Modele().probleme();
   double n;
   double k;
 
-  assert(pb.equation(1).inconnue().le_nom()=="temperature");
+  assert(pb.equation(1).inconnue()->le_nom()=="temperature");
   const DoubleTab& temper = pb.equation(1).inconnue()->valeurs();
 
-  const DoubleTab& indice = fluide().indice().valeurs();
-  const DoubleTab& kappa = fluide().kappa().valeurs();
+  const DoubleTab& indice = fluide().indice()->valeurs();
+  const DoubleTab& kappa = fluide().kappa()->valeurs();
   double sigma = Modele().valeur_sigma();
 
   secmem = 0;
   int face;
   for (face=0; face<nb_faces; face++)
     {
-      assert(fluide().indice().nb_comp() == 1);
+      assert(fluide().indice()->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide().indice().valeur()))
         n = indice(0,0);
       else
         n = indice(face,0);
 
-      assert(fluide().kappa().nb_comp() == 1);
+      assert(fluide().kappa()->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide().kappa().valeur()))
         k = kappa(0,0);
       else
@@ -125,7 +125,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
         Matrice matrice_tmp;
         dimensionner_Mat_Bloc_Morse_Sym(matrice_tmp);
         Mat_Morse_to_Mat_Bloc(matrice_tmp);
-        solveur.resoudre_systeme(matrice_tmp.valeur(),secmem,irradiance_.valeurs());
+        solveur.resoudre_systeme(matrice_tmp.valeur(),secmem,irradiance_->valeurs());
       }
     else
       {
@@ -139,7 +139,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
       }
   else if (solveur->que_suis_je() == "Solv_Gmres")
     if (Process::nproc() == 1)
-      solveur.resoudre_systeme(la_matrice,secmem,irradiance_.valeurs());
+      solveur.resoudre_systeme(la_matrice,secmem,irradiance_->valeurs());
     else
       {
         Cerr<<finl;
@@ -163,7 +163,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
     }
 
 
-  Debog::verifier("Eq_rayo_semi_transp_VEF::resoudre irradiance",irradiance_.valeurs());
+  Debog::verifier("Eq_rayo_semi_transp_VEF::resoudre irradiance",irradiance_->valeurs());
   //Cerr<<"irradiance.std::max() = "<<irradiance_.std::max()<<", irradiance.std::min() = "<<irradiance_.std::min()<<finl;
   //Cerr<<"Eq_rayo_semi_transp_VEF::resoudre : Fin"<<finl;
 }
@@ -178,7 +178,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 void Eq_rayo_semi_transp_VEF::modifier_matrice()
 {
   // On fait une boucle sur les conditions aux limites associees a l'equations
-  Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl = domaine_Cl_dis()->les_conditions_limites();
   const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis().valeur());
   const IntTab& face_voisins=zvef.face_voisins();
   const DoubleTab& face_normales = zvef.face_normales();
@@ -186,16 +186,16 @@ void Eq_rayo_semi_transp_VEF::modifier_matrice()
   int num_cl=0;
   for(num_cl = 0; num_cl<les_cl.size(); num_cl++)
     {
-      Cond_lim& la_cl = domaine_Cl_dis().les_conditions_limites(num_cl);
+      Cond_lim& la_cl = domaine_Cl_dis()->les_conditions_limites(num_cl);
       if (sub_type(Flux_radiatif_VEF,la_cl.valeur()))
         {
           Flux_radiatif_VEF& cl_radiatif = ref_cast(Flux_radiatif_VEF,la_cl.valeur());
-          const DoubleTab& epsilon = cl_radiatif.emissivite().valeurs();
+          const DoubleTab& epsilon = cl_radiatif.emissivite()->valeurs();
           double A = cl_radiatif.A();
 
-          if (sub_type(Front_VF,la_cl.frontiere_dis()))
+          if (sub_type(Front_VF,la_cl->frontiere_dis()))
             {
-              Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
               // Boucle sur les faces de le_bord
               int ndeb = le_bord.num_premiere_face();
               int nfin = ndeb + le_bord.nb_faces();
@@ -208,7 +208,7 @@ void Eq_rayo_semi_transp_VEF::modifier_matrice()
 
 
                   double epsi;
-                  assert(cl_radiatif.emissivite().nb_comp() == 1);
+                  assert(cl_radiatif.emissivite()->nb_comp() == 1);
                   if (sub_type(Champ_front_uniforme,cl_radiatif.emissivite().valeur()))
                     epsi = epsilon(0,0);
                   else
@@ -250,31 +250,31 @@ void Eq_rayo_semi_transp_VEF::modifier_matrice()
 void Eq_rayo_semi_transp_VEF::evaluer_cl_rayonnement(double temps)
 {
   // Boucle sur les conditions aux limites de l'equation de rayonnement
-  Conds_lim& les_cl_rayo = domaine_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl_rayo = domaine_Cl_dis()->les_conditions_limites();
 
   // recherche des conditions aux limites associes au l'equation de temperature
   Probleme_base& pb = Modele().probleme();
   Equation_base& eq_temp = pb.equation(1);
 
-  Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
+  Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites();
 
   int num_cl_rayo=0;
   for(num_cl_rayo = 0; num_cl_rayo<les_cl_rayo.size(); num_cl_rayo++)
     {
-      Cond_lim& la_cl_rayo = domaine_Cl_dis().les_conditions_limites(num_cl_rayo);
+      Cond_lim& la_cl_rayo = domaine_Cl_dis()->les_conditions_limites(num_cl_rayo);
       if(sub_type(Flux_radiatif_VEF,la_cl_rayo.valeur()))
         {
           Flux_radiatif_VEF& la_cl_rayon = ref_cast(Flux_radiatif_VEF,la_cl_rayo.valeur());
           // Recherche des temperatures de bord pour cette frontiere
-          Nom nom_cl_rayo = la_cl_rayo.frontiere_dis().le_nom();
+          Nom nom_cl_rayo = la_cl_rayo->frontiere_dis().le_nom();
           int num_cl_temp = 0;
           REF(Champ_front) Tb;
 
           int test_remplissage_Tb = 0;
           for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
             {
-              Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites(num_cl_temp);
-              Nom nom_cl_temp = la_cl_temp.frontiere_dis().le_nom();
+              Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites(num_cl_temp);
+              Nom nom_cl_temp = la_cl_temp->frontiere_dis().le_nom();
               if(nom_cl_temp == nom_cl_rayo)
                 {
                   if (sub_type(Neumann_paroi_rayo_semi_transp_VEF,la_cl_temp.valeur()))
@@ -346,7 +346,7 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
   const DoubleVect& volumes_entrelaces =  domaine_VF.volumes_entrelaces();
   //int nb_faces = domaine_VF.nb_faces();
 
-  const DoubleTab& irradi = irradiance_.valeurs();
+  const DoubleTab& irradi = irradiance_->valeurs();
 
   la_matrice.clean();
 
@@ -357,7 +357,7 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
 
 
   // Modification de la matrice pour prendre en compte le second membre en K*irradiance
-  const DoubleTab& kappa = fluide().kappa().valeurs();
+  const DoubleTab& kappa = fluide().kappa()->valeurs();
 
   Cerr<<"On verifie lors du calcul de la matrice de discretisation que "<<finl;
   Cerr<<"l'ordre de la matrice est bien egale au nombre de faces"<<finl;
@@ -369,7 +369,7 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
   double k;
   for (i=0; i<la_matrice.ordre(); i++)
     {
-      assert(fluide().kappa().nb_comp() == 1);
+      assert(fluide().kappa()->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide().kappa().valeur()))
         k = kappa(0,0);
       else

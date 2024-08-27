@@ -24,12 +24,12 @@
 
 #include <Source_base.h>
 #include <TRUST_Ref.h>
+#include <Champ_Don.h>
 
 class Convection_Diffusion_Concentration;
 class Convection_Diffusion_Temperature;
 class Champ_Don_base;
 class Equation_base;
-class Champ_Don;
 class Modele_Fonc_Realisable_base;
 class Modele_Fonc_Bas_Reynolds;
 class Fluide_base;

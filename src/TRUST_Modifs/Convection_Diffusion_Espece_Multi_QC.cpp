@@ -113,7 +113,7 @@ void Convection_Diffusion_Espece_Multi_QC::completer()
           toto >> condlims[i].valeur();
           condlims[i]->associer_fr_dis_base(frdis);
         }
-      DoubleTab& T = condlims[i]->champ_front().valeurs();
+      DoubleTab& T = condlims[i]->champ_front()->valeurs();
       T = 1.;
     }
 }
@@ -131,11 +131,11 @@ DoubleTab& Convection_Diffusion_Espece_Multi_QC::derivee_en_temps_inco(DoubleTab
   derivee = 0;
 
   les_sources.ajouter(derivee);
-  solveur_masse.appliquer(derivee);
+  solveur_masse->appliquer(derivee);
   DoubleTrav derivee_bis(derivee);
 
   // on commence par retirer phi*div(1 U)
-  const DoubleTab& frac_mass = inconnue().valeurs();
+  const DoubleTab& frac_mass = inconnue()->valeurs();
 
   Convection_Diffusion_Fluide_Dilatable_Proto::calculer_div_rho_u_impl(derivee_bis,*this);
 
@@ -148,7 +148,7 @@ DoubleTab& Convection_Diffusion_Espece_Multi_QC::derivee_en_temps_inco(DoubleTab
   operateur(0).ajouter(derivee_bis);
 
   solveur_masse->set_name_of_coefficient_temporel("masse_volumique");
-  solveur_masse.appliquer(derivee_bis);
+  solveur_masse->appliquer(derivee_bis);
   solveur_masse->set_name_of_coefficient_temporel("no_coeff");
   derivee += derivee_bis;
   return derivee;
@@ -203,11 +203,11 @@ void Convection_Diffusion_Espece_Multi_QC::assembler(Matrice_Morse& matrice, con
       DoubleTab test2(resu);
       DoubleTrav resu2(resu);
       derivee_en_temps_inco(resu2);
-      solveur_masse.appliquer(test2);
+      solveur_masse->appliquer(test2);
       resu2 -= test2;
       Cerr << " here " << mp_max_abs_vect(resu2) << finl;
       matrice.ajouter_multvect(inco, test);
-      solveur_masse.appliquer(test);
+      solveur_masse->appliquer(test);
       const double max_test = mp_max_abs_vect(test);
       Cerr << "iii " << max_test << finl;
 
@@ -226,8 +226,8 @@ void Convection_Diffusion_Espece_Multi_QC::assembler(Matrice_Morse& matrice, con
 void Convection_Diffusion_Espece_Multi_QC::assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)
 {
   statistiques().begin_count(assemblage_sys_counter_);
-  const std::string& nom_inco = inconnue().le_nom().getString();
-  const DoubleTab& inco = inconnue().valeurs();
+  const std::string& nom_inco = inconnue()->le_nom().getString();
+  const DoubleTab& inco = inconnue()->valeurs();
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
 
   secmem = 0;

@@ -65,11 +65,11 @@ Entree& Imprimer_Fichiers_RANS_VEF::interpreter(Entree& is)
 
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF,pb.equation(0).domaine_dis().valeur());
   const Equation_base& eqn_hydr = pb.equation(0);
-  const DoubleTab& vit = eqn_hydr.inconnue().valeurs(); //vitesse
+  const DoubleTab& vit = eqn_hydr.inconnue()->valeurs(); //vitesse
 
   //   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   //   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
-  //   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  //   const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   int nb_faces = domaine_VEF.nb_faces();
 
   SFichier fic("vitesse_RANS.dat");

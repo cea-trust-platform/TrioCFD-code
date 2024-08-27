@@ -26,7 +26,6 @@
 #include <Motcle.h>
 #include <TRUST_Ref.h>
 
-class Champ_Inc;
 class Entree;
 class Sortie;
 class Parser;

@@ -303,7 +303,7 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_teta(const Domaine_VDF& domaine_V
       if (sub_type(Entree_fluide_temperature_imposee,la_cl.valeur()) )
         {
           const Entree_fluide_temperature_imposee& la_cl_diri=ref_cast(Entree_fluide_temperature_imposee,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (face=ndeb; face<nfin; face++)
@@ -390,7 +390,7 @@ DoubleTab& Calcul_Production_K_VDF::calculer_u_conc(const Domaine_VDF& domaine_V
       if ( sub_type(Entree_fluide_concentration_imposee,la_cl.valeur()) )
         {
           const Entree_fluide_concentration_imposee& la_cl_diri= ref_cast(Entree_fluide_concentration_imposee,la_cl.valeur());
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
           for (face=ndeb; face<nfin; face++)

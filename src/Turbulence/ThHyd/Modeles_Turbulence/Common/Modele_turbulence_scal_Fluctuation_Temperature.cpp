@@ -110,11 +110,11 @@ bool Modele_turbulence_scal_Fluctuation_Temperature::initTimeStep(double dt)
 
 Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature::calculer_diffusivite_turbulente()
 {
-  DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();
-  const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
-  double temps = la_viscosite_turbulente->temps();
+  DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
+  const DoubleTab& nu_t = la_viscosite_turbulente.valeur()->valeurs();
+  double temps = la_viscosite_turbulente.valeur()->temps();
 
-  if (temps != diffusivite_turbulente_.temps())
+  if (temps != diffusivite_turbulente_->temps())
     {
       static const double Prdt_turbulent = 0.9;
 
@@ -129,7 +129,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature::calculer_diffusivite
       for (int i=0; i<n; i++)
         alpha_t[i] = nu_t[i]/Prdt_turbulent;
 
-      diffusivite_turbulente_.changer_temps(temps);
+      diffusivite_turbulente_->changer_temps(temps);
     }
   return diffusivite_turbulente_;
 }
@@ -139,7 +139,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature::mettre_a_jour(double temps)
   //  Champ_Inc& ch_Fluctu_Temp = Fluctu_Temperature();
   Schema_Temps_base& sch1 = eqn_transport_Fluctu_Temp.schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_Fluctu_Temp.domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transport_Fluctu_Temp.domaine_Cl_dis()->mettre_a_jour(temps);
   sch1.faire_un_pas_de_temps_eqn_base(eqn_transport_Fluctu_Temp);
   //eqn_transport_Fluctu_Temp.inconnue().mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp.mettre_a_jour(temps);
@@ -147,7 +147,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature::mettre_a_jour(double temps)
   //  Champ_Inc& ch_Flux_Chaleur_Turb = Flux_Chaleur_Turb();
   Schema_Temps_base& sch2 = eqn_transport_Flux_Chaleur_Turb.schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_Flux_Chaleur_Turb.domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transport_Flux_Chaleur_Turb.domaine_Cl_dis()->mettre_a_jour(temps);
   sch2.faire_un_pas_de_temps_eqn_base(eqn_transport_Flux_Chaleur_Turb);
   //eqn_transport_Flux_Chaleur_Turb.inconnue().mettre_a_jour(temps);
   eqn_transport_Flux_Chaleur_Turb.mettre_a_jour(temps);

@@ -17,7 +17,7 @@
 #include <Convection_Diffusion_Phase_field.h>
 #include <Source_Con_Phase_field.h>
 #include <RK3_MassRedistrib.h>
-#include <Equation.h>
+#include <Equation_base.h>
 
 Implemente_instanciable(RK3_MassRedistrib,"Runge_Kutta_ordre_3_MassRedistrib",RK3);
 
@@ -31,8 +31,8 @@ int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   const double a2 = -5. / 9., a3 = -153. / 128.;
   const double b1 = 1. / 3., b2 = 15. / 16., b3 = 8. / 15.;
 
-  DoubleTab& xi=eqn.inconnue().valeurs();
-  DoubleTab& xipls1=eqn.inconnue().futur();
+  DoubleTab& xi=eqn.inconnue()->valeurs();
+  DoubleTab& xipls1=eqn.inconnue()->futur();
   DoubleTab qi(xi) ;
   DoubleTab present(xi);
 
@@ -95,7 +95,7 @@ int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   //Mass_Redistribution_Phase_Field::impose_mass_redistribution(zvdf, xi, minnX, maxxX);
 
   // Update boundary condition on futur:
-  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
   xipls1.echange_espace_virtuel();
 
   /*  Mass_Redistribution_Phase_Field::impose_mass_redistribution(zvdf, xi, minnX, maxxX);*/

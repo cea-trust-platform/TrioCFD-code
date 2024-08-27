@@ -22,7 +22,6 @@
 
 #include <Flux_parietal_adaptatif.h>
 #include <Loi_paroi_adaptative.h>
-#include <Correlation.h>
 #include <Pb_Multiphase.h>
 #include <Domaine_dis.h>
 #include <Domaine_VF.h>

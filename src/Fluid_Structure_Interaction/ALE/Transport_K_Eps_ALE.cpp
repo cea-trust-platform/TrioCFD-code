@@ -54,9 +54,9 @@ void Transport_K_Eps_ALE::corriger_derivee_impl_ALE(DoubleTab& d)
       Cerr << "Adding ALE contribution to K Eps..." << finl;
       Op_Conv_ALE& opale=ref_cast(Op_Conv_ALE, terme_convectif.valeur());
       DoubleTrav ALE(d); // copie de la structure, initialise a zero
-      opale.ajouterALE(inconnue().valeurs(), ALE);
+      opale.ajouterALE(inconnue()->valeurs(), ALE);
       ALE.echange_espace_virtuel();
-      solveur_masse.appliquer(ALE);
+      solveur_masse->appliquer(ALE);
       ALE.echange_espace_virtuel();
       d+=ALE;
       d.echange_espace_virtuel();

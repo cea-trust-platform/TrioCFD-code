@@ -29,18 +29,17 @@
 #include <Iterateur_VDF_Elem.h>
 #include <Statistiques.h>
 #include <Op_VDF_Elem.h>
+#include <Domaine_Cl_dis.h>
+#include <Domaine_dis.h>
+#include <Champ_Inc.h>
 
 extern Stat_Counter_Id diffusion_counter_;
-
-class Domaine_Cl_dis;
-class Domaine_dis;
-class Champ_Inc;
 
 class Op_Diff_K_Eps_Bas_Re_VDF_base : public Op_Diff_K_Eps_Bas_Re_base, public Op_VDF_Elem
 {
   Declare_base(Op_Diff_K_Eps_Bas_Re_VDF_base);
 public:
-  Op_Diff_K_Eps_Bas_Re_VDF_base(const Iterateur_VDF_base& iter_base) : iter(iter_base) { }
+  Op_Diff_K_Eps_Bas_Re_VDF_base(const Iterateur_VDF_base& iter_base) { iter = iter_base; }
 
   void completer() override;
 
@@ -50,7 +49,7 @@ public:
 
   inline void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override
   {
-    const std::string& nom_inco = equation().inconnue().le_nom().getString();
+    const std::string& nom_inco = equation().inconnue()->le_nom().getString();
     Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
     if (!mat)
       return;
@@ -66,8 +65,7 @@ public:
   }
   inline int has_interface_blocs() const override { return 1; }
 
-
-  inline Iterateur_VDF& get_iter() { return iter; }
+  inline OWN_PTR(Iterateur_VDF_base)& get_iter() { return iter; }
 
   template <typename EVAL_TYPE>
   void associer_diffusivite_impl(const Champ_base& ch_diff)
@@ -94,7 +92,7 @@ public:
   void associer_diffusivite_turbulente_impl();
 
 protected:
-  Iterateur_VDF iter;
+  OWN_PTR(Iterateur_VDF_base) iter;
 };
 
 template <typename EVAL_TYPE, typename EVAL_TYPE2>

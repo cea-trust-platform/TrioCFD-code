@@ -25,9 +25,9 @@
 
 #include <Modele_turbulence_hyd_RANS_K_Eps_base.h>
 #include <Transport_2eq_base.h>
+#include <Champ_Inc.h>
 #include <TRUST_Ref.h>
 
-class Champ_Inc;
 class Milieu_base;
 class Champ_Inc_base;
 

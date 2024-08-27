@@ -147,20 +147,20 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
   // mutilde, div_alpha_gradC, alpha_gradC_carre et pression_thermo
   // ont la meme structure que la concentration
 
-  mutilde = inconnue().valeurs();
+  mutilde = inconnue()->valeurs();
   mutilde = 0.;
 
-  //Mass_Redistribution_Phase_Field::c_ini = inconnue().valeurs();//Mass_redistribution
+  //Mass_Redistribution_Phase_Field::c_ini = inconnue()->valeurs();//Mass_redistribution
 
 
   // si on traite une variable avec "dis." (voir discretiser()), l'operation "resize" est inutile car "dis." s'en charge.
   // En sequentiel : resize() autorise
   // En parallele : resize() interdit, car alors on ne prend pas en compte les joints
 
-  div_alpha_rho_gradC = inconnue().valeurs();
+  div_alpha_rho_gradC = inconnue()->valeurs();
   div_alpha_rho_gradC = 0.;
 
-  div_alpha_gradC = inconnue().valeurs();
+  div_alpha_gradC = inconnue()->valeurs();
   div_alpha_gradC = 0.;
 
 

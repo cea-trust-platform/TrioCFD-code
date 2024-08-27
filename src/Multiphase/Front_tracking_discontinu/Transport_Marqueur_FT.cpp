@@ -307,7 +307,7 @@ void Transport_Marqueur_FT::discretiser(void)
                           1 /* composantes */, nb_valeurs_temps,
                           temps,
                           champ_bidon_);
-  champ_bidon_.associer_eqn(*this);
+  champ_bidon_->associer_eqn(*this);
 
   Transport_Interfaces_FT_Disc::discretiser();
 
@@ -324,7 +324,7 @@ void Transport_Marqueur_FT::completer()
 {
   les_sources.completer();
   ////le_dom_Cl_dis->completer();
-  const Domaine& domaine = le_dom_dis->domaine();
+  const Domaine& domaine = le_dom_dis->valeur().domaine();
 
   Maillage_FT_Disc& ens_points = maillage_interface();
   ens_points.associer_domaine(domaine);
@@ -484,9 +484,9 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
   const Operateur_Grad& gradient = eq_ns.operateur_gradient();
 
   Champ_Inc champ_grad_p(eq_ns.grad_P());
-  gradient.calculer(champ_pression.valeurs(), champ_grad_p.valeurs());
-  le_solveur_masse_ns.appliquer(champ_grad_p.valeurs());
-  champ_grad_p.valeurs().echange_espace_virtuel();
+  gradient.calculer(champ_pression.valeurs(), champ_grad_p->valeurs());
+  le_solveur_masse_ns->appliquer(champ_grad_p->valeurs());
+  champ_grad_p->valeurs().echange_espace_virtuel();
   DoubleTabFT tab_som;
   const DoubleTab& pos = ens_points.sommets();
   const ArrOfInt& elem = ens_points.sommet_elem();
@@ -540,16 +540,16 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
         {
           const Fluide_Diphasique& fluide_diph = ref_cast(Fluide_Diphasique,mil);
           const Fluide_Incompressible& fluide = fluide_diph.fluide_phase(phase_marquee_);
-          const DoubleTab& rho = fluide.masse_volumique().valeurs();
-          const DoubleTab& visco_dyn = fluide.viscosite_dynamique().valeurs();
+          const DoubleTab& rho = fluide.masse_volumique()->valeurs();
+          const DoubleTab& visco_dyn = fluide.viscosite_dynamique()->valeurs();
           rho_fluide_som_ = rho(0,0);
           visco_dyn_fluide_som_ = visco_dyn(0,0);
         }
       else
         {
           const Fluide_base& fluide = ref_cast(Fluide_base,mil);
-          const DoubleTab& rho = fluide.masse_volumique().valeurs();
-          const DoubleTab& visco_dyn = fluide.viscosite_dynamique().valeurs();
+          const DoubleTab& rho = fluide.masse_volumique()->valeurs();
+          const DoubleTab& visco_dyn = fluide.viscosite_dynamique()->valeurs();
           rho_fluide_som_ = rho(0,0);
           visco_dyn_fluide_som_ = visco_dyn(0,0);
         }
@@ -859,7 +859,7 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
 {
   int phase_transfo = (phase_marquee_==0?1:0);
   const Fluide_Diphasique& fluide_diph = ref_cast(Fluide_Diphasique,probleme().equation(0).milieu());
-  const DoubleTab& rho = fluide_diph.fluide_phase(phase_transfo).masse_volumique().valeurs();
+  const DoubleTab& rho = fluide_diph.fluide_phase(phase_transfo).masse_volumique()->valeurs();
   double rho_val = rho(0,0);
 
   const int dim = positions.dimension(1);
@@ -870,7 +870,7 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
       size_new++;
 
   //remplir sommets_lu et proprietes
-  const Domaine& domaine = le_dom_dis->domaine();
+  const Domaine& domaine = le_dom_dis->valeur().domaine();
   ens_points.associer_domaine(domaine);
 
   DoubleTab&   soms_tmp =  ens_points.sommets_lu();

@@ -41,12 +41,12 @@ void Source_Transport_K_Eps_VDF_Elem::associer_pb(const Probleme_base& pb)
 
 const DoubleTab& Source_Transport_K_Eps_VDF_Elem::get_visc_turb() const
 {
-  return mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente().valeurs();
+  return mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente()->valeurs();
 }
 
 void Source_Transport_K_Eps_VDF_Elem::calculer_terme_production(const Champ_Face_VDF& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleVect& P) const
 {
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
   if (axi) calculer_terme_production_K_Axi(le_dom_VDF.valeur(),vitesse,P,K_eps,visco_turb);
   else calculer_terme_production_K(le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),P,K_eps,vit,vitesse,visco_turb);
 }
@@ -58,14 +58,14 @@ const Modele_Fonc_Bas_Reynolds& Source_Transport_K_Eps_VDF_Elem::get_modele_fonc
 
 void Source_Transport_K_Eps_VDF_Elem::calcul_D_E(const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don& ch_visco_cin, DoubleTab& D, DoubleTab& E) const
 {
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
   get_modele_fonc_bas_reyn().Calcul_D(D,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin);
   get_modele_fonc_bas_reyn().Calcul_E(E,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin,visco_turb);
 }
 
 void Source_Transport_K_Eps_VDF_Elem::calcul_F1_F2(const Champ_base& ch_visco_cin_ou_dyn, DoubleTab& P_tab, DoubleTab& D, DoubleTab& F1, DoubleTab& F2) const
 {
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
   get_modele_fonc_bas_reyn().Calcul_F1(F1,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(), P_tab, K_eps,ch_visco_cin_ou_dyn);
   get_modele_fonc_bas_reyn().Calcul_F2(F2,D,mon_eq_transport_K_Eps->domaine_dis(),K_eps, ch_visco_cin_ou_dyn);
 }
@@ -73,7 +73,7 @@ void Source_Transport_K_Eps_VDF_Elem::calcul_F1_F2(const Champ_base& ch_visco_ci
 void Source_Transport_K_Eps_VDF_Elem::fill_resu_bas_rey(const DoubleVect& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
 {
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
       resu(elem,0) += (P(elem)-K_eps(elem,1)-D(elem))*volumes(elem)*porosite_vol(elem);
@@ -84,7 +84,7 @@ void Source_Transport_K_Eps_VDF_Elem::fill_resu_bas_rey(const DoubleVect& P, con
 void Source_Transport_K_Eps_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& resu) const
 {
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
   const double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_K_MIN();
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
@@ -99,11 +99,11 @@ void Source_Transport_K_Eps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleT
 {
   Source_Transport_VDF_Elem_base::ajouter_keps(secmem);
 
-  const std::string& nom_inco = equation().inconnue().le_nom().getString();
+  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
   Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
   if(!mat) return;
 
-  const DoubleTab& val=equation().inconnue().valeurs();
+  const DoubleTab& val=equation().inconnue()->valeurs();
   const DoubleVect& porosite = le_dom_Cl_VDF->equation().milieu().porosite_elem(), &volumes = le_dom_VDF->volumes();
   const int size=val.dimension(0);
   // on implicite le -eps et le -eps^2/k

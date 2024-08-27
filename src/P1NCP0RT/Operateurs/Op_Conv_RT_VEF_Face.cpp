@@ -731,7 +731,7 @@ void Op_Conv_RT_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matr
 
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
-          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
