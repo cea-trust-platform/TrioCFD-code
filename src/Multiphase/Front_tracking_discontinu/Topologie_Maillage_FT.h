@@ -25,11 +25,11 @@
 
 #include <FTd_tools.h>
 #include <TRUSTTabFT.h>
-#include <Remailleur_Collision_FT.h>
+#include <Remailleur_Collision_FT_base.h>
+#include <TRUSTTabs_forward.h>
 
 class Maillage_FT_Disc;
 class Domaine_VF;
-class Remailleur_Collision_FT;
 class Motcle;
 class Champ_base;
 class Remaillage_FT;
@@ -40,9 +40,6 @@ class Remaillage_FT;
  *
  * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc
  */
-class Domaine_VF;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
 
 class Topologie_Maillage_FT : public Objet_U
 {
@@ -79,7 +76,7 @@ protected:
 
   int active_;
 
-  Remailleur_Collision_FT remailleur_Collision_;
+  OWN_PTR(Remailleur_Collision_FT_base) remailleur_Collision_;
 
   double Erreur_max_coordonnees_; // donnee par Parcours_interface
   int juric_local_;
