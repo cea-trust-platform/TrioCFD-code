@@ -30,13 +30,12 @@
 #include <TRUSTTabs_forward.h>
 #include <Connectivites_base.h>
 #include <TRUST_List.h>
-#include <Prolongement.h>
+#include <Prolongement_base.h>
 #include <Restriction_base.h>
 #include <TRUST_Ref.h>
 #include <Domaine_forward.h>
 
 class Pb_MG;
-class Prolongement;
 class Pb_grossier;
 class Champ_front_zoom;
 class Pb_1G;
@@ -62,8 +61,8 @@ public:
   inline OWN_PTR(Connectivites_base)& connectivites();
   Probleme_base& pb_Fin();
   const Probleme_base& pb_Fin() const ;
-  inline Prolongement& mon_prolongement(int i);
-  inline LIST(Prolongement)& mon_prolongement();
+  inline OWN_PTR(Prolongement_base)& mon_prolongement(int i);
+  inline LIST(OWN_PTR(Prolongement_base))& mon_prolongement();
   inline OWN_PTR(Restriction_base)& ma_restriction(int i);
   inline LIST(OWN_PTR(Restriction_base))& ma_restriction();
   Probleme_base& pbG();
@@ -87,7 +86,7 @@ private:
   REF(Pb_MG) pb_MG;
   int index_pb_fin;
   OWN_PTR(Connectivites_base) connectivites_ff_ee;
-  LIST(Prolongement) mon_prolongement_;
+  LIST(OWN_PTR(Prolongement_base)) mon_prolongement_;
   LIST(OWN_PTR(Restriction_base)) ma_restriction_;
   int nb_prolongement_;
   int nb_restriction_;
@@ -101,7 +100,7 @@ inline OWN_PTR(Connectivites_base)& Pb_2G::connectivites()
 }
 
 
-inline Prolongement& Pb_2G::mon_prolongement(int i)
+inline OWN_PTR(Prolongement_base)& Pb_2G::mon_prolongement(int i)
 {
   return mon_prolongement_(i);
 }
@@ -125,7 +124,7 @@ inline int Pb_2G::nb_restriction()
 }
 
 
-inline LIST(Prolongement)& Pb_2G::mon_prolongement()
+inline LIST(OWN_PTR(Prolongement_base))& Pb_2G::mon_prolongement()
 {
   return mon_prolongement_;
 }

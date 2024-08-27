@@ -115,15 +115,15 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
   pb2G.typer_Connectivites("Connectivites_DWF");
   pb2G.set_nb_prol(3);
   pb2G.set_nb_rest(0);
-  Prolongement P1;
+  OWN_PTR(Prolongement_base) P1;
   P1.typer("Prolongement_elem_elem_DWF"); // Pour la pression ou la temperature
   pb2G.mon_prolongement().add(P1);
 
-  Prolongement P2;
+  OWN_PTR(Prolongement_base) P2;
   P2.typer("Prolongement_face_face_DWF"); // Pour la vitesse
   pb2G.mon_prolongement().add(P2);
 
-  Prolongement P3;
+  OWN_PTR(Prolongement_base) P3;
   P3.typer("Prolongement_face_face_FMG"); // Pour les termes sources : prolongement partout
   pb2G.mon_prolongement().add(P3);
 

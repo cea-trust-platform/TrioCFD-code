@@ -63,7 +63,7 @@ void Source_DC_VDF_NS::associer_domaines(const Domaine_dis& domaine_dis,
 //ON NE TRAITE QUE LE CAS OU LA CONVECTION EST NEGLIGEABLE  :-(
 //!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!
-DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom& type_eq)
+DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(OWN_PTR(Prolongement_base))& P, Equation_base& eqG, Nom& type_eq)
 {
   Cerr<<"debut de Source_DC_VDF_NS::calculer_residu"<<finl;
 
@@ -79,9 +79,9 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
 
   if(type_eq == "NS")
     {
-      Prolongement& P1 = P(0); //prolongement pour la vitesse sur tout le domaine fin
-      Prolongement& P2 = P(1); //prolongement pour la pression
-      Prolongement& P3 = P(2); //prolongement pour la vitesse sur les bords du domaine fin
+      OWN_PTR(Prolongement_base)& P1 = P(0); //prolongement pour la vitesse sur tout le domaine fin
+      OWN_PTR(Prolongement_base)& P2 = P(1); //prolongement pour la pression
+      OWN_PTR(Prolongement_base)& P3 = P(2); //prolongement pour la vitesse sur les bords du domaine fin
 
       /* Recuperation des equations de bases et des domaines                     */
       Navier_Stokes_std& eqF = ref_cast(Navier_Stokes_std, equation());
@@ -146,7 +146,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
       DoubleTab op_G_prol;
       op_G_prol.resize(tailleF);
       op_G_prol = 0.;
-      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), op_G, op_G_prol, 1);
+      P1->prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), op_G, op_G_prol, 1);
       //     Cerr << "prolongement des operateurs grossiers" << op_G_prol << finl;
 
       Cerr<<"l prolongement des operateurs "<< le_residu << finl;
@@ -156,7 +156,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
       DoubleTab deriveeG(presentG);
       DoubleTab derivee(le_residu);
       eqG.derivee_en_temps_inco(deriveeG) ;
-      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), deriveeG,derivee , 1);
+      P1->prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), deriveeG,derivee , 1);
 
 
       Cerr << "Prolongement Derivee en temps inco " << derivee << finl;
@@ -179,7 +179,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
       op_presentG_prol.resize(tailleF);
       op_presentG_prol = 0.;
 
-      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), presentG, presentG_prol, 1);
+      P1->prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), presentG, presentG_prol, 1);
       Cerr <<"prolongement de l'inconnue grossiere present ---> ok" << finl;
 
       //      Cerr<<"vitesse apres prolongement : "<< presentG_prol <<finl;
@@ -220,7 +220,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
       /* vitesse_imposeeF.resize(nb_faces_bords,Objet_U::dimension); */
       /* Cerr << "present G = " << presentG << finl; */
 
-      P3.prolonger(le_dom, le_dom_fine,frontiereF, connect.connectivites_faceF_faceG(), presentG, vitesse_imposeeF, Objet_U::dimension);
+      P3->prolonger(le_dom, le_dom_fine,frontiereF, connect.connectivites_faceF_faceG(), presentG, vitesse_imposeeF, Objet_U::dimension);
 
 
 
@@ -259,7 +259,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(P
       pressionG_prol.resize(pressionF.size());
 
 
-      P2.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), pressionG, pressionG_prol, 1);
+      P2->prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), pressionG, pressionG_prol, 1);
       DoubleTab presentF_temp(presentF.size());
       DoubleTab pressionF_temp(pressionF.size());
       presentF_temp = presentF;

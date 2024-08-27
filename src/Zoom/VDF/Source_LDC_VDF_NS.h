@@ -50,13 +50,13 @@ public:
 
   DoubleTab& calculer_residu(Connectivites_IndGros& connect, Restriction_base& rest, Equation_base& eq_fine) override ;
 
-  inline DoubleTab& calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom&) override ;
+  inline DoubleTab& calculer_residu(Connectivites_base& connect, LIST(OWN_PTR(Prolongement_base))& P, Equation_base& eqG, Nom&) override ;
 
 
 };
 
 
-inline DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom& n)
+inline DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(OWN_PTR(Prolongement_base))& P, Equation_base& eqG, Nom& n)
 {
   Cerr<<"N'est pas codee avec ces arguments dans la classe Source_LDC_VDF_NS !!"<<finl;
   exit();

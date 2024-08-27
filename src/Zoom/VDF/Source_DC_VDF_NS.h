@@ -50,7 +50,7 @@ public:
 
   DoubleTab& calculer_residu(Connectivites_IndGros& connect, Restriction_base& rest, Equation_base& eq_fine) override ;
 
-  inline DoubleTab& calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom&) override ;
+  inline DoubleTab& calculer_residu(Connectivites_base& connect, LIST(OWN_PTR(Prolongement_base))& P, Equation_base& eqG, Nom&) override ;
 
 
 

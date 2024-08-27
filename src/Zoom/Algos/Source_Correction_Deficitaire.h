@@ -26,7 +26,7 @@
 #include <Source_base.h>
 #include <Connectivites_IndGros.h>
 #include <Restriction_base.h>
-#include <Prolongement.h>
+#include <Prolongement_base.h>
 #include <Domaine_dis.h>
 #include <Domaine_Cl_dis.h>
 class Equation_base;
@@ -61,7 +61,7 @@ public:
   virtual DoubleTab& calculer_residu(Connectivites_IndGros& connect, Restriction_base& rest, Equation_base& eq_fine) = 0;
 
 
-  virtual DoubleTab& calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom&) = 0;
+  virtual DoubleTab& calculer_residu(Connectivites_base& connect, LIST(OWN_PTR(Prolongement_base))& P, Equation_base& eqG, Nom&) = 0;
 
 
 

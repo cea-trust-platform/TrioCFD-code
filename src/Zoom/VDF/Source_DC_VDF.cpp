@@ -64,7 +64,7 @@ void Source_DC_VDF::associer_domaines(const Domaine_dis& domaine_dis,
 }
 
 
-DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom& type_eq)
+DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(OWN_PTR(Prolongement_base))& P, Equation_base& eqG, Nom& type_eq)
 {
   Cerr<<"debut de Source_DC_VDF::calculer_residu"<<finl;
   le_residu = 0;
@@ -77,7 +77,7 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prol
 
   if(type_eq == "cond")
     {
-      Prolongement& P1 = P(0);
+      OWN_PTR(Prolongement_base)& P1 = P(0);
 
       Equation_base& eqF = equation();
       Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
@@ -108,13 +108,13 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prol
       Cerr<<"tailleF = "<<tailleF<<finl;
       Cerr<<"presentG = "<<present<<finl;
       //Prolongement de l'inconnue grossiere present et passe
-      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), present, presentG_prol, 1);
+      P1->prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), present, presentG_prol, 1);
       Cerr<<"presentG_prol = "<<presentG_prol<<finl;
 
 
 
       Cerr<<"passeG = "<<passe<<finl;
-      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), passe, passeG_prol, 1);
+      P1->prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), passe, passeG_prol, 1);
       Cerr<<"passeG_prol = "<<passeG_prol<<finl;
 
 
@@ -173,7 +173,7 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prol
   else if(type_eq == "conv_diff")
     {
       Cerr<<"Je suis bien un pb de conduction et donc je sais calculer le residu !!"<<finl;
-      Prolongement& P1 = P(2);
+      OWN_PTR(Prolongement_base)& P1 = P(2);
 
       Equation_base& eqF = equation();
       Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
@@ -204,13 +204,13 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(Prol
       //   Cerr<<"tailleF = "<<tailleF<<finl;
       //       Cerr<<"presentG = "<<present<<finl;
       //Prolongement de l'inconnue grossiere present et passe
-      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), present, presentG_prol, 1);
+      P1->prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), present, presentG_prol, 1);
       //  Cerr<<"presentG_prol = "<<presentG_prol<<finl;
 
 
 
       //       Cerr<<"passeG = "<<passe<<finl;
-      P1.prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), passe, passeG_prol, 1);
+      P1->prolonger(le_dom, le_dom_fine,front_fictive, connect.connectivites_elemF_elemG(), passe, passeG_prol, 1);
       // Cerr<<"passeG_prol = "<<passeG_prol<<finl;
 
       //somme des operateurs fins appliques a l'inconnue grossiere prolongee

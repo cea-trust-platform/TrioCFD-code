@@ -82,7 +82,7 @@ void Pb_2G::calculer_connectivites_2G()
         else */
       for(i=0; i<nb_prolongement_; i++)
         {
-          mon_prolongement_(i).calculer(domaine_VFF, domaine_VFG, connect_ff);
+          mon_prolongement_(i)->calculer(domaine_VFF, domaine_VFG, connect_ff);
         }
     }
 
@@ -140,7 +140,7 @@ void Pb_2G::prolonger_2G(IntVect& connect, DoubleTab& valG, int nb_compo,
 
   //Cout << "Inco Grossiere = " << incoG.valeurs() << finl;
 
-  mon_prolongement_(num_prolongement).prolonger(domaine_VFG, domaine_VFF, frontF, connect, valG, tab, nb_compo);
+  mon_prolongement_(num_prolongement)->prolonger(domaine_VFG, domaine_VFF, frontF, connect, valG, tab, nb_compo);
 
   //Cerr<<"fin de Pb_2G::prolonger_2G"<<finl;
 }
