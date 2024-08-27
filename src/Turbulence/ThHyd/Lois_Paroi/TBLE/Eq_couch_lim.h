@@ -21,11 +21,12 @@
 
 #ifndef Eq_couch_lim_included
 #define Eq_couch_lim_included
-#include <TRUSTVect.h>
 
-#include <Diffu_totale.h>
-#include <Motcle.h>
+#include <Diffu_totale_base.h>
+#include <TRUST_Deriv.h>
+#include <TRUSTVect.h>
 #include <TRUST_Ref.h>
+#include <Motcle.h>
 
 class Milieu_base;
 
@@ -275,7 +276,7 @@ private :
   int N, N_comp ; //Nombre de points du maillage fin 1D
   int nu_t_dyn;
 
-  Diffu_totale a ; //diffusivite totale
+  OWN_PTR(Diffu_totale_base) a ; //diffusivite totale
 
   ArrOfDouble F ; //second membre
   ArrOfDouble Unp1, Un_old ; // inconnues et champs moyens
