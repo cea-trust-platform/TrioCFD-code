@@ -27,7 +27,6 @@
 
 #include <Domaine_VF.h>
 #include <Probleme_base.h>
-#include <Connectivites.h>
 #include <Restriction_base.h>
 
 /*! @brief class Restriction_elem_elem

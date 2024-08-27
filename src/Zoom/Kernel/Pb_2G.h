@@ -28,7 +28,7 @@
 
 
 #include <TRUSTTabs_forward.h>
-#include <Connectivites.h>
+#include <Connectivites_base.h>
 #include <TRUST_List.h>
 #include <Prolongement.h>
 #include <Restriction.h>
@@ -60,7 +60,7 @@ public:
   //inline Pb_2G(Pb_fin&);
   inline void set_nb_prol(int i);
   inline void set_nb_rest(int i);
-  inline Connectivites& connectivites();
+  inline OWN_PTR(Connectivites_base)& connectivites();
   Probleme_base& pb_Fin();
   const Probleme_base& pb_Fin() const ;
   inline Prolongement& mon_prolongement(int i);
@@ -87,7 +87,7 @@ public:
 private:
   REF(Pb_MG) pb_MG;
   int index_pb_fin;
-  Connectivites connectivites_ff_ee;
+  OWN_PTR(Connectivites_base) connectivites_ff_ee;
   LIST(Prolongement) mon_prolongement_;
   LIST(Restriction) ma_restriction_;
   int nb_prolongement_;
@@ -96,7 +96,7 @@ private:
 
 
 
-inline Connectivites& Pb_2G::connectivites()
+inline OWN_PTR(Connectivites_base)& Pb_2G::connectivites()
 {
   return connectivites_ff_ee;
 }

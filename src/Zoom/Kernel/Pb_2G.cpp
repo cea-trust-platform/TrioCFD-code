@@ -70,10 +70,10 @@ void Pb_2G::calculer_connectivites_2G()
   Domaine_VF& domaine_VFG = ref_cast(Domaine_VF, domaine_disG);
 
 
-  IntVect& connect_ff = connectivites().connectivites_faceF_faceG();
-  IntVect& connect_ee = connectivites().connectivites_elemF_elemG();
+  IntVect& connect_ff = connectivites()->connectivites_faceF_faceG();
+  IntVect& connect_ee = connectivites()->connectivites_elemF_elemG();
 
-  connectivites_ff_ee.calculer_connectivites(domaine_VFF, domaine_VFG, domaineG);
+  connectivites_ff_ee->calculer_connectivites(domaine_VFF, domaine_VFG, domaineG);
   if (nb_prolongement_>0)
     {
       /*if (sub_type(Prolongement_elem_face_FMG,mon_prolongement_.valeur()))
