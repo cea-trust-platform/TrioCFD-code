@@ -65,7 +65,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(mat
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
-  const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
+  const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const int nb_elem = domaine_VDF.nb_elem(), nb_elem_tot = domaine_VDF.nb_elem_tot();
 
@@ -119,7 +119,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(
 
   //Calcul des fonctions F1 et F2
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
-  const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
+  const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   DoubleTrav P(nb_elem_tot), F1(nb_elem_tot), F2(nb_elem_tot);
 
   mon_modele_fonc.Calcul_F2(F2,P,z,K_eps_Bas_Re,ch_visco_dyn);

@@ -39,6 +39,34 @@ Entree& Modele_Fonc_Bas_Reynolds_Base::readOn(Entree& is )
   return is;
 }
 
+void Modele_Fonc_Bas_Reynolds_Base::typer_lire_Modele_Fonc_Bas_Reynolds(OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& mod, const Equation_base& eqn, Entree& is )
+{
+  Motcle typ;
+  is >> typ;
+  Motcle nom1("Modele_");
+
+  nom1 += typ;
+  //  if ( (typ == "Jones_Launder") || (typ == "Nagano") || (typ == "Lam_Bremhorst")  )
+  //if ( (typ == "Jones_Launder") || (typ == "Nagano") || (typ == "launder_Sharma") )
+  {
+    nom1 += "_";
+    Cerr << nom1 << finl;
+    Nom discr = eqn.discretisation().que_suis_je();
+    if (discr=="VEFPreP1B") discr = "VEF";
+    nom1 += discr;
+  }
+  mod.typer(nom1);
+  mod->associer_eqn(eqn);
+  mod->associer(eqn.domaine_dis(), eqn.domaine_Cl_dis());
+  if ( mod->has_seconde_equation() )
+    {
+      mod->associer_eqn_2(mod->seconde_equation());
+      mod->associer(mod->seconde_equation().domaine_dis(), mod->seconde_equation().domaine_Cl_dis());
+    }
+  mod->associer_pb(eqn.probleme());
+  is >> mod.valeur();
+}
+
 void Modele_Fonc_Bas_Reynolds_Base::completer()
 {
   ;

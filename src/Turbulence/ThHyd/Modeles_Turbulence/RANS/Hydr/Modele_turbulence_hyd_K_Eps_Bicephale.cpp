@@ -54,10 +54,9 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::lire_motcle_non_standard(const Motcle
   if (mot == "Modele_Fonc_Bas_Reynolds")
     {
       Cerr << "Lecture du modele bas reynolds associe " << finl;
-      mon_modele_fonc_.associer_eqn(eqn_transp_K());
-      is >> mon_modele_fonc_;
-      mon_modele_fonc_.associer_eqn_2(eqn_transp_Eps());
-      Cerr << "mon_modele_fonc.que_suis_je() avant discretisation " << mon_modele_fonc_.que_suis_je() << finl;
+      Modele_Fonc_Bas_Reynolds_Base::typer_lire_Modele_Fonc_Bas_Reynolds(mon_modele_fonc_, eqn_transp_K(), is);
+      mon_modele_fonc_->associer_eqn_2(eqn_transp_Eps());
+      Cerr << "mon_modele_fonc.que_suis_je() avant discretisation " << mon_modele_fonc_->que_suis_je() << finl;
       mon_modele_fonc_->discretiser();
       Cerr << "mon_modele_fonc.que_suis_je() " << mon_modele_fonc_->que_suis_je() << finl;
       mon_modele_fonc_->lire_distance_paroi();
@@ -119,14 +118,14 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
 
       Fmu.resize(tab_K.dimension_tot(0));
 
-      mon_modele_fonc_.Calcul_Fmu_BiK(Fmu, le_dom_dis, le_dom_Cl_dis, tab_K, tab_Eps, ch_visco);
+      mon_modele_fonc_->Calcul_Fmu_BiK(Fmu, le_dom_dis, le_dom_Cl_dis, tab_K, tab_Eps, ch_visco);
 
-      int is_Cmu_constant = mon_modele_fonc_.Calcul_is_Cmu_constant();
+      int is_Cmu_constant = mon_modele_fonc_->Calcul_is_Cmu_constant();
       if (is_Cmu_constant == 0)
         {
           Cerr << " On utilise un Cmu non constant " << finl;
           const DoubleTab& vitesse = mon_equation_->inconnue()->valeurs();
-          mon_modele_fonc_.Calcul_Cmu_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, vitesse, tab_K, tab_Eps, EPS_MIN_);
+          mon_modele_fonc_->Calcul_Cmu_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, vitesse, tab_K, tab_Eps, EPS_MIN_);
 
           /*Paroi*/
           Nom lp = eqn_transp_K().modele_turbulence().loi_paroi()->que_suis_je();
@@ -137,7 +136,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
               visco_tab = tab_visco(0, 0);
               const int idt = mon_equation_->schema_temps().nb_pas_dt();
               const DoubleTab& tab_paroi = loi_paroi()->Cisaillement_paroi();
-              mon_modele_fonc_.Calcul_Cmu_Paroi_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, visco_tab, visco_turb, tab_paroi, idt, vitesse, tab_K, tab_Eps, EPS_MIN_);
+              mon_modele_fonc_->Calcul_Cmu_Paroi_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, visco_tab, visco_turb, tab_paroi, idt, vitesse, tab_K, tab_Eps, EPS_MIN_);
             }
         }
       else
@@ -193,7 +192,7 @@ void Modele_turbulence_hyd_K_Eps_Bicephale::fill_turbulent_viscosity_tab(const i
         {
           if (mon_modele_fonc_.non_nul())
             {
-              int is_Cmu_constant = mon_modele_fonc_.Calcul_is_Cmu_constant();
+              int is_Cmu_constant = mon_modele_fonc_->Calcul_is_Cmu_constant();
               if (is_Cmu_constant)
                 turbulent_viscosity[i] = Fmu(i) * LeCmu_ * tab_K(i) * tab_K(i) / (tab_Eps(i) + D(i));
               else

@@ -57,8 +57,7 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::lire_motcle_non_standard(const Mot
     }
   else if (mot == "Modele_Fonc_Bas_Reynolds")
     {
-      mon_modele_fonc_.associer_eqn(eqn_transp_K_Eps());
-      is >> mon_modele_fonc_;
+      Modele_Fonc_Bas_Reynolds_Base::typer_lire_Modele_Fonc_Bas_Reynolds(mon_modele_fonc_, eqn_transp_K_Eps(), is);
       mon_modele_fonc_->discretiser();
       Cerr << "Low Reynolds number model type " << mon_modele_fonc_->que_suis_je() << finl;
       return 1;
@@ -82,7 +81,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
   int n = tab_K_Eps.dimension(0);
   DoubleTab Fmu(n);
 
-  mon_modele_fonc_.Calcul_Fmu(Fmu, le_dom_dis, le_dom_Cl_dis, tab_K_Eps, ch_visco_cin);
+  mon_modele_fonc_->Calcul_Fmu(Fmu, le_dom_dis, le_dom_Cl_dis, tab_K_Eps, ch_visco_cin);
 
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente Fmu", Fmu);
 

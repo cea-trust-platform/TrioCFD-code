@@ -60,7 +60,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_keps(DoubleTab& resu) const
   domaine_VDF.domaine().creer_tableau_elements(P);
   calculer_terme_production(ch_vit,visco_turb,vit,P); // voir les classes filles
 
-  const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = get_modele_fonc_bas_reyn();
+  const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& mon_modele_fonc = get_modele_fonc_bas_reyn();
   const int is_modele_fonc=(mon_modele_fonc.non_nul());
 
   if (is_modele_fonc)

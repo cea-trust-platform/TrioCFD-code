@@ -61,7 +61,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
   const DoubleTab& K = get_K_pour_production(); // voir les classes filles
   calculer_terme_production_K(le_dom_VEF.valeur(), domaine_Cl_VEF, P, K, vit, visco_turb, _interpolation_viscosite_turbulente, _coefficient_limiteur);
 
-  const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = get_modele_fonc_bas_reyn(); // voir les classes filles
+  const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& mon_modele_fonc = get_modele_fonc_bas_reyn(); // voir les classes filles
   const int is_modele_fonc = (mon_modele_fonc.non_nul());
   if (is_modele_fonc)
     {
@@ -78,7 +78,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
       // Pour modele EASM
       const int nb_elem_tot = le_dom_VEF->nb_elem_tot();
 
-      int is_Reynolds_stress_isotrope = mon_modele_fonc.Calcul_is_Reynolds_stress_isotrope();
+      int is_Reynolds_stress_isotrope = mon_modele_fonc->Calcul_is_Reynolds_stress_isotrope();
       if (is_Reynolds_stress_isotrope == 0)
         {
           Cerr << "On utilise une diffusion turbulente non linaire dans le terme source P" << finl;

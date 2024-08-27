@@ -22,7 +22,7 @@
 #ifndef Modele_turbulence_hyd_K_Eps_Bicephale_included
 #define Modele_turbulence_hyd_K_Eps_Bicephale_included
 
-#include <Modele_Fonc_Bas_Reynolds.h>
+#include <Modele_Fonc_Bas_Reynolds_Base.h>
 #include <Transport_K_ou_Eps.h>
 
 /*! @brief Classe Modele_turbulence_hyd_K_Eps_Bicephale Cette classe represente le modele de turbulence (k,eps) pour les
@@ -52,8 +52,8 @@ public:
   inline const Transport_K_ou_Eps_base& eqn_transp_Eps() const override;
   const Equation_base& equation_k_eps(int) const override;
 
-  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction() { return mon_modele_fonc_; }
-  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const { return mon_modele_fonc_; }
+  inline OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& associe_modele_fonction() { return mon_modele_fonc_; }
+  inline const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& associe_modele_fonction() const { return mon_modele_fonc_; }
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
@@ -66,7 +66,7 @@ public:
   }
 
 protected:
-  Modele_Fonc_Bas_Reynolds mon_modele_fonc_;
+  OWN_PTR(Modele_Fonc_Bas_Reynolds_Base) mon_modele_fonc_;
   Transport_K_ou_Eps eqn_transport_K_, eqn_transport_Eps_;
   void fill_turbulent_viscosity_tab(const int , const DoubleTab&, const DoubleTab& , const DoubleTab& ,const DoubleTab& , const DoubleTab&  , DoubleTab& );
 };

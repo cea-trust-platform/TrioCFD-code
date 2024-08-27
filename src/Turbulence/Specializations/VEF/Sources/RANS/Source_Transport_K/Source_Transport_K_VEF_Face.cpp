@@ -57,7 +57,7 @@ const DoubleTab& Source_Transport_K_VEF_Face::get_K_pour_production() const
   return mon_eq_transport_K->inconnue()->valeurs();
 }
 
-const Modele_Fonc_Bas_Reynolds& Source_Transport_K_VEF_Face::get_modele_fonc_bas_reyn() const
+const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Source_Transport_K_VEF_Face::get_modele_fonc_bas_reyn() const
 {
   return ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence()).associe_modele_fonction();
 }
@@ -66,7 +66,7 @@ void Source_Transport_K_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, cons
                                                        DoubleTab& D, DoubleTab& E, DoubleTab& F1, DoubleTab& F2) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
-  get_modele_fonc_bas_reyn().Calcul_D_BiK(D, mon_eq_transport_K->domaine_dis(), mon_eq_transport_K->domaine_Cl_dis(), vit, K, Eps, ch_visco_cin);
+  get_modele_fonc_bas_reyn()->Calcul_D_BiK(D, mon_eq_transport_K->domaine_dis(), mon_eq_transport_K->domaine_Cl_dis(), vit, K, Eps, ch_visco_cin);
   D.echange_espace_virtuel();
 }
 

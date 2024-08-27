@@ -25,7 +25,8 @@
 
 #include <Modele_turbulence_hyd_2_eq_base.h>
 #include <Modele_turbulence_hyd_RANS_Gen.h>
-#include <Modele_Fonc_Bas_Reynolds.h>
+#include <Modele_Fonc_Bas_Reynolds_Base.h>
+#include <TRUST_Deriv.h>
 
 class Transport_K_Eps_base;
 
@@ -50,19 +51,19 @@ public:
   virtual const Transport_K_Eps_base& eqn_transp_K_Eps() const=0;
   virtual const Equation_base& equation_k_eps(int) const=0 ;
 
-  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction() { return mon_modele_fonc_; }
-  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const { return mon_modele_fonc_; }
+  inline OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& associe_modele_fonction() { return mon_modele_fonc_; }
+  inline const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& associe_modele_fonction() const { return mon_modele_fonc_; }
 
   bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const override
   {
-    if (associe_modele_fonction().non_nul() && associe_modele_fonction().Calcul_is_Reynolds_stress_isotrope()==0)
+    if (associe_modele_fonction().non_nul() && associe_modele_fonction()->Calcul_is_Reynolds_stress_isotrope()==0)
       return associe_modele_fonction()->calcul_tenseur_Re(nu_turb, grad, Re);
     else
       return false;
   }
 
 protected:
-  Modele_Fonc_Bas_Reynolds mon_modele_fonc_;
+  OWN_PTR(Modele_Fonc_Bas_Reynolds_Base) mon_modele_fonc_;
 };
 
 #endif /* Modele_turbulence_hyd_RANS_K_Eps_base_included */

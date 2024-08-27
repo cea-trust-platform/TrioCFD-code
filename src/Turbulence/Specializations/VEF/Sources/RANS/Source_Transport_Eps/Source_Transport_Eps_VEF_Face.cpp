@@ -57,7 +57,7 @@ const DoubleTab& Source_Transport_Eps_VEF_Face::get_K_pour_production() const
   return mon_eq_transport_K->inconnue()->valeurs();
 }
 
-const Modele_Fonc_Bas_Reynolds& Source_Transport_Eps_VEF_Face::get_modele_fonc_bas_reyn() const
+const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Source_Transport_Eps_VEF_Face::get_modele_fonc_bas_reyn() const
 {
   return ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence()).associe_modele_fonction();
 }
@@ -66,10 +66,10 @@ void Source_Transport_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, co
                                                          DoubleTab& D, DoubleTab& E, DoubleTab& F1, DoubleTab& F2) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
-  get_modele_fonc_bas_reyn().Calcul_E_BiK(E, mon_eq_transport_Eps->domaine_dis(), mon_eq_transport_Eps->domaine_Cl_dis(), vit, K, Eps, ch_visco_cin, visco_turb);
+  get_modele_fonc_bas_reyn()->Calcul_E_BiK(E, mon_eq_transport_Eps->domaine_dis(), mon_eq_transport_Eps->domaine_Cl_dis(), vit, K, Eps, ch_visco_cin, visco_turb);
   E.echange_espace_virtuel();
-  get_modele_fonc_bas_reyn().Calcul_F1_BiK(F1, mon_eq_transport_Eps->domaine_dis(), mon_eq_transport_Eps->domaine_Cl_dis(), P, K, Eps, ch_visco_cin_ou_dyn);
-  get_modele_fonc_bas_reyn().Calcul_F2_BiK(F2,D,mon_eq_transport_Eps->domaine_dis(),K,Eps, ch_visco_cin_ou_dyn);
+  get_modele_fonc_bas_reyn()->Calcul_F1_BiK(F1, mon_eq_transport_Eps->domaine_dis(), mon_eq_transport_Eps->domaine_Cl_dis(), P, K, Eps, ch_visco_cin_ou_dyn);
+  get_modele_fonc_bas_reyn()->Calcul_F2_BiK(F2,D,mon_eq_transport_Eps->domaine_dis(),K,Eps, ch_visco_cin_ou_dyn);
 }
 
 const Nom Source_Transport_Eps_VEF_Face::get_type_paroi() const

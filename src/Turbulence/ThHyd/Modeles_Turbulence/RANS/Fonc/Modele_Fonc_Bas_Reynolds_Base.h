@@ -46,6 +46,8 @@ class Modele_Fonc_Bas_Reynolds_Base : public Champs_compris_interface, public Ob
 
 public:
 
+  static void typer_lire_Modele_Fonc_Bas_Reynolds(OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)&, const Equation_base&, Entree& is );
+
   inline const Equation_base& equation() const;
   inline  Equation_base& equation();
   inline const Equation_base& seconde_equation() const;
@@ -99,6 +101,8 @@ public:
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
   virtual void lire_distance_paroi( );
+
+  bool has_seconde_equation() const { return ma_seconde_equation.non_nul(); }
 
 public:
   REF(Equation_base) ma_seconde_equation;

@@ -64,7 +64,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajouter_bl
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
-  const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = ref_cast(Modele_Fonc_Bas_Reynolds,mod_turb.associe_modele_fonction());
+  const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   const int nb_elem = domaine_VDF.nb_elem(), nb_elem_tot = domaine_VDF.nb_elem_tot(), nb_consti = eq_concentration->nb_constituants();
 
   DoubleTrav P(nb_elem_tot), G_t(nb_elem_tot), G_c(nb_elem_tot), D(nb_elem_tot), E(nb_elem_tot), F1(nb_elem_tot), F2(nb_elem_tot);

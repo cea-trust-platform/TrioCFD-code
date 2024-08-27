@@ -31,7 +31,6 @@ class Convection_Diffusion_Temperature;
 class Champ_Don_base;
 class Equation_base;
 class Modele_Fonc_Realisable_base;
-class Modele_Fonc_Bas_Reynolds;
 class Fluide_base;
 
 struct Source_Transport_proto

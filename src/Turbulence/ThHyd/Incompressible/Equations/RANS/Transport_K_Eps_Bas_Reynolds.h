@@ -27,7 +27,7 @@
 #define Transport_K_Eps_Bas_Reynolds_included
 
 #include <Transport_K_Eps_non_std.h>
-#include <Modele_Fonc_Bas_Reynolds.h>
+#include <Modele_Fonc_Bas_Reynolds_Base.h>
 #include <TRUST_Ref.h>
 
 class Motcle;
@@ -41,27 +41,27 @@ public :
 
   void associer_milieu_base(const Milieu_base&) override;
   void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Eps_base&) override;
-  inline const Modele_Fonc_Bas_Reynolds& modele_fonc() const;
-  inline  Modele_Fonc_Bas_Reynolds& modele_fonc();
+  inline const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& modele_fonc() const;
+  inline  OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& modele_fonc();
   inline const Champ_Inc& vitesse_transportante();
   const Motcle& domaine_application() const override;
   void completer() override;
 
 private :
 
-  REF(Modele_Fonc_Bas_Reynolds) mon_modele_fonc;
+  REF(OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)) mon_modele_fonc;
 
 };
 
 
 // Fonctions inline:
 
-inline const Modele_Fonc_Bas_Reynolds& Transport_K_Eps_Bas_Reynolds::modele_fonc() const
+inline const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Transport_K_Eps_Bas_Reynolds::modele_fonc() const
 {
   return mon_modele_fonc.valeur();
 }
 
-inline Modele_Fonc_Bas_Reynolds& Transport_K_Eps_Bas_Reynolds::modele_fonc()
+inline OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Transport_K_Eps_Bas_Reynolds::modele_fonc()
 {
   return mon_modele_fonc.valeur();
 }

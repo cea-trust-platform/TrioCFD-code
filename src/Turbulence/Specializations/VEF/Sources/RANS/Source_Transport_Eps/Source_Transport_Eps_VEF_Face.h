@@ -48,7 +48,7 @@ private:
   const DoubleTab& get_visc_turb() const override;
   const DoubleTab& get_cisaillement_paroi() const override;
   const DoubleTab& get_K_pour_production() const override;
-  const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const override;
+  const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& get_modele_fonc_bas_reyn() const override;
   void calcul_tabs_bas_reyn(const DoubleTrav&, const DoubleTab&, const DoubleTab&, const Champ_Don&, const Champ_base&, DoubleTab&, DoubleTab&, DoubleTab&, DoubleTab&) const override;
   const Nom get_type_paroi() const override;
   void calcul_tenseur_reyn(const DoubleTab&, const DoubleTab&, DoubleTab&) const override;
