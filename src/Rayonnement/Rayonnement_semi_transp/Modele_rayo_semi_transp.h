@@ -23,7 +23,7 @@
 #ifndef Modele_rayo_semi_transp_included
 #define Modele_rayo_semi_transp_included
 
-#include <Equation_rayonnement.h>
+#include <Equation_rayonnement_base.h>
 #include <Probleme_base.h>
 #include <Champ_front.h>
 #include <Champ_Inc.h>
@@ -111,29 +111,29 @@ public:
   Champ_Inc& put_irradience();
   inline Probleme_base& probleme();
   inline const Probleme_base& probleme() const;
-  inline Equation_rayonnement& eq_rayo();
-  inline const Equation_rayonnement& eq_rayo() const;
+  inline Equation_rayonnement_base& eq_rayo();
+  inline const Equation_rayonnement_base& eq_rayo() const;
   inline const double& valeur_sigma() const;
   const Champ_front& flux_radiatif(const Nom& nom_bord) const;
   void calculer_flux_radiatif();
 
 protected :
   REF(Probleme_base) mon_probleme_;
-  Equation_rayonnement Eq_rayo_;
+  OWN_PTR(Equation_rayonnement_base) Eq_rayo_;
   static const double sigma;
 };
 
 
-inline Equation_rayonnement& Modele_rayo_semi_transp::eq_rayo()
+inline Equation_rayonnement_base& Modele_rayo_semi_transp::eq_rayo()
 {
   assert(Eq_rayo_.non_nul());
-  return Eq_rayo_;
+  return Eq_rayo_.valeur();
 }
 
-inline const Equation_rayonnement& Modele_rayo_semi_transp::eq_rayo() const
+inline const Equation_rayonnement_base& Modele_rayo_semi_transp::eq_rayo() const
 {
   assert(Eq_rayo_.non_nul());
-  return Eq_rayo_;
+  return Eq_rayo_.valeur();
 }
 
 inline const Equation_base& Modele_rayo_semi_transp::equation(int i) const

@@ -95,19 +95,19 @@ Sortie& Modele_rayo_semi_transp::printOn(Sortie& os) const
 
 bool Modele_rayo_semi_transp::initTimeStep(double dt)
 {
-  return eq_rayo()->initTimeStep(dt);
+  return eq_rayo().initTimeStep(dt);
 }
 
 bool Modele_rayo_semi_transp::iterateTimeStep(bool& converged)
 {
   converged=true;
-  return eq_rayo()->solve();
+  return eq_rayo().solve();
 }
 
 void Modele_rayo_semi_transp::validateTimeStep()
 {
   double temps=probleme().presentTime();
-  eq_rayo()->mettre_a_jour(temps);
+  eq_rayo().mettre_a_jour(temps);
   calculer_flux_radiatif();
   les_postraitements_.mettre_a_jour(temps);
   schema_temps().mettre_a_jour();
@@ -250,17 +250,23 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
 {
 
   // Typage de l'equation de rayonnement
-  Cerr<<"typage de l'equation de rayonnement"<<finl;
-  Nom type;
+  Cerr<<"typage de l'equation de rayonnement " ;
   Equation_base& eq_base = probleme().equation(1);
-  Eq_rayo_.typer(type,eq_base);
+  Nom disc = eq_base.discretisation().que_suis_je(), type = "Eq_rayo_semi_transp_";
+  if(disc=="VEFPreP1B")
+    disc="VEF";
+
+  type+=disc;
+  Cerr << type << finl;
+
+  Eq_rayo_.typer(type);
   //
   // Creation des associations pour l'equation de rayonnement.
   // Necessairement ici car, contrairement aux cas classiques, l'equation
   // a besoin d'etre typee !
   //
-  Eq_rayo_.associer_modele_rayonnement(*this);
-  Eq_rayo_.associer_sch_tps_base(schema_temps());
+  Eq_rayo_->associer_modele_rayonnement(*this);
+  Eq_rayo_->associer_sch_tps_base(schema_temps());
 
   //  Probleme_base::discretiser(dis);
   associer();
@@ -289,7 +295,7 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
     {
 
       Fluide_base& fluide = ref_cast(Fluide_base,probleme().milieu());
-      Eq_rayo_.associer_fluide(fluide);
+      Eq_rayo_->associer_fluide(fluide);
 
       if (fluide.is_rayo_semi_transp())
         {

@@ -52,7 +52,7 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::calculer(DoubleTab& resu) const
 
 DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
 {
-  const Equation_rayonnement& eq_rayo = Modele().eq_rayo();
+  const Equation_rayonnement_base& eq_rayo = Modele().eq_rayo();
   const Domaine_VEF& zvef = ref_cast(Domaine_VEF,eq_rayo.domaine_dis().valeur());
   int nb_faces = zvef.nb_faces();
 

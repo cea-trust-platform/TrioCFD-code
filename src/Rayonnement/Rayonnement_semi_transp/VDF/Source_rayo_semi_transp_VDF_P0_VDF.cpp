@@ -52,7 +52,7 @@ DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::calculer(DoubleTab& resu) const
 
 DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::ajouter(DoubleTab& resu) const
 {
-  const Equation_rayonnement& eq_rayo = Modele().eq_rayo();
+  const Equation_rayonnement_base& eq_rayo = Modele().eq_rayo();
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,eq_rayo.domaine_dis().valeur());
   int nb_elem = zvdf.nb_elem();
   const Fluide_base& fluide = eq_rayo.fluide();
