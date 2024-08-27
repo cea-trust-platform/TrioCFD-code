@@ -25,7 +25,7 @@
 #include <DebogIJK.h>
 #include <stat_counters.h>
 #include <IJK_FT.h>
-#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_base.h>
 #include <OpConvDiscQuickIJKScalar.h>
 
 Implemente_instanciable_sans_constructeur( IJK_Thermal_Multiple_Subresolutions, "IJK_Thermal_Multiple_Subresolutions", IJK_Thermal_Subresolution ) ;

@@ -20,7 +20,7 @@
 #include <IJK_Field_simd_tools.h>
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_data_channel.h>
-#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_base.h>
 
 inline void putzero(IJK_Field_local_double& flux)
 {

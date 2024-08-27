@@ -27,12 +27,12 @@
  *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Corrige_flux_FT.cpp
+// File      : Corrige_flux_FT_base.cpp
 // Directory : $IJK_ROOT/src/Temperature
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_base.h>
 #include <DebogIJK.h>
 #include <IJK_FT.h>
 #include <IJK_Navier_Stokes_tools.h>

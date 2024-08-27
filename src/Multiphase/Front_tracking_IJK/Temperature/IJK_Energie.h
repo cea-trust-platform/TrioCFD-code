@@ -46,7 +46,7 @@
 #include <Ouvrir_fichier.h>
 #include <Parser.h>
 #include <TRUST_Ref.h>
-#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_base.h>
 #include <Corrige_flux_FT_temperature_conv.h>
 #include <Operateur_IJK_elem_diff_base.h>
 // #include <Corrige_flux_FT_temperature_conv.h>
@@ -150,7 +150,7 @@ protected:
   //  Nom fichier_sauvegarde_temperature_;
   // int timestep_sauvegarde_temperature_;
 
-  Corrige_flux_FT corrige_flux_;
+  OWN_PTR(Corrige_flux_FT_base) corrige_flux_;
 //  Corrige_flux_FT_temperature_conv corrige_flux_temp_conv_;
 
   OpConvQuickInterfaceOnefluidIJKScalar_double energy_convection_op_quick_interface_;

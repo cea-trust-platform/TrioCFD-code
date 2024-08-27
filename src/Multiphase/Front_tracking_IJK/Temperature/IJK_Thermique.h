@@ -32,7 +32,7 @@
 #include <OpConvQuickIJKScalar.h>
 #include <OpConvCentre2IJKScalar.h>
 #include <Ouvrir_fichier.h>
-#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_base.h>
 #include <TRUST_Ref.h>
 #include <Operateur_IJK_elem_diff_base.h>
 #include <OpConvAmontIJK.h>
@@ -210,7 +210,7 @@ protected :
   int diff_temp_negligible_;
   int conv_temperature_negligible_;
 
-  Corrige_flux_FT corrige_flux_;
+  OWN_PTR(Corrige_flux_FT_base) corrige_flux_;
 
   //MR: lambda variable dans le terme source de Tryggvason
   int lambda_variable_;

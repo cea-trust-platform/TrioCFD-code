@@ -66,7 +66,7 @@ public :
   /*
    * Setters
    */
-  inline void set_corrige_flux(Corrige_flux_FT& corrige_flux);
+  inline void set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux);
 
 protected:
   Motcles convection_op_words_;
@@ -95,7 +95,7 @@ inline void Operateur_IJK_elem_conv::compute_add(IJK_Field_double& dx)
   valeur().compute_add(dx);
 }
 
-inline void Operateur_IJK_elem_conv::set_corrige_flux(Corrige_flux_FT& corrige_flux)
+inline void Operateur_IJK_elem_conv::set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux)
 {
   valeur().set_corrige_flux(corrige_flux);
 }

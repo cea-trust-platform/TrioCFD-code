@@ -77,7 +77,7 @@ public :
                                     IJK_Field_local_double& coeff_field_x,
                                     IJK_Field_local_double& coeff_field_y,
                                     IJK_Field_local_double& coeff_field_z);
-  inline void set_corrige_flux(Corrige_flux_FT& corrige_flux);
+  inline void set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux);
   inline double get_uniform_lambda();
 
 protected:
@@ -124,7 +124,7 @@ inline void Operateur_IJK_elem_diff::set_coeff_x_y_z(IJK_Field_local_double& coe
   return valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
 }
 
-inline void Operateur_IJK_elem_diff::set_corrige_flux(Corrige_flux_FT& corrige_flux)
+inline void Operateur_IJK_elem_diff::set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux)
 {
   valeur().set_corrige_flux(corrige_flux);
 }

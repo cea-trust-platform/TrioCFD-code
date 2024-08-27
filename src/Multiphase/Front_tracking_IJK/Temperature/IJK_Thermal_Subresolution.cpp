@@ -25,7 +25,7 @@
 #include <DebogIJK.h>
 #include <stat_counters.h>
 #include <IJK_FT.h>
-#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_base.h>
 #include <OpConvDiscQuickIJKScalar.h>
 #include <IJK_Ghost_Fluid_tools.h>
 
@@ -654,11 +654,11 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   use_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction_ && distance_cell_faces_from_lrs_;
   if (use_cell_neighbours_for_fluxes_spherical_correction_)
     find_cell_neighbours_for_fluxes_spherical_correction_ = use_cell_neighbours_for_fluxes_spherical_correction_;
-  corrige_flux_.set_correction_cell_faces_neighbours(find_cell_neighbours_for_fluxes_spherical_correction_,
-                                                     use_cell_neighbours_for_fluxes_spherical_correction_,
-                                                     find_reachable_fluxes_,
-                                                     use_reachable_fluxes_,
-                                                     keep_first_reachable_fluxes_);
+  corrige_flux_->set_correction_cell_faces_neighbours(find_cell_neighbours_for_fluxes_spherical_correction_,
+                                                      use_cell_neighbours_for_fluxes_spherical_correction_,
+                                                      find_reachable_fluxes_,
+                                                      use_reachable_fluxes_,
+                                                      keep_first_reachable_fluxes_);
 
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
   if (debug_)
@@ -682,16 +682,16 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   if (!disable_mixed_cells_increment_)
     enable_mixed_cells_increment_ = (!disable_mixed_cells_increment_);
 
-  corrige_flux_.set_convection_diffusion_correction(convective_flux_correction_, diffusive_flux_correction_);
-  corrige_flux_.set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
-  corrige_flux_.set_debug(debug_);
-  corrige_flux_.set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs_);
-  corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_,
-                                               neighbours_weighting_,
-                                               smooth_temperature_field_);
-  corrige_flux_.set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed_);
-  corrige_flux_.set_temperature_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs_,
-                                                                               copy_temperature_on_every_procs_);
+  corrige_flux_->set_convection_diffusion_correction(convective_flux_correction_, diffusive_flux_correction_);
+  corrige_flux_->set_fluxes_feedback_params(discrete_integral_, quadtree_levels_);
+  corrige_flux_->set_debug(debug_);
+  corrige_flux_->set_distance_cell_faces_from_lrs(distance_cell_faces_from_lrs_);
+  corrige_flux_->set_correction_cell_neighbours(find_temperature_cell_neighbours_,
+                                                neighbours_weighting_,
+                                                smooth_temperature_field_);
+  corrige_flux_->set_eulerian_normal_vectors_ns_normed(eulerian_normal_vectors_ns_normed_);
+  corrige_flux_->set_temperature_fluxes_periodic_sharing_strategy_on_processors(copy_fluxes_on_every_procs_,
+                                                                                copy_temperature_on_every_procs_);
 
 
   if (diffusive_flux_correction_ || use_cell_neighbours_for_fluxes_spherical_correction_)
@@ -760,11 +760,11 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
   /*
    * Considered constant values
    */
-  corrige_flux_.set_physical_parameters(cp_liquid_ * ref_ijk_ft_->get_rho_l(),
-                                        cp_vapour_ * ref_ijk_ft_->get_rho_v(),
-                                        lambda_liquid_,
-                                        lambda_vapour_);
-  corrige_flux_.initialize_with_subproblems(
+  corrige_flux_->set_physical_parameters(cp_liquid_ * ref_ijk_ft_->get_rho_l(),
+                                         cp_vapour_ * ref_ijk_ft_->get_rho_v(),
+                                         lambda_liquid_,
+                                         lambda_vapour_);
+  corrige_flux_->initialize_with_subproblems(
     ref_ijk_ft_->get_splitting_ns(),
     temperature_,
     ref_ijk_ft_->itfce(),
@@ -2412,9 +2412,9 @@ void IJK_Thermal_Subresolution::compute_temperature_cell_centres_first_correctio
 
       find_temperature_cell_neighbours_ = 0;
       use_temperature_cell_neighbours_ = 0;
-      corrige_flux_.set_correction_cell_neighbours(find_temperature_cell_neighbours_,
-                                                   neighbours_weighting_,
-                                                   smooth_temperature_field_);
+      corrige_flux_->set_correction_cell_neighbours(find_temperature_cell_neighbours_,
+                                                    neighbours_weighting_,
+                                                    smooth_temperature_field_);
     }
 
 

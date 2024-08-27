@@ -176,9 +176,9 @@ int IJK_Energie::initialize(const IJK_Splitting& splitting, const int idx)
 
   corrige_flux_.typer("Corrige_flux_FT_temperature_conv");
 
-  corrige_flux_.set_physical_parameters(rho_cp_.liqu(), rho_cp_.vap(),
-                                        lda_.liqu(), lda_.vap());
-  corrige_flux_.initialize(
+  corrige_flux_->set_physical_parameters(rho_cp_.liqu(), rho_cp_.vap(),
+                                         lda_.liqu(), lda_.vap());
+  corrige_flux_->initialize(
     ref_ijk_ft_->get_splitting_ns(),
     temperature_,
     ref_ijk_ft_->itfce(),
@@ -798,18 +798,18 @@ void IJK_Energie::compute_interfacial_temperature2(
 //    temperature_ft_, lambda_liquid_, lambda_vapor_, dist, coord_facettes,
 //    normale_facettes, interfacial_temperature, flux_normal_interp, temp_liqu,
 //    temp_vap, coo_liqu, coo_vap);
-  corrige_flux_.calcul_temperature_flux_interface(temperature_ft_,
-                                                  lambda_liquid_,
-                                                  lambda_vapor_,
-                                                  dist,
-                                                  coord_facettes,
-                                                  normale_facettes,
-                                                  interfacial_temperature,
-                                                  flux_normal_interp,
-                                                  temp_liqu,
-                                                  temp_vap,
-                                                  coo_liqu,
-                                                  coo_vap);
+  corrige_flux_->calcul_temperature_flux_interface(temperature_ft_,
+                                                   lambda_liquid_,
+                                                   lambda_vapor_,
+                                                   dist,
+                                                   coord_facettes,
+                                                   normale_facettes,
+                                                   interfacial_temperature,
+                                                   flux_normal_interp,
+                                                   temp_liqu,
+                                                   temp_vap,
+                                                   coo_liqu,
+                                                   coo_vap);
   for (int fa7 = 0; fa7 < nb_facettes; fa7++)
     {
       flux_normal_interp(fa7) *= surface_facettes(fa7);

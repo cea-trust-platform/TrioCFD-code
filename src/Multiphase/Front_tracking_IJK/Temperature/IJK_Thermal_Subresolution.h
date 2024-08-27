@@ -31,7 +31,7 @@
 #include <OpConvQuickIJKScalar.h>
 #include <OpConvCentre2IJKScalar.h>
 #include <Ouvrir_fichier.h>
-#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_base.h>
 #include <TRUST_Ref.h>
 #include <Operateur_IJK_elem_diff_base.h>
 #include <OpConvAmontIJK.h>

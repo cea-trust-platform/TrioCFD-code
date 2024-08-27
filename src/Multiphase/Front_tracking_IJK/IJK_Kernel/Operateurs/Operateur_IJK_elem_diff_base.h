@@ -25,7 +25,7 @@ public:
   Operateur_IJK_elem_diff_base_double();
   virtual void initialize(const IJK_Splitting& splitting) override;
   virtual void set_indicatrice(const IJK_Field_double& indicatrice) { indicatrice_= &indicatrice; };
-  virtual void set_corrige_flux(Corrige_flux_FT& corrige_flux) { corrige_flux_ = &corrige_flux; };
+  virtual void set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux) { corrige_flux_ = &corrige_flux; };
   virtual void calculer(const IJK_Field_double& field,
                         IJK_Field_double& result,
                         const IJK_Field_local_double& boundary_flux_kmin,
@@ -91,7 +91,7 @@ protected:
   const IJK_Field_local_double *boundary_flux_kmin_;
   const IJK_Field_local_double *boundary_flux_kmax_;
 
-  Corrige_flux_FT *corrige_flux_;
+  OWN_PTR(Corrige_flux_FT_base) *corrige_flux_;
   const IJK_Field_local_double *indicatrice_;
 
   bool is_anisotropic_;

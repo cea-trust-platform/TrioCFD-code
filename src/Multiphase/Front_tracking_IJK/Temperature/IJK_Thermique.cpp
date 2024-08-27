@@ -25,7 +25,7 @@
 #include <DebogIJK.h>
 #include <stat_counters.h>
 #include <IJK_FT.h>
-#include <Corrige_flux_FT.h>
+#include <Corrige_flux_FT_base.h>
 #include <OpConvDiscQuickIJKScalar.h>
 
 Implemente_instanciable( IJK_Thermique, "IJK_Thermique", Objet_U ) ;
@@ -1796,12 +1796,12 @@ void IJK_Thermique::compute_interfacial_temperature2(
 
   DoubleTab coo_liqu, coo_vap;
   ArrOfDouble temp_liqu, temp_vap;
-  corrige_flux_.calcul_temperature_flux_interface(temperature_ft_,
-                                                  lambda_liquid_, lambda_vapor_, dist,
-                                                  coord_facettes, normale_facettes,
-                                                  interfacial_temperature, flux_normal_interp,
-                                                  temp_liqu, temp_vap,
-                                                  coo_liqu, coo_vap);
+  corrige_flux_->calcul_temperature_flux_interface(temperature_ft_,
+                                                   lambda_liquid_, lambda_vapor_, dist,
+                                                   coord_facettes, normale_facettes,
+                                                   interfacial_temperature, flux_normal_interp,
+                                                   temp_liqu, temp_vap,
+                                                   coo_liqu, coo_vap);
   for (int fa7=0; fa7 < nb_facettes; fa7++)
     {
       flux_normal_interp(fa7) *= surface_facettes(fa7);

@@ -43,11 +43,11 @@ void OpConvQuickInterfaceOnefluidIJKScalar_double::correct_flux(IJK_Field_local_
   if (dir==2)
     if (k_layer==0)
       {
-        corrige_flux_->update();
-        corrige_flux_->corrige_flux_faceIJ(flux, -1, dir);
+        corrige_flux_->valeur().update();
+        corrige_flux_->valeur().corrige_flux_faceIJ(flux, -1, dir);
       }
     else
-      corrige_flux_->corrige_flux_faceIJ(flux, k_layer, dir);
+      corrige_flux_->valeur().corrige_flux_faceIJ(flux, k_layer, dir);
   else
-    corrige_flux_->corrige_flux_faceIJ(flux, k_layer, dir);
+    corrige_flux_->valeur().corrige_flux_faceIJ(flux, k_layer, dir);
 }
