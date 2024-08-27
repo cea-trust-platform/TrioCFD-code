@@ -175,7 +175,7 @@ void Pb_2G::restreindre_2G(IntVect& connect, DoubleTab& val_incoG, const DoubleT
   //   Cerr<<"nom de l'incoG : "<<incoG.le_nom()<<finl;
   //   Cerr<<"nom de l'incoF : "<<incoF.le_nom()<<finl;
 
-  ma_restriction_(num_rest).restreindre(domaine_VFG, domaine_VFF,connect, val_incoG, val_incoF,nb_comp_incoG);
+  ma_restriction_(num_rest)->restreindre(domaine_VFG, domaine_VFF,connect, val_incoG, val_incoF,nb_comp_incoG);
 }
 
 
@@ -194,7 +194,7 @@ void Pb_2G::restreindre_2G(IntVect& connect, DoubleTab& val_incoG, const DoubleT
   Domaine_dis_base& domaineg = pb_G.domaine_dis();
   Domaine_VF& domaine_VFG = ref_cast(Domaine_VF, domaineg);
 
-  ma_restriction_(num_rest).restreindre(domaine_VFG, domaine_VFF,connect, val_incoG, val_incoF,nb_comp_incoG, num_prem_face_frontG);
+  ma_restriction_(num_rest)->restreindre(domaine_VFG, domaine_VFF,connect, val_incoG, val_incoF,nb_comp_incoG, num_prem_face_frontG);
 }
 
 

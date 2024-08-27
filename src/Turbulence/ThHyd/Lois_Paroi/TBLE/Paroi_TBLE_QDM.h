@@ -22,7 +22,8 @@
 #ifndef Paroi_TBLE_QDM_included
 #define Paroi_TBLE_QDM_included
 
-#include <MuLambda_TBLE.h>
+#include <MuLambda_TBLE_base.h>
+#include <TRUST_Deriv.h>
 #include <Paroi_TBLE_QDM_Scal.h>
 
 class Motcle;
@@ -142,7 +143,7 @@ protected:
   Nom mu_chaine;
   int lambda_fonction;
   Nom lambda_chaine;
-  MuLambda_TBLE mu_lambda;
+  OWN_PTR(MuLambda_TBLE_base) mu_lambda;
 
   //Flag pour le terme source de Boussinesq dans les equations TBLE :
   // le terme source de Boussi est automatiquement mis dans TBLE si il est present dans le 3D. Dans ce cas, il est possible de le supprimer malgre tout
