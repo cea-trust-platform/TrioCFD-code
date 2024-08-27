@@ -23,7 +23,7 @@
 #define Transport_K_KEps_included
 
 #include <Transport_K_Eps_non_std.h>
-#include <Loi_2couches.h>
+#include <Loi_2couches_base.h>
 #include <Operateur_Conv.h>
 #include <TRUST_Ref.h>
 
@@ -68,7 +68,7 @@ public :
 
 protected :
 
-  Loi_2couches loi_2couches;
+  OWN_PTR(Loi_2couches_base) loi_2couches;
 
 private:
   int nb_couches;        //le nombre de couches de mailles ou on applique le modele 1-equation
