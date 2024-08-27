@@ -92,27 +92,44 @@ int Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard(const Motcle& mot, Ent
   else if (mot=="modele_turbulence")
     {
       Cerr << "Reading and typing of the turbulence model :" ;
-      le_modele_turbulence->associer_eqn(*this);
-      is >> le_modele_turbulence;
-      // Si on vient de lire un modele de turbulence nul et que l'operateur
-      // de diffusion a deja ete lu, alors on s'est plante d'operateur,
-      // stop.
-      if (sub_type(Modele_turbulence_hyd_null, le_modele_turbulence.valeur())
-          && terme_diffusif.non_nul())
-        {
-          Cerr << "Erreur dans Navier_Stokes_Turbulent_ALE::lire:\n"
-               " Si le modele de turbulence est nul, il faut le specifier\n"
-               " en premier dans Navier_Stokes_Turbulent_ALE { ... }\n";
+      Motcle typ;
+      is >> typ;
+      Motcle nom1("Modele_turbulence_hyd_");
+      nom1 += typ;
+      Nom discr = discretisation().que_suis_je();
 
-          Cerr << "Error for the method Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard:\n"
-               " For the case of a nul turbulence model, it must be specified\n"
-               " first for the data of Navier_Stokes_Turbulent_ALE { ... }\n";
-          exit();
+      if (typ.debute_par("SOUS_MAILLE") || discr == "VDF_Hyper" || typ.debute_par("LONGUEUR_MELANGE") || (typ == "K_Epsilon_V2"))
+        {
+          if (dimension == 2 && discr != "VDF_Hyper")
+            {
+              Cerr << "Vous traitez un cas turbulent en dimension 2 avec un modele sous maille" << finl;
+              Cerr << "Attention a l'interpretation des resultats !!" << finl;
+            }
+
+          nom1 += "_";
+          // les operateurs de diffusion sont communs aux discretisations VEF et VEFP1B
+          if (discr == "VEFPreP1B") discr = "VEF";
+          nom1 += discr;
         }
+      if (nom1 == "MODELE_TURBULENCE_HYD_SOUS_MAILLE_LM_VEF")
+        {
+          Cerr << "Le mot cle Sous_maille_LM s'appelle desormais Longueur_Melange pour etre coherent en VDF et VEF." << finl;
+          Cerr << "Changer votre jeu de donnees." << finl;
+          Process::exit();
+        }
+
+      Cerr << nom1 << finl;
+
+      le_modele_turbulence.typer(nom1);
+      le_modele_turbulence->associer_eqn(*this);
+      le_modele_turbulence->associer(domaine_dis(), domaine_Cl_dis());
+      is >> le_modele_turbulence.valeur(); // on lit !
+
       le_modele_turbulence->discretiser();
       RefObjU le_modele;
       le_modele = le_modele_turbulence.valeur();
       liste_modeles_.add_if_not(le_modele);
+
       return 1;
     }
   else
@@ -258,7 +275,7 @@ int Navier_Stokes_Turbulent_ALE::sauvegarder(Sortie& os) const
   int bytes=0;
   bytes += Navier_Stokes_std_ALE::sauvegarder(os);
   assert(bytes % 4 == 0);
-  bytes += le_modele_turbulence.sauvegarder(os);
+  bytes += le_modele_turbulence->sauvegarder(os);
   assert(bytes % 4 == 0);
   return bytes;
 }
@@ -279,7 +296,7 @@ int Navier_Stokes_Turbulent_ALE::reprendre(Entree& is)
   ident_modele += Nom(temps,probleme().reprise_format_temps());
 
   avancer_fichier(is, ident_modele);
-  le_modele_turbulence.reprendre(is);
+  le_modele_turbulence->reprendre(is);
 
   return 1;
 }
