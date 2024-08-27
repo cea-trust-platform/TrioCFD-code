@@ -241,7 +241,7 @@ int Transport_Interfaces_FT_Disc_interne::sauvegarder(Sortie& os) const
   // correctement reconstruite a partir de l'interface (on tolere qu'il y ait
   // des inconsistances) :
   int bytes=0;
-  bytes += indicatrice_cache.sauvegarder(os);
+  bytes += indicatrice_cache->sauvegarder(os);
   int special, afaire;
   const int format_xyz = EcritureLectureSpecial::is_ecriture_special(special, afaire);
   if (format_xyz)
@@ -269,7 +269,7 @@ int Transport_Interfaces_FT_Disc_interne::reprendre(Entree& is)
       // Le champ n'est pas discretise, on lit ceci pour sauter le bloc
       indicatrice_cache.typer(type);
     }
-  indicatrice_cache.reprendre(is);
+  indicatrice_cache->reprendre(is);
   is >> indicatrice_cache_tag;
   maillage_interface.reprendre(is);
   remaillage_interface_.reprendre(is);
