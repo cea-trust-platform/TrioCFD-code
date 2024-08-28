@@ -622,9 +622,9 @@ void compute_eulerian_curvature_field_from_distance_field(const IJK_Field_double
   // Initialise with unit lambda
   laplacian_distance.initialize(distance.get_splitting());
   const double lambda = 1.;
-  laplacian_distance.set_uniform_lambda(lambda);
+  laplacian_distance->set_uniform_lambda(lambda);
   // Calculate Laplacian(dist)
-  laplacian_distance.calculer(distance, curvature, boundary_flux_kmin, boundary_flux_kmax);
+  laplacian_distance->calculer(distance, curvature, boundary_flux_kmin, boundary_flux_kmax);
   const IJK_Grid_Geometry& geom = curvature.get_splitting().get_grid_geometry();
   const double dx = geom.get_constant_delta(DIRECTION_I);
   const double dy = geom.get_constant_delta(DIRECTION_J);

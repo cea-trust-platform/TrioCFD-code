@@ -18,11 +18,10 @@
 // Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/IJK_Kernel/Operateurs
 //
 /////////////////////////////////////////////////////////////////////////////
-
 #include <Operateur_IJK_elem_conv.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_conv, "Operateur_IJK_elem_conv", DERIV(Operateur_IJK_elem_conv_base_double) ) ;
+Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_conv, "Operateur_IJK_elem_conv", DERIV(Operateur_IJK_elem_conv_base_double) );
 
 Operateur_IJK_elem_conv::Operateur_IJK_elem_conv()
 {
@@ -50,20 +49,16 @@ void Operateur_IJK_elem_conv::reset_operator()
   is_cast_ = false;
 }
 
-Sortie& Operateur_IJK_elem_conv::printOn( Sortie& os ) const
+Sortie& Operateur_IJK_elem_conv::printOn(Sortie& os) const
 {
   // DERIV(Operateur_IJK_elem_conv_base_double)::printOn( os );
   os << convection_op_words_[convection_rank_];
   return os;
 }
 
-Entree& Operateur_IJK_elem_conv::readOn( Entree& is )
+Entree& Operateur_IJK_elem_conv::readOn(Entree& is)
 {
   typer_convection_op(is);
-//  Param param(que_suis_je());
-//  set_param(param);
-//  param.lire_sans_accolade(is);
-//  is >> valeur();
   return is;
 }
 
@@ -88,11 +83,11 @@ Entree& Operateur_IJK_elem_conv::typer_convection_op(Entree& is)
   typer(type);
   Cerr << "Operateur_IJK_elem_conv cast to " << type << finl;
   is >> valeur();
-  is_cast_=true;
+  is_cast_ = true;
   return is;
 }
 
-void Operateur_IJK_elem_conv::typer_convection_op(const char * convection_op)
+void Operateur_IJK_elem_conv::typer_convection_op(const char *convection_op)
 {
   if (is_cast_)
     reset_operator();
@@ -101,7 +96,7 @@ void Operateur_IJK_elem_conv::typer_convection_op(const char * convection_op)
   Motcle type(get_convection_op_type(word));
   typer(type);
   Cerr << "Operateur_IJK_elem_conv cast to " << type << finl;
-  is_cast_=true;
+  is_cast_ = true;
 }
 
 Nom Operateur_IJK_elem_conv::get_convection_op_type(Motcle word)
@@ -110,32 +105,32 @@ Nom Operateur_IJK_elem_conv::get_convection_op_type(Motcle word)
   convection_rank_ = convection_op_words_.search(word);
   switch(convection_rank_)
     {
-    case 0 :
+    case 0:
       {
         convection_op_ += "Centre2";
         break;
       }
-    case 1 :
+    case 1:
       {
         convection_op_ += "Centre2";
         break;
       }
-    case 2 :
+    case 2:
       {
         convection_op_ += "Quick";
         break;
       }
-    case 3 :
+    case 3:
       {
         convection_op_ += "DiscQuick";
         break;
       }
-    case 4 :
+    case 4:
       {
         convection_op_ += "QuickInterface";
         break;
       }
-    default :
+    default:
       {
         Cerr << "ERROR : Scalar convection operators that are already implemented are:" << finl;
         Cerr << convection_op_words_ << finl;
@@ -145,22 +140,4 @@ Nom Operateur_IJK_elem_conv::get_convection_op_type(Motcle word)
   type += convection_op_;
   type += suffix_;
   return type;
-}
-
-void Operateur_IJK_elem_conv::calculer(const IJK_Field_double& field,
-                                       const IJK_Field_double& vx,
-                                       const IJK_Field_double& vy,
-                                       const IJK_Field_double& vz,
-                                       IJK_Field_double& result)
-{
-  valeur().calculer(field, vx, vy, vz, result);
-}
-
-void Operateur_IJK_elem_conv::ajouter(const IJK_Field_double& field,
-                                      const IJK_Field_double& vx,
-                                      const IJK_Field_double& vy,
-                                      const IJK_Field_double& vz,
-                                      IJK_Field_double& result)
-{
-  valeur().ajouter(field, vx, vy, vz, result);
 }

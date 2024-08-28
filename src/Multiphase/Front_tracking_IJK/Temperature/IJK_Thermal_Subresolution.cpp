@@ -662,7 +662,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
 
   temperature_diffusion_op_.set_conductivity_coefficient(uniform_lambda_, temperature_, temperature_, temperature_, temperature_);
   if (debug_)
-    Cerr << "Uniform lambda: " << temperature_diffusion_op_.get_uniform_lambda() << finl;
+    Cerr << "Uniform lambda: " << temperature_diffusion_op_->get_uniform_lambda() << finl;
 
   impose_fo_flux_correction_ = !disable_fo_flux_correction_;
   convective_flux_correction_ = convective_flux_correction_ && (!conv_temperature_negligible_);
@@ -699,7 +699,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       // Use an operator that override compute_set() with corrige_flux;
       temperature_diffusion_op_.typer("OpDiffUniformIJKScalarCorrection_double");
       temperature_diffusion_op_.initialize(splitting);
-      temperature_diffusion_op_.set_corrige_flux(corrige_flux_);
+      temperature_diffusion_op_->set_corrige_flux(corrige_flux_);
     }
 
   if (convective_flux_correction_ || use_cell_neighbours_for_fluxes_spherical_correction_)
@@ -707,7 +707,7 @@ int IJK_Thermal_Subresolution::initialize(const IJK_Splitting& splitting, const 
       // Use an operator that override compute_set() with corrige_flux;
       temperature_convection_op_.typer("OpConvQuickInterfaceIJKScalar_double");
       temperature_convection_op_.initialize(splitting);
-      temperature_convection_op_.set_corrige_flux(corrige_flux_);
+      temperature_convection_op_->set_corrige_flux(corrige_flux_);
     }
 
   if((convective_flux_correction_ || diffusive_flux_correction_) && store_cell_faces_corrected_)
@@ -1383,7 +1383,7 @@ void IJK_Thermal_Subresolution::compute_diffusion_increment()
             div_coeff_grad_T_(i,j,k) = resu;
         }
   if (debug_)
-    Cerr << "Uniform lambda: " << temperature_diffusion_op_.get_uniform_lambda() << finl;
+    Cerr << "Uniform lambda: " << temperature_diffusion_op_->get_uniform_lambda() << finl;
 }
 
 void IJK_Thermal_Subresolution::correct_any_temperature_fields_for_eulerian_fluxes(IJK_Field_double& temperature)
@@ -2267,7 +2267,7 @@ void IJK_Thermal_Subresolution::convert_into_sparse_matrix()
 
 void IJK_Thermal_Subresolution::compute_md_vector()
 {
-  one_dimensional_advection_diffusion_thermal_solver_.reinit();
+  one_dimensional_advection_diffusion_thermal_solver_->reinit();
 
   ArrOfInt pe_voisins_dummy;
   ArrsOfInt items_to_send_dummy;

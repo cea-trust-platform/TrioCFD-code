@@ -18,11 +18,10 @@
 // Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/IJK_Kernel/Operateurs
 //
 /////////////////////////////////////////////////////////////////////////////
-
 #include <Operateur_IJK_elem_diff.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", DERIV( Operateur_IJK_elem_diff_base_double ) ) ;
+Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", DERIV( Operateur_IJK_elem_diff_base_double ) );
 
 Operateur_IJK_elem_diff::Operateur_IJK_elem_diff()
 {
@@ -40,7 +39,7 @@ Operateur_IJK_elem_diff::Operateur_IJK_elem_diff()
   diffusion_op_ = "";
   diffusion_op_options_ = "";
   is_cast_ = false;
-  diffusion_rank_= 0 ;
+  diffusion_rank_ = 0;
 }
 
 void Operateur_IJK_elem_diff::reset_operator()
@@ -48,17 +47,17 @@ void Operateur_IJK_elem_diff::reset_operator()
   diffusion_op_ = "";
   diffusion_op_options_ = "";
   is_cast_ = false;
-  diffusion_rank_= 0 ;
+  diffusion_rank_ = 0;
 }
 
-Sortie& Operateur_IJK_elem_diff::printOn( Sortie& os ) const
+Sortie& Operateur_IJK_elem_diff::printOn(Sortie& os) const
 {
   // DERIV(Operateur_IJK_elem_diff_base_double)::printOn( os );
   os << diffusion_op_words_[diffusion_rank_];
   return os;
 }
 
-Entree& Operateur_IJK_elem_diff::readOn( Entree& is )
+Entree& Operateur_IJK_elem_diff::readOn(Entree& is)
 {
   typer_diffusion_op(is);
 //  Param param(que_suis_je());
@@ -88,11 +87,11 @@ Entree& Operateur_IJK_elem_diff::typer_diffusion_op(Entree& is)
   typer(type);
   Cerr << "Operateur_IJK_elem_diff cast to " << type << finl;
   is >> valeur();
-  is_cast_=true;
+  is_cast_ = true;
   return is;
 }
 
-void Operateur_IJK_elem_diff::typer_diffusion_op(const char * diffusion_op) // (const char * convection_op)
+void Operateur_IJK_elem_diff::typer_diffusion_op(const char *diffusion_op) // (const char * convection_op)
 {
   if (is_cast_)
     reset_operator();
@@ -101,7 +100,7 @@ void Operateur_IJK_elem_diff::typer_diffusion_op(const char * diffusion_op) // (
   Nom type(get_diffusion_op_type(word));
   typer(type);
   Cerr << "Operateur_IJK_elem_diff cast to " << type << finl;
-  is_cast_=true;
+  is_cast_ = true;
 }
 
 Nom Operateur_IJK_elem_diff::get_diffusion_op_type(Motcle word)
@@ -110,37 +109,37 @@ Nom Operateur_IJK_elem_diff::get_diffusion_op_type(Motcle word)
   diffusion_rank_ = diffusion_op_words_.search(word);
   switch(diffusion_rank_)
     {
-    case 0 :
+    case 0:
       {
         diffusion_op_ += "";
         break;
       }
-    case 1 :
+    case 1:
       {
         diffusion_op_ += "Uniform";
         break;
       }
-    case 2 :
+    case 2:
       {
         diffusion_op_ += "Anisotropic";
         break;
       }
-    case 3 :
+    case 3:
       {
         diffusion_op_ += "Vectorial";
         break;
       }
-    case 4 :
+    case 4:
       {
         diffusion_op_ += "VectorialAnisotropic";
         break;
       }
-    case 5 :
+    case 5:
       {
         diffusion_op_ += "StructuralOnly";
         break;
       }
-    default :
+    default:
       {
         Cerr << "ERROR : Diffusion operators (elem) that are already implemented are:" << finl;
         Cerr << diffusion_op_words_ << finl;
@@ -153,81 +152,51 @@ Nom Operateur_IJK_elem_diff::get_diffusion_op_type(Motcle word)
   return type;
 }
 
-void Operateur_IJK_elem_diff::set_conductivity_coefficient(const double& uniform_lambda,
-                                                           const IJK_Field_local_double& lambda,
-                                                           IJK_Field_local_double& coeff_field_x,
-                                                           IJK_Field_local_double& coeff_field_y,
-                                                           IJK_Field_local_double& coeff_field_z)
+void Operateur_IJK_elem_diff::set_conductivity_coefficient(const double& uniform_lambda, const IJK_Field_local_double& lambda, IJK_Field_local_double& coeff_field_x,
+                                                           IJK_Field_local_double& coeff_field_y, IJK_Field_local_double& coeff_field_z)
 {
   switch(diffusion_rank_)
     {
-    case 0 :
+    case 0:
       {
         // Standard
-        set_lambda(lambda);
+        valeur().set_lambda(lambda);
         break;
       }
-    case 1 :
+    case 1:
       {
         // Uniform
-        set_uniform_lambda(uniform_lambda);
+        valeur().set_uniform_lambda(uniform_lambda);
         break;
       }
-    case 2 :
+    case 2:
       {
         // Anisotropic
-        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+        valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
         break;
       }
-    case 3 :
+    case 3:
       {
         // Vectorial
-        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+        valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
         break;
       }
-    case 4 :
+    case 4:
       {
         // VectorialAnisotropic
-        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+        valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
         break;
       }
-    case 5 :
+    case 5:
       {
         // StructuralOnly
-        set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
+        valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
         break;
       }
-    default :
+    default:
       {
         Cerr << "ERROR : The conductivity can not be set properly" << finl;
         abort();
       }
     }
 }
-
-
-void Operateur_IJK_elem_diff::calculer(const IJK_Field_double& field,
-                                       IJK_Field_double& result,
-                                       const IJK_Field_local_double& boundary_flux_kmin,
-                                       const IJK_Field_local_double& boundary_flux_kmax)
-{
-  if (diffusion_rank_ == 1)
-    Cerr << "Uniform lambda: " << get_uniform_lambda() << finl;
-  return valeur().calculer(field,
-                           result,
-                           boundary_flux_kmin,
-                           boundary_flux_kmax);
-}
-
-
-void Operateur_IJK_elem_diff::ajouter(const IJK_Field_double& field,
-                                      IJK_Field_double& result,
-                                      const IJK_Field_local_double& boundary_flux_kmin,
-                                      const IJK_Field_local_double& boundary_flux_kmax)
-{
-  return valeur().ajouter(field,
-                          result,
-                          boundary_flux_kmin,
-                          boundary_flux_kmax);
-}
-

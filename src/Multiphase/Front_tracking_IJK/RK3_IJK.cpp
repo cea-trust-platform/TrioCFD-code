@@ -442,7 +442,7 @@ void IJK_problem_double::run()
   //d_fonction_levelset_.allocate(splitting_, IJK_Splitting::ELEM, 0);
 
   velocity_diffusion_op_.typer("OpDiffIJK_double");
-  velocity_diffusion_op_.set_bc(boundary_conditions_);
+  velocity_diffusion_op_->set_bc(boundary_conditions_);
   velocity_diffusion_op_.initialize(splitting_);
 
   velocity_convection_op_.typer("OpConvIJKQuickSharp_double");
@@ -663,9 +663,9 @@ void IJK_problem_double::euler_time_step()
       // Calcul d_velocity = v scalaire gradient(v)
       //(les compteurs statistiques sont deja presents a l'interieur des fonctions ajouter/calculer)
       //statistiques().begin_count(convection_counter_);
-      velocity_convection_op_.calculer(velocity_tmp_[0], velocity_tmp_[1], velocity_tmp_[2],
-                                       velocity_tmp_[0], velocity_tmp_[1], velocity_tmp_[2],
-                                       d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+      velocity_convection_op_->calculer(velocity_tmp_[0], velocity_tmp_[1], velocity_tmp_[2],
+                                        velocity_tmp_[0], velocity_tmp_[1], velocity_tmp_[2],
+                                        d_velocity_[0], d_velocity_[1], d_velocity_[2]);
       //statistiques().end_count(convection_counter_);
       // Multiplication par rho aux faces (on va rediviser a la fin)
       calculer_rho_v(rho_field_, d_velocity_, d_velocity_);
@@ -673,9 +673,9 @@ void IJK_problem_double::euler_time_step()
       // Calcul d_velocity
       //(les compteurs statistiques sont deja presents a l'interieur des fonctions ajouter/calculer)
       //statistiques().begin_count(diffusion_counter_);
-      velocity_diffusion_op_.set_nu(molecular_mu_);
-      velocity_diffusion_op_.ajouter(velocity_tmp_[0], velocity_tmp_[1], velocity_tmp_[2],
-                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+      velocity_diffusion_op_->set_nu(molecular_mu_);
+      velocity_diffusion_op_->ajouter(velocity_tmp_[0], velocity_tmp_[1], velocity_tmp_[2],
+                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
       //statistiques().end_count(diffusion_counter_);
       statistiques().begin_count(source_counter_);
 
@@ -688,9 +688,9 @@ void IJK_problem_double::euler_time_step()
       // Calcul d_velocity = v scalaire gradient(v)
       //(les compteurs statistiques sont deja presents a l'interieur des fonctions ajouter/calculer)
       //statistiques().begin_count(convection_counter_);
-      velocity_convection_op_.calculer(velocity_[0], velocity_[1], velocity_[2],
-                                       velocity_[0], velocity_[1], velocity_[2],
-                                       d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+      velocity_convection_op_->calculer(velocity_[0], velocity_[1], velocity_[2],
+                                        velocity_[0], velocity_[1], velocity_[2],
+                                        d_velocity_[0], d_velocity_[1], d_velocity_[2]);
       //statistiques().end_count(convection_counter_);
       // Multiplication par rho aux faces (on va rediviser a la fin)
       calculer_rho_v(rho_field_, d_velocity_, d_velocity_);
@@ -698,9 +698,9 @@ void IJK_problem_double::euler_time_step()
       // Calcul d_velocity
       //(les compteurs statistiques sont deja presents a l'interieur des fonctions ajouter/calculer)
       //statistiques().begin_count(diffusion_counter_);
-      velocity_diffusion_op_.set_nu(molecular_mu_);
-      velocity_diffusion_op_.ajouter(velocity_[0], velocity_[1], velocity_[2],
-                                     d_velocity_[0], d_velocity_[1], d_velocity_[2]);
+      velocity_diffusion_op_->set_nu(molecular_mu_);
+      velocity_diffusion_op_->ajouter(velocity_[0], velocity_[1], velocity_[2],
+                                      d_velocity_[0], d_velocity_[1], d_velocity_[2]);
       //statistiques().end_count(diffusion_counter_);
       statistiques().begin_count(source_counter_);
 

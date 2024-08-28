@@ -18,7 +18,6 @@
 // Directory : $TRIOCFD_ROOT/src/Multiphase/Front_tracking_IJK/IJK_Kernel/Operateurs
 //
 /////////////////////////////////////////////////////////////////////////////
-
 #ifndef Operateur_IJK_elem_diff_included
 #define Operateur_IJK_elem_diff_included
 
@@ -33,52 +32,23 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_IJK_elem_diff : public DERIV( Operateur_IJK_elem_diff_base_double )
+class Operateur_IJK_elem_diff: public DERIV( Operateur_IJK_elem_diff_base_double )
 {
 
-  Declare_instanciable( Operateur_IJK_elem_diff ) ;
+  Declare_instanciable( Operateur_IJK_elem_diff );
 
-public :
-  inline void initialize(const IJK_Splitting& splitting);
-  inline void compute_set(IJK_Field_double& dx);
-  inline void compute_add(IJK_Field_double& dx);
-  void calculer(const IJK_Field_double& field,
-                IJK_Field_double& result,
-                const IJK_Field_local_double& boundary_flux_kmin,
-                const IJK_Field_local_double& boundary_flux_kmax);
-  void ajouter(const IJK_Field_double& field,
-               IJK_Field_double& result,
-               const IJK_Field_local_double& boundary_flux_kmin,
-               const IJK_Field_local_double& boundary_flux_kmax);
-  /*
-   * ReadOn
-   */
+public:
+  inline void initialize(const IJK_Splitting &splitting);
+
   void reset_operator();
-  void typer_diffusion_op(const char * diffusion_op);
-  Entree& typer_diffusion_op(Entree& is);
-  int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
-  void set_param(Param& param);
+  void typer_diffusion_op(const char *diffusion_op);
+  Entree& typer_diffusion_op(Entree &is);
+  int lire_motcle_non_standard(const Motcle &mot, Entree &is) override;
+  void set_param(Param &param);
   Nom get_diffusion_op_type(Motcle word);
 
-  /*
-   * Getters
-   */
-
-  /*
-   * Setters
-   */
-  inline void set_uniform_lambda(const double& uniform_lambda);
-  inline void set_lambda(const IJK_Field_local_double& lambda);
-  inline void set_coeff_x_y_z(IJK_Field_local_double& coeff_field_x,
-                              IJK_Field_local_double& coeff_field_y,
-                              IJK_Field_local_double& coeff_field_z);
-  void set_conductivity_coefficient(const double& uniform_lambda,
-                                    const IJK_Field_local_double& lambda,
-                                    IJK_Field_local_double& coeff_field_x,
-                                    IJK_Field_local_double& coeff_field_y,
-                                    IJK_Field_local_double& coeff_field_z);
-  inline void set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux);
-  inline double get_uniform_lambda();
+  void set_conductivity_coefficient(const double &uniform_lambda, const IJK_Field_local_double &lambda, IJK_Field_local_double &coeff_field_x, IJK_Field_local_double &coeff_field_y,
+                                    IJK_Field_local_double &coeff_field_z);
 
 protected:
   Motcles diffusion_op_words_;
@@ -96,43 +66,5 @@ inline void Operateur_IJK_elem_diff::initialize(const IJK_Splitting& splitting)
     typer_diffusion_op("standard");
   valeur().initialize(splitting);
 }
-
-inline void Operateur_IJK_elem_diff::compute_set(IJK_Field_double& dx)
-{
-  valeur().compute_set(dx);
-}
-
-inline void Operateur_IJK_elem_diff::compute_add(IJK_Field_double& dx)
-{
-  valeur().compute_add(dx);
-}
-
-inline void Operateur_IJK_elem_diff::set_uniform_lambda(const double& uniform_lambda)
-{
-  return valeur().set_uniform_lambda(uniform_lambda);
-}
-
-inline void Operateur_IJK_elem_diff::set_lambda(const IJK_Field_local_double& lambda)
-{
-  return valeur().set_lambda(lambda);
-}
-
-inline void Operateur_IJK_elem_diff::set_coeff_x_y_z(IJK_Field_local_double& coeff_field_x,
-                                                     IJK_Field_local_double& coeff_field_y,
-                                                     IJK_Field_local_double& coeff_field_z)
-{
-  return valeur().set_coeff_x_y_z(coeff_field_x, coeff_field_y, coeff_field_z);
-}
-
-inline void Operateur_IJK_elem_diff::set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux)
-{
-  valeur().set_corrige_flux(corrige_flux);
-}
-
-inline double Operateur_IJK_elem_diff::get_uniform_lambda()
-{
-  return valeur().get_uniform_lambda();
-}
-
 
 #endif /* Operateur_IJK_elem_diff_included */

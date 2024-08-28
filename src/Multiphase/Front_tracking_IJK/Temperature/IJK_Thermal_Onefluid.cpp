@@ -191,7 +191,7 @@ void IJK_Thermal_Onefluid::add_temperature_diffusion()
   lambda_.echange_espace_virtuel(lambda_.ghost());
   DebogIJK::verifier("lambda", lambda_);
 
-  temperature_diffusion_op_.set_lambda(lambda_);
+  temperature_diffusion_op_->set_lambda(lambda_);
   IJK_Thermal_base::add_temperature_diffusion();
 }
 

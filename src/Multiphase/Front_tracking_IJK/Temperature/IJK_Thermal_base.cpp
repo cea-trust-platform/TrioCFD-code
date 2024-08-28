@@ -1246,7 +1246,7 @@ void IJK_Thermal_base::compute_temperature_convection(const FixedVector<IJK_Fiel
     }
   else
     {
-      temperature_convection_op_.calculer(temperature_, velocity[0], velocity[1], velocity[2], d_temperature_);
+      temperature_convection_op_->calculer(temperature_, velocity[0], velocity[1], velocity[2], d_temperature_);
       const int ni = d_temperature_.ni();
       const int nj = d_temperature_.nj();
       const int nk = d_temperature_.nk();
@@ -1317,10 +1317,10 @@ void IJK_Thermal_base::add_temperature_diffusion()
       /*
        * Correct the diffusive fluxes here or in the operator ?
        */
-      temperature_diffusion_op_.calculer(temperature_,
-                                         div_coeff_grad_T_volume_,
-                                         boundary_flux_kmin_,
-                                         boundary_flux_kmax_);
+      temperature_diffusion_op_->calculer(temperature_,
+                                          div_coeff_grad_T_volume_,
+                                          boundary_flux_kmin_,
+                                          boundary_flux_kmax_);
       compute_diffusion_increment();
       statistiques().end_count(cnt_diff_temp);
       DebogIJK::verifier("div_coeff_grad_T_volume_", div_coeff_grad_T_volume_);

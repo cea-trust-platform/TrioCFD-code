@@ -33,40 +33,17 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_IJK_elem_conv : public DERIV(Operateur_IJK_elem_conv_base_double)
+class Operateur_IJK_elem_conv: public DERIV(Operateur_IJK_elem_conv_base_double)
 {
-  Declare_instanciable( Operateur_IJK_elem_conv ) ;
-public :
-  inline void initialize(const IJK_Splitting& splitting);
-  inline void compute_set(IJK_Field_double& dx);
-  inline void compute_add(IJK_Field_double& dx);
-  void calculer(const IJK_Field_double& field,
-                const IJK_Field_double& vx,
-                const IJK_Field_double& vy,
-                const IJK_Field_double& vz,
-                IJK_Field_double& result);
-  void ajouter(const IJK_Field_double& field,
-               const IJK_Field_double& vx,
-               const IJK_Field_double& vy,
-               const IJK_Field_double& vz,
-               IJK_Field_double& result);
+  Declare_instanciable( Operateur_IJK_elem_conv );
+public:
+  inline void initialize(const IJK_Splitting &splitting);
   Nom get_convection_op_type(Motcle word);
-  /*
-   * ReadOn
-   */
   void reset_operator();
-  Entree& typer_convection_op(Entree& is);
-  void typer_convection_op(const char * convection_op);
-  int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
-  void set_param(Param& param);
-  /*
-   * Getters
-   */
-
-  /*
-   * Setters
-   */
-  inline void set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux);
+  Entree& typer_convection_op(Entree &is);
+  void typer_convection_op(const char *convection_op);
+  int lire_motcle_non_standard(const Motcle &mot, Entree &is) override;
+  void set_param(Param &param);
 
 protected:
   Motcles convection_op_words_;
@@ -83,21 +60,6 @@ inline void Operateur_IJK_elem_conv::initialize(const IJK_Splitting& splitting)
   if (!is_cast_)
     typer_convection_op("quick");
   valeur().initialize(splitting);
-}
-
-inline void Operateur_IJK_elem_conv::compute_set(IJK_Field_double& dx)
-{
-  valeur().compute_set(dx);
-}
-
-inline void Operateur_IJK_elem_conv::compute_add(IJK_Field_double& dx)
-{
-  valeur().compute_add(dx);
-}
-
-inline void Operateur_IJK_elem_conv::set_corrige_flux(OWN_PTR(Corrige_flux_FT_base)& corrige_flux)
-{
-  valeur().set_corrige_flux(corrige_flux);
 }
 
 #endif /* Operateur_IJK_elem_conv_included */

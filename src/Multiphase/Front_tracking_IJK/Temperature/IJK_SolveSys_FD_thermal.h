@@ -37,14 +37,10 @@
 
 class IJK_SolveSys_FD_thermal : public SolveurSys
 {
-
   Declare_instanciable( IJK_SolveSys_FD_thermal ) ;
-
 public :
-
   void cast_iterative_solver_by_default();
   void cast_direct_solver_by_default();
-  void reinit();
 
 protected :
   Nom iterative_solver_by_default_ = "Solv_Gmres";
