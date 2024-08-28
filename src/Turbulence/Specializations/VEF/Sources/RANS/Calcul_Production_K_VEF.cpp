@@ -50,15 +50,14 @@
  * @param[out]
  * @return DoubleTab& prodK
  */
-DoubleTab& Calcul_Production_K_VEF::calculer_terme_production_K(
-  const Domaine_VEF& domaine_VEF,
-  const Domaine_Cl_VEF& zcl_VEF,
-  DoubleTab& prodK,
-  const DoubleTab& K_eps,
-  const DoubleTab& vit,
-  const DoubleTab& visco_turb,
-  const int& interpol_visco,
-  const double& limiteur) const
+DoubleTab& Calcul_Production_K_VEF::calculer_terme_production_K(const Domaine_VEF& domaine_VEF,
+                                                                const Domaine_Cl_VEF& zcl_VEF,
+                                                                DoubleTab& prodK,
+                                                                const DoubleTab& K_eps,
+                                                                const DoubleTab& vit,
+                                                                const DoubleTab& visco_turb,
+                                                                const int& interpol_visco,
+                                                                const double& limiteur) const
 {
   prodK = 0;
 
@@ -150,7 +149,6 @@ void Calcul_Production_K_VEF::loop_for_non_periodic_boundaries(DoubleTab& prodK,
           const double dw_dz = gradient_elem(poly1, 2, 2);
 
           // Determination du terme de production
-
           prodK(fac) = (2*(du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz)
                         + ((du_dy + dv_dx) * (du_dy + dv_dx)
                            + (du_dz + dw_dx) * (du_dz + dw_dx)
@@ -648,6 +646,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_eq_0(const Do
       const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
       const int ndeb = le_bord.num_premiere_face();
       const int nfin = ndeb + le_bord.nb_faces();
+
       if (sub_type(Periodique, la_cl.valeur()))
         {
           for (int fac = ndeb ; fac < nfin; fac++)
@@ -705,6 +704,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_eq_1(const Do
       const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
       const int ndeb = le_bord.num_premiere_face();
       const int nfin = ndeb + le_bord.nb_faces();
+
       if (sub_type(Periodique, la_cl.valeur()))
         {
           for (int fac = ndeb; fac < nfin; fac++)
@@ -713,6 +713,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_eq_1(const Do
               const int elem2 = face_voisins(fac, 1);
               const double a = volumes(elem1)/(volumes(elem1) + volumes(elem2));
               const double b = volumes(elem2)/(volumes(elem1) + volumes(elem2));
+
               for (int i = 0; i < Objet_U::dimension; i++)
                 u_theta(fac, i) = a*tab_beta(elem1)*alpha_turb(elem1)*gradient_elem(elem1, i)
                                   + b*tab_beta(elem2)*alpha_turb(elem2)*gradient_elem(elem2, i);
@@ -723,6 +724,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_eq_1(const Do
           for (int fac = ndeb; fac < nfin; fac++)
             {
               const int elem1 = face_voisins(fac, 0);
+
               for (int i = 0; i < Objet_U::dimension; i++)
                 u_theta(fac, i) = tab_beta(elem1)*alpha_turb(elem1)*gradient_elem(elem1, i);
             }
@@ -734,10 +736,12 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_eq_1(const Do
     {
       const int elem1 = face_voisins(fac, 0);
       const int elem2 = face_voisins(fac, 1);
+
       if ((elem1 >= 0) && (elem2 >= 0))
         {
           const double a = volumes(elem1)/(volumes(elem1) + volumes(elem2));
           const double b = volumes(elem2)/(volumes(elem1) + volumes(elem2));
+
           for (int i = 0; i < Objet_U::dimension; i++)
             u_theta(fac, i) = a*tab_beta(elem1)*alpha_turb(elem1)*gradient_elem(elem1, i)
                               + b*tab_beta(elem2)*alpha_turb(elem2)*gradient_elem(elem2, i);
@@ -761,6 +765,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_gt_1(const Do
       const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
       const int ndeb = le_bord.num_premiere_face();
       const int nfin = ndeb + le_bord.nb_faces();
+
       if (sub_type(Periodique, la_cl.valeur()))
         {
           for (int fac = ndeb; fac < nfin; fac++)
@@ -769,6 +774,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_gt_1(const Do
               const int elem2 = face_voisins(fac, 1);
               const double a = volumes(elem1)/(volumes(elem1) + volumes(elem2));
               const double b = volumes(elem2)/(volumes(elem1) + volumes(elem2));
+
               for (int i = 0; i < Objet_U::dimension; i++)
                 u_theta(fac, i) = a*tab_beta(elem1, 0)*alpha_turb(elem1)*gradient_elem(elem1, i)
                                   + b*tab_beta(elem2, 0)*alpha_turb(elem2)*gradient_elem(elem2, i);
@@ -780,6 +786,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_gt_1(const Do
           for (int fac = ndeb; fac < nfin; fac++)
             {
               const int elem1 = face_voisins(fac, 0);
+
               for (int i = 0; i < Objet_U::dimension; i++)
                 u_theta(fac, i) = tab_beta(elem1, 0)*alpha_turb(elem1)*gradient_elem(elem1, i);
             }
@@ -787,14 +794,17 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_gt_1(const Do
     }
   // we treat the internal faces
   const int nb_faces_tot = domaine_VEF.nb_faces_tot();
+
   for (int fac = 0; fac < nb_faces_tot; fac++)
     {
       const int elem1 = face_voisins(fac, 0);
       const int elem2 = face_voisins(fac, 1);
+
       if ((elem1 >= 0) && (elem2 >= 0))
         {
           const double a = volumes(elem1)/(volumes(elem1) + volumes(elem2));
           const double b = volumes(elem2)/(volumes(elem1) + volumes(elem2));
+
           for (int i = 0; i < Objet_U::dimension; i++)
             u_theta(fac, i) = a*tab_beta(elem1, 0)*alpha_turb(elem1)*gradient_elem(elem1, i)
                               + b*tab_beta(elem2, 0)*alpha_turb(elem2)*gradient_elem(elem2, i);
@@ -839,6 +849,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_gt_1_nbCompo_eq_0(const Do
           for (int fac = ndeb; fac < nfin; fac++)
             {
               const int elem1 = face_voisins(fac, 0);
+
               for (int i = 0; i < nb_consti; i++)
                 for (int k = 0; k < Objet_U::dimension; k++)
                   u_theta(fac, i, k) = tab_beta(0, 0)*alpha_turb(elem1)*gradient_elem(elem1, i, k);
@@ -900,6 +911,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_gt_1_nbCompo_eq_1(const Do
           for (int fac = ndeb; fac < nfin; fac++)
             {
               const int elem1 = face_voisins(fac, 0);
+
               for (int i = 0; i < nb_consti; i++)
                 for (int k = 0; k < Objet_U::dimension; k++)
                   u_theta(fac, i, k) = tab_beta(elem1)*alpha_turb(elem1)*gradient_elem(elem1, i, k);
@@ -961,6 +973,7 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_gt_1_nbCompo_gt_1(const Do
           for (int fac = ndeb; fac < nfin; fac++)
             {
               const int elem1 = face_voisins(fac, 0);
+
               for (int i = 0; i < nb_consti; i++)
                 for (int k = 0; k < Objet_U::dimension; k++)
                   u_theta(fac, i, k) = tab_beta(elem1, 0)*alpha_turb(elem1)*gradient_elem(elem1, i, k);
@@ -1015,6 +1028,7 @@ DoubleTab& Calcul_Production_K_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face,
               const double invVol = 1/(volumes(poly1) + volumes(poly2));
               const double a = volumes(poly1)*invVol;
               const double b = volumes(poly2)*invVol;
+
               for (int i = 0; i < dimension; i++)
                 for (int j = 0; j < dimension; j++)
                   Tenseur_face(fac, i, j) = a*Tenseur_elem(poly1, i, j)
@@ -1026,6 +1040,7 @@ DoubleTab& Calcul_Production_K_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face,
           for (int fac = ndeb; fac < nfin; fac++)
             {
               const int poly1 = face_voisins(fac, 0);
+
               for (int i = 0; i < dimension; i++)
                 for (int j = 0; j < dimension; j++)
                   Tenseur_face(fac, i, j) = Tenseur_elem(poly1, i, j);
@@ -1042,6 +1057,7 @@ DoubleTab& Calcul_Production_K_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face,
       const double invVol = 1/(volumes(poly1) + volumes(poly2));
       const double a = volumes(poly1)*invVol;
       const double b = volumes(poly2)*invVol;
+
       for (int i = 0; i < dimension; i++)
         for (int j = 0; j < dimension; j++)
           Tenseur_face(fac, i, j) = a*Tenseur_elem(poly1, i, j) + b*Tenseur_elem(poly2, i, j);
