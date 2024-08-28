@@ -644,7 +644,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
 
   // on calcule D, E, F1, F2, F3, F4
 
-  const Modele_Fonc_Bas_Reynolds_Thermique& mon_modele_fonc = modele_Flux_Chaleur.associe_modele_fonction();
+  const Modele_Fonc_Bas_Reynolds_Thermique_Base& mon_modele_fonc = modele_Flux_Chaleur.associe_modele_fonction();
   mon_modele_fonc.Calcul_D(D,z,zcl_VDF_th_dis,scalaire,Fluctu_Temperature,diffu);
   mon_modele_fonc.Calcul_E(E,z,zcl_VDF_th_dis,scalaire,Fluctu_Temperature,diffu,alpha_turb);
   mon_modele_fonc.Calcul_F1(F1,z,K_eps_Bas_Re,Fluctu_Temperature,visco,diffu);

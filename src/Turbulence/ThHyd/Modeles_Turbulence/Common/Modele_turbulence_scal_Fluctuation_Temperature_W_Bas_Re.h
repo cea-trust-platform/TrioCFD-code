@@ -24,7 +24,7 @@
 
 #include <Modele_turbulence_scal_Fluctuation_Temperature_W.h>
 #include <Transport_Fluctuation_Temperature_W_Bas_Re.h>
-#include <Modele_Fonc_Bas_Reynolds_Thermique.h>
+#include <Modele_Fonc_Bas_Reynolds_Thermique_Base.h>
 
 class Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re :  public Modele_turbulence_scal_Fluctuation_Temperature_W
 {
@@ -42,8 +42,8 @@ public:
   inline Transport_Fluctuation_Temperature_W& equation_Fluctu() override;
   inline const Transport_Fluctuation_Temperature_W& equation_Fluctu() const override;
 
-  inline Modele_Fonc_Bas_Reynolds_Thermique& associe_modele_fonction();
-  inline const Modele_Fonc_Bas_Reynolds_Thermique& associe_modele_fonction() const;
+  inline Modele_Fonc_Bas_Reynolds_Thermique_Base& associe_modele_fonction();
+  inline const Modele_Fonc_Bas_Reynolds_Thermique_Base& associe_modele_fonction() const;
   Champ_Fonc& calculer_diffusivite_turbulente() override;
   void set_param(Param&) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
@@ -58,55 +58,41 @@ private :
 
 //Entree& lire(const Motcle&, Entree&);
   REF(Transport_Fluctuation_Temperature_W_Bas_Re) eqn_transport_Fluctu_Temp;
-  Modele_Fonc_Bas_Reynolds_Thermique mon_modele_fonc;
+  OWN_PTR(Modele_Fonc_Bas_Reynolds_Thermique_Base) mon_modele_fonc;
 
 
 protected :
   // nous n'avons plus alpha_turb = visco_turb/Prdt_turb
 };
 
-
-//
-//  Fonctions inline de la classe Modele_turbulence_hyd_K_Eps
-//
-
 inline Transport_Fluctuation_Temperature_W& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::equation_Fluctu()
 {
-  //        Cerr << "on est dans WBasRE1 " << finl;
-  //        Cerr << " eqn= " << eqn_transport_Fluctu_Temp.valeur() << finl;
   return eqn_transport_Fluctu_Temp.valeur();
 }
 
 inline const Transport_Fluctuation_Temperature_W& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::equation_Fluctu() const
 {
-  //Cerr << "on est dans WBasRE11 " << finl;
-  //Cerr << " eqn =  " << eqn_transport_Fluctu_Temp.valeur() << finl;
   return eqn_transport_Fluctu_Temp.valeur();
 }
 
-
 inline const Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature() const
 {
-  //Cerr << "on est dans WBasRE1 " << finl;
-  //Cerr << " inc =  " << eqn_transport_Fluctu_Temp->inconnue() << finl;
   return eqn_transport_Fluctu_Temp->inconnue();
 }
 
 inline Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature()
 {
-  //Cerr << "on est dans WBasRE11 " << finl;
-  //Cerr << " inc =  " << eqn_transport_Fluctu_Temp->inconnue() << finl;
   return eqn_transport_Fluctu_Temp->inconnue();
 }
 
-inline Modele_Fonc_Bas_Reynolds_Thermique& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::associe_modele_fonction()
+inline Modele_Fonc_Bas_Reynolds_Thermique_Base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::associe_modele_fonction()
 {
-  return mon_modele_fonc;
+  return mon_modele_fonc.valeur();
 }
 
-inline const Modele_Fonc_Bas_Reynolds_Thermique& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::associe_modele_fonction() const
+inline const Modele_Fonc_Bas_Reynolds_Thermique_Base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::associe_modele_fonction() const
 {
-  return mon_modele_fonc;
+  return mon_modele_fonc.valeur();
 }
 
 #endif

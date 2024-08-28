@@ -28,7 +28,6 @@
 #include <Transport_Fluctuation_Temperature_W.h>
 #include <TRUST_Ref.h>
 
-class Modele_Fonc_Bas_Reynolds_Thermique;
 class Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re;
 
 class Motcle;
@@ -45,8 +44,6 @@ public :
   void associer_modele_turbulence(const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& );
   inline const Milieu_base& milieu() const override;
   inline Milieu_base& milieu() override;
-  // inline Modele_Fonc_Bas_Reynolds_Thermique& modele_fonc();
-  // inline const Modele_Fonc_Bas_Reynolds_Thermique& modele_fonc() const;
   inline Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& modele_turbulence();
   inline const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& modele_turbulence() const;
   const Operateur& operateur(int) const override;
@@ -55,8 +52,6 @@ public :
 
 protected :
   REF(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re) mon_modele_Fluctu_Temp;
-  //REF(Modele_Fonc_Bas_Reynolds_Thermique) mon_modele_fonc;
-
 };
 
 

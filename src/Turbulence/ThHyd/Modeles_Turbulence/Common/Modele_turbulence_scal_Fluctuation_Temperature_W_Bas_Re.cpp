@@ -27,17 +27,10 @@
 
 Implemente_instanciable(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re,"Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re",Modele_turbulence_scal_Fluctuation_Temperature_W);
 
-//// printOn
-//
-
 Sortie& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << " " << le_nom();
 }
-
-
-//// readOn
-//
 
 Entree& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::readOn(Entree& is )
 {
@@ -77,8 +70,7 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::lire_motcle_non_sta
     case 1:
       {
         Cerr << "Lecture du modele bas reynolds associe " << finl;
-        mon_modele_fonc.associer_eqn(eqn_transport_Fluctu_Temp.valeur());
-        s >> mon_modele_fonc;
+        Modele_Fonc_Bas_Reynolds_Thermique_Base::typer_lire_Modele_Fonc_Bas_Reynolds_Thermique(mon_modele_fonc, eqn_transport_Fluctu_Temp.valeur(), s);
         mon_modele_fonc->discretiser();
         Cerr << "mon_modele_fonc.que_suis_je() " << mon_modele_fonc->que_suis_je() << finl;
         break;
@@ -149,7 +141,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
 
   int nb_elem = K_eps_Bas_Re.dimension(0);
   DoubleTab Flambda(nb_elem);
-  mon_modele_fonc.Calcul_Flambda( Flambda,le_dom_dis,K_eps_Bas_Re,chFluctuTemp,visco,diffu);
+  mon_modele_fonc->Calcul_Flambda( Flambda,le_dom_dis,K_eps_Bas_Re,chFluctuTemp,visco,diffu);
 
   if (temps != diffusivite_turbulente_.valeur().temps())
     {

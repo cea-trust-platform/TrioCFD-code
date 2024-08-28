@@ -19,13 +19,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Modele_Fonc_Bas_Reynolds_Thermique_Base.h>
 #include <Transport_Fluctuation_Temperature_W_Bas_Re.h>
-
+#include <Modele_Fonc_Bas_Reynolds_Thermique_Base.h>
+#include <Discretisation_base.h>
 
 Implemente_base(Modele_Fonc_Bas_Reynolds_Thermique_Base,"Modele_Fonc_Bas_Reynolds_Thermique_Base",Objet_U);
-
-// printOn et readOn
 
 Sortie& Modele_Fonc_Bas_Reynolds_Thermique_Base::printOn(Sortie& s ) const
 {
@@ -39,7 +37,24 @@ Entree& Modele_Fonc_Bas_Reynolds_Thermique_Base::readOn(Entree& is )
 
 void Modele_Fonc_Bas_Reynolds_Thermique_Base::completer()
 {
-  ;
+}
+
+void Modele_Fonc_Bas_Reynolds_Thermique_Base::typer_lire_Modele_Fonc_Bas_Reynolds_Thermique(OWN_PTR(Modele_Fonc_Bas_Reynolds_Thermique_Base) &mod, const Equation_base& eqn, Entree& is)
+{
+  Motcle typ, nom1("Modele_");
+  is >> typ;
+  nom1 += typ;
+  if ((typ == "Jones_Launder"))
+    {
+      nom1 += "_Thermique_";
+      Cerr << nom1 << finl;
+      nom1 += eqn.discretisation().que_suis_je();
+    }
+  mod.typer(nom1);
+  mod->associer_eqn(eqn);
+
+  mod->associer(eqn.domaine_dis(), eqn.domaine_Cl_dis());
+  is >> mod.valeur();
 }
 
 void Modele_Fonc_Bas_Reynolds_Thermique_Base::associer_eqn( const Equation_base& eqn)
