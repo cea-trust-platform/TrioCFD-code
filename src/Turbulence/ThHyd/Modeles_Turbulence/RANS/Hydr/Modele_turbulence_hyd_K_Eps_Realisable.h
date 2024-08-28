@@ -17,8 +17,8 @@
 #define Modele_turbulence_hyd_K_Eps_Realisable_included
 
 #include <Modele_turbulence_hyd_K_Eps.h>
+#include <Modele_Fonc_Realisable_base.h>
 #include <Transport_K_Eps_Realisable.h>
-#include <Modele_Fonc_Realisable.h>
 #include <Domaine_Cl_dis.h>
 #include <Domaine_dis.h>
 
@@ -45,10 +45,10 @@ public:
   virtual inline const Champ_Inc& K_Eps() const { return eqn_transport_K_Eps_Rea_.inconnue(); }
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override { return eqn_transport_K_Eps_Rea_; }
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override { return eqn_transport_K_Eps_Rea_; }
-  inline Modele_Fonc_Realisable& associe_modele_fonction() { return mon_modele_fonc_; }
-  inline const Modele_Fonc_Realisable& associe_modele_fonction() const { return mon_modele_fonc_; }
-  inline Modele_Fonc_Realisable& get_modele_fonction() { return mon_modele_fonc_; }
-  inline const Modele_Fonc_Realisable& get_modele_fonction() const { return mon_modele_fonc_; }
+  inline OWN_PTR(Modele_Fonc_Realisable_base)& associe_modele_fonction() { return mon_modele_fonc_; }
+  inline const OWN_PTR(Modele_Fonc_Realisable_base)& associe_modele_fonction() const { return mon_modele_fonc_; }
+  inline OWN_PTR(Modele_Fonc_Realisable_base)& get_modele_fonction() { return mon_modele_fonc_; }
+  inline const OWN_PTR(Modele_Fonc_Realisable_base)& get_modele_fonction() const { return mon_modele_fonc_; }
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
@@ -56,7 +56,7 @@ public:
   void controler() { eqn_transport_K_Eps_Rea_.controler_K_Eps(); }
 
 private:
-  Modele_Fonc_Realisable mon_modele_fonc_;
+  OWN_PTR(Modele_Fonc_Realisable_base) mon_modele_fonc_;
   Transport_K_Eps_Realisable eqn_transport_K_Eps_Rea_;
   void fill_turbulent_viscosity_tab(const int , const DoubleTab&, DoubleTab& );
 };

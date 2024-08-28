@@ -41,10 +41,10 @@ class Champ_base;
 
 class Modele_Fonc_Realisable_base : public Champs_compris_interface, public Objet_U
 {
-
   Declare_base(Modele_Fonc_Realisable_base);
-
 public:
+
+  static void typer_lire_Modele_Fonc_Realisable(OWN_PTR(Modele_Fonc_Realisable_base)&, const Equation_base&, Entree& is );
 
   inline const Equation_base& equation() const;
   inline  Equation_base& equation();
@@ -94,6 +94,8 @@ public:
   void associer_eqn(const Equation_base& );
 
   virtual void associer_eqn_2(const Equation_base& );
+
+  bool has_seconde_equation() const { return ma_seconde_equation.non_nul(); }
 
 public:
   REF(Equation_base) ma_seconde_equation;

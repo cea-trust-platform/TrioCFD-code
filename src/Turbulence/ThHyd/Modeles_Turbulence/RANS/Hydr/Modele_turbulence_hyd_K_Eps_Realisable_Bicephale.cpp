@@ -60,10 +60,9 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::lire_motcle_non_standard(c
 {
   if (mot == "Modele_Fonc_Realisable")
     {
-      get_modele_fonction().associer_eqn(eqn_transp_K());
-      is >> mon_modele_fonc_;
-      mon_modele_fonc_.associer_eqn_2(eqn_transp_Eps());
-      get_modele_fonction().discretiser();
+      Modele_Fonc_Realisable_base::typer_lire_Modele_Fonc_Realisable(mon_modele_fonc_, eqn_transp_K(), is);
+      mon_modele_fonc_->associer_eqn_2(eqn_transp_Eps());
+      get_modele_fonction()->discretiser();
       Cerr << "Realizable Two-headed K_Epsilon model type " << get_modele_fonction().que_suis_je() << finl;
       return 1;
     }
@@ -113,7 +112,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
 
 void Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::fill_turbulent_viscosity_tab(const int n, const DoubleTab& tab_K, const DoubleTab& tab_Eps, DoubleTab& turbulent_viscosity)
 {
-  const DoubleTab& Cmu = get_modele_fonction().get_Cmu(); // attention : il faut qu'il soit deja calcule!
+  const DoubleTab& Cmu = get_modele_fonction()->get_Cmu(); // attention : il faut qu'il soit deja calcule!
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente Cmu", Cmu);
 
   for (int i = 0; i < n; i++)

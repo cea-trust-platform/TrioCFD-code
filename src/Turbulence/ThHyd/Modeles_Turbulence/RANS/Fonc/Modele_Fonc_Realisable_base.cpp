@@ -46,6 +46,33 @@ void Modele_Fonc_Realisable_base::completer()
   ;
 }
 
+void Modele_Fonc_Realisable_base::typer_lire_Modele_Fonc_Realisable(OWN_PTR(Modele_Fonc_Realisable_base) &mod, const Equation_base& eqn, Entree& is)
+{
+  Motcle typ, nom1("Modele_");
+  is >> typ;
+
+  nom1 += typ;
+  {
+    nom1 += "_";
+    Cerr << nom1 << finl;
+    Nom discr = eqn.discretisation().que_suis_je();
+    if (discr == "VEFPreP1B")
+      discr = "VEF";
+    nom1 += discr;
+  }
+
+  mod.typer(nom1);
+  mod->associer_eqn(eqn);
+  mod->associer(eqn.domaine_dis(), eqn.domaine_Cl_dis());
+  if (mod->has_seconde_equation())
+    {
+      mod->associer_eqn_2(mod->seconde_equation());
+      mod->associer(mod->seconde_equation().domaine_dis(), mod->seconde_equation().domaine_Cl_dis());
+    }
+  mod->associer_pb(eqn.probleme());
+  is >> mod.valeur();
+}
+
 void Modele_Fonc_Realisable_base::associer_pb(const Probleme_base& pb )
 {
   Cerr << "Modele_Fonc_Realisable_base::associer_pb" << finl;

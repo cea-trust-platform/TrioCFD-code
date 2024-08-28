@@ -26,13 +26,12 @@
 #ifndef Transport_K_Eps_Realisable_included
 #define Transport_K_Eps_Realisable_included
 
-#include <Transport_K_Eps_base.h>
+#include <Modele_Fonc_Realisable_base.h>
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
+#include <Transport_K_Eps_base.h>
 #include <Op_Diff_K_Eps_base.h>
 #include <Operateur_Conv.h>
-#include <Modele_Fonc_Realisable.h>
 #include <TRUST_Ref.h>
-
 
 class Motcle;
 
@@ -53,8 +52,8 @@ public :
 
   void associer_milieu_base(const Milieu_base&) override;
   void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Eps_base&) override;
-  inline const Modele_Fonc_Realisable& modele_fonc() const;
-  inline  Modele_Fonc_Realisable& modele_fonc();
+  inline const OWN_PTR(Modele_Fonc_Realisable_base)& modele_fonc() const;
+  inline  OWN_PTR(Modele_Fonc_Realisable_base)& modele_fonc();
 //   inline const Champ_Inc& vitesse_transportante();
   const Motcle& domaine_application() const override;
   void completer() override;
@@ -69,19 +68,19 @@ protected:
 
 private :
 
-  REF( Modele_Fonc_Realisable ) mon_modele_fonc;
+  REF( OWN_PTR(Modele_Fonc_Realisable_base) ) mon_modele_fonc;
 
 };
 
 
 // Fonctions inline:
 
-inline const Modele_Fonc_Realisable& Transport_K_Eps_Realisable::modele_fonc() const
+inline const OWN_PTR(Modele_Fonc_Realisable_base)& Transport_K_Eps_Realisable::modele_fonc() const
 {
   return mon_modele_fonc.valeur();
 }
 
-inline Modele_Fonc_Realisable& Transport_K_Eps_Realisable::modele_fonc()
+inline OWN_PTR(Modele_Fonc_Realisable_base)& Transport_K_Eps_Realisable::modele_fonc()
 {
   return mon_modele_fonc.valeur();
 }
