@@ -653,8 +653,9 @@ void Calcul_Production_K_VEF::compute_utheta_nbConsti_le_1_nbCompo_eq_0(const Do
             {
               const int elem1 = face_voisins(fac, 0);
               const int elem2 = face_voisins(fac, 1);
-              const double a = volumes(elem1)/(volumes(elem1) + volumes(elem2));
-              const double b = volumes(elem2)/(volumes(elem1) + volumes(elem2));
+              const double invVol = 1/(volumes(elem1) + volumes(elem2));
+              const double a = volumes(elem1)*invVol;
+              const double b = volumes(elem2)*invVol;
               for (int i = 0; i < Objet_U::dimension; i++)
                 u_theta(fac, i) = a*tab_beta(0, 0)*alpha_turb(elem1)*gradient_elem(elem1, i)
                                   + b*tab_beta(0, 0)*alpha_turb(elem2)*gradient_elem(elem2, i);
