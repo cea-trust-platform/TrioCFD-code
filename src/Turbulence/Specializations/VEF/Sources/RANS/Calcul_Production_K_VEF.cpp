@@ -392,10 +392,10 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_production_K_EASM(const Domai
                                                                      const int& interpol_visco,
                                                                      const double& limiteur) const
 {
-  //
+  // We treat all exception at the beginning
   if (interpol_visco != 0 && interpol_visco != 1 && interpol_visco != 2)
     {
-      Cerr << "interpol_visco must be equal to [0, 1, 2] and it is " << interpol_visco << ".\n";
+      Cerr << "interpol_visco must be equal to [0, 1, 2] and its current value is " << interpol_visco << ".\n";
       Process::exit();
     }
 
