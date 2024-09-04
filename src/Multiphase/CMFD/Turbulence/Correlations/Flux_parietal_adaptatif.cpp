@@ -23,7 +23,7 @@
 #include <Flux_parietal_adaptatif.h>
 #include <Loi_paroi_adaptative.h>
 #include <Pb_Multiphase.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 
 #include <math.h>
 

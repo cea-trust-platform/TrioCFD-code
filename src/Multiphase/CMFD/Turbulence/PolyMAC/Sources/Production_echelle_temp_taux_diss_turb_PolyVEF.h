@@ -25,8 +25,6 @@
 
 #include <Source_Production_echelle_temp_taux_diss_turb.h>
 
-class Correlation;
-
 /*! @brief Classe Production_echelle_temp_taux_diss_turb_PolyVEF Cette classe implemente dans PolyVEF un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
  *
  *

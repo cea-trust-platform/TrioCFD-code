@@ -50,7 +50,7 @@ void Injection_QDM_nulle_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secm
   const Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF, equation().inconnue().valeur());
   const Champ_P0_VDF& cha= ref_cast(Champ_P0_VDF, equation().probleme().equation(1).inconnue().valeur()); // volume fraction
   const Domaine_VF&  domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const Conds_lim&      clsa = cha.domaine_Cl_dis().les_conditions_limites();
+  const Conds_lim&      clsa = cha.domaine_Cl_dis()->les_conditions_limites();
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
   const IntTab&  fcl = ch.fcl(),
@@ -62,7 +62,7 @@ void Injection_QDM_nulle_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secm
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir();
 
   const DoubleTab& vit = ch.valeurs(),
-                   &rho   = equation().milieu().masse_volumique().passe(), // passe car qdm
+                   &rho   = equation().milieu().masse_volumique()->passe(), // passe car qdm
                     &alpha = cha.passe();
 
   Matrice_Morse *mat = matrices.count(ch.le_nom().getString()) ? matrices.at(ch.le_nom().getString()) : nullptr; // Derivee locale/QDM

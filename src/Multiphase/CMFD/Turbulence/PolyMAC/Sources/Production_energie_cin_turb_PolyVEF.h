@@ -25,8 +25,6 @@
 
 #include <Source_Production_energie_cin_turb.h>
 
-class Correlation;
-
 /*! @brief Classe Production_energie_cin_turb_PolyVEF Cette classe implemente dans PolyVEF un operateur de production d'énergie cinetique turbulente k
  *
  *

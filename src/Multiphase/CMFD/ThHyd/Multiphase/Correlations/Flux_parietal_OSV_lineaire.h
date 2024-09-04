@@ -24,7 +24,7 @@
 #define Flux_parietal_OSV_lineaire_included
 #include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 #include <Param.h>
 
 /*! @brief Flux_parietal_OSV class that implements an onset of significant void-based heat flux partition when the boundary condition is neumann

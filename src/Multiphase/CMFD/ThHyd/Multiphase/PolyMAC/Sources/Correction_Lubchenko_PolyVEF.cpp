@@ -55,7 +55,7 @@ Entree& Correction_Lubchenko_PolyVEF::readOn(Entree& is)
   param.lire_avec_accolades_depuis(is);
 
   //identification des phases
-  Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : NULL;
+  Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
   for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
@@ -105,11 +105,11 @@ void Correction_Lubchenko_PolyVEF::ajouter_blocs_disp(matrices_t matrices, Doubl
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = pbm.equation_masse().inconnue().passe(),
-                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
-                     &temp  = pbm.equation_energie().inconnue().passe(),
-                      &rho   = equation().milieu().masse_volumique().passe(),
-                       &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
+                   &alpha = pbm.equation_masse().inconnue()->passe(),
+                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression()->passe(),
+                     &temp  = pbm.equation_energie().inconnue()->passe(),
+                      &rho   = equation().milieu().masse_volumique()->passe(),
+                       &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique()->passe(),
                         &y_elem = domaine.y_elem(),
                          &y_faces = domaine.y_faces(),
                           &n_y_elem = domaine.normale_paroi_elem(),
@@ -263,11 +263,11 @@ void Correction_Lubchenko_PolyVEF::ajouter_blocs_lift(matrices_t matrices, Doubl
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = pbm.equation_masse().inconnue().passe(),
-                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
-                     &temp  = pbm.equation_energie().inconnue().passe(),
-                      &rho   = equation().milieu().masse_volumique().passe(),
-                       &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
+                   &alpha = pbm.equation_masse().inconnue()->passe(),
+                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression()->passe(),
+                     &temp  = pbm.equation_energie().inconnue()->passe(),
+                      &rho   = equation().milieu().masse_volumique()->passe(),
+                       &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique()->passe(),
                         &vort  = equation().probleme().get_champ("vorticite").valeurs(),
                          &y_elem = domaine.y_elem(),
                           &y_faces = domaine.y_faces(),

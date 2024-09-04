@@ -40,8 +40,8 @@ Entree& Production_echelle_temp_taux_diss_turb_PolyVEF::readOn(Entree& is) { ret
 void Production_echelle_temp_taux_diss_turb_PolyVEF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_VF&                     domaine = ref_cast(Domaine_PolyVEF, equation().domaine_dis().valeur());
-  const DoubleTab&                     tab_diss = equation().inconnue().valeurs(); // tau ou omega selon l'equation
-  const DoubleTab&                    tab_pdiss = equation().inconnue().passe(); // tau ou omega selon l'equation
+  const DoubleTab&                     tab_diss = equation().inconnue()->valeurs(); // tau ou omega selon l'equation
+  const DoubleTab&                    tab_pdiss = equation().inconnue()->passe(); // tau ou omega selon l'equation
   const DoubleTab&                     tab_grad = equation().probleme().get_champ("gradient_vitesse").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
   const Probleme_base&                     pb = ref_cast(Probleme_base, equation().probleme());
