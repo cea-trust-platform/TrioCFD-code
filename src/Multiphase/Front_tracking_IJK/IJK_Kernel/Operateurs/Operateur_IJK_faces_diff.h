@@ -24,7 +24,7 @@
 #include <TRUST_Deriv.h>
 #include <Operateur_IJK_faces_diff_base.h>
 
-class Operateur_IJK_faces_diff: public DERIV( Operateur_IJK_faces_diff_base_double )
+class Operateur_IJK_faces_diff: public OWN_PTR( Operateur_IJK_faces_diff_base_double )
 {
   Declare_instanciable( Operateur_IJK_faces_diff );
 public:

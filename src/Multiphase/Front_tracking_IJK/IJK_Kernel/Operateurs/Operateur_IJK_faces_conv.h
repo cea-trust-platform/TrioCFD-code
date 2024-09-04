@@ -26,7 +26,7 @@
 #include <Operateur_IJK_faces_conv_base.h>
 #include <OpConvAmontIJK.h>
 
-class Operateur_IJK_faces_conv : public DERIV( Operateur_IJK_faces_conv_base_double )
+class Operateur_IJK_faces_conv : public OWN_PTR( Operateur_IJK_faces_conv_base_double )
 {
   Declare_instanciable( Operateur_IJK_faces_conv ) ;
 

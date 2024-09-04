@@ -34,7 +34,7 @@ Implemente_instanciable(Op_Diff_K_Omega_negligeable,
 
 Implemente_instanciable(Op_Diff_K_Omega,
                         "Op_Diff_K_Omega",
-                        DERIV(Op_Diff_K_Omega_base));
+                        OWN_PTR(Op_Diff_K_Omega_base));
 
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie.
@@ -110,7 +110,7 @@ void Op_Diff_K_Omega::typer()
 {
   if (typ=="negligeable")
     {
-      DERIV(Op_Diff_K_Omega_base)::typer("Op_Diff_K_Omega_negligeable");
+      OWN_PTR(Op_Diff_K_Omega_base)::typer("Op_Diff_K_Omega_negligeable");
       valeur().associer_diffusivite_turbulente();
     }
   else
@@ -149,7 +149,7 @@ void Op_Diff_K_Omega::typer()
           if (axi)
             nom_type += "_Axi";
         }
-      DERIV(Op_Diff_K_Omega_base)::typer(nom_type);
+      OWN_PTR(Op_Diff_K_Omega_base)::typer(nom_type);
       valeur().associer_eqn(equation());
       valeur().associer_diffusivite_turbulente();
       valeur().associer_diffusivite(diffusivite());

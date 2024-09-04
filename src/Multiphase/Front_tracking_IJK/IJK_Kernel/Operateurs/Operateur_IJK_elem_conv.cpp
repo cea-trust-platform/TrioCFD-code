@@ -21,7 +21,7 @@
 #include <Operateur_IJK_elem_conv.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_conv, "Operateur_IJK_elem_conv", DERIV(Operateur_IJK_elem_conv_base_double) );
+Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_conv, "Operateur_IJK_elem_conv", OWN_PTR(Operateur_IJK_elem_conv_base_double) );
 
 Operateur_IJK_elem_conv::Operateur_IJK_elem_conv()
 {
@@ -51,7 +51,7 @@ void Operateur_IJK_elem_conv::reset_operator()
 
 Sortie& Operateur_IJK_elem_conv::printOn(Sortie& os) const
 {
-  // DERIV(Operateur_IJK_elem_conv_base_double)::printOn( os );
+  // OWN_PTR(Operateur_IJK_elem_conv_base_double)::printOn( os );
   os << convection_op_words_[convection_rank_];
   return os;
 }

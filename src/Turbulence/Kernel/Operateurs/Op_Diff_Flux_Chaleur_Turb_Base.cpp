@@ -25,7 +25,7 @@
 // GF je ne sais pas si cette classe sert vraiment, mais elle herite pas de Op_Diff_base
 Implemente_base(Op_Diff_Flux_Chaleur_Turb_Base,"Op_Diff_Flux_Chaleur_Turb_Base",Operateur_base);
 Implemente_instanciable(Op_Diff_Flux_Chaleur_Turb_negligeable,"Op_Diff_Flux_Chaleur_Turb_negligeable",Op_Diff_Flux_Chaleur_Turb_Base);
-Implemente_instanciable(Op_Diff_Flux_Chaleur_Turb,"Op_Diff_Flux_Chaleur_Turb",DERIV(Op_Diff_Flux_Chaleur_Turb_Base));
+Implemente_instanciable(Op_Diff_Flux_Chaleur_Turb,"Op_Diff_Flux_Chaleur_Turb",OWN_PTR(Op_Diff_Flux_Chaleur_Turb_Base));
 
 
 ////  printOn
@@ -70,7 +70,7 @@ void Op_Diff_Flux_Chaleur_Turb::typer()
 {
   if (typ=="negligeable")
     {
-      DERIV(Op_Diff_Flux_Chaleur_Turb_Base)::typer("Op_Diff_Flux_Chaleur_Turb_negligeable");
+      OWN_PTR(Op_Diff_Flux_Chaleur_Turb_Base)::typer("Op_Diff_Flux_Chaleur_Turb_negligeable");
       valeur().associer_diffusivite_turbulente();
     }
   else
@@ -82,7 +82,7 @@ void Op_Diff_Flux_Chaleur_Turb::typer()
       nom_type+=(type_inco.suffix("Champ_"));
       if (axi)
         nom_type += "_Axi";
-      DERIV(Op_Diff_Flux_Chaleur_Turb_Base)::typer(nom_type);
+      OWN_PTR(Op_Diff_Flux_Chaleur_Turb_Base)::typer(nom_type);
       valeur().associer_eqn(equation());
       valeur().associer_diffusivite_turbulente();
       Cerr << valeur().que_suis_je() << finl;

@@ -98,7 +98,7 @@ class Tube_couple : public Tube_base
 };
 #endif
 
-class Faisceau_Tubes : public VECT(DERIV(Tube_base))
+class Faisceau_Tubes : public VECT(OWN_PTR(Tube_base))
 {
   Declare_instanciable(Faisceau_Tubes);
 };

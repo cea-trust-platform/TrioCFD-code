@@ -938,7 +938,7 @@ void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_
       Nom nom_type=eqn.discretisation().get_name_of_type_for(ns.que_suis_je(),inut,ns);
       //  const Probleme_FT_Disc_gen& pb = ref_cast(Probleme_FT_Disc_gen,probleme());
       // ref_cast
-      //  DERIV(Operateur_Div_base)::typer(nom_type);
+      //  OWN_PTR(Operateur_Div_base)::typer(nom_type);
       Cerr << "[Conv_diff_FT_Disc] Velocity correction. Construction of the divergence operator type : " << nom_type << finl;
       //   Cerr << valeur().que_suis_je() << finl ;
     }

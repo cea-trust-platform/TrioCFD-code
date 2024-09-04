@@ -118,7 +118,7 @@ protected:
  * @sa Op_Diff_K_Omega_base
  */
 class Op_Diff_K_Omega : public Operateur,
-  public DERIV(Op_Diff_K_Omega_base)
+  public OWN_PTR(Op_Diff_K_Omega_base)
 {
 
   Declare_instanciable(Op_Diff_K_Omega);

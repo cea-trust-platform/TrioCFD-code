@@ -24,7 +24,7 @@
 
 Implemente_base(Op_Diff_Fluctu_Temp_Base,"Op_Diff_Fluctu_Temp_Base",Operateur_base);
 Implemente_instanciable(Op_Diff_Fluctu_Temp_negligeable,"Op_Diff_Fluctu_Temp_negligeable",Op_Diff_Fluctu_Temp_Base);
-Implemente_instanciable(Op_Diff_Fluctu_Temp,"Op_Diff_Fluctu_Temp",DERIV(Op_Diff_Fluctu_Temp_Base));
+Implemente_instanciable(Op_Diff_Fluctu_Temp,"Op_Diff_Fluctu_Temp",OWN_PTR(Op_Diff_Fluctu_Temp_Base));
 
 
 ////  printOn
@@ -68,7 +68,7 @@ void Op_Diff_Fluctu_Temp::typer()
 {
   if (typ=="negligeable")
     {
-      DERIV(Op_Diff_Fluctu_Temp_Base)::typer("Op_Diff_Fluctu_Temp_negligeable");
+      OWN_PTR(Op_Diff_Fluctu_Temp_Base)::typer("Op_Diff_Fluctu_Temp_negligeable");
       valeur().associer_diffusivite_turbulente();
     }
   else
@@ -81,7 +81,7 @@ void Op_Diff_Fluctu_Temp::typer()
       nom_type+=(type_inco.suffix("Champ_"));
       if (axi)
         nom_type += "_Axi";
-      DERIV(Op_Diff_Fluctu_Temp_Base)::typer(nom_type);
+      OWN_PTR(Op_Diff_Fluctu_Temp_Base)::typer(nom_type);
       valeur().associer_eqn(equation());
       valeur().associer_diffusivite_turbulente();
       Cerr << valeur().que_suis_je() << finl;

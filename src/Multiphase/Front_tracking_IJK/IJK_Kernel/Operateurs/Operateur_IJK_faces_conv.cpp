@@ -22,7 +22,7 @@
 #include <Operateur_IJK_faces_conv.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur( Operateur_IJK_faces_conv, "Operateur_IJK_faces_conv", DERIV(Operateur_IJK_faces_conv_base_double) ) ;
+Implemente_instanciable_sans_constructeur( Operateur_IJK_faces_conv, "Operateur_IJK_faces_conv", OWN_PTR(Operateur_IJK_faces_conv_base_double) ) ;
 
 Operateur_IJK_faces_conv::Operateur_IJK_faces_conv()
 {
@@ -56,7 +56,7 @@ Operateur_IJK_faces_conv::Operateur_IJK_faces_conv()
 
 Sortie& Operateur_IJK_faces_conv::printOn( Sortie& os ) const
 {
-  // DERIV(Operateur_IJK_faces_conv_base_double)::printOn( os );
+  // OWN_PTR(Operateur_IJK_faces_conv_base_double)::printOn( os );
   os << convection_op_words_[convection_rank_] << "_" << convection_option_ << "\n";
   return os;
 }

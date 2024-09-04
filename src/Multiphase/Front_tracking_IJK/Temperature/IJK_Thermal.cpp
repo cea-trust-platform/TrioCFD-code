@@ -21,7 +21,7 @@
 #include <IJK_Thermal.h>
 #include <IJK_FT.h>
 
-Implemente_instanciable_sans_constructeur( IJK_Thermal, "IJK_Thermal", DERIV(IJK_Thermal_base) );
+Implemente_instanciable_sans_constructeur( IJK_Thermal, "IJK_Thermal", OWN_PTR(IJK_Thermal_base) );
 
 IJK_Thermal::IJK_Thermal()
 {
@@ -46,7 +46,7 @@ IJK_Thermal::IJK_Thermal()
 
 Sortie& IJK_Thermal::printOn(Sortie& os) const
 {
-  return DERIV(IJK_Thermal_base)::printOn(os);
+  return OWN_PTR(IJK_Thermal_base)::printOn(os);
 }
 
 Entree& IJK_Thermal::readOn(Entree& is)

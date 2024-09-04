@@ -21,7 +21,7 @@
 #include <Operateur_IJK_elem_diff.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", DERIV( Operateur_IJK_elem_diff_base_double ) );
+Implemente_instanciable_sans_constructeur( Operateur_IJK_elem_diff, "Operateur_IJK_elem_diff", OWN_PTR( Operateur_IJK_elem_diff_base_double ) );
 
 Operateur_IJK_elem_diff::Operateur_IJK_elem_diff()
 {
@@ -52,7 +52,7 @@ void Operateur_IJK_elem_diff::reset_operator()
 
 Sortie& Operateur_IJK_elem_diff::printOn(Sortie& os) const
 {
-  // DERIV(Operateur_IJK_elem_diff_base_double)::printOn( os );
+  // OWN_PTR(Operateur_IJK_elem_diff_base_double)::printOn( os );
   os << diffusion_op_words_[diffusion_rank_];
   return os;
 }

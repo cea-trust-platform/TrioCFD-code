@@ -3142,7 +3142,7 @@ void Couplage_Tubes_IBC::update(double current_time,
   Vecteur3 F_IBC_post_proj;
   Vecteur3 m_a;
 
-  // faisceau_[i] est un objet de type DERIV(Tube_base)
+  // faisceau_[i] est un objet de type OWN_PTR(Tube_base)
   // pour acceder a l'objet Tube_impose ou Tube_libre ou autre, il faut utiliser
   // faisceau_[i].valeur() qui est ici de type Tube_base.
   const int ntubes = faisceau_.size();

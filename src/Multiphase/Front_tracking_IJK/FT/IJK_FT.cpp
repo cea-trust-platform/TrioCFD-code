@@ -592,7 +592,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   param.ajouter("thermals", &thermals_);
 
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   param.ajouter("thermique", &thermique_); // XD_ADD_P thermique not_set
   param.ajouter("energie", &energie_); // XD_ADD_P chaine not_set
@@ -979,7 +979,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
   interfaces_.associer(*this);
 
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   for (auto& itr : thermique_)
     itr.associer(*this);
@@ -1571,7 +1571,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde,
   //TODO: sauvegarde des champs surfaces (vapeur) et barycentre,
   // eventuellement du med pour voir si la conversion marche.
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   for (auto& itr : thermique_)
     {
@@ -1627,7 +1627,7 @@ void IJK_FT_double::sauvegarder_probleme(const char *fichier_sauvegarde,
               << " corrections_qdm " << qdm_corrections_;
 
       /*
-       * TODO: Change this block with DERIV CLASS IJK_Thermal
+       * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
        */
       /*
        * Temperature
@@ -1698,7 +1698,7 @@ void IJK_FT_double::reprendre_probleme(const char *fichier_reprise)
   // param.ajouter("force_init", &force_init_);
 
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   param.ajouter("thermique", &thermique_);
   param.ajouter("energie", &energie_);
@@ -1810,7 +1810,7 @@ double IJK_FT_double::find_timestep(const double max_timestep,
   const double dt_eq_velocity = 1. / (1./dt_cfl_ + 1./dt_fo_ + 1./dt_oh_);
 
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   double dt_thermique = 1.e20;
   for (const auto& itr : thermique_)
@@ -2056,7 +2056,7 @@ int IJK_FT_double::initialise()
   statistiques().begin_count(calculer_thermique_prop_counter_);
 
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   int idx =0;
   for (auto& itr : thermique_)
@@ -2095,7 +2095,7 @@ int IJK_FT_double::initialise()
   Cout << "End of IJK_FT_double::initialise()" << finl;
 
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   //  if ((energie_.size() > 0) or (thermique_.size() >0) or (thermal_subresolution_.size()>0))
   if (energie_.size() > 0)
@@ -2933,7 +2933,7 @@ void IJK_FT_double::run()
           if (!disable_diphasique_)
             {
               /*
-               * TODO: Change this block with DERIV CLASS IJK_Thermal
+               * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
                */
               for (auto& itr : thermique_)
                 itr.update_thermal_properties();
@@ -3058,7 +3058,7 @@ void IJK_FT_double::run()
       // indicatrice_ns_next_.data() = 1.;
 
       /*
-       * TODO: Change this block with DERIV CLASS IJK_Thermal
+       * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
        */
       for (auto& itr : thermique_)
         {
@@ -3077,7 +3077,7 @@ void IJK_FT_double::run()
       Cerr << "Cas normal diphasique IJK_FT::run()" << finl;
 
       /*
-       * TODO: Change this block with DERIV CLASS IJK_Thermal
+       * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
        */
       for (auto& itr : thermique_)
         itr.update_thermal_properties();
@@ -3265,7 +3265,7 @@ void IJK_FT_double::run()
               maj_indicatrice_rho_mu();
 
               /*
-               * TODO: Change this block with DERIV CLASS IJK_Thermal
+               * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
                */
               for (auto& itr : thermique_)
                 {
@@ -4559,7 +4559,7 @@ void IJK_FT_double::euler_time_step(ArrOfDouble& var_volume_par_bulle)
     }
 
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   for (auto& itr : thermique_)
     itr.euler_time_step(timestep_);
@@ -4807,7 +4807,7 @@ void IJK_FT_double::rk3_sub_step(const int rk_step, const double total_timestep,
   statistiques().begin_count(euler_rk3_counter_);
 
   /*
-   * TODO: Change this block with DERIV CLASS IJK_Thermal
+   * TODO: Change this block with OWN_PTR CLASS IJK_Thermal
    */
   for (auto& itr : thermique_)
     {

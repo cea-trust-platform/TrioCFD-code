@@ -424,7 +424,7 @@ protected:
 
   // attention: la methode d'acces est const, et renvoie un objet non const :
   Maillage_FT_Disc_Data_Cache& mesh_data_cache() const;
-  DERIV(Maillage_FT_Disc_Data_Cache) mesh_data_cache_;
+  OWN_PTR(Maillage_FT_Disc_Data_Cache) mesh_data_cache_;
 
   // Classes amies (ces classes construisent ou modifient le maillage,
   // les algorithmes dependent fortement des details de mise en oeuvre

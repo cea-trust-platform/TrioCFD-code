@@ -79,7 +79,7 @@ public:
 
 
 class Op_Diff_Fluctu_Temp :  public Operateur,
-  public DERIV(Op_Diff_Fluctu_Temp_Base)
+  public OWN_PTR(Op_Diff_Fluctu_Temp_Base)
 {
 
   Declare_instanciable(Op_Diff_Fluctu_Temp);

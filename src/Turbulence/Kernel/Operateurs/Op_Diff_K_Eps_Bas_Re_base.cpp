@@ -26,7 +26,7 @@
 
 Implemente_base(Op_Diff_K_Eps_Bas_Re_base,"Op_Diff_K_Eps_Bas_Re_base",Operateur_base);
 Implemente_instanciable(Op_Diff_K_Eps_Bas_Re_negligeable,"Op_Diff_K_Eps_Bas_Re_negligeable",Op_Diff_K_Eps_Bas_Re_base);
-Implemente_instanciable(Op_Diff_K_Eps_Bas_Re,"Op_Diff_K_Eps_Bas_Re",DERIV(Op_Diff_K_Eps_Bas_Re_base));
+Implemente_instanciable(Op_Diff_K_Eps_Bas_Re,"Op_Diff_K_Eps_Bas_Re",OWN_PTR(Op_Diff_K_Eps_Bas_Re_base));
 
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie.
@@ -129,7 +129,7 @@ void Op_Diff_K_Eps_Bas_Re::typer()
   Cerr << "dans Op_Diff_K_Eps_Bas_Re::typer()  typ = " << typ << finl;
   if (typ=="negligeable")
     {
-      DERIV(Op_Diff_K_Eps_Bas_Re_base)::typer("Op_Diff_K_Eps_Bas_Re_negligeable");
+      OWN_PTR(Op_Diff_K_Eps_Bas_Re_base)::typer("Op_Diff_K_Eps_Bas_Re_negligeable");
       valeur().associer_diffusivite_turbulente();
     }
   else
@@ -156,7 +156,7 @@ void Op_Diff_K_Eps_Bas_Re::typer()
             nom_type += "_Axi";
         }
       Cerr << " type = " << nom_type << finl;
-      DERIV(Op_Diff_K_Eps_Bas_Re_base)::typer(nom_type);
+      OWN_PTR(Op_Diff_K_Eps_Bas_Re_base)::typer(nom_type);
       valeur().associer_eqn(equation());
       valeur().associer_diffusivite_turbulente();
       valeur().associer_diffusivite(diffusivite());

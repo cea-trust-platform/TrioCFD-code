@@ -80,7 +80,7 @@ public:
 
 
 class Op_Diff_Flux_Chaleur_Turb :  public Operateur,
-  public DERIV(Op_Diff_Flux_Chaleur_Turb_Base)
+  public OWN_PTR(Op_Diff_Flux_Chaleur_Turb_Base)
 {
 
   Declare_instanciable(Op_Diff_Flux_Chaleur_Turb);

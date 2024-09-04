@@ -22,7 +22,7 @@
 #include <Operateur_IJK_faces_diff.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur( Operateur_IJK_faces_diff, "Operateur_IJK_faces_diff", DERIV( Operateur_IJK_faces_diff_base_double ) );
+Implemente_instanciable_sans_constructeur( Operateur_IJK_faces_diff, "Operateur_IJK_faces_diff", OWN_PTR( Operateur_IJK_faces_diff_base_double ) );
 
 Operateur_IJK_faces_diff::Operateur_IJK_faces_diff()
 {
@@ -69,7 +69,7 @@ Operateur_IJK_faces_diff::Operateur_IJK_faces_diff()
 
 Sortie& Operateur_IJK_faces_diff::printOn(Sortie& os) const
 {
-  // DERIV(Operateur_IJK_faces_diff_base_double)::printOn( os );
+  // OWN_PTR(Operateur_IJK_faces_diff_base_double)::printOn( os );
   os << diffusion_op_words_[diffusion_rank_] << "_" << diffusion_option_ << "\n";
   return os;
 }

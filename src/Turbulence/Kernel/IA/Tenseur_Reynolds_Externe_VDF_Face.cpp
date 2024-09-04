@@ -421,7 +421,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::completer()
 {
   Source_base::completer();
 
-  la_source.DERIV(Champ_Don_base)::typer( "Champ_Fonc_xyz" );
+  la_source.OWN_PTR(Champ_Don_base)::typer( "Champ_Fonc_xyz" );
 }
 
 void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()

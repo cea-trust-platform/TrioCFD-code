@@ -32,7 +32,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_IJK_elem_diff: public DERIV( Operateur_IJK_elem_diff_base_double )
+class Operateur_IJK_elem_diff: public OWN_PTR( Operateur_IJK_elem_diff_base_double )
 {
 
   Declare_instanciable( Operateur_IJK_elem_diff );

@@ -24,7 +24,7 @@
 #include <IJK_Field.h>
 
 Implemente_base(Tube_base, "Tube_base", Objet_U);
-Implemente_instanciable(Faisceau_Tubes, "Faisceau_Tubes", VECT(DERIV(Tube_base)));
+Implemente_instanciable(Faisceau_Tubes, "Faisceau_Tubes", VECT(OWN_PTR(Tube_base)));
 
 static void evaluer_f_et_df_dt_et_df2_dt2(const Noms& expressions, const double t, const double dt, Vecteur3& f, Vecteur3& df_dt, Vecteur3& df2_dt2)
 {
@@ -282,10 +282,10 @@ void Tube_libre::update_vitesse_position(double current_time, double dt, const V
 //  ...
 Entree& Faisceau_Tubes::readOn(Entree& is)
 {
-  return VECT(DERIV(Tube_base))::readOn(is);
+  return VECT(OWN_PTR(Tube_base))::readOn(is);
 }
 
 Sortie&   Faisceau_Tubes::printOn(Sortie& is) const
 {
-  return VECT(DERIV(Tube_base))::printOn(is);
+  return VECT(OWN_PTR(Tube_base))::printOn(is);
 }

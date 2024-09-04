@@ -114,7 +114,7 @@ protected:
  * @sa Op_Diff_K_Eps_base
  */
 class Op_Diff_K_Eps : public Operateur,
-  public DERIV(Op_Diff_K_Eps_base)
+  public OWN_PTR(Op_Diff_K_Eps_base)
 {
 
   Declare_instanciable(Op_Diff_K_Eps);

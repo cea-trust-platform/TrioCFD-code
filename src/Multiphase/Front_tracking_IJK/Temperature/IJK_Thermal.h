@@ -37,7 +37,7 @@
 class IJK_FT_double;
 class Switch_FT_double;
 
-class IJK_Thermal: public DERIV(IJK_Thermal_base)
+class IJK_Thermal: public OWN_PTR(IJK_Thermal_base)
 {
   Declare_instanciable( IJK_Thermal );
 

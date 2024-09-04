@@ -33,7 +33,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_IJK_elem_conv: public DERIV(Operateur_IJK_elem_conv_base_double)
+class Operateur_IJK_elem_conv: public OWN_PTR(Operateur_IJK_elem_conv_base_double)
 {
   Declare_instanciable( Operateur_IJK_elem_conv );
 public:
