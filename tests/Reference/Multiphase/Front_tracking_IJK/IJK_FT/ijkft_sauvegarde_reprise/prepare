@@ -29,9 +29,9 @@ EOF
 
 # Lisse le maillage init.lata
 echo -n "Preparation du maillage initial par un lissage..."
-triou prepare.data 1> prepare.out 2> prepare.err 
+trust prepare.data 1> prepare.out 2> prepare.err 
 echo "done!"
 # Lancement de la sauvegarde
 echo -n "Lancement du calcul et sauvegarde dans PREV..."
-triou sauve 1>sauve.out 2>sauve.err || exit -1
+trust sauve 1>sauve.out 2>sauve.err || exit -1
 echo "done!"

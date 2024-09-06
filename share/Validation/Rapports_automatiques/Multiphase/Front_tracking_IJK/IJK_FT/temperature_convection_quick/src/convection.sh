@@ -21,7 +21,7 @@ do
         -e "s/nbelem_k .*/nbelem_k $n/g" \
         -e "s/ijk_splitting_ft_extension .*/ijk_splitting_ft_extension $n_splitting/g" -i ${jdd}.data
     echo -n "    Calculating DX_EUL_$n....."
-    # triou ${jdd} 8 1> $jdd.out 2> $jdd.err
+    # trust ${jdd} 8 1> $jdd.out 2> $jdd.err
     echo "Done!"
     cd ..
 done

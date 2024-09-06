@@ -6,5 +6,5 @@ tar xzf init.lata.tgz
 sed 's/check_pass/write_pass/;
 s/relax_barycentrage 1/relax_barycentrage 0.99999/' ijkft_debog_bug.data >prepare.data
 
-triou prepare.data
+trust prepare.data
 

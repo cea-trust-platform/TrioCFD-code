@@ -33,7 +33,7 @@ do
       # Euler :
       sed -i -e "s/nbelem_i .*/nbelem_i $n/g" -e "s/nbelem_j .*/nbelem_j $n/g" ${jdd}.data
       echo -n "    Calculating DX_EUL_$n....."
-      triou ${jdd} 1> out 2> err
+      trust ${jdd} 1> out 2> err
       echo "Done!"
       grep "ERROR FIELD" err | awk '{print $4, $5, $6, $7}' > DX_EUL_$n/L2.txt
       cp -f ${jdd}_PP_VX.son DX_EUL_$n/
@@ -48,7 +48,7 @@ do
       # RK3 :
       sed -e "/time_scheme/s/#//g" ${jdd}.data > ${jdd}_RK3.data 
       echo -n "    Calculating DX_RK_$n....."
-      triou ${jdd}_RK3 1> out 2> err
+      trust ${jdd}_RK3 1> out 2> err
       echo "Done!"
       grep "ERROR FIELD" err | awk '{print $4, $5, $6, $7}' > DX_RK_$n/L2.txt
       \cp -f ${jdd}_RK3_PP_VX.son DX_RK_$n/${jdd}_PP_VX.son
@@ -57,7 +57,7 @@ do
       np=`echo $n+1|bc`
       sed -i -e "s/Nombre_de_Noeuds .*/Nombre_de_Noeuds $np $np/g" ${jdd}_VDF.data
       echo -n "    Calculating DX_VDF_$n....."
-      triou ${jdd}_VDF 1> VDF.out 2> VDF.err
+      trust ${jdd}_VDF 1> VDF.out 2> VDF.err
       echo "Done!"
       grep "ERROR FIELD" VDF.err | awk '{print $4, $5, $6, $7}' > DX_VDF_$n/L2.txt # Fichiers Vides
       \cp -f ${jdd}_VDF_PP_VX.son DX_VDF_$n/${jdd}_PP_VX.son

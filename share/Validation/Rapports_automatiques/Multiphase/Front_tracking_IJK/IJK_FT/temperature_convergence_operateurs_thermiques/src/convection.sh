@@ -16,7 +16,7 @@ do
     # Euler :
     sed -i -e "s/nbelem_i .*/nbelem_i $n/g" -e "s/nbelem_j .*/nbelem_j $n/g" ${jdd}.data
     echo -n "    Calculating DX_EUL_$n....."
-    triou ${jdd} 1> out 2> err
+    trust ${jdd} 1> out 2> err
     echo "Done!"
     grep "ERROR T FIELD" err | awk '{print $5, $6}' > DX_EUL_$n/L2.txt
     cp ${jdd}_PP_T.son DX_EUL_$n/
@@ -31,7 +31,7 @@ do
     # RK3 :
     sed -e "/time_scheme/s/#//g" ${jdd}.data > ${jdd}_RK3.data 
     echo -n "    Calculating DX_RK_$n....."
-    triou ${jdd}_RK3 1> out 2> err
+    trust ${jdd}_RK3 1> out 2> err
     [ $? != 0 ] && echo "Calculation DX_RK_${n} failed! Exiting..." && exit -1
     echo "Done!"
     grep "ERROR T FIELD" err | awk '{print $5, $6}' > DX_RK_$n/L2.txt

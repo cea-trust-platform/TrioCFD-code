@@ -33,7 +33,7 @@ do
    # Euler :
    sed -i -e "s/nb_pas_dt_max .*/nb_pas_dt_max $nit/g" -e "s/timestep .*/timestep $dt/g" ${jdd}.data
    echo -n "Calculating DT_EUL_$n....."
-   triou ${jdd} 1> out 2> err
+   trust ${jdd} 1> out 2> err
    echo "Done!"
    \cp -f ${jdd}_acceleration.out DT_EUL_$n/acc.txt
    grep "ERROR FIELD" err | awk '{print $4, $5, $6, $7}' > DT_EUL_$n/L2.txt
@@ -49,7 +49,7 @@ do
    # RK3 :
    sed -e "/time_scheme/s/#//g" ${jdd}.data > ${jdd}_RK3.data 
    echo -n "Calculating DT_RK_$n....."
-   triou ${jdd}_RK3 1> out 2> err
+   trust ${jdd}_RK3 1> out 2> err
    echo "Done!"
    \cp -f ${jdd}_RK3_acceleration.out DT_RK_$n/acc.txt
    grep "ERROR FIELD" err | awk '{print $4, $5, $6, $7}' > DT_RK_$n/L2.txt

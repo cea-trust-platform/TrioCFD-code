@@ -33,7 +33,7 @@ rm -rf DX*
             ${jdd}.data
         #       -e "s/nbelem_k .*/nbelem_k $nk/g" ${jdd}.data
         echo -n "    Calculating DX_EUL_$n....."
-        triou ${jdd} 1> out 2> err
+        trust ${jdd} 1> out 2> err
         [ $? != 0 ] && echo "Calculation DX_EUL_$n failed! Exiting..." && exit -1
         echo "Done!"
         cp -f ${jdd}.data ${jdd}_PP_T.son DX_EUL_$n/
@@ -55,7 +55,7 @@ rm -rf DX*
                 -e "s/timestep_facsec .*/timestep_facsec 1./"\
                 ${jdd}.data > ${jdd}_3D.data
             echo -n "    Calculating DX_EUL_${n}_3D with a Fourier limited timestep....."
-            triou ${jdd}_3D 1> out 2> err
+            trust ${jdd}_3D 1> out 2> err
             [ $? != 0 ] && echo "Calculation DX_EUL_${n}_3D failed! Exiting..." && exit -1
             echo "Done!"
             grep "ERROR T FIELD" err | awk '{print $5, $6}' > DX_EUL_${n}_3D/L2.txt
@@ -65,7 +65,7 @@ rm -rf DX*
         # RK3 :
         sed -e "/time_scheme/s/#//g" ${jdd}.data > ${jdd}_RK3.data 
         echo -n "    Calculating DX_RK_$n....."
-        triou ${jdd}_RK3 1> out 2> err
+        trust ${jdd}_RK3 1> out 2> err
         [ $? != 0 ] && echo "Calculation DX_RK_${n} failed! Exiting..." && exit -1
         echo "Done!"
         grep "ERROR T FIELD" err | awk '{print $5, $6}' > DX_RK_$n/L2.txt
