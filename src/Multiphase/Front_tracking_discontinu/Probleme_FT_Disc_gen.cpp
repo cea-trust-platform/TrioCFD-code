@@ -242,7 +242,7 @@ Equation_base& Probleme_FT_Disc_gen::getset_equation_by_name(const Nom& un_nom)
   for (i = 0; i < n; i++)
     {
       eq = &equation(i);
-      if (eq->le_nom() == un_nom)
+      if (Motcle(eq->le_nom()) == un_nom)
         break;
     }
   if (i == n)
