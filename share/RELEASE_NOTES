@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.5_beta : Enhancements, modifications and corrected bugs since version 1.9.4 :
 --------------------------------------------------------------------------------------------------
+11/09/24 (TrioCFD) New feature : k-omega and k-tau CMFD turbulence models are now compatible with pb_(thermo)hydraulique (VDF and PolyMAC_P0 only)
 xx/xx/xx (TrioCFD) Keyword     : FTD - keyword juric_pour_tout was obsolete and did nothing, not allowed anymore in datafiles.
 25/07/24 (TrioCFD) Bug fix     : FT IJK - valgrind issue in shear periodic conditions fixed
 25/07/24 (TrioCFD) Bug fix     : FT IJK - Performance regression since v1.9.4 ('New shear periodic conditions') fixed
