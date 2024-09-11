@@ -130,7 +130,7 @@ void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, Dou
                     *Mt	= matrices.count("temperature") ? matrices.at("temperature") : nullptr;
 
   const int Nk = k.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(),
-            Na = sub_type(Pb_Multiphase, equation().probleme()) ? ref_cast(Pb_Multiphase, equation().probleme()).get_champ("alpha").valeurs().line_size() : 1.0,
+            Na = sub_type(Pb_Multiphase, equation().probleme()) ? ref_cast(Pb_Multiphase, equation().probleme()).get_champ("alpha").valeurs().line_size() : 1,
             Nt = Mt ? equation().probleme().get_champ("temperature").valeurs().line_size() : 1, nb_elem = domaine.nb_elem();
 
   for (int e = 0; e < nb_elem; e++)
