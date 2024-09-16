@@ -298,7 +298,7 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   //  const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn_temp).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
   const DoubleVect& Temp = eqn_temp.inconnue()->valeurs();
-  const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis().valeur());
+  const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis());
 
   double T0=0.;
 

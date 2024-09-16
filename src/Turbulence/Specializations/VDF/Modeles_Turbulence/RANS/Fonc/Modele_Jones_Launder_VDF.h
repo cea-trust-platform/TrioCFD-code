@@ -24,11 +24,11 @@
 
 #include <Modele_Fonc_Bas_Reynolds_Base.h>
 #include <TRUSTTabs_forward.h>
-#include <Domaine_Cl_dis.h>
+
 #include <Equation_base.h>
 #include <TRUST_Ref.h>
 
-#include <Domaine_Cl_dis.h>
+
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 class Champ_Face_VDF;
@@ -41,27 +41,27 @@ class Modele_Jones_Launder_VDF : public Modele_Fonc_Bas_Reynolds_Base
 public :
 
   Entree& lire(const Motcle&, Entree&);
-  void associer(const Domaine_dis_base& , const Domaine_Cl_dis& ) override;
+  void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ) override;
   void mettre_a_jour(double) override;
-  //     void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis& );
+  //     void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& );
 
-  DoubleTab& Calcul_D(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
-  DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
+  DoubleTab& Calcul_D(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
+  DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
 
 //  virtual DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis_base& ) const ;
-  DoubleTab& Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const override;
+  DoubleTab& Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const override;
   DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const Champ_base&) const override ;
-  DoubleTab& Calcul_Fmu ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const Champ_Don& )const override ;
+  DoubleTab& Calcul_Fmu ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const Champ_Don& )const override ;
 
-  DoubleTab& Calcul_D_BiK(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
-  DoubleTab& Calcul_E_BiK(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
-  DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const override;
+  DoubleTab& Calcul_D_BiK(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
+  DoubleTab& Calcul_E_BiK(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
+  DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const override;
   DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_base&) const override ;
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
 
 protected:
-  DoubleTab& calcul_derivees_premieres_croisees(DoubleTab& , const Domaine_dis_base& , const Domaine_Cl_dis& , const DoubleTab&  ) const;
-  DoubleTab& calcul_derivees_secondes_croisees(DoubleTab& , const Domaine_dis_base& , const Domaine_Cl_dis& , const DoubleTab&  ) const;
+  DoubleTab& calcul_derivees_premieres_croisees(DoubleTab& , const Domaine_dis_base& , const Domaine_Cl_dis_base& , const DoubleTab&  ) const;
+  DoubleTab& calcul_derivees_secondes_croisees(DoubleTab& , const Domaine_dis_base& , const Domaine_Cl_dis_base& , const DoubleTab&  ) const;
 
   REF(Domaine_VDF) le_dom_VDF;
   REF(Domaine_Cl_VDF) le_dom_Cl_VDF;

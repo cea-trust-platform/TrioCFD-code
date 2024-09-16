@@ -129,7 +129,7 @@ protected:
   Champ_Inc divergence_delta_U;
   SolveurSys solveur_pression_;
   Matrice matrice_pression_;
-  Domaine_Cl_dis zcl_fictitious_;
+  OWN_PTR(Domaine_Cl_dis_base) zcl_fictitious_;
   Noms name_bc_opening_pressure_; // Liste de noms pour laisser sortir la source de div(delta u)
 
   ArrOfInt mixed_elems_;

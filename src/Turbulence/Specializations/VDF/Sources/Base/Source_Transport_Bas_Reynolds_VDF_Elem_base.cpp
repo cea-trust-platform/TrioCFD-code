@@ -49,7 +49,7 @@ void Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter_blocs(matrices_t matri
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
-  const Domaine_Cl_dis& zcl_keps=eqn_keps_bas_re->domaine_Cl_dis();
+  const Domaine_Cl_dis_base& zcl_keps=eqn_keps_bas_re->domaine_Cl_dis();
   const Domaine_dis_base& domaine_dis_keps =eqn_keps_bas_re ->domaine_dis();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
   const int nb_elem = le_dom_VDF->nb_elem();

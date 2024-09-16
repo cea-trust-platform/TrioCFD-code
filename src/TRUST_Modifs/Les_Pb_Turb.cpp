@@ -26,7 +26,7 @@
  *     les modeles de turbulences des equations qui doivent etre
  *     de la meme famille.
  *     Appel la fonction de librairie hors classe:
- *       tester_compatibilite_hydr_concentration(const Domaine_Cl_dis&,const Domaine_Cl_dis&)
+ *       tester_compatibilite_hydr_concentration(const Domaine_Cl_dis_base&,const Domaine_Cl_dis_base&)
  *
  * @return (int) renvoie toujours 1
  * @throws modeles de turbulence de famille differente pour
@@ -34,8 +34,8 @@
  */
 int Pb_Hydraulique_Concentration_Turbulent::verifier()
 {
-  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
-  const Domaine_Cl_dis& domaine_Cl_co = eq_concentration.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_co = eq_concentration.domaine_Cl_dis();
 
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_concentration(domaine_Cl_hydr,domaine_Cl_co);
@@ -43,7 +43,7 @@ int Pb_Hydraulique_Concentration_Turbulent::verifier()
     {
       const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
+      const Domaine_Cl_dis_base& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
     }
 
@@ -78,8 +78,8 @@ int Pb_Hydraulique_Concentration_Turbulent::verifier()
  */
 int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::verifier()
 {
-  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
-  const Domaine_Cl_dis& domaine_Cl_fm = eq_frac_mass.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_fm = eq_frac_mass.domaine_Cl_dis();
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_fraction_massique(domaine_Cl_hydr,domaine_Cl_fm);
 
@@ -87,7 +87,7 @@ int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::verifier()
     {
       const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
+      const Domaine_Cl_dis_base& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
     }
 
@@ -114,19 +114,19 @@ int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::verifier()
  * Le test se fait sur les conditions
  *     aux limites discretisees de chaque equation.
  *     Appel la fonction de librairie hors classe:
- *       tester_compatibilite_hydr_turb(const Domaine_Cl_dis&)
+ *       tester_compatibilite_hydr_turb(const Domaine_Cl_dis_base&)
  *
  * @return (int) code de retour propage
  */
 int Pb_Hydraulique_Turbulent::verifier()
 {
-  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
 
   if ( sub_type(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur() ))
     {
       const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
+      const Domaine_Cl_dis_base& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
     }
 
@@ -140,8 +140,8 @@ int Pb_Hydraulique_Turbulent::verifier()
  *     les modeles de turbulence des equations qui doivent etre
  *     de la meme famille.
  *     Appels aux fonctions de librairie hors classe:
- *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis&,const Domaine_Cl_dis&)
- *       tester_compatibilite_hydr_concentration(const Domaine_Cl_dis&,const Domaine_Cl_dis&)
+ *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base&,const Domaine_Cl_dis_base&)
+ *       tester_compatibilite_hydr_concentration(const Domaine_Cl_dis_base&,const Domaine_Cl_dis_base&)
  *
  * @return (int) renvoie toujours 1
  * @throws les modeles de turbulence ne sont pas de la meme
@@ -151,9 +151,9 @@ int Pb_Hydraulique_Turbulent::verifier()
  */
 int Pb_Thermohydraulique_Concentration_Turbulent::verifier()
 {
-  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
-  const Domaine_Cl_dis& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
-  const Domaine_Cl_dis& domaine_Cl_co = eq_concentration.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_co = eq_concentration.domaine_Cl_dis();
 
   // Verification de la compatibilite des conditions aux limites
   tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
@@ -162,7 +162,7 @@ int Pb_Thermohydraulique_Concentration_Turbulent::verifier()
     {
       const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
+      const Domaine_Cl_dis_base& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
     }
 
@@ -201,8 +201,8 @@ int Pb_Thermohydraulique_Concentration_Turbulent::verifier()
  */
 int Pb_Thermohydraulique_Turbulent_QC::verifier()
 {
-  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
-  const Domaine_Cl_dis& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
 
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
@@ -210,7 +210,7 @@ int Pb_Thermohydraulique_Turbulent_QC::verifier()
     {
       const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
+      const Domaine_Cl_dis_base& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
     }
 
@@ -237,7 +237,7 @@ int Pb_Thermohydraulique_Turbulent_QC::verifier()
  *     modeles de turbulences respectifs des equations
  *     de l'hydraulique et de la thermique (qui doivent etre de la meme famille).
  *     Appel la fonction de librairie hors classe:
- *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis&,const Domaine_Cl_dis&)
+ *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base&,const Domaine_Cl_dis_base&)
  *
  * @return (int) renvoie toujours 1
  * @throws modeles de turbulence de famille differente pour
@@ -245,8 +245,8 @@ int Pb_Thermohydraulique_Turbulent_QC::verifier()
  */
 int Pb_Thermohydraulique_Turbulent::verifier()
 {
-  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
-  const Domaine_Cl_dis& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
 
   // Verification de la compatibilite des conditions aux limites:
   tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
@@ -254,7 +254,7 @@ int Pb_Thermohydraulique_Turbulent::verifier()
     {
       const Modele_turbulence_hyd_RANS_K_Eps_base& le_mod_RANS = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base, eq_hydraulique.get_modele(TURBULENCE).valeur());
       const Transport_K_Eps_base& eqn = ref_cast(Transport_K_Eps_base, le_mod_RANS.eqn_transp_K_Eps());
-      const Domaine_Cl_dis& domaine_Cl_turb = eqn.domaine_Cl_dis();
+      const Domaine_Cl_dis_base& domaine_Cl_turb = eqn.domaine_Cl_dis();
       tester_compatibilite_hydr_turb(domaine_Cl_hydr, domaine_Cl_turb);
     }
   return 1;

@@ -63,7 +63,7 @@ void test_impose_bound_cond(Equation_base& eqn,DoubleTab& current2,const char * 
   DoubleTab& present = eqn.inconnue()->futur();
   DoubleTab sauv(present);
   const Schema_Temps_base& sch = eqn.probleme().schema_temps();
-  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),sch.temps_courant()+sch.pas_de_temps());
+  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),sch.temps_courant()+sch.pas_de_temps());
   present -= sauv;
   // BM, je remplace max_abs par mp_pax_abs: du coup la methode doit etre appelee simultanement par tous les procs.
   double ecart_max=mp_max_abs_vect(present);
@@ -241,7 +241,7 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqn
 {
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis());
   const DoubleVect& volumes_entrelaces_ref=le_dom.volumes_entrelaces();
-  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis());
   const DoubleVect& volumes_entrelaces_cl=le_dom_cl.volumes_entrelaces_Cl();
   DoubleVect volumes_entrelaces(volumes_entrelaces_ref);
   int size_cl=volumes_entrelaces_cl.size();
@@ -304,7 +304,7 @@ void Implicit_steady::test_periodic_solution(Navier_Stokes_std& eqnNS, DoubleTab
 {
 
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis());
-  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis());
   int nb_comp=current.dimension(1);
   for (int n_bord=0; n_bord<le_dom.nb_front_Cl(); n_bord++)
     {

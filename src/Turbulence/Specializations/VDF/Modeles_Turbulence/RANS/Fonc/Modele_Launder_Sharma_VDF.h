@@ -24,7 +24,7 @@
 
 #include <Modele_Jones_Launder_VDF.h>
 
-#include <Domaine_Cl_dis.h>
+
 #include <TRUSTTabs_forward.h>
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;
@@ -36,11 +36,11 @@ class Modele_Launder_Sharma_VDF : public Modele_Jones_Launder_VDF
 
 public :
 
-  DoubleTab& Calcul_Fmu (DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const Champ_Don&) const override;
+  DoubleTab& Calcul_Fmu (DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const Champ_Don&) const override;
 
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
 
-  void associer(const Domaine_dis_base& , const Domaine_Cl_dis& ) override;
+  void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ) override;
   Entree& lire(const Motcle&, Entree&);
 
 protected:

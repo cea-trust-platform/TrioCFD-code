@@ -26,7 +26,7 @@
 #include <Source_base.h>
 #include <Domaine_VDF.h>
 
-#include <Domaine_Cl_dis.h>
+
 class Probleme_base;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ class Source_DWF_VDF : public Source_base
 
 public:
 
-  inline void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis& ) override;
+  inline void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis_base& ) override;
 
   inline DoubleTab& ajouter(DoubleTab& ) const override ;
   inline DoubleTab& calculer(DoubleTab& ) const override ;
@@ -81,7 +81,7 @@ inline DoubleTab& Source_DWF_VDF::calculer(DoubleTab& resu) const
 }
 
 void Source_DWF_VDF::associer_domaines(const Domaine_dis_base& domaine_dis,
-                                       const Domaine_Cl_dis& domaine_cl_dis)
+                                       const Domaine_Cl_dis_base& domaine_cl_dis)
 {
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
 

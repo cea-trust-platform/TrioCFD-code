@@ -24,7 +24,7 @@
 
 #include <Paroi_std_hyd_VDF.h>
 
-#include <Domaine_Cl_dis.h>
+
 class Champ_Fonc_base;
 
 

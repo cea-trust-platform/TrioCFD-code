@@ -35,10 +35,10 @@ Implemente_base_sans_constructeur( Source_Transport_VDF_Elem_base, "Source_Trans
 Sortie& Source_Transport_VDF_Elem_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
 Entree& Source_Transport_VDF_Elem_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is,que_suis_je()); }
 
-void Source_Transport_VDF_Elem_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis&  domaine_Cl_dis)
+void Source_Transport_VDF_Elem_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base&  domaine_Cl_dis)
 {
   le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
 }
 
 void Source_Transport_VDF_Elem_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
@@ -97,7 +97,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_keps(DoubleTab& resu) const
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) const
 {
   // on ajoute directement G
-  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
   const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& g = gravite->valeurs(), &tab_beta = beta_t->valeur().valeurs();
@@ -118,7 +118,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
 
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
 {
-  const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis());
   const DoubleTab& concen = eq_concentration->inconnue()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());
   const DoubleTab& diffu_turb = le_modele_scalaire.conductivite_turbulente()->valeurs();
@@ -145,8 +145,8 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
 // TODO : FIXME : on peut factoriser avec les 2 methodes ajouter_anisotherme et ajouter_concen
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme_concen(DoubleTab& resu) const
 {
-  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
-  const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
+  const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis());
   const DoubleTab& temper = eq_thermique->inconnue()->valeurs(), &concen = eq_concentration->inconnue()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_base& le_modele_scal_co = ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());

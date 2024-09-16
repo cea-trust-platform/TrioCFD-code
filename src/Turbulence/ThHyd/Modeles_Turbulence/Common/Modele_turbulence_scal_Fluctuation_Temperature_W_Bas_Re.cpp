@@ -185,7 +185,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::mettre_a_jour(doub
 {
   Schema_Temps_base& sch1 = eqn_transport_Fluctu_Temp->schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_Fluctu_Temp->domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transport_Fluctu_Temp->domaine_Cl_dis().mettre_a_jour(temps);
   sch1.faire_un_pas_de_temps_eqn_base(eqn_transport_Fluctu_Temp.valeur());
   eqn_transport_Fluctu_Temp->mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp->controler_grandeur();

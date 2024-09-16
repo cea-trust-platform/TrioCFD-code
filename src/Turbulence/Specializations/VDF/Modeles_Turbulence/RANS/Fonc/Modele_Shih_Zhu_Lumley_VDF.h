@@ -24,7 +24,7 @@
 
 #include <Modele_Fonc_Realisable_base.h>
 #include <TRUSTTabs_forward.h>
-#include <Domaine_Cl_dis.h>
+
 #include <Param.h>
 #include <Equation_base.h>
 #include <TRUST_Ref.h>
@@ -45,20 +45,20 @@ public :
 
   virtual void set_param(Param& param);
   void mettre_a_jour(double) override;
-  void Calcul_S(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse) override ;
-  void Calcul_C1(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) override ;
-  void Calcul_Cmu_et_S(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) override  ;
-  void Contributions_Sources(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) override ;
-  void Contributions_Sources_Paroi(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
+  void Calcul_S(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse) override ;
+  void Calcul_C1(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) override ;
+  void Calcul_Cmu_et_S(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) override  ;
+  void Contributions_Sources(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) override ;
+  void Contributions_Sources_Paroi(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                    const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) override ;
 
-  void Calcul_C1_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override ;
-  void Calcul_Cmu_et_S_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override  ;
-  void Contributions_Sources_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override ;
-  void Contributions_Sources_Paroi_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
+  void Calcul_C1_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override ;
+  void Calcul_Cmu_et_S_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override  ;
+  void Contributions_Sources_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) override ;
+  void Contributions_Sources_Paroi_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
                                        const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) override ;
 
-  void associer(const Domaine_dis_base& , const Domaine_Cl_dis& ) override;
+  void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ) override;
   void Initialisation(const Domaine_dis_base& domaine_dis) ;
 
 protected:

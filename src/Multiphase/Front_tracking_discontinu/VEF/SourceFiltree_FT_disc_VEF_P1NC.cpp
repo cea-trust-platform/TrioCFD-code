@@ -191,10 +191,10 @@ void SourceFiltree_FT_disc_VEF_P1NC::completer()
   Source_base::completer();
 }
 
-void SourceFiltree_FT_disc_VEF_P1NC::associer_domaines(const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
+void SourceFiltree_FT_disc_VEF_P1NC::associer_domaines(const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis);
-  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis);
 }
 void SourceFiltree_FT_disc_VEF_P1NC::associer_pb(const Probleme_base& pb)
 {

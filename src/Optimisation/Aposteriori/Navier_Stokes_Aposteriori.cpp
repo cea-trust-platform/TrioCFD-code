@@ -92,7 +92,7 @@ const Champ_base& Navier_Stokes_Aposteriori::get_champ(const Motcle& nom) const
 void Navier_Stokes_Aposteriori::estimateur_aposteriori()
 {
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, domaine_dis());
-  const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis());
   estimateur_aposteriori_.typer("Estimateur_Aposteriori_P0_VEF");
   Estimateur_Aposteriori_P0_VEF& ch = ref_cast(Estimateur_Aposteriori_P0_VEF, estimateur_aposteriori_.valeur());
   ch.associer_domaine_dis_base(domaine_vef);

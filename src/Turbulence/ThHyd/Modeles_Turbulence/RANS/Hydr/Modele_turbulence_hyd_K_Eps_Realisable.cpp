@@ -139,7 +139,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
 void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
-  eqn_transp_K_Eps().domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K_Eps().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
   eqn_transp_K_Eps().mettre_a_jour(temps);

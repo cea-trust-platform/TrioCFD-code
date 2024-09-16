@@ -27,7 +27,7 @@
 #include <distances_VEF.h>
 #include <Paroi_UTAU_IMP_Impl.h>
 
-#include <Domaine_Cl_dis.h>
+
 class Champ_Fonc_base;
 
 /*! @brief Ne pas utiliser cette classe.

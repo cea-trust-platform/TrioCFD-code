@@ -41,7 +41,7 @@ class Paroi_loi_WW_scal_VEF : public Paroi_std_scal_hyd_VEF
   Declare_instanciable_sans_constructeur(Paroi_loi_WW_scal_VEF);
 
 public:
-  void associer(const Domaine_dis_base& ,const Domaine_Cl_dis& ) override;
+  void associer(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
   int calculer_scal(Champ_Fonc_base& ) override;
 
 private:

@@ -104,7 +104,7 @@ Implemente_instanciable_sans_constructeur(Maillage_FT_Disc,"Maillage_FT_Disc",En
 void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
 {
   const Equation_base& eq = equation_transport();
-  const Domaine_Cl_dis_base& domaine_cl = eq.domaine_Cl_dis().valeur();
+  const Domaine_Cl_dis_base& domaine_cl = eq.domaine_Cl_dis();
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,eq.domaine_dis());
 
   const int nb_som = nb_sommets();
@@ -4591,7 +4591,7 @@ void Maillage_FT_Disc::nettoyer_noeuds_virtuels_et_frontieres()
   //On ne retient pas les sommets virtuels et ceux situes sur des faces de frontiere ouverte
   for (int som=0; som<nb_sommets(); som++)
     {
-      const Domaine_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).domaine_Cl_dis().valeur();
+      const Domaine_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).domaine_Cl_dis();
       int face_loc;
       int face_bord = sommet_face_bord_[som];
       int face_fr_ouverte = 0;
@@ -6019,7 +6019,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                     {
                       const double t=temps_physique_;
                       int face_loc;
-                      const Domaine_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).domaine_Cl_dis().valeur();
+                      const Domaine_Cl_dis_base& zcl = equation_transport().get_probleme_base().equation(0).domaine_Cl_dis();
                       const Cond_lim_base& type_cl = zcl.condition_limite_de_la_face_reelle(face,face_loc);
                       const Nom& bc_name = type_cl.frontiere_dis().le_nom();
                       // For each BC, we check its type to see if it's a wall:
@@ -6105,8 +6105,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
 
                       int face_loc;
                       const Domaine_Cl_dis_base& zcl =
-                        equation_transport ().get_probleme_base ().equation (
-                          0).domaine_Cl_dis ().valeur ();
+                        equation_transport().get_probleme_base().equation(0).domaine_Cl_dis();
                       const Cond_lim_base& type_cl =
                         zcl.condition_limite_de_la_face_reelle (face,
                                                                 face_loc);

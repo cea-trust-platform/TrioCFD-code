@@ -136,7 +136,7 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
   // on doit retyper maintenant le champ de la CL "Interface" en Champ_front_zoom
   for(int i=0; i<pb_fin->nombre_d_equations(); i++)
     {
-      Conds_lim& les_cl = pb_fin->equation(i).domaine_Cl_dis()->les_conditions_limites();
+      Conds_lim& les_cl = pb_fin->equation(i).domaine_Cl_dis().les_conditions_limites();
       for (int icl = 0; icl<les_cl.size(); icl++)
         {
           const Frontiere_dis_base& cl = les_cl[icl]->frontiere_dis();
@@ -151,7 +151,7 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
                   champ+=Nom(" ");
                   champ+=pb_thhyd.le_nom();
                   champ+=Nom(" ");
-                  champ+=Nom(mon_modele_turb_hyd->equation().domaine_Cl_dis()->les_conditions_limites(0)->frontiere_dis().le_nom());
+                  champ+=Nom(mon_modele_turb_hyd->equation().domaine_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
                   champ+=Nom(" vitesse ");
                   EChaine chp(champ);
                   chp >> les_cl[icl]->champ_front();
@@ -171,8 +171,8 @@ int Paroi_DWF_hyd_VDF::init_lois_paroi()
               champ+=pb_thhyd.le_nom();
               champ+=Nom(" ");
               // marchait avant
-              //          champ+=Nom(modele_turbulence().equation().domaine_Cl_dis()->les_conditions_limites(0)->frontiere_dis().le_nom());
-              champ+=Nom(mon_modele_turb_hyd->equation().domaine_Cl_dis()->les_conditions_limites(0)->frontiere_dis().le_nom());
+              //          champ+=Nom(modele_turbulence().equation().domaine_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
+              champ+=Nom(mon_modele_turb_hyd->equation().domaine_Cl_dis().les_conditions_limites(0)->frontiere_dis().le_nom());
               champ+=Nom(" temperature ");
               EChaine chp(champ);
               chp >> les_cl[icl]->champ_front();
@@ -279,7 +279,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
 
   // Remplissage de la CL sur le bord de nom "Interface" du probleme fin
-  Conds_lim& les_cl = pb_fin->equation(0).domaine_Cl_dis()->les_conditions_limites();
+  Conds_lim& les_cl = pb_fin->equation(0).domaine_Cl_dis().les_conditions_limites();
   Prolongement_base& P_cl = pbMG.pb_2G(0).mon_prolongement(1);
 
   int icl,i_de_la_cl=0;
@@ -331,7 +331,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Probleme_base& pb_gros = mon_modele_turb_hyd->equation().probleme();
   const DoubleTab& tempiotte_grosse = pb_gros.equation(1).inconnue()->valeurs();
 
-  Conds_lim& les_cl_th = eqn_NRJ_F.domaine_Cl_dis()->les_conditions_limites();
+  Conds_lim& les_cl_th = eqn_NRJ_F.domaine_Cl_dis().les_conditions_limites();
   Prolongement_base& P_cl_th = pbMG.pb_2G(0).mon_prolongement(0);
 
   i_de_la_cl=0;

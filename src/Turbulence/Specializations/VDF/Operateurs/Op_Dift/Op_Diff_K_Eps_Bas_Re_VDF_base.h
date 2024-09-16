@@ -29,7 +29,7 @@
 #include <Iterateur_VDF_Elem.h>
 #include <Statistiques.h>
 #include <Op_VDF_Elem.h>
-#include <Domaine_Cl_dis.h>
+
 
 #include <Champ_Inc.h>
 

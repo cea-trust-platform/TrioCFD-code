@@ -1615,7 +1615,7 @@ void Traitement_particulier_NS_THI_VEF::isotropie(const DoubleTab& vitesse, Nom 
 
 double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vitesse, Nom ext)
 {
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis());
   const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
@@ -1936,7 +1936,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_nu_t(void)
 
 void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& tab_global , DoubleVect& moyenne)
 {
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis());
   const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
@@ -2016,7 +2016,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& 
 
 void Traitement_particulier_NS_THI_VEF::calcul_moyenne(const DoubleTab& tab_global , double& moyenne)
 {
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis());
   const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();

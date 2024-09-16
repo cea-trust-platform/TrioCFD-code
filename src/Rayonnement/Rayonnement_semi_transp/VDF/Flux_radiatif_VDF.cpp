@@ -170,13 +170,13 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = le_bord.nb_faces();
   REF(Champ_front) Tb;
-  const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites();
+  const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
   int num_cl_temp = 0;
 
   int test_nom = 0;
   for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
     {
-      const Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites(num_cl_temp);
+      const Cond_lim& la_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites(num_cl_temp);
       Nom nom_cl_temp = la_cl_temp->frontiere_dis().le_nom();
       if(nom_cl_temp == frontiere_dis().le_nom())
         {

@@ -40,7 +40,7 @@ class Op_Diff_K_Eps_Bas_Re_VEF_Face_Q1 : public Op_Diff_K_Eps_Bas_Re_VEF_base, p
 
 public:
 
-  void associer(const Domaine_dis_base& , const Domaine_Cl_dis& ,
+  void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ,
                 const Champ_Inc& ) override;
   void associer_diffusivite_turbulente() override;
   const Champ_Fonc& diffusivite_turbulente() const;

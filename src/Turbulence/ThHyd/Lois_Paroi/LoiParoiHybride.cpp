@@ -22,7 +22,7 @@
 #include <LoiParoiHybride.h>
 #include <Motcle.h>
 
-#include <Domaine_Cl_dis.h>
+
 #include <EChaine.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
@@ -112,7 +112,7 @@ Entree& LoiParoiHybride::lire(Entree& is, const Noms& noms_bord, const Modele_tu
   return is;
 }
 
-void LoiParoiHybride::associer(const Domaine_dis_base& zd, const Domaine_Cl_dis& zcl)
+void LoiParoiHybride::associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcl)
 {
   int size = vect_lp.size();
   for (int ilp=0; ilp<size; ilp++)

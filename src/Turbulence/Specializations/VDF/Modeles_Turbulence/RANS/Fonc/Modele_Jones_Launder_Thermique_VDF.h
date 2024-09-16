@@ -27,7 +27,7 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
 
-#include <Domaine_Cl_dis.h>
+
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 class Fluide_base;
@@ -42,8 +42,8 @@ class Modele_Jones_Launder_Thermique_VDF : public Modele_Fonc_Bas_Reynolds_Therm
 
 public :
 
-  DoubleTab& Calcul_D(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const override;
-  DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const override;
+  DoubleTab& Calcul_D(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&, double) const override;
+  DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const override;
   DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const override ;
   DoubleTab& Calcul_F2(DoubleTab&, const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const override ;
   DoubleTab& Calcul_F3(DoubleTab&, const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const override ;
@@ -51,7 +51,7 @@ public :
   DoubleTab& Calcul_Flambda ( DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const override ;
   Entree& lire(const Motcle&, Entree&);
   void associer_pb(const Probleme_base& ) override;
-  void associer(const Domaine_dis_base& , const Domaine_Cl_dis& ) override;
+  void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ) override;
   void mettre_a_jour(double) override;
 
 protected:

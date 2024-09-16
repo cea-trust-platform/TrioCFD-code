@@ -42,7 +42,7 @@ Entree& Modele_turbulence_hyd_LES_DSGS_VDF::readOn(Entree& s)
   return Modele_turbulence_hyd_LES_Smago_VDF::readOn(s);
 }
 
-void Modele_turbulence_hyd_LES_DSGS_VDF::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Modele_turbulence_hyd_LES_DSGS_VDF::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   Modele_turbulence_hyd_LES_Smago_VDF::associer(domaine_dis, domaine_Cl_dis);
 

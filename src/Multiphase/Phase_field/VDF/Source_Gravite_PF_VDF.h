@@ -27,7 +27,7 @@
 #include <Source_base.h>
 #include <TRUST_Ref.h>
 
-#include <Domaine_Cl_dis.h>
+
 
 class Probleme_base;
 class Domaine_Cl_VDF;
@@ -54,7 +54,7 @@ public:
   void mettre_a_jour(double temps) override { }
 
 protected :
-  void associer_domaines(const Domaine_dis_base& domaine,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& domaine,const Domaine_Cl_dis_base& ) override;
   REF(Domaine_VDF) le_dom;
   REF(Domaine_Cl_VDF) le_dom_Cl;
   REF(Probleme_base) le_probleme;

@@ -47,10 +47,10 @@ Entree& Source_LDC_VDF_NS::readOn(Entree& s )
 
 
 void Source_LDC_VDF_NS::associer_domaines(const Domaine_dis_base& domaine_dis,
-                                          const Domaine_Cl_dis& domaine_cl_dis)
+                                          const Domaine_Cl_dis_base& domaine_cl_dis)
 {
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
-  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
+  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis);
 
   // const Domaine& mon_dom = zvdf.domaine();
   Champ_Inc_base& inco = equation().inconnue();

@@ -37,7 +37,7 @@ public:
   // Source_Transport_VDF_Elem_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   DoubleTab& calculer(DoubleTab&) const override;
-  void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis&) override;
+  void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis_base&) override;
   void associer_pb(const Probleme_base&) override;
 
   inline int has_interface_blocs() const override { return 1; }

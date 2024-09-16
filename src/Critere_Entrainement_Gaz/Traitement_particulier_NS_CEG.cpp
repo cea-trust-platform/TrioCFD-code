@@ -139,7 +139,7 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
 {
   // Recherche de la frontiere surface libre:
   int trouve=0;
-  const Conds_lim& les_cls=mon_equation->domaine_Cl_dis()->les_conditions_limites();
+  const Conds_lim& les_cls=mon_equation->domaine_Cl_dis().les_conditions_limites();
   for (int num_cl=0; num_cl<les_cls.size(); num_cl++)
     {
       // Surface libre trouvee

@@ -70,7 +70,7 @@ void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_pb(const Probleme_base& pb)
 
 
 void Source_rayo_semi_transp_QC_VDF_P0_VDF::associer_domaines(const Domaine_dis_base& domaine_dis,
-                                                              const Domaine_Cl_dis& domaine_Cl_dis)
+                                                              const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   ;
 }

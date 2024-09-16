@@ -35,10 +35,10 @@ Implemente_base_sans_constructeur( Source_Transport_VEF_Face_base, "Source_Trans
 Sortie& Source_Transport_VEF_Face_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
 Entree& Source_Transport_VEF_Face_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is,que_suis_je()); }
 
-void Source_Transport_VEF_Face_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Source_Transport_VEF_Face_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis);
-  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis);
 }
 
 void Source_Transport_VEF_Face_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
@@ -51,7 +51,7 @@ DoubleTab& Source_Transport_VEF_Face_base::calculer(DoubleTab& resu) const
 
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
 {
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, eq_hydraulique->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, eq_hydraulique->domaine_Cl_dis());
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
@@ -114,7 +114,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme(DoubleTab& resu) const
 {
   // on ajoute directement G
-  const Domaine_Cl_VEF& zcl_VEF_th = ref_cast(Domaine_Cl_VEF,eq_thermique->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& zcl_VEF_th = ref_cast(Domaine_Cl_VEF,eq_thermique->domaine_Cl_dis());
   const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   DoubleTab alpha_turb(le_modele_scalaire.diffusivite_turbulente()->valeurs());
@@ -134,7 +134,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme(DoubleTab& resu) 
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_concen(DoubleTab& resu) const
 {
   // on ajoute directement G
-  const Domaine_Cl_VEF& zcl_VEF_co = ref_cast(Domaine_Cl_VEF, eq_concentration->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& zcl_VEF_co = ref_cast(Domaine_Cl_VEF, eq_concentration->domaine_Cl_dis());
   const DoubleTab& concen = eq_concentration->inconnue()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_concentration->get_modele(TURBULENCE).valeur());
   const DoubleTab& lambda_turb = le_modele_scalaire.conductivite_turbulente()->valeurs();
@@ -155,8 +155,8 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_concen(DoubleTab& resu) const
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme_concen(DoubleTab& resu) const
 {
   // on ajoute directement G
-  const Domaine_Cl_VEF& zcl_VEF_th = ref_cast(Domaine_Cl_VEF, eq_thermique->domaine_Cl_dis().valeur());
-  const Domaine_Cl_VEF& zcl_VEF_co = ref_cast(Domaine_Cl_VEF, eq_concentration->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& zcl_VEF_th = ref_cast(Domaine_Cl_VEF, eq_thermique->domaine_Cl_dis());
+  const Domaine_Cl_VEF& zcl_VEF_co = ref_cast(Domaine_Cl_VEF, eq_concentration->domaine_Cl_dis());
   const DoubleTab& temper = eq_thermique->inconnue()->valeurs(), &concen = eq_concentration->inconnue()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_thermique->get_modele(TURBULENCE).valeur());
 

@@ -194,7 +194,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis_base& le_domaine_dis,
           IntVect fait(nb_faces_tot);
           fait=0;
           const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis);
-          const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+          const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis());
           for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -226,8 +226,8 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis_base& le_domaine_dis,
           int nb_eqn=pb.nombre_d_equations();
           for(int num_eq=0; num_eq<nb_eqn; num_eq++)
             {
-              Domaine_Cl_dis& zcl_dis=pb.equation(num_eq).domaine_Cl_dis();
-              Domaine_Cl_VEF& la_zcl_VEF=ref_cast(Domaine_Cl_VEF, zcl_dis.valeur());
+              Domaine_Cl_dis_base& zcl_dis=pb.equation(num_eq).domaine_Cl_dis();
+              Domaine_Cl_VEF& la_zcl_VEF=ref_cast(Domaine_Cl_VEF, zcl_dis);
               la_zcl_VEF.remplir_volumes_entrelaces_Cl(le_dom_VEF);
               la_zcl_VEF.remplir_normales_facettes_Cl(le_dom_VEF );
             }
@@ -472,7 +472,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis_base& le_domaine_dis,Pr
     }
 
   //checking correct type of BC on the moving boundary
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis());
   for (int j=0; j<nb_bords_ALE; j++)
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(j).le_nom();
@@ -679,7 +679,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis_base& le_domaine_dis,Probleme_base
   int nb_som_ele = nb_som_elem();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis);
   const DoubleTab& normales=domaine_VEF.face_normales();
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis());
   const IntTab& elem_som = les_elems();
   const IntTab& elem_faces=domaine_VEF.elem_faces();
   double mijK;

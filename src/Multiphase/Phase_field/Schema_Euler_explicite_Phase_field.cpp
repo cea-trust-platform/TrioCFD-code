@@ -32,7 +32,7 @@ int Schema_Euler_explicite_Phase_field::faire_un_pas_de_temps_eqn_base(Equation_
   DoubleTab dudt(futur);
 
   // Boundary conditions applied on Un+1:
-  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, eqn.domaine_dis());
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme->equation(1));
@@ -56,7 +56,7 @@ int Schema_Euler_explicite_Phase_field::faire_un_pas_de_temps_eqn_base(Equation_
 
   Mass_Redistribution_Phase_Field::impose_mass_redistribution(zvdf, futur, minnX, maxxX);
 
-  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
   update_critere_statio(dudt, eqn);
 
   return 1;

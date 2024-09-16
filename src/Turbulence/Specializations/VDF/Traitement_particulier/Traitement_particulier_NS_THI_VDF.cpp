@@ -368,8 +368,8 @@ void Traitement_particulier_NS_THI_VDF::calcul_skewness_ordre_2(double& Skewness
   const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VDF& domaine_vdf=ref_cast(Domaine_VDF, zdisbase);
 
-  const Domaine_Cl_dis& zcldis = mon_equation->domaine_Cl_dis();
-  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcldis.valeur());
+  const Domaine_Cl_dis_base& zcldis = mon_equation->domaine_Cl_dis();
+  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcldis);
 
   const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
   const IntTab& face_voisins = domaine_vdf.face_voisins();

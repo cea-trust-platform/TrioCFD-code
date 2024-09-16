@@ -29,7 +29,7 @@
 #include <TRUST_Ref.h>
 #include <Champ_Fonc.h>
 #include <Champ_Inc.h>
-#include <Domaine_Cl_dis.h>
+
 
 
 class Domaine_Cl_VEF;

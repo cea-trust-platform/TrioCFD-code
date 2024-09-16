@@ -132,7 +132,7 @@ bool Modele_turbulence_hyd_K_Eps_2_Couches::initTimeStep(double dt)
 void Modele_turbulence_hyd_K_Eps_2_Couches::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transport_K_Eps_.schema_temps();
-  eqn_transport_K_Eps_.domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transport_K_Eps_.domaine_Cl_dis().mettre_a_jour(temps);
   sch.faire_un_pas_de_temps_eqn_base(eqn_transport_K_Eps_);
   eqn_transport_K_Eps_.mettre_a_jour(temps);
 

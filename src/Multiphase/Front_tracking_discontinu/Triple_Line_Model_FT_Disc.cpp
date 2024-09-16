@@ -289,7 +289,7 @@ void Triple_Line_Model_FT_Disc::completer()
     {
       // ymeso has not been initialised. n_ext_meso is used instead:
       const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
-      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
+      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis();
       // get wall BC frontiere nb
       int num_bord = -1;
       for (int i=0; i<zcldis.nb_cond_lim(); i++)
@@ -329,7 +329,7 @@ void Triple_Line_Model_FT_Disc::completer()
   if (reinjection_tcl())
     {
       const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
-      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
+      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis();
       // get wall BC frontiere nb
       int num_bord = -1;
       for (int i=0; i<zcldis.nb_cond_lim(); i++)
@@ -1141,7 +1141,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     // const double temps = ns.schema_temps().temps_courant();
     Cerr <<  " ****************************** TCL ****************************** " << finl;
     Cerr << que_suis_je() << "::compute_TCL_fluxes_in_all_boundary_cells() searching TCL cells" <<finl;
-    const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
+    const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis();
     // get wall BC frontiere nb
     int num_bord = -1;
     int nbwall_found = 0;
@@ -2101,8 +2101,7 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
     {
 
       double Twall = 0.;
-      const Domaine_Cl_dis_base& zcldis = ref_cast(
-                                            Domaine_Cl_dis_base, ref_eq_temp_->domaine_Cl_dis ().valeur ());
+      const Domaine_Cl_dis_base& zcldis = ref_eq_temp_->domaine_Cl_dis();
       const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
       const Cond_lim& la_cl = zclvdf.la_cl_de_la_face (num_face);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());

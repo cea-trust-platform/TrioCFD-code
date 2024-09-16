@@ -165,17 +165,17 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
 {
   //  Cerr<<"Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement : Debut"<<finl;
   // Boucle sur les conditions aux limites de l'equation de rayonnement
-  Conds_lim& les_cl_rayo = domaine_Cl_dis()->les_conditions_limites();
+  Conds_lim& les_cl_rayo = domaine_Cl_dis().les_conditions_limites();
 
   // recherche des conditions aux limites associes au l'equation de temperature
   Equation_base& eq_temp = Modele().probleme().equation(1);
   assert(eq_temp.inconnue()->le_nom()=="temperature");
 
-  Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis()->les_conditions_limites();
+  Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
   int num_cl_rayo=0;
   for(num_cl_rayo = 0; num_cl_rayo<les_cl_rayo.size(); num_cl_rayo++)
     {
-      Cond_lim& la_cl_rayo =  domaine_Cl_dis()->les_conditions_limites(num_cl_rayo);
+      Cond_lim& la_cl_rayo =  domaine_Cl_dis().les_conditions_limites(num_cl_rayo);
       if(sub_type(Flux_radiatif_VDF,la_cl_rayo.valeur()))
         {
           Flux_radiatif_VDF& la_cl_rayon = ref_cast(Flux_radiatif_VDF,la_cl_rayo.valeur());
@@ -187,7 +187,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
           int test_remplissage_Tb = 0;
           for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
             {
-              Cond_lim& la_cl_temp =  eq_temp.domaine_Cl_dis()->les_conditions_limites(num_cl_temp);
+              Cond_lim& la_cl_temp =  eq_temp.domaine_Cl_dis().les_conditions_limites(num_cl_temp);
               Nom nom_cl_temp = la_cl_temp->frontiere_dis().le_nom();
               if(nom_cl_temp == nom_cl_rayo)
                 {
@@ -277,7 +277,7 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
 {
   //  Cerr<<"Eq_rayo_semi_transp_VDF::modifier_matrice : Debut"<<finl;
   // On fait une boucle sur les conditions aux limites associees a l'equations
-  Conds_lim& les_cl = domaine_Cl_dis()->les_conditions_limites();
+  Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis());
   const IntTab& face_voisins=zvdf.face_voisins();
   const DoubleVect& face_surfaces = zvdf.face_surfaces();
@@ -285,7 +285,7 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
   int num_cl=0;
   for(num_cl = 0; num_cl<les_cl.size(); num_cl++)
     {
-      Cond_lim& la_cl = domaine_Cl_dis()->les_conditions_limites(num_cl);
+      Cond_lim& la_cl = domaine_Cl_dis().les_conditions_limites(num_cl);
       if (sub_type(Flux_radiatif_VDF,la_cl.valeur()))
         {
           Flux_radiatif_VDF& cl_radiatif = ref_cast(Flux_radiatif_VDF,la_cl.valeur());
@@ -510,7 +510,7 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 
   // Prise en compte des conditions de type periodicite
   int i;
-  const Conds_lim& les_cl = domaine_Cl_dis()->les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
 
   for (i=0; i<les_cl.size(); i++)
   {
@@ -740,7 +740,7 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 
   // Prise en compte des conditions de type periodicite
   int i;
-  const Conds_lim& les_cl = domaine_Cl_dis()->les_conditions_limites();
+  const Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
 
   for (i=0; i<les_cl.size(); i++)
   {

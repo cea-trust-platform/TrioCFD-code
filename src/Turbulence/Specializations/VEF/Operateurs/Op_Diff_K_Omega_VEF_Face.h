@@ -27,7 +27,7 @@
 #include <TRUST_Ref.h>
 #include <Champ_Fonc.h>
 #include <Champ_Inc.h>
-#include <Domaine_Cl_dis.h>
+
 
 
 class Domaine_Cl_VEF;
@@ -47,7 +47,7 @@ class Op_Diff_K_Omega_VEF_Face : public Op_Diff_K_Omega_VEF_base, public Op_VEF_
 
 public:
 
-  void associer(const Domaine_dis_base&, const Domaine_Cl_dis&,
+  void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&,
                 const Champ_Inc&) override;
   void associer_diffusivite_turbulente() override;
   const Champ_Fonc& diffusivite_turbulente() const;

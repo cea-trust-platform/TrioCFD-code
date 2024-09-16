@@ -231,7 +231,7 @@ bool Modele_turbulence_hyd_K_Omega::initTimeStep(double dt)
 void Modele_turbulence_hyd_K_Omega::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K_Omega().schema_temps();
-  eqn_transp_K_Omega().domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transp_K_Omega().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K_Omega().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Omega());
   eqn_transp_K_Omega().mettre_a_jour(temps);

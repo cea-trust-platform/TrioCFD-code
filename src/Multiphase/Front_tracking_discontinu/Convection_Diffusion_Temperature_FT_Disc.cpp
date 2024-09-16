@@ -1466,7 +1466,7 @@ void Convection_Diffusion_Temperature_FT_Disc::completer()
       zcl_fictitious_->completer();
 
       // Associate to the newly created zcl :
-      // required because It's not a good plan to use ns.domaine_Cl_dis().valeur() because of outlet_BC
+      // required because It's not a good plan to use ns.domaine_Cl_dis() because of outlet_BC
       assembleur_pression_->associer_domaine_cl_dis_base(zcl_fictitious_.valeur());
       assembleur_pression_->completer(ns); // Should it be associated to (*this) or ns?
       //                                        I think it does not matter because Assembleur_base::completer is called and does nothing
@@ -1555,7 +1555,7 @@ int Convection_Diffusion_Temperature_FT_Disc::preparer_calcul()
 double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_face) const
 {
   double interfacial_flux = 0.;
-  const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis().valeur();
+  const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis();
   if (!sub_type(Domaine_Cl_VDF, zcldis))
     {
       Cerr << "Woops! Not VDF";
@@ -1660,7 +1660,7 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
                                                                   double& flux, double& Twall) const
 {
   flux = 0.;
-  const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis().valeur();
+  const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis();
   if (!sub_type(Domaine_Cl_VDF, zcldis))
     {
       Cerr << "Woops! Not VDF";

@@ -37,7 +37,7 @@ class Modele_turbulence_hyd_LES_DSGS_VDF: public Modele_turbulence_hyd_LES_Smago
 {
   Declare_instanciable(Modele_turbulence_hyd_LES_DSGS_VDF);
 public:
-  void associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis) override;
+  void associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis) override;
 
 protected:
   Champ_Fonc coeff_field;

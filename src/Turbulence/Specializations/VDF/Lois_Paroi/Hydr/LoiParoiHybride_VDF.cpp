@@ -46,7 +46,7 @@ Entree& LoiParoiHybride_VDF::readOn(Entree& s)
   return s ;
 }
 
-void LoiParoiHybride_VDF::associer(const Domaine_dis_base& zd, const Domaine_Cl_dis& zcl)
+void LoiParoiHybride_VDF::associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcl)
 {
   LoiParoiHybride::associer(zd,zcl);
   Paroi_hyd_base_VDF::associer(zd,zcl);

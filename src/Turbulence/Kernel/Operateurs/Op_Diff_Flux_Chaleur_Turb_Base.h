@@ -61,7 +61,7 @@ class   Op_Diff_Flux_Chaleur_Turb_negligeable : public Operateur_negligeable, pu
 
 public:
 
-  inline void associer(const Domaine_dis_base&, const Domaine_Cl_dis&, const Champ_Inc& ) override;
+  inline void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc& ) override;
   inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
@@ -103,7 +103,7 @@ public:
 ///////////////////////////////////////////////////////////////
 
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::associer(const Domaine_dis_base& domaine_dis,
-                                                            const Domaine_Cl_dis& domaine_cl_dis,
+                                                            const Domaine_Cl_dis_base& domaine_cl_dis,
                                                             const Champ_Inc& inco)
 {
   Operateur_negligeable::associer(domaine_dis,domaine_cl_dis,inco);

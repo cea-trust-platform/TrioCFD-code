@@ -47,7 +47,7 @@ Entree& Source_DC_VDF_NS::readOn(Entree& s )
 
 
 void Source_DC_VDF_NS::associer_domaines(const Domaine_dis_base& domaine_dis,
-                                         const Domaine_Cl_dis& domaine_cl_dis)
+                                         const Domaine_Cl_dis_base& domaine_cl_dis)
 {
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
 
@@ -193,7 +193,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(O
       */
 
       /* Recuperation du domaine fin de base */
-      Domaine_Cl_dis_base& domaineCL_baseF = eqF.domaine_Cl_dis().valeur();
+      Domaine_Cl_dis_base& domaineCL_baseF = eqF.domaine_Cl_dis();
 
       /* recuperation des conditions limites existantes */
       Conds_lim& conds_limF = domaineCL_baseF.les_conditions_limites();
@@ -212,7 +212,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(O
       /* ---> On remplit ici les valeurs de la vitesse imposee en prenant celles de la grille grossiere prolongee */
       DoubleTab& vitesse_imposeeF = CL_vitesse_imposeeF.champ_front()->valeurs();
       const int nb_faces_bords    = frontiereF.nb_faces();//eqF.domaine_Cl_dis().nb_faces_Cl();
-      const int nb_faces_bords_tot    = eqF.domaine_Cl_dis()->nb_faces_Cl();
+      const int nb_faces_bords_tot    = eqF.domaine_Cl_dis().nb_faces_Cl();
 
       Cerr << "nb_faces_bords :"<<nb_faces_bords<< finl;
 

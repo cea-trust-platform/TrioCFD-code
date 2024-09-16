@@ -55,10 +55,10 @@ void Modele_turbulence_scal_LES_dyn_VDF::set_param(Param& param)
   Modele_turbulence_scal_base::set_param(param);
 }
 
-void Modele_turbulence_scal_LES_dyn_VDF::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Modele_turbulence_scal_LES_dyn_VDF::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis);
 }
 
 int Modele_turbulence_scal_LES_dyn_VDF::lire_motcle_non_standard(const Motcle& motlu, Entree& is)

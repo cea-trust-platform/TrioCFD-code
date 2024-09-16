@@ -87,7 +87,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
 {
   const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue().valeur();
   Nom type = chK_Eps.que_suis_je();
-  const Domaine_Cl_dis& le_dom_Cl_dis = eqn_transp_K_Eps().domaine_Cl_dis();
+  const Domaine_Cl_dis_base& le_dom_Cl_dis = eqn_transp_K_Eps().domaine_Cl_dis();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
 
@@ -239,7 +239,7 @@ bool Modele_turbulence_hyd_K_Eps::initTimeStep(double dt)
 void Modele_turbulence_hyd_K_Eps::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
-  eqn_transp_K_Eps().domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K_Eps().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
   eqn_transp_K_Eps().mettre_a_jour(temps);

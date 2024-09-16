@@ -76,7 +76,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
 {
   const Champ_base& chK = eqn_transp_K().inconnue().valeur(), &chEps = eqn_transp_Eps().inconnue().valeur();
   const Domaine_dis_base& le_dom_dis = eqn_transp_K().domaine_dis();
-  const Domaine_Cl_dis& le_dom_Cl_dis = eqn_transp_K().domaine_Cl_dis();
+  const Domaine_Cl_dis_base& le_dom_Cl_dis = eqn_transp_K().domaine_Cl_dis();
 
   const Nom& type = chK.que_suis_je();
   const DoubleTab& tab_K = chK.valeurs(), &tab_Eps = chEps.valeurs();
@@ -241,8 +241,8 @@ bool Modele_turbulence_hyd_K_Eps_Bicephale::initTimeStep(double dt)
 void Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K().schema_temps(), &sch2 = eqn_transp_Eps().schema_temps();
-  eqn_transp_K().domaine_Cl_dis()->mettre_a_jour(temps);
-  eqn_transp_Eps().domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transp_K().domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_Eps().domaine_Cl_dis().mettre_a_jour(temps);
 
   if (!eqn_transp_K().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K());

@@ -53,7 +53,7 @@ Entree& Modele_EASM_Baglietto_VEF::readOn(Entree& is )
 }
 
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   D=0;
@@ -61,7 +61,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D(DoubleTab& D,const Domaine_dis_ba
 }
 
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   double kkk = CNL1;
   Cerr<<"kkk = " << kkk <<finl;
@@ -78,7 +78,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E(DoubleTab& E,const Domaine_dis_ba
   return F1;
 }
 */
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
 
   double visco=-1;
@@ -87,7 +87,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1( DoubleTab& F1, const Domaine_di
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
@@ -261,7 +261,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, 
   }
 
 */
-DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco->valeurs();
@@ -269,7 +269,7 @@ DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Rey;
@@ -369,7 +369,7 @@ DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_
   return Fmu;
 }
 
-DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco->valeurs();
@@ -377,7 +377,7 @@ DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Doma
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Rey;
@@ -523,7 +523,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& D
   return F2;
 }
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
 
   double visco=-1;
@@ -532,7 +532,7 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domain
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
@@ -630,12 +630,12 @@ DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domain
 }
 
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   return Calcul_E( E, domaine_dis, domaine_Cl_dis, transporte, K_Bas_Re, ch_visco, visco_turb );
 }
 
-DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+DoubleTab& Modele_EASM_Baglietto_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                    const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   D=0;

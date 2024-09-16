@@ -31,7 +31,7 @@ class Modele_turbulence_hyd_LES_SMAGO_DYN_VDF: public Modele_turbulence_hyd_LES_
 public:
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  void associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis) override;
+  void associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis) override;
   void mettre_a_jour(double) override;
   int preparer_calcul() override;
 

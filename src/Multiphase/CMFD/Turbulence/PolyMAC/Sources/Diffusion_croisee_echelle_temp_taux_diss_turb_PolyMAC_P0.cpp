@@ -43,9 +43,9 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::completer()
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase,  equation().probleme());
 
   for (int i = 0 ; i <pb.nombre_d_equations() ; i++)
-    for (int j = 0 ; j<pb.equation(i).domaine_Cl_dis()->nb_cond_lim(); j++)
+    for (int j = 0 ; j<pb.equation(i).domaine_Cl_dis().nb_cond_lim(); j++)
       {
-        const Cond_lim& cond_lim_loc = pb.equation(i).domaine_Cl_dis()->les_conditions_limites(j);
+        const Cond_lim& cond_lim_loc = pb.equation(i).domaine_Cl_dis().les_conditions_limites(j);
         if      sub_type(Echange_impose_base, cond_lim_loc.valeur())         f_grad_k_fixe = 0;
         else if sub_type(Echange_impose_base, cond_lim_loc.valeur()) f_grad_tau_omega_fixe = 0;
       }
@@ -57,7 +57,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   const Domaine_PolyMAC_P0& 		domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const Champ_Elem_PolyMAC_P0& 	ch_k 		= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("k"));	// Champ k
   const DoubleTab& 	  		k_passe				= ch_k.passe(), &xp = domaine.xp(), &xv = domaine.xv();
-  const Conds_lim&          cls_k 			= ch_k.domaine_Cl_dis()->les_conditions_limites(); 		// conditions aux limites du champ k
+  const Conds_lim&          cls_k 			= ch_k.domaine_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ k
   const IntTab&             fcl_k 			= ch_k.fcl(), &e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes(), &fs = domaine.face_surfaces();
 
@@ -65,7 +65,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   const DoubleTab& 			diss_passe			= ch_diss.passe();
   const DoubleTab& 			      diss			= ch_diss.valeurs();
 
-  const Conds_lim& 		   	cls_diss			= ch_diss.domaine_Cl_dis()->les_conditions_limites(); 	// conditions aux limites du champ tau ou omega
+  const Conds_lim& 		   	cls_diss			= ch_diss.domaine_Cl_dis().les_conditions_limites(); 	// conditions aux limites du champ tau ou omega
   const IntTab&				   fcl_diss 			= ch_diss.fcl(); // tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
 
   const int nf = domaine.nb_faces(), D = dimension, nb_elem = domaine.nb_elem(), nb_elem_tot = domaine.nb_elem_tot() ;

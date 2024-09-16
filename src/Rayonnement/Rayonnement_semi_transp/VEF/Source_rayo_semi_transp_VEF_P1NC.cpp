@@ -99,7 +99,7 @@ void Source_rayo_semi_transp_VEF_P1NC::associer_pb(const Probleme_base& pb)
 
 
 void Source_rayo_semi_transp_VEF_P1NC::associer_domaines(const Domaine_dis_base& domaine_dis,
-                                                         const Domaine_Cl_dis& domaine_Cl_dis)
+                                                         const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   ;
 }

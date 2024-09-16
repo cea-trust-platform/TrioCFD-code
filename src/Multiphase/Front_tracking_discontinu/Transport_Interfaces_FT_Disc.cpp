@@ -1565,7 +1565,12 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
   variables_internes_->algorithmes_transport_.typer("Algorithmes_Transport_FT_Disc");
   // On n'appelle pas Equation_base::discretiser car on ne veut pas
   // de solveur masse.
-  discretisation().domaine_Cl_dis(domaine_dis(), le_dom_Cl_dis);
+
+  Cerr << "Discretizing of the boundary conditions... ";
+  le_dom_Cl_dis.typer(discretisation().domaine_cl_dis_type());
+  le_dom_Cl_dis->associer(domaine_dis());
+  Cerr << " OK " << finl;
+
   le_dom_Cl_dis->associer_eqn(*this);
   le_dom_Cl_dis->associer_inconnue(inconnue());
 }

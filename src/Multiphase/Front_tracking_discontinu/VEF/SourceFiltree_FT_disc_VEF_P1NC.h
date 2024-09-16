@@ -49,7 +49,7 @@ public :
 
 protected :
   Entree& lire(Entree& is);
-  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
   void associer_pb(const Probleme_base& ) override;
 
   REF(Domaine_VEF) le_dom_VEF;

@@ -119,10 +119,10 @@ void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_pb(con
 }
 
 void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_domaines(const Domaine_dis_base& domaine_dis,
-                                                                                   const Domaine_Cl_dis& domaine_Cl_dis)
+                                                                                   const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis);
 }
 
 
@@ -572,17 +572,17 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
 
 DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(DoubleTab& resu) const
 {
-  const Domaine_Cl_dis& zcl = eq_hydraulique->domaine_Cl_dis();
+  const Domaine_Cl_dis_base& zcl = eq_hydraulique->domaine_Cl_dis();
   const Domaine_dis_base& z = eq_hydraulique->domaine_dis();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
-  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl.valeur());
+  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl);
   const RefObjU& modele_turbulence_hydr = eq_hydraulique->get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& modele_bas_Re =
     ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,le_modele);
   const Transport_K_Eps_base& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.eqn_transp_K_Eps();
-  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
-  const Domaine_Cl_dis& zcl_VDF_th_dis = eq_thermique->domaine_Cl_dis();
+  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
+  const Domaine_Cl_dis_base& zcl_VDF_th_dis = eq_thermique->domaine_Cl_dis();
   const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue()->valeurs();
   const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();

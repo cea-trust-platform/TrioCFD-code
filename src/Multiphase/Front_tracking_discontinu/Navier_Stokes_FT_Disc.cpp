@@ -1486,7 +1486,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(const Champ_base& indi
       const int nbdimr = resu.line_size();
       //      assert_espace_virtuel_vect(inco);
       const Domaine_VF& zvf = ref_cast(Domaine_VF, domaine_dis());
-      const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis().valeur();
+      const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis();
       const DoubleVect& face_surfaces = zvf.face_surfaces();
       const IntTab& face_voisins = domaine_dis().face_voisins();
 
@@ -1600,7 +1600,7 @@ void Navier_Stokes_FT_Disc::correct_at_exit_bad_gradient(DoubleTab& u0) const
   const Domaine_VF& zvf = ref_cast(Domaine_VF, domaine_dis());
   const IntTab& elem_faces = zvf.elem_faces();
   const IntTab& face_voisins = zvf.face_voisins();
-  const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis().valeur();
+  const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis();
   // Boucle sur les bords pour traiter les conditions aux limites
   for (int n_bord = 0; n_bord < zvf.nb_front_Cl(); n_bord++)
     {
@@ -2367,7 +2367,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
     case Navier_Stokes_FT_Disc_interne::ZERO_OUT_FLUX_ON_MIXED_CELLS:
       {
         const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, domaine_dis());
-        const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis().valeur();
+        const Domaine_Cl_dis_base& zcldis = domaine_Cl_dis();
         const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
         const DoubleVect& face_surfaces = zvdf.face_surfaces();
         // Boucle sur les bords pour traiter les conditions aux limites

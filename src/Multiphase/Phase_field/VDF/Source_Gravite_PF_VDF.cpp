@@ -26,7 +26,7 @@
 #include <Periodique.h>
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>
-#include <Domaine_Cl_dis.h>
+
 #include <Navier_Stokes_phase_field.h>
 #include <Convection_Diffusion_Phase_field.h>
 #include <Probleme_base.h>
@@ -63,10 +63,10 @@ Entree& Source_Gravite_PF_VDF::readOn(Entree& is)
  * @param (Entree& is) le flot d'entree pour la lecture des parametres
  * @return le flot d'entree modifie
  */
-void Source_Gravite_PF_VDF::associer_domaines(const Domaine_dis_base& dds,const Domaine_Cl_dis& domaine_cl)
+void Source_Gravite_PF_VDF::associer_domaines(const Domaine_dis_base& dds,const Domaine_Cl_dis_base& domaine_cl)
 {
   le_dom = ref_cast(Domaine_VDF,dds);
-  le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_cl.valeur());
+  le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_cl);
 }
 
 

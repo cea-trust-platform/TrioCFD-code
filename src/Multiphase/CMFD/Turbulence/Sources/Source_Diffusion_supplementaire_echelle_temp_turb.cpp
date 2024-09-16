@@ -40,9 +40,9 @@ Entree& Source_Diffusion_supplementaire_echelle_temp_turb::readOn(Entree& is) { 
 
 void Source_Diffusion_supplementaire_echelle_temp_turb::completer()
 {
-  for (int j = 0 ; j<equation().domaine_Cl_dis()->nb_cond_lim(); j++)
+  for (int j = 0 ; j<equation().domaine_Cl_dis().nb_cond_lim(); j++)
     {
-      const Cond_lim& cond_lim_loc = equation().domaine_Cl_dis()->les_conditions_limites(j);
+      const Cond_lim& cond_lim_loc = equation().domaine_Cl_dis().les_conditions_limites(j);
       if sub_type(Echange_impose_base, cond_lim_loc.valeur()) f_grad_tau_fixe = 0;
     }
 }

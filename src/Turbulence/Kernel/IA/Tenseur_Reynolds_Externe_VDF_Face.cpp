@@ -21,7 +21,7 @@
 
 #include <Tenseur_Reynolds_Externe_VDF_Face.h>
 #include <Champ_Uniforme.h>
-#include <Domaine_Cl_dis.h>
+
 #include <Domaine_VDF.h>
 #include <Domaine_Cl_VDF.h>
 #include <Neumann_sortie_libre.h>
@@ -157,10 +157,10 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
 }
 
 void Tenseur_Reynolds_Externe_VDF_Face::associer_domaines(const Domaine_dis_base& domaine_dis,
-                                                          const Domaine_Cl_dis& domaine_Cl_dis)
+                                                          const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis);
 
   nelem_ = le_dom_VDF->nb_elem();
 }

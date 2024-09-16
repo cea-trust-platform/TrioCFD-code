@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Paroi_TAU_NUL_VDF.h>
-#include <Domaine_Cl_dis.h>
+
 // printOn et readOn
 
 Implemente_instanciable_sans_constructeur(Paroi_TAU_NUL_VDF,"tau_nul_VDF",Paroi_std_hyd_VDF);

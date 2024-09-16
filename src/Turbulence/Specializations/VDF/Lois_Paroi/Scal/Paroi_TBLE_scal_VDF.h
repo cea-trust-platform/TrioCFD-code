@@ -23,14 +23,14 @@
 #define Paroi_TBLE_scal_VDF_included
 
 #include <Paroi_std_scal_hyd_VDF.h>
-#include <Domaine_Cl_dis.h>
+
 #include <Eq_couch_lim.h>
 #include <TRUST_Vector.h>
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM_Scal.h>
 #include <TRUST_Ref.h>
 
-#include <Domaine_Cl_dis.h>
+
 class Convection_Diffusion_std;
 class Champ_Fonc_base;
 class Paroi_TBLE_QDM;

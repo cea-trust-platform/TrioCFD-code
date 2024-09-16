@@ -26,7 +26,7 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
 
-#include <Domaine_Cl_dis.h>
+
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
@@ -47,7 +47,7 @@ public:
 protected:
   REF(Domaine_VEF) le_dom_VEF;
   REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  void associer_domaines(const Domaine_dis_base& , const Domaine_Cl_dis&) override;
+  void associer_domaines(const Domaine_dis_base& , const Domaine_Cl_dis_base&) override;
 //  double dt_post;
   Noms noms_parois;
   DoubleVect T_parois;

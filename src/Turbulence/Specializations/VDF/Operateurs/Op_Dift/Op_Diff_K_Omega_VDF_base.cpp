@@ -130,7 +130,7 @@ void Op_Diff_K_Omega_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
           const Transport_K_Omega& eqn_k_omega=ref_cast(Transport_K_Omega,equation());
           const DoubleTab& val=eqn_k_omega.inconnue()->valeurs();
 
-          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis().valeur());
+          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis());
 
           const Conds_lim& les_cl = domaine_Cl_dis_base.les_conditions_limites();
           int nb_cl=les_cl.size();

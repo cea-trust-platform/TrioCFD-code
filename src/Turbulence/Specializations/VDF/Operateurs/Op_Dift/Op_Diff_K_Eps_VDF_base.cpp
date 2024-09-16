@@ -177,7 +177,7 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
           const Transport_K_Eps& eqn_k_eps=ref_cast(Transport_K_Eps,equation());
           const DoubleTab& val=eqn_k_eps.inconnue()->valeurs();
 
-          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis().valeur());
+          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis());
 
           const Conds_lim& les_cl = domaine_Cl_dis_base.les_conditions_limites();
           int nb_cl=les_cl.size();
@@ -214,7 +214,7 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
         {
           const Transport_K_Eps_Realisable& eqn_k_eps=ref_cast(Transport_K_Eps_Realisable,equation());
           const DoubleTab& val=eqn_k_eps.inconnue()->valeurs();
-          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis().valeur());
+          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis());
           const Conds_lim& les_cl = domaine_Cl_dis_base.les_conditions_limites();
           int nb_cl=les_cl.size();
           for (int num_cl=0; num_cl<nb_cl; num_cl++)
@@ -250,7 +250,7 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
         {
           const Transport_K_ou_Eps& eqn=ref_cast(Transport_K_ou_Eps,equation());
           const DoubleTab& val=eqn.inconnue()->valeurs();
-          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis().valeur());
+          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis());
           const Conds_lim& les_cl = domaine_Cl_dis_base.les_conditions_limites();
           int nb_cl=les_cl.size();
           for (int num_cl=0; num_cl<nb_cl; num_cl++)

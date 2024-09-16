@@ -78,20 +78,20 @@ Entree& Modele_Lam_Bremhorst_VEF::lire(const Motcle& , Entree& is)
 ///////////////////////////////////////////////////////////////
 
 void  Modele_Lam_Bremhorst_VEF::associer(const Domaine_dis_base& domaine_dis,
-                                         const Domaine_Cl_dis& domaine_Cl_dis)
+                                         const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis);
-  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
 }
 
-DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_D(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_D(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                               const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   D = 0;
   return D;
 }
 
-DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_E(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_E(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   E = 0;
   return E;
@@ -106,7 +106,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_E(DoubleTab& E,const Domaine_dis_bas
   return F1;
 }
 */
-DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
 
   double visco=-1;
@@ -115,7 +115,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
@@ -268,7 +268,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
   return F2;
 }
 
-DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco->valeurs();
@@ -276,7 +276,7 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_d
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
@@ -649,7 +649,7 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem_BiK(const Discretisat
 
 
 DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_shih(const Discretisation_base& dis,
-                                                           const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                           const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                            const DoubleTab& G,
                                                            const Champ_base& K_Eps) const
 {
@@ -787,12 +787,12 @@ void Modele_Lam_Bremhorst_VEF::lire_distance_paroi( )
 }
 
 DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu(DoubleTab& Cmu,
-                                                const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                 const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
 {
 
   const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
 
   DoubleTab gradient_elem;
   init_tenseur_elem(gradient_elem,domaine_VEF,2);
@@ -838,14 +838,14 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu(DoubleTab& Cmu,
 }
 
 DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_Paroi(DoubleTab& Cmu,
-                                                      const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                      const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                       const DoubleTab& visco, const DoubleTab& visco_turb,
                                                       const DoubleTab& loi_paroi,const int idt,
                                                       const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
 {
 
   const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
 
   DoubleTab gradient_elem;
   init_tenseur_elem(gradient_elem,domaine_VEF,2);
@@ -896,12 +896,12 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_Paroi(DoubleTab& Cmu,
 
 
 DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_BiK(DoubleTab& Cmu,
-                                                    const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                    const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                     const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
 {
 
   const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
 
   DoubleTab gradient_elem;
   init_tenseur_elem(gradient_elem,domaine_VEF,2);
@@ -947,14 +947,14 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_BiK(DoubleTab& Cmu,
 }
 
 DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_Paroi_BiK(DoubleTab& Cmu,
-                                                          const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                          const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                           const DoubleTab& visco, const DoubleTab& visco_turb,
                                                           const DoubleTab& loi_paroi,const int idt,
                                                           const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
 {
 
   const Domaine_VEF&       domaine_VEF = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
 
   DoubleTab gradient_elem;
   init_tenseur_elem(gradient_elem,domaine_VEF,2);
@@ -1004,7 +1004,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_Paroi_BiK(DoubleTab& Cmu,
 }
 
 
-DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco->valeurs();
@@ -1012,7 +1012,7 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domai
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
@@ -1159,7 +1159,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& De
   return F2;
 }
 
-DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
 
   double visco=-1;
@@ -1168,7 +1168,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine
   if (is_visco_const)
     visco=tab_visco(0,0);
   const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   const DoubleTab& wall_length = BR_wall_length_->valeurs();
   DoubleTab wall_length_face(0);
   le_dom.creer_tableau_faces(wall_length_face);
@@ -1283,13 +1283,13 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine
 
 
 
-DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
 {
   E = 0;
   return E;
 }
 
-DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                   const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
 {
   D = 0;

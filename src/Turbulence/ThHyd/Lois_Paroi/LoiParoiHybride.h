@@ -42,7 +42,7 @@ public :
 
 
   Entree& lire(Entree& , const Noms&, const Modele_turbulence_hyd_base&);
-  void associer(const Domaine_dis_base&, const Domaine_Cl_dis&);
+  void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&);
   int init_lois_paroi() ;
 
   // Simple appel aux calculer_hyd des differentes lois de parois

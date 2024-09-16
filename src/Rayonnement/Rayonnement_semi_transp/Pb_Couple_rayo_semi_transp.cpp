@@ -71,7 +71,7 @@ void Pb_Couple_rayo_semi_transp::initialize( )
       Probleme_base& pb=ref_cast(Probleme_base,probleme(i));
       for (int j=0; j<pb.nombre_d_equations(); j++)
         {
-          pb.equation(j).domaine_Cl_dis()->calculer_coeffs_echange(presentTime());
+          pb.equation(j).domaine_Cl_dis().calculer_coeffs_echange(presentTime());
         }
     }
 }

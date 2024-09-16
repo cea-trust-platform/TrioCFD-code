@@ -30,7 +30,7 @@
 #include <Probleme_Couple.h>
 #include <TRUST_Ref.h>
 #include <Champ_Fonc.h>
-#include <Domaine_Cl_dis.h>
+
 
 
 class Champ_Fonc_base;

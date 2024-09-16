@@ -83,7 +83,7 @@ void Source_Transport_K_Realisable_VEF_Face::mettre_a_jour(double temps)
   const int idt = eq_hydraulique->schema_temps().nb_pas_dt();
   const DoubleTab& tab_paroi = mod_turb.loi_paroi()->Cisaillement_paroi();
 
-  const Domaine_Cl_dis& zcl_keps = eqn_k_Rea->domaine_Cl_dis();
+  const Domaine_Cl_dis_base& zcl_keps = eqn_k_Rea->domaine_Cl_dis();
   const Domaine_dis_base& domaine_dis_keps = eqn_k_Rea->domaine_dis();
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue()->valeurs(), & eps_Rea = eqn_eps_Rea->inconnue()->valeurs();
   mon_modele_fonc.Contributions_Sources_Paroi_BiK(domaine_dis_keps, zcl_keps, vit, K_Rea, eps_Rea, epsilon_minimum, visco_tab, visco_turb, tab_paroi, idt);

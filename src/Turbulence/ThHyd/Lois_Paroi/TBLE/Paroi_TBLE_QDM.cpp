@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <Paroi_TBLE_QDM.h>
 #include <Domaine_dis_base.h>
-#include <Domaine_Cl_dis.h>
+
 #include <Front_VF.h>
 #include <Domaine_VF.h>
 #include <EFichier.h>

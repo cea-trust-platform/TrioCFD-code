@@ -34,7 +34,7 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Omega.h>
 
-#include <Domaine_Cl_dis.h>
+
 class Champ_Fonc_base;
 
 /*! @brief CLASS: Paroi_std_hyd_VEF

@@ -55,7 +55,7 @@ public :
 
 protected :
   Operateur_Conv op_conv;
-  void associer(const Domaine_dis_base&, const Domaine_Cl_dis&, const Champ_Inc& inco) override ;//Classe abstraite de Operateur base
+  void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc& inco) override ;//Classe abstraite de Operateur base
   REF(Domaine) dom;
   REF(Champ_Inc_base) la_vitesse;
 

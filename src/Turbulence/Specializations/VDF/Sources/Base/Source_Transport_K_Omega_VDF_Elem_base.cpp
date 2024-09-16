@@ -39,10 +39,10 @@ Sortie& Source_Transport_K_Omega_VDF_Elem_base::printOn( Sortie& os ) const { re
 Entree& Source_Transport_K_Omega_VDF_Elem_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is, que_suis_je()); }
 
 // cAlan : mutualisable
-void Source_Transport_K_Omega_VDF_Elem_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis&  domaine_Cl_dis)
+void Source_Transport_K_Omega_VDF_Elem_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base&  domaine_Cl_dis)
 {
   le_domaine_VDF = ref_cast(Domaine_VDF, domaine_dis);
-  le_domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  le_domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
 }
 
 void Source_Transport_K_Omega_VDF_Elem_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }

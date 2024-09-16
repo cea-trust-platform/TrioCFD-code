@@ -50,12 +50,12 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::associer_pb(const
 // TODO : FIXME : a factoriser avec Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter
 void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& resu, const tabs_t& semi_impl) const
 {
-  const Domaine_Cl_dis& zcl=eq_hydraulique->domaine_Cl_dis();
-  const Domaine_Cl_dis& zcl_keps=eqn_keps_bas_re->domaine_Cl_dis();
+  const Domaine_Cl_dis_base& zcl=eq_hydraulique->domaine_Cl_dis();
+  const Domaine_Cl_dis_base& zcl_keps=eqn_keps_bas_re->domaine_Cl_dis();
   const Domaine_dis_base& domaine_dis_keps =eqn_keps_bas_re ->domaine_dis();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
-  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl.valeur());
-  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl);
+  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs(), &scalaire = eq_thermique->inconnue()->valeurs(), &vit = eq_hydraulique->inconnue()->valeurs();
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
@@ -109,7 +109,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(
 {
   const Domaine_dis_base& z = eq_hydraulique->domaine_dis();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,z);
-  const Domaine_Cl_VDF& zcl_VDF = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis().valeur());
+  const Domaine_Cl_VDF& zcl_VDF = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis());
   const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs(), &K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_dyn = fluide.viscosite_dynamique();

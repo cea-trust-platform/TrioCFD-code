@@ -95,7 +95,7 @@ int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   //Mass_Redistribution_Phase_Field::impose_mass_redistribution(zvdf, xi, minnX, maxxX);
 
   // Update boundary condition on futur:
-  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
   xipls1.echange_espace_virtuel();
 
   /*  Mass_Redistribution_Phase_Field::impose_mass_redistribution(zvdf, xi, minnX, maxxX);*/
