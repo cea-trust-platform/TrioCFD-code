@@ -25,7 +25,7 @@
 #include <Modele_Fonc_Bas_Reynolds_Base.h>
 #include <Domaine_Cl_dis.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 #include <TRUSTTabs_forward.h>
 class Domaine_Cl_VEF;
@@ -39,24 +39,24 @@ class Modele_Jones_Launder_VEF : public Modele_Fonc_Bas_Reynolds_Base
 public :
 
 
-  DoubleTab& Calcul_D(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
-  DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
+  DoubleTab& Calcul_D(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
+  DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
 
-//  virtual DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis& ) const ;
-  DoubleTab& Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const override;
-  DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Domaine_dis&,const DoubleTab&,const Champ_base&) const override ;
-  DoubleTab& Calcul_Fmu ( DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const Champ_Don& )const override ;
+//  virtual DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis_base& ) const ;
+  DoubleTab& Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const override;
+  DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const Champ_base&) const override ;
+  DoubleTab& Calcul_Fmu ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const Champ_Don& )const override ;
   Entree& lire(const Motcle&, Entree&);
   // void associer_pb(const Probleme_base& );
-  void associer(const Domaine_dis& , const Domaine_Cl_dis& ) override;
+  void associer(const Domaine_dis_base& , const Domaine_Cl_dis& ) override;
   void mettre_a_jour(double) override;
 
-  DoubleTab& Calcul_D_BiK(DoubleTab&, const Domaine_dis&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
-  DoubleTab& Calcul_E_BiK(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
+  DoubleTab& Calcul_D_BiK(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
+  DoubleTab& Calcul_E_BiK(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
 //
-  DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const override;
-  DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Domaine_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const override ;
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
+  DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const override;
+  DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_base&) const override ;
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
 
 protected:
 

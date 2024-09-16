@@ -24,7 +24,7 @@
 #include <Flux_parietal_adaptatif.h>
 #include <Loi_paroi_adaptative.h>
 #include <Pb_Multiphase.h>
-#include <Domaine_dis.h>
+
 #include <TRUSTTrav.h>
 #include <Milieu_composite.h>
 #include <Saturation_base.h>

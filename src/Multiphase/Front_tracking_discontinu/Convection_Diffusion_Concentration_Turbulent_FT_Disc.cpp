@@ -278,7 +278,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
   const double dt = pb.schema_temps().pas_de_temps();
   const int nb_faces = champ1.dimension(0);
 
-  const IntTab& face_voisins = ref_cast(Domaine_VF, domaine_dis().valeur()).face_voisins();
+  const IntTab& face_voisins = ref_cast(Domaine_VF, domaine_dis()).face_voisins();
   const DoubleTab *champ_nu_t = 0;
   if (nom_equation_nu_t_ != "??")
     {
@@ -299,7 +299,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
 
   const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant()->valeurs();
   double coeff_diffusivite = tab_diffusivite(0,0);
-  const DoubleVect& volumes_entrelaces = ref_cast(Domaine_VF, domaine_dis().valeur()).volumes_entrelaces();
+  const DoubleVect& volumes_entrelaces = ref_cast(Domaine_VF, domaine_dis()).volumes_entrelaces();
   const int dim = Objet_U::dimension;
 
   const Fluide_Diphasique& fluide = ref_cast(Fluide_Diphasique, pb.milieu());
@@ -423,7 +423,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
 //  et calcule l'integrale des valeurs avant modifications
 void Convection_Diffusion_Concentration_Turbulent_FT_Disc::multiplier_valeurs_faces(const ArrOfBit marqueurs_faces, double facteur, double& integrale_avant, DoubleTab& tab)
 {
-  const Domaine_VEF&     domaine_vef = ref_cast(Domaine_VEF, domaine_dis().valeur());
+  const Domaine_VEF&     domaine_vef = ref_cast(Domaine_VEF, domaine_dis());
   const DoubleVect& volumes = domaine_vef.volumes_entrelaces();
   const DoubleVect& volumes_cl = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur()).volumes_entrelaces_Cl();
   const int nb_faces = domaine_vef.nb_faces();
@@ -450,14 +450,14 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::marquer_faces_sous_do
                                                                                       ArrOfBit& marqueur,
                                                                                       int sans_faces_non_std_volume_nul) const
 {
-  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, domaine_dis().valeur());
+  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, domaine_dis());
   const IntTab& elem_faces = domaine_vef.elem_faces();
   const int nb_faces_tot = domaine_vef.nb_faces_tot();
   const int nb_faces_non_std = domaine_vef.nb_faces_non_std();
   const int nb_faces_elem = elem_faces.dimension(1);
   marqueur.resize_array(nb_faces_tot);
   marqueur = 0;
-  const Sous_Domaine& sous_domaine = domaine_dis()->domaine().ss_domaine(nom_sous_domaine);
+  const Sous_Domaine& sous_domaine = domaine_dis().domaine().ss_domaine(nom_sous_domaine);
   const int nb_elem_sous_domaine = sous_domaine.nb_elem_tot();
   const DoubleVect& volumes_cl = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur()).volumes_entrelaces_Cl();
   int i;
@@ -520,7 +520,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour(double 
     DoubleTab indic_faces;
     calculer_indicatrice_comme(ref_eq_transport_->inconnue().valeur(),
                                indic_faces, inconnue().valeur());
-    const Domaine_VEF&     domaine_vef = ref_cast(Domaine_VEF, domaine_dis().valeur());
+    const Domaine_VEF&     domaine_vef = ref_cast(Domaine_VEF, domaine_dis());
     const DoubleVect& volumes = domaine_vef.volumes_entrelaces();
     const DoubleVect& volumes_cl = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis().valeur()).volumes_entrelaces_Cl();
     const int nb_faces = domaine_vef.nb_faces();

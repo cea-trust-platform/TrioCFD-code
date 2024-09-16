@@ -42,7 +42,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
 {
   Debog::verifier("Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter resu 0", resu);
   const Domaine_Cl_dis& zcl_keps = eqn_keps_bas_re->domaine_Cl_dis();
-  const Domaine_dis& domaine_dis_keps = eqn_keps_bas_re->domaine_dis();
+  const Domaine_dis_base& domaine_dis_keps = eqn_keps_bas_re->domaine_dis();
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();

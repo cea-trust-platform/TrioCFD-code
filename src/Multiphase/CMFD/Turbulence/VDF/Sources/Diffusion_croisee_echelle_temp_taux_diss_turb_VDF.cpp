@@ -40,7 +40,7 @@ Entree& Diffusion_croisee_echelle_temp_taux_diss_turb_VDF::readOn(Entree& is) { 
 
 void Diffusion_croisee_echelle_temp_taux_diss_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const Champ_Inc_P0_base& ch_k = ref_cast(Champ_Inc_P0_base, equation().probleme().get_champ("k"));	// Champ k
   const DoubleTab& k_passe = ch_k.passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();

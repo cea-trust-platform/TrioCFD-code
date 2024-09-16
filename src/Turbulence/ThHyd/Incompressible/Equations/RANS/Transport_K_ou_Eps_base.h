@@ -52,7 +52,7 @@ public:
   Milieu_base& milieu() override ;
   void associer(const Equation_base&);
   void discretiser() override;
-  virtual void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;
+  virtual void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis_base&, Champ_Inc&) const;
 
   virtual int controler_variable();
   void valider_iteration() override;

@@ -105,7 +105,7 @@ void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
 {
   const Equation_base& eq = equation_transport();
   const Domaine_Cl_dis_base& domaine_cl = eq.domaine_Cl_dis().valeur();
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,eq.domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,eq.domaine_dis());
 
   const int nb_som = nb_sommets();
   costheta.resize(nb_som, 2);
@@ -584,19 +584,19 @@ void Maillage_FT_Disc::associer_equation_transport(const Equation_base& equation
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc,equation);
   refequation_transport_ = eq;
 
-  const Domaine_dis& domaine_dis = eq.domaine_dis();
+  const Domaine_dis_base& domaine_dis = eq.domaine_dis();
   const Parcours_interface& parcours_interface = eq.parcours_interface();
   associer_domaine_dis_parcours(domaine_dis, parcours_interface);
 }
 
-void Maillage_FT_Disc::associer_domaine_dis_parcours(const Domaine_dis& domaine_dis, const Parcours_interface& parcours)
+void Maillage_FT_Disc::associer_domaine_dis_parcours(const Domaine_dis_base& domaine_dis, const Parcours_interface& parcours)
 {
   refdomaine_dis_ = domaine_dis;
   refparcours_interface_ = parcours;
 
   // On recupere la liste des PE voisins
   ArrOfIntFT pe_list;
-  for (const auto& itr : domaine_dis->domaine().faces_joint())
+  for (const auto& itr : domaine_dis.domaine().faces_joint())
     {
       const Joint& joint = itr;
       const int pe_voisin = joint.PEvoisin();
@@ -878,9 +878,9 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
   static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Calculer_Indicatrice", "FrontTracking");
   statistiques().begin_count(stat_counter);
 
-  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine& ladomaine = domaine_dis->domaine();
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+  const Domaine_dis_base& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine& ladomaine = domaine_dis.domaine();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
   const int nb_elem = ladomaine.nb_elem();
   const int nb_elem_tot = ladomaine.nb_elem_tot();
   const IntTab& elem_faces = domaine_vf.elem_faces();
@@ -1966,8 +1966,8 @@ int Maillage_FT_Disc::calculer_voisinage_facettes(IntTab& fa7Voisines,
 
   ArrOfIntFT fa7s_elem;
   int i, nb_fa7, ifa70,ifa71,fa70,fa71, iarete0,iarete1;
-  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine& ladomaine = domaine_dis->domaine();
+  const Domaine_dis_base& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine& ladomaine = domaine_dis.domaine();
   const int nb_elem = ladomaine.nb_elem(); // Nombre d'elements reels
   for (i=0 ; i<nb_elem ; i++)
     {
@@ -2108,8 +2108,8 @@ int Maillage_FT_Disc::sauvegarder(Sortie& os) const
   const int format_xyz = EcritureLectureSpecial::is_ecriture_special(special, afaire);
   if (format_xyz)
     {
-      const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+      const Domaine_dis_base& domaine_dis = refdomaine_dis_.valeur();
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
       Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(*this, domaine_vf, os);
       return 0;
     }
@@ -2157,8 +2157,8 @@ int Maillage_FT_Disc::reprendre(Entree& is)
     {
       if (refdomaine_dis_.non_nul())
         {
-          const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-          const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+          const Domaine_dis_base& domaine_dis = refdomaine_dis_.valeur();
+          const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
           Sauvegarde_Reprise_Maillage_FT::lire_xyz(*this, &domaine_vf, &is, 0);
         }
       else
@@ -2509,9 +2509,9 @@ void Maillage_FT_Disc::echanger_sommets_PE(const ArrOfInt& liste_sommets,
 
   // Creation des noeuds virtuels sur le processeur d'arrivee s'ils n'existent
   // pas encore.
-  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine& ladomaine = domaine_dis->domaine();
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+  const Domaine_dis_base& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine& ladomaine = domaine_dis.domaine();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
   const IntTab& elem_virt_pe_num = ladomaine.elem_virt_pe_num();
   const IntTab& face_virt_pe_num = domaine_vf.face_virt_pe_num();
   const int nb_elements_reels = ladomaine.nb_elem();
@@ -3112,8 +3112,8 @@ void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
   // et conversion du numero de l'element virtuel en numero local sur ce pe.
   static ArrOfIntFT liste_pe_dest;
 
-  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine& le_dom = domaine_dis->domaine();
+  const Domaine_dis_base& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine& le_dom = domaine_dis.domaine();
   const int nb_elem = le_dom.nb_elem(); // Nombre d'elements reels
   {
     liste_pe_dest.resize_array(nb_facettes_envoi);
@@ -3623,7 +3623,7 @@ void Maillage_FT_Disc::deplacer_sommets(const ArrOfInt& liste_sommets_initiale,
   if (Comm_Group::check_enabled()) check_mesh(1,0,skip_facettes);
 
   const int dimension3 = (Objet_U::dimension == 3);
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_->valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur());
   const Parcours_interface& parcours = refparcours_interface_.valeur();
   const IntTab& face_voisins = domaine_vf.face_voisins();
 
@@ -3777,8 +3777,8 @@ int Maillage_FT_Disc::check_sommets(int error_is_fatal) const
   const double invalid_value = DMAXFLOAT*0.9;
   const int dimension3 = (Objet_U::dimension == 3);
   const int moi = Process::me();
-  const Domaine_dis& domaine_dis = refdomaine_dis_.valeur();
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+  const Domaine_dis_base& domaine_dis = refdomaine_dis_.valeur();
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
   const int nb_elements_reels = domaine_vf.nb_elem();
   int i, j;
 

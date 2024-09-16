@@ -38,7 +38,7 @@
 #include <Transport_Flux_Chaleur_Turbulente.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 
 class Probleme_base;
@@ -73,7 +73,7 @@ protected :
   REF(Convection_Diffusion_Temperature) eq_thermique;
   REF(Champ_Don) beta_t;
   REF(Champ_Don_base) gravite;
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis& ) override;
 
 };
 

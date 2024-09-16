@@ -72,7 +72,7 @@ Entree& Eq_rayo_semi_transp_VDF::readOn(Entree& s )
 void Eq_rayo_semi_transp_VDF::resoudre(double temps)
 {
   //  Cerr<<"Eq_rayo_semi_transp_VDF::resoudre : Debut"<<finl;
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis());
   int nb_elem = domaine_VF.nb_elem();
   const DoubleTab& kappa = fluide().kappa()->valeurs();
   //calcul du second membre
@@ -250,7 +250,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
           if ( test_remplissage_Tb == 0)
             // On n'a pas remplie le tableau des temperatures de bord !!!!
             Cerr<<"On n'a pas remplie le tableau des temperatures de bord !!!!"<<finl;
-          const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis().valeur());
+          const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis());
           la_cl_rayon.evaluer_cl_rayonnement(Tb.valeur(), fluide().kappa(), fluide().longueur_rayo(),
                                              fluide().indice(),zvf,Modele().valeur_sigma(),temps);
         }
@@ -278,7 +278,7 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
   //  Cerr<<"Eq_rayo_semi_transp_VDF::modifier_matrice : Debut"<<finl;
   // On fait une boucle sur les conditions aux limites associees a l'equations
   Conds_lim& les_cl = domaine_Cl_dis()->les_conditions_limites();
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis());
   const IntTab& face_voisins=zvdf.face_voisins();
   const DoubleVect& face_surfaces = zvdf.face_surfaces();
 
@@ -369,7 +369,7 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
 
 void Eq_rayo_semi_transp_VDF::completer()
 {
-  const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
+  const Domaine_dis_base& un_domaine_dis = domaine_dis();
   int n = un_domaine_dis.nb_front_Cl();
 
   int ii;
@@ -389,7 +389,7 @@ void Eq_rayo_semi_transp_VDF::completer()
 
 void Eq_rayo_semi_transp_VDF::assembler_matrice()
 {
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis());
   int nb_elem_tot = domaine_VF.nb_elem_tot();
 
   const DoubleTab& irradi = irradiance_->valeurs();
@@ -439,7 +439,7 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 /*
   void Eq_rayo_semi_transp_VDF::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
   {
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,domaine_dis().valeur());
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,domaine_dis());
   const IntTab& face_voisins = domaine_VDF.face_voisins();
 
   int elem1,elem2;
@@ -685,7 +685,7 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 /*
   void Eq_rayo_semi_transp_VDF::dimensionner_Mat_Bloc_Morse(Matrice& matrice_tmp)
   {
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,domaine_dis().valeur());
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,domaine_dis());
   const IntTab& face_voisins = domaine_VDF.face_voisins();
 
   int elem1,elem2;
@@ -880,12 +880,12 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
 
 int Eq_rayo_semi_transp_VDF::nb_colonnes_tot()
 {
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis());
   return domaine_VF.domaine().nb_elem_tot();
 }
 
 int Eq_rayo_semi_transp_VDF::nb_colonnes()
 {
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis().valeur());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis());
   return domaine_VF.domaine().nb_elem();
 }

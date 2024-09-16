@@ -42,7 +42,7 @@ Entree& Source_Reaction_Particules::readOn(Entree& is)
   return is;
 }
 
-void Source_Reaction_Particules::associer_domaines(const Domaine_dis& zdis,const Domaine_Cl_dis& zcldis)
+void Source_Reaction_Particules::associer_domaines(const Domaine_dis_base& zdis,const Domaine_Cl_dis& zcldis)
 {
   //Ne fait rien
 }

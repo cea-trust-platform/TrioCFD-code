@@ -54,7 +54,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::completer()
 
 void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_PolyMAC_P0& 		domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& 		domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const Champ_Elem_PolyMAC_P0& 	ch_k 		= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("k"));	// Champ k
   const DoubleTab& 	  		k_passe				= ch_k.passe(), &xp = domaine.xp(), &xv = domaine.xv();
   const Conds_lim&          cls_k 			= ch_k.domaine_Cl_dis()->les_conditions_limites(); 		// conditions aux limites du champ k

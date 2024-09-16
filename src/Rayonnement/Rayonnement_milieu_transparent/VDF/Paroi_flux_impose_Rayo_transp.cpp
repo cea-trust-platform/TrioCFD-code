@@ -53,10 +53,10 @@ void Paroi_flux_impose_Rayo_transp::completer()
   preparer_surface(frontiere_dis(),domaine_Cl_dis());
   is_VDF_=0;
 
-  if (sub_type(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur()))
+  if (sub_type(Domaine_VDF,domaine_Cl_dis().domaine_dis()))
     {
       is_VDF_=1;
-      domaine_VDF = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+      domaine_VDF = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
 
       // initialisation de Teta_i
       const Domaine_VDF& zvdf = domaine_VDF.valeur();
@@ -114,7 +114,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   int nb_faces_bord = la_frontiere_VF.nb_faces();
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const IntTab& face_voisins = zvdf.face_voisins();
   int is_rho_unif=0;
   int is_conduc_unif=0;

@@ -46,10 +46,10 @@ Entree& Source_DC_VDF_NS::readOn(Entree& s )
 }
 
 
-void Source_DC_VDF_NS::associer_domaines(const Domaine_dis& domaine_dis,
+void Source_DC_VDF_NS::associer_domaines(const Domaine_dis_base& domaine_dis,
                                          const Domaine_Cl_dis& domaine_cl_dis)
 {
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
 
   int nb_face = zvdf.nb_faces();
   la_correction.resize(nb_face);
@@ -85,8 +85,8 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(O
 
       /* Recuperation des equations de bases et des domaines                     */
       Navier_Stokes_std& eqF = ref_cast(Navier_Stokes_std, equation());
-      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
-      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis().valeur());
+      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis());
+      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis());
 
       /* Recuperation des inconnues vitesses fines et grossieres              */
       DoubleTab& presentG = eqG.inconnue()->valeurs();

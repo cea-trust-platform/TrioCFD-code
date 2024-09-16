@@ -27,7 +27,7 @@
 #include <Connectivites_IndGros.h>
 #include <Restriction_base.h>
 #include <Prolongement_base.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 class Equation_base;
 class Probleme_base;
@@ -51,7 +51,7 @@ public:
   inline DoubleTab& calculer(DoubleTab& ) const override ;
   void completer() override;
   void associer_pb(const Probleme_base& ) override;
-  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override = 0;
+  void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis& ) override = 0;
   void mettre_a_jour(double temps) override
   {
     ;

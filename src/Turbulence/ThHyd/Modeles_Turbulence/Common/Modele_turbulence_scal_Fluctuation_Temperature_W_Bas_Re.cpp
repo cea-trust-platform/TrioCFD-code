@@ -100,7 +100,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   const DoubleTab& nu_t = la_viscosite_turbulente.valeur()->valeurs();
   double temps = la_viscosite_turbulente.valeur()->temps();
   const DoubleTab& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue()->valeurs();
-  const Domaine_dis& le_dom_dis = eqn_transport_Fluctu_Temp->domaine_dis();
+  const Domaine_dis_base& le_dom_dis = eqn_transport_Fluctu_Temp->domaine_dis();
 
   const Probleme_base& mon_pb = mon_equation_->probleme();
   const Equation_base& eqn_hydr = mon_pb.equation(0);

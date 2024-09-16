@@ -28,7 +28,7 @@
 #include <Champ_Fonc.h>
 #include <TRUSTTab.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 class Domaine_Cl_VDF;
 class Domaine_VDF;
@@ -40,7 +40,7 @@ class Modele_turbulence_scal_LES_dyn_VDF: public Modele_turbulence_scal_base
 
 public:
 
-  void associer(const Domaine_dis&, const Domaine_Cl_dis&) override;
+  void associer(const Domaine_dis_base&, const Domaine_Cl_dis&) override;
   ////virtual Entree& lire(const Motcle&, Entree&);
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;

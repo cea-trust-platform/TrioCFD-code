@@ -45,7 +45,7 @@ public:
 
   virtual void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Eps_base& )=0;
   void discretiser() override;
-  void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;
+  void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis_base&, Champ_Inc&) const;
 
   int controler_K_Eps();
   void valider_iteration() override;

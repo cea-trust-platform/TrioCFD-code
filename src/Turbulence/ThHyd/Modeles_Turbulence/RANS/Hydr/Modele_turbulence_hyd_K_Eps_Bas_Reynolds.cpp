@@ -70,7 +70,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
 {
 
   const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue().valeur();
-  const Domaine_dis& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
+  const Domaine_dis_base& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
   const Domaine_Cl_dis& le_dom_Cl_dis = eqn_transp_K_Eps().domaine_Cl_dis();
   Nom type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
@@ -99,7 +99,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
     {
       Champ_Inc visco_turb_au_format_K_eps_Bas_Re;
       visco_turb_au_format_K_eps_Bas_Re.typer(type);
-      DoubleTab& visco_turb_K_eps_Bas_Re = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis().valeur(), visco_turb_au_format_K_eps_Bas_Re);
+      DoubleTab& visco_turb_K_eps_Bas_Re = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis(), visco_turb_au_format_K_eps_Bas_Re);
 
       if (visco_turb_K_eps_Bas_Re.size() != n)
         {

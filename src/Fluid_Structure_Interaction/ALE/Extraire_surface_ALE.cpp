@@ -90,7 +90,7 @@ Entree& Extraire_surface_ALE::interpreter_(Entree& is)
       exit();
     }
   Probleme_base& pb=ref_cast(Probleme_base, objet(nom_pb));
-  const Domaine_VF& domaine_vf=ref_cast(Domaine_VF,pb.domaine_dis().valeur());
+  const Domaine_VF& domaine_vf=ref_cast(Domaine_VF,pb.domaine_dis());
   const Domaine& domaine_volumique = domaine_vf.domaine();
 
   // Check that actually a Domaine_ALE:

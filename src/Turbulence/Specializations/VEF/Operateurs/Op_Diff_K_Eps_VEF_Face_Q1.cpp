@@ -50,12 +50,12 @@ Entree& Op_Diff_K_Eps_VEF_Face_Q1::readOn(Entree& s )
 /*! @brief complete l'evaluateur
  *
  */
-void Op_Diff_K_Eps_VEF_Face_Q1::associer(const Domaine_dis& domaine_dis,
+void Op_Diff_K_Eps_VEF_Face_Q1::associer(const Domaine_dis_base& domaine_dis,
                                          const Domaine_Cl_dis& domaine_cl_dis,
                                          const Champ_Inc& ch_diffuse)
 {
   const Champ_Q1NC& inco = ref_cast(Champ_Q1NC,ch_diffuse.valeur());
-  const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis);
   const Domaine_Cl_VEF& zclVEF = ref_cast(Domaine_Cl_VEF,domaine_cl_dis.valeur());
   inconnue_ = inco;
   le_dom_vef = zVEF;

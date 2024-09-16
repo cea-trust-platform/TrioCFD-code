@@ -109,7 +109,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
@@ -272,7 +272,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl(), &e_f = domaine.elem_faces();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
@@ -536,7 +536,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
 
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_BIF(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
-  const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const Op_Diff_Turbulent_PolyMAC_P0_Face& Op_diff = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());

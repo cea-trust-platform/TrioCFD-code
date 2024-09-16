@@ -61,7 +61,7 @@ Entree& Imprimer_Fichiers_RANS_VDF::interpreter(Entree& is)
     }
   Probleme_base& pb=ref_cast(Probleme_base, objet(nom_pb));
 
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,pb.equation(0).domaine_dis().valeur());
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,pb.equation(0).domaine_dis());
   const Equation_base& eqn_hydr = pb.equation(0);
   const DoubleVect& vit = eqn_hydr.inconnue()->valeurs(); //vitesse
   SFichier fic_vit("vitesse_RANS.dat");

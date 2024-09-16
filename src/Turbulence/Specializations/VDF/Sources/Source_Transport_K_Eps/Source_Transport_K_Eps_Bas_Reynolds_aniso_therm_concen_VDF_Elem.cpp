@@ -47,8 +47,8 @@ void Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajouter_bl
 {
   const Domaine_Cl_dis& zcl=eq_hydraulique->domaine_Cl_dis();
   const Domaine_Cl_dis& zcl_keps=eqn_keps_bas_re->domaine_Cl_dis();
-  const Domaine_dis& domaine_dis_keps =eqn_keps_bas_re ->domaine_dis();
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
+  const Domaine_dis_base& domaine_dis_keps =eqn_keps_bas_re ->domaine_dis();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl.valeur());
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
   const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis().valeur());

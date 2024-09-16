@@ -278,9 +278,9 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
   le_domaine_->init_renum_perio();
 
   dis.associer_domaine(le_domaine_.valeur());
-  dis.discretiser(le_domaine_dis_);
+  le_domaine_dis_ = dis.discretiser();
   // Can not do this before, since the Domaine_dis is not typed yet:
-  le_domaine_dis_->valeur().associer_domaine(le_domaine_);
+  le_domaine_dis_->associer_domaine(le_domaine_);
 
   Cerr << "Discretisation des equations" << finl;
   for(int i=0; i<nombre_d_equations(); i++)

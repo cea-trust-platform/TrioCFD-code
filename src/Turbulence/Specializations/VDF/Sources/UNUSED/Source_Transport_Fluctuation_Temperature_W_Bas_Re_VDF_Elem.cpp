@@ -118,10 +118,10 @@ void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_pb(con
   gravite_ = fluide.gravite();
 }
 
-void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_domaines(const Domaine_dis& domaine_dis,
+void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_domaines(const Domaine_dis_base& domaine_dis,
                                                                                    const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
   le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
 }
 
@@ -573,8 +573,8 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
 DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(DoubleTab& resu) const
 {
   const Domaine_Cl_dis& zcl = eq_hydraulique->domaine_Cl_dis();
-  const Domaine_dis& z = eq_hydraulique->domaine_dis();
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
+  const Domaine_dis_base& z = eq_hydraulique->domaine_dis();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl.valeur());
   const RefObjU& modele_turbulence_hydr = eq_hydraulique->get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());

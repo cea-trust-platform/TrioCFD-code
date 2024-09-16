@@ -29,7 +29,7 @@
 #include <TRUSTTabs_forward.h>
 #include <Milieu_base.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 
 class Convection_Diffusion_std;

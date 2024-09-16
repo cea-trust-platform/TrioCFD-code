@@ -24,13 +24,13 @@
 
 #include <TRUST_Vector.h>
 #include <Paroi_hyd_base_VDF.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 #include <Eq_couch_lim.h>
 #include <Milieu_base.h>
 #include <Mod_echelle_LRM_base.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 class Champ_Fonc_base;
 class Mod_echelle_LRM_base;

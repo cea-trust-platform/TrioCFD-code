@@ -53,7 +53,7 @@ DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::calculer(DoubleTab& resu) const
 DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::ajouter(DoubleTab& resu) const
 {
   const Equation_rayonnement_base& eq_rayo = Modele().eq_rayo();
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,eq_rayo.domaine_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,eq_rayo.domaine_dis());
   int nb_elem = zvdf.nb_elem();
   const Fluide_base& fluide = eq_rayo.fluide();
   const DoubleTab& kappa = fluide.kappa()->valeurs();
@@ -96,7 +96,7 @@ void Source_rayo_semi_transp_VDF_P0_VDF::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_VDF_P0_VDF::associer_domaines(const Domaine_dis& domaine_dis,
+void Source_rayo_semi_transp_VDF_P0_VDF::associer_domaines(const Domaine_dis_base& domaine_dis,
                                                            const Domaine_Cl_dis& domaine_Cl_dis)
 {
   ;

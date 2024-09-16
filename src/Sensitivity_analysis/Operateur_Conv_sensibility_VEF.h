@@ -41,7 +41,7 @@ class Operateur_Conv_sensibility_VEF : public Operateur_Conv_sensibility
   Declare_instanciable( Operateur_Conv_sensibility_VEF ) ;
 
 public :
-  void associer (const Domaine_dis& , const Domaine_Cl_dis& ,const Champ_Inc& ) override;
+  void associer (const Domaine_dis_base& , const Domaine_Cl_dis& ,const Champ_Inc& ) override;
   DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const override;
   void ajouter_Lstate_sensibility_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const; //L(U0)U1
   void ajouter_Lsensibility_state_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const;//L(U1)U0

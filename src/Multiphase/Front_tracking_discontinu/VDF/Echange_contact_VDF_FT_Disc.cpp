@@ -140,7 +140,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_pb));
   Probleme_FT_Disc_gen *pbft = dynamic_cast<Probleme_FT_Disc_gen*>(&pb_gen);
 
-  const Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
+  const Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis());
   const DoubleVect& surface= le_dom.face_surfaces();
 
 

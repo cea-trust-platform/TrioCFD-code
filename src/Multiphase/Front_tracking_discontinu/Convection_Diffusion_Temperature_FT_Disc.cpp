@@ -484,7 +484,7 @@ void Convection_Diffusion_Temperature_FT_Disc::calculer_grad_t()
   const int stencil_width = stencil_width_;
   const double interfacial_value = TSAT_CONSTANTE;
 
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
 
   const double temps = schema_temps().temps_courant();
 
@@ -538,7 +538,7 @@ void Convection_Diffusion_Temperature_FT_Disc::calculer_mpoint(Champ_base& mpoin
   mpoint.valeurs() *= f;
 
   // Pour deverminage : on impose une variation de mpoint lineaire en z
-  //const Domaine_VF & domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  //const Domaine_VF & domaine_vf = ref_cast(Domaine_VF, domaine_dis());
   //for (int i = 0; i < n ; i++)
   //  mpoint.valeurs()[i] = 500./8957.*(1.+0.1*(domaine_vf.xp()(i,3)-0.0005)/0.001);
 
@@ -629,7 +629,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
 
   Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, ref_eq_ns_.valeur());
   const double Lvap  = fluide_dipha_->chaleur_latente();
-  const DoubleVect& volume = ref_cast(Domaine_VF, domaine_dis().valeur()).volumes();
+  const DoubleVect& volume = ref_cast(Domaine_VF, domaine_dis()).volumes();
   DoubleTab& mp = mpoint_->valeurs();
   const DoubleTab& ai = ns.get_interfacial_area();
   const double temps = schema_temps().temps_courant();
@@ -901,7 +901,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
         }
       mmax = Process::mp_max(mmax);
       //  Cerr << "[Maximum-mp] Time= " << temps << " max(abs(mp))= " << mmax << finl;
-      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
       const DoubleTab& distance_interface = eq_interface_.get_update_distance_interface().valeurs();
       extrapolate(domaine_vf, ai, stencil_width_, distance_interface, mp);
     }
@@ -971,7 +971,7 @@ void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_
   if (0) // Cela pourrait etre utile si on construisait le saut de vitesse delta u_0 mais
     // cela semble presenter que peu d'interet...
     {
-      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
       const IntTab& face_voisins = domaine_vf.face_voisins();
       const IntTab& elem_faces = domaine_vf.elem_faces();
       const int nb_elem = secmem.size_array();
@@ -1286,14 +1286,14 @@ void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
     {
       const Nom nom_sous_domaine = nom_sous_domaine_;
       const double temp_moy_ini = temp_moy_ini_;
-      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+      const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
       const Domaine& dom = domaine_vf.domaine();
       const Sous_Domaine& ss_domaine = dom.ss_domaine(nom_sous_domaine);
 
       Transport_Interfaces_FT_Disc& eq_interface_ = ref_eq_interface_.valeur();
       const DoubleTab& indicatrice = eq_interface_.get_update_indicatrice().valeurs();
       DoubleTab& temperature = inconnue()->valeurs();
-      const DoubleVect& volume = ref_cast(Domaine_VF, domaine_dis().valeur()).volumes();
+      const DoubleVect& volume = ref_cast(Domaine_VF, domaine_dis()).volumes();
       const int nb_elem = domaine_vf.domaine().nb_elem();
 
       // Calcul de la moyenne sous domaine, et du facteur : fac = temp_moy_ini/temp_moy_ss_domaine
@@ -1333,7 +1333,7 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser()
 
   const Discretisation_base& dis = discretisation();
   const double temps = schema_temps().temps_courant();
-  const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
+  const Domaine_dis_base& un_domaine_dis = domaine_dis();
   LIST(REF(Champ_base)) & champs_compris = liste_champs_compris_;
   const int nb_valeurs_temps = schema_temps().nb_valeurs_temporelles();
 
@@ -1400,7 +1400,7 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser_assembleur_pression()
   //type += "_homogene";
   Cerr << "Navier_Stokes_std::discretiser_assembleur_pression : type="<< type << finl;
   assembleur_pression_.typer(type);
-  assembleur_pression_->associer_domaine_dis_base(domaine_dis().valeur());
+  assembleur_pression_->associer_domaine_dis_base(domaine_dis());
 }
 
 void Convection_Diffusion_Temperature_FT_Disc::completer()
@@ -1432,7 +1432,7 @@ void Convection_Diffusion_Temperature_FT_Disc::completer()
       // Step 0: Build string corresponding to the list of CLs we want to pass:
       SChaine instructions;
       instructions << "{" << finl;
-      const Domaine& ladomaine=ns.domaine_dis()->domaine();
+      const Domaine& ladomaine=ns.domaine_dis().domaine();
       int nfront = ladomaine.nb_front_Cl();
       // The idea is to open the pressure on boundaries in contact with the other phase ie "(1-phase_)"
       // The goal is to let some fictitious pressure out (to accomodate for an (\int div(u_conv) dv !=0)
@@ -1452,7 +1452,7 @@ void Convection_Diffusion_Temperature_FT_Disc::completer()
       Cerr << "Discretisation of fictitious CL ..." << finl;
       zcl_fictitious_.typer("Domaine_Cl_VDF");
       Domaine_Cl_VDF& zcl_fictitious_vdf = ref_cast(Domaine_Cl_VDF, zcl_fictitious_.valeur());
-      Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, domaine_dis().valeur());
+      Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, domaine_dis());
       zcl_fictitious_vdf.associer(domaine_vdf);
       zcl_fictitious_->associer_eqn(ns);
       // zcl_fictitious_->associer_inconnue(inconnue()); // Useless
@@ -1526,7 +1526,7 @@ void Convection_Diffusion_Temperature_FT_Disc::suppression_interfaces(const IntV
   if (nouvelle_phase != phase_)
     return;
 
-  const int n = domaine_dis()->domaine().nb_elem();
+  const int n = domaine_dis().domaine().nb_elem();
   assert(num_compo.size() == n);
   const int nb_valeurs_temporelles = inconnue()->nb_valeurs_temporelles();
   // Il faut traiter toutes les cases temporelles:
@@ -1626,7 +1626,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall_at_face(const int num
 double Convection_Diffusion_Temperature_FT_Disc::get_Twall_at_elem(const int elem) const
 {
   //ArrOfInt num_faces;
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nb_faces_voisins = elem_faces.dimension(1);
@@ -1750,7 +1750,7 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
 
 double Convection_Diffusion_Temperature_FT_Disc::get_Twall(const int num_face) const
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
   const IntTab& faces_elem = domaine_vf.face_voisins();
   // On of the neighbours doesnot exist so it has "-1". We get the other elem by:
   const int elem = faces_elem(num_face, 0) + faces_elem(num_face, 1) +1;

@@ -74,7 +74,7 @@ void Transport_K_Eps_base::discretiser()
 }
 
 void Transport_K_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
-                                             Domaine_dis& z, Champ_Inc& ch) const
+                                             Domaine_dis_base& z, Champ_Inc& ch) const
 {
   Cerr << "K_Eps field discretization" << finl;
   Noms noms(2);
@@ -85,14 +85,14 @@ void Transport_K_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
   unit[1]="m2/s3";
 
   const Discretisation_base& dis = discretisation();
-  dis.discretiser_champ("temperature",z.valeur(),multi_scalaire,noms,unit,2,sch.nb_valeurs_temporelles(),sch.temps_courant(),ch);
+  dis.discretiser_champ("temperature",z,multi_scalaire,noms,unit,2,sch.nb_valeurs_temporelles(),sch.temps_courant(),ch);
   ch->nommer("K_Eps");
 }
 
 // For VEF-like scheme
 void Transport_K_Eps_base::get_position_faces(Nom& position, int& n)
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
 
   position = "x=";
   position += (Nom)domaine_vf.xv(n, 0);
@@ -108,7 +108,7 @@ void Transport_K_Eps_base::get_position_faces(Nom& position, int& n)
 // For VDF-like scheme
 void Transport_K_Eps_base::get_position_cells(Nom& position, int& n)
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
 
   position = "x=";
   position += (Nom)domaine_vf.xp(n, 0);
@@ -134,7 +134,7 @@ int Transport_K_Eps_base::controler_K_Eps()
   if (size < 0)
     {
       if (sub_type(Champ_Inc_P0_base, le_champ_K_Eps.valeur()))
-        size = le_champ_K_Eps->equation().domaine_dis()->domaine().nb_elem();
+        size = le_champ_K_Eps->equation().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_Eps field in Transport_K_Eps_base::controler_K_Eps()" << finl;
@@ -156,7 +156,7 @@ int Transport_K_Eps_base::controler_K_Eps()
      if (this->que_suis_je()=="Transport_K_Eps") control=0;
      #endif
   */
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis());
   double LeEPS_MIN = modele_turbulence().get_EPS_MIN();
   double LeEPS_MAX = modele_turbulence().get_EPS_MAX();
   double LeK_MIN = modele_turbulence().get_K_MIN();

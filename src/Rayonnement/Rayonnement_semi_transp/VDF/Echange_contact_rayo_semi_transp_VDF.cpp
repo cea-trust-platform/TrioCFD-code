@@ -91,7 +91,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_temperature_bord(double temp
   if (T_autre_pb()->valeurs_au_temps(temps).size()==0)
     {
       T_autre_pb()->associer_fr_dis_base(T_ext()->frontiere_dis());
-      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
       if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene")
         verifier_correspondance();
@@ -187,10 +187,10 @@ void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
           exit();
         }
 
-      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis()->frontiere_dis(frontiere_dis().le_nom()));
+      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis().frontiere_dis(frontiere_dis().le_nom()));
       num_premiere_face_dans_pb_fluide=frontvf.num_premiere_face();
 
-      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
       if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene")
         verifier_correspondance();
@@ -259,7 +259,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_p
   //  Tw=(autr_h*Tautre+mon_h*monT)/(autr_h+mon_h)
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
-  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 
   //DoubleTab& mon_h=h_imp_->valeurs();

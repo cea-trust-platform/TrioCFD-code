@@ -142,14 +142,14 @@ int Modele_Fonc_Bas_Reynolds_Base::Calcul_is_Reynolds_stress_isotrope() const
 
 
 DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu(DoubleTab& Cmu,
-                                                     const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                     const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                      const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
 {
   return Cmu;
 }
 
 DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_Paroi(DoubleTab& Cmu,
-                                                           const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                           const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                            const DoubleTab& visco, const DoubleTab& visco_turb,
                                                            const DoubleTab& loi_paroi,const int idt,
                                                            const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
@@ -166,14 +166,14 @@ bool Modele_Fonc_Bas_Reynolds_Base::calcul_tenseur_Re(const DoubleTab&, const Do
 
 
 DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_BiK(DoubleTab& Cmu,
-                                                         const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                         const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                          const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
 {
   return Cmu;
 }
 
 DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_Paroi_BiK(DoubleTab& Cmu,
-                                                               const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+                                                               const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
                                                                const DoubleTab& visco, const DoubleTab& visco_turb,
                                                                const DoubleTab& loi_paroi,const int idt,
                                                                const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
@@ -209,7 +209,7 @@ void Modele_Fonc_Bas_Reynolds_Base::lire_distance_paroi( )
   //exit();
 
 }
-/*DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+/*DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
 	return F1;
 }

@@ -114,7 +114,7 @@ protected:
   int nkr, nit;
   double rec_min, rec_max, epsGMRES;
 
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis& ) override;
   DoubleTab& laplacien(const DoubleTab&, DoubleTab&) const;
   DoubleTab& div_kappa_grad(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
   void calculer_alpha_gradC_carre(DoubleTab&) const;

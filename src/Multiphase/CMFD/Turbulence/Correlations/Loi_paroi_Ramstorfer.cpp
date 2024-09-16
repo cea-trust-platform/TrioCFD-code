@@ -60,7 +60,7 @@ void Loi_paroi_Ramstorfer::completer()
 
 void Loi_paroi_Ramstorfer::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
 {
-  Domaine_VF& domaine = ref_cast(Domaine_VF, pb_->domaine_dis().valeur());
+  Domaine_VF& domaine = ref_cast(Domaine_VF, pb_->domaine_dis());
   DoubleTab& u_t = valeurs_loi_paroi_["u_tau"], &y_p = valeurs_loi_paroi_["y_plus"];
   const DoubleTab& n_f = domaine.face_normales();
   const DoubleVect& fs = domaine.face_surfaces();

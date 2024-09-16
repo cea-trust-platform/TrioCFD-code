@@ -63,9 +63,9 @@ Entree& Source_Gravite_PF_VDF::readOn(Entree& is)
  * @param (Entree& is) le flot d'entree pour la lecture des parametres
  * @return le flot d'entree modifie
  */
-void Source_Gravite_PF_VDF::associer_domaines(const Domaine_dis& domaine,const Domaine_Cl_dis& domaine_cl)
+void Source_Gravite_PF_VDF::associer_domaines(const Domaine_dis_base& dds,const Domaine_Cl_dis& domaine_cl)
 {
-  le_dom = ref_cast(Domaine_VDF,domaine.valeur());
+  le_dom = ref_cast(Domaine_VDF,dds);
   le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_cl.valeur());
 }
 

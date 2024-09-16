@@ -71,7 +71,7 @@ void Transport_K_Omega_base::discretiser()
 }
 
 void Transport_K_Omega_base::discretiser_K_Omega(const Schema_Temps_base& sch,
-                                                 Domaine_dis& z, Champ_Inc& ch) const
+                                                 Domaine_dis_base& z, Champ_Inc& ch) const
 {
   Cerr << "K_Omega field discretization" << finl;
   Noms noms(2);
@@ -83,7 +83,7 @@ void Transport_K_Omega_base::discretiser_K_Omega(const Schema_Temps_base& sch,
 
   // cAlan : possibilité de mutualiser ça dans Transport_RANS_2eq
   const Discretisation_base& dis = discretisation();
-  dis.discretiser_champ("temperature", z.valeur(), multi_scalaire,
+  dis.discretiser_champ("temperature", z, multi_scalaire,
                         noms, unit, 2, sch.nb_valeurs_temporelles(),
                         sch.temps_courant(), ch);
   ch->nommer("K_Omega");
@@ -95,7 +95,7 @@ void Transport_K_Omega_base::discretiser_K_Omega(const Schema_Temps_base& sch,
 //For VEF-like scheme
 void Transport_K_Omega_base::get_position_faces(Nom& position, int& n)
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
 
   position = "x=";
   position += (Nom)domaine_vf.xv(n, 0);
@@ -111,7 +111,7 @@ void Transport_K_Omega_base::get_position_faces(Nom& position, int& n)
 // For VDF-like scheme
 void Transport_K_Omega_base::get_position_cells(Nom& position, int& n)
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
 
   position = "x=";
   position += (Nom)domaine_vf.xp(n, 0);
@@ -141,7 +141,7 @@ int Transport_K_Omega_base::controler_K_Omega()
           Cerr << "Unsupported K_Omega field in Transport_K_Omega_base::controler_K_Omega()" << finl;
           Process::exit();
         }
-      size = le_champ_K_Omega->equation().domaine_dis()->domaine().nb_elem();
+      size = le_champ_K_Omega->equation().domaine_dis().domaine().nb_elem();
     }
 
   //int size_tot=mp_sum(size);
@@ -153,7 +153,7 @@ int Transport_K_Omega_base::controler_K_Omega()
   const int lquiet = modele_turbulence().get_lquiet(); // cAlan remonter ce lquiet dans modele_turbu
 
   // cAlan, le 20/01/2023 : on force les valeurs au min et max comme pour le K_Eps.
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
   const double OMEGA_MIN = modele_turbulence().get_OMEGA_MIN();
   const double OMEGA_MAX = modele_turbulence().get_OMEGA_MAX();
   const double K_MIN = modele_turbulence().get_K_MIN();

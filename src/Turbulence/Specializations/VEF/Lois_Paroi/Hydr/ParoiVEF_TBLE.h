@@ -28,7 +28,7 @@
 #include <Eq_couch_lim.h>
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 #include <Paroi_log_QDM.h>
 

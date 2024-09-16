@@ -20,7 +20,7 @@
 #include <Modele_Fonc_Realisable_base.h>
 #include <Transport_K_Eps_Realisable.h>
 #include <Domaine_Cl_dis.h>
-#include <Domaine_dis.h>
+
 
 /*! @brief class Modele_turbulence_hyd_K_Eps_Realisable
  *

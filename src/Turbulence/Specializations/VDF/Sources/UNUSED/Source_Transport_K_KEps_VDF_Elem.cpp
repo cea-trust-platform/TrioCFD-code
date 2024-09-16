@@ -47,7 +47,7 @@ void Source_Transport_K_KEps_VDF_Elem::associer_pb(const Probleme_base& pb)
 void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
-  const Domaine_VDF& domaine_VDF_NS = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
+  const Domaine_VDF& domaine_VDF_NS = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
   const Domaine_Cl_VDF& domaine_Cl_VDF_NS = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis().valeur());
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
   const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente()->valeurs();

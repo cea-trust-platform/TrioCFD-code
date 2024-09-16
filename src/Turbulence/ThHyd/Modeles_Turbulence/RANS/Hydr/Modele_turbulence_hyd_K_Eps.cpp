@@ -100,7 +100,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
   if (n < 0)
     {
       if (sub_type(Champ_Inc_P0_base, chK_Eps))
-        n = eqn_transp_K_Eps().domaine_dis()->domaine().nb_elem();
+        n = eqn_transp_K_Eps().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_Eps field in Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente" << finl;
@@ -122,7 +122,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
       //      const DoubleTab& tab_visco = ch_visco.valeurs();
       Fmu.resize(tab_K_Eps.dimension_tot(0));
-      const Domaine_dis& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
+      const Domaine_dis_base& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
 
       mon_modele_fonc_->Calcul_Fmu(Fmu, le_dom_dis, le_dom_Cl_dis, tab_K_Eps, ch_visco);
       int is_Cmu_constant = mon_modele_fonc_->Calcul_is_Cmu_constant();
@@ -157,7 +157,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
     {
       Champ_Inc visco_turb_au_format_K_eps;
       visco_turb_au_format_K_eps.typer(type);
-      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis().valeur(), visco_turb_au_format_K_eps);
+      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis(), visco_turb_au_format_K_eps);
 
       if (visco_turb_K_eps.size() != n)
         {

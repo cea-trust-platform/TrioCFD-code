@@ -70,7 +70,7 @@ protected:
 
   REF(Domaine_VDF) le_dom_VDF;
   REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis& ) override;
 
   void Calcul_RSLambda();
   DoubleTab& Calcul_bij_TBNN(DoubleTab& resu) const;

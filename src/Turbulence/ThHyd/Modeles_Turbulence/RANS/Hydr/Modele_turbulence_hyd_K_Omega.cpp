@@ -107,7 +107,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
                << finl;
           Process::exit();
         }
-      komega_size_real = eqn_transp_K_Omega().domaine_dis()->domaine().nb_elem();
+      komega_size_real = eqn_transp_K_Omega().domaine_dis().domaine().nb_elem();
     }
 
   // cAlan, le 20/01/2023 : sortir cette partie et en faire une fonction à
@@ -125,7 +125,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(double 
       Champ_Inc visco_turb_au_format_K_Omega;
       visco_turb_au_format_K_Omega.typer(type);
       DoubleTab& visco_turb_K_Omega = complete_viscosity_field(komega_size_real,
-                                                               eqn_transp_K_Omega().domaine_dis().valeur(),
+                                                               eqn_transp_K_Omega().domaine_dis(),
                                                                visco_turb_au_format_K_Omega);
 
       if (visco_turb_K_Omega.size() != komega_size_real)

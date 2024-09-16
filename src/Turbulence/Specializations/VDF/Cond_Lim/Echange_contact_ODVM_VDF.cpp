@@ -44,7 +44,7 @@ void Echange_contact_ODVM_VDF::calculer_Teta_equiv(DoubleTab& La_T_ext,const Dou
 {
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
-  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
   DoubleTab& t_autre=T_autre_pb()->valeurs_au_temps(temps);
   int ndeb = ma_front_vf.num_premiere_face();

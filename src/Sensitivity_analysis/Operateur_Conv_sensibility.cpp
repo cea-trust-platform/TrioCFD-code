@@ -43,7 +43,7 @@ void Operateur_Conv_sensibility::associer_vitesse(const Champ_base& vit)
 {
   la_vitesse = ref_cast(Champ_Inc_base,vit);
 }
-void Operateur_Conv_sensibility::associer(const Domaine_dis& zdis,
+void Operateur_Conv_sensibility::associer(const Domaine_dis_base& zdis,
                                           const Domaine_Cl_dis& zcl_dis,
                                           const Champ_Inc& inco)
 {

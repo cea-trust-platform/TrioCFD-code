@@ -47,7 +47,7 @@ void Variation_rho::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
 
   if (!(pch_rho)) return; //rien a faire : le terme est nul
 
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue()->valeurs().line_size();
 
   for (auto &&n_m : matrices)
@@ -76,7 +76,7 @@ void Variation_rho::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const 
 
   if (!(pch_rho)) return; //rien a faire : le terme est nul
 
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   const DoubleTab& inco = equation().inconnue()->valeurs(),

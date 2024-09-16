@@ -36,7 +36,7 @@ int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   DoubleTab qi(xi) ;
   DoubleTab present(xi);
 
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, eqn.domaine_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, eqn.domaine_dis());
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme->equation(1));
   Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());

@@ -105,8 +105,8 @@ void Convection_Diffusion_Phase_field::discretiser()
   Cerr << "mutilde discretization" << finl;
   //dis.mutilde(schema_temps(), domaine_dis(), ch_mutilde);
 
-  //dis.discretiser_champ("temperature",domaine_dis().valeur(),"potentiel_chimique_generalise",".",1,schema_temps().temps_courant(),ch_mutilde);
-  dis.discretiser_champ("temperature",domaine_dis().valeur(),"potentiel_chimique_generalise",".",constituant().nb_constituants(),schema_temps().temps_courant(),ch_mutilde);
+  //dis.discretiser_champ("temperature",domaine_dis(),"potentiel_chimique_generalise",".",1,schema_temps().temps_courant(),ch_mutilde);
+  dis.discretiser_champ("temperature",domaine_dis(),"potentiel_chimique_generalise",".",constituant().nb_constituants(),schema_temps().temps_courant(),ch_mutilde);
   champs_compris_.ajoute_champ(ch_mutilde);
 
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,probleme().equation(0));

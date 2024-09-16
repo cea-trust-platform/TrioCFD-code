@@ -24,7 +24,7 @@
 #define Source_DC_VDF_included
 
 #include <Source_Correction_Deficitaire.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 class Probleme_base;
 
@@ -43,7 +43,7 @@ class Source_DC_VDF : public Source_Correction_Deficitaire
 
 public:
 
-  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis& ) override;
 
 
 

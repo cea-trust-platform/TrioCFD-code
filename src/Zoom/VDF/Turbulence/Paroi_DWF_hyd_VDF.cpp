@@ -236,7 +236,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const int nb_compo = eqn_hydr.inconnue()->nb_comp();
 
   // Variables sur le probleme fin
-  Domaine_VDF& domaine_fine = ref_cast(Domaine_VDF,pb_fin->domaine_dis().valeur());
+  Domaine_VDF& domaine_fine = ref_cast(Domaine_VDF,pb_fin->domaine_dis());
 
 
   // Calcul des termes sources grossiers

@@ -60,7 +60,7 @@ Entree& Rupture_bulles_1groupe_PolyMAC_P0::readOn(Entree& is)
 
 void Rupture_bulles_1groupe_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = equation().inconnue()->valeurs().line_size();
 
   for (auto &&n_m : matrices)
@@ -88,7 +88,7 @@ void Rupture_bulles_1groupe_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, 
 
 void Rupture_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   const DoubleTab& inco = equation().inconnue()->valeurs(),

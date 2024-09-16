@@ -72,7 +72,7 @@ void Nucleation_paroi_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const 
 void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const IntTab& f_e = domaine.face_voisins();
 
   const DoubleTab& rho = pbm.milieu().masse_volumique()->passe(),

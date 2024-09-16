@@ -75,7 +75,7 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::lire_motcle_non_standard(const Motcle
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente(double temps)
 {
   const Champ_base& chK = eqn_transp_K().inconnue().valeur(), &chEps = eqn_transp_Eps().inconnue().valeur();
-  const Domaine_dis& le_dom_dis = eqn_transp_K().domaine_dis();
+  const Domaine_dis_base& le_dom_dis = eqn_transp_K().domaine_dis();
   const Domaine_Cl_dis& le_dom_Cl_dis = eqn_transp_K().domaine_Cl_dis();
 
   const Nom& type = chK.que_suis_je();
@@ -90,14 +90,14 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
   if (n < 0)
     {
       if (sub_type(Champ_Inc_P0_base, chK))
-        n = eqn_transp_K().domaine_dis()->domaine().nb_elem();
+        n = eqn_transp_K().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K field in Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente" << finl;
           Process::exit(-1);
         }
       if (sub_type(Champ_Inc_P0_base, chEps))
-        n = eqn_transp_Eps().domaine_dis()->domaine().nb_elem();
+        n = eqn_transp_Eps().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported epsilon field in Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente" << finl;
@@ -156,7 +156,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
     {
       Champ_Inc visco_turb_au_format_K_eps;
       visco_turb_au_format_K_eps.typer(type);
-      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transp_K().domaine_dis().valeur(), visco_turb_au_format_K_eps);
+      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transp_K().domaine_dis(), visco_turb_au_format_K_eps);
 
       if (visco_turb_K_eps.size() != n)
         {

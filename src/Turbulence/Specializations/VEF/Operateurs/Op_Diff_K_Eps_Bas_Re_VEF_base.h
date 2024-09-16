@@ -30,7 +30,7 @@
 #include <Champ_Fonc.h>
 #include <Champ_Inc.h>
 #include <Domaine_Cl_dis.h>
-#include <Domaine_dis.h>
+
 
 class Domaine_Cl_VEF;
 class Domaine_VEF;

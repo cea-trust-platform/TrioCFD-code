@@ -45,7 +45,7 @@ Entree& Maillage_FT_IJK::readOn(Entree& is)
   return is;
 }
 
-void Maillage_FT_IJK::initialize(const IJK_Splitting& s, const Domaine_dis& domaine_dis, const Parcours_interface& parcours)
+void Maillage_FT_IJK::initialize(const IJK_Splitting& s, const Domaine_dis_base& domaine_dis, const Parcours_interface& parcours)
 {
   ref_splitting_ = s;
   // Mise a jour des tableaux de processeurs voisins :

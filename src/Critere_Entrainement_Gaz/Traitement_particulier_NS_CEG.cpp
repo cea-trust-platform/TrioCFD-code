@@ -411,7 +411,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               points(i_theta,2)=centre_vortex[2];
             }
           // On cherche les elements contenant le point x,y,z:
-          mon_equation->domaine_dis()->domaine().chercher_elements(points,elements);
+          mon_equation->domaine_dis().domaine().chercher_elements(points,elements);
           for (int i_theta=0; i_theta<nb_dtheta; i_theta++)
             {
               int elem=elements[i_theta];

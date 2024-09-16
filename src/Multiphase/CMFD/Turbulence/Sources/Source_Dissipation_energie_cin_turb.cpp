@@ -64,7 +64,7 @@ void Source_Dissipation_energie_cin_turb::completer()
 
 void Source_Dissipation_energie_cin_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab& k 	 = equation().inconnue()->valeurs();
   const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = k.line_size();
 
@@ -102,7 +102,7 @@ void Source_Dissipation_energie_cin_turb::dimensionner_blocs(matrices_t matrices
 
 void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
-  const Domaine_VF&             domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Domaine_VF&             domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab&                    k = equation().inconnue()->valeurs();
   const Champ_Inc_base&  ch_alpha_rho_k = equation().champ_conserve();
   const DoubleTab&          alpha_rho_k = ch_alpha_rho_k.passe();

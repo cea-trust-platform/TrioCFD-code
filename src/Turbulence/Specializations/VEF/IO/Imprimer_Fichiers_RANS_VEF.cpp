@@ -63,7 +63,7 @@ Entree& Imprimer_Fichiers_RANS_VEF::interpreter(Entree& is)
   Probleme_base& pb=ref_cast(Probleme_base, objet(nom_pb));
 
 
-  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF,pb.equation(0).domaine_dis().valeur());
+  const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF,pb.equation(0).domaine_dis());
   const Equation_base& eqn_hydr = pb.equation(0);
   const DoubleTab& vit = eqn_hydr.inconnue()->valeurs(); //vitesse
 

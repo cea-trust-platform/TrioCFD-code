@@ -92,7 +92,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
     {
       Champ_Inc visco_turb_au_format_K_eps_Rea;
       visco_turb_au_format_K_eps_Rea.typer(type);
-      DoubleTab& visco_turb_K_eps_Rea = complete_viscosity_field(n, eqn_transp_K().domaine_dis().valeur(), visco_turb_au_format_K_eps_Rea);
+      DoubleTab& visco_turb_K_eps_Rea = complete_viscosity_field(n, eqn_transp_K().domaine_dis(), visco_turb_au_format_K_eps_Rea);
 
       if (visco_turb_K_eps_Rea.size() != n)
         {

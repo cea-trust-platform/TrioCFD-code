@@ -87,7 +87,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
       DoubleVect e;
 
-      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
       //MODIF

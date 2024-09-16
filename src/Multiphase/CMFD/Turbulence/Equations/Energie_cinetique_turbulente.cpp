@@ -96,7 +96,7 @@ void Energie_cinetique_turbulente::mettre_a_jour(double temps)
       {
         Cerr << "Limiting the value of K : coeff used = " << coef_limit_ << finl;
         const Champ_Face_PolyMAC_P0& ch_vit = ref_cast(Champ_Face_PolyMAC_P0, ref_cast(Navier_Stokes_std,pbm.equation_qdm()).vitesse().valeur());
-        const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, domaine_dis().valeur());
+        const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, domaine_dis());
         DoubleTab& k_val = inconnue()->valeurs();
         const int N = k_val.line_size(), D = dimension;
 

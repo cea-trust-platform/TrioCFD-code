@@ -126,7 +126,7 @@ void Source_Transport_Eps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab
     {
       DoubleTrav D(0);
       F2.resize(K.dimension_tot(0));
-      const Domaine_dis& domaine_dis_eps =mon_eq_transport_Eps->domaine_dis();
+      const Domaine_dis_base& domaine_dis_eps =mon_eq_transport_Eps->domaine_dis();
       const Champ_base& ch_visco_cin_ou_dyn =ref_cast(Op_Diff_K_Eps_base, equation().operateur(0).l_op_base()).diffusivite();
       mon_modele_fonc->Calcul_F2_BiK(F2,D,domaine_dis_eps,K,Eps, ch_visco_cin_ou_dyn  );
     }

@@ -74,7 +74,7 @@ void Echange_contact_Rayo_transp_VDF::completer()
 
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
-  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 
   int ndeb = ma_front_vf.num_premiere_face();
@@ -144,9 +144,9 @@ void Echange_contact_Rayo_transp_VDF::mettre_a_jour(double temps)
           exit();
         }
 
-      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis()->frontiere_dis(frontiere_dis().le_nom()));
+      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis().frontiere_dis(frontiere_dis().le_nom()));
       num_premiere_face_dans_pb_fluide=frontvf.num_premiere_face();
-      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
       if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene")
         verifier_correspondance();
@@ -203,7 +203,7 @@ void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
   //  Tw=(autr_h*Tautre+mon_h*monT)/(autr_h+mon_h)
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
-  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 
   //DoubleTab& mon_h=h_imp_->valeurs();
@@ -234,7 +234,7 @@ void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
       flux_radia_fluide(nfluide)=modrayo.flux_radiatif(nfluide+ndebfluide);
     }
   DoubleVect fluxradia;
-  Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+  Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
   Nom nom_racc1=frontiere_dis().frontiere().le_nom();
   if ((ispbfluide)||(domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene"))
     {

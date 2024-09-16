@@ -16,7 +16,7 @@
 #include <Source_injection_masse_base.h>
 #include <Pb_Multiphase.h>
 #include <Discret_Thyd.h>
-#include <Domaine_dis.h>
+
 
 Implemente_base(Source_injection_masse_base, "Source_injection_masse_base", Sources_Multiphase_base);
 
@@ -57,7 +57,7 @@ void Source_injection_masse_base::mettre_a_jour(double temps) { flux_masse_->met
 
 void Source_injection_masse_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
   const DoubleTab& rho = pb.get_champ("masse_volumique").passe(),
                    &tab_inj = flux_masse_->valeurs();

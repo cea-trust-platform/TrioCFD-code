@@ -39,7 +39,7 @@ public :
   Source_Transport_VEF_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   void associer_pb(const Probleme_base& pb) override;
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis& ) override;
   DoubleTab& calculer(DoubleTab& ) const override;
   DoubleTab& ajouter(DoubleTab& ) const override = 0; // XXX XXX XXX Elie Saikali : like that !!;
 

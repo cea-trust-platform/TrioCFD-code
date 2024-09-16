@@ -175,7 +175,7 @@ void  Face_Rayonnante::ecrire_temperature_bord() const
       if (faces_j.nb_faces_bord()!=0)
         {
           const Frontiere& le_bord =  faces_j.la_cl_base().frontiere_dis().frontiere();
-          const Domaine_VF& domaine_dis=ref_cast(Domaine_VF, faces_j.la_cl_base().domaine_Cl_dis().domaine_dis().valeur());
+          const Domaine_VF& domaine_dis=ref_cast(Domaine_VF, faces_j.la_cl_base().domaine_Cl_dis().domaine_dis());
           const DoubleTab& xv=domaine_dis.xv();
           double surf;
           int nbfacesbord=le_bord.nb_faces();

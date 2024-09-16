@@ -29,7 +29,7 @@
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM_Scal.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 class Convection_Diffusion_std;
 class Champ_Fonc_base;

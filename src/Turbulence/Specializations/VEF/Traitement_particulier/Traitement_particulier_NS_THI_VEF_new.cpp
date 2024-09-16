@@ -55,8 +55,8 @@ Entree& Traitement_particulier_NS_THI_VEF_new::readOn(Entree& is)
 
 void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   calcul_nb_som_dir(domaine);
   int nsize, nsizes2, nl;
 
@@ -129,8 +129,8 @@ void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
 
 void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   calcul_nb_som_dir(domaine);
   int nsize, nsizes2, nl;
 
@@ -277,7 +277,7 @@ void Traitement_particulier_NS_THI_VEF_new::renorm_Ec(void)
   {
   Ectot=0.0;
 
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
   const Domaine& domaine = zdis.domaine();
   int nb_som = domaine.nb_som();
   double nb=pow(nb_som*1.,1./3.);
@@ -402,8 +402,8 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_2(DoubleTab& vit
 
 void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_s(DoubleTab& vit_u_s, DoubleTab& vit_v_s, DoubleTab& vit_w_s) const
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   int nb_som = domaine.nb_som();
   int nl;
 
@@ -469,8 +469,8 @@ void Traitement_particulier_NS_THI_VEF_new::determine_new_tab_fft_VEF()
   const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleTab& xv = domaine_VEF.xv();
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   const DoubleTab& coord = domaine.coord_sommets();
   int nb_som = domaine.nb_som();
   calcul_nb_som_dir(domaine);

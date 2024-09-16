@@ -19,7 +19,7 @@
 #include <Modele_turbulence_hyd_RANS_Bicephale_base.h>
 #include <Transport_K_ou_Eps_Realisable.h>
 #include <Modele_Fonc_Realisable_base.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 
 /*! @brief class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale

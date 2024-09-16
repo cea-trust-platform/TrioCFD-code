@@ -48,7 +48,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(m
 {
   Source_Diffusion_supplementaire_echelle_temp_turb::dimensionner_blocs(matrices, semi_impl) ;
 
-  const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const Champ_Elem_PolyMAC_P0&                   tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());
 
   if (!matrices.count("tau") || semi_impl.count("tau")) return;
@@ -84,7 +84,7 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(m
 
 void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_PolyMAC_P0&             domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0&             domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const Domaine_Cl_PolyMAC&                 zcl = ref_cast(Domaine_Cl_PolyMAC, equation().domaine_Cl_dis().valeur());
 //  const Echelle_temporelle_turbulente&       eq = ref_cast(Echelle_temporelle_turbulente, equation());
   const Champ_Elem_PolyMAC_P0&              tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());

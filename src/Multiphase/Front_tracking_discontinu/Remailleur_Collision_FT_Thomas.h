@@ -25,7 +25,7 @@
 
 #include <Remailleur_Collision_FT_Juric.h>
 #include <Transport_Interfaces_FT_Disc.h>
-#include <Domaine_dis.h>
+
 #include <TRUSTTabs_forward.h>
 class Domaine_dis_base;
 
@@ -130,7 +130,7 @@ private :
   double surface_intersection(const int, const Maillage_FT_Disc&) const;
 
   //Fonction qui renvoie le domaine discret dans lequel evolue l'interface
-  inline const Domaine_dis& domaine_dis(const Maillage_FT_Disc&) const;
+  inline const Domaine_dis_base& domaine_dis(const Maillage_FT_Disc&) const;
 
   //Fonction qui renvoie le Remaillage conservatif en volume
   inline const Remaillage_FT& remaillage_FT(const Maillage_FT_Disc&) const;
@@ -193,7 +193,7 @@ inline int Remailleur_Collision_FT_Thomas::plus_grande_distance_interface_elemen
   return plus_grande_distance_interface_element_eulerien_;
 }
 
-inline const Domaine_dis& Remailleur_Collision_FT_Thomas::domaine_dis(const Maillage_FT_Disc& maillage) const
+inline const Domaine_dis_base& Remailleur_Collision_FT_Thomas::domaine_dis(const Maillage_FT_Disc& maillage) const
 {
   return maillage.equation_transport().domaine_dis();
 }

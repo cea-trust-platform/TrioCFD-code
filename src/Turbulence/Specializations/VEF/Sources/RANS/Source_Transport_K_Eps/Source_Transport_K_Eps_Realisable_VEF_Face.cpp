@@ -91,7 +91,7 @@ void Source_Transport_K_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
   const DoubleTab& tab_paroi = mod_turb.loi_paroi()->Cisaillement_paroi();
 
   const Domaine_Cl_dis& zcl_keps = eqn_keps_Rea->domaine_Cl_dis();
-  const Domaine_dis& domaine_dis_keps = eqn_keps_Rea->domaine_dis();
+  const Domaine_dis_base& domaine_dis_keps = eqn_keps_Rea->domaine_dis();
   const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue()->valeurs();
   mon_modele_fonc.Contributions_Sources_Paroi(domaine_dis_keps, zcl_keps, vit, K_eps_Rea, epsilon_minimum, visco_tab, visco_turb, tab_paroi, idt);
 

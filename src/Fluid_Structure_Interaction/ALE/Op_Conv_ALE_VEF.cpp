@@ -55,7 +55,7 @@ void Op_Conv_ALE_VEF::completer()
   op_conv.completer();
 }
 
-void Op_Conv_ALE_VEF::associer (const Domaine_dis& domaine_dis ,
+void Op_Conv_ALE_VEF::associer (const Domaine_dis_base& domaine_dis ,
                                 const Domaine_Cl_dis& domaine_cl_dis,
                                 const Champ_Inc& inco )
 {
@@ -63,7 +63,7 @@ void Op_Conv_ALE_VEF::associer (const Domaine_dis& domaine_dis ,
 
 //  Op_Conv_ALE::associer(domaine_dis,domaine_cl_dis,inco);
 
-  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis);
   const Domaine_Cl_VEF& zclvef = ref_cast(Domaine_Cl_VEF,domaine_cl_dis.valeur());
   dom=inco->domaine();
   le_dom_vef = zvef;

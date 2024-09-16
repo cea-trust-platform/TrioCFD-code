@@ -68,7 +68,7 @@ void Frontiere_ouverte_vitesse_vortex::mettre_a_jour(double temps)
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc, equation);
   const DoubleTab& indic = eq.inconnue()->valeurs();
   const Sous_Domaine& sous_domaine = domaine_Cl_dis_base.domaine().ss_domaine(nom_sous_domaine_);
-  const DoubleVect& volume = ref_cast(Domaine_VF, domaine_Cl_dis_base.domaine_dis().valeur()).volumes();
+  const DoubleVect& volume = ref_cast(Domaine_VF, domaine_Cl_dis_base.domaine_dis()).volumes();
 
   double integrale = 0.;
   const int n = sous_domaine.nb_elem_tot();

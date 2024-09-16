@@ -181,7 +181,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   DoubleTab& indice = fluide.indice()->valeurs();
   DoubleTab& irradiance = eq_rayo.inconnue()->valeurs();
 
-  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_Cl_dis().domaine_dis().valeur());
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_Cl_dis().domaine_dis());
   //  const IntTab& face_voisins = zvef.face_voisins();
   const DoubleTab& face_normales = zvef.face_normales();
 

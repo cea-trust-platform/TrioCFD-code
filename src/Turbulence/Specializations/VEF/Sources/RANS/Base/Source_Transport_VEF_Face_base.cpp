@@ -35,9 +35,9 @@ Implemente_base_sans_constructeur( Source_Transport_VEF_Face_base, "Source_Trans
 Sortie& Source_Transport_VEF_Face_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
 Entree& Source_Transport_VEF_Face_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is,que_suis_je()); }
 
-void Source_Transport_VEF_Face_base::associer_domaines(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Source_Transport_VEF_Face_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis);
   le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis.valeur());
 }
 

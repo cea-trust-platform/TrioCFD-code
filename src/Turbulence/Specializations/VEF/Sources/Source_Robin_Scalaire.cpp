@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Robin_Scalaire.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 #include <Domaine_VEF.h>
 #include <Domaine_Cl_VEF.h>
@@ -140,8 +140,8 @@ DoubleTab& Source_Robin_Scalaire::calculer(DoubleTab& resu) const
 
 
 // associer_domaines
-void Source_Robin_Scalaire::associer_domaines(const Domaine_dis& z, const Domaine_Cl_dis& zcl)
+void Source_Robin_Scalaire::associer_domaines(const Domaine_dis_base& z, const Domaine_Cl_dis& zcl)
 {
-  le_dom_VEF = ref_cast(Domaine_VEF,z.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,z);
   le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,zcl.valeur());
 }

@@ -209,7 +209,7 @@ void compute_eulerian_normal_distance_facet_barycentre_field(const IJK_Interface
   const int dim = 3; // in IJK
 
   // Vertex coordinates of the eulerian domain
-  const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis().valeur();
+  const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis();
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
   const DoubleTab& centre_element = domaine_vf.xp();
 
@@ -671,7 +671,7 @@ void compute_eulerian_curvature_field_from_interface(const FixedVector<IJK_Field
   curvature.data() = invalid_curvature_value * 1.1;
 
   // Vertex coordinates of the eulerian domain
-  const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis().valeur();
+  const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis();
   const int nb_elem = mon_dom_dis.domaine().nb_elem();
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
   const IJK_Splitting& splitting_curvature = normal_vect.get_splitting();
@@ -967,7 +967,7 @@ void propagate_eulerian_normal_temperature_gradient_interface(const IJK_Interfac
   else
     {
       // Using the elem_faces connectivity matrix of TrioCFD
-      const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis().valeur();
+      const Domaine_dis_base& mon_dom_dis = interfaces.get_domaine_dis();
       const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, mon_dom_dis);
       extrapolate_with_elem_faces_connectivity(domaine_vf, distance, grad_T_interface, stencil_width);
     }

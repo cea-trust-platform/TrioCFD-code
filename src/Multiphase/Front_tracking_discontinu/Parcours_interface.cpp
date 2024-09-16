@@ -83,9 +83,9 @@ const Parcours_interface& Parcours_interface::operator=(const Parcours_interface
  *    equations_plans_faces_).
  *
  */
-void Parcours_interface::associer_domaine_dis(const Domaine_dis& domaine_dis)
+void Parcours_interface::associer_domaine_dis(const Domaine_dis_base& domaine_dis)
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis.valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
   assert(! refdomaine_vf_.non_nul());
   refdomaine_vf_ = domaine_vf;
   nb_faces_elem_ = domaine_vf.domaine().nb_faces_elem();

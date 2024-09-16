@@ -30,7 +30,7 @@
 #include <Beam_model.h>
 #include <Champs_front_ALE_projection.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 
 class Equation_base;
 class Beam_model;
@@ -60,10 +60,10 @@ public :
   inline const DoubleTab& vitesse() const;
   inline DoubleTab& vitesse_faces();
   inline const DoubleTab& vitesse_faces() const;
-  void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&) override;
+  void mettre_a_jour (double temps, Domaine_dis_base&, Probleme_base&) override;
   void update_after_post(double temps) override;
-  void initialiser (double temps, Domaine_dis&, Probleme_base&) override;
-  DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, bool&);
+  void initialiser (double temps, Domaine_dis_base&, Probleme_base&) override;
+  DoubleTab calculer_vitesse(double temps,Domaine_dis_base&, Probleme_base&, bool&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
   void reading_vit_bords_ALE(Entree& is);
   void reading_solver_moving_mesh_ALE(Entree& is);
@@ -73,7 +73,7 @@ public :
   void reading_ALE_Neumann_BC_for_grid_problem(Entree& is);
   void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
   void  update_ALE_projection(const double);
-  DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
+  DoubleTab& laplacien(Domaine_dis_base&, Probleme_base&, const DoubleTab&, DoubleTab&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
   void resumptionJacobian(DoubleTab&, DoubleTab&);
@@ -84,7 +84,7 @@ public :
 
 
   DoubleVect interpolationOnThe3DSurface(const int&, const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
-  //double computeDtBeam(Domaine_dis&);
+  //double computeDtBeam(Domaine_dis_base&);
   const DoubleTab& getBeamDisplacement(const int&, const int&) const;
   const DoubleTab& getBeamRotation(const int&, const int&) const;
   inline const int& getBeamDirection(const int&) const;

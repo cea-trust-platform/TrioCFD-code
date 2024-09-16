@@ -46,10 +46,10 @@ Entree& Source_LDC_VDF_NS::readOn(Entree& s )
 }
 
 
-void Source_LDC_VDF_NS::associer_domaines(const Domaine_dis& domaine_dis,
+void Source_LDC_VDF_NS::associer_domaines(const Domaine_dis_base& domaine_dis,
                                           const Domaine_Cl_dis& domaine_cl_dis)
 {
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
   // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
 
   // const Domaine& mon_dom = zvdf.domaine();
@@ -73,8 +73,8 @@ DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_IndGros& connect, Re
   // Equation_base& eq_fine = pb_fin.equation(0); // 1 seule equation pour l instant !!
   DoubleTab& present = eq.inconnue()->valeurs();
   DoubleTab& present_fin = eq_fine.inconnue()->valeurs();
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eq.domaine_dis().valeur());
-  const Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eq_fine.domaine_dis().valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eq.domaine_dis());
+  const Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eq_fine.domaine_dis());
   const IntVect& indice_gros = connect.indice_gros();
   int i;
   //AJOUT !

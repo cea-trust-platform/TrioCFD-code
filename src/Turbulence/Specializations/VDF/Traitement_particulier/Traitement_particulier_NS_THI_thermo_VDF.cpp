@@ -94,8 +94,8 @@ void Traitement_particulier_NS_THI_thermo_VDF::init_calc_spectre(void)
 void Traitement_particulier_NS_THI_thermo_VDF::calcul_spectre(void)
 {
 
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   int nb_elem = domaine.nb_elem();
   //  double nb=pow(nb_elem*1.,1./3.);
   //  int nb_elem_dir = (int)(nb)+1;
@@ -135,8 +135,8 @@ void Traitement_particulier_NS_THI_thermo_VDF::calcul_spectre(void)
 
 void Traitement_particulier_NS_THI_thermo_VDF::sorties_fichiers(void)
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   int nb_elem = domaine.nb_elem();
   int i;
 
@@ -218,9 +218,9 @@ void Traitement_particulier_NS_THI_thermo_VDF::sorties_fichiers(void)
 
 double Traitement_particulier_NS_THI_thermo_VDF::calcul_enstrophie(void)
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,zdis.valeur());
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,zdis);
   int nb_elem = domaine.nb_elem();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();

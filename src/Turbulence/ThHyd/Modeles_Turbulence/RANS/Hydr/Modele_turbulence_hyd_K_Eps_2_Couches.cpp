@@ -77,7 +77,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
     {
       Champ_Inc visco_turb_au_format_K_eps;
       visco_turb_au_format_K_eps.typer(type);
-      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transport_K_Eps_.domaine_dis().valeur(), visco_turb_au_format_K_eps);
+      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transport_K_Eps_.domaine_dis(), visco_turb_au_format_K_eps);
 
       if (visco_turb_K_eps.size() != n)
         {

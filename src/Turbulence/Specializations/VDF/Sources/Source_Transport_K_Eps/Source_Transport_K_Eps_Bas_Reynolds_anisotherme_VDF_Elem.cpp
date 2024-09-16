@@ -52,8 +52,8 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(mat
 {
   const Domaine_Cl_dis& zcl=eq_hydraulique->domaine_Cl_dis();
   const Domaine_Cl_dis& zcl_keps=eqn_keps_bas_re->domaine_Cl_dis();
-  const Domaine_dis& domaine_dis_keps =eqn_keps_bas_re ->domaine_dis();
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
+  const Domaine_dis_base& domaine_dis_keps =eqn_keps_bas_re ->domaine_dis();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl.valeur());
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs(), &scalaire = eq_thermique->inconnue()->valeurs(), &vit = eq_hydraulique->inconnue()->valeurs();
@@ -107,8 +107,8 @@ Entree& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::readOn(Entr
 
 void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& resu, const tabs_t& semi_impl) const
 {
-  const Domaine_dis& z = eq_hydraulique->domaine_dis();
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,z.valeur());
+  const Domaine_dis_base& z = eq_hydraulique->domaine_dis();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,z);
   const Domaine_Cl_VDF& zcl_VDF = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis().valeur());
   const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs(), &K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());

@@ -160,7 +160,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       DoubleTab& tab= h_imp_->valeurs();
 
 
-      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       const Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
 

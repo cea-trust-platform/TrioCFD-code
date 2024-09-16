@@ -21,7 +21,7 @@
 #include <Descripteur_FT.h>
 #include <Intersections_Elem_Facettes_Data.h>
 #include <TRUSTTabs_forward.h>
-#include <Domaine_dis.h>
+
 #include <TRUST_Deriv.h>
 #include <TRUST_Ref.h>
 
@@ -97,7 +97,7 @@ public:
                                   const Intersections_Elem_Facettes* ief=nullptr) const;
 
   void associer_equation_transport(const Equation_base& equation) override;
-  void associer_domaine_dis_parcours(const Domaine_dis& domaine_dis, const Parcours_interface& parcours);
+  void associer_domaine_dis_parcours(const Domaine_dis_base& domaine_dis, const Parcours_interface& parcours);
   Transport_Interfaces_FT_Disc& equation_transport();
   const Transport_Interfaces_FT_Disc& equation_transport() const;
   int type_statut() const;
@@ -283,7 +283,7 @@ protected:
   // Pour pouvoir utiliser le maillage_FT_IJK sans equation de transport, j'ajoute une ref
   // au domaine_dis, et on l'utilise directement chaque fois que c'est possible au lieu de l'eq. transp.:
   // C'est initialise dans associer_domaine_dis.
-  REF(Domaine_dis) refdomaine_dis_;
+  REF(Domaine_dis_base) refdomaine_dis_;
   // Pour la meme raison, ajout d'une ref au parcours de l'interface:
   REF(Parcours_interface) refparcours_interface_;
 

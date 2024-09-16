@@ -30,7 +30,7 @@
 #include <Statistiques.h>
 #include <Op_VDF_Elem.h>
 #include <Domaine_Cl_dis.h>
-#include <Domaine_dis.h>
+
 #include <Champ_Inc.h>
 
 extern Stat_Counter_Id diffusion_counter_;

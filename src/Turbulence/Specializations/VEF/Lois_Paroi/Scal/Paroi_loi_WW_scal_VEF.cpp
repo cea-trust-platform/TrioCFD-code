@@ -50,9 +50,9 @@ Entree& Paroi_loi_WW_scal_VEF::readOn(Entree& s)
   return s ;
 }
 
-void Paroi_loi_WW_scal_VEF::associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
+void Paroi_loi_WW_scal_VEF::associer(const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
 {
-  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis);
   le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
 }
 

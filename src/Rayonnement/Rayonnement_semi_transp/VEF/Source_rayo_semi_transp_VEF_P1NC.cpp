@@ -53,7 +53,7 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::calculer(DoubleTab& resu) const
 DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
 {
   const Equation_rayonnement_base& eq_rayo = Modele().eq_rayo();
-  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,eq_rayo.domaine_dis().valeur());
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,eq_rayo.domaine_dis());
   int nb_faces = zvef.nb_faces();
 
   const Fluide_base& fluide = eq_rayo.fluide();
@@ -98,7 +98,7 @@ void Source_rayo_semi_transp_VEF_P1NC::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_VEF_P1NC::associer_domaines(const Domaine_dis& domaine_dis,
+void Source_rayo_semi_transp_VEF_P1NC::associer_domaines(const Domaine_dis_base& domaine_dis,
                                                          const Domaine_Cl_dis& domaine_Cl_dis)
 {
   ;

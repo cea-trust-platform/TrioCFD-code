@@ -112,7 +112,7 @@ int Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::lire_motcle_non_standard(const Motc
     return Modele_turbulence_hyd_LES_Smago_VDF::lire_motcle_non_standard(mot, is);
 }
 
-void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::associer(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
 {
   Modele_turbulence_hyd_LES_Smago_VDF::associer(domaine_dis, domaine_Cl_dis);
 

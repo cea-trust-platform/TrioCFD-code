@@ -31,7 +31,7 @@
 #include <Paroi_hyd_base_EF.h>
 #include <distances_EF.h>
 #include <Paroi_log_QDM.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_Cl_dis.h>
 class Champ_Fonc_base;
 

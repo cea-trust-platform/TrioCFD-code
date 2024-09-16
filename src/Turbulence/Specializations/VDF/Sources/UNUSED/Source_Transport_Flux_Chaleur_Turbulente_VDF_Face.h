@@ -38,7 +38,7 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
 #include <Domaine_Cl_dis.h>
-#include <Domaine_dis.h>
+
 #include <Champ_Don.h>
 
 class Convection_Diffusion_Temperature;
@@ -85,7 +85,7 @@ protected :
   REF(Champ_Don) beta_t;
   REF(Champ_Don_base) gravite_;
   REF(Modele_turbulence_hyd_K_Eps_Bas_Reynolds) le_modele;
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis& ) override;
 
 };
 

@@ -35,9 +35,9 @@ Implemente_base_sans_constructeur( Source_Transport_VDF_Elem_base, "Source_Trans
 Sortie& Source_Transport_VDF_Elem_base::printOn( Sortie& os ) const { return os << que_suis_je(); }
 Entree& Source_Transport_VDF_Elem_base::readOn( Entree& is ) { return Source_Transport_proto::readOn_proto(is,que_suis_je()); }
 
-void Source_Transport_VDF_Elem_base::associer_domaines(const Domaine_dis& domaine_dis, const Domaine_Cl_dis&  domaine_Cl_dis)
+void Source_Transport_VDF_Elem_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis&  domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
   le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
 }
 

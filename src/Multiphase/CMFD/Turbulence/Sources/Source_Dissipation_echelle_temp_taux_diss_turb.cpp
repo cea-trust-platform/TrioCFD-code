@@ -46,7 +46,7 @@ Entree& Source_Dissipation_echelle_temp_taux_diss_turb::readOn(Entree& is)
 
 void Source_Dissipation_echelle_temp_taux_diss_turb::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab& diss     = equation().inconnue()->valeurs() ;
   const DoubleTab& pdiss    = equation().inconnue()->passe() ;
   const DoubleVect& pe      = equation().milieu().porosite_elem(), &ve = domaine.volumes();

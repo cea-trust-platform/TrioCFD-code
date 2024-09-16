@@ -134,7 +134,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
         }
     }
   const Domaine_VF& le_dom = ref_cast(
-                               Domaine_VF, mon_dom_cl_dis->domaine_dis ().valeur ());
+                               Domaine_VF, mon_dom_cl_dis->domaine_dis());
 
 
   Probleme_base& pb_gen = ref_cast(Probleme_base, Interprete::objet (nom_autre_pb_));

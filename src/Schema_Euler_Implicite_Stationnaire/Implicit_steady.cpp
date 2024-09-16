@@ -239,7 +239,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
 //Calcule M/dt_locaux
 void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqnNS, DoubleVect& m_dt, DoubleVect& dt_locaux)
 {
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis().valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis());
   const DoubleVect& volumes_entrelaces_ref=le_dom.volumes_entrelaces();
   const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis().valeur());
   const DoubleVect& volumes_entrelaces_cl=le_dom_cl.volumes_entrelaces_Cl();
@@ -276,7 +276,7 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqn
 
 void Implicit_steady::calcul_mat_masse_diviser_par_dt_vdf(Navier_Stokes_std& eqnNS, DoubleVect& m_dt, DoubleVect& dt_locaux)
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,eqnNS.domaine_dis().valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,eqnNS.domaine_dis());
   const DoubleVect& volumes_entrelaces=le_dom.volumes_entrelaces();
   int size=volumes_entrelaces.size_totale();
   // Si rho n'est pas constant
@@ -303,7 +303,7 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vdf(Navier_Stokes_std& eqn
 void Implicit_steady::test_periodic_solution(Navier_Stokes_std& eqnNS, DoubleTab& current) const
 {
 
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis().valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis());
   const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis().valeur());
   int nb_comp=current.dimension(1);
   for (int n_bord=0; n_bord<le_dom.nb_front_Cl(); n_bord++)
