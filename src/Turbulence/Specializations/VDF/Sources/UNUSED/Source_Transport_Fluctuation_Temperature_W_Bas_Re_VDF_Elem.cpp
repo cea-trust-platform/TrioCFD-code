@@ -583,11 +583,11 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
   const Transport_K_Eps_base& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.eqn_transp_K_Eps();
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
   const Domaine_Cl_dis_base& zcl_VDF_th_dis = eq_thermique->domaine_Cl_dis();
-  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue()->valeurs();
-  const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue().valeurs();
+  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleTab& visco_turb = le_modele.viscosite_turbulente()->valeurs();
-  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue()->valeurs();
+  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire =
     ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& modele_Flux_Chaleur = ref_cast(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re,le_modele_scalaire);
@@ -664,12 +664,12 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
 
   if (axi)
     {
-      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
       calculer_terme_production_K_Axi(domaine_VDF,vitesse,P,K_eps_Bas_Re,visco_turb);
     }
   else
     {
-      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
       calculer_terme_production_K(domaine_VDF,domaine_Cl_VDF,P,K_eps_Bas_Re,vit,vitesse,visco_turb);
     }
 

@@ -38,14 +38,14 @@ Entree& Production_echelle_temp_taux_diss_turb_VDF::readOn(Entree& is) { return 
 void Production_echelle_temp_taux_diss_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_VF&                     domaine = ref_cast(Domaine_VF, equation().domaine_dis());
-  const DoubleTab&                     tab_diss = equation().inconnue()->valeurs(); // tau ou omega selon l'equation
-  const DoubleTab&                    tab_pdiss = equation().inconnue()->passe(); // tau ou omega selon l'equation
+  const DoubleTab&                     tab_diss = equation().inconnue().valeurs(); // tau ou omega selon l'equation
+  const DoubleTab&                    tab_pdiss = equation().inconnue().passe(); // tau ou omega selon l'equation
   const DoubleTab&                     tab_grad = equation().probleme().get_champ("gradient_vitesse").passe();
   const DoubleTab&                          alp = equation().probleme().get_champ("alpha").valeurs();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   int ne = domaine.nb_elem(), D = dimension;
-  int N = equation().inconnue()->valeurs().line_size();
+  int N = equation().inconnue().valeurs().line_size();
   int Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
   int e, n;
 

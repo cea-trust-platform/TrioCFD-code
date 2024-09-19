@@ -78,7 +78,7 @@ void Production_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& se
 
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
-  int Nk = equation().inconnue()->valeurs().dimension(1), N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne = domaine.nb_elem(), nf_tot = domaine.nb_faces_tot(), D = dimension ;
+  int Nk = equation().inconnue().valeurs().dimension(1), N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne = domaine.nb_elem(), nf_tot = domaine.nb_faces_tot(), D = dimension ;
   if (Nk!=1) Process::exit("WIT is only in the liquid phase");
   if (D!=3) Process::exit("WIT is only coded for 3 dimensions");
 

@@ -52,8 +52,8 @@ void Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajouter_bl
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl);
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
   const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis());
-  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();
-  const DoubleTab& temper = eq_thermique->inconnue()->valeurs(), &concen = eq_concentration->inconnue()->valeurs(), &vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
+  const DoubleTab& temper = eq_thermique->inconnue().valeurs(), &concen = eq_concentration->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs();
@@ -62,7 +62,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajouter_bl
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   const int nb_elem = domaine_VDF.nb_elem(), nb_elem_tot = domaine_VDF.nb_elem_tot(), nb_consti = eq_concentration->nb_constituants();

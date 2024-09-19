@@ -186,7 +186,7 @@ Champ_Fonc& Modele_turbulence_scal_LES_dyn_VDF::calculer_diffusivite_turbulente(
   DoubleTab filt_vel(0, dimension);
   le_dom_VDF->domaine().creer_tableau_elements(filt_vel);
 
-  const DoubleTab& teta = equation().inconnue()->valeurs();
+  const DoubleTab& teta = equation().inconnue().valeurs();
   DoubleTab filt_teta;
   le_dom_VDF->domaine().creer_tableau_elements(filt_teta);
   DoubleTab Lj(filt_vel);
@@ -1015,7 +1015,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calc_elem_elem(void)
 void Modele_turbulence_scal_LES_dyn_VDF::calcul_tableaux_correspondance(int& N_c, IntVect& compt_c, IntVect& corresp_c)
 {
   // Initialisation de : Yuv + compt_c + corresp_c
-  const Domaine_dis_base& zdisbase = mon_equation_->inconnue()->domaine_dis_base();
+  const Domaine_dis_base& zdisbase = mon_equation_->inconnue().domaine_dis_base();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, zdisbase);
   const DoubleTab& xp = domaine_VDF.xp();
   int nb_elems = domaine_VDF.domaine().nb_elem();

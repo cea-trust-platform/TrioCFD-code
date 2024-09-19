@@ -44,7 +44,7 @@ private:
   const Modele_Fonc_Realisable_base& get_modele_fonc() const override;
   void calculer_terme_production_real(const DoubleTab&, const DoubleTab&, DoubleTrav&) const override;
   void fill_resu_real(const int, const DoubleVect&, const DoubleTrav&, const DoubleTab&, const DoubleTab&, const double, DoubleTab&) const override;
-  inline int get_size_k_eps() const override { return eqn_k_Rea->inconnue()->valeurs().dimension(0); }
+  inline int get_size_k_eps() const override { return eqn_k_Rea->inconnue().valeurs().dimension(0); }
   void fill_coeff_matrice(const int , const DoubleVect& , const DoubleVect& , const double , Matrice_Morse& ) const override;
 };
 

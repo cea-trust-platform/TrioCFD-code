@@ -148,7 +148,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
   //  Cerr<<"Nom du bord : "<<front_vf.le_nom()<<finl;
   ////double d_Lambda = Lambda(0,0);
 
-  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue()->valeurs();
+  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
   DoubleTab& T_b = temperature_bord_->valeurs_au_temps(temps);
 
   const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom())->valeurs();
@@ -211,7 +211,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::completer()
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   int ndeb = front_vf.num_premiere_face();
   const IntTab& face_voisins = zvdf.face_voisins();
-  const DoubleTab& T = mon_dom_cl_dis->equation().inconnue()->valeurs();
+  const DoubleTab& T = mon_dom_cl_dis->equation().inconnue().valeurs();
   int face=0;
   //
   // Debut de la boucle sur les faces de bord

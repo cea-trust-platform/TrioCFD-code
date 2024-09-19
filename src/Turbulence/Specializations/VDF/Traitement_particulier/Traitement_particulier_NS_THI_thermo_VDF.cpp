@@ -101,8 +101,8 @@ void Traitement_particulier_NS_THI_thermo_VDF::calcul_spectre(void)
   //  int nb_elem_dir = (int)(nb)+1;
   calcul_nb_elem_dir(domaine);
 
-  double temps_crt = mon_equation->inconnue()->temps();
-  const DoubleTab& Temp = mon_equation_NRJ->inconnue()->valeurs();
+  double temps_crt = mon_equation->inconnue().temps();
+  const DoubleTab& Temp = mon_equation_NRJ->inconnue().valeurs();
 
   int i,k;
 
@@ -140,8 +140,8 @@ void Traitement_particulier_NS_THI_thermo_VDF::sorties_fichiers(void)
   int nb_elem = domaine.nb_elem();
   int i;
 
-  double temps_crt = mon_equation->inconnue()->temps();
-  const DoubleTab& Temp = mon_equation_NRJ->inconnue()->valeurs();
+  double temps_crt = mon_equation->inconnue().temps();
+  const DoubleTab& Temp = mon_equation_NRJ->inconnue().valeurs();
 
   SFichier fic45("Sorties_THI_Thermo.dat",ios::app);
 
@@ -225,7 +225,7 @@ double Traitement_particulier_NS_THI_thermo_VDF::calcul_enstrophie(void)
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
 
-  const DoubleTab& Temp = mon_equation_NRJ->inconnue()->valeurs();
+  const DoubleTab& Temp = mon_equation_NRJ->inconnue().valeurs();
 
   double DT=0;
   double gradT=0.;

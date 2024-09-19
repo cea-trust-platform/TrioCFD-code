@@ -26,7 +26,7 @@
 #include <Equation_base.h>
 #include <Transport_Interfaces_base.h>
 #include <Postraitement_base.h>
-#include <Champ_Inc.h>
+
 #include <Remaillage_FT.h>
 #include <Parcours_interface.h>
 #include <Marching_Cubes.h>
@@ -61,8 +61,8 @@ public:
   int            nombre_d_operateurs(void) const override; // Zero, y'en a pas.
   const Operateur& operateur(int i) const override;    // Erreur
   Operateur&        operateur(int i) override;         // Erreur
-  const Champ_Inc& inconnue(void) const override;         // C'est l'indicatrice
-  Champ_Inc&        inconnue(void) override;
+  const Champ_Inc_base& inconnue(void) const override;         // C'est l'indicatrice
+  Champ_Inc_base&        inconnue(void) override;
   //
   // Methodes surchargees de Equation_base
   //
@@ -320,8 +320,8 @@ protected:
   REF(Probleme_base) probleme_base_;
   REF(Navier_Stokes_FT_Disc) equation_ns_;
   // L'inconnue du probleme
-  Champ_Inc indicatrice_;
-  Champ_Inc indicatrice_faces_;
+  OWN_PTR(Champ_Inc_base) indicatrice_;
+  OWN_PTR(Champ_Inc_base) indicatrice_faces_;
   // Utiliser ces accesseurs :
   Maillage_FT_Disc& maillage_interface();
   // Utiliser ces accesseurs :
@@ -415,7 +415,7 @@ public:
   int reprendre(Entree& is) override;
 
   // Les membres suivantes sont sauvegardes et repris:
-  Champ_Inc        indicatrice_cache;     // L'indicatrice calculee par get_update_indicatrice
+  OWN_PTR(Champ_Inc_base)        indicatrice_cache;     // L'indicatrice calculee par get_update_indicatrice
   int           indicatrice_cache_tag; // Le tag du maillage correspondant
   Maillage_FT_Disc maillage_interface;          // Objet qui peut se reduire a un ensemble de sommets
   // quand il represente les positions de particules
@@ -458,7 +458,7 @@ public:
   // Si non nul, le calcul de l'integrale pour le volume impose porte sur cette sous-domaine
   Nom    nom_domaine_volume_impose_;
 
-  Champ_Inc vitesse_filtree;
+  OWN_PTR(Champ_Inc_base) vitesse_filtree;
   DoubleTab doubletab_pos;
   DoubleTab doubletab_vitesses;
   IntVect   intvect_elements;

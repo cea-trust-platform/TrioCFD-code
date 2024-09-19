@@ -64,8 +64,8 @@ void Injection_QDM_nulle_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, con
 
 void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
-  const Champ_Elem_PolyMAC_P0& cha= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().equation(1).inconnue().valeur()); // volume fraction
+  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue());
+  const Champ_Elem_PolyMAC_P0& cha= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().equation(1).inconnue()); // volume fraction
   const Domaine_PolyMAC_P0&     domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const Conds_lim&           clsa = cha.domaine_Cl_dis().les_conditions_limites();
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
@@ -137,7 +137,7 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
   if ( (pbm) && pbm->has_correlation("flux_parietal") )
     {
       const DoubleTab& qpi = ref_cast(Source_Flux_interfacial_base, pbm->equation_energie().sources().dernier().valeur()).qpi(),
-                       &press = ref_cast(QDM_Multiphase, pbm->equation_qdm()).pression()->passe();
+                       &press = ref_cast(QDM_Multiphase, pbm->equation_qdm()).pression().passe();
       int nb_max_sat = N*(N-1)/2;
 
       /* limiteur de changement de phase : pas mis dans la V0 de cette force */

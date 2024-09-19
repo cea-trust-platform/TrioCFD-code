@@ -59,13 +59,13 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
   const Fluide_base& fluide = eq_rayo.fluide();
   const DoubleTab& kappa = fluide.kappa()->valeurs();
   const DoubleTab& indice = fluide.indice()->valeurs();
-  const DoubleTab& G = eq_rayo.inconnue()->valeurs();
+  const DoubleTab& G = eq_rayo.inconnue().valeurs();
 
   const DoubleVect& volumes_entrelaces =  zvef.volumes_entrelaces();
 
   double sigma = Modele().valeur_sigma();
 
-  const DoubleTab& temperature = equation().inconnue()->valeurs();
+  const DoubleTab& temperature = equation().inconnue().valeurs();
 
   // boucle sur les elements
   int face=0;

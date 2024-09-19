@@ -39,7 +39,7 @@ Entree& Cond_lim_k_simple_flux_nul::readOn(Entree& s ) {return Echange_global_im
 void Cond_lim_k_simple_flux_nul::completer()
 {
   if (!sub_type(Energie_cinetique_turbulente, domaine_Cl_dis().equation())) Process::exit("Cond_lim_k_simple : equation must be k !");
-  if (domaine_Cl_dis().equation().inconnue()->valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
+  if (domaine_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
 }
 
 int Cond_lim_k_simple_flux_nul::initialiser(double temps)

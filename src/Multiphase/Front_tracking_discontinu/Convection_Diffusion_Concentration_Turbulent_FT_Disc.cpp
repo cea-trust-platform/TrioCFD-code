@@ -222,7 +222,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::ramasse_miette_simple
 {
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc, ref_eq_transport_.valeur());
   DoubleTab tmp;
-  Champ_base& champ_inco = inconnue().valeur();
+  Champ_base& champ_inco = inconnue();
   DoubleTab&   inco       = champ_inco.valeurs();
 
   // Calcule une indicatrice de phase localisee comme l'inconnue de l'equation
@@ -271,9 +271,9 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
     }
 
   Probleme_base& pb = mon_probleme.valeur();
-  DoubleTab& champ1 = pb.getset_equation_by_name(equations_source_chimie_[0]).inconnue()->valeurs();
-  DoubleTab& champ2 = pb.getset_equation_by_name(equations_source_chimie_[1]).inconnue()->valeurs();
-  DoubleTab& champ3 = inconnue()->valeurs();
+  DoubleTab& champ1 = pb.getset_equation_by_name(equations_source_chimie_[0]).inconnue().valeurs();
+  DoubleTab& champ2 = pb.getset_equation_by_name(equations_source_chimie_[1]).inconnue().valeurs();
+  DoubleTab& champ3 = inconnue().valeurs();
 
   const double dt = pb.schema_temps().pas_de_temps();
   const int nb_faces = champ1.dimension(0);
@@ -312,8 +312,8 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
   const double delta_nu = nu_phase_1 - nu_phase_0;
 
   DoubleTab indic_faces;
-  calculer_indicatrice_comme(ref_eq_transport_->inconnue().valeur(),
-                             indic_faces, inconnue().valeur());
+  calculer_indicatrice_comme(ref_eq_transport_->inconnue(),
+                             indic_faces, inconnue());
 
   for (int face = 0; face < nb_faces; face++)
     {
@@ -483,7 +483,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::marquer_faces_sous_do
  */
 void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour(double temps)
 {
-  Debog::verifier("Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour c1", inconnue()->valeurs());
+  Debog::verifier("Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour c1", inconnue().valeurs());
   Convection_Diffusion_Concentration_Turbulent::mettre_a_jour(temps);
 
   switch(option_)
@@ -513,20 +513,20 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour(double 
       ArrOfBit marqueur;
       marquer_faces_sous_domaine(nom_domaine_sortie_, marqueur,
                                  0 /* annuler les valeurs sur les faces non std */);
-      DoubleTab& tab = inconnue()->valeurs();
+      DoubleTab& tab = inconnue().valeurs();
       multiplier_valeurs_faces(marqueur, 0., integrale_sortie, tab);
     }
   {
     DoubleTab indic_faces;
-    calculer_indicatrice_comme(ref_eq_transport_->inconnue().valeur(),
-                               indic_faces, inconnue().valeur());
+    calculer_indicatrice_comme(ref_eq_transport_->inconnue(),
+                               indic_faces, inconnue());
     const Domaine_VEF&     domaine_vef = ref_cast(Domaine_VEF, domaine_dis());
     const DoubleVect& volumes = domaine_vef.volumes_entrelaces();
     const DoubleVect& volumes_cl = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis()).volumes_entrelaces_Cl();
     const int nb_faces = domaine_vef.nb_faces();
     const int nb_faces_non_std = domaine_vef.nb_faces_non_std();
     const ArrOfInt& faces_doubles = domaine_vef.faces_doubles();
-    const DoubleTab& inco = inconnue()->valeurs();
+    const DoubleTab& inco = inconnue().valeurs();
     for (int i = 0; i < nb_faces; i++)
       {
         double vol = (i < nb_faces_non_std) ? volumes_cl[i] : volumes[i];
@@ -554,5 +554,5 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour(double 
                integrale_sortie / dt);
       f << s << finl;
     }
-  Debog::verifier("Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour c2", inconnue()->valeurs());
+  Debog::verifier("Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour c2", inconnue().valeurs());
 }

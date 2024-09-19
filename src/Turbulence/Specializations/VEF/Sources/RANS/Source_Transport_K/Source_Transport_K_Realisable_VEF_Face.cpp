@@ -45,13 +45,13 @@ DoubleTab& Source_Transport_K_Realisable_VEF_Face::ajouter(DoubleTab& resu) cons
 {
   Debog::verifier("Source_Transport_K_Realisable_VEF_Face::ajouter resu 0", resu);
 
-  const DoubleTab& K_Rea = eqn_k_Rea->inconnue()->valeurs(), &eps_Rea = eqn_eps_Rea->inconnue()->valeurs();
+  const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, eqn_k_Rea->modele_turbulence());
-  const DoubleTab& visco_turb = mod_turb.viscosite_turbulente()->valeurs(), &vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& visco_turb = mod_turb.viscosite_turbulente()->valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& vol_ent = le_dom_VEF->volumes_entrelaces();
 
   DoubleTab vitesse_filtree(vit);
-  ref_cast(Champ_P1NC,eq_hydraulique->inconnue().valeur()).filtrer_L2(vitesse_filtree);
+  ref_cast(Champ_P1NC,eq_hydraulique->inconnue()).filtrer_L2(vitesse_filtree);
 
   const int nb_faces = le_dom_VEF->nb_faces();
   DoubleTrav P(nb_faces);
@@ -71,7 +71,7 @@ void Source_Transport_K_Realisable_VEF_Face::mettre_a_jour(double temps)
   Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, eqn_k_Rea->modele_turbulence());
   Modele_Fonc_Realisable_base& mon_modele_fonc = mod_turb.associe_modele_fonction();
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente()->valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const double epsilon_minimum = eqn_k_Rea->modele_turbulence().get_EPS_MIN();
   const Champ_Don& ch_visco_cin = ref_cast(Fluide_base,eqn_k_Rea->milieu()).viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -85,7 +85,7 @@ void Source_Transport_K_Realisable_VEF_Face::mettre_a_jour(double temps)
 
   const Domaine_Cl_dis_base& zcl_keps = eqn_k_Rea->domaine_Cl_dis();
   const Domaine_dis_base& domaine_dis_keps = eqn_k_Rea->domaine_dis();
-  const DoubleTab& K_Rea = eqn_k_Rea->inconnue()->valeurs(), & eps_Rea = eqn_eps_Rea->inconnue()->valeurs();
+  const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), & eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   mon_modele_fonc.Contributions_Sources_Paroi_BiK(domaine_dis_keps, zcl_keps, vit, K_Rea, eps_Rea, epsilon_minimum, visco_tab, visco_turb, tab_paroi, idt);
 
   Calcul_Production_K_VEF::mettre_a_jour(temps);
@@ -93,7 +93,7 @@ void Source_Transport_K_Realisable_VEF_Face::mettre_a_jour(double temps)
 
 void Source_Transport_K_Realisable_VEF_Face::fill_coeff_matrice(const int face, const DoubleVect& porosite_face, const DoubleVect& volumes_entrelaces, const double visco, Matrice_Morse& matrice) const
 {
-  const DoubleTab& K_Rea = eqn_k_Rea->inconnue()->valeurs(), &eps_Rea = eqn_eps_Rea->inconnue()->valeurs();
+  const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, eqn_k_Rea->modele_turbulence());
   const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
 

@@ -90,7 +90,7 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
 {
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
-  const DoubleTab& temperature = equation().inconnue()->valeurs();
+  const DoubleTab& temperature = equation().inconnue().valeurs();
   const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
   const Champ_Don& lambda = fluide.conductivite();
   int lambda_uniforme = (sub_type(Champ_Uniforme,lambda.valeur()) ? 1 : 0);

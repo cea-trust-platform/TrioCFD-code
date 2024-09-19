@@ -54,7 +54,7 @@ public :
   void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Eps_base&) override;
   inline const OWN_PTR(Modele_Fonc_Realisable_base)& modele_fonc() const;
   inline  OWN_PTR(Modele_Fonc_Realisable_base)& modele_fonc();
-//   inline const Champ_Inc& vitesse_transportante();
+//   inline const Champ_Inc_base& vitesse_transportante();
   const Motcle& domaine_application() const override;
   void completer() override;
 
@@ -63,7 +63,7 @@ protected:
   Op_Diff_K_Eps terme_diffusif;
   Operateur_Conv terme_convectif;
 
-  REF(Champ_Inc) inco_eqn_associee;
+  REF(Champ_Inc_base) inco_eqn_associee;
   Champ_Don Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
 
 private :

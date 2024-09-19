@@ -95,7 +95,7 @@ Entree& Traitement_particulier_NS_CEG::lire(Entree& is)
        mon_equation->milieu().gravite().valeurs()(0,1)!=0 ||
        mon_equation->milieu().gravite().valeurs()(0,2)>=0 ) error("Error ! Gravity should be defined and oriented parallel to Z, downwards.");
   // Verification VEF 3D
-  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   if (vitesse.nb_dim()!=2 || vitesse.dimension(1)!=3) error("Error ! Only works in VEF 3D.");
 
   // XD traitement_particulier_ceg traitement_particulier_base ceg 1  Keyword for a CEG ( Gas Entrainment Criteria)  calculation. An objective is deepening gas entrainment on the free surface. Numerical analysis can be performed to predict the hydraulic and geometric conditions that can   handle gas entrainment from the free surface.
@@ -145,7 +145,7 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
       // Surface libre trouvee
       if (les_cls[num_cl]->frontiere_dis().le_nom()==la_surface_libre_nom_)
         {
-          const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue()->domaine_dis_base());
+          const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
           la_surface_libre_ = ref_cast(Front_VF,les_cls[num_cl]->frontiere_dis());
           trouve=1;
           int nb_faces=la_surface_libre_->nb_faces();
@@ -195,11 +195,11 @@ void Traitement_particulier_NS_CEG::post_traitement_particulier()
 
 void Traitement_particulier_NS_CEG::critere_areva()
 {
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue()->domaine_dis_base());
-  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
+  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const DoubleTab& vorticite = mon_equation->get_champ("vorticite").valeurs();
   const Navier_Stokes_Turbulent& eqn = ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0));
-  const DoubleTab& KEps = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base,eqn.modele_turbulence().valeur()).equation_k_eps(0).inconnue()->valeurs();
+  const DoubleTab& KEps = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base,eqn.modele_turbulence().valeur()).equation_k_eps(0).inconnue().valeurs();
 
   double gz = mon_equation->milieu().gravite().valeurs()(0,2);
   double K_max_local=0;
@@ -272,7 +272,7 @@ int Traitement_particulier_NS_CEG::lpost(double temps_courant, double dt_post) c
 
 void Traitement_particulier_NS_CEG::critere_cea_jaea()
 {
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue()->domaine_dis_base());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
   int nb_faces=la_surface_libre_->nb_faces();
   int nb_elem=domaine_VF.nb_elem();
 
@@ -284,7 +284,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
 
   // GF on laisse faire NS...
   // DoubleTab critereQ(nb_elem);
-  //ref_cast(Champ_P1NC,mon_equation->inconnue().valeur()).calcul_critere_Q(critereQ);
+  //ref_cast(Champ_P1NC,mon_equation->inconnue()).calcul_critere_Q(critereQ);
   const DoubleTab& critereQ = mon_equation->get_champ("critere_Q").valeurs();
 
 
@@ -481,7 +481,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               //if (e>=0) Cerr << "Sur process " << Process::me() << " critere_Q=" << critereQ(e) << finl;
             }
           // On evalue la vitesse aux points:
-          mon_equation->inconnue()->valeur_aux(points,u);
+          mon_equation->inconnue().valeur_aux(points,u);
           double alpha=0;
           double gamma=0;
           // On integre sur le cercle pour calcul alpha et gamma:

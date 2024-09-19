@@ -40,10 +40,10 @@ public:
   void mettre_a_jour(double ) override;
   void associer_eqn(const Equation_base&);
   void associer_viscosite_turbulente(const Champ_Fonc& );
-  inline Champ_Inc& Fluctu_Temperature();
-  inline const Champ_Inc& Fluctu_Temperature() const;
-  inline Champ_Inc& Flux_Chaleur_Turb();
-  inline const Champ_Inc& Flux_Chaleur_Turb() const;
+  inline Champ_Inc_base& Fluctu_Temperature();
+  inline const Champ_Inc_base& Fluctu_Temperature() const;
+  inline Champ_Inc_base& Flux_Chaleur_Turb();
+  inline const Champ_Inc_base& Flux_Chaleur_Turb() const;
   inline Transport_Fluctuation_Temperature& equation_Fluctu();
   inline const Transport_Fluctuation_Temperature& equation_Fluctu() const;
   inline Transport_Flux_Chaleur_Turbulente& equation_Chaleur();
@@ -100,22 +100,22 @@ inline const Transport_Flux_Chaleur_Turbulente& Modele_turbulence_scal_Fluctuati
   return eqn_transport_Flux_Chaleur_Turb;
 }
 
-inline const Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature::Fluctu_Temperature() const
+inline const Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature::Fluctu_Temperature() const
 {
   return eqn_transport_Fluctu_Temp.inconnue();
 }
 
-inline Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature::Fluctu_Temperature()
+inline Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature::Fluctu_Temperature()
 {
   return eqn_transport_Fluctu_Temp.inconnue();
 }
 
-inline const Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature::Flux_Chaleur_Turb() const
+inline const Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature::Flux_Chaleur_Turb() const
 {
   return eqn_transport_Flux_Chaleur_Turb.inconnue();
 }
 
-inline Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature::Flux_Chaleur_Turb()
+inline Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature::Flux_Chaleur_Turb()
 {
   return eqn_transport_Flux_Chaleur_Turb.inconnue();
 }

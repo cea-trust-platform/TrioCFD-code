@@ -258,7 +258,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_p
   // Tautre=Text;
   //  Tw=(autr_h*Tautre+mon_h*monT)/(autr_h+mon_h)
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-  const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
+  const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 

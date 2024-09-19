@@ -72,10 +72,10 @@ int Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::lire_motcle_non_standard(c
 
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente(double temps)
 {
-  const Champ_base& chK = eqn_transp_K().inconnue().valeur();
+  const Champ_base& chK = eqn_transp_K().inconnue();
   Nom type = chK.que_suis_je();
   const DoubleTab& tab_K = chK.valeurs();
-  const Champ_base& chEps = eqn_transp_Eps().inconnue().valeur();
+  const Champ_base& chEps = eqn_transp_Eps().inconnue();
   const DoubleTab& tab_Eps = chEps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente K", tab_K);
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite_turbulente Epsilon", tab_Eps);
@@ -90,7 +90,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::calculer_viscosite
 
   if (non_prepare == 1)
     {
-      Champ_Inc visco_turb_au_format_K_eps_Rea;
+      OWN_PTR(Champ_Inc_base) visco_turb_au_format_K_eps_Rea;
       visco_turb_au_format_K_eps_Rea.typer(type);
       DoubleTab& visco_turb_K_eps_Rea = complete_viscosity_field(n, eqn_transp_K().domaine_dis(), visco_turb_au_format_K_eps_Rea);
 

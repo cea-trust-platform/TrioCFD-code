@@ -129,7 +129,7 @@ void Schema_Euler_Implicite_Stationnaire::ajouter_inertie(Matrice_Base& mat_mors
               dt_locaux_taille_vitesse[i]= dt_locaux[j];
             }
           dt_locaux_taille_vitesse.echange_espace_virtuel();
-          eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux_taille_vitesse,secmem,eqn.inconnue()->passe(),pen);
+          eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux_taille_vitesse,secmem,eqn.inconnue().passe(),pen);
           eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux_taille_vitesse,mat_morse,pen);
         }
       else if (dt_locaux.size()*2==secmem.size())
@@ -143,7 +143,7 @@ void Schema_Euler_Implicite_Stationnaire::ajouter_inertie(Matrice_Base& mat_mors
               dt_locaux_taille_vitesse[i]= dt_locaux[j];
             }
           dt_locaux_taille_vitesse.echange_espace_virtuel();
-          eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux_taille_vitesse,secmem,eqn.inconnue()->passe(),pen);
+          eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux_taille_vitesse,secmem,eqn.inconnue().passe(),pen);
           eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux_taille_vitesse,mat_morse,pen);
         }
       else
@@ -155,7 +155,7 @@ void Schema_Euler_Implicite_Stationnaire::ajouter_inertie(Matrice_Base& mat_mors
     }
   else
     {
-      eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux,secmem,eqn.inconnue()->passe(),pen);
+      eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux,secmem,eqn.inconnue().passe(),pen);
       eqn.solv_masse()->ajouter_masse_dt_local(dt_locaux,mat_morse,pen);
     }
 }

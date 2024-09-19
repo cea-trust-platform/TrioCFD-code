@@ -788,7 +788,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
@@ -816,7 +816,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   ArrOfDouble val(dimension);
   Cisaillement_paroi_=0;
 
-  int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
+  int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue());
   remplir_face_keps_imposee( flag_face_keps_imposee_, methode_calcul_face_keps_impose_, face_keps_imposee_, domaine_VEF, le_dom_Cl_VEF, !is_champ_Q1NC);
 
   IntVect num(nfac);
@@ -1141,7 +1141,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
             }
           else
             {
-              assert(sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur())) ;
+              assert(sub_type(Champ_Q1NC,eqn_hydr.inconnue())) ;
               distb=distance_face_elem(num_face,elem,domaine_VEF);
             }
 
@@ -1185,7 +1185,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
 
@@ -1211,7 +1211,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
   ArrOfDouble val(dimension);
   Cisaillement_paroi_ = 0;
 
-  int is_champ_Q1NC = sub_type(Champ_Q1NC, eqn_hydr.inconnue().valeur());
+  int is_champ_Q1NC = sub_type(Champ_Q1NC, eqn_hydr.inconnue());
   remplir_face_keps_imposee(flag_face_keps_imposee_, methode_calcul_face_keps_impose_,
                             face_keps_imposee_, domaine_VEF,
                             le_dom_Cl_VEF, !is_champ_Q1NC);
@@ -1565,7 +1565,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
             }
           else
             {
-              assert(sub_type(Champ_Q1NC, eqn_hydr.inconnue().valeur())) ;
+              assert(sub_type(Champ_Q1NC, eqn_hydr.inconnue())) ;
               distb = distance_face_elem(num_face, elem, domaine_VEF);
             }
 
@@ -1707,7 +1707,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
   double dist_corr=1.;
   double coef_vit=nfac;
-  if (sub_type(Champ_P1NC,eqn_hydr.inconnue().valeur()))
+  if (sub_type(Champ_P1NC,eqn_hydr.inconnue()))
     {
       dist_corr=double(dimension+1)/double(dimension);
       coef_vit=nfac-1;
@@ -1745,7 +1745,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
           CIntArrView le_bord_num_face = le_bord.num_face().view_ro();
           CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
           CIntTabView elem_faces = domaine_VEF.elem_faces().view_ro();
-          CDoubleTabView vitesse = eqn_hydr.inconnue()->valeurs().view_ro();
+          CDoubleTabView vitesse = eqn_hydr.inconnue().valeurs().view_ro();
           CDoubleTabView face_normales = domaine_VEF.face_normales().view_ro();
           CDoubleTabView xp = domaine_VEF.xp().view_ro();
           CDoubleTabView xv = domaine_VEF.xv().view_ro();

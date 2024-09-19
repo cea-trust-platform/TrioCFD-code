@@ -103,7 +103,7 @@ void Modele_turbulence_hyd_LES_1elt_selectif_mod_VEF::calculer_fonction_structur
 void Modele_turbulence_hyd_LES_1elt_selectif_mod_VEF::cutoff()
 {
   double Sin2Angl;
-  const Champ_P1NC& vitesse = ref_cast(Champ_P1NC, mon_equation_->inconnue().valeur());
+  const Champ_P1NC& vitesse = ref_cast(Champ_P1NC, mon_equation_->inconnue());
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const int nb_elem = domaine_VEF.nb_elem();
   const IntTab& elem_faces = domaine_VEF.elem_faces();

@@ -1345,9 +1345,9 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
   double norme_op_diff=mp_norme_vect(flux_bords_diff);
   if(resumption && norme_op_diff==0. )
     {
-      DoubleTab resu=eqn_hydr.vitesse()->valeurs();
+      DoubleTab resu=eqn_hydr.vitesse().valeurs();
       resu=0.;
-      op_diff.ajouter(eqn_hydr.vitesse()->valeurs(),resu);
+      op_diff.ajouter(eqn_hydr.vitesse().valeurs(),resu);
     }
   //end resumption
 

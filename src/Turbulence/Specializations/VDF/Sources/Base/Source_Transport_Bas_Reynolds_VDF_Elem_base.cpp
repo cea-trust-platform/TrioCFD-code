@@ -42,16 +42,16 @@ void Source_Transport_Bas_Reynolds_VDF_Elem_base::associer_pb(const Probleme_bas
 // pour le moment j'ai fait comme Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
 void Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter_blocs(matrices_t matrices, DoubleTab& resu, const tabs_t& semi_impl) const
 {
-  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente()->valeurs();
   const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const Domaine_Cl_dis_base& zcl_keps=eqn_keps_bas_re->domaine_Cl_dis();
   const Domaine_dis_base& domaine_dis_keps =eqn_keps_bas_re ->domaine_dis();
-  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
   const int nb_elem = le_dom_VDF->nb_elem();
 
   DoubleTrav P(visco_turb), D(visco_turb), E(visco_turb), F1(nb_elem), F2(nb_elem);

@@ -311,7 +311,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
                   {
                     const Champ_Inc_base& incoG = eqG.inconnue();
                     const DoubleTab& T_VDF = incoG.valeurs();
-                    const DoubleTab& T_VEF = eqF.inconnue()->valeurs();
+                    const DoubleTab& T_VEF = eqF.inconnue().valeurs();
                     DoubleVect cumulHiSi(nb_faces_front_vdf);
                     DoubleVect Tparoi(nb_faces_front_vdf);
 

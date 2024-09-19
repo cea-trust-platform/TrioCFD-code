@@ -136,7 +136,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature::calculer_diffusivite
 
 void Modele_turbulence_scal_Fluctuation_Temperature::mettre_a_jour(double temps)
 {
-  //  Champ_Inc& ch_Fluctu_Temp = Fluctu_Temperature();
+  //  Champ_Inc_base& ch_Fluctu_Temp = Fluctu_Temperature();
   Schema_Temps_base& sch1 = eqn_transport_Fluctu_Temp.schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
   eqn_transport_Fluctu_Temp.domaine_Cl_dis().mettre_a_jour(temps);
@@ -144,7 +144,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature::mettre_a_jour(double temps)
   //eqn_transport_Fluctu_Temp.inconnue().mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp.mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp.controler_grandeur();
-  //  Champ_Inc& ch_Flux_Chaleur_Turb = Flux_Chaleur_Turb();
+  //  Champ_Inc_base& ch_Flux_Chaleur_Turb = Flux_Chaleur_Turb();
   Schema_Temps_base& sch2 = eqn_transport_Flux_Chaleur_Turb.schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
   eqn_transport_Flux_Chaleur_Turb.domaine_Cl_dis().mettre_a_jour(temps);

@@ -106,13 +106,13 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W::calculer_diffusivi
   DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
   const DoubleTab& mu_t = la_viscosite_turbulente.valeur()->valeurs();
   double temps = la_viscosite_turbulente.valeur()->temps();
-  const Champ_base& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeur();
+  const Champ_base& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue();
 
   const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,modele_turbulence.valeur());
   const Transport_K_Eps_base& eqBasRe = mod_turb_hydr.eqn_transp_K_Eps();
-  const DoubleTab& K_eps_Bas_Re = eqBasRe.inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqBasRe.inconnue().valeurs();
 
   if (temps != diffusivite_turbulente_->temps())
     {

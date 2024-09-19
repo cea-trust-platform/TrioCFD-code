@@ -58,9 +58,9 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, eq_hydraulique->domaine_dis());
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, zcl);
   const Domaine_Cl_VEF& zcl_VEF_th = ref_cast(Domaine_Cl_VEF, eq_thermique->domaine_Cl_dis());
-  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();
-  const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
+  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs(), &g = gravite->valeurs();

@@ -580,11 +580,11 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::ajouter(DoubleTa
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& modele_bas_Re = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,le_modele);
   const Transport_K_Eps_base& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.eqn_transp_K_Eps();
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
-  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue()->valeurs();
-  const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue().valeurs();
+  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleTab& visco_turb = le_modele.viscosite_turbulente()->valeurs();
-  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue()->valeurs();
+  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue().valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
   const Modele_turbulence_scal_base& le_modele_scalaire =
@@ -611,12 +611,12 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::ajouter(DoubleTa
 
   if (axi)
     {
-      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
       calculer_terme_production_K_Axi(domaine_VDF,vitesse,P,K_eps_Bas_Re,visco_turb);
     }
   else
     {
-      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
       calculer_terme_production_K(domaine_VDF,domaine_Cl_VDF,P,K_eps_Bas_Re,vit,vitesse,visco_turb);
     }
 

@@ -26,8 +26,8 @@
 #include <Source_base.h>
 #include <SourceFiltree_FT_disc_base.h>
 #include <TRUST_Ref.h>
-#include <Champ_Inc.h>
 
+class Champ_Inc_base;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
@@ -54,7 +54,7 @@ protected :
 
   REF(Domaine_VEF) le_dom_VEF;
   REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  REF(Champ_Inc) Indic_;
+  REF(Champ_Inc_base) Indic_;
 };
 
 #endif

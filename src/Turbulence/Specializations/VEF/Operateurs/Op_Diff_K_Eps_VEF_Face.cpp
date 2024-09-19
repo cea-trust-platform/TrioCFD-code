@@ -45,9 +45,9 @@ Entree& Op_Diff_K_Eps_VEF_Face::readOn(Entree& s )
  */
 void Op_Diff_K_Eps_VEF_Face::associer(const Domaine_dis_base& domaine_dis,
                                       const Domaine_Cl_dis_base& domaine_cl_dis,
-                                      const Champ_Inc& ch_diffuse)
+                                      const Champ_Inc_base& ch_diffuse)
 {
-  const Champ_P1NC& inco = ref_cast(Champ_P1NC,ch_diffuse.valeur());
+  const Champ_P1NC& inco = ref_cast(Champ_P1NC,ch_diffuse);
   const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis);
   const Domaine_Cl_VEF& zclVEF = ref_cast(Domaine_Cl_VEF,domaine_cl_dis);
   inconnue_ = inco;
@@ -1000,7 +1000,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
   if ( sub_type( Transport_K_Eps,equation() ) )
     {
       const Transport_K_Eps& eqn_k_eps=ref_cast(Transport_K_Eps,equation());
-      const DoubleTab& val=equation().inconnue()->valeurs();
+      const DoubleTab& val=equation().inconnue().valeurs();
       const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
       const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
@@ -1037,7 +1037,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
   else if ( sub_type( Transport_K_Eps_Realisable,equation() ) )
     {
       const Transport_K_Eps_Realisable& eqn_k_eps=ref_cast(Transport_K_Eps_Realisable,equation());
-      const DoubleTab& val=equation().inconnue()->valeurs();
+      const DoubleTab& val=equation().inconnue().valeurs();
       const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
       const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
@@ -1073,7 +1073,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
   else if ( sub_type( Transport_K_ou_Eps,equation() ) )
     {
       const Transport_K_ou_Eps& eqn_k_eps=ref_cast(Transport_K_ou_Eps,equation());
-      const DoubleTab& val=equation().inconnue()->valeurs();
+      const DoubleTab& val=equation().inconnue().valeurs();
       const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
       const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();

@@ -80,13 +80,13 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
   //            temps
 
   //calcul du second membre
-  DoubleTrav secmem(inconnue()->valeurs());
+  DoubleTrav secmem(inconnue().valeurs());
   Probleme_base& pb = Modele().probleme();
   double n;
   double k;
 
-  assert(pb.equation(1).inconnue()->le_nom()=="temperature");
-  const DoubleTab& temper = pb.equation(1).inconnue()->valeurs();
+  assert(pb.equation(1).inconnue().le_nom()=="temperature");
+  const DoubleTab& temper = pb.equation(1).inconnue().valeurs();
 
   const DoubleTab& indice = fluide().indice()->valeurs();
   const DoubleTab& kappa = fluide().kappa()->valeurs();

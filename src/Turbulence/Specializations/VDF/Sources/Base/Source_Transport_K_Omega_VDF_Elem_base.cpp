@@ -57,8 +57,8 @@ DoubleTab& Source_Transport_K_Omega_VDF_Elem_base::ajouter_komega(DoubleTab& res
 {
   const Domaine_VDF& domaine_VDF = le_domaine_VDF.valeur();
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
-  const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF, eq_hydraulique->inconnue().valeur());
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
+  const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF, eq_hydraulique->inconnue());
 
   DoubleVect P; // Ajout d'un espace virtuel au tableau P
   domaine_VDF.domaine().creer_tableau_elements(P);

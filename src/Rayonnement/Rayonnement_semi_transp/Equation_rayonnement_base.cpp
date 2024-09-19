@@ -124,7 +124,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
     nb_inc = "_Mult_inco_";
   type+=nb_inc;
 
-  Nom type_inco=inconnue()->que_suis_je();
+  Nom type_inco=inconnue().que_suis_je();
   type+=(type_inco.suffix("Champ_"));
 
   if (axi)
@@ -328,9 +328,9 @@ Operateur& Equation_rayonnement_base::operateur(int i)
 
 /*! @brief Renvoie l'irradiance (champ inconnue de l'equation de rayonnement) (version const)
  *
- * @return (Champ_Inc&) le champ inconnue representant l'irradience
+ * @return (Champ_Inc_base&) le champ inconnue representant l'irradience
  */
-const Champ_Inc& Equation_rayonnement_base::inconnue() const
+const Champ_Inc_base& Equation_rayonnement_base::inconnue() const
 {
   return irradiance_;
 }
@@ -338,9 +338,9 @@ const Champ_Inc& Equation_rayonnement_base::inconnue() const
 
 /*! @brief Renvoie l'irradiance (champ inconnue de l'equation de rayonnement) (version const)
  *
- * @return (Champ_Inc&) le champ inconnue representant l'irradience
+ * @return (Champ_Inc_base&) le champ inconnue representant l'irradience
  */
-Champ_Inc& Equation_rayonnement_base::inconnue()
+Champ_Inc_base& Equation_rayonnement_base::inconnue()
 {
   return irradiance_;
 }

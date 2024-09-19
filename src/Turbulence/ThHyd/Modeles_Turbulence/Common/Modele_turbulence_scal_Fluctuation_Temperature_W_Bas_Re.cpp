@@ -99,7 +99,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
   const DoubleTab& nu_t = la_viscosite_turbulente.valeur()->valeurs();
   double temps = la_viscosite_turbulente.valeur()->temps();
-  const DoubleTab& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue()->valeurs();
+  const DoubleTab& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeurs();
   const Domaine_dis_base& le_dom_dis = eqn_transport_Fluctu_Temp->domaine_dis();
 
   const Probleme_base& mon_pb = mon_equation_->probleme();
@@ -107,7 +107,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   const RefObjU& modele_turbulence = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,modele_turbulence.valeur());
   const Transport_K_Eps_base& eqBasRe = mod_turb_hydr.eqn_transp_K_Eps();
-  const DoubleTab& K_eps_Bas_Re = eqBasRe.inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqBasRe.inconnue().valeurs();
 
   //on recupere les proprietes physiques du fluide : viscosite cinematique et diffusivite
   const Fluide_base& fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
@@ -143,7 +143,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   DoubleTab Flambda(nb_elem);
   mon_modele_fonc->Calcul_Flambda( Flambda,le_dom_dis,K_eps_Bas_Re,chFluctuTemp,visco,diffu);
 
-  if (temps != diffusivite_turbulente_.valeur().temps())
+  if (temps != diffusivite_turbulente_->temps())
     {
       static const double C_Lambda = 0.11;
       int n= alpha_t.size();

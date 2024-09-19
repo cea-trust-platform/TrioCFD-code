@@ -41,8 +41,8 @@ public :
   virtual int reprendre(Entree&) override;
 
 protected :
-  Champ_Inc ALEMeshVelocity_;
-  Champ_Inc ALEMeshTotalDisplacement_;
+  OWN_PTR(Champ_Inc_base) ALEMeshVelocity_;
+  OWN_PTR(Champ_Inc_base) ALEMeshTotalDisplacement_;
 };
 
 #endif

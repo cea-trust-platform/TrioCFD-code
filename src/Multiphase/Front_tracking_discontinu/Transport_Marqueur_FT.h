@@ -164,8 +164,8 @@ public:
   const DoubleTab& calculer_valeurs_volumes(DoubleTab& val_volume) const;
 
 
-  const Champ_Inc& inconnue(void) const override;     //renvoie un champ bidon
-  Champ_Inc&        inconnue(void) override;
+  const Champ_Inc_base& inconnue(void) const override;     //renvoie un champ bidon
+  Champ_Inc_base&        inconnue(void) override;
 
   //Methodes d acces aux tableaux contenant les proprietes du fluide
   inline const DoubleTab& vitesse_fluide() const;
@@ -204,7 +204,7 @@ protected:
 
   // L'inconnue de cette equation n a pas de sens
   //Creation d un champ bidon
-  Champ_Inc champ_bidon_;
+  OWN_PTR(Champ_Inc_base) champ_bidon_;
 
   int phase_marquee_;                    //numero de la phase marquee par des particules (-1 pour cas monophasique)
   Nom nom_eq_interf_;                        //Pour recuperer l equation d interface entre les deux phases

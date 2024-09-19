@@ -58,12 +58,12 @@ DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::ajouter(DoubleTab& resu) const
   const Fluide_base& fluide = eq_rayo.fluide();
   const DoubleTab& kappa = fluide.kappa()->valeurs();
   const DoubleTab& indice = fluide.indice()->valeurs();
-  const DoubleTab& G = eq_rayo.inconnue()->valeurs();
+  const DoubleTab& G = eq_rayo.inconnue().valeurs();
   const double sigma = Modele().valeur_sigma();
 
   int elem;
 
-  const DoubleTab& temperature = equation().inconnue()->valeurs();
+  const DoubleTab& temperature = equation().inconnue().valeurs();
 
   // boucle sur les elements
   for(elem=0; elem<nb_elem; elem++)

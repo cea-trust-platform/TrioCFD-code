@@ -26,7 +26,7 @@
 #include <Domaine_VEF.h>
 #include <TRUST_Ref.h>
 #include <Champ_Fonc.h>
-#include <Champ_Inc.h>
+
 
 
 
@@ -48,7 +48,7 @@ class Op_Diff_K_Eps_VEF_Face : public Op_Diff_K_Eps_VEF_base, public Op_VEF_Face
 public:
 
   void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ,
-                const Champ_Inc& ) override;
+                const Champ_Inc_base& ) override;
   void associer_diffusivite_turbulente() override;
   const Champ_Fonc& diffusivite_turbulente() const;
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;

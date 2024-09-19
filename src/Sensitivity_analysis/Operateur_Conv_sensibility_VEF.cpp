@@ -62,7 +62,7 @@ Entree&  Operateur_Conv_sensibility_VEF::readOn(Entree& is)
 
 void  Operateur_Conv_sensibility_VEF::associer (const Domaine_dis_base& domaine_dis ,
                                                 const Domaine_Cl_dis_base& domaine_cl_dis,
-                                                const Champ_Inc& inco )
+                                                const Champ_Inc_base& inco )
 {
   Cerr << " Operateur_Conv_sensibility_VEF::associer" << finl;
   const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis);

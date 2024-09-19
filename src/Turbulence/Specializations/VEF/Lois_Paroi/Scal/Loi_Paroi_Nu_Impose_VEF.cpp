@@ -130,7 +130,7 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
-  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
 
@@ -261,7 +261,7 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& conductivite = le_fluide.conductivite();
-  const DoubleTab& temperature = eqn.probleme().equation(1).inconnue()->valeurs();
+  const DoubleTab& temperature = eqn.probleme().equation(1).inconnue().valeurs();
 
   const DoubleTab& conductivite_turbulente =  mon_modele_turb_scal->conductivite_turbulente()->valeurs();
 

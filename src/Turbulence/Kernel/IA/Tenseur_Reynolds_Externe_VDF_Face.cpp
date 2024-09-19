@@ -430,7 +430,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
   const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eqn_NS_->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eqn_NS_->inconnue() );
   assert (vitesse.valeurs().line_size() == 1);
   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
@@ -441,7 +441,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
   DoubleTab lambda_4(nb_elem_tot);
   DoubleTab lambda_5(nb_elem_tot);
 
-  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue()->valeurs();
+  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue().valeurs();
 
   DoubleTab S_etoile(nb_elem_tot,dimension,dimension);
   DoubleTab R_etoile(nb_elem_tot,dimension,dimension);
@@ -631,7 +631,7 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::Calcul_Tenseur_Reynolds(DoubleTab&
 {
   DoubleTab bij = Calcul_bij_TBNN(resu);
 
-  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue()->valeurs();
+  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue().valeurs();
 
   for (int elem=0; elem<nelem_; elem++)
     {

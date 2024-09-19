@@ -45,7 +45,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_VDF::ajouter_blocs(matrices_t
   const DoubleTab& k_passe = ch_k.passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
-  const Champ_Inc_P0_base& ch_diss	= ref_cast(Champ_Inc_P0_base, equation().inconnue().valeur()); 		// Champ tau ou omega
+  const Champ_Inc_P0_base& ch_diss	= ref_cast(Champ_Inc_P0_base, equation().inconnue()); 		// Champ tau ou omega
   const DoubleTab& diss_passe = ch_diss.passe();
   const DoubleTab& diss = ch_diss.valeurs();
 

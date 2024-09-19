@@ -25,7 +25,7 @@
 
 #include <Modele_turbulence_hyd_RANS_K_Eps_base.h>
 #include <Transport_2eq_base.h>
-#include <Champ_Inc.h>
+
 #include <TRUST_Ref.h>
 
 class Milieu_base;
@@ -45,12 +45,11 @@ public:
 
   virtual void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Eps_base& )=0;
   void discretiser() override;
-  void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis_base&, Champ_Inc&) const;
 
   int controler_K_Eps();
   void valider_iteration() override;
-  inline const Champ_Inc& inconnue() const override;
-  inline Champ_Inc& inconnue() override;
+  inline const Champ_Inc_base& inconnue() const override;
+  inline Champ_Inc_base& inconnue() override;
   inline const Modele_turbulence_hyd_RANS_K_Eps_base& modele_turbulence() const;
   inline Modele_turbulence_hyd_RANS_K_Eps_base& modele_turbulence();
 
@@ -60,7 +59,7 @@ public:
 
 protected:
 
-  Champ_Inc le_champ_K_Eps;
+  OWN_PTR(Champ_Inc_base) le_champ_K_Eps;
   REF(Modele_turbulence_hyd_RANS_K_Eps_base) mon_modele;
 
 };
@@ -69,9 +68,9 @@ protected:
  *
  * Un champ vecteur contenant K et epsilon.
  *
- * @return (Champ_Inc&) le champ inconnue de l'equation
+ * @return (Champ_Inc_base&) le champ inconnue de l'equation
  */
-inline Champ_Inc& Transport_K_Eps_base::inconnue() { return le_champ_K_Eps; }
+inline Champ_Inc_base& Transport_K_Eps_base::inconnue() { return le_champ_K_Eps; }
 
 
 /*! @brief Renvoie le champ inconnue de l'equation.
@@ -79,9 +78,9 @@ inline Champ_Inc& Transport_K_Eps_base::inconnue() { return le_champ_K_Eps; }
  * Un champ vecteur contenant K et epsilon.
  *     (version const)
  *
- * @return (Champ_Inc&) le champ inconnue de l'equation
+ * @return (Champ_Inc_base&) le champ inconnue de l'equation
  */
-inline const Champ_Inc& Transport_K_Eps_base::inconnue() const { return le_champ_K_Eps; }
+inline const Champ_Inc_base& Transport_K_Eps_base::inconnue() const { return le_champ_K_Eps; }
 
 /*! @brief Renvoie le modele de turbulence associe a l'equation.
  *

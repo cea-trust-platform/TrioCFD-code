@@ -324,7 +324,7 @@ void Transport_Marqueur_FT::completer()
 {
   les_sources.completer();
   ////le_dom_Cl_dis->completer();
-  const Domaine& domaine = le_dom_dis.valeur().domaine();
+  const Domaine& domaine = le_dom_dis->domaine();
 
   Maillage_FT_Disc& ens_points = maillage_interface();
   ens_points.associer_domaine(domaine);
@@ -365,12 +365,12 @@ int Transport_Marqueur_FT::preparer_calcul()
   return 1;
 }
 
-const Champ_Inc& Transport_Marqueur_FT::inconnue(void) const
+const Champ_Inc_base& Transport_Marqueur_FT::inconnue(void) const
 {
   return champ_bidon_;
 }
 
-Champ_Inc& Transport_Marqueur_FT::inconnue(void)
+Champ_Inc_base& Transport_Marqueur_FT::inconnue(void)
 {
   return champ_bidon_;
 }
@@ -483,7 +483,9 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
   const Solveur_Masse& le_solveur_masse_ns = eq_ns.solv_masse();
   const Operateur_Grad& gradient = eq_ns.operateur_gradient();
 
-  Champ_Inc champ_grad_p(eq_ns.grad_P());
+  OWN_PTR(Champ_Inc_base) champ_grad_p;
+  champ_grad_p.typer(eq_ns.grad_P().que_suis_je());
+
   gradient.calculer(champ_pression.valeurs(), champ_grad_p->valeurs());
   le_solveur_masse_ns->appliquer(champ_grad_p->valeurs());
   champ_grad_p->valeurs().echange_espace_virtuel();
@@ -678,7 +680,7 @@ void Transport_Marqueur_FT::transformation(Maillage_FT_Disc& marqueurs,Propriete
   const Equation_base& eq = probleme_base_->get_equation_by_name(nom_eq_interf_);
   Transport_Interfaces_FT_Disc& eq_interf = ref_cast_non_const(Transport_Interfaces_FT_Disc,eq);
   const Equation_base& eqn_hydraulique = probleme_base_->equation(0);
-  const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
+  const Champ_base& champ_vitesse = eqn_hydraulique.inconnue();
   DoubleTab& vitesse_p = proprietes.vitesse_particules();
 
   IntVect num_compo;
@@ -870,7 +872,7 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
       size_new++;
 
   //remplir sommets_lu et proprietes
-  const Domaine& domaine = le_dom_dis.valeur().domaine();
+  const Domaine& domaine = le_dom_dis->domaine();
   ens_points.associer_domaine(domaine);
 
   DoubleTab&   soms_tmp =  ens_points.sommets_lu();
@@ -932,7 +934,7 @@ void Transport_Marqueur_FT::calcul_vitesse_p(DoubleTab& deplacement) const
       //Pour une equation de transport d interface solide, la REF refequation_vitesse_transport est vide
       //On utilise directement l equation de N_S et non pas efequation_vitesse_transport.valeur()
       const Equation_base& eqn_hydraulique = probleme_base_->equation(0);
-      const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
+      const Champ_base& champ_vitesse = eqn_hydraulique.inconnue();
       calculer_vitesse_transport_interpolee(champ_vitesse,
                                             maillage_interface(),
                                             deplacement, 1 /* recalculer le champ de vitesse L2 */);

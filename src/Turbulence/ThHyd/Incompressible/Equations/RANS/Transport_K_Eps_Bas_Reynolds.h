@@ -43,7 +43,7 @@ public :
   void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Eps_base&) override;
   inline const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& modele_fonc() const;
   inline  OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& modele_fonc();
-  inline const Champ_Inc& vitesse_transportante();
+  inline const Champ_Inc_base& vitesse_transportante();
   const Motcle& domaine_application() const override;
   void completer() override;
 

@@ -228,7 +228,7 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Domaine_dis_bas
   int fac=-1,elem1,comp;
   // Rque methode non const Pourquoi ?
 
-  const Champ_P1NC& vitesse = ref_cast(Champ_P1NC,eq_hydraulique->inconnue().valeur());
+  const Champ_P1NC& vitesse = ref_cast(Champ_P1NC,eq_hydraulique->inconnue());
   ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(transporte,gradient_elem,ref_cast(Domaine_Cl_VEF,eq_hydraulique->domaine_Cl_dis()));
 
   gradient_elem.echange_espace_virtuel();

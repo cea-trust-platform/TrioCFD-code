@@ -23,12 +23,12 @@
 #ifndef Ensemble_Faces_base_included
 #define Ensemble_Faces_base_included
 
+#include <Domaine_forward.h>
 #include <Cond_Lim_Rayo.h>
-#include <Motcle.h>
 #include <TRUST_Ref.h>
+#include <Motcle.h>
 
 class Cond_lim_base;
-
 
 class Ensemble_Faces_base : public Objet_U
 {

@@ -60,7 +60,7 @@ void Cond_lim_omega_dix::completer()
   if (sub_type(Echelle_temporelle_turbulente, domaine_Cl_dis().equation())) Process::exit(que_suis_je() + " : you cannot define such a BC for tau equation, only for omega. Use scalaire_impose_paroi Champ_front_uniforme 1 0 for tau.");
   else if (!sub_type(Taux_dissipation_turbulent, domaine_Cl_dis().equation())) Process::exit(que_suis_je() + " : equation must be tau/omega !");
 
-  int N = domaine_Cl_dis().equation().inconnue()->valeurs().line_size();
+  int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size();
   if (N > 1)  Process::exit(que_suis_je() + " : Only one phase for turbulent wall law is coded for now");
 
   correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");

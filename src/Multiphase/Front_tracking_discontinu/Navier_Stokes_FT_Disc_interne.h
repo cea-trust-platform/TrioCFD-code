@@ -63,14 +63,14 @@ public:
   Champ_Fonc potentiel_faces;
   Champ_Fonc potentiel_elements;
   // delta_u_interface = la partie "saut de vitesse" du champ de vitesse a l'interface
-  Champ_Inc delta_u_interface;
+  OWN_PTR(Champ_Inc_base) delta_u_interface;
   Champ_Fonc laplacien_d;
   Champ_Fonc mpoint;
   Champ_Fonc mpoint_vap;
   // Variation temporelle indicatrice de phase
   Champ_Fonc derivee_temporelle_indicatrice;
   Champ_Fonc ai; // Eulerian interfacial area.
-  Champ_Inc vitesse_jump0_; // Extended Velocity of phase 0.
+  OWN_PTR(Champ_Inc_base) vitesse_jump0_; // Extended Velocity of phase 0.
 
   LIST(REF(Champ_base)) liste_champs_compris;
 

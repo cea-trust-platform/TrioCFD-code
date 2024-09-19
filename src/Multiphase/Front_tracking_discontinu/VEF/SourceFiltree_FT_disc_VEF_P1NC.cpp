@@ -59,7 +59,7 @@ DoubleTab& SourceFiltree_FT_disc_VEF_P1NC::ajouter(DoubleTab& resu) const
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const DoubleTab& xv = domaine_VEF.xv();
-  const DoubleTab& Indicatrice = Indic_->valeur().valeurs();
+  const DoubleTab& Indicatrice = Indic_->valeurs();
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
   const int nb_front_Cl = domaine_VEF.nb_front_Cl();

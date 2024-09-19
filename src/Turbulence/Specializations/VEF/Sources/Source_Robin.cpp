@@ -76,7 +76,7 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
   const Navier_Stokes_Turbulent& eq_ns = ref_cast(Navier_Stokes_Turbulent,equation());
   const DoubleTab& cisaillement        = eq_ns.modele_turbulence()->loi_paroi()->Cisaillement_paroi();
 //  const DoubleVect& u_star             = eq_ns.modele_turbulence().loi_paroi()->tab_u_star();
-//  double temps = mon_equation->inconnue()->temps();
+//  double temps = mon_equation->inconnue().temps();
 //  static double temps_dernier_post = -1;
 //  const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
 //  double nu = fluide.viscosite_cinematique().valeurs()(0,0);

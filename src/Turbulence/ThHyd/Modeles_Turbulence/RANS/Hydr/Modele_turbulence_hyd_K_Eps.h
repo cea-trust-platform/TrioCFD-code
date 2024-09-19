@@ -42,8 +42,8 @@ public:
   void verifie_loi_paroi() override;
   bool initTimeStep(double dt) override;
   void mettre_a_jour(double) override;
-  virtual inline Champ_Inc& K_Eps();
-  virtual inline const Champ_Inc& K_Eps() const;
+  virtual inline Champ_Inc_base& K_Eps();
+  virtual inline const Champ_Inc_base& K_Eps() const;
 
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
@@ -69,9 +69,9 @@ protected:
  *     par l'equation de transport K-eps porte par le modele.
  *     (version const)
  *
- * @return (Champ_Inc&) le champ inconnue (K,epsilon)
+ * @return (Champ_Inc_base&) le champ inconnue (K,epsilon)
  */
-inline const Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps() const
+inline const Champ_Inc_base& Modele_turbulence_hyd_K_Eps::K_Eps() const
 {
   return eqn_transport_K_Eps_.inconnue();
 }
@@ -81,9 +81,9 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps() const
  * e. : (K,Epsilon). Cette inconnue est portee
  *     par l'equation de transport K-eps porte par le modele.
  *
- * @return (Champ_Inc&) le champ inconnue (K,epsilon)
+ * @return (Champ_Inc_base&) le champ inconnue (K,epsilon)
  */
-inline Champ_Inc& Modele_turbulence_hyd_K_Eps::K_Eps()
+inline Champ_Inc_base& Modele_turbulence_hyd_K_Eps::K_Eps()
 {
   return eqn_transport_K_Eps_.inconnue();
 }

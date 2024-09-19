@@ -34,7 +34,7 @@ class Op_Diff_K_Omega_VDF_Elem : public Op_Diff_K_Omega_VDF_base, public Op_Diff
   Declare_instanciable_sans_constructeur(Op_Diff_K_Omega_VDF_Elem);
 public:
   Op_Diff_K_Omega_VDF_Elem();
-  inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Omega_VDF_Elem>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc_base& inc) override { associer_impl<Eval_Diff_K_Omega_VDF_Elem>(zd,zcd,inc); }
 };
 
 // class Op_Diff_K_Omega_VDF_Elem_Axi : public Op_Diff_K_Omega_VDF_base, public Op_Diff_K_Omega_VDF_Generique<Op_Diff_K_Omega_VDF_Elem_Axi>
@@ -42,7 +42,7 @@ public:
 //   Declare_instanciable_sans_constructeur(Op_Diff_K_Omega_VDF_Elem_Axi);
 // public:
 //   Op_Diff_K_Omega_VDF_Elem_Axi();
-//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Omega_VDF_Elem_Axi>(zd,zcd,inc); }
+//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc_base& inc) override { associer_impl<Eval_Diff_K_Omega_VDF_Elem_Axi>(zd,zcd,inc); }
 // };
 
 // class Op_Diff_K_Omega_QC_VDF_Elem : public Op_Diff_K_Omega_VDF_base, public Op_Diff_K_Omega_VDF_Generique<Op_Diff_K_Omega_QC_VDF_Elem>
@@ -50,7 +50,7 @@ public:
 //   Declare_instanciable_sans_constructeur(Op_Diff_K_Omega_QC_VDF_Elem);
 // public:
 //   Op_Diff_K_Omega_QC_VDF_Elem();
-//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Omega_QC_VDF_Elem>(zd,zcd,inc); }
+//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc_base& inc) override { associer_impl<Eval_Diff_K_Omega_QC_VDF_Elem>(zd,zcd,inc); }
 // };
 
 // var
@@ -59,7 +59,7 @@ class Op_Diff_K_Omega_var_VDF_Elem : public Op_Diff_K_Omega_VDF_base, public Op_
   Declare_instanciable_sans_constructeur(Op_Diff_K_Omega_var_VDF_Elem);
 public:
   Op_Diff_K_Omega_var_VDF_Elem();
-  inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Omega_var_VDF_Elem>(zd,zcd,inc); }
+  inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc_base& inc) override { associer_impl<Eval_Diff_K_Omega_var_VDF_Elem>(zd,zcd,inc); }
 };
 
 // class Op_Diff_K_Omega_var_QC_VDF_Elem : public Op_Diff_K_Omega_VDF_base, public Op_Diff_K_Omega_VDF_Generique<Op_Diff_K_Omega_var_QC_VDF_Elem>
@@ -67,7 +67,7 @@ public:
 //   Declare_instanciable_sans_constructeur(Op_Diff_K_Omega_var_QC_VDF_Elem);
 // public:
 //   Op_Diff_K_Omega_var_QC_VDF_Elem();
-//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_Omega_QC_var_VDF_Elem>(zd,zcd,inc); }
+//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc_base& inc) override { associer_impl<Eval_Diff_K_Omega_QC_var_VDF_Elem>(zd,zcd,inc); }
 // };
 
 // Bicephale
@@ -77,7 +77,7 @@ public:
 //   Declare_instanciable_sans_constructeur(Op_Diff_K_VDF_Elem);
 // public:
 //   Op_Diff_K_VDF_Elem();
-//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_K_VDF_Elem>(zd,zcd,inc); }
+//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc_base& inc) override { associer_impl<Eval_Diff_K_VDF_Elem>(zd,zcd,inc); }
 // };
 
 // class Op_Diff_Omega_VDF_Elem : public Op_Diff_K_Omega_VDF_base, public Op_Diff_K_Omega_VDF_Generique<Op_Diff_Omega_VDF_Elem>
@@ -85,7 +85,7 @@ public:
 //   Declare_instanciable_sans_constructeur(Op_Diff_Omega_VDF_Elem);
 // public:
 //   Op_Diff_Omega_VDF_Elem();
-//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc& inc) override { associer_impl<Eval_Diff_Omega_VDF_Elem>(zd,zcd,inc); }
+//   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd, const Champ_Inc_base& inc) override { associer_impl<Eval_Diff_Omega_VDF_Elem>(zd,zcd,inc); }
 // };
 
 #endif /* Op_Diff_K_Omega_VDF_leaves_included */

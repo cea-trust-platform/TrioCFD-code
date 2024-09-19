@@ -64,7 +64,7 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::lire_motcle_non_standard(const Motcle
  */
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente(double temps)
 {
-  const Champ_base& chK_Eps = eqn_transport_K_Eps_.inconnue().valeur();
+  const Champ_base& chK_Eps = eqn_transport_K_Eps_.inconnue();
   Nom type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
@@ -75,7 +75,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente
   int n = tab_K_Eps.dimension(0);
   if (visco_turb.size() != n)
     {
-      Champ_Inc visco_turb_au_format_K_eps;
+      OWN_PTR(Champ_Inc_base) visco_turb_au_format_K_eps;
       visco_turb_au_format_K_eps.typer(type);
       DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transport_K_Eps_.domaine_dis(), visco_turb_au_format_K_eps);
 
@@ -111,7 +111,7 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::preparer_calcul()
   eqn_transp_K_Eps().preparer_calcul();
   calculer_viscosite_turbulente(equation().schema_temps().temps_courant());
   Modele_turbulence_hyd_base::preparer_calcul();
-  calculer_viscosite_turbulente(K_Eps()->temps());
+  calculer_viscosite_turbulente(K_Eps().temps());
   la_viscosite_turbulente_->valeurs().echange_espace_virtuel();
   return 1;
 }

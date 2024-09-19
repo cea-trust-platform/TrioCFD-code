@@ -74,7 +74,7 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::lire_motcle_non_standard(const Motcle
  */
 Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente(double temps)
 {
-  const Champ_base& chK = eqn_transp_K().inconnue().valeur(), &chEps = eqn_transp_Eps().inconnue().valeur();
+  const Champ_base& chK = eqn_transp_K().inconnue(), &chEps = eqn_transp_Eps().inconnue();
   const Domaine_dis_base& le_dom_dis = eqn_transp_K().domaine_dis();
   const Domaine_Cl_dis_base& le_dom_Cl_dis = eqn_transp_K().domaine_Cl_dis();
 
@@ -124,7 +124,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
       if (is_Cmu_constant == 0)
         {
           Cerr << " On utilise un Cmu non constant " << finl;
-          const DoubleTab& vitesse = mon_equation_->inconnue()->valeurs();
+          const DoubleTab& vitesse = mon_equation_->inconnue().valeurs();
           mon_modele_fonc_->Calcul_Cmu_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, vitesse, tab_K, tab_Eps, EPS_MIN_);
 
           /*Paroi*/
@@ -154,7 +154,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
 
   if (non_prepare == 1)
     {
-      Champ_Inc visco_turb_au_format_K_eps;
+      OWN_PTR(Champ_Inc_base) visco_turb_au_format_K_eps;
       visco_turb_au_format_K_eps.typer(type);
       DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transp_K().domaine_dis(), visco_turb_au_format_K_eps);
 

@@ -73,7 +73,7 @@ void Loi_paroi_Ramstorfer::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu
   DoubleTab pvit_elem(0, N * dimension);
   if (nf_tot == vit.dimension_tot(0))
     {
-      const Champ_Face_base& ch = ref_cast(Champ_Face_base, pb_->equation(0).inconnue().valeur());
+      const Champ_Face_base& ch = ref_cast(Champ_Face_base, pb_->equation(0).inconnue());
       domaine.domaine().creer_tableau_elements(pvit_elem);
       ch.get_elem_vector_field(pvit_elem, true);
     }

@@ -56,7 +56,16 @@ void Transport_K_Eps_base::discretiser()
   if (sub_type(Discret_Thyd,discretisation()))
     {
       Cerr << "K,Eps transport equation ("<< que_suis_je() <<") discretization" << finl;
-      discretiser_K_Eps(schema_temps(),domaine_dis(),le_champ_K_Eps);
+      Cerr << "K_Eps field discretization" << finl;
+      Noms noms(2);
+      Noms unit(2);
+      noms[0]="K";
+      noms[1]="eps";
+      unit[0]="m2/s2";
+      unit[1]="m2/s3";
+
+      discretisation().discretiser_champ("temperature",domaine_dis(),multi_scalaire,noms,unit,2,schema_temps().nb_valeurs_temporelles(),schema_temps().temps_courant(),le_champ_K_Eps);
+      le_champ_K_Eps->nommer("K_Eps");
       champs_compris_.ajoute_champ(le_champ_K_Eps);
       if (modele_turbulence().equation().calculate_time_derivative())
         {
@@ -71,22 +80,6 @@ void Transport_K_Eps_base::discretiser()
       Cerr<<"Discretization "<<discretisation().que_suis_je()<<" not recognized."<<finl;
       exit();
     }
-}
-
-void Transport_K_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
-                                             Domaine_dis_base& z, Champ_Inc& ch) const
-{
-  Cerr << "K_Eps field discretization" << finl;
-  Noms noms(2);
-  Noms unit(2);
-  noms[0]="K";
-  noms[1]="eps";
-  unit[0]="m2/s2";
-  unit[1]="m2/s3";
-
-  const Discretisation_base& dis = discretisation();
-  dis.discretiser_champ("temperature",z,multi_scalaire,noms,unit,2,sch.nb_valeurs_temporelles(),sch.temps_courant(),ch);
-  ch->nommer("K_Eps");
 }
 
 // For VEF-like scheme

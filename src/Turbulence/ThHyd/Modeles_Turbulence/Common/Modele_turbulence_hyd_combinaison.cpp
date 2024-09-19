@@ -100,7 +100,7 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
   const DoubleTab& xp = domaine_VF.xp();
   DoubleTab& viscosite_valeurs = la_viscosite_turbulente_->valeurs();
   const Probleme_base& mon_pb = equation().probleme();
-  double temps = equation().inconnue()->temps();
+  double temps = equation().inconnue().temps();
   int nb_ddl = domaine_VF.nb_elem();
   double x = 0;
   double y = 0;

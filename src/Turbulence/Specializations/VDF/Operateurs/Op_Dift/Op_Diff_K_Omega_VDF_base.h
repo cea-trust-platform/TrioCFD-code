@@ -28,7 +28,7 @@
 #include <Op_VDF_Elem.h>
 
 
-#include <Champ_Inc.h>
+
 
 class Op_Diff_K_Omega_VDF_base : public Op_Diff_K_Omega_base, public Op_VDF_Elem
 {
@@ -69,9 +69,9 @@ class Op_Diff_K_Omega_VDF_Generique
 protected:
 
   template <typename EVAL_TYPE>
-  inline void associer_impl(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_cl_dis, const Champ_Inc& ch_diffuse)
+  inline void associer_impl(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_cl_dis, const Champ_Inc_base& ch_diffuse)
   {
-    const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse.valeur());
+    const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse);
     const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
     const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis);
     iter_()->associer(zvdf, zclvdf,static_cast<OP_TYPE&>(*this));

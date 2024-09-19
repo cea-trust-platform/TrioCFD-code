@@ -31,7 +31,7 @@
 #include <Op_VDF_Elem.h>
 
 
-#include <Champ_Inc.h>
+
 
 extern Stat_Counter_Id diffusion_counter_;
 
@@ -49,7 +49,7 @@ public:
 
   inline void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override
   {
-    const std::string& nom_inco = equation().inconnue()->le_nom().getString();
+    const std::string& nom_inco = equation().inconnue().le_nom().getString();
     Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
     if (!mat)
       return;

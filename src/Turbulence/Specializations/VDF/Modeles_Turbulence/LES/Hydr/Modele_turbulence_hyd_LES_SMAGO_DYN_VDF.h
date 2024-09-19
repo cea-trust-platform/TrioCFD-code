@@ -36,9 +36,9 @@ public:
   int preparer_calcul() override;
 
   static void calculer_length_scale(DoubleVect&, const Domaine_VDF&);
-  static void calculer_cell_cent_vel(DoubleTab&, const Domaine_VDF&, Champ_Inc&);
+  static void calculer_cell_cent_vel(DoubleTab&, const Domaine_VDF&, Champ_Inc_base&);
   static void calculer_filter_field(const DoubleTab&, DoubleTab&, const Domaine_VDF&);
-  static void calculer_Sij(DoubleTab&, const Domaine_VDF&, const Domaine_Cl_VDF&, Champ_Inc&);
+  static void calculer_Sij(DoubleTab&, const Domaine_VDF&, const Domaine_Cl_VDF&, Champ_Inc_base&);
   static void calculer_Sij_vel_filt(const DoubleTab&, DoubleTab&, const Domaine_VDF&);
   static void calculer_S_norme(const DoubleTab&, DoubleVect&, int);
   static void interpole(const IntVect&, const DoubleVect&, const DoubleVect&, double&);

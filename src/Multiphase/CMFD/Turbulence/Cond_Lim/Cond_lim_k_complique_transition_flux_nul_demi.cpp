@@ -42,7 +42,7 @@ Entree& Cond_lim_k_complique_transition_flux_nul_demi::readOn(Entree& s ) {retur
 void Cond_lim_k_complique_transition_flux_nul_demi::completer()
 {
   if (!sub_type(Energie_cinetique_turbulente, domaine_Cl_dis().equation())) Process::exit("Cond_lim_k_simple : equation must be k !");
-  if (domaine_Cl_dis().equation().inconnue()->valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
+  if (domaine_Cl_dis().equation().inconnue().valeurs().line_size() != 1)  Process::exit("Cond_lim_k_simple : Only one phase for turbulent wall law is coded for now");
 }
 
 void Cond_lim_k_complique_transition_flux_nul_demi::me_calculer()

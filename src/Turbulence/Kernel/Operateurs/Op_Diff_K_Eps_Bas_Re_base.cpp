@@ -150,7 +150,7 @@ void Op_Diff_K_Eps_Bas_Re::typer()
           else
             type_diff="_var_";
           nom_type+= type_diff;
-          Nom type_inco=equation().inconnue()->que_suis_je();
+          Nom type_inco=equation().inconnue().que_suis_je();
           nom_type+=(type_inco.suffix("Champ_"));
           if (axi)
             nom_type += "_Axi";

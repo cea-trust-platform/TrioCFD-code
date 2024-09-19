@@ -28,7 +28,7 @@
 #include <Op_VEF_Face.h>
 #include <TRUST_Ref.h>
 #include <Champ_Fonc.h>
-#include <Champ_Inc.h>
+
 
 
 

@@ -82,7 +82,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& vit = eqn_hydr.inconnue()->valeurs();
+  const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
@@ -138,7 +138,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
               int elem = face_voisins(num_face,0);
-              if (sub_type(Champ_P1NC,eqn_hydr.inconnue().valeur())) // donc triangle ou tetraedre
+              if (sub_type(Champ_P1NC,eqn_hydr.inconnue())) // donc triangle ou tetraedre
                 {
 
                   // Calcul la moyenne de la vitesse et de la position aux faces (autre que bord) dans l'elem.

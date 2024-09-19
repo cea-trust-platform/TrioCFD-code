@@ -139,9 +139,9 @@ void Modele_rayo_semi_transp::associer_sch_tps_base(const Schema_Temps_base& un_
 // Effets de bord :
 // Postcondition :
 //
-Champ_Inc& Modele_rayo_semi_transp::put_irradience()
+Champ_Inc_base& Modele_rayo_semi_transp::put_irradience()
 {
-  Champ_Inc& irradiance = eq_rayo().inconnue();
+  Champ_Inc_base& irradiance = eq_rayo().inconnue();
   return irradiance;
 }
 

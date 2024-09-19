@@ -49,7 +49,7 @@ const DoubleTab& Source_Transport_Eps_VDF_Elem::get_visc_turb() const
 
 void Source_Transport_Eps_VDF_Elem::calculer_terme_production(const Champ_Face_VDF& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleVect& P) const
 {
-  const DoubleTab& K   = mon_eq_transport_K->inconnue()->valeurs();
+  const DoubleTab& K   = mon_eq_transport_K->inconnue().valeurs();
 
   if (axi) calculer_terme_production_K_BiK_Axi(le_dom_VDF.valeur(),vitesse,P,K,visco_turb);
   else calculer_terme_production_K_BiK(le_dom_VDF.valeur(),le_dom_Cl_VDF.valeur(),P,K,vit,vitesse,visco_turb);
@@ -62,14 +62,14 @@ const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Source_Transport_Eps_VDF_Elem::get
 
 void Source_Transport_Eps_VDF_Elem::calcul_D_E(const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don& ch_visco_cin, DoubleTab& D, DoubleTab& E) const
 {
-  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   get_modele_fonc_bas_reyn()->Calcul_D_BiK(D,mon_eq_transport_Eps->domaine_dis(),mon_eq_transport_Eps->domaine_Cl_dis(),vit,K, Eps,ch_visco_cin);
   get_modele_fonc_bas_reyn()->Calcul_E_BiK(E,mon_eq_transport_Eps->domaine_dis(),mon_eq_transport_Eps->domaine_Cl_dis(),vit,K, Eps,ch_visco_cin,visco_turb);
 }
 
 void Source_Transport_Eps_VDF_Elem::calcul_F1_F2(const Champ_base& ch_visco_cin_ou_dyn, DoubleTab& P_tab, DoubleTab& D, DoubleTab& F1, DoubleTab& F2) const
 {
-  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   get_modele_fonc_bas_reyn()->Calcul_F1_BiK(F1,mon_eq_transport_Eps->domaine_dis(),mon_eq_transport_Eps->domaine_Cl_dis(), P_tab, K, Eps,ch_visco_cin_ou_dyn);
   get_modele_fonc_bas_reyn()->Calcul_F2_BiK(F2,D,mon_eq_transport_Eps->domaine_dis(),K, Eps, ch_visco_cin_ou_dyn  );
 }
@@ -77,7 +77,7 @@ void Source_Transport_Eps_VDF_Elem::calcul_F1_F2(const Champ_base& ch_visco_cin_
 void Source_Transport_Eps_VDF_Elem::fill_resu_bas_rey(const DoubleVect& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
 {
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
-  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     resu(elem) += ((C1*P(elem)*F1(elem)- C2*F2(elem)*(Eps(elem)))*Eps(elem)/(K(elem)+DMINFLOAT)+E(elem))*volumes(elem)*porosite_vol(elem);
 }
@@ -85,7 +85,7 @@ void Source_Transport_Eps_VDF_Elem::fill_resu_bas_rey(const DoubleVect& P, const
 void Source_Transport_Eps_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& resu) const
 {
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
-  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K->modele_turbulence().get_K_MIN();
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     if (K(elem) >= LeK_MIN)
@@ -94,12 +94,12 @@ void Source_Transport_Eps_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& re
 
 void Source_Transport_Eps_VDF_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
   if(!mat) return;
 
   IntTab stencil(0, 2);
-  const int size = mon_eq_transport_K->inconnue()->valeurs().dimension(0);
+  const int size = mon_eq_transport_K->inconnue().valeurs().dimension(0);
   for (int e = 0; e < size; e++)
     stencil.append_line(e, e);
   tableau_trier_retirer_doublons(stencil);
@@ -111,11 +111,11 @@ void Source_Transport_Eps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab
 {
   Source_Transport_VDF_Elem_base::ajouter_keps(secmem);
 
-  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
   if(!mat) return;
 
-  const DoubleTab& K = mon_eq_transport_K->inconnue()->valeurs(), &Eps = mon_eq_transport_Eps->inconnue()->valeurs();
+  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   const DoubleVect& porosite = le_dom_Cl_VDF->equation().milieu().porosite_elem(), &volumes = le_dom_VDF->volumes();
   const int size = K.dimension(0);
   // on implicite le -eps^2/k

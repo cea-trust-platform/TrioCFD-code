@@ -22,21 +22,18 @@
 #ifndef Modele_Fonc_Realisable_base_included
 #define Modele_Fonc_Realisable_base_included
 
-
 #include <Champ_Fonc.h>
 #include <Champs_compris.h>
 #include <Champs_compris_interface.h>
 #include <Champ_Don.h>
 #include <TRUST_Ref.h>
-#include <Champ_Inc.h>
-
-
 
 class Fluide_base;
 class Motcle;
 class Equation_base;
 class Probleme_base;
 class Discretisation_base;
+class Champ_Inc_base;
 class Champ_base;
 
 class Modele_Fonc_Realisable_base : public Champs_compris_interface, public Objet_U
@@ -109,7 +106,7 @@ protected :
   REF(Equation_base) mon_equation;
 
   REF(Fluide_base) le_fluide;
-  REF(Champ_Inc) la_vitesse_transportante;
+  REF(Champ_Inc_base) la_vitesse_transportante;
   REF(Equation_base) eq_hydraulique;
   REF(Champ_Don) visco_;
 

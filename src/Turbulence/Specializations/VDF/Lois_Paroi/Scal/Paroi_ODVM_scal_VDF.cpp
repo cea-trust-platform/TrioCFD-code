@@ -146,7 +146,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   const IntTab& face_voisins = domaine_VDF.face_voisins();
 
   const Equation_base& eqn_temp = mon_modele_turb_scal->equation();
-  const DoubleTab& Temp = eqn_temp.inconnue()->valeurs();
+  const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
   const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis());
 
   const double t0 = eqn_temp.schema_temps().temps_courant();
@@ -401,7 +401,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   if (sub_type(Convection_Diffusion_Concentration,eqn_temp)) schmidt = 1;
   const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn_temp).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
-  const DoubleVect& Temp = eqn_temp.inconnue()->valeurs();
+  const DoubleVect& Temp = eqn_temp.inconnue().valeurs();
   const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis());
 
 

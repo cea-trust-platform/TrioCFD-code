@@ -103,7 +103,7 @@ void Modele_turbulence_hyd_LES_selectif_VDF::calculer_fonction_structure()
 
 void Modele_turbulence_hyd_LES_selectif_VDF::cutoff()
 {
-  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF, mon_equation_->inconnue().valeur());
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF, mon_equation_->inconnue());
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();

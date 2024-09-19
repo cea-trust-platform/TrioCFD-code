@@ -100,7 +100,7 @@ void Transport_Fluctuation_Temperature::completer()
   // Source t;
   //   Source& so=les_sources.add(t);
   les_sources.completer();
-  inconnue()->associer_eqn(*this);
+  inconnue().associer_eqn(*this);
   for(int i=0; i<nombre_d_operateurs(); i++)
     {
       operateur(i).completer();

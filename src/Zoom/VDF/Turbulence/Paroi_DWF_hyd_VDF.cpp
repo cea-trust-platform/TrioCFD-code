@@ -232,8 +232,8 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const double temps = eqn_hydr.schema_temps().temps_courant();
 
   // la vitesse resolue par l'equation hydr
-  const DoubleTab& vit = eqn_hydr.inconnue()->valeurs();
-  const int nb_compo = eqn_hydr.inconnue()->nb_comp();
+  const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
+  const int nb_compo = eqn_hydr.inconnue().nb_comp();
 
   // Variables sur le probleme fin
   Domaine_VDF& domaine_fine = ref_cast(Domaine_VDF,pb_fin->domaine_dis());
@@ -329,7 +329,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
   Equation_base& eqn_NRJ_F = pb_fin->equation(1);
   const Probleme_base& pb_gros = mon_modele_turb_hyd->equation().probleme();
-  const DoubleTab& tempiotte_grosse = pb_gros.equation(1).inconnue()->valeurs();
+  const DoubleTab& tempiotte_grosse = pb_gros.equation(1).inconnue().valeurs();
 
   Conds_lim& les_cl_th = eqn_NRJ_F.domaine_Cl_dis().les_conditions_limites();
   Prolongement_base& P_cl_th = pbMG.pb_2G(0).mon_prolongement(0);

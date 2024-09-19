@@ -41,8 +41,8 @@ public:
   int preparer_calcul() override;
   bool initTimeStep(double dt) override;
   void mettre_a_jour(double) override;
-  virtual inline Champ_Inc& K_Omega();
-  virtual inline const Champ_Inc& K_Omega() const;
+  virtual inline Champ_Inc_base& K_Omega();
+  virtual inline const Champ_Inc_base& K_Omega() const;
 
   inline Transport_K_Omega_base& eqn_transp_K_Omega() override;
   inline const Transport_K_Omega_base& eqn_transp_K_Omega() const override;
@@ -82,9 +82,9 @@ protected:
  *     par l'equation de transport K-Omega porte par le modele.
  *     (version const)
  *
- * @return (Champ_Inc&) le champ inconnue (K, Omega)
+ * @return (Champ_Inc_base&) le champ inconnue (K, Omega)
  */
-inline const Champ_Inc& Modele_turbulence_hyd_K_Omega::K_Omega() const
+inline const Champ_Inc_base& Modele_turbulence_hyd_K_Omega::K_Omega() const
 {
   return eqn_transport_K_Omega_.inconnue();
 }
@@ -94,9 +94,9 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Omega::K_Omega() const
  * e. : (K, Omega). Cette inconnue est portee
  *     par l'equation de transport K-Omega porte par le modele.
  *
- * @return (Champ_Inc&) le champ inconnue (K, Omega)
+ * @return (Champ_Inc_base&) le champ inconnue (K, Omega)
  */
-inline Champ_Inc& Modele_turbulence_hyd_K_Omega::K_Omega()
+inline Champ_Inc_base& Modele_turbulence_hyd_K_Omega::K_Omega()
 {
   return eqn_transport_K_Omega_.inconnue();
 }

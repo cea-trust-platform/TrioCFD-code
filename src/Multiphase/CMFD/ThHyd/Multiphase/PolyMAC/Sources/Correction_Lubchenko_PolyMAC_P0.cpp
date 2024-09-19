@@ -108,15 +108,15 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
+  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue());
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = pbm.equation_masse().inconnue()->passe(),
-                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression()->passe(),
-                     &temp  = pbm.equation_energie().inconnue()->passe(),
+                   &alpha = pbm.equation_masse().inconnue().passe(),
+                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
+                     &temp  = pbm.equation_energie().inconnue().passe(),
                       &rho   = equation().milieu().masse_volumique()->passe(),
                        &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique()->passe(),
                         &y_elem = domaine.y_elem(),
@@ -271,15 +271,15 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
+  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue());
   const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl(), &e_f = domaine.elem_faces();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = pbm.equation_masse().inconnue()->passe(),
-                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression()->passe(),
-                     &temp  = pbm.equation_energie().inconnue()->passe(),
+                   &alpha = pbm.equation_masse().inconnue().passe(),
+                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
+                     &temp  = pbm.equation_energie().inconnue().passe(),
                       &rho   = equation().milieu().masse_volumique()->passe(),
                        &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique()->passe(),
                         &vort  = equation().probleme().get_champ("vorticite").valeurs(),
@@ -557,11 +557,11 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_BIF(matrices_t matrices, Dou
 
   // On recupere les tensions de reynolds des termes de BIF
   DoubleTrav Rij(0, N, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression().valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress_BIF(Rij);
 
   DoubleTrav grad_Rij(0, N, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.vitesse()->valeurs().get_md_vector(), grad_Rij); //Necessary to exchange virtual elements after calculation of the gradient at the faces()
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.vitesse().valeurs().get_md_vector(), grad_Rij); //Necessary to exchange virtual elements after calculation of the gradient at the faces()
 
   const Champ_Elem_PolyMAC_P0& ch_alpha = ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("alpha"));	// Champ alpha qui servira à obtenir les coeffs du gradient ; normalement toujours des CAL de Neumann ; terme source qui n'apparait qu'en multiphase
   ch_alpha.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires

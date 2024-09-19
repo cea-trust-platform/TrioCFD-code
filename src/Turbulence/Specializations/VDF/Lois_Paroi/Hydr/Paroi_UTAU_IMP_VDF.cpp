@@ -70,7 +70,7 @@ int Paroi_UTAU_IMP_VDF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const IntVect& orientation = domaine_VDF.orientation();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& xv=domaine_VDF.xv() ;                   // centres de gravite des faces
   DoubleVect pos(dimension);
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
@@ -224,7 +224,7 @@ int Paroi_UTAU_IMP_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const IntVect& orientation = domaine_VDF.orientation();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& xv=domaine_VDF.xv() ;                   // centres de gravite des faces
   DoubleVect pos(dimension);
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());

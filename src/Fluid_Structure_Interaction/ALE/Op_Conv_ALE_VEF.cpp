@@ -57,7 +57,7 @@ void Op_Conv_ALE_VEF::completer()
 
 void Op_Conv_ALE_VEF::associer (const Domaine_dis_base& domaine_dis ,
                                 const Domaine_Cl_dis_base& domaine_cl_dis,
-                                const Champ_Inc& inco )
+                                const Champ_Inc_base& inco )
 {
   Cerr << "Op_Conv_ALE_VEF::associer" << finl;
 
@@ -65,7 +65,7 @@ void Op_Conv_ALE_VEF::associer (const Domaine_dis_base& domaine_dis ,
 
   const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis);
   const Domaine_Cl_VEF& zclvef = ref_cast(Domaine_Cl_VEF,domaine_cl_dis);
-  dom=inco->domaine();
+  dom=inco.domaine();
   le_dom_vef = zvef;
   la_zcl_vef = zclvef;
 }
@@ -388,7 +388,10 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   // Si alpha<1, la boucle se compose de 2 passes:
   //                         -la premiere avec le schema choisi et une ponderation de alpha
   //                         -la seconde avec le schema centre et une ponderation de 1-alpha
-  Champ_Inc vit_maillage_ALE = equation().inconnue();
+
+  OWN_PTR(Champ_Inc_base) vit_maillage_ALE;
+  vit_maillage_ALE.typer(equation().inconnue().que_suis_je()); // Initialize with same discretization
+
   vit_maillage_ALE->valeurs() = vitesse_face_absolue;
   double alpha = alpha_;
   int nombre_passes = (alpha==1 ? 1 : 2);
@@ -814,8 +817,8 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
 //old const Champ_Inc_base& la_vitesse=vitesse_.valeur();
 //old const DoubleTab& tab_vitesse=la_vitesse.valeurs();
-//new DoubleTab velocity= equation().inconnue()->valeurs();
-  const DoubleTab& tab_vitesse= equation().inconnue()->valeurs();
+//new DoubleTab velocity= equation().inconnue().valeurs();
+  const DoubleTab& tab_vitesse= equation().inconnue().valeurs();
   const DoubleTab& tab_vitesse_faces_ALE = ref_cast(Domaine_ALE, dom.valeur()).vitesse_faces();
 
   const DoubleTab& face_normales=domaine_VEF.face_normales();
@@ -1043,7 +1046,7 @@ void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
   const int nb_faces_tot = domaine_VEF.nb_faces_tot();
   DoubleTab ALEmeshVelocityGradient(nb_faces_tot,dimension,dimension);
   //jacobianALE.resize(nb_faces_tot,dimension);
-  jacobianALE= equation().inconnue()->valeurs();
+  jacobianALE= equation().inconnue().valeurs();
   jacobianALE=1.;
   calculateALEMeshVelocityGradientOnFaces(ALEmeshVelocityGradient);
 

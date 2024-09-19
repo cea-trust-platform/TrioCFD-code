@@ -239,7 +239,7 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
   DoubleTab& kappa = fluide.kappa()->valeurs();
   DoubleTab& indice = fluide.indice()->valeurs();
 
-  DoubleTab& irradiance = eq_rayo.inconnue()->valeurs();
+  DoubleTab& irradiance = eq_rayo.inconnue().valeurs();
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const IntTab& face_voisins = zvdf.face_voisins();

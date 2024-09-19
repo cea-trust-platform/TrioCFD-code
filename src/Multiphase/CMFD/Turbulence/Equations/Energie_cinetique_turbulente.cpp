@@ -95,9 +95,9 @@ void Energie_cinetique_turbulente::mettre_a_jour(double temps)
     if ( temps > schema_temps().temps_courant() && coef_limit_ > 0 )
       {
         Cerr << "Limiting the value of K : coeff used = " << coef_limit_ << finl;
-        const Champ_Face_PolyMAC_P0& ch_vit = ref_cast(Champ_Face_PolyMAC_P0, ref_cast(Navier_Stokes_std,pbm.equation_qdm()).vitesse().valeur());
+        const Champ_Face_PolyMAC_P0& ch_vit = ref_cast(Champ_Face_PolyMAC_P0, ref_cast(Navier_Stokes_std,pbm.equation_qdm()).vitesse());
         const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, domaine_dis());
-        DoubleTab& k_val = inconnue()->valeurs();
+        DoubleTab& k_val = inconnue().valeurs();
         const int N = k_val.line_size(), D = dimension;
 
         for (int e = 0; e < domaine.nb_elem(); e++)
@@ -108,7 +108,7 @@ void Energie_cinetique_turbulente::mettre_a_jour(double temps)
               k_val(e, n) = std::min(k_val(e, n), coef_limit_ * norm_v2 );
             }
         k_val.echange_espace_virtuel();
-        inconnue()->passe() = k_val;
+        inconnue().passe() = k_val;
       }
 }
 
@@ -118,11 +118,11 @@ void Energie_cinetique_turbulente::calculer_alpha_rho_k(const Objet_U& obj, Doub
 
   /*  const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
     const Champ_base& ch_rho = fl.masse_volumique();
-    const Champ_Inc_base *ch_alpha = sub_type(Pb_Multiphase, eqn.probleme()) ? &ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue().valeur() : nullptr,
+    const Champ_Inc_base *ch_alpha = sub_type(Pb_Multiphase, eqn.probleme()) ? &ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue() : nullptr,
                           *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
-    const DoubleTab* alpha = ch_alpha ? &ch_alpha->valeurs() : nullptr, &rho = ch_rho.valeurs(), &k = eqn.inconnue()->valeurs();
+    const DoubleTab* alpha = ch_alpha ? &ch_alpha->valeurs() : nullptr, &rho = ch_rho.valeurs(), &k = eqn.inconnue().valeurs();
   */
-  const DoubleTab& k = eqn.inconnue()->valeurs();
+  const DoubleTab& k = eqn.inconnue().valeurs();
 
   /* valeurs du champ */
   int i, n, N = val.line_size(), Nl = val.dimension_tot(0);
@@ -130,7 +130,7 @@ void Energie_cinetique_turbulente::calculer_alpha_rho_k(const Objet_U& obj, Doub
     for (n = 0; n < N; n++) val(i, n) = k(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  const DoubleTab& b_k = eqn.inconnue()->valeur_aux_bords();
+  const DoubleTab& b_k = eqn.inconnue().valeur_aux_bords();
   int Nb = b_k.dimension_tot(0);
   for (i = 0; i < Nb; i++)
     for (n = 0; n < N; n++) bval(i, n) = b_k(i, n);

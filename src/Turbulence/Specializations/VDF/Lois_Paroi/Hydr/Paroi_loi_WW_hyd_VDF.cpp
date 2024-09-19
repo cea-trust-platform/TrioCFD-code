@@ -96,7 +96,7 @@ int Paroi_loi_WW_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
 
   // la vitesse resolue par l'equation hydr
-  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco=-1;
 

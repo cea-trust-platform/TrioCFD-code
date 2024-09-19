@@ -53,8 +53,8 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_keps(DoubleTab& resu) const
 {
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
-  const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
+  const Champ_Face_VDF& ch_vit = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue());
 
   DoubleVect P; // Ajout d'un espace virtuel au tableu P
   domaine_VDF.domaine().creer_tableau_elements(P);
@@ -98,7 +98,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
 {
   // on ajoute directement G
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
-  const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
+  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& g = gravite->valeurs(), &tab_beta = beta_t->valeur().valeurs();
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs();
@@ -119,7 +119,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
 DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
 {
   const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis());
-  const DoubleTab& concen = eq_concentration->inconnue()->valeurs();
+  const DoubleTab& concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());
   const DoubleTab& diffu_turb = le_modele_scalaire.conductivite_turbulente()->valeurs();
 //  const DoubleTab& diffu_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
@@ -147,7 +147,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme_concen(DoubleTab&
 {
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
   const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis());
-  const DoubleTab& temper = eq_thermique->inconnue()->valeurs(), &concen = eq_concentration->inconnue()->valeurs();
+  const DoubleTab& temper = eq_thermique->inconnue().valeurs(), &concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_base& le_modele_scal_co = ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());
 

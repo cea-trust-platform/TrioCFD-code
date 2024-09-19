@@ -22,14 +22,10 @@
 #ifndef Modele_Fonc_Bas_Reynolds_Base_included
 #define Modele_Fonc_Bas_Reynolds_Base_included
 
-
 #include <Champs_compris_interface.h>
 #include <Champs_compris.h>
-
-
 #include <Champ_Fonc.h>
 #include <Champ_Don.h>
-#include <Champ_Inc.h>
 #include <TRUST_Ref.h>
 
 class Fluide_base;
@@ -38,6 +34,7 @@ class Equation_base;
 class Probleme_base;
 class Discretisation_base;
 class Champ_base;
+class Champ_Inc_base;
 
 class Modele_Fonc_Bas_Reynolds_Base : public Champs_compris_interface, public Objet_U
 {
@@ -110,7 +107,7 @@ public:
 protected :
   REF(Equation_base) mon_equation;
   REF(Fluide_base) le_fluide;
-  REF(Champ_Inc) la_vitesse_transportante;
+  REF(Champ_Inc_base) la_vitesse_transportante;
   REF(Equation_base) eq_hydraulique;
   REF(Champ_Don) visco_;
 

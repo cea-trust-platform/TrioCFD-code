@@ -35,7 +35,7 @@ void Source_Transport_K_KEps_anisotherme_VDF_Elem::associer_pb(const Probleme_ba
 
 void Source_Transport_K_KEps_anisotherme_VDF_Elem::fill_resu_anisotherme(const DoubleVect& G, const DoubleVect& volumes, const DoubleVect& porosite_vol, DoubleTab& resu) const
 {
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {
       if ( (G(elem)>0) && (K_eps(elem,0) >= 10.e-8) )

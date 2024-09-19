@@ -31,8 +31,8 @@ int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   const double a2 = -5. / 9., a3 = -153. / 128.;
   const double b1 = 1. / 3., b2 = 15. / 16., b3 = 8. / 15.;
 
-  DoubleTab& xi=eqn.inconnue()->valeurs();
-  DoubleTab& xipls1=eqn.inconnue()->futur();
+  DoubleTab& xi=eqn.inconnue().valeurs();
+  DoubleTab& xipls1=eqn.inconnue().futur();
   DoubleTab qi(xi) ;
   DoubleTab present(xi);
 

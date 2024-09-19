@@ -49,7 +49,7 @@ class Transport_K_ou_Eps : public Transport_K_ou_Eps_base
 public:
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  inline void associer_Champ_Inconnu(const Champ_Inc& );
+  inline void associer_Champ_Inconnu(const Champ_Inc_base& );
   void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_Bicephale_base& ) override;
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
@@ -62,7 +62,7 @@ protected :
   Op_Diff_K_Eps terme_diffusif;
   Operateur_Conv terme_convectif;
 
-  REF(Champ_Inc) inco_eqn_associee;
+  REF(Champ_Inc_base) inco_eqn_associee;
   Champ_Don Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
 
 };
@@ -70,9 +70,9 @@ protected :
 
 /*! @brief Associe un champ de vitesse (transportante)a l'equation.
  *
- * @param (Champ_Inc& vit) le champ de vitesse a associer a l'equation
+ * @param (Champ_Inc_base& vit) le champ de vitesse a associer a l'equation
  */
-inline void Transport_K_ou_Eps::associer_Champ_Inconnu(const Champ_Inc& vit)
+inline void Transport_K_ou_Eps::associer_Champ_Inconnu(const Champ_Inc_base& vit)
 {
   inco_eqn_associee = vit;
 }

@@ -23,6 +23,7 @@
 #ifndef Modele_Rayonnement_base_included
 #define Modele_Rayonnement_base_included
 
+#include <Domaine_forward.h>
 #include <Cond_lim_base.h>
 
 class Modele_Rayonnement_base : public Objet_U

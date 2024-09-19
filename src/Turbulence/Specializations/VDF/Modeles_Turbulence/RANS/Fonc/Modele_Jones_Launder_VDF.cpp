@@ -270,7 +270,7 @@ DoubleTab& Modele_Jones_Launder_VDF::Calcul_E(DoubleTab& E,const Domaine_dis_bas
       const IntTab& face_voisins = le_dom.face_voisins();
       const IntTab& elem_faces = le_dom.elem_faces();
 
-      const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue());
       int nb_elem_tot=le_dom.nb_elem_tot();
       assert (vitesse.valeurs().line_size() == 1);
       DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
@@ -452,7 +452,7 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
   const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
   const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
   //  Cerr<<le_dom_Cl.equation().le_nom()<<finl;exit();
-  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue());
   const Domaine_Cl_VDF& zcl_hydro = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis());
   //  int nb_faces = le_dom.nb_faces();
   const IntTab& Qdm = le_dom.Qdm();
@@ -803,7 +803,7 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_secondes_croisees(DoubleTab
 {
   const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
   const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
-  //  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+  //  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue());
 
   //  int nb_faces = le_dom.nb_faces();
   const IntTab& Qdm = le_dom.Qdm();

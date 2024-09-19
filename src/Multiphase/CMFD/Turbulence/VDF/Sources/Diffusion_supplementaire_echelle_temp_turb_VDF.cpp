@@ -44,7 +44,7 @@ void Diffusion_supplementaire_echelle_temp_turb_VDF::ajouter_blocs(matrices_t ma
 {
   const Domaine_VDF&                    domaine = ref_cast(Domaine_VDF, equation().domaine_dis());
   const Domaine_Cl_VDF&                     zcl = ref_cast(Domaine_Cl_VDF, equation().domaine_Cl_dis());
-  const Champ_Inc_P0_base&                  tau = ref_cast(Champ_Inc_P0_base, equation().inconnue().valeur());
+  const Champ_Inc_P0_base&                  tau = ref_cast(Champ_Inc_P0_base, equation().inconnue());
   const DoubleTab& tab_tau = semi_impl.count("tau") ? semi_impl.at("tau") : tau.passe(),
                    &nu_turb = ref_cast(Op_Dift_Multiphase_VDF_Elem, equation().operateur(0).l_op_base()).get_diffusivite_turbulente(),
                     &nu_visc  = ref_cast(Convection_Diffusion_std, equation()).diffusivite_pour_transport()->passe();

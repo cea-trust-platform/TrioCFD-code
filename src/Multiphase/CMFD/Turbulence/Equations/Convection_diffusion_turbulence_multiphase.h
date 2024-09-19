@@ -39,8 +39,8 @@ class Convection_diffusion_turbulence_multiphase : public Convection_Diffusion_s
 public :
 
   void completer() override;
-  inline const Champ_Inc& inconnue() const override;
-  inline Champ_Inc& inconnue() override;
+  inline const Champ_Inc_base& inconnue() const override;
+  inline Champ_Inc_base& inconnue() override;
   void associer_milieu_base(const Milieu_base& ) override;
   const Milieu_base& milieu() const override;
   Milieu_base& milieu() override;
@@ -51,7 +51,7 @@ public :
 
 protected :
 
-  Champ_Inc l_inco_ch;
+  OWN_PTR(Champ_Inc_base) l_inco_ch;
   REF(Fluide_base) le_fluide;
   Operateur_Grad Op_Grad_; // Pour calculer le gradient en VDF
 
@@ -62,9 +62,9 @@ protected :
 
 /*! @brief Renvoie le champ inconnue representant l'inconnue (k, omega, epsilon, tau) (version const)
  *
- * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ * @return (Champ_Inc_base&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
  */
-inline const Champ_Inc& Convection_diffusion_turbulence_multiphase::inconnue() const
+inline const Champ_Inc_base& Convection_diffusion_turbulence_multiphase::inconnue() const
 {
   return l_inco_ch;
 }
@@ -72,9 +72,9 @@ inline const Champ_Inc& Convection_diffusion_turbulence_multiphase::inconnue() c
 
 /*! @brief Renvoie le champ inconnue representant l'inconnue (k, omega, epsilon, tau)
  *
- * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ * @return (Champ_Inc_base&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
  */
-inline Champ_Inc& Convection_diffusion_turbulence_multiphase::inconnue()
+inline Champ_Inc_base& Convection_diffusion_turbulence_multiphase::inconnue()
 {
   return l_inco_ch;
 }

@@ -43,8 +43,8 @@ public:
   void mettre_a_jour(double ) override;
   //virtual void associer_eqn(const Equation_base&);
   void associer_viscosite_turbulente(const Champ_Fonc& );
-  inline virtual Champ_Inc& Fluctu_Temperature();
-  inline virtual const Champ_Inc& Fluctu_Temperature() const;
+  inline virtual Champ_Inc_base& Fluctu_Temperature();
+  inline virtual const Champ_Inc_base& Fluctu_Temperature() const;
   inline virtual Transport_Fluctuation_Temperature_W& equation_Fluctu();
   inline virtual const Transport_Fluctuation_Temperature_W& equation_Fluctu() const;
 
@@ -99,12 +99,12 @@ inline const Transport_Fluctuation_Temperature_W& Modele_turbulence_scal_Fluctua
 }
 
 
-inline const Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W::Fluctu_Temperature() const
+inline const Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature_W::Fluctu_Temperature() const
 {
   return eqn_transport_Fluctu_Temp->inconnue();
 }
 
-inline Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W::Fluctu_Temperature()
+inline Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature_W::Fluctu_Temperature()
 {
   return eqn_transport_Fluctu_Temp->inconnue();
 }

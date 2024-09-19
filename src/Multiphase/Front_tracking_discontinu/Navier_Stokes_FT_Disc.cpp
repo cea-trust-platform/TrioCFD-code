@@ -835,7 +835,7 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
     //   on ne fait rien.
   }
 
-  DoubleTab& tab_vitesse = inconnue()->valeurs();
+  DoubleTab& tab_vitesse = inconnue().valeurs();
 
   // On assemble la matrice de pression pour la premiere fois.
   assembleur_pression()->assembler_rho_variable(matrice_pression_, champ_rho_faces_.valeur());
@@ -1178,7 +1178,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
         //  non zero on the faces of these elements.
         int element;
         const int nb_elements = poids.dimension(0);
-        const IntTab& face_voisins = le_dom_dis.valeur().face_voisins();
+        const IntTab& face_voisins = le_dom_dis->face_voisins();
         const Domaine_VF& domainevf = ref_cast(Domaine_VF, le_dom_dis.valeur());
         const IntTab& elem_faces = domainevf.elem_faces();
         const int nb_faces_par_element = elem_faces.line_size();
@@ -1231,7 +1231,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
     valeurs_potentiel_faces = 0.;
     const DoubleTab& valeurs_potentiel_elements = potentiel_elements.valeurs();
     const int nb_faces_pot = valeurs_potentiel_faces.dimension(0);
-    const IntTab& face_voisins = le_dom_dis.valeur().face_voisins();
+    const IntTab& face_voisins = le_dom_dis->face_voisins();
     for (face = 0; face < nb_faces_pot; face++)
       {
         double p = 0.; // Somme des poids des deux elements voisins
@@ -2150,16 +2150,16 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
   if (delta_rho != 0)
     rho_0_sur_delta_rho = rho_0 / delta_rho;
 
-  const DoubleTab& tab_vitesse = inconnue()->valeurs();
+  const DoubleTab& tab_vitesse = inconnue().valeurs();
   const IntTab& face_voisins = domaine_dis().face_voisins();
 
   REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
   const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
-  const DoubleTab& indicatrice = eq_transport.inconnue()->valeurs();
+  const DoubleTab& indicatrice = eq_transport.inconnue().valeurs();
   const Maillage_FT_Disc& maillage = eq_transport.maillage_interface();
   const Domaine_VF& domVF = ref_cast(Domaine_VF, domaine_dis());
   //const IntVect& orientation = ref_cast(Domaine_VF, domaine_dis()).orientation();
-  //  const DoubleTab& indicatrice = variables_internes().ref_eq_interf_proprietes_fluide->inconnue()->valeurs();
+  //  const DoubleTab& indicatrice = variables_internes().ref_eq_interf_proprietes_fluide->inconnue().valeurs();
   DoubleTab tmp(tab_vitesse); // copie du tableau des vitesses de ns
   const int dim = tab_vitesse.line_size();
   const int n = tab_vitesse.dimension(0);
@@ -2685,7 +2685,7 @@ void Navier_Stokes_FT_Disc::compute_boussinesq_additional_gravity(const Convecti
                                                                   DoubleTab& gravite_face) const
 {
   const int phase_eq = eq.get_phase();
-  const DoubleTab& temperature_eq = eq.inconnue()->valeurs();
+  const DoubleTab& temperature_eq = eq.inconnue().valeurs();
   const Fluide_Incompressible& fluide_phase_eq = fluide_dipha.fluide_phase(phase_eq);
   const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t()->valeurs();
   const double beta_th_phase_eq = tab_beta_th_phase_eq(0, 0);
@@ -2732,7 +2732,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
     REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
     if (refeq_transport.non_nul())
       {
-        FT_disc_calculer_champs_rho_mu_nu_dipha(domaine_dis(), fluide_diphasique(), refeq_transport->inconnue()->valeurs(),
+        FT_disc_calculer_champs_rho_mu_nu_dipha(domaine_dis(), fluide_diphasique(), refeq_transport->inconnue().valeurs(),
                                                 // (indicatrice)
                                                 champ_rho_elem_->valeurs(), champ_nu_->valeurs(), champ_mu_->valeurs(), champ_rho_faces_->valeurs());
       }
@@ -2839,7 +2839,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   const int nbdim1 = (vpoint.line_size() == 1);
   const int m = vpoint.line_size();
 
-  DoubleTab gravite_face(inconnue()->valeurs());
+  DoubleTab gravite_face(inconnue().valeurs());
   if (milieu().a_gravite())
     {
       ArrOfDouble g(dimension);
@@ -2858,7 +2858,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       //  (traitement special des CL de Dirichlet)
       if (nbdim1)
         {
-          const IntTab& face_voisins = le_dom_dis.valeur().face_voisins();
+          const IntTab& face_voisins = le_dom_dis->face_voisins();
           const IntVect& orientation = ref_cast(Domaine_VDF, domaine_dis()).orientation();
           if (variables_internes().terme_gravite_ == Navier_Stokes_FT_Disc_interne::GRAVITE_RHO_G)
             {
@@ -3043,7 +3043,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 
       DoubleTrav tt(vpoint);
       tt = vpoint;
-      derivee = inconnue()->valeurs();
+      derivee = inconnue().valeurs();
       Equation_base::Gradient_conjugue_diff_impl(tt, derivee);
 
       solveur_masse->set_name_of_coefficient_temporel("no_coeff");
@@ -3072,7 +3072,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 
           Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 
-          const DoubleTab& inco_val = inconnue()->valeurs();
+          const DoubleTab& inco_val = inconnue().valeurs();
           const DoubleTab& rho_faces = champ_rho_faces_->valeurs();
           DoubleTab& source_val = variables_internes().terme_source->valeurs();
           const double temps = schema_temps().temps_courant();
@@ -3170,7 +3170,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 
               Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 
-              const DoubleTab& inco_val = inconnue()->valeurs();
+              const DoubleTab& inco_val = inconnue().valeurs();
               const DoubleTab& rho_faces = champ_rho_faces_->valeurs();
               DoubleTab& source_val = variables_internes().terme_source->valeurs();
               const double temps = schema_temps().temps_courant();
@@ -3233,7 +3233,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   DoubleTab& secmem2 = variables_internes().second_membre_projection_jump_->valeurs();
   const int nb_elem = secmem2.dimension(0);
   const double dt = schema_temps().pas_de_temps();
-  const DoubleTab& inco = inconnue()->valeurs();
+  const DoubleTab& inco = inconnue().valeurs();
   // secmem = div(U/dt+vpoint) = div(U(n+1)/dt)
   DoubleTab du(inco);
   du /= dt;
@@ -3315,7 +3315,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
           const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 #if NS_VERBOSE
-          const DoubleTab& indicatrice = eq_transport.inconnue()->valeurs();
+          const DoubleTab& indicatrice = eq_transport.inconnue().valeurs();
 #endif
           // Distance a l'interface discretisee aux elements:
           const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
@@ -3657,7 +3657,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       //Calcul de la vitesse au temps n+1
       DoubleTab vv(vpoint);
       vv *= schema_temps().pas_de_temps();
-      vv += inconnue()->valeurs();
+      vv += inconnue().valeurs();
 
       // Terme de diffusion
       terme_diffusif.calculer(vv, variables_internes().terme_diffusion->valeurs());
@@ -3745,7 +3745,7 @@ const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
   const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();
 
   DoubleTab& phi = variables_internes().laplacien_d->valeurs();
-  DoubleTab u0(inconnue()->valeurs());
+  DoubleTab u0(inconnue().valeurs());
 
   //  static const Stat_Counter_Id count = statistiques().new_counter(1, "calculer_div_normale", 0);
   //  statistiques().begin_count(count);

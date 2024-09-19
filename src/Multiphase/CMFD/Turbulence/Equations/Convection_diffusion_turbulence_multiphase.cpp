@@ -81,7 +81,7 @@ void Convection_diffusion_turbulence_multiphase::completer()
       Op_Grad_.typer();
       Op_Grad_.l_op_base().associer_eqn(*this);
       const Domaine_Cl_dis_base& zcl = domaine_Cl_dis();
-      const Champ_Inc& inco = inconnue();
+      const Champ_Inc_base& inco = inconnue();
       Op_Grad_->associer(zdis, zcl, inco);
     }
 }

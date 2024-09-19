@@ -1535,7 +1535,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
                             1 /* composantes */,
                             schema_temps().nb_valeurs_temporelles(),
                             temps,
-                            derivee_en_temps());
+                            derivee_en_temps_);
       //TF : Fin de l'ajout
     }
 
@@ -1651,7 +1651,7 @@ int Transport_Interfaces_FT_Disc::preparer_calcul(void)
   //                                                  Maillage_FT_Disc::MINIMAL);
 
   //Ajout TF : gestion de la derivee en temps
-  if (calculate_time_derivative()) derivee_en_temps()->changer_temps(temps);
+  if (calculate_time_derivative()) derivee_en_temps().changer_temps(temps);
   //Fin TF
   return 1;
 }
@@ -2552,7 +2552,7 @@ void Transport_Interfaces_FT_Disc::calcul_indicatrice_faces(const DoubleTab& ind
             const DoubleTab& interfacial_area = ns.get_interfacial_area();
             const DoubleTab& normale_elements = get_update_normale_interface().valeurs();
 
-            const int dim = ns.inconnue()->valeurs().line_size();
+            const int dim = ns.inconnue().valeurs().line_size();
             const int vef = (dim == 2);
             if (vef)
               {
@@ -2986,8 +2986,8 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
 void Transport_Interfaces_FT_Disc::update_critere_statio()
 {
   Schema_Temps_base& sch_tps = schema_temps();
-  const DoubleTab& present = inconnue()->valeurs();
-  const DoubleTab& passe = inconnue()->passe();
+  const DoubleTab& present = inconnue().valeurs();
+  const DoubleTab& passe = inconnue().passe();
   const double dt = sch_tps.pas_de_temps();
   DoubleTab tab_critere(present);
 
@@ -6384,7 +6384,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
 {
   DoubleTab& deplacement = variables_internes_->deplacement_sommets;
   const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
-  const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
+  const Champ_base& champ_vitesse = eqn_hydraulique.inconnue();
   Maillage_FT_Disc& maillage = maillage_interface();
   // Calcul de la vitesse de deplacement des sommets par interpolation
   // (deplacement contient en fait la vitesse en m/s)
@@ -7177,7 +7177,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
   // Fin de GB
 
   //TF : Gestion de l avancee en temps de la derivee
-  if (calculate_time_derivative()) derivee_en_temps()->changer_temps(temps);
+  if (calculate_time_derivative()) derivee_en_temps().changer_temps(temps);
   //Fin de TF
 }
 
@@ -7270,12 +7270,12 @@ Operateur& Transport_Interfaces_FT_Disc::operateur(int i)
   throw;
 }
 
-const Champ_Inc& Transport_Interfaces_FT_Disc::inconnue(void) const
+const Champ_Inc_base& Transport_Interfaces_FT_Disc::inconnue(void) const
 {
   return indicatrice_;
 }
 
-Champ_Inc& Transport_Interfaces_FT_Disc::inconnue(void)
+Champ_Inc_base& Transport_Interfaces_FT_Disc::inconnue(void)
 {
   return indicatrice_;
 }
@@ -7378,7 +7378,7 @@ int Transport_Interfaces_FT_Disc::sauvegarder(Sortie& os) const
   {
     int special, afaire;
     const int format_xyz = EcritureLectureSpecial::is_ecriture_special(special, afaire);
-    double temps=inconnue()->temps();
+    double temps=inconnue().temps();
     Nom mon_ident("variables_internes_transport");
     mon_ident += Nom(temps,"%e");
     if (format_xyz)
@@ -7522,7 +7522,7 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 // Calcul de la vitesse de deplacement des sommets par interpolation
                 // (deplacement contient en fait la vitesse en m/s)
                 const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
-                const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
+                const Champ_base& champ_vitesse = eqn_hydraulique.inconnue();
                 int flag = 1;
                 if (sub_type(Navier_Stokes_FT_Disc, eqn_hydraulique))
                   {
@@ -7563,7 +7563,7 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 // Calcul de la vitesse de deplacement des sommets par interpolation
                 // (deplacement contient en fait la vitesse en m/s)
                 const Equation_base& eqn_hydraulique = variables_internes_->refequation_vitesse_transport.valeur();
-                const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
+                const Champ_base& champ_vitesse = eqn_hydraulique.inconnue();
                 calculer_vitesse_transport_interpolee(champ_vitesse, maillage_interface_pour_post(), vit,
                                                       0 /* ne pas recalculer le champ de vitesse L2 */,  // GB 2020/03/20 -> Je suis surpris par cette option 0 en desaccord avec le moment du calcul
                                                       // mais je ne prends pas la responsabilite de changer car je ne sais pas trop ce que ca represente (c'est du VEF uniquement?)

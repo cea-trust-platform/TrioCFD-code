@@ -438,13 +438,13 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
       // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
       Source_Con_Phase_field_base& source_pf_base = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
-      source_pf_base.calculer_champ_fonc_c(temps, rho_, eq_c.inconnue()->futur(i));
-      source_pf_base.calculer_champ_fonc_c(temps, drhodc_, eq_c.inconnue()->futur(i));
+      source_pf_base.calculer_champ_fonc_c(temps, rho_, eq_c.inconnue().futur(i));
+      source_pf_base.calculer_champ_fonc_c(temps, drhodc_, eq_c.inconnue().futur(i));
       //Cerr << "rho = " << rho_->valeurs()[14*48+24] << finl;
     }
   else
     {
-      const DoubleTab& c = eq_c.inconnue()->futur(i);
+      const DoubleTab& c = eq_c.inconnue().futur(i);
       //Mirantsoa 264902
       DoubleTab& rhoTab = rho_->valeurs(); /**/
       DoubleTab& drhodcTab = drhodc_->valeurs();/**/
@@ -523,7 +523,7 @@ void Navier_Stokes_phase_field::calculer_mu(const bool init)
       // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
       Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
       Source_Con_Phase_field_base& source_pf = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
-      source_pf.calculer_champ_fonc_c(temps, mu_, eq_c.inconnue()->futur(i));
+      source_pf.calculer_champ_fonc_c(temps, mu_, eq_c.inconnue().futur(i));
       mu_->valeurs().echange_espace_virtuel();
     }
 }
@@ -660,7 +660,7 @@ int Navier_Stokes_phase_field::preparer_calcul()
     {
       Champ_Don rho_face_P;
       rho_face_P.typer("Champ_Fonc_Face");
-      rho_face_P->valeurs()=inconnue()->valeurs();
+      rho_face_P->valeurs()=inconnue().valeurs();
       const DoubleTab& tab_rho=rho_->valeurs();
 
       rho_aux_faces(tab_rho, rho_face_P);
@@ -730,7 +730,7 @@ void Navier_Stokes_phase_field::mettre_a_jour(double temps)
     {
       Champ_Don rho_face_P;
       rho_face_P.typer("Champ_Fonc_Face");
-      rho_face_P->valeurs()=inconnue()->valeurs();
+      rho_face_P->valeurs()=inconnue().valeurs();
       const DoubleTab& tab_rho=rho_->valeurs();
 
       rho_aux_faces(tab_rho, rho_face_P);
@@ -1080,7 +1080,7 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
 
       solveur_masse->appliquer(vpoint);
       if (calculate_time_derivative())
-        derivee_en_temps()->valeurs()=vpoint;
+        derivee_en_temps().valeurs()=vpoint;
       schema_temps().modifier_second_membre((*this),vpoint);
 
       // Appliquer le solveur masse => diviser par le volume
@@ -1136,7 +1136,7 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       //Champ_Fonc_Face rho_face_P;
       Champ_Don rho_face_P;
       rho_face_P.typer("Champ_Fonc_Face");
-      rho_face_P->valeurs()=inconnue()->valeurs();
+      rho_face_P->valeurs()=inconnue().valeurs();
 
       for (int fac=0; fac<nbfaces_bord; fac++)
         {

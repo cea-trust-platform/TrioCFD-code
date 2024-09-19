@@ -45,9 +45,9 @@ void Operateur_Conv_sensibility::associer_vitesse(const Champ_base& vit)
 }
 void Operateur_Conv_sensibility::associer(const Domaine_dis_base& zdis,
                                           const Domaine_Cl_dis_base& zcl_dis,
-                                          const Champ_Inc& inco)
+                                          const Champ_Inc_base& inco)
 {
-  dom=inco->domaine();
+  dom=inco.domaine();
   op_conv.l_op_base().associer(zdis, zcl_dis, inco);
 }
 DoubleTab& Operateur_Conv_sensibility::calculer(const DoubleTab& inco, DoubleTab& resu) const

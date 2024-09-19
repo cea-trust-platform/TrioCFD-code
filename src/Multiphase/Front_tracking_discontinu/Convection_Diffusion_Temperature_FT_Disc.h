@@ -119,14 +119,14 @@ protected:
   Champ_Fonc grad_t_;
   Champ_Fonc mpoint_;
   Champ_Fonc mpoint_uncorrected_;
-  Champ_Inc vitesse_convection_;
+  OWN_PTR(Champ_Inc_base) vitesse_convection_;
 
   // To make a divergence-free velocity extension :
   int divergence_free_velocity_extension_;
   OWN_PTR(Assembleur_base) assembleur_pression_;
-  Champ_Inc la_pression; // Of course, it's a fake :D
-  Champ_Inc gradient_pression_;
-  Champ_Inc divergence_delta_U;
+  OWN_PTR(Champ_Inc_base) la_pression; // Of course, it's a fake :D
+  OWN_PTR(Champ_Inc_base) gradient_pression_;
+  OWN_PTR(Champ_Inc_base) divergence_delta_U;
   SolveurSys solveur_pression_;
   Matrice matrice_pression_;
   OWN_PTR(Domaine_Cl_dis_base) zcl_fictitious_;

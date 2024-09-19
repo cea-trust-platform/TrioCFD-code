@@ -170,7 +170,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 
 
           const Equation_base& autre_eqn = ref_cast(Equation_base, ch.domaine_Cl_dis().equation());
-          const DoubleTab& autre_inco =autre_eqn.inconnue ()->valeurs ();
+          const DoubleTab& autre_inco =autre_eqn.inconnue().valeurs();
 
           DoubleTab phi_filed(autre_inco);
           phi_filed = 0.;
@@ -200,29 +200,26 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
             }
         }
 
-      const Equation_base& mon_eqn = domaine_Cl_dis ().equation ();
-      const DoubleTab& mon_inco = mon_eqn.inconnue ()->valeurs ();
-      const IntTab& face_voisins = le_dom.face_voisins ();
+      const Equation_base& mon_eqn = domaine_Cl_dis().equation();
+      const DoubleTab& mon_inco = mon_eqn.inconnue().valeurs();
+      const IntTab& face_voisins = le_dom.face_voisins();
 
       // replace mon_h and mon_Ti;
-      int taille = mon_h.dimension (0);
+      int taille = mon_h.dimension(0);
       for (int jj = 0; jj < nb_comp; jj++)
         {
           for (int ii = 0; ii < taille; ii++)
             {
-              if (!est_egal (mon_phi (ii, jj), 0.))
+              if (!est_egal(mon_phi(ii, jj), 0.))
                 {
-                  mon_phi (ii, jj) = - mon_phi (ii, jj);
+                  mon_phi(ii, jj) = -mon_phi(ii, jj);
 
-                  hh_imp (ii, jj) = 0.;
+                  hh_imp(ii, jj) = 0.;
 
-                  const int face = ii
-                                   + frontiere_dis ().frontiere ().num_premiere_face ();
+                  const int face = ii + frontiere_dis().frontiere().num_premiere_face();
 
-                  const int elemi = face_voisins (face, 0)
-                                    + face_voisins (face, 1) + 1;
-                  mon_Ti (ii, jj) = mon_inco (elemi, 0)
-                                    + mon_phi (ii, jj) / mon_h (ii);
+                  const int elemi = face_voisins(face, 0) + face_voisins(face, 1) + 1;
+                  mon_Ti(ii, jj) = mon_inco(elemi, 0) + mon_phi(ii, jj) / mon_h(ii);
                 }
             }
         }

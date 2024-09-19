@@ -153,7 +153,7 @@ int Transport_K_ou_Eps::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   else if (mot=="convection")
     {
       Cerr << "Reading and typing of the convection operator : " << finl;
-      const Champ_Inc& vitesse_transportante = probleme().equation(0).inconnue();
+      const Champ_Inc_base& vitesse_transportante = probleme().equation(0).inconnue();
       associer_vitesse(vitesse_transportante);
       terme_convectif.associer_vitesse(vitesse_transportante);
       is >> terme_convectif;

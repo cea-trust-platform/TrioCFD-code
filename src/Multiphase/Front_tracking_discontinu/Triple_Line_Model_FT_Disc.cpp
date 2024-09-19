@@ -1170,7 +1170,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     const Frontiere& fr=zcldis.les_conditions_limites(num_bord)->frontiere_dis().frontiere();
     const int nb_first_face = fr.num_premiere_face();
     const int nb_face = fr.nb_faces();
-    const DoubleTab& indica = eq_transport.inconnue ()->valeurs ();
+    const DoubleTab& indica = eq_transport.inconnue().valeurs();
 
     // get TCL cells
     for (int ii = 0; ii < nb_face; ii++)

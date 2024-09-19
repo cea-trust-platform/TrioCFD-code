@@ -153,7 +153,7 @@ int Pb_Thermohydraulique_sensibility::verifier()
   Probleme_base::finir();
 
   Navier_Stokes_std& eqnNS = ref_cast(Navier_Stokes_std,equation(0));
-  const  DoubleTab& vitesse=  eqnNS.inconnue().valeur();
+  const  DoubleTab& vitesse=  eqnNS.inconnue();
   if( equation(0).que_suis_je() == "Navier_Stokes_standard")
     {
       Nom   nom_fichier_vitesse("Velocity_state.txt");
@@ -181,7 +181,7 @@ int Pb_Thermohydraulique_sensibility::verifier()
   if(nombre_d_equations() == 2 )
     {
       Convection_Diffusion_Temperature& eqnCDT = ref_cast(Convection_Diffusion_Temperature,equation(1));
-      const  DoubleTab& temperature=  eqnCDT.inconnue().valeur();
+      const  DoubleTab& temperature=  eqnCDT.inconnue();
       if (equation(1).que_suis_je() == "Convection_Diffusion_Temperature")
         {
           Nom   nom_fichier_temp("Temperature_state.txt");

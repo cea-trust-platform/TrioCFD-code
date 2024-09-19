@@ -4802,7 +4802,7 @@ void Maillage_FT_Disc::nettoyer_phase(const Nom& nom_eq, const int phase)
   sommets_utilises=0;
   const Equation_base& eq = equation_transport().probleme().get_equation_by_name(nom_eq);
   Transport_Interfaces_FT_Disc& eq_interf = ref_cast_non_const(Transport_Interfaces_FT_Disc,eq);
-  const DoubleTab& indic =  eq_interf.inconnue()->valeurs();
+  const DoubleTab& indic =  eq_interf.inconnue().valeurs();
   double phase_reelle = double(phase);
   int elem;
 

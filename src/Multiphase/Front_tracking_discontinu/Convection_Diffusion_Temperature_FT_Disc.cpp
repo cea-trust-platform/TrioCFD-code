@@ -80,7 +80,7 @@ Entree& Convection_Diffusion_Temperature_FT_Disc::readOn(Entree& is)
   // Ne pas faire assert(fluide non nul)
   Convection_Diffusion_std::readOn(is);
   solveur_masse->set_name_of_coefficient_temporel("rho_cp_comme_T");
-  Nom num=inconnue()->le_nom(); // On prevoir le cas d'equation de scalaires passifs
+  Nom num=inconnue().le_nom(); // On prevoir le cas d'equation de scalaires passifs
   num.suffix("temperature_thermique");
   Nom nom="Convection_chaleur";
   nom+=num;
@@ -490,7 +490,7 @@ void Convection_Diffusion_Temperature_FT_Disc::calculer_grad_t()
 
   // Extrapolation lineaire de la temperature des mailles diphasiques a partir
   // de la temperature des mailles de la "phase".
-  DoubleTab& temperature = inconnue()->valeurs();
+  DoubleTab& temperature = inconnue().valeurs();
 
   Navier_Stokes_FT_Disc& eq_navier_stokes = ref_cast(Navier_Stokes_FT_Disc, ref_eq_ns_.valeur());
   const DoubleTab& div_n = eq_navier_stokes.calculer_div_normale_interface().valeurs();
@@ -599,7 +599,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
   Cerr << "Work in progress and widly incorrect. " << finl;
   Cerr << "Wait and see for further improvements. Exit" << finl;
   Process::exit();
-  if (inconnue()->nb_valeurs_temporelles() == 1)
+  if (inconnue().nb_valeurs_temporelles() == 1)
     {
       Cerr << "You need at least 2 positions to the wheel... Contact TRUST support. " << finl;
       Process::exit();
@@ -607,12 +607,12 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
   Transport_Interfaces_FT_Disc& eq_interface_ = ref_eq_interface_.valeur();
   //const Champ_base& ch_indic = ref_cast(Champ_Inc,eq_interface_.get_update_indicatrice());
   //const DoubleTab& indicatrice = ch_indic.valeurs();
-  const DoubleTab& indicatrice = eq_interface_.inconnue()->valeurs();
-  const DoubleTab& indicatrice_passe = eq_interface_.inconnue()->passe();
+  const DoubleTab& indicatrice = eq_interface_.inconnue().valeurs();
+  const DoubleTab& indicatrice_passe = eq_interface_.inconnue().passe();
   const double& dt = schema_temps().pas_de_temps();
   //const DoubleTab& indicatrice_passe = ch_indic.passe();
-  DoubleTab& temperature = inconnue()->valeurs();
-  const DoubleTab& temperature_passe = inconnue()->passe();
+  DoubleTab& temperature = inconnue().valeurs();
+  const DoubleTab& temperature_passe = inconnue().passe();
   const double rhocp = fluide_dipha_->fluide_phase(phase_).masse_volumique()->valeurs()(0,0)
                        * fluide_dipha_->fluide_phase(phase_).capacite_calorifique()->valeurs()(0,0);
 
@@ -913,7 +913,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
 void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_extension()
 {
   Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, ref_eq_ns_.valeur());
-  vitesse_convection_->valeurs() = ns.inconnue()->valeurs();
+  vitesse_convection_->valeurs() = ns.inconnue().valeurs();
   // Projection of the convective field :
   //SolveurSys solveur_pression(ns.get_solveur_pression());
   Solveur_Masse solveur_masse_fictitious(ns.solv_masse()); // Copy the operator to change the coeff
@@ -964,7 +964,7 @@ void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_
   // RHS for this pressure solveur : div(delta_u)
   // We need to create a table sized as temperature to store the rhs :
   DoubleTab& secmem = divergence_delta_U->valeurs();
-  //secmem.copy(inconnue()->valeurs(), RESIZE_OPTIONS::NOCOPY_NOINIT);
+  //secmem.copy(inconnue().valeurs(), RESIZE_OPTIONS::NOCOPY_NOINIT);
   div_tmp->calculer(vitesse_convection_->valeurs(),secmem);
 
   // On ne conserve que la divergence des elements proches de l'interface, et supprime quand la distance est invalide
@@ -1084,13 +1084,13 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
   // extension before at the begining of the function.
   static const Stat_Counter_Id count1 = statistiques().new_counter(1, "extend_ui", 0);
   statistiques().begin_count(count1);
-  const Champ_Inc& vitesse_ns = ns.inconnue();
+  const Champ_Inc_base& vitesse_ns = ns.inconnue();
   if (!divergence_free_velocity_extension_)
     {
       ns.calculer_delta_u_interface(vitesse_convection_, phase_, correction_courbure_ordre_);
       //vitesse_convection_.valeurs() += vitesse_ns.valeurs();
-      vitesse_convection_->valeurs() += vitesse_ns->futur(); // avec les jeux d'avancer reculer et les equations, il faut prendre futur pour avoir u^n ici
-      //Cerr << inconnue()->temps()  << " =! " << vitesse_ns.temps() << " " << vitesse_convection_.temps() << finl;
+      vitesse_convection_->valeurs() += vitesse_ns.futur(); // avec les jeux d'avancer reculer et les equations, il faut prendre futur pour avoir u^n ici
+      //Cerr << inconnue().temps()  << " =! " << vitesse_ns.temps() << " " << vitesse_convection_.temps() << finl;
       //Process::exit();
     }
   else
@@ -1107,7 +1107,7 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
   // diffusion can be implicited.
   // rhoCp is used for convection.
   // vitesse_convection_ is used for convection.
-  DoubleTab& temperature = inconnue()->valeurs();
+  DoubleTab& temperature = inconnue().valeurs();
   derivee = 0.;
 
   // STEP 3: Diffusion operator
@@ -1292,7 +1292,7 @@ void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
 
       Transport_Interfaces_FT_Disc& eq_interface_ = ref_eq_interface_.valeur();
       const DoubleTab& indicatrice = eq_interface_.get_update_indicatrice().valeurs();
-      DoubleTab& temperature = inconnue()->valeurs();
+      DoubleTab& temperature = inconnue().valeurs();
       const DoubleVect& volume = ref_cast(Domaine_VF, domaine_dis()).volumes();
       const int nb_elem = domaine_vf.domaine().nb_elem();
 
@@ -1528,14 +1528,14 @@ void Convection_Diffusion_Temperature_FT_Disc::suppression_interfaces(const IntV
 
   const int n = domaine_dis().domaine().nb_elem();
   assert(num_compo.size() == n);
-  const int nb_valeurs_temporelles = inconnue()->nb_valeurs_temporelles();
+  const int nb_valeurs_temporelles = inconnue().nb_valeurs_temporelles();
   // Il faut traiter toutes les cases temporelles:
   //  selon l'ordre des equations dans le probleme, la roue a deja ete tournee ou pas...
   // Note B.M. est ce que c'est compatible avec la spec de ICOCO ? (modif
   //  du temps n autorisee ???)
   for (int t = 0; t < nb_valeurs_temporelles; t++)
     {
-      DoubleTab& temp = inconnue()->futur(t);
+      DoubleTab& temp = inconnue().futur(t);
       for (int i = 0; i < n; i++)
         {
           const int c = num_compo[i];
@@ -1754,7 +1754,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall(const int num_face) c
   const IntTab& faces_elem = domaine_vf.face_voisins();
   // On of the neighbours doesnot exist so it has "-1". We get the other elem by:
   const int elem = faces_elem(num_face, 0) + faces_elem(num_face, 1) +1;
-  const DoubleTab& temperature = inconnue()->valeurs();
+  const DoubleTab& temperature = inconnue().valeurs();
 
   double P[3] = {0.,0.,0.}, xyz_face[3] = {0.,0.,0.};
   xyz_face[0] =  domaine_vf.xv(num_face,0);

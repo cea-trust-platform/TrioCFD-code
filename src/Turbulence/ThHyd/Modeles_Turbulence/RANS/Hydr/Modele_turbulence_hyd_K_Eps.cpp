@@ -85,7 +85,7 @@ int Modele_turbulence_hyd_K_Eps::lire_motcle_non_standard(const Motcle& mot, Ent
  */
 Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double temps)
 {
-  const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue().valeur();
+  const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue();
   Nom type = chK_Eps.que_suis_je();
   const Domaine_Cl_dis_base& le_dom_Cl_dis = eqn_transp_K_Eps().domaine_Cl_dis();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
@@ -128,7 +128,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
       int is_Cmu_constant = mon_modele_fonc_->Calcul_is_Cmu_constant();
       if (is_Cmu_constant == 0)
         {
-          const DoubleTab& vitesse = mon_equation_->inconnue()->valeurs();
+          const DoubleTab& vitesse = mon_equation_->inconnue().valeurs();
           mon_modele_fonc_->Calcul_Cmu(Cmu, le_dom_dis, le_dom_Cl_dis, vitesse, tab_K_Eps, EPS_MIN_);
 
           /*Paroi*/
@@ -155,7 +155,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
 
   if (non_prepare == 1)
     {
-      Champ_Inc visco_turb_au_format_K_eps;
+      OWN_PTR(Champ_Inc_base) visco_turb_au_format_K_eps;
       visco_turb_au_format_K_eps.typer(type);
       DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis(), visco_turb_au_format_K_eps);
 

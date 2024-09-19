@@ -94,7 +94,7 @@ void Paroi_frottante_simple::me_calculer()
   assert((mu_poly) || (mu_vdf));
 
   int nf = la_frontiere_dis->frontiere().nb_faces(), nf_tot = domaine.nb_faces_tot(), f1 = la_frontiere_dis->frontiere().num_premiere_face();
-  int N = domaine_Cl_dis().equation().inconnue()->valeurs().line_size(), D = dimension;
+  int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size(), D = dimension;
 
   const DoubleTab& n_f = domaine.face_normales();
   const DoubleVect& fs = domaine.face_surfaces();
@@ -103,7 +103,7 @@ void Paroi_frottante_simple::me_calculer()
   DoubleTab pvit_elem(0, N * dimension);
   if (mu_vdf)
     {
-      const Champ_Face_base& ch = ref_cast(Champ_Face_base, domaine_Cl_dis().equation().probleme().equation(0).inconnue().valeur());
+      const Champ_Face_base& ch = ref_cast(Champ_Face_base, domaine_Cl_dis().equation().probleme().equation(0).inconnue());
       domaine.domaine().creer_tableau_elements(pvit_elem);
       ch.get_elem_vector_field(pvit_elem, true);
     }

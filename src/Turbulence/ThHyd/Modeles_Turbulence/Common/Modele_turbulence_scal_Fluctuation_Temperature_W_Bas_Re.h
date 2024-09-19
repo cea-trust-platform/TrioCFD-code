@@ -36,8 +36,8 @@ public:
   void mettre_a_jour(double ) override;
   //void associer_eqn(const Equation_base&);
 
-  inline Champ_Inc& Fluctu_Temperature() override;
-  inline const Champ_Inc& Fluctu_Temperature() const override;
+  inline Champ_Inc_base& Fluctu_Temperature() override;
+  inline const Champ_Inc_base& Fluctu_Temperature() const override;
 
   inline Transport_Fluctuation_Temperature_W& equation_Fluctu() override;
   inline const Transport_Fluctuation_Temperature_W& equation_Fluctu() const override;
@@ -75,12 +75,12 @@ inline const Transport_Fluctuation_Temperature_W& Modele_turbulence_scal_Fluctua
   return eqn_transport_Fluctu_Temp.valeur();
 }
 
-inline const Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature() const
+inline const Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature() const
 {
   return eqn_transport_Fluctu_Temp->inconnue();
 }
 
-inline Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature()
+inline Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature()
 {
   return eqn_transport_Fluctu_Temp->inconnue();
 }

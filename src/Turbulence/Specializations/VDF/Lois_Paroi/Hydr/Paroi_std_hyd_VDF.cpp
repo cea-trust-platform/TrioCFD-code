@@ -171,7 +171,7 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1, int isKeps, DoubleTab& tab2
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco = -1;
   int l_unif {0};
@@ -426,7 +426,7 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco = -1;
 
@@ -1181,7 +1181,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -1398,7 +1398,7 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco = -1;
   int l_unif {0};

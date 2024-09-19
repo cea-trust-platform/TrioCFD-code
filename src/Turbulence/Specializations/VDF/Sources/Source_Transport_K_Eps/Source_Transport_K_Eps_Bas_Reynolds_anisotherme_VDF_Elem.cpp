@@ -56,7 +56,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(mat
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
   const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl);
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
-  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs(), &scalaire = eq_thermique->inconnue()->valeurs(), &vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs(), &scalaire = eq_thermique->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente()->valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs(), &g = gravite->valeurs();
@@ -66,7 +66,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(mat
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
-  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
   const int nb_elem = domaine_VDF.nb_elem(), nb_elem_tot = domaine_VDF.nb_elem_tot();
 
   DoubleTrav P(nb_elem_tot), G(nb_elem_tot), G1(nb_elem_tot), D(nb_elem_tot), E(nb_elem_tot), F1(nb_elem_tot), F2(nb_elem_tot);
@@ -110,7 +110,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(
   const Domaine_dis_base& z = eq_hydraulique->domaine_dis();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,z);
   const Domaine_Cl_VDF& zcl_VDF = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis());
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs(), &K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs(), &K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_dyn = fluide.viscosite_dynamique();
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente()->valeurs();
@@ -125,7 +125,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(
   mon_modele_fonc.Calcul_F2(F2,P,z,K_eps_Bas_Re,ch_visco_dyn);
 
   //Calcul du terme de production
-  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
   calculer_terme_production_K(domaine_VDF,zcl_VDF,P,K_eps_Bas_Re,vit,vitesse,visco_turb);
 
   //Calcul du terme source

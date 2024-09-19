@@ -63,7 +63,7 @@ Entree& Imprimer_Fichiers_RANS_VDF::interpreter(Entree& is)
 
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,pb.equation(0).domaine_dis());
   const Equation_base& eqn_hydr = pb.equation(0);
-  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs(); //vitesse
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs(); //vitesse
   SFichier fic_vit("vitesse_RANS.dat");
 
   int ndeb = 0, nfin = domaine_VDF.nb_faces_tot() ;
@@ -77,7 +77,7 @@ Entree& Imprimer_Fichiers_RANS_VDF::interpreter(Entree& is)
   //     {
   SFichier fic_temp("temperature_RANS.dat");
   const Equation_base& eqn_therm = pb.equation(1);
-  const DoubleVect& temp = eqn_therm.inconnue()->valeurs(); //temperature
+  const DoubleVect& temp = eqn_therm.inconnue().valeurs(); //temperature
 
   int ndeb2 = 0, nfin2 = domaine_VDF.nb_elem_tot() ;
 

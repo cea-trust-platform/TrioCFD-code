@@ -71,8 +71,8 @@ DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_IndGros& connect, Re
   //Cerr<<"debut de Source_LDC_VDF_NS::calculer_residu"<<finl;
   Equation_base& eq = equation();
   // Equation_base& eq_fine = pb_fin.equation(0); // 1 seule equation pour l instant !!
-  DoubleTab& present = eq.inconnue()->valeurs();
-  DoubleTab& present_fin = eq_fine.inconnue()->valeurs();
+  DoubleTab& present = eq.inconnue().valeurs();
+  DoubleTab& present_fin = eq_fine.inconnue().valeurs();
   const Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eq.domaine_dis());
   const Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eq_fine.domaine_dis());
   const IntVect& indice_gros = connect.indice_gros();

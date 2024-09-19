@@ -46,9 +46,9 @@ Entree& Op_Diff_K_Omega_VEF_Face::readOn(Entree& s )
  */
 void Op_Diff_K_Omega_VEF_Face::associer(const Domaine_dis_base& domaine_dis,
                                         const Domaine_Cl_dis_base& domaine_cl_dis,
-                                        const Champ_Inc& ch_diffuse)
+                                        const Champ_Inc_base& ch_diffuse)
 {
-  inconnue_  = ref_cast(Champ_P1NC, ch_diffuse.valeur());
+  inconnue_  = ref_cast(Champ_P1NC, ch_diffuse);
   le_dom_vef = ref_cast(Domaine_VEF, domaine_dis);
   la_zcl_vef = ref_cast(Domaine_Cl_VEF, domaine_cl_dis);
 }
@@ -487,7 +487,7 @@ void Op_Diff_K_Omega_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
 {
   // on recupere le tableau
   const Transport_K_Omega& eqn_k_omega = ref_cast(Transport_K_Omega, equation());
-  const DoubleTab& val = equation().inconnue()->valeurs();
+  const DoubleTab& val = equation().inconnue().valeurs();
   const Turbulence_paroi& mod = eqn_k_omega.modele_turbulence().loi_paroi();
   const Paroi_hyd_base_VEF& paroi = ref_cast(Paroi_hyd_base_VEF, mod.valeur());
   const ArrOfInt& face_komega_imposee = paroi.face_keps_imposee();

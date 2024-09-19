@@ -61,7 +61,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   const IntTab&             fcl_k 			= ch_k.fcl(), &e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes(), &fs = domaine.face_surfaces();
 
-  const Champ_Elem_PolyMAC_P0& 	ch_diss	= ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()); 		// Champ tau ou omega
+  const Champ_Elem_PolyMAC_P0& 	ch_diss	= ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue()); 		// Champ tau ou omega
   const DoubleTab& 			diss_passe			= ch_diss.passe();
   const DoubleTab& 			      diss			= ch_diss.valeurs();
 

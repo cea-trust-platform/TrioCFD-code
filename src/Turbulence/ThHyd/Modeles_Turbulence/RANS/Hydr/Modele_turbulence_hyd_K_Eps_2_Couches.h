@@ -41,8 +41,8 @@ public:
   int preparer_calcul() override;
   bool initTimeStep(double dt) override;
   void mettre_a_jour(double) override;
-  inline Champ_Inc& K_Eps();
-  inline const Champ_Inc& K_Eps() const;
+  inline Champ_Inc_base& K_Eps();
+  inline const Champ_Inc_base& K_Eps() const;
   inline int get_nbcouches() const;
   inline int get_yswitch() const;
   inline int get_nutswitch() const;
@@ -72,9 +72,9 @@ private:
  *     par l'equation de transport K-eps porte par le modele.
  *     (version const)
  *
- * @return (Champ_Inc&) le champ inconnue (K,epsilon)
+ * @return (Champ_Inc_base&) le champ inconnue (K,epsilon)
  */
-inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
+inline const Champ_Inc_base& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
 {
   return eqn_transport_K_Eps_.inconnue();
 }
@@ -84,9 +84,9 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
  * e. : (K,Epsilon). Cette inconnue est portee
  *     par l'equation de transport K-eps porte par le modele.
  *
- * @return (Champ_Inc&) le champ inconnue (K,epsilon)
+ * @return (Champ_Inc_base&) le champ inconnue (K,epsilon)
  */
-inline Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps()
+inline Champ_Inc_base& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps()
 {
   return eqn_transport_K_Eps_.inconnue();
 }

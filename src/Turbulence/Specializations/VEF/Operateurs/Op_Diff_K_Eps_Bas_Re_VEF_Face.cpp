@@ -59,9 +59,9 @@ Entree& Op_Diff_K_Eps_Bas_Re_VEF_Face::readOn(Entree& s )
  */
 void Op_Diff_K_Eps_Bas_Re_VEF_Face::associer(const Domaine_dis_base& domaine_dis,
                                              const Domaine_Cl_dis_base& domaine_cl_dis,
-                                             const Champ_Inc& ch_diffuse)
+                                             const Champ_Inc_base& ch_diffuse)
 {
-  const Champ_P1NC& inco = ref_cast(Champ_P1NC,ch_diffuse.valeur());
+  const Champ_P1NC& inco = ref_cast(Champ_P1NC,ch_diffuse);
   const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis);
   const Domaine_Cl_VEF& zclVEF = ref_cast(Domaine_Cl_VEF,domaine_cl_dis);
   inconnue_ = inco;

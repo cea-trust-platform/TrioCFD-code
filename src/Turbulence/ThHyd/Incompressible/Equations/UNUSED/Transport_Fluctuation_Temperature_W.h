@@ -53,8 +53,8 @@ public :
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
-  const Champ_Inc& inconnue() const override;
-  Champ_Inc& inconnue() override;
+  const Champ_Inc_base& inconnue() const override;
+  Champ_Inc_base& inconnue() override;
 
 
 
@@ -63,7 +63,7 @@ public :
 
 protected :
 
-  Champ_Inc le_champ_Fluctu_Temperature;
+  OWN_PTR(Champ_Inc_base) le_champ_Fluctu_Temperature;
   Op_Diff_Fluctu_Temp terme_diffusif;
 
   REF(Fluide_base)le_fluide;
@@ -76,7 +76,7 @@ protected :
 /*! @brief renvoie le champ inconnue.
  *
  */
-inline Champ_Inc& Transport_Fluctuation_Temperature_W::inconnue()
+inline Champ_Inc_base& Transport_Fluctuation_Temperature_W::inconnue()
 {
   return le_champ_Fluctu_Temperature;
 }
@@ -84,7 +84,7 @@ inline Champ_Inc& Transport_Fluctuation_Temperature_W::inconnue()
 /*! @brief renvoie le champ inconnue.
  *
  */
-inline const Champ_Inc& Transport_Fluctuation_Temperature_W::inconnue() const
+inline const Champ_Inc_base& Transport_Fluctuation_Temperature_W::inconnue() const
 {
   return le_champ_Fluctu_Temperature;
 }

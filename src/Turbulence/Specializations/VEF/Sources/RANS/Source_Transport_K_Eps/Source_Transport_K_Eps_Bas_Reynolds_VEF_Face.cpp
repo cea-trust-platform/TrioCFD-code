@@ -45,13 +45,13 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   const Domaine_dis_base& domaine_dis_keps = eqn_keps_bas_re->domaine_dis();
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
-  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue()->valeurs();
+  const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, eqn_keps_bas_re->modele_turbulence());
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente()->valeurs();
   const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   const Fluide_base& fluide = ref_cast(Fluide_base, eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& vol_ent = domaine_VEF.volumes_entrelaces();
   const int nb_faces = domaine_VEF.nb_faces();
 

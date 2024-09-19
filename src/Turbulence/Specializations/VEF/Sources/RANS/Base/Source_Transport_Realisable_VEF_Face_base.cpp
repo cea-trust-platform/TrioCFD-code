@@ -47,11 +47,11 @@ DoubleTab& Source_Transport_Realisable_VEF_Face_base::ajouter_keps_real(DoubleTa
   double visco = -1;
   if (is_visco_const) visco = std::max(tab_visco(0, 0), DMINFLOAT);
 
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& vol_ent = le_dom_VEF->volumes_entrelaces();
 
   DoubleTab vitesse_filtree(vit);
-  ref_cast(Champ_P1NC,eq_hydraulique->inconnue().valeur()).filtrer_L2(vitesse_filtree);
+  ref_cast(Champ_P1NC,eq_hydraulique->inconnue()).filtrer_L2(vitesse_filtree);
 
   const int nb_faces = le_dom_VEF->nb_faces();
   DoubleTrav P(nb_faces);

@@ -109,7 +109,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
   const int nfac = domaine.nb_faces_elem();
 
   const Equation_base& eqn_temp = mon_modele_turb_scal->equation();
-  const DoubleTab& Temp = eqn_temp.inconnue()->valeurs();
+  const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
   const Equation_base& eq_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
@@ -298,7 +298,7 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const DoubleVect& Temp = eqn_temp.inconnue()->valeurs();
+  const DoubleVect& Temp = eqn_temp.inconnue().valeurs();
   int elem;
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_temp.probleme().equation(0).milieu());
@@ -496,7 +496,7 @@ int ParoiVEF_TBLE_scal::calculer_stats()
   const DoubleTab& face_normale = domaine_VEF.face_normales();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const double tps = eqn_temp.inconnue()->temps();
+  const double tps = eqn_temp.inconnue().temps();
   const double dt = eqn_temp.schema_temps().pas_de_temps();
   const Equation_base& eq_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_hydr.get_modele(TURBULENCE);
@@ -600,7 +600,7 @@ int ParoiVEF_TBLE_scal::calculer_stats()
 void ParoiVEF_TBLE_scal::imprimer_nusselt(Sortie& os) const
 {
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const double tps = eqn_temp.inconnue()->temps();
+  const double tps = eqn_temp.inconnue().temps();
   Paroi_scal_hyd_base_VEF::imprimer_nusselt(os);
   Paroi_TBLE_QDM_Scal::imprimer_sondes(os, tps, equivalent_distance_);
   Paroi_TBLE_QDM_Scal::imprimer_stat(os, tps);
@@ -609,7 +609,7 @@ void ParoiVEF_TBLE_scal::imprimer_nusselt(Sortie& os) const
 int ParoiVEF_TBLE_scal::sauvegarder(Sortie& os) const
 {
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
-  double tps =  mon_modele_turb_scal->equation().inconnue()->temps();
+  double tps =  mon_modele_turb_scal->equation().inconnue().temps();
   return Paroi_TBLE_QDM_Scal::sauvegarder(os, domaine_VEF, le_dom_Cl_VEF.valeur(), tps);
 }
 

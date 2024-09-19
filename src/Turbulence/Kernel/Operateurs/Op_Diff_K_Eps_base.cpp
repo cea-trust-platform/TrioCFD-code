@@ -154,7 +154,7 @@ void Op_Diff_K_Eps::typer()
           if (discr!="VDF_Hyper")
             {
               nom_type += "_";
-              Nom type_inco=equation().inconnue()->que_suis_je();
+              Nom type_inco=equation().inconnue().que_suis_je();
               nom_type+=(type_inco.suffix("Champ_"));
               if (axi)
                 nom_type += "_Axi";
@@ -188,7 +188,7 @@ void Op_Diff_K_Eps::typer()
           if (discr!="VDF_Hyper")
             {
               nom_type += "_";
-              Nom type_inco=equation().inconnue()->que_suis_je();
+              Nom type_inco=equation().inconnue().que_suis_je();
               nom_type+=(type_inco.suffix("Champ_"));
               if (axi)
                 nom_type += "_Axi";

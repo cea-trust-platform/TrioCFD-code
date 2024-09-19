@@ -55,12 +55,16 @@ int Navier_Stokes_std_ALE::sauvegarder(Sortie& os) const
   const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
   if (a_faire)
     {
-      Champ_Inc JacobianOld = vitesse(); // Initialize with same discretization
+      OWN_PTR(Champ_Inc_base) JacobianOld;
+      JacobianOld.typer(vitesse().que_suis_je()); // Initialize with same discretization
       JacobianOld->nommer("JacobianOld");
       JacobianOld->valeurs() = dom_ale.getOldJacobian(); // Use good values
-      Champ_Inc JacobianNew = vitesse(); // Initialize with same discretization
+
+      OWN_PTR(Champ_Inc_base) JacobianNew;
+      JacobianNew.typer(vitesse().que_suis_je()); // Initialize with same discretization
       JacobianNew->nommer("JacobianNew");
       JacobianNew->valeurs() = dom_ale.getNewJacobian(); // Use good values
+
       if (special && Process::nproc() > 1)
         Cerr << "ATTENTION : For a parallel calculation, the field Jacobian is not saved in xyz format ... " << finl;
       else
@@ -76,14 +80,18 @@ int Navier_Stokes_std_ALE::reprendre(Entree& is)
 {
 // start resuming
   Navier_Stokes_std::reprendre(is);
+
   // resumption Jacobian
-  Champ_Inc JacobianOld = vitesse(); // Initialize with same discretization
+  OWN_PTR(Champ_Inc_base) JacobianOld;
+  JacobianOld.typer(vitesse().que_suis_je()); // Initialize with same discretization
   JacobianOld->nommer("JacobianOld");
   Nom field_tag_JOld(JacobianOld->le_nom());
   field_tag_JOld += JacobianOld->que_suis_je();
   field_tag_JOld += probleme().domaine().le_nom();
   field_tag_JOld += Nom(probleme().schema_temps().temps_courant(),probleme().reprise_format_temps());
-  Champ_Inc JacobianNew = vitesse(); // Initialize with same discretization
+
+  OWN_PTR(Champ_Inc_base) JacobianNew;
+  JacobianNew.typer(vitesse().que_suis_je()); // Initialize with same discretization
   JacobianNew->nommer("JacobianNew");
   Nom field_tag_JNew(JacobianNew->le_nom());
   field_tag_JNew += JacobianNew->que_suis_je();

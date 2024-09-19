@@ -79,7 +79,7 @@ bool RK3_FT::iterateTimeStep(bool& converged)
 
   const double epsilon_dt = dt_ * 0.001;
 
-  Champ_Inc_base& inconnue_ = prob.equation(0).inconnue().valeur();
+  Champ_Inc_base& inconnue_ = prob.equation(0).inconnue();
 
   DoubleTab  qNSi(inconnue_.valeurs());
   DoubleTab  qNSj(inconnue_.valeurs());
@@ -283,7 +283,7 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
     {
       // <REF(Champ_Inc_base)> = <Champ_Inc_base>
       Probleme_base& pb = ref_cast(Probleme_base,pbc.probleme(i));
-      inconnues[i] = pb.equation(0).inconnue().valeur();
+      inconnues[i] = pb.equation(0).inconnue();
       qNSi[i] = inconnues[i]->valeurs();
       qNSj[i] = inconnues[i]->valeurs();
     }

@@ -40,7 +40,7 @@ void Op_Diff_K_Omega_VDF_base::completer()
   Operateur_base::completer();
   iter->completer_();
   iter->associer_champ_convecte_ou_inc(equation().inconnue(), nullptr);
-  iter->set_name_champ_inco(equation().inconnue()->le_nom().getString());
+  iter->set_name_champ_inco(equation().inconnue().le_nom().getString());
   iter->set_convective_op_pb_type(false /* diff op */, 0 /* pas pb_multiphase */);
 
   // diffuse_k_seul   = false;
@@ -128,7 +128,7 @@ void Op_Diff_K_Omega_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
       if(sub_type(Transport_K_Omega,mon_equation.valeur()))
         {
           const Transport_K_Omega& eqn_k_omega=ref_cast(Transport_K_Omega,equation());
-          const DoubleTab& val=eqn_k_omega.inconnue()->valeurs();
+          const DoubleTab& val=eqn_k_omega.inconnue().valeurs();
 
           const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis());
 
@@ -173,7 +173,7 @@ void Op_Diff_K_Omega_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
 
 void Op_Diff_K_Omega_VDF_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
   Op_VDF_Elem::dimensionner(iter->domaine(), iter->domaine_Cl(), mat2);
   mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
@@ -183,9 +183,9 @@ void Op_Diff_K_Omega_VDF_base::dimensionner_blocs(matrices_t matrices, const tab
 void Op_Diff_K_Omega_VDF_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   statistiques().begin_count(diffusion_counter_);
-  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
-  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue()->valeurs();
+  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue().valeurs();
 
   if(mat) iter->ajouter_contribution(inco, *mat);
   mettre_a_jour_diffusivite();

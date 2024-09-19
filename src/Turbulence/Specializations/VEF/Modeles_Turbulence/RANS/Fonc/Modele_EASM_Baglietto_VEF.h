@@ -54,7 +54,7 @@ public :
 protected:
 
   /*   REF(Fluide_Incompressible) le_fluide; */
-  /*   REF(Champ_Inc) la_vitesse_transportante; */
+  /*   REF(Champ_Inc_base) la_vitesse_transportante; */
   /*   REF(Transport_K_Eps_Bas_Reynolds) eq_transport_K_Eps_Bas_Re; */
   /*   REF(Champ_Don) visco; */
   // Coefficients du modele

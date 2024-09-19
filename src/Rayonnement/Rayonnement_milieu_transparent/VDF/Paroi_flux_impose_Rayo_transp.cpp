@@ -22,7 +22,7 @@
 
 #include <Paroi_flux_impose_Rayo_transp.h>
 #include <Domaine_VDF.h>
-#include <Champ_Inc.h>
+
 #include <Equation_base.h>
 #include <Milieu_base.h>
 #include <Champ_Uniforme.h>
@@ -61,7 +61,7 @@ void Paroi_flux_impose_Rayo_transp::completer()
       // initialisation de Teta_i
       const Domaine_VDF& zvdf = domaine_VDF.valeur();
 
-      const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue()->valeurs();
+      const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
       int ndeb = la_frontiere_VF.num_premiere_face();
       int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -81,7 +81,7 @@ void Paroi_flux_impose_Rayo_transp::completer()
   else
     {
       // initialisation de Teta_i en VEF
-      const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue()->valeurs();
+      const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
       int ndeb = la_frontiere_VF.num_premiere_face();
       int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -110,7 +110,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
   const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
   ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
   ////double d_Lambda = Lambda(0,0);
-  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue()->valeurs();
+  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -213,7 +213,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 
 void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VEF()
 {
-  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue()->valeurs();
+  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
   double Temp;
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();

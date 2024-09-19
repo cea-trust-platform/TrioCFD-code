@@ -51,7 +51,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
     }
 
   int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = domaine.nb_elem(), D = dimension, nf_tot = domaine.nb_faces_tot() ;
-  int N = equation().inconnue()->valeurs().line_size(),
+  int N = equation().inconnue().valeurs().line_size(),
       Np = equation().probleme().get_champ("pression").valeurs().line_size(),
       Nt = equation().probleme().get_champ("temperature").valeurs().line_size(),
       Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
@@ -76,7 +76,7 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
   if (Type_diss == "")
     {
       DoubleTrav nut(0, Nph);
-      MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), nut); //Necessary to compare size in eddy_viscosity()
+      MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression().valeurs().get_md_vector(), nut); //Necessary to compare size in eddy_viscosity()
       visc_turb.eddy_viscosity(nut);
 
       Matrice_Morse *mat = matrices.count("k") ? matrices.at("k") : nullptr;

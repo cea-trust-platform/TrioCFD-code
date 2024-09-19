@@ -89,15 +89,15 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(O
       Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis());
 
       /* Recuperation des inconnues vitesses fines et grossieres              */
-      DoubleTab& presentG = eqG.inconnue()->valeurs();
-      DoubleTab& presentF = eqF.inconnue()->valeurs();
+      DoubleTab& presentG = eqG.inconnue().valeurs();
+      DoubleTab& presentF = eqF.inconnue().valeurs();
       int tailleF = presentF.dimension(0); // = nombre de faces fines
       int tailleG = presentG.dimension(0); // = nombre de faces grossieres
 
       /* on recupere la pression grossiere et fine                            */
       Navier_Stokes_std& eqG_typee = ref_cast(Navier_Stokes_std, eqG);
-      DoubleTab& pressionG = eqG_typee.pression()->valeurs();
-      DoubleTab& pressionF = eqF.pression()->valeurs();
+      DoubleTab& pressionG = eqG_typee.pression().valeurs();
+      DoubleTab& pressionF = eqF.pression().valeurs();
 
       const Bord front_fictive; // Pour les prolongements 0 et 1
 

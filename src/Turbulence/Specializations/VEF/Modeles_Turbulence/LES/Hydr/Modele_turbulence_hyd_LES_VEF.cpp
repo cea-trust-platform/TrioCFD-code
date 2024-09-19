@@ -39,7 +39,7 @@ Champ_Fonc& Modele_turbulence_hyd_LES_VEF::calculer_viscosite_turbulente()
   static const double Csm1 = CSM1;
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, le_dom_Cl_.valeur());
-  double temps = mon_equation_->inconnue()->temps();
+  double temps = mon_equation_->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   const int nb_face = domaine_VEF.nb_faces();
   const int nb_face_tot = domaine_VEF.nb_faces_tot();
@@ -107,7 +107,7 @@ Champ_Fonc& Modele_turbulence_hyd_LES_VEF::calculer_viscosite_turbulente()
 
 void Modele_turbulence_hyd_LES_VEF::calculer_fonction_structure()
 {
-  const DoubleTab& la_vitesse = mon_equation_->inconnue()->valeurs();
+  const DoubleTab& la_vitesse = mon_equation_->inconnue().valeurs();
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, le_dom_Cl_.valeur());
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
 

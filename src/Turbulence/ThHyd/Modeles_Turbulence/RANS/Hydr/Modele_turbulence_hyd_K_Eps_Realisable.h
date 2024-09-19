@@ -41,8 +41,8 @@ public:
   void completer() override;
   const Equation_base& equation_k_eps(int) const override;
 
-  virtual inline Champ_Inc& K_Eps() { return eqn_transport_K_Eps_Rea_.inconnue(); }
-  virtual inline const Champ_Inc& K_Eps() const { return eqn_transport_K_Eps_Rea_.inconnue(); }
+  virtual inline Champ_Inc_base& K_Eps() { return eqn_transport_K_Eps_Rea_.inconnue(); }
+  virtual inline const Champ_Inc_base& K_Eps() const { return eqn_transport_K_Eps_Rea_.inconnue(); }
   inline Transport_K_Eps_base& eqn_transp_K_Eps() override { return eqn_transport_K_Eps_Rea_; }
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override { return eqn_transport_K_Eps_Rea_; }
   inline OWN_PTR(Modele_Fonc_Realisable_base)& associe_modele_fonction() { return mon_modele_fonc_; }
