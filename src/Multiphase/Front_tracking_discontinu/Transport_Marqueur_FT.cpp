@@ -483,8 +483,7 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
   const Solveur_Masse& le_solveur_masse_ns = eq_ns.solv_masse();
   const Operateur_Grad& gradient = eq_ns.operateur_gradient();
 
-  OWN_PTR(Champ_Inc_base) champ_grad_p;
-  champ_grad_p.typer(eq_ns.grad_P().que_suis_je());
+  OWN_PTR(Champ_Inc_base) champ_grad_p = eq_ns.grad_P();
 
   gradient.calculer(champ_pression.valeurs(), champ_grad_p->valeurs());
   le_solveur_masse_ns->appliquer(champ_grad_p->valeurs());

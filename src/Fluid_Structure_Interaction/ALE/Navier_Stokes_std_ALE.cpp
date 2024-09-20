@@ -55,13 +55,11 @@ int Navier_Stokes_std_ALE::sauvegarder(Sortie& os) const
   const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
   if (a_faire)
     {
-      OWN_PTR(Champ_Inc_base) JacobianOld;
-      JacobianOld.typer(vitesse().que_suis_je()); // Initialize with same discretization
+      OWN_PTR(Champ_Inc_base) JacobianOld = vitesse(); // Initialize with same discretization
       JacobianOld->nommer("JacobianOld");
       JacobianOld->valeurs() = dom_ale.getOldJacobian(); // Use good values
 
-      OWN_PTR(Champ_Inc_base) JacobianNew;
-      JacobianNew.typer(vitesse().que_suis_je()); // Initialize with same discretization
+      OWN_PTR(Champ_Inc_base) JacobianNew = vitesse(); // Initialize with same discretization
       JacobianNew->nommer("JacobianNew");
       JacobianNew->valeurs() = dom_ale.getNewJacobian(); // Use good values
 
@@ -82,16 +80,14 @@ int Navier_Stokes_std_ALE::reprendre(Entree& is)
   Navier_Stokes_std::reprendre(is);
 
   // resumption Jacobian
-  OWN_PTR(Champ_Inc_base) JacobianOld;
-  JacobianOld.typer(vitesse().que_suis_je()); // Initialize with same discretization
+  OWN_PTR(Champ_Inc_base) JacobianOld = vitesse(); // Initialize with same discretization
   JacobianOld->nommer("JacobianOld");
   Nom field_tag_JOld(JacobianOld->le_nom());
   field_tag_JOld += JacobianOld->que_suis_je();
   field_tag_JOld += probleme().domaine().le_nom();
   field_tag_JOld += Nom(probleme().schema_temps().temps_courant(),probleme().reprise_format_temps());
 
-  OWN_PTR(Champ_Inc_base) JacobianNew;
-  JacobianNew.typer(vitesse().que_suis_je()); // Initialize with same discretization
+  OWN_PTR(Champ_Inc_base) JacobianNew = vitesse(); // Initialize with same discretization
   JacobianNew->nommer("JacobianNew");
   Nom field_tag_JNew(JacobianNew->le_nom());
   field_tag_JNew += JacobianNew->que_suis_je();

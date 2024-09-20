@@ -71,8 +71,7 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
   // Verifie la validite de T0:
   check();
   ArrOfDouble T0_etat=T0;
-  OWN_PTR(Champ_Inc_base) T_etat;
-  T_etat.typer(le_scalaire.que_suis_je());
+  OWN_PTR(Champ_Inc_base) T_etat = le_scalaire;
   T_etat->valeurs()=0.;
 
   const Convection_Diffusion_Temperature_sensibility& eqn_conv_diff_temp_sens=ref_cast(Convection_Diffusion_Temperature_sensibility,equation_scalaire());

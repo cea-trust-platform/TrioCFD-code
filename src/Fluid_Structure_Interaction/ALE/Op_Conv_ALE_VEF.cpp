@@ -389,8 +389,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   //                         -la premiere avec le schema choisi et une ponderation de alpha
   //                         -la seconde avec le schema centre et une ponderation de 1-alpha
 
-  OWN_PTR(Champ_Inc_base) vit_maillage_ALE;
-  vit_maillage_ALE.typer(equation().inconnue().que_suis_je()); // Initialize with same discretization
+  OWN_PTR(Champ_Inc_base) vit_maillage_ALE = equation().inconnue(); // Initialize with same discretization
 
   vit_maillage_ALE->valeurs() = vitesse_face_absolue;
   double alpha = alpha_;
