@@ -91,7 +91,7 @@ public :
 
   enum InoutMethod { EXACT, APPROX, BOTH };
 
-  //InoutMethod inout_method() const { return inout_method_;} ;
+  //InoutMethod inout_method() const { return inout_method_; }
   inline ArrOfInt& elems();
 
   inline const ArrOfInt& elems() const

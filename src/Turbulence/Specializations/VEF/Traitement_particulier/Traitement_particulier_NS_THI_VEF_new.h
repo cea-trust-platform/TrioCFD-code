@@ -42,13 +42,13 @@ class Traitement_particulier_NS_THI_VEF_new : public Traitement_particulier_NS_T
 
 protected :
 
-  void renorm_Ec(void) override;
-  void init_calc_spectre(void) override;
-  void calcul_spectre(void) override;
+  void renorm_Ec() override;
+  void init_calc_spectre() override;
+  void calcul_spectre() override;
 
 private:
 
-  void determine_new_tab_fft_VEF(void);
+  void determine_new_tab_fft_VEF();
   void calculer_spectre_new(DoubleTab&, DoubleTab&, DoubleTab&, int, int, double, DoubleVect& , double& , DoubleVect& , double&);
   void calculer_spectre_new_s(DoubleTab&, DoubleTab&, DoubleTab&, int, int, double, DoubleVect& , double& , DoubleVect& , double&);
 

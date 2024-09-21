@@ -53,7 +53,7 @@ Entree& Traitement_particulier_NS_THI_VEF_new::readOn(Entree& is)
   return is;
 }
 
-void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
+void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre()
 {
   const Domaine_dis_base& zdis = mon_equation->domaine_dis();
   const Domaine& domaine = zdis.domaine();
@@ -127,7 +127,7 @@ void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
 }
 
 
-void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
+void Traitement_particulier_NS_THI_VEF_new::calcul_spectre()
 {
   const Domaine_dis_base& zdis = mon_equation->domaine_dis();
   const Domaine& domaine = zdis.domaine();
@@ -248,7 +248,7 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
 }
 
 
-void Traitement_particulier_NS_THI_VEF_new::renorm_Ec(void)
+void Traitement_particulier_NS_THI_VEF_new::renorm_Ec()
 {
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);

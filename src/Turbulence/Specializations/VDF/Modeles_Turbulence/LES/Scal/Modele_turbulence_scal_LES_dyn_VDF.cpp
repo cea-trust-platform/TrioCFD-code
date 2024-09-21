@@ -899,7 +899,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calcul_voisins(const int element_number
  }
  */
 //////////////////////////////////////////////////////////////////////
-void Modele_turbulence_scal_LES_dyn_VDF::calc_elem_elem(void)
+void Modele_turbulence_scal_LES_dyn_VDF::calc_elem_elem()
 {
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = domaine_VDF.face_voisins();

@@ -54,7 +54,7 @@ Entree& Traitement_particulier_NS_THI_thermo_VDF::readOn(Entree& is)
 Implemente_instanciable(Traitement_particulier_NS_THI_thermo_VDF,"Traitement_particulier_NS_THI_thermo_VDF",Traitement_particulier_NS_THI_VDF);
 
 
-void Traitement_particulier_NS_THI_thermo_VDF::init_calc_spectre(void)
+void Traitement_particulier_NS_THI_thermo_VDF::init_calc_spectre()
 {
 
 
@@ -91,7 +91,7 @@ void Traitement_particulier_NS_THI_thermo_VDF::init_calc_spectre(void)
 
 
 
-void Traitement_particulier_NS_THI_thermo_VDF::calcul_spectre(void)
+void Traitement_particulier_NS_THI_thermo_VDF::calcul_spectre()
 {
 
   const Domaine_dis_base& zdis = mon_equation->domaine_dis();
@@ -133,7 +133,7 @@ void Traitement_particulier_NS_THI_thermo_VDF::calcul_spectre(void)
 
 
 
-void Traitement_particulier_NS_THI_thermo_VDF::sorties_fichiers(void)
+void Traitement_particulier_NS_THI_thermo_VDF::sorties_fichiers()
 {
   const Domaine_dis_base& zdis = mon_equation->domaine_dis();
   const Domaine& domaine = zdis.domaine();
@@ -216,7 +216,7 @@ void Traitement_particulier_NS_THI_thermo_VDF::sorties_fichiers(void)
 }
 
 
-double Traitement_particulier_NS_THI_thermo_VDF::calcul_enstrophie(void)
+double Traitement_particulier_NS_THI_thermo_VDF::calcul_enstrophie()
 {
   const Domaine_dis_base& zdis = mon_equation->domaine_dis();
   const Domaine& domaine = zdis.domaine();

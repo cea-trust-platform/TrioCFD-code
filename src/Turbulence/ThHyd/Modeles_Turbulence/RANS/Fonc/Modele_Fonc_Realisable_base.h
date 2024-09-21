@@ -49,10 +49,10 @@ public:
   inline  Equation_base& seconde_equation();
   inline const DoubleTab& get_S() const;
   inline  DoubleTab& get_S();
-  inline const DoubleTab& get_Cmu( void ) const;
-  inline DoubleTab& get_Cmu( void );
-  inline const DoubleTab& get_C1( void ) const;
-  inline DoubleTab& get_C1( void );
+  inline const DoubleTab& get_Cmu() const;
+  inline DoubleTab& get_Cmu();
+  inline const DoubleTab& get_C1() const;
+  inline DoubleTab& get_C1();
 
 
   virtual int preparer_calcul();
@@ -167,22 +167,22 @@ inline DoubleTab& Modele_Fonc_Realisable_base::get_S()
   return S_;
 }
 
-inline DoubleTab& Modele_Fonc_Realisable_base::get_Cmu( void )
+inline DoubleTab& Modele_Fonc_Realisable_base::get_Cmu()
 {
   return Cmu_;
 }
 
-inline const DoubleTab& Modele_Fonc_Realisable_base::get_Cmu( void ) const
+inline const DoubleTab& Modele_Fonc_Realisable_base::get_Cmu() const
 {
   return Cmu_;
 }
 
-inline DoubleTab& Modele_Fonc_Realisable_base::get_C1( void )
+inline DoubleTab& Modele_Fonc_Realisable_base::get_C1()
 {
   return C1_;
 }
 
-inline const DoubleTab& Modele_Fonc_Realisable_base::get_C1( void ) const
+inline const DoubleTab& Modele_Fonc_Realisable_base::get_C1() const
 {
   return C1_;
 }

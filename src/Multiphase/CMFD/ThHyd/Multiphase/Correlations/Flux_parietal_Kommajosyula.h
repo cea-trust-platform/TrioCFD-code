@@ -43,9 +43,9 @@ public:
 
   virtual void completer() override;
 
-  int calculates_bubble_nucleation_diameter() const override {return 1;} ;
-  int needs_saturation() const override {return 1;} ;
-  virtual int T_at_wall() const override {return 1;};
+  int calculates_bubble_nucleation_diameter() const override {return 1;}
+  int needs_saturation() const override {return 1;}
+  virtual int T_at_wall() const override {return 1;}
 
 protected :
   Correlation correlation_monophasique_;

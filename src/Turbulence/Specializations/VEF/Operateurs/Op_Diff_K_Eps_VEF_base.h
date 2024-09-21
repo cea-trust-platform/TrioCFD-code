@@ -61,7 +61,7 @@ public:
   inline const Champ_base& diffusivite() const override
   {
     return diffusivite_.valeur();
-  } ;
+  }
 
 protected:
   double Prdt_K;

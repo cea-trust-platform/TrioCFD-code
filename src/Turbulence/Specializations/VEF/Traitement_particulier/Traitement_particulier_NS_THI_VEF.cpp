@@ -287,7 +287,7 @@ Entree& Traitement_particulier_NS_THI_VEF::lire(Entree& is)
 }
 
 
-void Traitement_particulier_NS_THI_VEF::init_calc_spectre(void)
+void Traitement_particulier_NS_THI_VEF::init_calc_spectre()
 // Appelle les fonctions qui a priori ne doivent etre lancees qu'une fois
 // (sauf si le domaine de calcul change, raffinement, ...)
 {
@@ -326,7 +326,7 @@ void Traitement_particulier_NS_THI_VEF::init_calc_spectre(void)
 }
 
 
-void Traitement_particulier_NS_THI_VEF::renorm_Ec(void)
+void Traitement_particulier_NS_THI_VEF::renorm_Ec()
 {
   // Ajuste les valeurs du champ de vitesse pour retrouver une energie definie.
   // La renormalisation peut se faire sur l'energie de l'espace physique ou
@@ -390,7 +390,7 @@ void Traitement_particulier_NS_THI_VEF::renorm_Ec(void)
 
 
 
-void Traitement_particulier_NS_THI_VEF::calcul_spectre(void)
+void Traitement_particulier_NS_THI_VEF::calcul_spectre()
 {
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
@@ -481,7 +481,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_spectre(void)
 
 
 
-void Traitement_particulier_NS_THI_VEF::sorties_globales(void)
+void Traitement_particulier_NS_THI_VEF::sorties_globales()
 {
   // Pour les traitements effectues a chaque pas de temps
 
@@ -1869,7 +1869,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_Sk(DoubleTab& Sk)
 
 
 
-void Traitement_particulier_NS_THI_VEF::calcul_nu_t(void)
+void Traitement_particulier_NS_THI_VEF::calcul_nu_t()
 {
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
@@ -2081,7 +2081,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_moyenne(const DoubleTab& tab_glob
 
 }
 
-void Traitement_particulier_NS_THI_VEF::impression_moyenne(void)
+void Traitement_particulier_NS_THI_VEF::impression_moyenne()
 {
   if (je_suis_maitre())
     {
@@ -2112,7 +2112,7 @@ void Traitement_particulier_NS_THI_VEF::impression_moyenne(void)
 }
 
 
-void Traitement_particulier_NS_THI_VEF::suppression_vitesse_moyenne(void)
+void Traitement_particulier_NS_THI_VEF::suppression_vitesse_moyenne()
 // Supprime la composante moyenne de la vitesse dans chaque direction,
 // travaille avec les vitesses aux faces
 {
@@ -2141,7 +2141,7 @@ void Traitement_particulier_NS_THI_VEF::suppression_vitesse_moyenne(void)
 }
 
 
-void Traitement_particulier_NS_THI_VEF::conservation_Ec(void)
+void Traitement_particulier_NS_THI_VEF::conservation_Ec()
 // force la conservation de l'energie cinetique (THI forcee
 // par opposition a THI en decroissance libre)
 {
@@ -2257,7 +2257,7 @@ void Traitement_particulier_NS_THI_VEF::post_traitement_particulier()
   sorties_globales();
 }
 
-double Traitement_particulier_NS_THI_VEF::calcul_volume_elem(void)
+double Traitement_particulier_NS_THI_VEF::calcul_volume_elem()
 {
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase);

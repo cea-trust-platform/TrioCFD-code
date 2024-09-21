@@ -31,7 +31,6 @@
 #include <EcritureLectureSpecial.h>
 #include <Avanc.h>
 
-
 Implemente_instanciable(Navier_Stokes_std_ALE,"Navier_Stokes_standard_ALE",Navier_Stokes_std);
 // XD Navier_Stokes_std_ALE navier_stokes_standard Navier_Stokes_std_ALE -1 Resolution of hydraulic Navier-Stokes eq. on mobile domain (ALE)
 
@@ -42,9 +41,7 @@ Sortie& Navier_Stokes_std_ALE::printOn(Sortie& os ) const
 
 Entree& Navier_Stokes_std_ALE::readOn(Entree& is )
 {
-  Navier_Stokes_std::readOn(is);
-  //Nom pbb = probleme().que_suis_je();
-  return is;
+  return Navier_Stokes_std::readOn(is);
 }
 
 int Navier_Stokes_std_ALE::sauvegarder(Sortie& os) const
@@ -114,9 +111,6 @@ int Navier_Stokes_std_ALE::reprendre(Entree& is)
   return 1;
 }
 
-
-
-
 void Navier_Stokes_std_ALE::renewing_jacobians( DoubleTab& derivee )
 {
   //Renewing ALE Jacobians
@@ -182,7 +176,7 @@ void Navier_Stokes_std_ALE::div_ale_derivative( DoubleTrav& deriveeALE, double t
   Debog::verifier("secmemP Navier_Stokes_std::corriger_derivee_impl",secmemP);
 }
 
-void Navier_Stokes_std_ALE::update_pressure_matrix( void )
+void Navier_Stokes_std_ALE::update_pressure_matrix()
 {
   //In case of zero ALE mesh velocity (..._coeffs()=1), BM-1Bt matrix stays unchanged.
   Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());

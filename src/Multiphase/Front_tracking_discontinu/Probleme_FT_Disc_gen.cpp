@@ -316,7 +316,7 @@ const Navier_Stokes_FT_Disc& Probleme_FT_Disc_gen::equation_hydraulique(const Mo
   return *eq_ptr;
 }
 
-double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
+double Probleme_FT_Disc_gen::calculer_pas_de_temps() const
 {
   // prend le min des pas de temps de chaque equation
   double dt = Pb_Fluide_base::calculer_pas_de_temps();
@@ -347,7 +347,7 @@ void Probleme_FT_Disc_gen::mettre_a_jour(double temps)
     la_chimie_->mettre_a_jour(temps);
 }
 
-void Probleme_FT_Disc_gen::completer(void)
+void Probleme_FT_Disc_gen::completer()
 {
   Pb_Fluide_base::completer();
 

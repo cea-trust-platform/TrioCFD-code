@@ -58,11 +58,11 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   // Methodes virtuelles pures de Equation_base
   //
-  int            nombre_d_operateurs(void) const override; // Zero, y'en a pas.
+  int            nombre_d_operateurs() const override; // Zero, y'en a pas.
   const Operateur& operateur(int i) const override;    // Erreur
   Operateur&        operateur(int i) override;         // Erreur
-  const Champ_Inc_base& inconnue(void) const override;         // C'est l'indicatrice
-  Champ_Inc_base&        inconnue(void) override;
+  const Champ_Inc_base& inconnue() const override;         // C'est l'indicatrice
+  Champ_Inc_base&        inconnue() override;
   //
   // Methodes surchargees de Equation_base
   //
@@ -73,10 +73,10 @@ public:
   Milieu_base&        milieu() override;       // Erreur
   const Milieu_base& milieu() const override;  // Erreur
   void    associer_pb_base(const Probleme_base& probleme) override;
-  void    discretiser(void) override;
+  void    discretiser() override;
   Entree& lire_cond_init(Entree& is) override;
   int  verif_Cl() const override;
-  double  calculer_pas_de_temps(void) const override;
+  double  calculer_pas_de_temps() const override;
   DoubleTab& derivee_en_temps_inco(DoubleTab& derivee) override;
   void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override ;
 

@@ -84,7 +84,7 @@ public:
   Entree& lire_injection(Entree& is);
   Entree& lire_transformation(Entree& is);
 
-  void    discretiser(void) override;
+  void    discretiser() override;
   int  preparer_calcul() override;
   void    completer() override;
 
@@ -164,8 +164,8 @@ public:
   const DoubleTab& calculer_valeurs_volumes(DoubleTab& val_volume) const;
 
 
-  const Champ_Inc_base& inconnue(void) const override;     //renvoie un champ bidon
-  Champ_Inc_base&        inconnue(void) override;
+  const Champ_Inc_base& inconnue() const override;     //renvoie un champ bidon
+  Champ_Inc_base&        inconnue() override;
 
   //Methodes d acces aux tableaux contenant les proprietes du fluide
   inline const DoubleTab& vitesse_fluide() const;

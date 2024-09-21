@@ -288,7 +288,7 @@ Entree& Transport_Marqueur_FT::lire_transformation(Entree& is)
 }
 
 //Discretisation du champ inconnu (champ_bidon_)
-void Transport_Marqueur_FT::discretiser(void)
+void Transport_Marqueur_FT::discretiser()
 {
   const Probleme_base&  pb = get_probleme_base();
   const Discretisation_base& discr = pb.discretisation();
@@ -365,12 +365,12 @@ int Transport_Marqueur_FT::preparer_calcul()
   return 1;
 }
 
-const Champ_Inc_base& Transport_Marqueur_FT::inconnue(void) const
+const Champ_Inc_base& Transport_Marqueur_FT::inconnue() const
 {
   return champ_bidon_;
 }
 
-Champ_Inc_base& Transport_Marqueur_FT::inconnue(void)
+Champ_Inc_base& Transport_Marqueur_FT::inconnue()
 {
   return champ_bidon_;
 }

@@ -211,7 +211,7 @@ const Champ_base& Convection_Diffusion_Temperature_FT_Disc::vitesse_pour_transpo
   return vitesse_convection_;
 }
 
-void Convection_Diffusion_Temperature_FT_Disc::preparer_pas_de_temps(void)
+void Convection_Diffusion_Temperature_FT_Disc::preparer_pas_de_temps()
 {
 }
 

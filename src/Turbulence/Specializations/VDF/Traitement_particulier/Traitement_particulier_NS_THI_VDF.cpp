@@ -76,7 +76,7 @@ void Traitement_particulier_NS_THI_VDF::init_calc_spectre()
     }
 }
 
-void Traitement_particulier_NS_THI_VDF::calcul_spectre(void)
+void Traitement_particulier_NS_THI_VDF::calcul_spectre()
 {
   const Domaine_dis_base& zdis = mon_equation->domaine_dis();
   const Domaine& domaine = zdis.domaine();
@@ -100,7 +100,7 @@ void Traitement_particulier_NS_THI_VDF::calcul_spectre(void)
     }
 }
 
-void Traitement_particulier_NS_THI_VDF::sorties_globales(void)
+void Traitement_particulier_NS_THI_VDF::sorties_globales()
 {
   //const Domaine_dis_base& zdis = mon_equation->domaine_dis();
   //const Domaine& domaine = zdis.domaine();
@@ -121,7 +121,7 @@ void Traitement_particulier_NS_THI_VDF::sorties_globales(void)
   Cerr << "temps=" << temps_crt << "  Ec=" << Ec << "  D=" << D << "  skewness=" << skewness  << finl;
 }
 
-void Traitement_particulier_NS_THI_VDF::renorm_Ec(void)
+void Traitement_particulier_NS_THI_VDF::renorm_Ec()
 {
   double Ec=0,D=0;
   DoubleTab& vitesse = mon_equation->inconnue().valeurs();

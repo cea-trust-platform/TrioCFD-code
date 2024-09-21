@@ -130,7 +130,7 @@ public:
   Desc_Structure_FT();
 
   // Vide la structure (la memoire n'est pas liberee)
-  void reset(void);
+  void reset();
 
   // Echange des espaces virtuels pour differents types de tableaux
   void echange_espace_virtuel(ArrOfDouble& tab) const;

@@ -95,7 +95,7 @@ public :
   void create_folders_for_probes();
   void create_folders(Nom folder_name_base);
   void set_first_step_thermals_post(int& first_step_thermals_post);
-  void set_post_pro_first_call() { post_pro_first_call_ = 1; } ;
+  void set_post_pro_first_call() { post_pro_first_call_ = 1; }
   void set_temperature_ini();
   void recompute_interface_smoothing();
   void compute_new_thermal_field(Switch_FT_double& switch_double_ft,

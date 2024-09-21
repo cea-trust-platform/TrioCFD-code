@@ -41,7 +41,7 @@ public:
   Convection_Diffusion_Temperature_FT_Disc();
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  virtual void preparer_pas_de_temps(void);
+  virtual void preparer_pas_de_temps();
   virtual void corriger_pas_de_temps(double dt);
   void compute_divergence_free_velocity_extension();
   DoubleTab&   derivee_en_temps_inco(DoubleTab&) override;
@@ -58,7 +58,7 @@ public:
   Milieu_base&        milieu() override;
   const Milieu_base& milieu() const override;
   const Champ_base& vitesse_pour_transport() const override;
-  void    discretiser(void) override;
+  void    discretiser() override;
 
   int get_phase() const;
   void discretiser_assembleur_pression();

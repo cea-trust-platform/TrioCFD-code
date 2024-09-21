@@ -1365,7 +1365,7 @@ void Transport_Interfaces_FT_Disc::associer_pb_base(const Probleme_base& un_prob
  *  - typage du maillage et de l'algorithme marching cubes
  *
  */
-void Transport_Interfaces_FT_Disc::discretiser(void)
+void Transport_Interfaces_FT_Disc::discretiser()
 {
   // Le nom des differents champs est un identifiant (indicatrice, vitesse, ...)
   // suivi de "_nom_de_l_equation" :
@@ -1581,7 +1581,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
  *    - gestion des coalescences-fragmentations.
  *
  */
-void Transport_Interfaces_FT_Disc::remailler_interface(void)
+void Transport_Interfaces_FT_Disc::remailler_interface()
 {
   Journal() << "Transport_Interfaces_FT_Disc::remailler_interface " << le_nom() << finl;
   const double temps = schema_temps().temps_courant();
@@ -1593,7 +1593,7 @@ void Transport_Interfaces_FT_Disc::remailler_interface(void)
   algo_topologie.remailler_interface(temps, maillage, indicatrice, algo_remaillage_local);
 }
 
-int Transport_Interfaces_FT_Disc::preparer_calcul(void)
+int Transport_Interfaces_FT_Disc::preparer_calcul()
 {
   Process::Journal()<<"Transport_Interfaces_FT_Disc::preparer_calcul"<<finl;
 
@@ -1656,12 +1656,12 @@ int Transport_Interfaces_FT_Disc::preparer_calcul(void)
   return 1;
 }
 
-void Transport_Interfaces_FT_Disc::preparer_pas_de_temps(void)
+void Transport_Interfaces_FT_Disc::preparer_pas_de_temps()
 {
 
 }
 
-double Transport_Interfaces_FT_Disc::calculer_pas_de_temps(void) const
+double Transport_Interfaces_FT_Disc::calculer_pas_de_temps() const
 {
   // TODO:
 // We should think of implementing it as in eq. 16 for instance:
@@ -7251,7 +7251,7 @@ const Milieu_base& Transport_Interfaces_FT_Disc::milieu() const
   return ref_milieu_.valeur();
 }
 
-int Transport_Interfaces_FT_Disc::nombre_d_operateurs(void) const
+int Transport_Interfaces_FT_Disc::nombre_d_operateurs() const
 {
   return 0;
 }
@@ -7270,12 +7270,12 @@ Operateur& Transport_Interfaces_FT_Disc::operateur(int i)
   throw;
 }
 
-const Champ_Inc_base& Transport_Interfaces_FT_Disc::inconnue(void) const
+const Champ_Inc_base& Transport_Interfaces_FT_Disc::inconnue() const
 {
   return indicatrice_;
 }
 
-Champ_Inc_base& Transport_Interfaces_FT_Disc::inconnue(void)
+Champ_Inc_base& Transport_Interfaces_FT_Disc::inconnue()
 {
   return indicatrice_;
 }
