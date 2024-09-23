@@ -138,11 +138,11 @@ int Paroi_TBLE_scal_VDF::init_lois_paroi()
   const Equation_base& eqn_hydr  = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
+  const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi();
   const Fluide_base& le_fluide   = ref_cast(Fluide_base, eqn_hydr.milieu());
   const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique()->valeurs()(0, 0);
 
-  if (!sub_type(ParoiVDF_TBLE,loi.valeur()))
+  if (!sub_type(ParoiVDF_TBLE,loi))
     {
       Cerr << "Une loi de paroi TBLE en thermique doit etre utilisee obligatoirement avec une loi de paroi TBLE sur la QDM " << finl;
       exit();
@@ -460,8 +460,8 @@ int Paroi_TBLE_scal_VDF::calculer_stats()
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
-  ParoiVDF_TBLE& loi_tble_hyd = ref_cast_non_const(ParoiVDF_TBLE,loi.valeur());
+  const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi();
+  ParoiVDF_TBLE& loi_tble_hyd = ref_cast_non_const(ParoiVDF_TBLE,loi);
 
 
 
@@ -567,8 +567,8 @@ void Paroi_TBLE_scal_VDF::calculer_convection(int compteur_faces_paroi, int elem
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
-  ParoiVDF_TBLE& loi_tble_hyd = ref_cast_non_const(ParoiVDF_TBLE,loi.valeur());
+  const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi();
+  ParoiVDF_TBLE& loi_tble_hyd = ref_cast_non_const(ParoiVDF_TBLE,loi);
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
@@ -710,7 +710,7 @@ Paroi_TBLE_QDM& Paroi_TBLE_scal_VDF::getLoiParoiHydraulique()
   const Equation_base& eqn_hydr = pb_base.equation(0);
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi().valeur();
+  const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi();
 
   if (sub_type(ParoiVDF_TBLE,loi))
     {

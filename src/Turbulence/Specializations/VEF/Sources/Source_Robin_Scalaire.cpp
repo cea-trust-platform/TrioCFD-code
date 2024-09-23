@@ -97,7 +97,7 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
   const Convection_Diffusion_Temperature& eq_th = ref_cast(Convection_Diffusion_Temperature,equation());
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_th.get_modele(TURBULENCE).valeur());
   const DoubleTab& lambda_t = le_modele_scalaire.conductivite_turbulente()->valeurs();
-  const Paroi_scal_hyd_base_VEF& loi_de_paroi = ref_cast(Paroi_scal_hyd_base_VEF,le_modele_scalaire.loi_paroi().valeur());
+  const Paroi_scal_hyd_base_VEF& loi_de_paroi = ref_cast(Paroi_scal_hyd_base_VEF,le_modele_scalaire.loi_paroi());
   const DoubleVect& surfaces_face = ref_cast_non_const(Domaine_VEF,domaine_VEF).face_surfaces();
 
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)

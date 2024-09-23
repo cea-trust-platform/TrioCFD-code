@@ -155,7 +155,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
           //           if (dequiv)
           //             {
-          //               const Turbulence_paroi& loipar =  eq_turb.modele_turbulence().loi_paroi();
+          //               const Turbulence_paroi_base& loipar =  eq_turb.modele_turbulence().loi_paroi();
 
           //               if (sub_type(Paroi_std_scal_hyd_VDF,loipar.valeur()))
           //                 {
@@ -252,11 +252,11 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
                 }
 
               const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,mod.valeur());
-              const Turbulence_paroi_scal& loipar =  le_mod_turb_th.loi_paroi();
-              if (sub_type(Turbulence_paroi_scal_base,loipar.valeur()))
+              const Turbulence_paroi_scal_base& loipar =  le_mod_turb_th.loi_paroi();
+              if (sub_type(Turbulence_paroi_scal_base,loipar))
                 {
                   {
-                    const Turbulence_paroi_scal_base& paroi_vdf = ref_cast(Turbulence_paroi_scal_base,loipar.valeur());
+                    const Turbulence_paroi_scal_base& paroi_vdf = ref_cast(Turbulence_paroi_scal_base,loipar);
                     for (int faceb=ndeb; faceb<nfin; faceb++)
                       {
                         num_faceG = connect(faceb);

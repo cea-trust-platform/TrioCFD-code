@@ -146,9 +146,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
 
       eqn_NS_ = ref_cast(Navier_Stokes_Turbulent,eqn);
 
-      const Modele_turbulence_hyd& modele_turbulence = eqn_NS_->modele_turbulence();
+      const Modele_turbulence_hyd_base& modele_turbulence = eqn_NS_->modele_turbulence();
 
-      const Modele_turbulence_hyd_K_Eps& modele_turbulence_keps = ref_cast(Modele_turbulence_hyd_K_Eps,modele_turbulence.valeur());
+      const Modele_turbulence_hyd_K_Eps& modele_turbulence_keps = ref_cast(Modele_turbulence_hyd_K_Eps,modele_turbulence);
 
       modele_K_Eps_ = modele_turbulence_keps;
 
@@ -223,15 +223,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
 
             }
           else if (sub_type(Symetrie,la_cl.valeur()))
-            ;
-          else if ( (sub_type(Dirichlet,la_cl.valeur()))
-                    ||
-                    (sub_type(Dirichlet_homogene,la_cl.valeur()))
-                  )
-            {
-              // do nothing
-              ;
-            }
+            { /* do nothing */ }
+          else if ((sub_type(Dirichlet, la_cl.valeur())) || (sub_type(Dirichlet_homogene, la_cl.valeur())))
+            { /* do nothing */ }
         }
 
 
@@ -286,12 +280,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
 
             }
           else if (sub_type(Symetrie,la_cl.valeur()))
-            ;
-          else if ( (sub_type(Dirichlet,la_cl.valeur()))
-                    ||
-                    (sub_type(Dirichlet_homogene,la_cl.valeur()))
-                  )
-            ;
+            { /* do nothing */ }
+          else if ((sub_type(Dirichlet, la_cl.valeur())) || (sub_type(Dirichlet_homogene, la_cl.valeur())))
+            { /* do nothing */ }
           else if (sub_type(Periodique,la_cl.valeur()))
             {
               double s_face;

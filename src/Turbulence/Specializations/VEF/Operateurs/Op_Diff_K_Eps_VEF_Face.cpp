@@ -1001,8 +1001,8 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
     {
       const Transport_K_Eps& eqn_k_eps=ref_cast(Transport_K_Eps,equation());
       const DoubleTab& val=equation().inconnue().valeurs();
-      const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
-      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
+      const Turbulence_paroi_base& mod=eqn_k_eps.modele_turbulence().loi_paroi();
+      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod);
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
       int size=secmem.dimension(0);
       const IntVect& tab1=matrice.get_tab1();
@@ -1038,8 +1038,8 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
     {
       const Transport_K_Eps_Realisable& eqn_k_eps=ref_cast(Transport_K_Eps_Realisable,equation());
       const DoubleTab& val=equation().inconnue().valeurs();
-      const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
-      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
+      const Turbulence_paroi_base& mod=eqn_k_eps.modele_turbulence().loi_paroi();
+      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod);
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
       int size=secmem.dimension(0);
       const IntVect& tab1=matrice.get_tab1();
@@ -1074,8 +1074,8 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
     {
       const Transport_K_ou_Eps& eqn_k_eps=ref_cast(Transport_K_ou_Eps,equation());
       const DoubleTab& val=equation().inconnue().valeurs();
-      const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
-      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
+      const Turbulence_paroi_base& mod=eqn_k_eps.modele_turbulence().loi_paroi();
+      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod);
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
       int size=secmem.dimension(0);
       const IntVect& tab1=matrice.get_tab1();

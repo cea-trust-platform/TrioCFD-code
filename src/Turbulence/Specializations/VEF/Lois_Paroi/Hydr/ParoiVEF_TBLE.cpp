@@ -454,7 +454,7 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
                       const DoubleVect& gravite = ch_gravite.valeurs();
                       const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
                       const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
-                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi();
                       ParoiVEF_TBLE_scal& loi_tble_T = ref_cast_non_const(ParoiVEF_TBLE_scal,loi);
                       if (loi_tble_T.est_initialise())
                         {
@@ -545,7 +545,7 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
                       const DoubleVect& gravite = ch_gravite.valeurs();
                       const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
                       const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
-                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi();
                       ParoiVEF_TBLE_scal& loi_tble_T = ref_cast_non_const(ParoiVEF_TBLE_scal,loi);
                       if (loi_tble_T.est_initialise())
                         {
@@ -854,7 +854,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                       const DoubleVect& gravite = ch_gravite.valeurs();
                       const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
                       const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
-                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi();
                       ParoiVEF_TBLE_scal& loi_tble_T = ref_cast_non_const(ParoiVEF_TBLE_scal,loi);
                       if (loi_tble_T.est_initialise())
                         {
@@ -945,7 +945,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                       const DoubleVect& gravite = ch_gravite.valeurs();
                       const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
                       const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
-                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi();
                       ParoiVEF_TBLE_scal& loi_tble_T = ref_cast_non_const(ParoiVEF_TBLE_scal,loi);
                       if (loi_tble_T.est_initialise())
                         {

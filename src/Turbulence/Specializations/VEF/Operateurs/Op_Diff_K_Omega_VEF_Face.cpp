@@ -488,8 +488,8 @@ void Op_Diff_K_Omega_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
   // on recupere le tableau
   const Transport_K_Omega& eqn_k_omega = ref_cast(Transport_K_Omega, equation());
   const DoubleTab& val = equation().inconnue().valeurs();
-  const Turbulence_paroi& mod = eqn_k_omega.modele_turbulence().loi_paroi();
-  const Paroi_hyd_base_VEF& paroi = ref_cast(Paroi_hyd_base_VEF, mod.valeur());
+  const Turbulence_paroi_base& mod = eqn_k_omega.modele_turbulence().loi_paroi();
+  const Paroi_hyd_base_VEF& paroi = ref_cast(Paroi_hyd_base_VEF, mod);
   const ArrOfInt& face_komega_imposee = paroi.face_keps_imposee();
   int size = secmem.dimension(0);
   const IntVect& tab1 = matrice.get_tab1();

@@ -161,10 +161,10 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
                 }
 
               const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,mod.valeur());
-              const Turbulence_paroi_scal& loipar =  le_mod_turb_th.loi_paroi();
-              if (sub_type(Turbulence_paroi_scal_base,loipar.valeur()))
+              const Turbulence_paroi_scal_base& loipar =  le_mod_turb_th.loi_paroi();
+              if (sub_type(Turbulence_paroi_scal_base,loipar))
                 {
-                  const Turbulence_paroi_scal_base& paroi_vdf = ref_cast(Turbulence_paroi_scal_base,loipar.valeur());
+                  const Turbulence_paroi_scal_base& paroi_vdf = ref_cast(Turbulence_paroi_scal_base,loipar);
                   for (face=ndeb; face<nfin; face++)
                     {
                       num_faceG = connect(face);

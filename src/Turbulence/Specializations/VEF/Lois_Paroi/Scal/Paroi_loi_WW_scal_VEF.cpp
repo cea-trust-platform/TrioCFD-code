@@ -120,8 +120,8 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   double d_visco;
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi& loi = le_modele.loi_paroi();
-  const DoubleVect& tab_u_star = loi->tab_u_star();
+  const Turbulence_paroi_base& loi = le_modele.loi_paroi();
+  const DoubleVect& tab_u_star = loi.tab_u_star();
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
 
   int schmidt = 0;

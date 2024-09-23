@@ -128,14 +128,14 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
           mon_modele_fonc_->Calcul_Cmu_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, vitesse, tab_K, tab_Eps, EPS_MIN_);
 
           /*Paroi*/
-          Nom lp = eqn_transp_K().modele_turbulence().loi_paroi()->que_suis_je();
+          Nom lp = eqn_transp_K().modele_turbulence().loi_paroi().que_suis_je();
           if (lp != "negligeable_VEF")
             {
               DoubleTab visco_tab(visco_turb.dimension_tot(0));
               assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
               visco_tab = tab_visco(0, 0);
               const int idt = mon_equation_->schema_temps().nb_pas_dt();
-              const DoubleTab& tab_paroi = loi_paroi()->Cisaillement_paroi();
+              const DoubleTab& tab_paroi = loi_paroi().Cisaillement_paroi();
               mon_modele_fonc_->Calcul_Cmu_Paroi_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, visco_tab, visco_turb, tab_paroi, idt, vitesse, tab_K, tab_Eps, EPS_MIN_);
             }
         }
@@ -215,8 +215,8 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul()
       const RefObjU& modele_turbulence = equation().probleme().equation(1).get_modele(TURBULENCE);
       if (sub_type(Modele_turbulence_scal_base, modele_turbulence.valeur()))
         {
-          Turbulence_paroi_scal& loi_paroi_T = ref_cast_non_const(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi();
-          loi_paroi_T->init_lois_paroi();
+          Turbulence_paroi_scal_base& loi_paroi_T = ref_cast_non_const(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi();
+          loi_paroi_T.init_lois_paroi();
         }
     }
 

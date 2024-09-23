@@ -266,7 +266,7 @@ const Motcle& Transport_K_ou_Eps::domaine_application() const
 
 DoubleTab& Transport_K_ou_Eps::corriger_derivee_impl(DoubleTab& d)
 {
-  const Turbulence_paroi_base& loi_paroi=modele_turbulence().loi_paroi().valeur();
+  const Turbulence_paroi_base& loi_paroi=modele_turbulence().loi_paroi();
   loi_paroi.corriger_derivee_impl(d);
   return Transport_K_ou_Eps_base::corriger_derivee_impl(d);
 }

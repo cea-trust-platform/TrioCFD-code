@@ -81,7 +81,7 @@ const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_visc_turb() const
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_cisaillement_paroi() const
 {
-  return turbulence_model->loi_paroi()->Cisaillement_paroi();
+  return turbulence_model->loi_paroi().Cisaillement_paroi();
 }
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_K_pour_production() const
@@ -91,7 +91,7 @@ const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_K_pour_production() cons
 
 const Nom Source_Transport_K_Omega_VEF_Face::get_type_paroi() const
 {
-  return turbulence_model->loi_paroi()->que_suis_je();
+  return turbulence_model->loi_paroi().que_suis_je();
 }
 
 void Source_Transport_K_Omega_VEF_Face::compute_blending_F1(DoubleTab& gradKgradOmega) const

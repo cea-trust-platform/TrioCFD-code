@@ -29,18 +29,12 @@
 #include <Milieu_base.h>
 #include <Champ_front_fonc.h>
 #include <Champ_Uniforme.h>
-#include <Turbulence_paroi.h>
-
-
-
 
 /*! @brief classe : Echange_contact_VDF_Zoom_grossier
  *
  *
  *
  */
-
-////////////////////////////////////////////////////////////////
 
 class Echange_contact_VDF_Zoom_grossier  : public Echange_contact_VDF_Zoom_base
 {

@@ -22,9 +22,10 @@
 #ifndef LoiParoiHybride_included
 #define LoiParoiHybride_included
 
+#include <Turbulence_paroi_base.h>
 #include <TRUSTTabs_forward.h>
-#include <Turbulence_paroi.h>
 #include <TRUST_Vector.h>
+#include <TRUST_Deriv.h>
 #include <Noms.h>
 
 class Domaine_dis_base;
@@ -66,7 +67,7 @@ public :
   int calculer_hyd_BiK(DoubleTab& , DoubleTab& , Domaine_dis_base const& , Domaine_Cl_dis_base const& , DoubleTab& );
 
 private:
-  VECT(Turbulence_paroi) vect_lp;
+  VECT(OWN_PTR(Turbulence_paroi_base)) vect_lp;
   IntVect lp_bord; // indice dans le vecteur precedent de la loi de paroi correspondant a chaque  bord
 };
 

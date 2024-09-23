@@ -49,7 +49,7 @@ const DoubleTab& Source_Transport_K_VEF_Face::get_visc_turb() const
 const DoubleTab& Source_Transport_K_VEF_Face::get_cisaillement_paroi() const
 {
   const Modele_turbulence_hyd_K_Eps_Bicephale& mod = ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale, mon_eq_transport_K->modele_turbulence());
-  return mod.loi_paroi()->Cisaillement_paroi();
+  return mod.loi_paroi().Cisaillement_paroi();
 }
 
 const DoubleTab& Source_Transport_K_VEF_Face::get_K_pour_production() const
@@ -73,7 +73,7 @@ void Source_Transport_K_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, cons
 const Nom Source_Transport_K_VEF_Face::get_type_paroi() const
 {
   const Modele_turbulence_hyd_K_Eps_Bicephale& mod  = ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence());
-  return mod.loi_paroi()->que_suis_je();
+  return mod.loi_paroi().que_suis_je();
 }
 
 void Source_Transport_K_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco_turb, const DoubleTab& gradient_elem, DoubleTab& Re) const

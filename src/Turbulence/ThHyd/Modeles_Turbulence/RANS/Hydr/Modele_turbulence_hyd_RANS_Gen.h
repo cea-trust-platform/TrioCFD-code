@@ -86,7 +86,7 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc_base
 
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 1);
 
-  z_class->loi_paroi()->calculer_hyd(ch_K_Eps_ou_Omega);
+  z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
   z_class->controler();
   z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
   z_class->limiter_viscosite_turbulente();
@@ -123,7 +123,7 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc_base
   if (!IS_K_EPS_REALISABLE_BICEPHALE)
     print_evolution<M_TYPE>(ch_K, z_class->equation().schema_temps(), LeCmu, 1, &ch_Eps);
 
-  z_class->loi_paroi()->calculer_hyd_BiK(ch_K.valeurs(), ch_Eps.valeurs());
+  z_class->loi_paroi().calculer_hyd_BiK(ch_K.valeurs(), ch_Eps.valeurs());
   z_class->controler();
   z_class->calculer_viscosite_turbulente(ch_K.temps());
   z_class->limiter_viscosite_turbulente();
@@ -156,7 +156,7 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc_base
     diviser_par_rho_si_dilatable(ch_K_Eps_ou_Omega.valeurs(), mil);
 
   z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
-  z_class->loi_paroi()->calculer_hyd(ch_K_Eps_ou_Omega);
+  z_class->loi_paroi().calculer_hyd(ch_K_Eps_ou_Omega);
   z_class->limiter_viscosite_turbulente();
 
   // on remultiplie par rho

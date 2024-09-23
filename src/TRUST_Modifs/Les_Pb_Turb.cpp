@@ -48,10 +48,10 @@ int Pb_Hydraulique_Concentration_Turbulent::verifier()
     }
 
   // Verification de la compatibilite des modeles de turbulence:
-  const Modele_turbulence_hyd& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
+  const Modele_turbulence_hyd_base& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
   const Modele_turbulence_scal_base& le_mod_turb_co = ref_cast(Modele_turbulence_scal_base,eq_concentration.get_modele(TURBULENCE).valeur());
 
-  if ((sub_type(Modele_turbulence_hyd_LES_base,le_mod_turb_hyd.valeur())) || (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur())))
+  if ((sub_type(Modele_turbulence_hyd_LES_base,le_mod_turb_hyd)) || (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd)))
     {
       if (!sub_type(Modele_turbulence_scal_Schmidt,le_mod_turb_co))
         {
@@ -92,11 +92,11 @@ int Pb_Hydraulique_Melange_Binaire_Turbulent_QC::verifier()
     }
 
   // Verification de la compatibilite des modeles de turbulence:
-  const Modele_turbulence_hyd& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
+  const Modele_turbulence_hyd_base& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
   const Modele_turbulence_scal_base& le_mod_turb_th =
     ref_cast(Modele_turbulence_scal_base,eq_frac_mass.get_modele(TURBULENCE).valeur());
 
-  if  (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur()))
+  if  (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd))
     {
       if (!sub_type(Modele_turbulence_scal_Prandtl,le_mod_turb_th))
         {
@@ -167,10 +167,10 @@ int Pb_Thermohydraulique_Concentration_Turbulent::verifier()
     }
 
   // Verification de la compatibilite des modeles de turbulence
-  const Modele_turbulence_hyd& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
+  const Modele_turbulence_hyd_base& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
   const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eq_thermique.get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_base& le_mod_turb_co = ref_cast(Modele_turbulence_scal_base,eq_concentration.get_modele(TURBULENCE).valeur());
-  if ((sub_type(Modele_turbulence_hyd_LES_base,le_mod_turb_hyd.valeur()))  || (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur())))
+  if ((sub_type(Modele_turbulence_hyd_LES_base,le_mod_turb_hyd))  || (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd)))
     {
       if (!sub_type(Modele_turbulence_scal_Prandtl,le_mod_turb_th))
         {
@@ -215,10 +215,10 @@ int Pb_Thermohydraulique_Turbulent_QC::verifier()
     }
 
   // Verification de la compatibilite des modeles de turbulence:
-  const Modele_turbulence_hyd& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
+  const Modele_turbulence_hyd_base& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
   const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eq_thermique.get_modele(TURBULENCE).valeur());
 
-  if  (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur()))
+  if  (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd))
     {
       if (!sub_type(Modele_turbulence_scal_Prandtl,le_mod_turb_th))
         {

@@ -56,16 +56,16 @@ void Echange_contact_ODVM_VDF::calculer_Teta_equiv(DoubleTab& La_T_ext,const Dou
       mon_eqn.probleme().equation(0).get_champ("vitesse");
       isfluide=1;
     }
-  catch (Champs_compris_erreur)
+  catch (Champs_compris_erreur&)
     {
     }
 
   const Champ_front_calc& chcal=ref_cast(Champ_front_calc,T_autre_pb().valeur());
   const Equation_base& eq = (isfluide==1?mon_eqn:chcal.inconnue().equation());
   const Modele_turbulence_scal_base& modele_turbulence = ref_cast(Modele_turbulence_scal_base,eq.get_modele(TURBULENCE).valeur());
-  const Turbulence_paroi_scal& loipar = modele_turbulence.loi_paroi();
+  const Turbulence_paroi_scal_base& loipar = modele_turbulence.loi_paroi();
 
-  const Paroi_ODVM_scal_VDF& paroi_vdf = ref_cast(Paroi_ODVM_scal_VDF,loipar.valeur());
+  const Paroi_ODVM_scal_VDF& paroi_vdf = ref_cast(Paroi_ODVM_scal_VDF,loipar);
   // Initialise la loi de paroi si necessaire:
 // GF non pas ici	// paroi_vdf.init_lois_paroi();
   if (paroi_vdf.get_Tf0().size_array()==0)
