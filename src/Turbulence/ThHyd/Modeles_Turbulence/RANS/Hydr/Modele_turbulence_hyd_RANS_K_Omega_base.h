@@ -40,7 +40,7 @@ public:
   Modele_turbulence_hyd_RANS_K_Omega_base()
   {
     Prandtl_K_ = 2.; // cAlan: careful, it is the inverse of the classical definition for code purpose
-    model_variant_ = "SST";
+    model_variant_ = "STD";
   }
 
   void set_param(Param& param) override;
