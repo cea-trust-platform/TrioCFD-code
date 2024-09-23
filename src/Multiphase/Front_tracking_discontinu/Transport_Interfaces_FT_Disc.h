@@ -163,7 +163,7 @@ public:
                      const double eta);
   void modifie_source(DoubleTab& so_modif,const DoubleTab& so_val,const DoubleTab& rho_faces,
                       const int n,const int m, const int is_QC,
-                      const DoubleVect& vol_entrelaces,const Solveur_Masse& solv_masse);
+                      const DoubleVect& vol_entrelaces,const Solveur_Masse_base& solv_masse);
 
   void calcul_effort_fluide_interface(const DoubleTab& vpoint,const DoubleTab& rho_faces,
                                       DoubleTab& source_val,const int is_explicite,const double eta);

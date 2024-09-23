@@ -2456,7 +2456,7 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
       source_val.echange_espace_virtuel();
 
       const DoubleVect& volumes_entrelaces = ref_cast(Domaine_VF,mon_dom_dis).volumes_entrelaces();
-      const Solveur_Masse& le_solveur_masse = eq.solv_masse();
+      const Solveur_Masse_base& le_solveur_masse = eq.solv_masse();
       int i, j;
 
       DoubleTab termes_sources_face(vpoint);
@@ -2829,7 +2829,7 @@ void ouvrir_fichier(SFichier& os,const Nom& type, const int flag, const Transpor
 
 void Transport_Interfaces_FT_Disc::modifie_source(DoubleTab& termes_sources_face,const DoubleTab& source_val,const DoubleTab& rho_faces,
                                                   const int n,const int m, const int is_QC,
-                                                  const DoubleVect& vol_entrelaces,const Solveur_Masse& un_solv_masse)
+                                                  const DoubleVect& vol_entrelaces,const Solveur_Masse_base& un_solv_masse)
 {
 
   for (int face=0; face<n; face++)
@@ -2837,7 +2837,7 @@ void Transport_Interfaces_FT_Disc::modifie_source(DoubleTab& termes_sources_face
       termes_sources_face(face,dim)=vol_entrelaces(face)*source_val(face,dim);
 
   termes_sources_face.echange_espace_virtuel() ; // CI
-  un_solv_masse->appliquer(termes_sources_face);
+  un_solv_masse.appliquer(termes_sources_face);
 
   if (!is_QC)
     {
@@ -3009,7 +3009,7 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
 
   int is_QC=0;
   const Equation_base& eq = probleme_base_->equation(0);
-  const Solveur_Masse& le_solveur_masse = eq.solv_masse();
+  const Solveur_Masse_base& le_solveur_masse = eq.solv_masse();
   if (sub_type(Navier_Stokes_FT_Disc,eq))
     is_QC=0;
   else
@@ -3041,7 +3041,7 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
       }
 
   termes_sources_face.echange_espace_virtuel() ;
-  le_solveur_masse->appliquer(termes_sources_face);
+  le_solveur_masse.appliquer(termes_sources_face);
 
   // Impression des efforts exerces par le fluide sur l'interface
   {

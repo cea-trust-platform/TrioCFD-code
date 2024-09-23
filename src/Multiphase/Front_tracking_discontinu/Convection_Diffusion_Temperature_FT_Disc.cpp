@@ -916,7 +916,7 @@ void Convection_Diffusion_Temperature_FT_Disc::compute_divergence_free_velocity_
   vitesse_convection_->valeurs() = ns.inconnue().valeurs();
   // Projection of the convective field :
   //SolveurSys solveur_pression(ns.get_solveur_pression());
-  Solveur_Masse solveur_masse_fictitious(ns.solv_masse()); // Copy the operator to change the coeff
+  OWN_PTR(Solveur_Masse_base) solveur_masse_fictitious(ns.solv_masse()); // Copy the operator to change the coeff
   solveur_masse_fictitious->set_name_of_coefficient_temporel("no_coeff");
 
   //On utilise un operateur de divergence temporaire et pas celui porte par l equation

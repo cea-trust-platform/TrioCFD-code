@@ -164,7 +164,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
     calcul_mat_masse_diviser_par_dt_vef(eqnNS, m_dt, dt_locaux);
 
   //DoubleVect  m_dt(dt_locaux);
-  //eqnNS.solv_masse()->get_masse_divide_by_local_dt(m_dt, dt_locaux, 0);
+  //eqnNS.solv_masse().get_masse_divide_by_local_dt(m_dt, dt_locaux, 0);
 
 
   //Construction de matrice_en_pression_2 = B*dt_locaux*M-1Bt
@@ -176,7 +176,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
   correction_en_pression.echange_espace_virtuel();
   //Calcul de M^-1BtP'=gradP
   gradient->multvect(correction_en_pression,gradP);
-  eqn.solv_masse()->appliquer(gradP);
+  eqn.solv_masse().appliquer(gradP);
   //Calcul de Un+1 = U* -dt_locaux*gradP -M*dt_locaux*deltaU/dt
   //dt = pas de temps global
   //deltaU = Un+1 -Un
@@ -204,7 +204,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
     }
   DoubleVect  dt_locaux_masse (dt_locaux_taille_vitesse);
   //Calcul du M*dt_locaux
-  eqnNS.solv_masse()->get_masse_dt_local(dt_locaux_masse, dt_locaux_taille_vitesse, 0);
+  eqnNS.solv_masse().get_masse_dt_local(dt_locaux_masse, dt_locaux_taille_vitesse, 0);
 
 
   for(int i=0; i<size; i++)

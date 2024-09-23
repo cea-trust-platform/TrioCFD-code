@@ -480,13 +480,13 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
   const Champ_base& champ_vitesse =  eq_ns.inconnue();
   const Champ_base& champ_pression =  eq_ns.pression();
 
-  const Solveur_Masse& le_solveur_masse_ns = eq_ns.solv_masse();
+  const Solveur_Masse_base& le_solveur_masse_ns = eq_ns.solv_masse();
   const Operateur_Grad& gradient = eq_ns.operateur_gradient();
 
   OWN_PTR(Champ_Inc_base) champ_grad_p = eq_ns.grad_P();
 
   gradient.calculer(champ_pression.valeurs(), champ_grad_p->valeurs());
-  le_solveur_masse_ns->appliquer(champ_grad_p->valeurs());
+  le_solveur_masse_ns.appliquer(champ_grad_p->valeurs());
   champ_grad_p->valeurs().echange_espace_virtuel();
   DoubleTabFT tab_som;
   const DoubleTab& pos = ens_points.sommets();

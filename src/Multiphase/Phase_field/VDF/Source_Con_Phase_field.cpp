@@ -1326,7 +1326,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
       //     }
       //   Cerr << "Fin multiplication mobilite" << finl;
       // Application solveur masse
-      eq_ns.solv_masse()->appliquer(prov_face);
+      eq_ns.solv_masse().appliquer(prov_face);
       //Cerr <<"opgrad dans laplacien"<<prov_face<<finl;
 
       // Div(M*Grad(F))
@@ -1361,7 +1361,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
               prov_face(k,j)=temp_prov_face(k,0);
             }
         }
-      eq_ns.solv_masse()->appliquer(prov_face);
+      eq_ns.solv_masse().appliquer(prov_face);
       //Cerr <<"opgrad dans laplacien"<<prov_face<<finl;
 
       // Div(alpha*Grad(F))
@@ -1384,7 +1384,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
           opgrad.calculer(temp_F,prov_face);
 
           // Application solveur masse
-          eq_ns.solv_masse()->appliquer(prov_face);
+          eq_ns.solv_masse().appliquer(prov_face);
 
           // Laplacien = Div(Grad(F))
           opdiv.calculer(prov_face,temp_resu);
@@ -1443,7 +1443,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
         }
 
       // Application solveur masse (/M)
-      eq_ns.solv_masse()->appliquer(prov_face);
+      eq_ns.solv_masse().appliquer(prov_face);
 
       // Div(Kappa*Grad(F))
       opdiv.calculer(prov_face,resu);
@@ -1507,7 +1507,7 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
         }
 
       // Application solveur masse (/M)
-      eq_ns.solv_masse()->appliquer(temp_prov_face2);
+      eq_ns.solv_masse().appliquer(temp_prov_face2);
 
       // Div(Kappa*Grad(F))
       for (int j=0; j<nb_comp; j++)
@@ -2118,7 +2118,7 @@ void Source_Con_Phase_field::premier_demi_dt()
       //   prov_elem*=-kappa;
 
       accr+=prov_elem;
-      //eq_c.solv_masse()->appliquer(prov_elem);
+      //eq_c.solv_masse().appliquer(prov_elem);
       //Cerr<<"masse de la force sur c "<<prov_elem.max_abs()<<finl;
 
       // Utile pour pouvoir utiliser n'importe quel dt - voir Schema_Phase_Field
@@ -2156,12 +2156,12 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
 
       // Grad(C)
       opgrad.calculer(c,prov_face);
-      eq_ns.solv_masse()->appliquer(prov_face);
+      eq_ns.solv_masse().appliquer(prov_face);
       prov_face *= alpha;
 
       // Div(alpha*Grad(c))
       opdiv.calculer(prov_face,div_alpha_gradC);
-      eq_c.solv_masse()->appliquer(div_alpha_gradC);
+      eq_c.solv_masse().appliquer(div_alpha_gradC);
       //Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
 
     }
@@ -2207,7 +2207,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
                prov_face(k,j)=temp_prov_face(k,0);
              }
          }
-       eq_ns.solv_masse()->appliquer(prov_face);
+       eq_ns.solv_masse().appliquer(prov_face);
 
        // alpha*Grad(C)
        DoubleTab temp_prov_face2 = prov_face;
@@ -2229,7 +2229,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
 
        // Div(alpha*Grad(c))
        opdiv.calculer(prov_face,div_alpha_gradC);
-       eq_c.solv_masse()->appliquer(div_alpha_gradC);
+       eq_c.solv_masse().appliquer(div_alpha_gradC);
        //Cerr << "div_alpha_gradC apres solv_masse.appliquer "<<div_alpha_gradC<<finl;
        Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
       */
@@ -2253,7 +2253,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
           opgrad.calculer(temp_c,prov_face);
 
           // Application solveur masse
-          eq_ns.solv_masse()->appliquer(prov_face);
+          eq_ns.solv_masse().appliquer(prov_face);
 
           // alpha*Grad(C)
 
@@ -2276,7 +2276,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
           // Div(Grad(c))
           opdiv.calculer(prov_face,temp_resu);
           //opdiv.calculer(temp_prov_face2,div_alpha_gradC);
-          eq_c.solv_masse()->appliquer(temp_resu);
+          eq_c.solv_masse().appliquer(temp_resu);
 
           for (int i=0; i<temp_resu.dimension(0); i++)
             {
@@ -2318,7 +2318,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 
       // Grad(C)
       opgrad.calculer(c,prov_face);
-      eq_ns.solv_masse()->appliquer(prov_face);
+      eq_ns.solv_masse().appliquer(prov_face);
 
       const DoubleTab rhoPF=eq_ns.rho()->valeurs();
       double rho_face;
@@ -2343,7 +2343,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 
       // Div(alpha*rho*Grad(c))
       opdiv.calculer(prov_face,div_alpha_rho_gradC);
-      eq_c.solv_masse()->appliquer(div_alpha_rho_gradC);
+      eq_c.solv_masse().appliquer(div_alpha_rho_gradC);
     }
 }
 
@@ -4346,12 +4346,12 @@ void Source_Con_Phase_field::calculer_mutilde_demi(DoubleTab& mutilde_demi, Doub
 
       // Grad(C)
       opgrad.calculer(c_demi,prov_face);
-      eq_ns.solv_masse()->appliquer(prov_face);
+      eq_ns.solv_masse().appliquer(prov_face);
       prov_face *= alpha;
 
       // Div(alpha*Grad(c))
       opdiv.calculer(prov_face,mutilde_demi);
-      eq_c.solv_masse()->appliquer(mutilde_demi);
+      eq_c.solv_masse().appliquer(mutilde_demi);
       //Cerr <<"div_alpha_gradC"<<div_alpha_gradC<<finl;
 
       mutilde_demi *= -1.;
@@ -4388,7 +4388,7 @@ void Source_Con_Phase_field::calculer_mutilde_demi(DoubleTab& mutilde_demi, Doub
           opgrad.calculer(temp_c,prov_face);
 
           // Application solveur masse
-          eq_ns.solv_masse()->appliquer(prov_face);
+          eq_ns.solv_masse().appliquer(prov_face);
 
           // alpha*Grad(C)
 
@@ -4411,7 +4411,7 @@ void Source_Con_Phase_field::calculer_mutilde_demi(DoubleTab& mutilde_demi, Doub
           // Div(Grad(c))
           opdiv.calculer(prov_face,temp_resu);
           //opdiv.calculer(temp_prov_face2,div_alpha_gradC);
-          eq_c.solv_masse()->appliquer(temp_resu);
+          eq_c.solv_masse().appliquer(temp_resu);
 
           for (int i=0; i<temp_resu.dimension(0); i++)
             {
@@ -4637,7 +4637,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
 
   // On calcule Grad(c) que l'on met dans prov_face
   opgrad.calculer(c,prov_face);
-  eq_ns.solv_masse()->appliquer(prov_face);
+  eq_ns.solv_masse().appliquer(prov_face);
 
   // On calcule (Grad(c))^2 sur les faces que l'on met dans gradc2
   DoubleVect gradc2;
@@ -4682,8 +4682,8 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
           }
       }
 
-    eq_ns.solv_masse()->appliquer(prov_face);
-    Cerr<<"prov_face apres eq_ns.solv_masse()->appliquer"<<prov_face<<finl;
+    eq_ns.solv_masse().appliquer(prov_face);
+    Cerr<<"prov_face apres eq_ns.solv_masse().appliquer"<<prov_face<<finl;
 
 
     // On calcule (Grad(c))^2 sur les faces que l'on met dans gradc2
