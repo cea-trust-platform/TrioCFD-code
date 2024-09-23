@@ -69,8 +69,8 @@ public :
 protected:
   int nb_iterations_relax_;
 
-  Schema_Temps sch2;
-  Schema_Temps sch3;
+  OWN_PTR(Schema_Temps_base) sch2;
+  OWN_PTR(Schema_Temps_base) sch3;
 };
 
 #endif

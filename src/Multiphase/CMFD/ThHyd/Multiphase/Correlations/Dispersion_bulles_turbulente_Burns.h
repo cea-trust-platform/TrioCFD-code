@@ -40,7 +40,7 @@ public:
   void completer() override;
 
 protected:
-  REF(Correlation) correlation_drag_;
+  OWN_PTR(Correlation_base) correlation_drag_;
   int n_l = -1; //phase liquide
   double Prt_ = .9 ; // Turbulent Prandtl number
   double minimum_ = -1.;

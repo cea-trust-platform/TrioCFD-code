@@ -118,7 +118,7 @@ void Flux_parietal_Kommajosyula::qp(const input_t& in, output_t& out) const
               double u_bulk = 0;
               if (sub_type(Flux_parietal_adaptatif, correlation_monophasique_.valeur()))
                 {
-                  const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, ref_cast(Pb_Multiphase, pb_.valeur()).get_correlation("Loi_paroi").valeur());
+                  const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, ref_cast(Pb_Multiphase, pb_.valeur()).get_correlation("Loi_paroi"));
                   const double u_tau = corr_loi_paroi.get_utau(in.f);
                   u_bulk = 20.*u_tau; // Big approximation...
                 }

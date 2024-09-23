@@ -63,14 +63,14 @@ Entree& Paroi_frottante_loi::readOn(Entree& s )
 void Paroi_frottante_loi::completer()
 {
   if (!ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).is_turb()) Process::exit(que_suis_je() + " : diffusion operator must be turbulent !");
-  if sub_type(Viscosite_turbulente_k_tau, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur())
+  if sub_type(Viscosite_turbulente_k_tau, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()))
     {
       if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.2;
       if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;
       if (fac_prod_k_grand_<-1.e7) fac_prod_k_grand_ = .2;
       if (y_p_prod_k_grand_<-1.e7) y_p_prod_k_grand_ = 150.;
     }
-  else if sub_type(Viscosite_turbulente_k_omega, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur())
+  else if sub_type(Viscosite_turbulente_k_omega, (*ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).correlation_viscosite_turbulente()))
     {
       if (fac_prod_k_<-1.e7) fac_prod_k_ = 1.0;
       if (y_p_prod_k_<-1.e7) y_p_prod_k_ =  4.;

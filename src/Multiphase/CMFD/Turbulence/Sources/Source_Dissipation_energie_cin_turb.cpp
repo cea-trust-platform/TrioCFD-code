@@ -108,7 +108,7 @@ void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, Dou
   const DoubleTab&          alpha_rho_k = ch_alpha_rho_k.passe();
   const tabs_t&         der_alpha_rho_k = ref_cast(Champ_Inc_base, ch_alpha_rho_k).derivees(); // dictionnaire des derivees
   const Navier_Stokes_std&       eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
-  const Viscosite_turbulente_base& visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
+  const Viscosite_turbulente_base& visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()));
   const DoubleTab& nu = equation().probleme().get_champ("viscosite_cinematique").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
   double dt = equation().schema_temps().pas_de_temps();

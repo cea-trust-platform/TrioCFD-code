@@ -46,7 +46,7 @@ Sortie& Source_BIF_PolyMAC_P0::printOn(Sortie& os) const
 
 Entree& Source_BIF_PolyMAC_P0::readOn(Entree& is)
 {
-  if (!sub_type(Viscosite_turbulente_multiple, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, ref_cast(Navier_Stokes_std, equation().probleme().equation(0)).operateur(0).l_op_base()).correlation().valeur())) Process::exit(que_suis_je() + " : the turbulence correlation must be multiple");
+  if (!sub_type(Viscosite_turbulente_multiple, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, ref_cast(Navier_Stokes_std, equation().probleme().equation(0)).operateur(0).l_op_base()).correlation())) Process::exit(que_suis_je() + " : the turbulence correlation must be multiple");
 
   return is;
 }
@@ -70,7 +70,7 @@ void Source_BIF_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   const DoubleTab& normales_f = domaine.face_normales();
   const IntTab& voisins_f = domaine.face_voisins(), &e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
 
-  const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.correlation().valeur());
+  const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.correlation());
 
   int N = pb.get_champ("vitesse").valeurs().dimension(1), D = dimension, nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot() ;
 

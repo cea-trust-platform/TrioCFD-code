@@ -46,7 +46,7 @@ public :
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:
-  Correlation correlation_; //correlation donnant le coeff de coalescence
+  OWN_PTR(Correlation_base) correlation_; //correlation donnant le coeff de coalescence
 
   double beta_k_ = 0.09;
   int n_l = -1 ; // liquid phase

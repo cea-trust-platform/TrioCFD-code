@@ -49,7 +49,7 @@ private:
   double sigma_ = 1.;
   double beta_k_ = 0.09;
   int    gas_turb_ = 0 ; // Si 0, pas de turbulence dans la phase gazeuse ; si 1, il y en a
-  Correlation correlation_; //correlation donnant le coeff de masse ajoutee
+  OWN_PTR(Correlation_base) correlation_; //correlation donnant le coeff de masse ajoutee
 };
 
 #endif

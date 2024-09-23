@@ -65,7 +65,7 @@ public:
 
 protected:
   DerObjU der_domaine_clone;
-  Schema_Temps sch_clone;
+  OWN_PTR(Schema_Temps_base) sch_clone;
   REF(Modele_rayo_semi_transp) le_modele_;
 };
 

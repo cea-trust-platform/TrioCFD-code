@@ -48,7 +48,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
   const Domaine_VF&                   domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const Probleme_base&                     pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&             eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
-  const Viscosite_turbulente_base&  visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
+  const Viscosite_turbulente_base&  visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()));
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   std::string Type_diss = ""; // omega or tau dissipation

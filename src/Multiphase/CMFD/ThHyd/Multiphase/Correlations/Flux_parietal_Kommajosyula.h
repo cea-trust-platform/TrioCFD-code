@@ -48,7 +48,7 @@ public:
   virtual int T_at_wall() const override {return 1;}
 
 protected :
-  Correlation correlation_monophasique_;
+  OWN_PTR(Correlation_base) correlation_monophasique_;
   double theta_ ; //contact angle on the surface
   double molar_mass_ ; //molar mass (unit: kg/mol)
 
