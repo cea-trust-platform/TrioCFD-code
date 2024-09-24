@@ -39,14 +39,14 @@ class Flux_radiatif_base : public Neumann_paroi
 
 public :
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
-  inline Champ_front& emissivite();
-  inline const Champ_front& emissivite() const;
+  inline Champ_front_base& emissivite();
+  inline const Champ_front_base& emissivite() const;
   inline double& A();
   inline const double& A() const;
 
   virtual void calculer_flux_radiatif(const Equation_base& eq_temp)=0;
-  inline Champ_front& flux_radiatif();
-  inline const Champ_front& flux_radiatif() const;
+  inline Champ_front_base& flux_radiatif();
+  inline const Champ_front_base& flux_radiatif() const;
   void completer() override;
 
   double flux_impose(int i) const override;
@@ -54,18 +54,18 @@ public :
 
 protected :
   double A_;
-  Champ_front emissivite_;
-  Champ_front flux_radiatif_;
+  OWN_PTR(Champ_front_base) emissivite_;
+  OWN_PTR(Champ_front_base) flux_radiatif_;
 };
 
 
 
-inline Champ_front& Flux_radiatif_base::flux_radiatif()
+inline Champ_front_base& Flux_radiatif_base::flux_radiatif()
 {
   return flux_radiatif_;
 }
 
-inline const Champ_front& Flux_radiatif_base::flux_radiatif() const
+inline const Champ_front_base& Flux_radiatif_base::flux_radiatif() const
 {
   return flux_radiatif_;
 }
@@ -81,12 +81,12 @@ inline const double& Flux_radiatif_base::A() const
 }
 
 
-inline Champ_front& Flux_radiatif_base::emissivite()
+inline Champ_front_base& Flux_radiatif_base::emissivite()
 {
   return emissivite_;
 }
 
-inline const Champ_front& Flux_radiatif_base::emissivite() const
+inline const Champ_front_base& Flux_radiatif_base::emissivite() const
 {
   return emissivite_;
 }

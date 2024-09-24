@@ -23,14 +23,13 @@
 #ifndef Domaine_ALE_included
 #define Domaine_ALE_included
 
-#include <Domaine.h>
+#include <Champs_front_ALE_projection.h>
+#include <Champ_front_base.h>
 #include <TRUSTLists.h>
-#include <Champs_front.h>
 #include <Champ_P1NC.h>
 #include <Beam_model.h>
-#include <Champs_front_ALE_projection.h>
 #include <TRUST_Ref.h>
-
+#include <Domaine.h>
 
 class Equation_base;
 class Beam_model;
@@ -111,7 +110,7 @@ protected:
   IntTab som_faces_bords;
   SolveurSys solv;
   Matrice_Morse_Sym mat;
-  Champs_front les_champs_front;
+  TRUST_Vector<OWN_PTR(Champ_front_base)> les_champs_front;
   int nb_bords_ALE;
   Bords les_bords_ALE;
   int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Domaine_ALE::calculer_vitesse).

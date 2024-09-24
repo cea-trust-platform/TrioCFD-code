@@ -250,7 +250,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
           else if(sub_type(Echange_contact_VDF,la_cl_th.valeur()))
             {
               const Echange_contact_VDF& la_cl_couplee = ref_cast(Echange_contact_VDF,la_cl_th.valeur());
-              const Champ_front_calc& ch_solide = ref_cast(Champ_front_calc, la_cl_couplee.T_autre_pb().valeur());
+              const Champ_front_calc& ch_solide = ref_cast(Champ_front_calc, la_cl_couplee.T_autre_pb());
               const Milieu_base& le_milieu_solide=ch_solide.milieu();
               const DoubleTab& lambda_s = le_milieu_solide.conductivite()->valeurs();
               const DoubleTab& Cp_s     = le_milieu_solide.capacite_calorifique()->valeurs();
@@ -518,7 +518,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
               // On fait une supposition sur le schema en temps
               // (CLs prises au temps futur)
-              const DoubleTab& t_autre=la_cl_couplee.T_autre_pb()->valeurs_au_temps(tps+dtG);
+              const DoubleTab& t_autre=la_cl_couplee.T_autre_pb().valeurs_au_temps(tps+dtG);
               for (int num_face=ndeb; num_face<nfin; num_face++)
                 {
                   if ((elem = face_voisins(num_face,0)) == -1) elem = face_voisins(num_face,1);

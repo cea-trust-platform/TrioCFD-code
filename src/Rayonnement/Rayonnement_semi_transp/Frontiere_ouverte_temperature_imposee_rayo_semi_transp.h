@@ -26,7 +26,7 @@
 
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Dirichlet_entree_fluide_leaves.h>
-#include <Champ_front.h>
+
 
 /*! @brief classe Frontiere_ouverte_temperature_imposee_rayo_semi_transp
  *
@@ -43,20 +43,20 @@ public :
   const Cond_lim_base& la_cl() const override;
   void completer() override;
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
-  inline Champ_front& temperature_bord();
-  inline const Champ_front& temperature_bord() const;
+  inline Champ_front_base& temperature_bord();
+  inline const Champ_front_base& temperature_bord() const;
   void calculer_temperature_bord(double temps);
 
 protected :
 
 };
 
-inline Champ_front& Frontiere_ouverte_temperature_imposee_rayo_semi_transp::temperature_bord()
+inline Champ_front_base& Frontiere_ouverte_temperature_imposee_rayo_semi_transp::temperature_bord()
 {
   return le_champ_front;
 }
 
-inline const Champ_front& Frontiere_ouverte_temperature_imposee_rayo_semi_transp::temperature_bord() const
+inline const Champ_front_base& Frontiere_ouverte_temperature_imposee_rayo_semi_transp::temperature_bord() const
 {
   return le_champ_front;
 }

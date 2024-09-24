@@ -139,7 +139,7 @@ void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
             {
             case Paroi_FT_disc::CONSTANT:
               {
-                const Champ_front_base& champ_frontiere = cl_ft.champ_front().valeur();
+                const Champ_front_base& champ_frontiere = cl_ft.champ_front();
                 champ_frontiere.valeurs_face(num_face_frontiere, tmp);
                 theta1 = tmp[0];
                 theta2 = theta1;
@@ -147,7 +147,7 @@ void Maillage_FT_Disc::calculer_costheta_minmax(DoubleTab& costheta) const
               }
             case Paroi_FT_disc::HYSTERESIS:
               {
-                const Champ_front_base& champ_frontiere = cl_ft.champ_front().valeur();
+                const Champ_front_base& champ_frontiere = cl_ft.champ_front();
                 champ_frontiere.valeurs_face(num_face_frontiere, tmp);
                 theta1 = tmp[0];
                 theta2 = tmp[1];

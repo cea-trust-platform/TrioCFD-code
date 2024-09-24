@@ -206,11 +206,10 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(O
       Entree_fluide_vitesse_imposee&   CL_vitesse_imposeeF = ref_cast(Entree_fluide_vitesse_imposee,conds_limF[0].valeur());
 
 
-      const Champ_front& champ_frontF = CL_vitesse_imposeeF.champ_front();
-      const Frontiere& frontiereF =champ_frontF->frontiere_dis().frontiere();
+      const Frontiere& frontiereF =CL_vitesse_imposeeF.champ_front().frontiere_dis().frontiere();
 
       /* ---> On remplit ici les valeurs de la vitesse imposee en prenant celles de la grille grossiere prolongee */
-      DoubleTab& vitesse_imposeeF = CL_vitesse_imposeeF.champ_front()->valeurs();
+      DoubleTab& vitesse_imposeeF = CL_vitesse_imposeeF.champ_front().valeurs();
       const int nb_faces_bords    = frontiereF.nb_faces();//eqF.domaine_Cl_dis().nb_faces_Cl();
       const int nb_faces_bords_tot    = eqF.domaine_Cl_dis().nb_faces_Cl();
 

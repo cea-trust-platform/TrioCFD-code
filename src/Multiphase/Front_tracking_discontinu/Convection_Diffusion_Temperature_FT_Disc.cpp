@@ -1577,7 +1577,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_flux_to_face(const int num_
     {
       Cerr << "paroi_flux_impose" << finl;
       const Neumann_paroi& la_cl_typee = ref_cast(Neumann_paroi, la_cl.valeur());
-      double phi_imp = la_cl_typee.champ_front()->valeurs()(num_face-ndeb); // Should it be valeurs instead of ?
+      double phi_imp = la_cl_typee.champ_front().valeurs()(num_face-ndeb); // Should it be valeurs instead of ?
       return phi_imp;
     }
   else if (sub_type(Echange_impose_base, la_cl.valeur()))
@@ -1685,7 +1685,7 @@ void Convection_Diffusion_Temperature_FT_Disc::get_flux_and_Twall(const int num_
     {
       Cerr << "paroi_flux_impose" << finl;
       const Neumann_paroi& la_cl_typee = ref_cast(Neumann_paroi, la_cl.valeur());
-      flux = la_cl_typee.champ_front()->valeurs()(num_face-ndeb); // Should it be valeurs instead of ?
+      flux = la_cl_typee.champ_front().valeurs()(num_face-ndeb); // Should it be valeurs instead of ?
       //
       Cerr << "How can we set Twall when temperature(elem) is not valid? Or is it?" << finl;
       Process::exit();

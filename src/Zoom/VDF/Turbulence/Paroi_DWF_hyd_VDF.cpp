@@ -296,7 +296,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 
   // On prolonge la vitesse sur ce bord
   const Frontiere_dis_base& cl = les_cl[i_de_la_cl]->frontiere_dis();
-  DoubleTab& val  = les_cl[i_de_la_cl]->champ_front()->valeurs();
+  DoubleTab& val  = les_cl[i_de_la_cl]->champ_front().valeurs();
   DoubleTab pente(val);
 
   P_cl.prolonger(domaine_VDF,domaine_fine,cl.frontiere(),connect.connectivites_elemF_elemG(),vit, pente,nb_compo);
@@ -315,7 +315,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       // Et on met pente a 0.
       pente = 0;
     }
-  ref_cast(Champ_front_var_instationnaire,les_cl[i_de_la_cl]->champ_front().valeur()).set_derivee_en_temps(pente);
+  ref_cast(Champ_front_var_instationnaire,les_cl[i_de_la_cl]->champ_front()).set_derivee_en_temps(pente);
 
   // #############
   // # THERMIQUE #
@@ -345,7 +345,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
         }
     }
   const Frontiere_dis_base& cl_th = les_cl_th[i_de_la_cl]->frontiere_dis();
-  DoubleTab& val_th  = les_cl_th[i_de_la_cl]->champ_front()->valeurs();
+  DoubleTab& val_th  = les_cl_th[i_de_la_cl]->champ_front().valeurs();
 
   DoubleTab pente_th(val_th);
 

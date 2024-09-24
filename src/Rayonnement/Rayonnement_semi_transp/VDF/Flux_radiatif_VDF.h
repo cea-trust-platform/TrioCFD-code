@@ -25,7 +25,7 @@
 
 #include <Flux_radiatif_base.h>
 #include <Champ_Don.h>
-#include <Champ_front.h>
+
 
 class Domaine_VF;
 
@@ -41,7 +41,7 @@ class Flux_radiatif_VDF : public Flux_radiatif_base
   Declare_instanciable(Flux_radiatif_VDF);
 
 public :
-  void evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&,
+  void evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don&,
                               const Champ_Don&, const Champ_Don&,
                               const Domaine_VF&, const double, double);
 

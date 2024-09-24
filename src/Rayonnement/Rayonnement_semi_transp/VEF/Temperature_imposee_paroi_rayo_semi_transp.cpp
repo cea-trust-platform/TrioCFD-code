@@ -87,7 +87,7 @@ const Cond_lim_base&  Temperature_imposee_paroi_rayo_semi_transp::la_cl() const
 }
 
 
-Champ_front&  Temperature_imposee_paroi_rayo_semi_transp::temperature_bord()
+Champ_front_base&  Temperature_imposee_paroi_rayo_semi_transp::temperature_bord()
 {
   return le_champ_front;
 }

@@ -63,13 +63,13 @@ Entree& Flux_radiatif_VDF::readOn(Entree& s )
 /*! @brief
  *
  */
-void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don& coeff_abs, const Champ_Don& longueur_rayo,
+void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don& coeff_abs, const Champ_Don& longueur_rayo,
                                                const Champ_Don& indice,const Domaine_VF& zvf, const double sigma, double temps)
 {
   //  Cerr<<"Flux_radiatif_VDF::evaluer_cl_rayonnement() : Debut"<<finl;
   const DoubleTab& l_rayo = longueur_rayo->valeurs();
   const DoubleTab& n = indice->valeurs();
-  const DoubleTab& epsilon = emissivite()->valeurs();
+  const DoubleTab& epsilon = emissivite().valeurs();
   const DoubleTab& kappa = coeff_abs->valeurs();
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,zvf);
@@ -128,17 +128,17 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
       // determination de la temperature de paroi en fonction
       // de la face consideree
       double T;
-      assert(Tb->nb_comp() == 1);
-      if (sub_type(Champ_front_uniforme,Tb.valeur()))
-        T = Tb->valeurs()(0,0);
+      assert(Tb.nb_comp() == 1);
+      if (sub_type(Champ_front_uniforme,Tb))
+        T = Tb.valeurs()(0,0);
       else
-        T = Tb->valeurs_au_temps(temps)(face-ndeb,0);
+        T = Tb.valeurs_au_temps(temps)(face-ndeb,0);
 
       // Determination de l'emissivite de paroi en fonction
       // de la face consideree
       double epsi;
-      assert(emissivite()->nb_comp() == 1);
-      if (sub_type(Champ_front_uniforme,emissivite().valeur()))
+      assert(emissivite().nb_comp() == 1);
+      if (sub_type(Champ_front_uniforme,emissivite()))
         epsi = epsilon(0,0);
       else
         epsi = epsilon(face-ndeb,0);
@@ -169,7 +169,7 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
   // On doit recuperer la temperature de bord
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = le_bord.nb_faces();
-  REF(Champ_front) Tb;
+  REF(Champ_front_base) Tb;
   const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
   int num_cl_temp = 0;
 
@@ -230,7 +230,7 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
       exit();
     }
   //  Tb contient les temperatures de bord
-  //  Cerr<<"Tb = "<<Tb->valeurs()<<finl;
+  //  Cerr<<"Tb = "<<Tb.valeurs()<<finl;
   // Calcul du flux radiatif
   DoubleTab& Flux = flux_radiatif_->valeurs();
   Flux.resize(le_bord.nb_faces(),1);
@@ -265,11 +265,11 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
       else
         kappa_F = kappa(elem,0);
       double epsi;
-      assert(emissivite()->nb_comp() == 1);
-      if (sub_type(Champ_front_uniforme,emissivite().valeur()))
-        epsi = emissivite()->valeurs()(0,0);
+      assert(emissivite().nb_comp() == 1);
+      if (sub_type(Champ_front_uniforme,emissivite()))
+        epsi = emissivite().valeurs()(0,0);
       else
-        epsi = emissivite()->valeurs()(face,0);
+        epsi = emissivite().valeurs()(face,0);
       double eF = zvdf.dist_norm_bord(face+ndeb);
       double n;
       assert(fluide.indice()->nb_comp() == 1);
@@ -281,11 +281,11 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
       double sigma = eq_rayo.Modele().valeur_sigma();
       double Tbord;
 
-      assert(Tb->valeur().nb_comp() == 1);
-      if(sub_type(Champ_front_uniforme,Tb->valeur()))
-        Tbord = Tb->valeur().valeurs()(0,0);
+      assert(Tb.valeur().nb_comp() == 1);
+      if(sub_type(Champ_front_uniforme,Tb.valeur()))
+        Tbord = Tb.valeur().valeurs()(0,0);
       else
-        Tbord = Tb->valeur().valeurs()(face,0);
+        Tbord = Tb.valeur().valeurs()(face,0);
 
       double denum = A()*(2-epsi);
       denum /= 3*kappa_F*epsi;

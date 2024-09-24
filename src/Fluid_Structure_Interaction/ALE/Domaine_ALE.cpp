@@ -70,7 +70,7 @@ void Domaine_ALE::clear()
   som_faces_bords.reset();
   solv = SolveurSys();
   mat = Matrice_Morse_Sym();
-  les_champs_front = Champs_front();
+  les_champs_front = TRUST_Vector<OWN_PTR(Champ_front_base)>();
   nb_bords_ALE = 0;
   les_bords_ALE.vide();
   update_or_not_matrix_coeffs_ = 1;

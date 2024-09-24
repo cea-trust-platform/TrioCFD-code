@@ -42,10 +42,10 @@ Entree& Echange_contact_VDF_Zoom_fin::readOn(Entree& s )
 void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 {
   int num_faceG;
-  if(sub_type(Champ_front_zoom, T_ext().valeur()))
+  if(sub_type(Champ_front_zoom, T_ext()))
     {
-      Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext().valeur());
-      DoubleTab& Text_valeurs = T_ext()->valeurs_au_temps(temps);
+      Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext());
+      DoubleTab& Text_valeurs = T_ext().valeurs_au_temps(temps);
 
       int elemG;
       REF(Pb_2G) le_pb2G;

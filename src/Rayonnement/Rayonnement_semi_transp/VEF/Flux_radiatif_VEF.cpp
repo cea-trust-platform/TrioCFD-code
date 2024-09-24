@@ -63,13 +63,13 @@ Entree& Flux_radiatif_VEF::readOn(Entree& s )
 /*! @brief
  *
  */
-void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
+void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don&
                                                coeff_abs, const Champ_Don& longueur_rayo,
                                                const Champ_Don& indice,const Domaine_VF& zvf,
                                                const double sigma, double temps)
 {
   const DoubleTab& n = indice->valeurs();
-  const DoubleTab& epsilon = emissivite()->valeurs();
+  const DoubleTab& epsilon = emissivite().valeurs();
 
   //  int nb_elem = zvf.nb_elem();
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
@@ -86,8 +86,8 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
   for(face = ndeb; face<nfin; face++)
     {
       double epsi;
-      assert(emissivite()->nb_comp() == 1);
-      if(sub_type(Champ_front_uniforme,emissivite().valeur()))
+      assert(emissivite().nb_comp() == 1);
+      if(sub_type(Champ_front_uniforme,emissivite()))
         epsi = epsilon(0,0);
       else
         epsi = epsilon(face-ndeb,0);
@@ -101,11 +101,11 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
 
 
       double T;
-      assert(Tb->nb_comp() == 1);
-      if(sub_type(Champ_front_uniforme,Tb.valeur()))
-        T = Tb->valeurs()(0,0);
+      assert(Tb.nb_comp() == 1);
+      if(sub_type(Champ_front_uniforme,Tb))
+        T = Tb.valeurs()(0,0);
       else
-        T = Tb->valeurs_au_temps(temps)(face-ndeb,0);
+        T = Tb.valeurs_au_temps(temps)(face-ndeb,0);
 
       double numer_coeff = 4*nn*nn*sigma*pow(T,4)*epsi;
       double denum_coeff = A()*(2-epsi);
@@ -122,7 +122,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   // On doit recuperer la temperature de bord
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = le_bord.nb_faces();
-  REF(Champ_front) Tb;
+  REF(Champ_front_base) Tb;
   const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
   int num_cl_temp = 0;
 
@@ -174,7 +174,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
     }
   //  Tb contient les temperatures de bord
   // Calcul du flux radiatif
-  DoubleTab& Flux = flux_radiatif()->valeurs();
+  DoubleTab& Flux = flux_radiatif().valeurs();
   Flux.resize(le_bord.nb_faces(),1);
   Eq_rayo_semi_transp_VEF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VEF,domaine_Cl_dis().equation());
   Fluide_base& fluide = eq_rayo.fluide();
@@ -193,11 +193,11 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   for(face=0; face<nb_faces; face++)
     {
       double epsi;
-      assert(emissivite()->nb_comp() == 1);
-      if (sub_type(Champ_front_uniforme,emissivite().valeur()))
-        epsi = emissivite()->valeurs()(0,0);
+      assert(emissivite().nb_comp() == 1);
+      if (sub_type(Champ_front_uniforme,emissivite()))
+        epsi = emissivite().valeurs()(0,0);
       else
-        epsi = emissivite()->valeurs()(face,0);
+        epsi = emissivite().valeurs()(face,0);
       double n;
       assert(fluide.indice()->nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide.indice().valeur()))
@@ -206,11 +206,11 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
         n = indice(face+ndeb,0);
       double sigma = eq_rayo.Modele().valeur_sigma();
       double Tbord;
-      assert(Tb.valeur()->nb_comp() == 1);
-      if(sub_type(Champ_front_uniforme,Tb->valeur()))
-        Tbord = Tb.valeur()->valeurs()(0,0);
+      assert(Tb->nb_comp() == 1);
+      if(sub_type(Champ_front_uniforme,Tb.valeur()))
+        Tbord = Tb->valeurs()(0,0);
       else
-        Tbord = Tb.valeur()->valeurs()(face,0);
+        Tbord = Tb->valeurs()(face,0);
       double irra = irradiance(face+ndeb);
 
       double denum = A()*(2-epsi);
@@ -229,7 +229,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
     }
 
   //Debog::verifier(" Flux_radiatif_VEF::calculer_flux_radiatif_irra",irradiance);
-  //Debog::verifier_bord(" Flux_radiatif_VEF::calculer_flux_radiatif_Tb",Tb->valeurs()(0,0),ndeb);
+  //Debog::verifier_bord(" Flux_radiatif_VEF::calculer_flux_radiatif_Tb",Tb.valeurs()(0,0),ndeb);
   Debog::verifier_bord(" Flux_radiatif_VEF::calculer_flux_radiatif_Flux",Flux,ndeb);
 
   if (eq_rayo.schema_temps().limpr())

@@ -111,7 +111,7 @@ const Cond_lim_base& Echange_externe_impose_rayo_semi_transp::la_cl() const
 }
 
 
-Champ_front& Echange_externe_impose_rayo_semi_transp::temperature_bord()
+Champ_front_base& Echange_externe_impose_rayo_semi_transp::temperature_bord()
 {
   return T_ext();
 }

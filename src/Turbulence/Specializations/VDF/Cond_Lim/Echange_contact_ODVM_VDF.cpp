@@ -46,7 +46,7 @@ void Echange_contact_ODVM_VDF::calculer_Teta_equiv(DoubleTab& La_T_ext,const Dou
   const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
-  DoubleTab& t_autre=T_autre_pb()->valeurs_au_temps(temps);
+  DoubleTab& t_autre=T_autre_pb().valeurs_au_temps(temps);
   int ndeb = ma_front_vf.num_premiere_face();
   int nb_faces_bord = ma_front_vf.nb_faces();
   int ind_fac,elem, isfluide=0;
@@ -60,7 +60,7 @@ void Echange_contact_ODVM_VDF::calculer_Teta_equiv(DoubleTab& La_T_ext,const Dou
     {
     }
 
-  const Champ_front_calc& chcal=ref_cast(Champ_front_calc,T_autre_pb().valeur());
+  const Champ_front_calc& chcal=ref_cast(Champ_front_calc,T_autre_pb());
   const Equation_base& eq = (isfluide==1?mon_eqn:chcal.inconnue().equation());
   const Modele_turbulence_scal_base& modele_turbulence = ref_cast(Modele_turbulence_scal_base,eq.get_modele(TURBULENCE).valeur());
   const Turbulence_paroi_scal_base& loipar = modele_turbulence.loi_paroi();

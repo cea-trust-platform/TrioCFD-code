@@ -25,7 +25,7 @@
 
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Echange_contact_VDF.h>
-#include <Champ_front.h>
+
 
 /*! @brief classe Echange_contact_rayo_semi_transp_VDF Cette classe est utilisee pour realiser un couplage entre une
  *
@@ -41,7 +41,7 @@ class Echange_contact_rayo_semi_transp_VDF: public Cond_Lim_rayo_semi_transp, pu
 
 public :
   const Cond_lim_base& la_cl() const override;
-  Champ_front& temperature_bord();
+  Champ_front_base& temperature_bord();
   void calculer_temperature_bord(double temps);
   int compatible_avec_eqn(const Equation_base&) const override;
   void mettre_a_jour(double temps) override;
@@ -52,7 +52,7 @@ public :
   Echange_contact_rayo_semi_transp_VDF& la_Cl_opposee();
 protected :
 
-  Champ_front T_paroi;
+  OWN_PTR(Champ_front_base) T_paroi;
   int num_premiere_face_dans_pb_fluide;
 };
 

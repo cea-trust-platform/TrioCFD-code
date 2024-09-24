@@ -395,7 +395,7 @@ void Modele_rayo_semi_transp::calculer_flux_radiatif()
 // Effets de bord :
 // Postcondition :
 //
-const Champ_front& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) const
+const Champ_front_base& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) const
 {
   //  Cerr<<"Modele_rayo_semi_transp::flux_radiatif const : Debut"<<finl;
   // On fait une boucle sur les bords pour trouver celui dont le nom est nom_bord
