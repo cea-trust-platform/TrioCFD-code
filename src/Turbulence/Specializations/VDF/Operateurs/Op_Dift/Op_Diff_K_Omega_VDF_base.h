@@ -40,7 +40,7 @@ public:
   void associer_diffusivite(const Champ_base& ch_diff) override;
   void associer_diffusivite_turbulente() override;
   void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
-  const Champ_Fonc& diffusivite_turbulente() const;
+  const Champ_Fonc_base& diffusivite_turbulente() const;
   const Champ_base& diffusivite() const override;
 
   virtual inline void mettre_a_jour_diffusivite() const { assert(mon_equation.non_nul()); }

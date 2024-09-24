@@ -101,7 +101,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
   const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& g = gravite->valeurs(), &tab_beta = beta_t->valeur().valeurs();
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs();
+  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
 
   // Ajout d'un espace virtuel au tableau G
@@ -121,7 +121,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
   const Domaine_Cl_VDF& zcl_VDF_co = ref_cast(Domaine_Cl_VDF,eq_concentration->domaine_Cl_dis());
   const DoubleTab& concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());
-  const DoubleTab& diffu_turb = le_modele_scalaire.conductivite_turbulente()->valeurs();
+  const DoubleTab& diffu_turb = le_modele_scalaire.conductivite_turbulente().valeurs();
 //  const DoubleTab& diffu_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
   const DoubleVect& g = gravite->valeurs(), &volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
@@ -154,13 +154,13 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme_concen(DoubleTab&
   // XXX : Elie Saikali : vaut mieux utiliser diffusivite_turbulente au lie de faire ca ....
   // voila dans Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem
   // const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
-  DoubleTab alpha_turb(le_modele_scalaire.conductivite_turbulente()->valeurs()); // on veut pas modifier la ref !
+  DoubleTab alpha_turb(le_modele_scalaire.conductivite_turbulente().valeurs()); // on veut pas modifier la ref !
   double rhocp = eq_thermique->milieu().capacite_calorifique()->valeurs()(0, 0) * eq_thermique->milieu().masse_volumique()->valeurs()(0, 0);
   alpha_turb /= rhocp;
 
   const Champ_Don& ch_beta_temper = beta_t.valeur();
-  const DoubleTab& diffu_turb = le_modele_scal_co.conductivite_turbulente()->valeurs(), &tab_beta_t = ch_beta_temper->valeurs();
-//  const DoubleTab& diffu_turb = le_modele_scal_co.diffusivite_turbulente()->valeurs(); // XXX : realisable utilise ca ???? a voir
+  const DoubleTab& diffu_turb = le_modele_scal_co.conductivite_turbulente().valeurs(), &tab_beta_t = ch_beta_temper->valeurs();
+//  const DoubleTab& diffu_turb = le_modele_scal_co.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem(), &g = gravite->valeurs();
   const int nb_consti = eq_concentration->constituant().nb_constituants();

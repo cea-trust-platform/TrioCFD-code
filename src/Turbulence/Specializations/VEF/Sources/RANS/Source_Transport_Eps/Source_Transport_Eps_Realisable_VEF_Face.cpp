@@ -42,7 +42,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::associer_pb(const Probleme_base& 
 
 const DoubleTab& Source_Transport_Eps_Realisable_VEF_Face::get_visc_turb() const
 {
-  return ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, eqn_k_Rea->modele_turbulence()).viscosite_turbulente()->valeurs();
+  return ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, eqn_k_Rea->modele_turbulence()).viscosite_turbulente().valeurs();
 }
 
 const Modele_Fonc_Realisable_base& Source_Transport_Eps_Realisable_VEF_Face::get_modele_fonc() const
@@ -76,7 +76,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
 {
   Modele_turbulence_hyd_K_Eps_Realisable_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable_Bicephale, eqn_k_Rea->modele_turbulence());
   Modele_Fonc_Realisable_base& mon_modele_fonc = mod_turb.associe_modele_fonction();
-  const DoubleTab& visco_turb = mod_turb.viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const double epsilon_minimum = eqn_k_Rea->modele_turbulence().get_EPS_MIN();
   const Champ_Don& ch_visco_cin = ref_cast(Fluide_base,eqn_k_Rea->milieu()).viscosite_cinematique();

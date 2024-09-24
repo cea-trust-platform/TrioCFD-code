@@ -30,7 +30,7 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
 #include <Champ_Don.h>
-#include <Champ_Fonc.h>
+
 
 class Champ_base;
 

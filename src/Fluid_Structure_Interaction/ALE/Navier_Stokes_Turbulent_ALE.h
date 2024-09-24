@@ -27,7 +27,7 @@
 #include <Modele_turbulence_hyd_base.h>
 #include <Navier_Stokes_std_ALE.h>
 #include <Les_mod_turb.h>
-#include <Champ_Fonc.h>
+
 
 /*! @brief classe Navier_Stokes_Turbulent_ALE Cette classe represente l'equation de la dynamique pour un fluide
  *
@@ -45,7 +45,7 @@ public :
 
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  inline const Champ_Fonc& viscosite_turbulente() const;
+  inline const Champ_Fonc_base& viscosite_turbulente() const;
   inline const Modele_turbulence_hyd_base& modele_turbulence() const;
   int sauvegarder(Sortie&) const override;
   int reprendre(Entree&) override;
@@ -80,9 +80,9 @@ protected:
 
 /*! @brief Renvoie le champ representant la viscosite turbulente.
  *
- * @return (Champ_Fonc&) le champ representant la viscosite turbulente
+ * @return (Champ_Fonc_base&) le champ representant la viscosite turbulente
  */
-inline const Champ_Fonc& Navier_Stokes_Turbulent_ALE::viscosite_turbulente() const
+inline const Champ_Fonc_base& Navier_Stokes_Turbulent_ALE::viscosite_turbulente() const
 {
   return le_modele_turbulence->viscosite_turbulente();
 }

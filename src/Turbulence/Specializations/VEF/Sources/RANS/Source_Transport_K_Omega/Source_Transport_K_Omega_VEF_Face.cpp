@@ -76,7 +76,7 @@ void Source_Transport_K_Omega_VEF_Face::associer_pb(const Probleme_base& pb)
 }
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_visc_turb() const
 {
-  return eqn_K_Omega->modele_turbulence().viscosite_turbulente()->valeurs();
+  return eqn_K_Omega->modele_turbulence().viscosite_turbulente().valeurs();
 }
 
 const DoubleTab& Source_Transport_K_Omega_VEF_Face::get_cisaillement_paroi() const

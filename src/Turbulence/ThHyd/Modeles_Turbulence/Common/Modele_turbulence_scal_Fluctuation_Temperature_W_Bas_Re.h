@@ -44,7 +44,7 @@ public:
 
   inline Modele_Fonc_Bas_Reynolds_Thermique_Base& associe_modele_fonction();
   inline const Modele_Fonc_Bas_Reynolds_Thermique_Base& associe_modele_fonction() const;
-  Champ_Fonc& calculer_diffusivite_turbulente() override;
+  Champ_Fonc_base& calculer_diffusivite_turbulente() override;
   void set_param(Param&) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   //////////////////////////////////////////////////////

@@ -99,7 +99,7 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc_base
         correction_nut_et_cisaillement_paroi_si_qc(*z_class);
     }
 
-  z_class->viscosite_turbulente()->valeurs().echange_espace_virtuel();
+  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
 
   print_evolution<M_TYPE>(ch_K_Eps_ou_Omega, z_class->equation().schema_temps(), LeCmu, 0);
 }
@@ -136,7 +136,7 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc_base
       correction_nut_et_cisaillement_paroi_si_qc(*z_class);
     }
 
-  z_class->viscosite_turbulente()->valeurs().echange_espace_virtuel();
+  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
 
   if (!IS_K_EPS_REALISABLE_BICEPHALE)
     print_evolution<M_TYPE>(ch_K, z_class->equation().schema_temps(), LeCmu, 0, &ch_Eps);
@@ -166,7 +166,7 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc_base
       correction_nut_et_cisaillement_paroi_si_qc(*z_class);
     }
 
-  z_class->viscosite_turbulente()->valeurs().echange_espace_virtuel();
+  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
 }
 
 template<typename MODELE> template<MODELE_TYPE M_TYPE>
@@ -177,7 +177,7 @@ Modele_turbulence_hyd_RANS_Gen<MODELE>::calculate_limit_viscosity(Champ_Inc_base
   z_class->controler();
   z_class->calculer_viscosite_turbulente(ch_K_Eps_ou_Omega.temps());
   z_class->limiter_viscosite_turbulente();
-  z_class->viscosite_turbulente()->valeurs().echange_espace_virtuel();
+  z_class->viscosite_turbulente().valeurs().echange_espace_virtuel();
 }
 
 template <typename MODELE> template <MODELE_TYPE M_TYPE>

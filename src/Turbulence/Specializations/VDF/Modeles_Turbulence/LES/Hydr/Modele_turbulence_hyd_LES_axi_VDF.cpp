@@ -38,7 +38,7 @@ Sortie& Modele_turbulence_hyd_LES_axi_VDF::printOn(Sortie& s) const { return s <
 
 Entree& Modele_turbulence_hyd_LES_axi_VDF::readOn(Entree& s) { return Modele_turbulence_hyd_LES_VDF::readOn(s); }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_axi_VDF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_axi_VDF::calculer_viscosite_turbulente()
 {
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   const IntTab& elem_faces = domaine_VDF.elem_faces();

@@ -22,9 +22,10 @@
 #ifndef Modele_Fonc_Realisable_base_included
 #define Modele_Fonc_Realisable_base_included
 
-#include <Champ_Fonc.h>
-#include <Champs_compris.h>
+
 #include <Champs_compris_interface.h>
+#include <Champ_Fonc_base.h>
+#include <Champs_compris.h>
 #include <Champ_Don.h>
 #include <TRUST_Ref.h>
 
@@ -111,7 +112,7 @@ protected :
   REF(Champ_Don) visco_;
 
   Nom nom_fic;
-  Champ_Fonc BR_wall_length_;
+  OWN_PTR(Champ_Fonc_base)  BR_wall_length_;
   int is_Cmu_constant_;
   int is_Reynolds_stress_isotrope_;
 

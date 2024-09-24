@@ -42,7 +42,7 @@ void Source_Transport_K_Realisable_VDF_Elem::ajouter_blocs(matrices_t matrices, 
   Source_Transport_Realisable_VDF_Elem_base::ajouter_blocs(matrices, secmem, semi_impl);
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
-  const DoubleTab& visco_turb = eqn_k_Rea->modele_turbulence().viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = eqn_k_Rea->modele_turbulence().viscosite_turbulente().valeurs();
   const DoubleVect& volumes = le_dom_VDF->volumes(), &porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   DoubleTrav P(visco_turb);
 

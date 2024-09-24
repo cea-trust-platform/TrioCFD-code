@@ -50,7 +50,7 @@ public:
 protected:
   int kc_ = -123, ki_ = -123, thi_ = 0, canal_ = 0, dir_par_ = -123;
   double demi_h_ = -123.;
-  Champ_Fonc la_vorticite_;
+  OWN_PTR(Champ_Fonc_base)  la_vorticite_;
 
   void cutoff();
 };

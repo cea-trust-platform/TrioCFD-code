@@ -43,7 +43,7 @@ void Source_Transport_K_VEF_Face::associer_pb(const Probleme_base& pb)
 
 const DoubleTab& Source_Transport_K_VEF_Face::get_visc_turb() const
 {
-  return mon_eq_transport_K->modele_turbulence().viscosite_turbulente()->valeurs();
+  return mon_eq_transport_K->modele_turbulence().viscosite_turbulente().valeurs();
 }
 
 const DoubleTab& Source_Transport_K_VEF_Face::get_cisaillement_paroi() const

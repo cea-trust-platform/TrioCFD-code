@@ -56,7 +56,7 @@ public:
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
   void controler() { eqn_transport_K_Eps_.controler_K_Eps(); }
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  virtual Champ_Fonc_base& calculer_viscosite_turbulente(double temps);
 
 protected:
   Transport_K_Eps eqn_transport_K_Eps_;

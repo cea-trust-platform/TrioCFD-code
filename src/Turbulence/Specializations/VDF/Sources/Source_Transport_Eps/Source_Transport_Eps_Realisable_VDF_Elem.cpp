@@ -38,7 +38,7 @@ void Source_Transport_Eps_Realisable_VDF_Elem::associer_pb(const Probleme_base& 
 
 const DoubleTab& Source_Transport_Eps_Realisable_VDF_Elem::get_visc_turb() const
 {
-  return eqn_k_Rea->modele_turbulence().viscosite_turbulente()->valeurs();
+  return eqn_k_Rea->modele_turbulence().viscosite_turbulente().valeurs();
 }
 
 const Modele_Fonc_Realisable_base& Source_Transport_Eps_Realisable_VDF_Elem::get_modele_fonc() const

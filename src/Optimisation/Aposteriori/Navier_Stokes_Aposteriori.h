@@ -32,7 +32,7 @@ public:
   Champ_Post_Operateur_Eqn& get_champ_source() { return champ_src_; }
 
 private:
-  Champ_Fonc estimateur_aposteriori_;
+  OWN_PTR(Champ_Fonc_base)  estimateur_aposteriori_;
   Champ_Post_Operateur_Eqn champ_src_;
   void estimateur_aposteriori();
 };

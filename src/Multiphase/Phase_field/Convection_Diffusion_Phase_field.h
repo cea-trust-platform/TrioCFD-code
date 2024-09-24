@@ -26,7 +26,7 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Operateur_Grad.h>
 #include <Debog.h>
-#include <Champ_Fonc.h>
+
 #include <Champ_Don.h>
 #include <Constituant.h>
 #include <TRUST_Ref.h>
@@ -48,7 +48,7 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   Convection_Diffusion_Phase_field();
   void discretiser() override;
-  Champ_Fonc& set_mutilde_() { return ch_mutilde; }
+  Champ_Fonc_base& set_mutilde_() { return ch_mutilde; }
   DoubleTab& set_mutilde() { return mutilde; }
   DoubleTab& set_mutilde_demi() { return mutilde_demi; }
   DoubleTab& set_c_demi() { return c_demi; }
@@ -56,7 +56,7 @@ public:
   DoubleTab& set_div_alpha_gradC() { return div_alpha_gradC; }
   DoubleTab& set_alpha_gradC_carre() { return alpha_gradC_carre; }
   DoubleTab& set_pression_thermo() { return pression_thermo; }
-  const Champ_Fonc& get_mutilde_() const { return ch_mutilde; }
+  const Champ_Fonc_base& get_mutilde_() const { return ch_mutilde; }
   const DoubleTab& get_mutilde() const { return mutilde; }
   const DoubleTab& get_mutilde_demi() const { return mutilde_demi; }
   const DoubleTab& get_c_demi() const { return c_demi; }
@@ -72,7 +72,7 @@ public:
   inline int& get_mutype_() { return mutype_; }
   inline int get_mutype_() const { return mutype_; }
 protected:
-  Champ_Fonc ch_mutilde;
+  OWN_PTR(Champ_Fonc_base)  ch_mutilde;
   Operateur_Grad gradient;
   DoubleTab div_alpha_gradC, div_alpha_rho_gradC, alpha_gradC_carre;
   DoubleTab pression_thermo, mutilde, c_demi, mutilde_demi;

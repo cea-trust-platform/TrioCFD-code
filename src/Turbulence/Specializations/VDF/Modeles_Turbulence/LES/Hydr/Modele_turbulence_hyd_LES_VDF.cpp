@@ -79,7 +79,7 @@ int Modele_turbulence_hyd_LES_VDF::lire_motcle_non_standard(const Motcle& mot, E
     return Modele_turbulence_hyd_LES_VDF_base::lire_motcle_non_standard(mot, is);
 }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_VDF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_VDF::calculer_viscosite_turbulente()
 {
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   double temps = mon_equation_->inconnue().temps();

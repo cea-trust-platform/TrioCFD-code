@@ -24,7 +24,6 @@
 
 #include <Champs_compris_interface.h>
 #include <Champs_compris.h>
-#include <Champ_Fonc.h>
 #include <Champ_Don.h>
 #include <TRUST_Ref.h>
 
@@ -35,6 +34,7 @@ class Probleme_base;
 class Discretisation_base;
 class Champ_base;
 class Champ_Inc_base;
+class Champ_Fonc_base;
 
 class Modele_Fonc_Bas_Reynolds_Base : public Champs_compris_interface, public Objet_U
 {
@@ -112,7 +112,7 @@ protected :
   REF(Champ_Don) visco_;
 
   Nom nom_fic;
-  Champ_Fonc BR_wall_length_;
+  OWN_PTR(Champ_Fonc_base)  BR_wall_length_;
   int is_Cmu_constant_;
   int is_Reynolds_stress_isotrope_;
   Champ_Don D_,E_,F1_,F2_;

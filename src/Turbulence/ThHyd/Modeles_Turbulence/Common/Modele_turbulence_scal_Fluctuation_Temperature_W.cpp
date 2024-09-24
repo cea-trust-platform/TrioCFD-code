@@ -80,7 +80,7 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W::lire_motcle_non_standard(c
   return 1;
 }
 
-void Modele_turbulence_scal_Fluctuation_Temperature_W::associer_viscosite_turbulente(const Champ_Fonc& visc_turb)
+void Modele_turbulence_scal_Fluctuation_Temperature_W::associer_viscosite_turbulente(const Champ_Fonc_base& visc_turb)
 {
   la_viscosite_turbulente = visc_turb;
 }
@@ -101,11 +101,11 @@ bool Modele_turbulence_scal_Fluctuation_Temperature_W::initTimeStep(double dt)
   return eqn->initTimeStep(dt);
 }
 
-Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W::calculer_diffusivite_turbulente()
+Champ_Fonc_base& Modele_turbulence_scal_Fluctuation_Temperature_W::calculer_diffusivite_turbulente()
 {
   DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
-  const DoubleTab& mu_t = la_viscosite_turbulente.valeur()->valeurs();
-  double temps = la_viscosite_turbulente.valeur()->temps();
+  const DoubleTab& mu_t = la_viscosite_turbulente->valeurs();
+  double temps = la_viscosite_turbulente->temps();
   const Champ_base& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue();
 
   const Probleme_base& mon_pb = mon_equation_->probleme();
@@ -161,7 +161,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::completer()
   const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
-  const Champ_Fonc& visc_turb = mod_turb_hydr.viscosite_turbulente();
+  const Champ_Fonc_base& visc_turb = mod_turb_hydr.viscosite_turbulente();
   associer_viscosite_turbulente(visc_turb);
   Cerr << "Fin de Modele_turbulence_scal_Fluctuation_Temperature_W::completer()" << finl;
 

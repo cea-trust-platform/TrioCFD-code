@@ -47,7 +47,7 @@ void Op_Diff_K_Eps_Bas_Re_VEF_base::completer()
   Operateur_base::completer();
   /*const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
     const Modele_turbulence_hyd_K_Eps& mod_turb = eqn_transport.modele_turbulence();
-    const Champ_Fonc& visc_turb = mod_turb.viscosite_turbulente();
+    const Champ_Fonc_base& visc_turb = mod_turb.viscosite_turbulente();
     associer_diffusivite_turbulente(visc_turb);*/
 }
 

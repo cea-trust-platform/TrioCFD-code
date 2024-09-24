@@ -50,26 +50,26 @@ public:
   int mpoint_inactif;
   int mpointv_inactif;
 
-  Champ_Fonc second_membre_projection;
-  Champ_Fonc second_membre_projection_jump_;
-  Champ_Fonc derivee_u_etoile;
-  Champ_Fonc gradient_pression;
-  Champ_Fonc terme_diffusion;
-  Champ_Fonc terme_convection;
-  Champ_Fonc terme_source;
-  Champ_Fonc terme_source_interfaces;
-  Champ_Fonc indicatrice_p1b;
-  Champ_Fonc gradient_indicatrice;
-  Champ_Fonc potentiel_faces;
-  Champ_Fonc potentiel_elements;
+  OWN_PTR(Champ_Fonc_base)  second_membre_projection;
+  OWN_PTR(Champ_Fonc_base)  second_membre_projection_jump_;
+  OWN_PTR(Champ_Fonc_base)  derivee_u_etoile;
+  OWN_PTR(Champ_Fonc_base)  gradient_pression;
+  OWN_PTR(Champ_Fonc_base)  terme_diffusion;
+  OWN_PTR(Champ_Fonc_base)  terme_convection;
+  OWN_PTR(Champ_Fonc_base)  terme_source;
+  OWN_PTR(Champ_Fonc_base)  terme_source_interfaces;
+  OWN_PTR(Champ_Fonc_base)  indicatrice_p1b;
+  OWN_PTR(Champ_Fonc_base)  gradient_indicatrice;
+  OWN_PTR(Champ_Fonc_base)  potentiel_faces;
+  OWN_PTR(Champ_Fonc_base)  potentiel_elements;
   // delta_u_interface = la partie "saut de vitesse" du champ de vitesse a l'interface
   OWN_PTR(Champ_Inc_base) delta_u_interface;
-  Champ_Fonc laplacien_d;
-  Champ_Fonc mpoint;
-  Champ_Fonc mpoint_vap;
+  OWN_PTR(Champ_Fonc_base)  laplacien_d;
+  OWN_PTR(Champ_Fonc_base)  mpoint;
+  OWN_PTR(Champ_Fonc_base)  mpoint_vap;
   // Variation temporelle indicatrice de phase
-  Champ_Fonc derivee_temporelle_indicatrice;
-  Champ_Fonc ai; // Eulerian interfacial area.
+  OWN_PTR(Champ_Fonc_base)  derivee_temporelle_indicatrice;
+  OWN_PTR(Champ_Fonc_base)  ai; // Eulerian interfacial area.
   OWN_PTR(Champ_Inc_base) vitesse_jump0_; // Extended Velocity of phase 0.
 
   LIST(REF(Champ_base)) liste_champs_compris;

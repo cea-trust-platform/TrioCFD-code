@@ -25,7 +25,7 @@
 
 #include <Modele_turbulence_scal_base.h>
 #include <Motcle.h>
-#include <Champ_Fonc.h>
+
 #include <TRUSTTab.h>
 #include <TRUST_Ref.h>
 
@@ -59,7 +59,7 @@ protected:
   DoubleVect model_coeff;
 
   void mettre_a_jour(double) override;
-  Champ_Fonc& calculer_diffusivite_turbulente();
+  Champ_Fonc_base& calculer_diffusivite_turbulente();
 
   ////void calculer_length_scale(DoubleVect& );
   ////void calculer_cell_cent_vel(DoubleTab& );

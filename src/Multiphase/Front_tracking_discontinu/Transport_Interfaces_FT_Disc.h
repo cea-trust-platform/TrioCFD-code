@@ -33,7 +33,7 @@
 #include <Connectivite_frontieres.h>
 #include <Topologie_Maillage_FT.h>
 #include <Algorithmes_Transport_FT_Disc.h>
-#include <Champ_Fonc.h>
+
 #include <Navier_Stokes_FT_Disc.h>
 #include <Proprietes_part_vol.h>
 #include <TRUSTTabs_forward.h>
@@ -345,7 +345,7 @@ protected:
 
   Nom suppression_interfaces_sous_domaine_;
 
-  Champ_Fonc vitesse_imp_interp_;
+  OWN_PTR(Champ_Fonc_base)  vitesse_imp_interp_;
 
 
 private:
@@ -463,16 +463,16 @@ public:
   DoubleTab doubletab_vitesses;
   IntVect   intvect_elements;
 
-  Champ_Fonc distance_interface; // Distance a l'interface (aux elements)
-  Champ_Fonc normale_interface;  // Une normale etalee
-  Champ_Fonc surface_interface;  // GB : La surface d'interface dans chaque element
-  Champ_Fonc tmp_flux;           // Tableau temporaire pour le ramasse-miettes
-  Champ_Fonc distance_interface_faces; // CF : Distance a l'interface (aux faces)
+  OWN_PTR(Champ_Fonc_base)  distance_interface; // Distance a l'interface (aux elements)
+  OWN_PTR(Champ_Fonc_base)  normale_interface;  // Une normale etalee
+  OWN_PTR(Champ_Fonc_base)  surface_interface;  // GB : La surface d'interface dans chaque element
+  OWN_PTR(Champ_Fonc_base)  tmp_flux;           // Tableau temporaire pour le ramasse-miettes
+  OWN_PTR(Champ_Fonc_base)  distance_interface_faces; // CF : Distance a l'interface (aux faces)
   DoubleTab  distance_interface_sommets; // Distance a l'interface (aux sommets)
-  Champ_Fonc distance_interface_faces_corrigee; // CI : Distance a l'interface corrigee (aux faces)
-  Champ_Fonc distance_interface_faces_difference; // CI : Distance a l'interface corrigee - Distance a l'interface calculee (aux faces)
-  Champ_Fonc index_element; // CI : indexation des elements
-  Champ_Fonc nelem_par_direction; // CI : nombre d'elements par direction
+  OWN_PTR(Champ_Fonc_base)  distance_interface_faces_corrigee; // CI : Distance a l'interface corrigee (aux faces)
+  OWN_PTR(Champ_Fonc_base)  distance_interface_faces_difference; // CI : Distance a l'interface corrigee - Distance a l'interface calculee (aux faces)
+  OWN_PTR(Champ_Fonc_base)  index_element; // CI : indexation des elements
+  OWN_PTR(Champ_Fonc_base)  nelem_par_direction; // CI : nombre d'elements par direction
   // Note de B.M. : zut, y'a pas de champ aux sommets en VDF... donc DoubleTab et
   // du coup on ne peut pas postraiter facilement. C'est trop con...
   int     n_iterations_distance;

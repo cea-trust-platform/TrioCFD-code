@@ -144,21 +144,21 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Domaine_dis_base& doma
   }
 }
 
-static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis, const Fluide_Incompressible& fluide, Champ_Fonc& champ_rho_elem_, Champ_Don& champ_mu_, Champ_Don& champ_nu_,
-                                                   Champ_Fonc& champ_rho_faces_)
+static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis, const Fluide_Incompressible& fluide, Champ_Fonc_base& champ_rho_elem_, Champ_Don& champ_mu_, Champ_Don& champ_nu_,
+                                                   Champ_Fonc_base& champ_rho_faces)
 {
 
-  if (sub_type(Champ_Uniforme,champ_rho_elem_.valeur()) && (sub_type(Champ_Uniforme, champ_nu_.valeur())))
+  if (sub_type(Champ_Uniforme,champ_rho_elem_) && (sub_type(Champ_Uniforme, champ_nu_.valeur())))
     {
       const DoubleTab& tab_rho_phase_0 = fluide.masse_volumique()->valeurs();
       const double rho = tab_rho_phase_0(0, 0);
       const DoubleTab& tab_nu_phase_0 = fluide.viscosite_cinematique()->valeurs();
       const double nu = tab_nu_phase_0(0, 0);
       const double mu = nu * rho;
-      champ_rho_elem_->valeurs() = rho;
+      champ_rho_elem_.valeurs() = rho;
       champ_nu_->valeurs() = nu;
       champ_mu_->valeurs() = mu;
-      champ_rho_faces_->valeurs() = rho;
+      champ_rho_faces.valeurs() = rho;
     }
   else
     {
@@ -176,10 +176,10 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis,
         les_polys(i) = i;
 
       const DoubleTab& cg = zvf.xp();
-      DoubleTab& val_rho = champ_rho_elem_->valeurs();
+      DoubleTab& val_rho = champ_rho_elem_.valeurs();
       DoubleTab& val_nu = champ_nu_->valeurs();
       DoubleTab& val_mu = champ_mu_->valeurs();
-      DoubleTab& val_rho_faces = champ_rho_faces_->valeurs();
+      DoubleTab& val_rho_faces = champ_rho_faces.valeurs();
 
       fluide.masse_volumique()->valeur_aux_elems(cg, les_polys, val_rho);
       fluide.viscosite_dynamique()->valeur_aux_elems(cg, les_polys, val_mu);
@@ -3476,7 +3476,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 #endif
     }
 
-  Champ_Fonc champ_rho_faces_modifie(champ_rho_faces_);
+  OWN_PTR(Champ_Fonc_base)  champ_rho_faces_modifie(champ_rho_faces_);
   DoubleTab& rho_faces_modifie = champ_rho_faces_modifie->valeurs();
 
   if (interf_vitesse_imposee_ok)
@@ -3791,7 +3791,7 @@ const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
   return variables_internes().laplacien_d.valeur();
 }
 
-const Champ_Fonc& Navier_Stokes_FT_Disc::champ_rho_faces() const
+const Champ_Fonc_base& Navier_Stokes_FT_Disc::champ_rho_faces() const
 {
   return champ_rho_faces_;
 }

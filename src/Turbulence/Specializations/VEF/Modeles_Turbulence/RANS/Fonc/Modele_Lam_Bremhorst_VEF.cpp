@@ -532,7 +532,7 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem(const Discretisation_
 {
   int nelem = G.dimension(0);
 
-  Champ_Fonc K_Eps_elem;
+  OWN_PTR(Champ_Fonc_base)  K_Eps_elem;
   Noms noms(2), unites(2);
   noms[0]="K";
   noms[1]="eps";
@@ -591,8 +591,8 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem_BiK(const Discretisat
 {
   int nelem = G.dimension(0);
 
-  Champ_Fonc K_elem;
-  Champ_Fonc Eps_elem;
+  OWN_PTR(Champ_Fonc_base)  K_elem;
+  OWN_PTR(Champ_Fonc_base)  Eps_elem;
   Noms noms(1), unites(1), noms2(1), unites2(1);
   noms[0]="K";
   noms2[0]="eps";
@@ -691,7 +691,7 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem_shih(const Discretisa
 {
   int nelem = G.dimension(0);
 
-  Champ_Fonc K_Eps_elem;
+  OWN_PTR(Champ_Fonc_base)  K_Eps_elem;
   Noms noms(2), unites(2);
   noms[0]="K";
   noms[1]="eps";

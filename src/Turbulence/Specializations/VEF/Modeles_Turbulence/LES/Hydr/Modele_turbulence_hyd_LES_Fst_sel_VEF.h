@@ -45,7 +45,7 @@ public:
   void calculer_racine() override;
 
 protected:
-  Champ_Fonc la_vorticite_;
+  OWN_PTR(Champ_Fonc_base)  la_vorticite_;
   void cutoff();
 };
 

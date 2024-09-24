@@ -22,14 +22,15 @@
 #ifndef Modele_Fonc_Bas_Reynolds_Thermique_Base_included
 #define Modele_Fonc_Bas_Reynolds_Thermique_Base_included
 
-
-#include <Champ_Fonc.h>
-#include <Champs_compris.h>
 #include <Champs_compris_interface.h>
+#include <TRUSTTabs_forward.h>
+#include <Champs_compris.h>
+#include <TRUST_Deriv.h>
+#include <TRUST_Ref.h>
 #include <TRUST_Ref.h>
 
-
-
+class Domaine_dis_base;
+class Domaine_Cl_dis_base;
 class Champ_base;
 class Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re;
 class Transport_Fluctuation_Temperature_W_Bas_Re;

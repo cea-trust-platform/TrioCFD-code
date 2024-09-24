@@ -94,7 +94,7 @@ void Modele_turbulence_hyd_combinaison::mettre_a_jour(double temps)
   statistiques().end_count(nut_counter_);
 }
 
-Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
 {
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab& xp = domaine_VF.xp();

@@ -27,7 +27,7 @@
 #include <Op_Diff_K_Eps_base.h>
 #include <Op_VEF_Face.h>
 #include <TRUST_Ref.h>
-#include <Champ_Fonc.h>
+
 
 
 
@@ -55,9 +55,9 @@ public:
   void completer() override;
   void associer_diffusivite(const Champ_base& ch_diff) override;
   void associer_diffusivite_turbulente() override =0;
-  inline void associer_diffusivite_turbulente(const Champ_Fonc& );
+  inline void associer_diffusivite_turbulente(const Champ_Fonc_base& );
   inline void associer_Pr_K_Eps(double, double);
-  inline const Champ_Fonc& diffusivite_turbulente() const;
+  inline const Champ_Fonc_base& diffusivite_turbulente() const;
   inline const Champ_base& diffusivite() const override
   {
     return diffusivite_.valeur();
@@ -66,7 +66,7 @@ public:
 protected:
   double Prdt_K;
   double Prdt_Eps;
-  REF(Champ_Fonc) diffusivite_turbulente_;
+  REF(Champ_Fonc_base) diffusivite_turbulente_;
   REF(Champ_Don_base) tmp;
   REF(Champ_base) diffusivite_;
 };
@@ -80,12 +80,12 @@ inline Op_Diff_K_Eps_VEF_base::Op_Diff_K_Eps_VEF_base(double Prandt_K ,
                                                       double Prandt_Eps )
   : Prdt_K(Prandt_K) , Prdt_Eps(Prandt_Eps) {}
 
-inline const Champ_Fonc& Op_Diff_K_Eps_VEF_base::diffusivite_turbulente() const
+inline const Champ_Fonc_base& Op_Diff_K_Eps_VEF_base::diffusivite_turbulente() const
 {
   return diffusivite_turbulente_.valeur();
 }
 
-inline void Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(const Champ_Fonc& ch)
+inline void Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(const Champ_Fonc_base& ch)
 {
   diffusivite_turbulente_=ch;
 }

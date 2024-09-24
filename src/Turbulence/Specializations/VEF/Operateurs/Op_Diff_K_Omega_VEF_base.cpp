@@ -47,7 +47,7 @@ void Op_Diff_K_Omega_VEF_base::completer()
       const Transport_K_Omega& eqn_transport = ref_cast(Transport_K_Omega, mon_equation.valeur());
       const Modele_turbulence_hyd_K_Omega& mod_turb = ref_cast(Modele_turbulence_hyd_K_Omega,
                                                                eqn_transport.modele_turbulence());
-      const Champ_Fonc& visc_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& visc_turb = mod_turb.viscosite_turbulente();
       associer_diffusivite_turbulente(visc_turb);
       Op_Diff_K_Omega_VEF_base::associer_Pr_K_Omega(mod_turb.get_Prandtl_K(),
                                                     mod_turb.get_Prandtl_Omega());

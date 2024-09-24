@@ -29,7 +29,7 @@
 #include <Paroi_loi_WW_scal_VDF.h>
 #include <Probleme_Couple.h>
 #include <TRUST_Ref.h>
-#include <Champ_Fonc.h>
+
 
 
 

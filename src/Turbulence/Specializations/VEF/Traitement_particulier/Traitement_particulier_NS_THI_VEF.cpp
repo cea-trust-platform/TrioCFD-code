@@ -1876,7 +1876,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_nu_t()
   const DoubleVect& volumes = domaine_VEF.volumes();
   const int nb_elem = domaine_VEF.nb_elem();
   const Navier_Stokes_Turbulent& N_S_Turb  = ref_cast(Navier_Stokes_Turbulent,mon_equation.valeur());
-  const DoubleTab& visc_turb = N_S_Turb.viscosite_turbulente()->valeurs();
+  const DoubleTab& visc_turb = N_S_Turb.viscosite_turbulente().valeurs();
 
   double nu_t = 0;
   double nu_t_min = 1e+20;

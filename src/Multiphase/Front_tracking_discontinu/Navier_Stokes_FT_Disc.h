@@ -62,7 +62,7 @@ public:
                                              const DoubleVect& volumes_entrelaces, const IntVect& orientation, const DoubleTab& indicatrice, const ArrOfDouble& g, DoubleTab& gravite_face) const;
 
   int is_terme_gravite_rhog() const;
-  const Champ_Fonc& champ_rho_faces() const;
+  const Champ_Fonc_base& champ_rho_faces() const;
 
   virtual void calculer_dI_dt(DoubleVect& dI_dt); // const;
   const int& get_is_penalized() const;
@@ -90,10 +90,10 @@ protected:
   REF(Probleme_FT_Disc_gen) probleme_ft_;
 
   // Masse volumique calculee aux elements
-  Champ_Fonc champ_rho_elem_;
+  OWN_PTR(Champ_Fonc_base)  champ_rho_elem_;
   // Masse volumique calculee pour les volumes de controle de la vitesse
   // (pour division   v = (rho.v) / rho et pour matrice de pression)
-  Champ_Fonc champ_rho_faces_;
+  OWN_PTR(Champ_Fonc_base)  champ_rho_faces_;
   // Viscosite dynamique (calcul dans preparer_pas_de_temps)
   // champ du type requis pour l'operateur diffusion.
   Champ_Don champ_mu_;

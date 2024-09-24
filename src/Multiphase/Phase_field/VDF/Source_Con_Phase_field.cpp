@@ -1550,8 +1550,8 @@ void Source_Con_Phase_field::mettre_a_jour(double temps)
   Cerr << "" << finl;
 
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  Champ_Fonc& ch=eq_c.set_mutilde_();
-  ch->mettre_a_jour(temps);
+  Champ_Fonc_base& ch=eq_c.set_mutilde_();
+  ch.mettre_a_jour(temps);
 }
 
 
@@ -1566,7 +1566,7 @@ void Source_Con_Phase_field::premier_demi_dt()
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   DoubleTab& c=eq_c.inconnue().valeurs();
 
-  DoubleTab& mutilde=eq_c.set_mutilde_()->valeurs();
+  DoubleTab& mutilde=eq_c.set_mutilde_().valeurs();
   DoubleTab& mutilde_demi=eq_c.set_mutilde_demi();
   DoubleTab& c_demi=eq_c.set_c_demi();
 

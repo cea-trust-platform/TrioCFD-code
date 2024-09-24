@@ -64,21 +64,21 @@ void Op_Diff_K_Eps_VEF_Face::associer_diffusivite_turbulente()
     {
       const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
     }
   else if ( sub_type( Transport_K_Eps_Realisable,mon_equation.valeur() ) )
     {
       const Transport_K_Eps_Realisable& eqn_transport = ref_cast(Transport_K_Eps_Realisable,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
     }
   else if ( sub_type( Transport_K_ou_Eps,mon_equation.valeur() ) )
     {
       const Transport_K_ou_Eps& eqn_transport = ref_cast(Transport_K_ou_Eps,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
     }
 }
@@ -116,7 +116,7 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTab&
 
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   int nb_front=domaine_VEF.nb_front_Cl();
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
   // double inverse_Prdt_K = 1.0/Prdt_K;
   //double inverse_Prdt_Eps = 1.0/Prdt_Eps;
   int j;
@@ -491,7 +491,7 @@ void Op_Diff_K_Eps_VEF_Face::ajouter_contribution(const DoubleTab& transporte, M
   ArrOfDouble inv_Prdt(2),diffu_tot(2);
   inv_Prdt[0]=1./Prdt_K;
   inv_Prdt[1]=1./Prdt_Eps;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
   int is_mu_unif=sub_type(Champ_Uniforme,diffusivite_.valeur());
   const DoubleTab& mu=diffusivite_->valeurs();

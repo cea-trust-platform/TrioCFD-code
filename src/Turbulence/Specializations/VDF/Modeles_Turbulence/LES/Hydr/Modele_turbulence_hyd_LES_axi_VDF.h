@@ -34,7 +34,7 @@ class Modele_turbulence_hyd_LES_axi_VDF: public Modele_turbulence_hyd_LES_VDF
 {
   Declare_instanciable(Modele_turbulence_hyd_LES_axi_VDF);
 public:
-  Champ_Fonc& calculer_viscosite_turbulente() override;
+  Champ_Fonc_base& calculer_viscosite_turbulente() override;
   void calculer_fonction_structure() override;
 
   void calculer_longueurs_caracteristiques() override

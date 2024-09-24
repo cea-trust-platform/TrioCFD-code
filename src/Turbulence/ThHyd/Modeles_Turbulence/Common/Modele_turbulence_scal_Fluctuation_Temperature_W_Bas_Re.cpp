@@ -93,12 +93,12 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::preparer_calcul()
   return 1;
 }
 
-Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_diffusivite_turbulente()
+Champ_Fonc_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_diffusivite_turbulente()
 {
 
   DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
-  const DoubleTab& nu_t = la_viscosite_turbulente.valeur()->valeurs();
-  double temps = la_viscosite_turbulente.valeur()->temps();
+  const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
+  double temps = la_viscosite_turbulente->temps();
   const DoubleTab& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeurs();
   const Domaine_dis_base& le_dom_dis = eqn_transport_Fluctu_Temp->domaine_dis();
 
@@ -177,7 +177,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::completer()
   const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
-  const Champ_Fonc& visc_turb = mod_turb_hydr.viscosite_turbulente();
+  const Champ_Fonc_base& visc_turb = mod_turb_hydr.viscosite_turbulente();
   associer_viscosite_turbulente(visc_turb);
 }
 

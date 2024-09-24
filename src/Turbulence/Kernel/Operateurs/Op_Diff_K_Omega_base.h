@@ -27,7 +27,7 @@
 #include <TRUSTTabs_forward.h>
 #include <Matrice_Morse.h>
 #include <TRUST_Deriv.h>
-#include <Champ_Fonc.h>
+
 #include <TRUST_Ref.h>
 #include <Operateur.h>
 #include <Champ_Don.h>

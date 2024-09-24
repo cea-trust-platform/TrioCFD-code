@@ -583,13 +583,13 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::ajouter(DoubleTa
   const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue().valeurs();
   const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleTab& visco_turb = le_modele.viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = le_modele.viscosite_turbulente().valeurs();
   const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue().valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
   const Modele_turbulence_scal_base& le_modele_scalaire =
     ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs();
+  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const DoubleTab& g = gravite_->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
   int nb_elem = domaine_VDF.nb_elem();

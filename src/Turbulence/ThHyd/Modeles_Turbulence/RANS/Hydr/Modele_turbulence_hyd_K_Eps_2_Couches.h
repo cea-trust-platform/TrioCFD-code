@@ -59,7 +59,7 @@ public:
 
   void controler() { eqn_transport_K_Eps_.controler_K_Eps(); }
 
-  Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  Champ_Fonc_base& calculer_viscosite_turbulente(double temps);
 
 private:
   Transport_K_KEps eqn_transport_K_Eps_;

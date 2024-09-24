@@ -63,7 +63,7 @@ public:
   }
 
   void controler() { eqn_transport_K_Omega_.controler_K_Omega(); }
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double );
+  virtual Champ_Fonc_base& calculer_viscosite_turbulente(double );
 
   inline bool is_SST() const { return is_SST_ ;};
 

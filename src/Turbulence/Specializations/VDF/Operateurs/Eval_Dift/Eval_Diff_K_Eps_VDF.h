@@ -22,8 +22,8 @@
 #ifndef Eval_Diff_K_Eps_VDF_included
 #define Eval_Diff_K_Eps_VDF_included
 
+#include <Champ_Fonc_base.h>
 #include <Champ_Uniforme.h>
-#include <Champ_Fonc.h>
 #include <Champ_base.h>
 #include <TRUST_Ref.h>
 
@@ -39,7 +39,7 @@ public:
     Prdt[1]=Prandt_Eps;
   }
 
-  inline void associer_diff_turb(const Champ_Fonc& diffu) { diffusivite_turbulente_ = diffu; }
+  inline void associer_diff_turb(const Champ_Fonc_base& diffu) { diffusivite_turbulente_ = diffu; }
 
   inline void associer_mvolumique(const Champ_base& mvol)
   {
@@ -63,11 +63,11 @@ public:
 
   inline virtual void mettre_a_jour()
   {
-    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeur().valeurs());
+    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs());
     if (sub_type(Champ_Uniforme, diffusivite_.valeur())) db_diffusivite = diffusivite_->valeurs()(0,0);
   }
 
-  inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }
+  inline const Champ_Fonc_base& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }
   inline const Champ_base& diffusivite() const { return diffusivite_.valeur(); }
 
   // Pour CRTP !
@@ -79,7 +79,7 @@ protected:
   static constexpr double PRDT_K_DEFAUT = 1.0, PRDT_EPS_DEFAUT = 1.3;
   double Prdt_K, Prdt_Eps, db_diffusivite, Prdt[2];
   DoubleVect dv_diffusivite_turbulente, dv_mvol;
-  REF(Champ_Fonc) diffusivite_turbulente_;
+  REF(Champ_Fonc_base) diffusivite_turbulente_;
   REF(Champ_base) masse_volumique_, diffusivite_;
 };
 

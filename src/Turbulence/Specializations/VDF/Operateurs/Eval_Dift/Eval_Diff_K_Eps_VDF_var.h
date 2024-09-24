@@ -39,7 +39,7 @@ public:
   {
     (diffusivite_->valeurs().echange_espace_virtuel());
     dv_diffusivite.ref(diffusivite_->valeurs());
-    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeur().valeurs());
+    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs());
   }
 
   // Methods used by the flux computation in template class:

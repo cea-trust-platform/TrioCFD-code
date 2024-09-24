@@ -43,7 +43,7 @@ public:
   static void calculer_S_norme(const DoubleTab&, DoubleVect&, int);
   static void interpole(const IntVect&, const DoubleVect&, const DoubleVect&, double&);
 protected:
-  Champ_Fonc coeff_field_;
+  OWN_PTR(Champ_Fonc_base)  coeff_field_;
   Motcle methode_stabilise_;
   int N_c_ = -123;
   IntVect compt_c_;
@@ -55,10 +55,10 @@ protected:
   void calculer_Lij(const DoubleTab&, const DoubleTab&, DoubleTab&);
   void calculer_Mij(const DoubleTab&, const DoubleTab&, const DoubleVect&, DoubleTab&);
   void calculer_model_coefficient(const DoubleTab&, const DoubleTab&);
-  Champ_Fonc& calculer_viscosite_turbulente(const DoubleVect&, const DoubleVect&);
-  Champ_Fonc& calculer_viscosite_turbulente() override;
+  Champ_Fonc_base& calculer_viscosite_turbulente(const DoubleVect&, const DoubleVect&);
+  Champ_Fonc_base& calculer_viscosite_turbulente() override;
   void calculer_energie_cinetique_turb() override;
-  Champ_Fonc& calculer_energie_cinetique_turb(const DoubleVect&, const DoubleVect&);
+  Champ_Fonc_base& calculer_energie_cinetique_turb(const DoubleVect&, const DoubleVect&);
   void controler_grandeurs_turbulentes();
 
   void stabilise_moyenne(const DoubleTab&, const DoubleTab&);

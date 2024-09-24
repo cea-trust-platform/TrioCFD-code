@@ -406,7 +406,7 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   const DoubleTab& p = eqnNS.pression().valeurs();
   const Operateur_Grad& gradient = eqnNS.operateur_gradient();
   gradient.calculer(p, grad_p);
-  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente().valeurs();
 
 
   DoubleTab termes_sources;
@@ -953,7 +953,7 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const DoubleTab& p = eqnNS.pression().valeurs();
   const Operateur_Grad& gradient = eqnNS.operateur_gradient();
   gradient.calculer(p, grad_p);
-  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente().valeurs();
 
 
   DoubleTab termes_sources;

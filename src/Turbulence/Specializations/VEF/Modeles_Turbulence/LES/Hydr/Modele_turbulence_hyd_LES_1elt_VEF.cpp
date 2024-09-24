@@ -32,7 +32,7 @@ Sortie& Modele_turbulence_hyd_LES_1elt_VEF::printOn(Sortie& s) const { return s 
 
 Entree& Modele_turbulence_hyd_LES_1elt_VEF::readOn(Entree& s) { return Modele_turbulence_hyd_LES_VEF_base::readOn(s); }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_1elt_VEF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_1elt_VEF::calculer_viscosite_turbulente()
 {
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   double temps = mon_equation_->inconnue().temps();

@@ -66,7 +66,7 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::lire_motcle_non_standard(const Mot
     return Modele_turbulence_hyd_RANS_K_Eps_base::lire_motcle_non_standard(mot, is);
 }
 
-Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente(double temps)
+Champ_Fonc_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente(double temps)
 {
 
   const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue();

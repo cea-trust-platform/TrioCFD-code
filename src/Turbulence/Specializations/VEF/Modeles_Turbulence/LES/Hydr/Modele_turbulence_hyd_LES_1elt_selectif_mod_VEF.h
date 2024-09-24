@@ -44,7 +44,7 @@ public:
   void discretiser() override;
 
 protected:
-  Champ_Fonc la_vorticite_;
+  OWN_PTR(Champ_Fonc_base)  la_vorticite_;
   void cutoff();
   void calculer_angle_limite(const double, double&);
 };

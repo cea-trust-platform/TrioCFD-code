@@ -61,7 +61,7 @@ void Modele_turbulence_hyd_LES_DSGS_VDF::associer(const Domaine_dis_base& domain
   // model_coeff.resize(le_dom_VDF->nb_elem_tot());
 }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_DSGS_VDF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_DSGS_VDF::calculer_viscosite_turbulente()
 {
   double temps = mon_equation_->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();

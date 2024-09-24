@@ -25,7 +25,7 @@
 #include <Op_VEF_Face.h>
 #include <Domaine_VEF.h>
 #include <TRUST_Ref.h>
-#include <Champ_Fonc.h>
+
 
 
 
@@ -50,7 +50,7 @@ public:
   void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ,
                 const Champ_Inc_base& ) override;
   void associer_diffusivite_turbulente() override;
-  const Champ_Fonc& diffusivite_turbulente() const;
+  const Champ_Fonc_base& diffusivite_turbulente() const;
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline double viscA(int, int, int, double) const;

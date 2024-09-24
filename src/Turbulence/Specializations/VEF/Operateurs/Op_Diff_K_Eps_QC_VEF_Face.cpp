@@ -109,7 +109,7 @@ void Op_Diff_K_Eps_QC_VEF_Face::ajouter_contribution(const DoubleTab& transporte
   double  d_mu,Prdt[2];
   Prdt[0]=Prdt_K;
   Prdt[1]=Prdt_Eps;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
   const int nb_comp = transporte.line_size();
   assert(nb_comp==2);
 

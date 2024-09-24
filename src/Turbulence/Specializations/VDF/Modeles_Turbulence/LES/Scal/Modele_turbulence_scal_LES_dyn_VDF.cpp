@@ -169,16 +169,16 @@ void Modele_turbulence_scal_LES_dyn_VDF::mettre_a_jour(double)
 }
 
 //////////////////////////////////////////////////////////////////////
-Champ_Fonc& Modele_turbulence_scal_LES_dyn_VDF::calculer_diffusivite_turbulente()
+Champ_Fonc_base& Modele_turbulence_scal_LES_dyn_VDF::calculer_diffusivite_turbulente()
 {
   DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
   Equation_base& eq_NS_turb = equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_NS_turb.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base, modele_turbulence_hydr.valeur());
-  const Champ_Fonc& champ = mod_turb_hydr.viscosite_turbulente();
+  const Champ_Fonc_base& champ = mod_turb_hydr.viscosite_turbulente();
 
-  Debog::verifier("la_viscosite_turbulente", champ->valeurs());
-  double temps = champ->temps();
+  Debog::verifier("la_viscosite_turbulente", champ.valeurs());
+  double temps = champ.temps();
   int nb_elem_tot = le_dom_VDF->domaine().nb_elem_tot();
   DoubleTab l(nb_elem_tot);
   cell_cent_vel.resize(nb_elem_tot, dimension);

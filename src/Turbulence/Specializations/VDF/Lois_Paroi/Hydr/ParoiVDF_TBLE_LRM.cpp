@@ -510,7 +510,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   Mod_echelle_LRM_base& le_mod_ech= mod_ech.valeur();
 
-  const DoubleTab& nu_t = mon_modele_turb_hyd->viscosite_turbulente()->valeurs();
+  const DoubleTab& nu_t = mon_modele_turb_hyd->viscosite_turbulente().valeurs();
 
 
 
@@ -1432,7 +1432,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   Mod_echelle_LRM_base& le_mod_ech= mod_ech.valeur();
 
-  const DoubleTab& nu_t = mon_modele_turb_hyd->viscosite_turbulente()->valeurs();
+  const DoubleTab& nu_t = mon_modele_turb_hyd->viscosite_turbulente().valeurs();
 
 
 

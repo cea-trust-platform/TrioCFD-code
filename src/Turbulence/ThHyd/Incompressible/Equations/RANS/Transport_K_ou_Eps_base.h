@@ -70,7 +70,7 @@ public:
 protected:
 
   OWN_PTR(Champ_Inc_base) le_champ_;
-  Champ_Fonc residu_;
+  OWN_PTR(Champ_Fonc_base)  residu_;
 
   REF(Milieu_base) le_fluide;
   REF(Champ_Inc_base) la_vitesse_transportante;

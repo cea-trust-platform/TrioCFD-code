@@ -69,7 +69,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::associer_diffusivite_turbulente()
   double Prandtl_K, Prandtl_Eps;
   const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
   const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
-  const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+  const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
   Prandtl_K = mod_turb.get_Prandtl_K();
   Prandtl_Eps = mod_turb.get_Prandtl_Eps();
 
@@ -122,7 +122,7 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,  Double
   int elem;
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double valA, d_mu;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
   // On traite les faces bord :
   int n_bord;
@@ -279,7 +279,7 @@ void Op_Diff_K_Eps_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte
   int elem;
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double valA, d_mu,Prdt;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
   IntVect& tab1 = matrice.get_set_tab1();
   IntVect& tab2 = matrice.get_set_tab2();

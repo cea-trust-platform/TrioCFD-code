@@ -182,8 +182,8 @@ public:
 
 protected:
 
-  Champ_Fonc densite_particules_;   //Exprime le nombre de particules par maille
-  Champ_Fonc volume_particules_;    //Exprime le volume des particules par maille
+  OWN_PTR(Champ_Fonc_base)  densite_particules_;   //Exprime le nombre de particules par maille
+  OWN_PTR(Champ_Fonc_base)  volume_particules_;    //Exprime le volume des particules par maille
 
   double t_debut_integr_;            //Instant de demarrage de l integration
   double t_debut_inject_;            //Instant de la premiere injection

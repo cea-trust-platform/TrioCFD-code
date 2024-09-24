@@ -175,7 +175,7 @@ void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::mettre_a_jour(double temps)
   Debog::verifier("model_coeff", coeff_field_->valeurs());
   calculer_viscosite_turbulente(S_grid_scale_norme, l);
   calculer_energie_cinetique_turb(S_grid_scale_norme, l);
-  loipar_->calculer_hyd(la_viscosite_turbulente_->valeurs(), energie_cinetique_turbulente()->valeurs());
+  loipar_->calculer_hyd(la_viscosite_turbulente_->valeurs(), energie_cinetique_turbulente().valeurs());
   limiter_viscosite_turbulente();
   controler_grandeurs_turbulentes();
   coeff_field_->changer_temps(temps);
@@ -583,7 +583,7 @@ void Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_length_scale(DoubleVect& 
     }
 }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_viscosite_turbulente(const DoubleVect& SMA_barre, const DoubleVect& l)
+Champ_Fonc_base& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_viscosite_turbulente(const DoubleVect& SMA_barre, const DoubleVect& l)
 {
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   DoubleVect& model_coeff = coeff_field_->valeurs();
@@ -608,12 +608,12 @@ Champ_Fonc& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_viscosite_turbulen
   return la_viscosite_turbulente_;
 }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_viscosite_turbulente()
 {
   return la_viscosite_turbulente_;
 }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_energie_cinetique_turb(const DoubleVect& SMA_barre, const DoubleVect& l)
+Champ_Fonc_base& Modele_turbulence_hyd_LES_SMAGO_DYN_VDF::calculer_energie_cinetique_turb(const DoubleVect& SMA_barre, const DoubleVect& l)
 {
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   DoubleVect& model_coeff = coeff_field_->valeurs();

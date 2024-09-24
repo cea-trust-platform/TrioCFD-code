@@ -26,7 +26,7 @@
 #include <Transport_Fluctuation_Temperature.h>
 #include <Transport_Flux_Chaleur_Turbulente.h>
 #include <TRUST_Ref.h>
-#include <Champ_Fonc.h>
+
 
 class Modele_turbulence_scal_Fluctuation_Temperature :  public Modele_turbulence_scal_base
 {
@@ -39,7 +39,7 @@ public:
   bool initTimeStep(double dt) override;
   void mettre_a_jour(double ) override;
   void associer_eqn(const Equation_base&);
-  void associer_viscosite_turbulente(const Champ_Fonc& );
+  void associer_viscosite_turbulente(const Champ_Fonc_base& );
   inline Champ_Inc_base& Fluctu_Temperature();
   inline const Champ_Inc_base& Fluctu_Temperature() const;
   inline Champ_Inc_base& Flux_Chaleur_Turb();
@@ -70,8 +70,8 @@ private :
 
 
 protected :
-  REF(Champ_Fonc) la_viscosite_turbulente;
-  Champ_Fonc& calculer_diffusivite_turbulente();
+  REF(Champ_Fonc_base) la_viscosite_turbulente;
+  Champ_Fonc_base& calculer_diffusivite_turbulente();
   // nous n'avons plus alpha_turb = visco_turb/Prdt_turb
 };
 

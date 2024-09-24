@@ -112,7 +112,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
       const Transport_K_Eps_base& eqn_transport = ref_cast(Transport_K_Eps_base,mon_equation.valeur());
       {
         const Modele_turbulence_hyd_RANS_K_Eps_base& mod_turb = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base,eqn_transport.modele_turbulence());
-        const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+        const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
         Eval_Diff_K_Eps_VDF& eval_diff = dynamic_cast<Eval_Diff_K_Eps_VDF&> (iter->evaluateur());
         eval_diff.associer_diff_turb(diff_turb);
       }
@@ -122,7 +122,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
       const Transport_K_ou_Eps_base& eqn_transport = ref_cast(Transport_K_ou_Eps_base,mon_equation.valeur());
       {
         const Modele_turbulence_hyd_RANS_Bicephale_base& mod_turb = ref_cast(Modele_turbulence_hyd_RANS_Bicephale_base,eqn_transport.modele_turbulence());
-        const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+        const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
         if ( eqn_transport.transporte_t_il_K( ) )
           {
             Eval_Diff_K_VDF_Elem& eval_diff = static_cast<Eval_Diff_K_VDF_Elem&> (iter->evaluateur());
@@ -149,7 +149,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
   }
 }
 
-const Champ_Fonc& Op_Diff_K_Eps_VDF_base::diffusivite_turbulente() const
+const Champ_Fonc_base& Op_Diff_K_Eps_VDF_base::diffusivite_turbulente() const
 {
   const Eval_Diff_K_Eps_VDF& eval_diff = dynamic_cast<const Eval_Diff_K_Eps_VDF&> (iter->evaluateur());
   return eval_diff.diffusivite_turbulente();

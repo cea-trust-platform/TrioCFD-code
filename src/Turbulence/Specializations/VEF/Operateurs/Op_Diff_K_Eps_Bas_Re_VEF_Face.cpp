@@ -75,7 +75,7 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::associer_diffusivite_turbulente()
   assert(mon_equation.non_nul());
   const Transport_K_Eps_Bas_Reynolds& eqn_transport = ref_cast(Transport_K_Eps_Bas_Reynolds,mon_equation.valeur());
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_transport.modele_turbulence());
-  const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+  const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
   Op_Diff_K_Eps_Bas_Re_VEF_base::associer_diffusivite_turbulente(diff_turb);
 }
 
@@ -143,7 +143,7 @@ DoubleTab& Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter(const DoubleTab& inconnue,  Do
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   //  int nb_elem = domaine_VEF.domaine().nb_elem();
   double valA,valA_bis, d_mu;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
   // A la paroi les conditions sont:
   // Pour k on a 0
@@ -361,7 +361,7 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
   int elem;
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double valA, valA_bis, d_mu,Prdt;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
 
   IntVect& tab1 = matrice.get_set_tab1();

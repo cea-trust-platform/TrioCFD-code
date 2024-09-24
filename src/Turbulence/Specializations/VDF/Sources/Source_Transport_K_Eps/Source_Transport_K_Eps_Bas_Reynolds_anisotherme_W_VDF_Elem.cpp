@@ -51,10 +51,10 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter_blocs(m
   const Domaine_Cl_VDF& zcl_VDF = ref_cast(Domaine_Cl_VDF,zcl);
   const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs(), &scalaire = eq_thermique->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_Fluctuation_Temperature_W& modele_Fluctu = ref_cast(Modele_turbulence_scal_Fluctuation_Temperature_W,le_modele_scalaire);
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs();
+  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const Transport_Fluctuation_Temperature_W& monEqFluctu = modele_Fluctu.equation_Fluctu();
   const DoubleTab& Fluctu_Temperature = monEqFluctu.inconnue().valeurs(), &g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();

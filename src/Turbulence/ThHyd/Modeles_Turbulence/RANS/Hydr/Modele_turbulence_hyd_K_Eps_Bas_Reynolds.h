@@ -49,7 +49,7 @@ public:
 
   void imprimer(Sortie&) const override { /* Don nothing */ }
   void controler() { eqn_transport_K_Eps_Bas_Re_.controler_K_Eps(); }
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  virtual Champ_Fonc_base& calculer_viscosite_turbulente(double temps);
 
 private:
   Transport_K_Eps_Bas_Reynolds eqn_transport_K_Eps_Bas_Re_;

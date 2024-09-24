@@ -39,7 +39,7 @@ Sortie& Modele_turbulence_hyd_LES_Fst_VEF::printOn(Sortie& s) const { return s <
 
 Entree& Modele_turbulence_hyd_LES_Fst_VEF::readOn(Entree& is) { return Modele_turbulence_hyd_LES_VEF_base::readOn(is); }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_Fst_VEF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_Fst_VEF::calculer_viscosite_turbulente()
 {
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();

@@ -59,10 +59,10 @@ int Modele_turbulence_hyd_K_Eps_2_Couches::lire_motcle_non_standard(const Motcle
 /*! @brief Calcule la viscosite turbulente au temps demande.
  *
  * @param (double temps) le temps auquel il faut calculer la viscosite
- * @return (Champ_Fonc&) la viscosite turbulente au temps demande
+ * @return (Champ_Fonc_base&) la viscosite turbulente au temps demande
  * @throws erreur de taille de visco_turb_K_eps
  */
-Champ_Fonc& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente(double temps)
+Champ_Fonc_base& Modele_turbulence_hyd_K_Eps_2_Couches::calculer_viscosite_turbulente(double temps)
 {
   const Champ_base& chK_Eps = eqn_transport_K_Eps_.inconnue();
   Nom type = chK_Eps.que_suis_je();

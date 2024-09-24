@@ -23,7 +23,7 @@
 #define Convection_Diffusion_Temperature_FT_Disc_included
 
 #include <Convection_Diffusion_Temperature.h>
-#include <Champ_Fonc.h>
+
 #include <Champ_Don.h>
 #include <Assembleur_base.h>
 #include <TRUST_Ref.h>
@@ -116,9 +116,9 @@ protected:
   // Gradient normal de temperature a l'interface phase 0
   // (grad T scalaire normale a l'interface, normale dirigee
   //  vers la phase 1)
-  Champ_Fonc grad_t_;
-  Champ_Fonc mpoint_;
-  Champ_Fonc mpoint_uncorrected_;
+  OWN_PTR(Champ_Fonc_base)  grad_t_;
+  OWN_PTR(Champ_Fonc_base)  mpoint_;
+  OWN_PTR(Champ_Fonc_base)  mpoint_uncorrected_;
   OWN_PTR(Champ_Inc_base) vitesse_convection_;
 
   // To make a divergence-free velocity extension :

@@ -75,7 +75,7 @@ public:
   }
 
   template <typename EVAL_TYPE>
-  const Champ_Fonc& diffusivite_turbulente_impl() const
+  const Champ_Fonc_base& diffusivite_turbulente_impl() const
   {
     const EVAL_TYPE& eval_diff = static_cast<const EVAL_TYPE&> (iter->evaluateur());
     return eval_diff.diffusivite_turbulente();
@@ -103,7 +103,7 @@ void Op_Diff_K_Eps_Bas_Re_VDF_base::associer_diffusivite_turbulente_impl()
     {
       const Transport_K_KEps& eqn_transport = ref_cast(Transport_K_KEps,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps_2_Couches& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_2_Couches,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       EVAL_TYPE& eval_diff = static_cast<EVAL_TYPE&> (iter->evaluateur());
       eval_diff.associer_diff_turb(diff_turb);
     }
@@ -111,7 +111,7 @@ void Op_Diff_K_Eps_Bas_Re_VDF_base::associer_diffusivite_turbulente_impl()
     {
       const Transport_K_Eps_Bas_Reynolds& eqn_transport = ref_cast(Transport_K_Eps_Bas_Reynolds,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       EVAL_TYPE& eval_diff = static_cast<EVAL_TYPE&> (iter->evaluateur());
       eval_diff.associer_diff_turb(diff_turb);
     }
@@ -119,7 +119,7 @@ void Op_Diff_K_Eps_Bas_Re_VDF_base::associer_diffusivite_turbulente_impl()
     {
       const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       EVAL_TYPE2& eval_diff = static_cast<EVAL_TYPE2&> (iter->evaluateur());
       eval_diff.associer_diff_turb(diff_turb);
     }

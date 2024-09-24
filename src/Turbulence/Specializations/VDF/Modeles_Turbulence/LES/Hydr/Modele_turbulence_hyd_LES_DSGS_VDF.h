@@ -40,7 +40,7 @@ public:
   void associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis) override;
 
 protected:
-  Champ_Fonc coeff_field;
+  OWN_PTR(Champ_Fonc_base)  coeff_field;
   DoubleVect model_coeff;
 
   void calculer_cell_cent_vel(DoubleTab&);
@@ -51,7 +51,7 @@ protected:
   void calculer_Sij(const DoubleTab&, DoubleTab&);
   void calculer_Mij(const DoubleTab&, const DoubleTab&, DoubleTab&);
   void calculer_model_coefficient(const DoubleTab&, const DoubleTab&);
-  Champ_Fonc& calculer_viscosite_turbulente() override;
+  Champ_Fonc_base& calculer_viscosite_turbulente() override;
 };
 
 #endif /* Modele_turbulence_hyd_LES_DSGS_VDF_included */
