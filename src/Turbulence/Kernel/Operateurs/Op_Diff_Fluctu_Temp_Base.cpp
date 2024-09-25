@@ -69,7 +69,6 @@ void Op_Diff_Fluctu_Temp::typer()
   if (typ=="negligeable")
     {
       OWN_PTR(Op_Diff_Fluctu_Temp_Base)::typer("Op_Diff_Fluctu_Temp_negligeable");
-      valeur().associer_diffusivite_turbulente();
     }
   else
     {
@@ -83,9 +82,16 @@ void Op_Diff_Fluctu_Temp::typer()
         nom_type += "_Axi";
       OWN_PTR(Op_Diff_Fluctu_Temp_Base)::typer(nom_type);
       valeur().associer_eqn(equation());
-      valeur().associer_diffusivite_turbulente();
       Cerr << valeur().que_suis_je() << finl;
     }
+}
+
+void Op_Diff_Fluctu_Temp::completer()
+{
+  Operateur::completer();
+
+  /* XXX : Elie Saikali => j'associe ici apres la discr de la viscosite turb */
+  valeur().associer_diffusivite_turbulente();
 }
 
 

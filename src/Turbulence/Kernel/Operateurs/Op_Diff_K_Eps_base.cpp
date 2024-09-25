@@ -104,10 +104,7 @@ Entree& Op_Diff_K_Eps::readOn(Entree& s )
 void Op_Diff_K_Eps::typer()
 {
   if (typ=="negligeable")
-    {
-      OWN_PTR(Op_Diff_K_Eps_base)::typer("Op_Diff_K_Eps_negligeable");
-      valeur().associer_diffusivite_turbulente();
-    }
+    OWN_PTR(Op_Diff_K_Eps_base)::typer("Op_Diff_K_Eps_negligeable");
   else
     {
       Nom nom_type="Op_Diff_K_Eps_";
@@ -161,7 +158,6 @@ void Op_Diff_K_Eps::typer()
             }
           OWN_PTR(Op_Diff_K_Eps_base)::typer(nom_type);
           valeur().associer_eqn(equation());
-          valeur().associer_diffusivite_turbulente();
           valeur().associer_diffusivite(diffusivite());
           Cerr << valeur().que_suis_je() << finl;
         }
@@ -195,13 +191,19 @@ void Op_Diff_K_Eps::typer()
             }
           OWN_PTR(Op_Diff_K_Eps_base)::typer(nom_type);
           valeur().associer_eqn(equation());
-          valeur().associer_diffusivite_turbulente();
           valeur().associer_diffusivite(diffusivite());
           Cerr << valeur().que_suis_je() << finl;
         }
     }
 }
 
+void Op_Diff_K_Eps::completer()
+{
+  Operateur::completer();
+
+  /* XXX : Elie Saikali => j'associe ici apres la discr de la viscosite turb */
+  valeur().associer_diffusivite_turbulente();
+}
 /*! @brief Appel a l'objet sous-jacent.
  *
  * Ajoute la contribution de l'operateur au tableau

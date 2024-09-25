@@ -89,10 +89,10 @@ public:
 
   inline Operateur_base& l_op_base() override;
   inline const Operateur_base& l_op_base() const override;
-  inline void associer_diffusivite_turbulente();
   inline DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
   inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   void typer() override;
+  void completer() override;
   inline int op_non_nul() const override;
 
 
@@ -125,7 +125,6 @@ inline DoubleTab& Op_Diff_Flux_Chaleur_Turb_negligeable::calculer(const DoubleTa
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::contribuer_a_avec(const DoubleTab& inco,
                                                                      Matrice_Morse& matrice) const
 {
-  ;
 }
 
 /*! @brief on ajoute la contribution du second membre.
@@ -133,28 +132,21 @@ inline void Op_Diff_Flux_Chaleur_Turb_negligeable::contribuer_a_avec(const Doubl
  */
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::contribuer_au_second_membre(DoubleTab& resu) const
 {
-  ;
 }
 
 // Modification des Cl
 inline void  Op_Diff_Flux_Chaleur_Turb_negligeable::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& resu) const
 {
-  ;
 }
 
 inline void  Op_Diff_Flux_Chaleur_Turb_negligeable::dimensionner(Matrice_Morse& matrice) const
 {
-  ;
 }
 
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::associer_diffusivite_turbulente()
 {
-  ;
 }
 
-/*! @brief
- *
- */
 inline Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base()
 {
   if(!non_nul())
@@ -162,19 +154,11 @@ inline Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base()
   return valeur();
 }
 
-/*! @brief
- *
- */
 inline const Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base() const
 {
   if(!non_nul())
     Cerr << "Op_Diff_Flux_Chaleur_Turb n'a pas ete typer" << finl;
   return valeur();
-}
-
-inline void Op_Diff_Flux_Chaleur_Turb::associer_diffusivite_turbulente()
-{
-  valeur().associer_diffusivite_turbulente();
 }
 
 inline DoubleTab& Op_Diff_Flux_Chaleur_Turb::ajouter(const DoubleTab& inconnue, DoubleTab& resu) const

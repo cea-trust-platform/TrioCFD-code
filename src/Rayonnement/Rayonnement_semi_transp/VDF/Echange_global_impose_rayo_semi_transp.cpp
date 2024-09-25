@@ -71,7 +71,7 @@ Entree& Echange_global_impose_rayo_semi_transp::readOn(Entree& is)
           }
         case 1:
           {
-            is >> T_ext();
+            is >> le_champ_front;
             break;
           }
         default:

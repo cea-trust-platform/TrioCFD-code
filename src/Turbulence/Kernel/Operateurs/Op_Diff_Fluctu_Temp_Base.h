@@ -88,13 +88,11 @@ public:
 
   inline Operateur_base& l_op_base() override;
   inline const Operateur_base& l_op_base() const override;
-  inline void associer_diffusivite_turbulente();
   inline DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
   inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   void typer() override;
   inline int op_non_nul() const override;
-
-
+  void completer() override;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -124,7 +122,6 @@ inline DoubleTab& Op_Diff_Fluctu_Temp_negligeable::calculer(const DoubleTab& x, 
 inline void Op_Diff_Fluctu_Temp_negligeable::contribuer_a_avec(const DoubleTab& inco,
                                                                Matrice_Morse& matrice) const
 {
-  ;
 }
 
 /*! @brief on ajoute la contribution du second membre.
@@ -132,28 +129,21 @@ inline void Op_Diff_Fluctu_Temp_negligeable::contribuer_a_avec(const DoubleTab& 
  */
 inline void Op_Diff_Fluctu_Temp_negligeable::contribuer_au_second_membre(DoubleTab& resu) const
 {
-  ;
 }
 
 // Modification des Cl
 inline void  Op_Diff_Fluctu_Temp_negligeable::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& resu) const
 {
-  ;
 }
 
 inline void  Op_Diff_Fluctu_Temp_negligeable::dimensionner(Matrice_Morse& matrice) const
 {
-  ;
 }
 
 inline void Op_Diff_Fluctu_Temp_negligeable::associer_diffusivite_turbulente()
 {
-  ;
 }
 
-/*! @brief
- *
- */
 inline Operateur_base& Op_Diff_Fluctu_Temp::l_op_base()
 {
   if(!non_nul())
@@ -169,11 +159,6 @@ inline const Operateur_base& Op_Diff_Fluctu_Temp::l_op_base() const
   if(!non_nul())
     Cerr << "Op_Diff_Fluctu_Temp n'a pas ete typer" << finl;
   return valeur();
-}
-
-inline void Op_Diff_Fluctu_Temp::associer_diffusivite_turbulente()
-{
-  valeur().associer_diffusivite_turbulente();
 }
 
 inline DoubleTab& Op_Diff_Fluctu_Temp::ajouter(const DoubleTab& inconnue, DoubleTab& resu) const

@@ -111,12 +111,12 @@ public:
 
   inline Operateur_base& l_op_base() override;
   inline const Operateur_base& l_op_base() const override;
-  inline void associer_diffusivite_turbulente();
   inline DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
   inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline Champ_base& associer_diffusivite(const Champ_base&);
   inline const Champ_base& diffusivite() const;
   void typer() override;
+  void completer() override;
   inline int op_non_nul() const override;
 
 protected :
@@ -171,14 +171,9 @@ inline DoubleTab& Op_Diff_K_Eps_Bas_Re_negligeable::calculer(const DoubleTab& x,
   return Operateur_negligeable::calculer(x,y);
 }
 
-
-/*! @brief NE FAIT RIEN
- *
- */
 inline void Op_Diff_K_Eps_Bas_Re_negligeable::contribuer_a_avec(const DoubleTab& inco,
                                                                 Matrice_Morse& matrice) const
 {
-  ;
 }
 
 /*! @brief on ajoute la contribution du second membre.
@@ -186,23 +181,19 @@ inline void Op_Diff_K_Eps_Bas_Re_negligeable::contribuer_a_avec(const DoubleTab&
  */
 inline void Op_Diff_K_Eps_Bas_Re_negligeable::contribuer_au_second_membre(DoubleTab& resu) const
 {
-  ;
 }
 
 // Modification des Cl
 inline void  Op_Diff_K_Eps_Bas_Re_negligeable::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& resu) const
 {
-  ;
 }
 
 inline void  Op_Diff_K_Eps_Bas_Re_negligeable::dimensionner(Matrice_Morse& matrice) const
 {
-  ;
 }
 
 inline void Op_Diff_K_Eps_Bas_Re_negligeable::associer_diffusivite_turbulente()
 {
-  ;
 }
 
 /*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base
@@ -228,16 +219,6 @@ inline const Operateur_base& Op_Diff_K_Eps_Bas_Re::l_op_base() const
     Cerr << "Op_Diff_K_Eps_Bas_Re n'a pas ete typer" << finl;
   return valeur();
 }
-
-
-/*! @brief Appel a l'objet sous-jacent.
- *
- */
-inline void Op_Diff_K_Eps_Bas_Re::associer_diffusivite_turbulente()
-{
-  valeur().associer_diffusivite_turbulente();
-}
-
 
 /*! @brief Appel a l'objet sous-jacent.
  *

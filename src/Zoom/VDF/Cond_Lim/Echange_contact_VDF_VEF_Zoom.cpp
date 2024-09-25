@@ -102,7 +102,7 @@ Sortie& Echange_contact_VDF_VEF_Zoom::printOn(Sortie& s ) const
 Entree& Echange_contact_VDF_VEF_Zoom::readOn(Entree& s )
 {
 
-  s >> T_ext();
+  s >> le_champ_front;
 
   h_paroi=1.e30;
   // GF on le type plus tard

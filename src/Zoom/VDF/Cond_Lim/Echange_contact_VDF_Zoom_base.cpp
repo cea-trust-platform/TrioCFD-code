@@ -56,7 +56,7 @@ Entree& Echange_contact_VDF_Zoom_base::readOn(Entree& s )
           }
         case 1:
           {
-            s >> T_ext();
+            s >> le_champ_front;
             break;
           }
         default:
