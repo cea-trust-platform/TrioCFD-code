@@ -1783,7 +1783,7 @@ void IJK_Thermal_base::calculer_source_temperature_ana()
       Cerr << " " << err ;
       if (!Process::je_suis_maitre())
         {
-          Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_SOURCE_TEMPERATURE_ANA sur ce proc (ni,nj,nk,ntot):"
+          Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : OWN_PTR(Champ_base) ECART_SOURCE_TEMPERATURE_ANA sur ce proc (ni,nj,nk,ntot):"
                              << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
         }
       // ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());
@@ -1918,7 +1918,7 @@ void IJK_Thermal_base::calculer_ecart_T_ana()
       Cerr << " " << err ;
       if (!Process::je_suis_maitre())
         {
-          Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_T_ANA sur ce proc (ni,nj,nk,ntot):"
+          Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : OWN_PTR(Champ_base) ECART_T_ANA sur ce proc (ni,nj,nk,ntot):"
                              << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
         }
       ecart_t_ana_.echange_espace_virtuel(ecart_t_ana_.ghost());

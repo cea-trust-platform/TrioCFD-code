@@ -541,7 +541,7 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
         {
           const Fluide_Diphasique& fluide_diph = ref_cast(Fluide_Diphasique,mil);
           const Fluide_Incompressible& fluide = fluide_diph.fluide_phase(phase_marquee_);
-          const DoubleTab& rho = fluide.masse_volumique()->valeurs();
+          const DoubleTab& rho = fluide.masse_volumique().valeurs();
           const DoubleTab& visco_dyn = fluide.viscosite_dynamique()->valeurs();
           rho_fluide_som_ = rho(0,0);
           visco_dyn_fluide_som_ = visco_dyn(0,0);
@@ -549,7 +549,7 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
       else
         {
           const Fluide_base& fluide = ref_cast(Fluide_base,mil);
-          const DoubleTab& rho = fluide.masse_volumique()->valeurs();
+          const DoubleTab& rho = fluide.masse_volumique().valeurs();
           const DoubleTab& visco_dyn = fluide.viscosite_dynamique()->valeurs();
           rho_fluide_som_ = rho(0,0);
           visco_dyn_fluide_som_ = visco_dyn(0,0);
@@ -574,7 +574,7 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
   else
     {
       const Fluide_base& fluide = ref_cast(Fluide_base,eq_ns.milieu());
-      const Champ_base& champ_masse_vol =  fluide.masse_volumique().valeur();
+      const Champ_base& champ_masse_vol =  fluide.masse_volumique();
       const Champ_base& champ_visco_dyn =  fluide.viscosite_dynamique().valeur();
 
       DoubleTab& les_positions = tableaux_positions();
@@ -860,7 +860,7 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
 {
   int phase_transfo = (phase_marquee_==0?1:0);
   const Fluide_Diphasique& fluide_diph = ref_cast(Fluide_Diphasique,probleme().equation(0).milieu());
-  const DoubleTab& rho = fluide_diph.fluide_phase(phase_transfo).masse_volumique()->valeurs();
+  const DoubleTab& rho = fluide_diph.fluide_phase(phase_transfo).masse_volumique().valeurs();
   double rho_val = rho(0,0);
 
   const int dim = positions.dimension(1);

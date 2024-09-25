@@ -255,7 +255,7 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqn
 
   int size=volumes_entrelaces.size_totale();
   // Si rho n'est pas constant
-  const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique()->valeurs();
+  const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique().valeurs();
   if(masse_volumique.size_totale()==size)
     {
       for (int face=0; face<size; face++)
@@ -280,7 +280,7 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vdf(Navier_Stokes_std& eqn
   const DoubleVect& volumes_entrelaces=le_dom.volumes_entrelaces();
   int size=volumes_entrelaces.size_totale();
   // Si rho n'est pas constant
-  const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique()->valeurs();
+  const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique().valeurs();
   if(masse_volumique.size_totale()==size)
     {
       for (int face=0; face<size; face++)

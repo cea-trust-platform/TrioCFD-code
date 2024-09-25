@@ -174,7 +174,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
           //                 tab(face,i) = 1./(e(face)/lambda(face,i)+1./h_paroi);
           //               }
           //         }
-          //       else  // la conductivite est un Champ uniforme
+          //       else  // la conductivite est un OWN_PTR(Champ_base) uniforme
           //         {
           //           //Cerr << "cas d'une conductivite uniforme " << finl;
           //           const DoubleTab& lambda = le_milieu.conductivite().valeurs();
@@ -291,7 +291,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
                       }
                   }
             }
-          else  // la conductivite est un Champ uniforme
+          else  // la conductivite est un OWN_PTR(Champ_base) uniforme
             {
               //Cerr << "raccord local homogene et conductivite uniforme " << finl;
               assert(h_paroi!=0.);

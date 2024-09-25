@@ -343,7 +343,7 @@ void Navier_Stokes_phase_field::discretiser()
   //   (et non pas creer_champ/completer comme pour la masse volumique sinon probleme dans terme_diffusif.associer_diffusivite dans Navier_Stokes_std::lire_motcle_non_standard)
   // afin que les options boussi_ et diff_boussi_ soient connues
 
-  const DoubleTab& rho0Tab=le_fluide->masse_volumique()->valeurs();
+  const DoubleTab& rho0Tab=le_fluide->masse_volumique().valeurs();
   int dim=rho0Tab.nb_dim();
   switch(dim)
     {

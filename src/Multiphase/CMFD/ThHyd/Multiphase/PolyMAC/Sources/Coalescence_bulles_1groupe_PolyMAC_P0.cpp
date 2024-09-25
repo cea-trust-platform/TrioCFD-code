@@ -95,7 +95,7 @@ void Coalescence_bulles_1groupe_PolyMAC_P0::ajouter_blocs(matrices_t matrices, D
                      &alpha_p = pbm.equation_masse().inconnue().passe(),
                       &press_p = ref_cast(QDM_Multiphase,pbm.equation_qdm()).pression().passe(),
                        &temp_p  = pbm.equation_energie().inconnue().passe(),
-                        &rho_p   = equation().milieu().masse_volumique()->passe(),
+                        &rho_p   = equation().milieu().masse_volumique().passe(),
                          &nu_p = equation().probleme().get_champ("viscosite_cinematique").passe(),
                           *tab_k_p = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").passe() : nullptr,
                            *tab_k = equation().probleme().has_champ("k") ? &equation().probleme().get_champ("k").valeurs() : nullptr,

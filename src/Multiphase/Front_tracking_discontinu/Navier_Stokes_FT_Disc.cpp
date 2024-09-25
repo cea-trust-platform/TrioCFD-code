@@ -60,8 +60,8 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Domaine_dis_base& doma
 {
   const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
-  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
   const double rho_phase_0 = tab_rho_phase_0(0, 0);
   const double rho_phase_1 = tab_rho_phase_1(0, 0);
   const double delta_rho = rho_phase_1 - rho_phase_0;
@@ -150,7 +150,7 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis,
 
   if (sub_type(Champ_Uniforme,champ_rho_elem_) && (sub_type(Champ_Uniforme, champ_nu_.valeur())))
     {
-      const DoubleTab& tab_rho_phase_0 = fluide.masse_volumique()->valeurs();
+      const DoubleTab& tab_rho_phase_0 = fluide.masse_volumique().valeurs();
       const double rho = tab_rho_phase_0(0, 0);
       const DoubleTab& tab_nu_phase_0 = fluide.viscosite_cinematique()->valeurs();
       const double nu = tab_nu_phase_0(0, 0);
@@ -181,7 +181,7 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis,
       DoubleTab& val_mu = champ_mu_->valeurs();
       DoubleTab& val_rho_faces = champ_rho_faces.valeurs();
 
-      fluide.masse_volumique()->valeur_aux_elems(cg, les_polys, val_rho);
+      fluide.masse_volumique().valeur_aux_elems(cg, les_polys, val_rho);
       fluide.viscosite_dynamique()->valeur_aux_elems(cg, les_polys, val_mu);
       val_rho.echange_espace_virtuel();
       val_mu.echange_espace_virtuel();
@@ -1006,8 +1006,8 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
       {
         if (milieu().a_gravite())
           {
-            const double rho_0 = fluide_dipha.fluide_phase(0).masse_volumique()->valeurs()(0, 0);
-            const double rho_1 = fluide_dipha.fluide_phase(1).masse_volumique()->valeurs()(0, 0);
+            const double rho_0 = fluide_dipha.fluide_phase(0).masse_volumique().valeurs()(0, 0);
+            const double rho_1 = fluide_dipha.fluide_phase(1).masse_volumique().valeurs()(0, 0);
             const double delta_rho = rho_1 - rho_0;
 
             // Pour l'instant : gravite uniforme g => phi(s) = - x scalaire g
@@ -1680,8 +1680,8 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0, int
   const Fluide_Diphasique& fluide_dipha = fluide_diphasique();
   const Fluide_Incompressible& phase_0 = fluide_dipha.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide_dipha.fluide_phase(1);
-  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
-  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
   const double rho_0 = tab_rho_phase_0(0, 0);
   const double rho_1 = tab_rho_phase_1(0, 0);
   //const double delta_un_sur_rho = 1. / rho_1 - 1. / rho_0;
@@ -2142,8 +2142,8 @@ void correct_indicatrice_face_bord(const int num_face, const Maillage_FT_Disc& m
 // INTERP_MODIFIEE et AI_BASED qui recalculent indicatrice_faces.
 void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
 {
-  const double rho_0 = fluide_diphasique().fluide_phase(0).masse_volumique()->valeurs()(0, 0);
-  const double rho_1 = fluide_diphasique().fluide_phase(1).masse_volumique()->valeurs()(0, 0);
+  const double rho_0 = fluide_diphasique().fluide_phase(0).masse_volumique().valeurs()(0, 0);
+  const double rho_1 = fluide_diphasique().fluide_phase(1).masse_volumique().valeurs()(0, 0);
   const double delta_rho = rho_0 - rho_1;
 
   double rho_0_sur_delta_rho = 0.;
@@ -2475,8 +2475,8 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
           const Fluide_Diphasique& fluide = fluide_diphasique();
           const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
           const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-          const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
-          const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
+          const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+          const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
           const double rho_phase_0 = tab_rho_phase_0(0,0);
           const double rho_phase_1 = tab_rho_phase_1(0,0);
           const double jump_inv_rho = 1./rho_phase_1 - 1./rho_phase_0;
@@ -3294,8 +3294,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       const Fluide_Diphasique& fluide_diph = fluide_diphasique();
       const Fluide_Incompressible& phase_0 = fluide_diph.fluide_phase(0);
       const Fluide_Incompressible& phase_1 = fluide_diph.fluide_phase(1);
-      const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
-      const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
+      const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+      const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
       const double rho_phase_0 = tab_rho_phase_0(0, 0);
       const double rho_phase_1 = tab_rho_phase_1(0, 0);
       const double jump_inv_rho = 1. / rho_phase_1 - 1. / rho_phase_0;

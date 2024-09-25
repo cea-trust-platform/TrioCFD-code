@@ -79,7 +79,7 @@ void Injection_QDM_nulle_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTa
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir();
 
   const DoubleTab& vit = ch.valeurs(),
-                   &rho   = equation().milieu().masse_volumique()->passe(), // passe car qdm
+                   &rho   = equation().milieu().masse_volumique().passe(), // passe car qdm
                     &alpha = cha.passe();
 
   Matrice_Morse *mat = matrices.count(ch.le_nom().getString()) ? matrices.at(ch.le_nom().getString()) : nullptr; // Derivee locale/QDM

@@ -155,7 +155,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   const Milieu_base& le_milieu_fluide = eqn_hydr.milieu();
   const Champ_Don& ch_lambda = le_milieu_fluide.conductivite();
   const Champ_Don& ch_Cp = le_milieu_fluide.capacite_calorifique();
-  const Champ& ch_rho = le_milieu_fluide.masse_volumique();
+  const Champ_base& ch_rho = le_milieu_fluide.masse_volumique();
   const DoubleTab& lambda_f = ch_lambda->valeurs();
   const DoubleTab& Cp_f     = ch_Cp->valeurs();
   const DoubleTab& rho_f    = ch_rho->valeurs();
@@ -254,7 +254,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
               const Milieu_base& le_milieu_solide=ch_solide.milieu();
               const DoubleTab& lambda_s = le_milieu_solide.conductivite()->valeurs();
               const DoubleTab& Cp_s     = le_milieu_solide.capacite_calorifique()->valeurs();
-              const DoubleTab& rho_s    = le_milieu_solide.masse_volumique()->valeurs();
+              const DoubleTab& rho_s    = le_milieu_solide.masse_volumique().valeurs();
 
               double K;
               for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -327,7 +327,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Champ_Don& ch_visco_cin            = le_fluide.viscosite_cinematique();
   const Milieu_base& le_milieu_fluide      = eqn_hydr.milieu();
   const DoubleTab& lambda_f                = le_milieu_fluide.conductivite()->valeurs();
-  const double rhoCp = le_milieu_fluide.capacite_calorifique()->valeurs()(0, 0) * le_milieu_fluide.masse_volumique()->valeurs()(0, 0);
+  const double rhoCp = le_milieu_fluide.capacite_calorifique()->valeurs()(0, 0) * le_milieu_fluide.masse_volumique().valeurs()(0, 0);
 
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems,1);

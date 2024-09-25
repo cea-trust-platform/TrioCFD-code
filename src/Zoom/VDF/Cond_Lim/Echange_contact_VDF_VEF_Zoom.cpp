@@ -251,7 +251,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
                     if (cumulSurfaces(face)>0.) tab(face,i) = tab(face,i)/ cumulSurfaces(face);
                 }
             }
-          else  // la conductivite est un Champ uniforme
+          else  // la conductivite est un OWN_PTR(Champ_base) uniforme
             {
               assert(h_paroi!=0.);
               const DoubleTab& lambda = le_milieu->conductivite()->valeurs();

@@ -164,7 +164,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme_concen(DoubleTab&
   // voila dans Source_Transport_K_Eps_Realisable_aniso_therm_concen_VEF_Face
   // const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   DoubleTab alpha_turb(le_modele_scalaire.conductivite_turbulente().valeurs());
-  double rhocp = eq_thermique->milieu().capacite_calorifique()->valeurs()(0, 0) * eq_thermique->milieu().masse_volumique()->valeurs()(0, 0);
+  double rhocp = eq_thermique->milieu().capacite_calorifique()->valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
   alpha_turb /= rhocp;
   const DoubleVect& g = gravite->valeurs(), &volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   const Champ_Don& ch_beta_temper = beta_t.valeur(), &ch_beta_concen = beta_c.valeur();

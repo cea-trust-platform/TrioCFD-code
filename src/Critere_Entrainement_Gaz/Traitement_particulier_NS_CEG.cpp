@@ -597,7 +597,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
                           file << " x= " << x << " y= " << y << " z= " << z;
                         }
                       file << finl;
-                      file << "# Champ CRITERE" << finl;
+                      file << "# OWN_PTR(Champ_base) CRITERE" << finl;
                       file << "# Type POINTS" << finl;
                       file << sch.temps_courant();
                       //for (int i_theta=0;i_theta<nb_dtheta;i_theta++) file << " " << Critere_max(critere);
@@ -616,7 +616,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
                   file << "# Temps";
                   for (int vortex=0; vortex<nb_vortex; vortex++) file << " x= " << Centre(vortex,0) << " y= " << Centre(vortex,1) << " z= " << Centre(vortex,2)+2*R0;
                   file << finl;
-                  file << "# Champ RAYON" << finl;
+                  file << "# OWN_PTR(Champ_base) RAYON" << finl;
                   file << "# Type POINTS" << finl;
                   file << sch.temps_courant();
                   for (int vortex=0; vortex<nb_vortex; vortex++) file << " " << Rayon[vortex];

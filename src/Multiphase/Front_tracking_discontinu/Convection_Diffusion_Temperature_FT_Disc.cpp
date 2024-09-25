@@ -613,7 +613,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
   //const DoubleTab& indicatrice_passe = ch_indic.passe();
   DoubleTab& temperature = inconnue().valeurs();
   const DoubleTab& temperature_passe = inconnue().passe();
-  const double rhocp = fluide_dipha_->fluide_phase(phase_).masse_volumique()->valeurs()(0,0)
+  const double rhocp = fluide_dipha_->fluide_phase(phase_).masse_volumique().valeurs()(0,0)
                        * fluide_dipha_->fluide_phase(phase_).capacite_calorifique()->valeurs()(0,0);
 
   const int nb_elem = mixed_elems_.size_array();

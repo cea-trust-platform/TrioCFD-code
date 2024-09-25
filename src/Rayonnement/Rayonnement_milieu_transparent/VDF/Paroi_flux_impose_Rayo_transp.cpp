@@ -124,11 +124,11 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
   double d_Lambda=0;
   double d_Cp =0;
 
-  const DoubleTab& rho=le_milieu.masse_volumique()->valeurs();
+  const DoubleTab& rho=le_milieu.masse_volumique().valeurs();
   const DoubleTab& Lambda = le_milieu.conductivite()->valeurs();
   const DoubleTab& Cp = le_milieu.capacite_calorifique()->valeurs();
 
-  if (sub_type(Champ_Uniforme,le_milieu.masse_volumique().valeur()))
+  if (sub_type(Champ_Uniforme,le_milieu.masse_volumique()))
     {
       is_rho_unif=1;
 

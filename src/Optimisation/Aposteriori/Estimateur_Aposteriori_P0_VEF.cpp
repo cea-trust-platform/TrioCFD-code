@@ -74,7 +74,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   Navier_Stokes_Aposteriori& eq = ref_cast(Navier_Stokes_Aposteriori,vitesse_->equation());
   //const Sources& sources_eq =  eq.sources();
 
-  Champ espace_stockage;
+  OWN_PTR(Champ_base) espace_stockage;
   const Champ_base& ch_bs = eq.get_champ_source().get_champ(espace_stockage);
   const DoubleTab& src = ch_bs.valeurs();
 

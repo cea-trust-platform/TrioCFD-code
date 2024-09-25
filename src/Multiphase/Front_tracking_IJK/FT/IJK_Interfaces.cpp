@@ -4133,8 +4133,8 @@ void IJK_Interfaces::convert_to_IntVect(const ArrOfInt& in, IntVect& out) const
 // Ajout d'un terme en d(rho*v)/dt
 // delta_rho = rho_liq - rho_vap
 // la variable vpoint correspond a d(v)/dt, ou v correspond a nptquel valeur
-// vrepul : Champ etendu de potentiel de repulsion seul
-// vabsrepul : Champ etendu de la valeur absolue des repulsions.
+// vrepul : OWN_PTR(Champ_base) etendu de potentiel de repulsion seul
+// vabsrepul : OWN_PTR(Champ_base) etendu de la valeur absolue des repulsions.
 void IJK_Interfaces::ajouter_terme_source_interfaces(
   FixedVector<IJK_Field_double, 3>& vpoint,
   FixedVector<IJK_Field_double, 3>& vrepul,

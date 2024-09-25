@@ -252,7 +252,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
                       }
                   }
             }
-          else  // la conductivite est un Champ uniforme
+          else  // la conductivite est un OWN_PTR(Champ_base) uniforme
             {
               assert(h_paroi!=0.);
               const DoubleTab& lambda = le_milieu->conductivite()->valeurs();

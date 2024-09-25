@@ -89,7 +89,7 @@ DoubleTab& Source_Reaction_Particules_VEF::ajouter(DoubleTab& resu) const
   if (sub_type(Navier_Stokes_FT_Disc,equation()))
     is_FT = 1;
 
-  const Champ_base& champ_rho = (is_FT==1?ref_cast(Navier_Stokes_FT_Disc,equation()).champ_rho_faces():equation().milieu().masse_volumique().valeur());
+  const Champ_base& champ_rho = (is_FT==1?ref_cast(Navier_Stokes_FT_Disc,equation()).champ_rho_faces():equation().milieu().masse_volumique());
   const DoubleTab& rho_faces = champ_rho.valeurs();
 
   //Remplissage de source_som (interpolation de source_stockage aux sommets)

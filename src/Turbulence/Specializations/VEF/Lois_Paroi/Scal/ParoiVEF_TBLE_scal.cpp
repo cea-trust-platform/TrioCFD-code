@@ -302,7 +302,7 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   int elem;
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_temp.probleme().equation(0).milieu());
-  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique()->valeurs()(0, 0);
+  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
   const Champ_Don& alpha = le_fluide.diffusivite();
   DoubleTab alpha_t = diffusivite_turb.valeurs();
 

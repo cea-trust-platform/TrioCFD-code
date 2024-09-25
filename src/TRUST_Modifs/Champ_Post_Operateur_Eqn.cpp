@@ -105,7 +105,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
   if (sub_type(Champ_Generique_refChamp,get_source(0)))
     {
 
-      Champ espace_stockage;
+      OWN_PTR(Champ_base) espace_stockage;
       const Champ_base& mon_champ = get_source(0).get_champ(espace_stockage);
       if (sub_type(Champ_Inc_base,mon_champ))
         {
@@ -212,13 +212,13 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
   verification_cas_compo();
 }
 
-const Champ_base& Champ_Post_Operateur_Eqn::get_champ_without_evaluation(Champ& espace_stockage) const
+const Champ_base& Champ_Post_Operateur_Eqn::get_champ_without_evaluation(Champ_base& espace_stockage) const
 {
   espace_stockage = ref_eq_->inconnue();
   return espace_stockage;
 }
 
-const Champ_base& Champ_Post_Operateur_Eqn::get_champ_compo_without_evaluation(Champ& espace_stockage) const
+const Champ_base& Champ_Post_Operateur_Eqn::get_champ_compo_without_evaluation(Champ_base& espace_stockage) const
 {
 
   OWN_PTR(Champ_Fonc_base)  espace_stockage_fonc;
@@ -246,15 +246,15 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ_compo_without_evaluation(C
   int nb_comp = 1;
   ref_eq_->discretisation().discretiser_champ(directive,ref_eq_->domaine_dis(),"oooo","unit", nb_comp,temps,espace_stockage_fonc);
   espace_stockage = espace_stockage_fonc;
-  espace_stockage->fixer_nature_du_champ(scalaire);
+  espace_stockage.fixer_nature_du_champ(scalaire);
 
   return espace_stockage;
 }
 
-const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) const
+const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ_base& espace_stockage) const
 {
   // On commence par construire le champ vectoriel complet
-  Champ espace_stockage_complet;
+  OWN_PTR(Champ_base) espace_stockage_complet;
   espace_stockage_complet = get_champ_without_evaluation(espace_stockage_complet);
   DoubleTab& es = (espace_stockage_complet->valeurs());
 
@@ -286,7 +286,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
   if (compo_>-1)
     {
       // on prepare l'espace de stockage pour une composante
-      Champ espace_stockage_compo;
+      OWN_PTR(Champ_base) espace_stockage_compo;
       espace_stockage_compo = get_champ_compo_without_evaluation(espace_stockage_compo);
       DoubleTab& es_compo = (espace_stockage_compo->valeurs());
       int nb_pos = es.dimension(0);
@@ -299,7 +299,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
   else
     espace_stockage = espace_stockage_complet;
 
-  return espace_stockage.valeur();
+  return espace_stockage;
 }
 
 const Noms Champ_Post_Operateur_Eqn::get_property(const Motcle& query) const

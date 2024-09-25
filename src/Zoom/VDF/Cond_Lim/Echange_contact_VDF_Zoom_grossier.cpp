@@ -206,7 +206,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
           //                 tab(face,i) = 1./(e(face)/lambda(face,i)+1./h_paroi);
           //               }
           //         }
-          //       else  // la conductivite est un Champ uniforme
+          //       else  // la conductivite est un OWN_PTR(Champ_base) uniforme
           //         {
           //           //Cerr << "cas d'une conductivite uniforme " << finl;
           //           const DoubleTab& lambda = le_milieu.conductivite().valeurs();
@@ -379,7 +379,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
                     if (cumulSurfaces(nb_face_frontG)>0.) tab(nb_face_frontG,i) = tab(nb_face_frontG,i)/ cumulSurfaces(nb_face_frontG);
                 }
             }
-          else  // la conductivite est un Champ uniforme
+          else  // la conductivite est un OWN_PTR(Champ_base) uniforme
             {
               assert(h_paroi!=0.);
               const DoubleTab& lambda = le_milieu->conductivite()->valeurs();

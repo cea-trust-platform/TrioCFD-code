@@ -144,7 +144,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
   {
     Eval_Diff_K_Eps_VDF& eval_diff = dynamic_cast<Eval_Diff_K_Eps_VDF&> (iter->evaluateur());
     const Fluide_base& mil = ref_cast(Fluide_base,mon_equation->milieu());
-    const Champ_base& mvol = mil.masse_volumique().valeur();
+    const Champ_base& mvol = mil.masse_volumique();
     eval_diff.associer_mvolumique(mvol);
   }
 }

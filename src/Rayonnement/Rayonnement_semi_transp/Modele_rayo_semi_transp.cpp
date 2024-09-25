@@ -319,7 +319,7 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
             }
           else
             {
-              Cerr <<"le coefficient d'absorption n'est pas un Champ Uniforme "<<finl;
+              Cerr <<"le coefficient d'absorption n'est pas un OWN_PTR(Champ_base) Uniforme "<<finl;
               Cerr <<"mais un "<<coeff_abs.que_suis_je()<<". modifier la methode "<<finl;
               Cerr <<"Pb_Couple_rayo_semi_transp::discretiser pour pouvoir prendre"<<finl;
               Cerr <<"en compte ce type de Champ_Don"<<finl;

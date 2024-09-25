@@ -269,7 +269,7 @@ void Triple_Line_Model_FT_Disc::completer()
   // Via the temperature transport equation, we directly get access to a Fluide_Incompressible:
   const Milieu_base& milieu = ref_eq_temp_->milieu();
   kl_cond_ = milieu.conductivite()->valeurs()(0,0);
-  rhocpl_ =  milieu.masse_volumique()->valeurs()(0,0) * milieu.capacite_calorifique()->valeurs()(0,0);
+  rhocpl_ =  milieu.masse_volumique().valeurs()(0,0) * milieu.capacite_calorifique()->valeurs()(0,0);
 
   if ((n_ext_meso_ != 1)and(ymeso_>DMINFLOAT))
     {
@@ -1061,8 +1061,8 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   const Fluide_Diphasique& fluide = ns.fluide_diphasique();
   const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
-  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
   const double rho_phase_0 = tab_rho_phase_0(0,0);
   const double rho_phase_1 = tab_rho_phase_1(0,0);
   const double jump_inv_rho = 1./rho_phase_1 - 1./rho_phase_0;

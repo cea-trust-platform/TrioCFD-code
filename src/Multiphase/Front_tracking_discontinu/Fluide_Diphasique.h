@@ -52,8 +52,8 @@ public:
   void discretiser(const Probleme_base& pb, const Discretisation_base& dis) override;
 
   // L'appel a ces methodes est invalide et genere une erreur
-  const Champ& masse_volumique() const override { return invalid_<const Champ&>(__func__); }
-  Champ& masse_volumique() override { return invalid_<Champ&>(__func__); }
+  const Champ_base& masse_volumique() const override { return invalid_<const Champ_base&>(__func__); }
+  Champ_base& masse_volumique() override { return invalid_<Champ_base&>(__func__); }
   const Champ_Don& diffusivite() const override { return invalid_<const Champ_Don&>(__func__); }
   Champ_Don& diffusivite() override { return invalid_<Champ_Don&>(__func__); }
   const Champ_Don& conductivite() const override  { return invalid_<const Champ_Don&>(__func__); }

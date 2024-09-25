@@ -140,7 +140,7 @@ int Paroi_TBLE_scal_VDF::init_lois_paroi()
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi();
   const Fluide_base& le_fluide   = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique()->valeurs()(0, 0);
+  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
 
   if (!sub_type(ParoiVDF_TBLE,loi))
     {
@@ -262,7 +262,7 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const double tps = eqn_temp.schema_temps().temps_courant();
   const double dt = eqn_temp.schema_temps().pas_de_temps();
   const double dt_min = eqn_temp.schema_temps().pas_temps_min();
-  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique()->valeurs()(0, 0);
+  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems,1);
   eqn_temp.sources().calculer(termes_sources); //les termes sources

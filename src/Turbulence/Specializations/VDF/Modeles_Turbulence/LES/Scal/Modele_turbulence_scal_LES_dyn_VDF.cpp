@@ -152,7 +152,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::mettre_a_jour(double)
   const Milieu_base& le_milieu = equation().probleme().milieu();
   const DoubleTab& tab_Cp = le_milieu.capacite_calorifique()->valeurs();
   const bool Ccp = sub_type(Champ_Uniforme, le_milieu.capacite_calorifique().valeur());
-  const DoubleTab& tab_rho = le_milieu.masse_volumique()->valeurs();
+  const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
   const Probleme_base& mon_pb = mon_equation_->probleme();
   DoubleTab& lambda_t = conductivite_turbulente_->valeurs();
   lambda_t = diffusivite_turbulente_->valeurs();

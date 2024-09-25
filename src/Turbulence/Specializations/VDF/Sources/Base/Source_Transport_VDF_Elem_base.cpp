@@ -155,7 +155,7 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme_concen(DoubleTab&
   // voila dans Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem
   // const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   DoubleTab alpha_turb(le_modele_scalaire.conductivite_turbulente().valeurs()); // on veut pas modifier la ref !
-  double rhocp = eq_thermique->milieu().capacite_calorifique()->valeurs()(0, 0) * eq_thermique->milieu().masse_volumique()->valeurs()(0, 0);
+  double rhocp = eq_thermique->milieu().capacite_calorifique()->valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
   alpha_turb /= rhocp;
 
   const Champ_Don& ch_beta_temper = beta_t.valeur();

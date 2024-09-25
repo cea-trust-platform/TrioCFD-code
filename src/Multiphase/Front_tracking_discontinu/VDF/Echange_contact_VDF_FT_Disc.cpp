@@ -64,7 +64,7 @@ Entree& Echange_contact_VDF_FT_Disc::readOn( Entree& s )
   nom_bord_oppose_=nom_bord;
 
   h_paroi=1e10; // why not git 1/h_paroi = 0....?
-  // T_autre_pb(): temp type front from other calculation/Champ dans le domaine
+  // T_autre_pb(): temp type front from other calculation/OWN_PTR(Champ_base) dans le domaine
   T_autre_pb_.typer("Champ_front_calc");
   // T_ext(): mettre_a_jour utilise des donnees externes,
   // Peut aussi initialized by a champ dans le domaine.

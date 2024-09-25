@@ -52,7 +52,7 @@
 #include <Transport_Marqueur_FT.h>
 #include <communications.h>
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
-#include <Champ.h>
+
 #include <Champ_Fonc_P0_base.h>
 #include <EFichierBin.h>
 #include <Param.h>
@@ -2220,7 +2220,7 @@ void Transport_Interfaces_FT_Disc::calculer_scalaire_interpole(
     case Transport_Interfaces_FT_Disc_interne::VALEUR_A_ELEM:
       {
 
-        Champ champ_scal_interp;
+        OWN_PTR(Champ_base) champ_scal_interp;
         champ_scal_interp=champ_scal;
         if (sub_type(Champ_P1NC, champ_scal) || sub_type(Champ_Fonc_P1NC,champ_scal))
           {
@@ -3444,7 +3444,7 @@ inline void check(const DoubleTab& v_imp, int& i_face, double v, int v_est_initi
 // On en deduit le gradient aux faces telles que indicatrice!=phase, via un processus iteratif qui permet d'etendre
 // l'interpolation aux points interieurs a l'IBC. L'interpolation s'effectue sur les quatre faces les plus proches de
 // meme orientation (vitesses non colocalisees).
-// Le resultat Champ est prealablement construit a partir du champ de vitesse Un+vpoint.dt dans la methode
+// Le resultat OWN_PTR(Champ_base) est prealablement construit a partir du champ de vitesse Un+vpoint.dt dans la methode
 // calcule_vitesse
 //
 // Attention :
