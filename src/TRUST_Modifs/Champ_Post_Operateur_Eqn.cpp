@@ -212,13 +212,13 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
   verification_cas_compo();
 }
 
-const Champ_base& Champ_Post_Operateur_Eqn::get_champ_without_evaluation(Champ_base& espace_stockage) const
+const Champ_base& Champ_Post_Operateur_Eqn::get_champ_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const
 {
   espace_stockage = ref_eq_->inconnue();
   return espace_stockage;
 }
 
-const Champ_base& Champ_Post_Operateur_Eqn::get_champ_compo_without_evaluation(Champ_base& espace_stockage) const
+const Champ_base& Champ_Post_Operateur_Eqn::get_champ_compo_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const
 {
 
   OWN_PTR(Champ_Fonc_base)  espace_stockage_fonc;
@@ -246,12 +246,12 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ_compo_without_evaluation(C
   int nb_comp = 1;
   ref_eq_->discretisation().discretiser_champ(directive,ref_eq_->domaine_dis(),"oooo","unit", nb_comp,temps,espace_stockage_fonc);
   espace_stockage = espace_stockage_fonc;
-  espace_stockage.fixer_nature_du_champ(scalaire);
+  espace_stockage->fixer_nature_du_champ(scalaire);
 
   return espace_stockage;
 }
 
-const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ_base& espace_stockage) const
+const Champ_base& Champ_Post_Operateur_Eqn::get_champ(OWN_PTR(Champ_base)& espace_stockage) const
 {
   // On commence par construire le champ vectoriel complet
   OWN_PTR(Champ_base) espace_stockage_complet;

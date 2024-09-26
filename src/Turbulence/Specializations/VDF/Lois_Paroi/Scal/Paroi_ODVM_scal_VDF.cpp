@@ -158,7 +158,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   const Champ_base& ch_rho = le_milieu_fluide.masse_volumique();
   const DoubleTab& lambda_f = ch_lambda->valeurs();
   const DoubleTab& Cp_f     = ch_Cp->valeurs();
-  const DoubleTab& rho_f    = ch_rho->valeurs();
+  const DoubleTab& rho_f    = ch_rho.valeurs();
 
   int lambda_unif = 0;
   int Cp_unif = 0;
@@ -177,7 +177,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
       Cp_unif = 1;
       Cp_f_loc = std::max(Cp_f(0,0),DMINFLOAT);
     }
-  if (sub_type(Champ_Uniforme,ch_rho.valeur()))
+  if (sub_type(Champ_Uniforme,ch_rho))
     {
       rho_unif = 1;
       rho_f_loc = std::max(rho_f(0,0),DMINFLOAT);
