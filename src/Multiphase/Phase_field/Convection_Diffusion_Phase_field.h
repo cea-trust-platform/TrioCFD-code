@@ -27,7 +27,7 @@
 #include <Operateur_Grad.h>
 #include <Debog.h>
 
-#include <Champ_Don.h>
+
 #include <Constituant.h>
 #include <TRUST_Ref.h>
 

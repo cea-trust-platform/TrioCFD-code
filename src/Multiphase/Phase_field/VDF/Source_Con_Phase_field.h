@@ -26,7 +26,7 @@
 
 #include <Source_Con_Phase_field_base.h>
 #include <Matrice_Morse.h>
-#include <Champ_Don.h>
+
 #include <Table.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Equation_base.h>
@@ -62,12 +62,12 @@ public:
 
   inline double drhodc(const int n_elem) const;
 
-  void calculer_champ_fonc_c(const double t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const override;
+  void calculer_champ_fonc_c(const double t, Champ_Don_base& champ_fonc_c, const DoubleTab& val_c) const override;
 
 protected:
   int tpsaff;
   double rho0;
-  REF(Champ_Don) drhodc_;
+  REF(Champ_Don_base) drhodc_;
   DoubleTab accr;
   DoubleVect u_carre_;
   DoubleTab prov_face_,prov_elem_;
@@ -159,7 +159,7 @@ inline const int& Source_Con_Phase_field::get_type_systeme_naire()
 }
 inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 {
-  const DoubleTab& tab = drhodc_->valeur().valeurs();
+  const DoubleTab& tab = drhodc_->valeurs();
   if (tab.dimension(0)==1)
     {
       int dim = tab.nb_dim();

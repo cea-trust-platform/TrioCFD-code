@@ -110,15 +110,15 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const IntTab& face_voisins=zvdf.face_voisins();
   const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
-  ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
+  ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite());
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = front_vf.nb_faces();
   int ndeb = front_vf.num_premiere_face();
   const DoubleTab& rho = le_milieu.masse_volumique().valeurs();
-  const DoubleTab& Cp = le_milieu.capacite_calorifique()->valeurs();
-  const DoubleTab& Lambda= le_milieu.conductivite()->valeurs();
+  const DoubleTab& Cp = le_milieu.capacite_calorifique().valeurs();
+  const DoubleTab& Lambda= le_milieu.conductivite().valeurs();
 
-  assert(le_milieu.capacite_calorifique()->nb_comp() == 1);
+  assert(le_milieu.capacite_calorifique().nb_comp() == 1);
   assert(le_milieu.masse_volumique().nb_comp() == 1);
   double d_Cp, d_rho, d_Lambda;
   if (Cp.get_md_vector().non_nul() || rho.get_md_vector().non_nul() || Lambda.get_md_vector().non_nul())

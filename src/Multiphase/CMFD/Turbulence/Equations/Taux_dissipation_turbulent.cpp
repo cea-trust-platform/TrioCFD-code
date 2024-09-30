@@ -71,7 +71,7 @@ Entree& Taux_dissipation_turbulent::readOn(Entree& is)
   return is;
 }
 
-const Champ_Don& Taux_dissipation_turbulent::diffusivite_pour_transport() const
+const Champ_Don_base& Taux_dissipation_turbulent::diffusivite_pour_transport() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }

@@ -88,22 +88,22 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
   assert(pb.equation(1).inconnue().le_nom()=="temperature");
   const DoubleTab& temper = pb.equation(1).inconnue().valeurs();
 
-  const DoubleTab& indice = fluide().indice()->valeurs();
-  const DoubleTab& kappa = fluide().kappa()->valeurs();
+  const DoubleTab& indice = fluide().indice().valeurs();
+  const DoubleTab& kappa = fluide().kappa().valeurs();
   double sigma = Modele().valeur_sigma();
 
   secmem = 0;
   int face;
   for (face=0; face<nb_faces; face++)
     {
-      assert(fluide().indice()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide().indice().valeur()))
+      assert(fluide().indice().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide().indice()))
         n = indice(0,0);
       else
         n = indice(face,0);
 
-      assert(fluide().kappa()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide().kappa().valeur()))
+      assert(fluide().kappa().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide().kappa()))
         k = kappa(0,0);
       else
         k = kappa(face,0);
@@ -120,7 +120,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
   secmem.echange_espace_virtuel();
 
   if (solveur->que_suis_je() == "Solv_GCP")
-    if (sub_type(Champ_Uniforme,fluide().kappa().valeur()))
+    if (sub_type(Champ_Uniforme,fluide().kappa()))
       {
         Matrice matrice_tmp;
         dimensionner_Mat_Bloc_Morse_Sym(matrice_tmp);
@@ -357,7 +357,7 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
 
 
   // Modification de la matrice pour prendre en compte le second membre en K*irradiance
-  const DoubleTab& kappa = fluide().kappa()->valeurs();
+  const DoubleTab& kappa = fluide().kappa().valeurs();
 
   Cerr<<"On verifie lors du calcul de la matrice de discretisation que "<<finl;
   Cerr<<"l'ordre de la matrice est bien egale au nombre de faces"<<finl;
@@ -369,8 +369,8 @@ void Eq_rayo_semi_transp_VEF::assembler_matrice()
   double k;
   for (i=0; i<la_matrice.ordre(); i++)
     {
-      assert(fluide().kappa()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide().kappa().valeur()))
+      assert(fluide().kappa().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide().kappa()))
         k = kappa(0,0);
       else
         k = kappa(i,0);

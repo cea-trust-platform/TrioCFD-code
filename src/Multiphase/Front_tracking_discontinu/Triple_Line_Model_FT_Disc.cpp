@@ -268,8 +268,8 @@ void Triple_Line_Model_FT_Disc::completer()
 {
   // Via the temperature transport equation, we directly get access to a Fluide_Incompressible:
   const Milieu_base& milieu = ref_eq_temp_->milieu();
-  kl_cond_ = milieu.conductivite()->valeurs()(0,0);
-  rhocpl_ =  milieu.masse_volumique().valeurs()(0,0) * milieu.capacite_calorifique()->valeurs()(0,0);
+  kl_cond_ = milieu.conductivite().valeurs()(0,0);
+  rhocpl_ =  milieu.masse_volumique().valeurs()(0,0) * milieu.capacite_calorifique().valeurs()(0,0);
 
   if ((n_ext_meso_ != 1)and(ymeso_>DMINFLOAT))
     {

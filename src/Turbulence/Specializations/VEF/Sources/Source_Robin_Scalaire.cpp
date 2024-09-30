@@ -92,8 +92,8 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   const DoubleTab& temperature = equation().inconnue().valeurs();
   const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
-  const Champ_Don& lambda = fluide.conductivite();
-  int lambda_uniforme = (sub_type(Champ_Uniforme,lambda.valeur()) ? 1 : 0);
+  const Champ_Don_base& lambda = fluide.conductivite();
+  int lambda_uniforme = (sub_type(Champ_Uniforme,lambda) ? 1 : 0);
   const Convection_Diffusion_Temperature& eq_th = ref_cast(Convection_Diffusion_Temperature,equation());
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_th.get_modele(TURBULENCE).valeur());
   const DoubleTab& lambda_t = le_modele_scalaire.conductivite_turbulente().valeurs();
@@ -119,7 +119,7 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
             {
               int elem = domaine_VEF.face_voisins(face,0);
               if (elem==-1) elem = domaine_VEF.face_voisins(face,1);
-              double d_lambda = (lambda_uniforme ? lambda->valeurs()(0,0) : lambda->valeurs()(elem,0));
+              double d_lambda = (lambda_uniforme ? lambda.valeurs()(0,0) : lambda.valeurs()(elem,0));
               double acc_loc = - (d_lambda + lambda_t(elem)) * (temperature(face) - Tw) / dist_equiv[face-ndeb] * surfaces_face(face);
               // acc_loc_tot += acc_loc;
               resu(face) += acc_loc;

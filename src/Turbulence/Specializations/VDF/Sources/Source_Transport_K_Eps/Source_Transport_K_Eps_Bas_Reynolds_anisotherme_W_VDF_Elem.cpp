@@ -57,10 +57,10 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter_blocs(m
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const Transport_Fluctuation_Temperature_W& monEqFluctu = modele_Fluctu.equation_Fluctu();
   const DoubleTab& Fluctu_Temperature = monEqFluctu.inconnue().valeurs(), &g = gravite->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
   const DoubleVect& volumes = domaine_VDF.volumes(), &porosite_vol = eq_hydraulique->milieu().porosite_elem();
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
@@ -76,8 +76,8 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter_blocs(m
   else calculer_terme_production_K(domaine_VDF,zcl_VDF,P,K_eps_Bas_Re,vit,vitesse,visco_turb);
 
   // C'est l'objet de type domaine_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
-  const DoubleTab& tab_beta = ch_beta->valeurs();
-  if (sub_type(Champ_Uniforme,ch_beta.valeur())) calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta(0,0),g);
+  const DoubleTab& tab_beta = ch_beta.valeurs();
+  if (sub_type(Champ_Uniforme,ch_beta)) calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta(0,0),g);
   else calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta,g);
 
   for (int elem=0; elem<nb_elem; elem++)
@@ -208,11 +208,11 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
         }
     }
   const DoubleTab& g = gravite->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
 
   //on calcule gteta2 pour corriger u_teta confermement au modele de Wrobel
-  if (sub_type(Champ_Uniforme,ch_beta.valeur())) calculer_gteta2(domaine_VDF,gteta2 ,fluctu_temp,tab_beta(0,0),g);
+  if (sub_type(Champ_Uniforme,ch_beta)) calculer_gteta2(domaine_VDF,gteta2 ,fluctu_temp,tab_beta(0,0),g);
   else calculer_gteta2(domaine_VDF, gteta2 ,fluctu_temp,tab_beta,g);
 
 

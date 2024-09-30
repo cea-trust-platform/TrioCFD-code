@@ -25,7 +25,7 @@
 
 #include <Domaine_VEF.h>
 #include <Paroi_std_scal_hyd_VEF.h>
-#include <Champ_Don.h>
+
 #include <Parser_U.h>
 
 /*! @brief classe Loi_Paroi_Nu_Impose_VEF
@@ -47,7 +47,7 @@ public:
 
 protected:
 
-  Champ_Don diam_hydr;
+  OWN_PTR(Champ_Don_base) diam_hydr;
   Parser_U nusselt;
 
 };

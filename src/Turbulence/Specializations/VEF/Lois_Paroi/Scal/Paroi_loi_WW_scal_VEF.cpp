@@ -86,9 +86,9 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
 
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   int l_unif;
 
   if (axi)
@@ -99,7 +99,7 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
     }
 
   double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       l_unif = 1;
       visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -126,7 +126,7 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
   int schmidt = 0;
   if (sub_type(Convection_Diffusion_Concentration,eqn)) schmidt = 1;
-  const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
+  const Champ_Don_base& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
   // Boucle sur les bords:
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
@@ -170,14 +170,14 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               double (*pf)(double,double,double);
               pf = &FthparVEF_WW;
               double d_alpha=0.;
-              if (sub_type(Champ_Uniforme,alpha.valeur()))
-                d_alpha = alpha->valeurs()(0,0);
+              if (sub_type(Champ_Uniforme,alpha))
+                d_alpha = alpha.valeurs()(0,0);
               else
                 {
-                  if (alpha->nb_comp()==1)
-                    d_alpha = alpha->valeurs()(elem);
+                  if (alpha.nb_comp()==1)
+                    d_alpha = alpha.valeurs()(elem);
                   else
-                    d_alpha = alpha->valeurs()(elem,0);
+                    d_alpha = alpha.valeurs()(elem,0);
                 }
               double Pr = d_visco/d_alpha;
               double Beta = pow(3.85*pow(Pr,1./3.)-1.3,2.)+2.12*log(Pr);

@@ -73,7 +73,7 @@ Entree& Echelle_temporelle_turbulente::readOn(Entree& is)
   return is;
 }
 
-const Champ_Don& Echelle_temporelle_turbulente::diffusivite_pour_transport() const
+const Champ_Don_base& Echelle_temporelle_turbulente::diffusivite_pour_transport() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }

@@ -26,7 +26,6 @@
 
 Implemente_instanciable(MuLambda_TBLE_Cte,"MuLambda_TBLE_Cte",MuLambda_TBLE_base);
 
-
 Sortie& MuLambda_TBLE_Cte::printOn(Sortie& os) const
 {
   return os;
@@ -37,9 +36,6 @@ Entree& MuLambda_TBLE_Cte::readOn(Entree& is)
   return is;
 }
 
-
-
-
 void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
 {
   if (!sub_type(Fluide_Incompressible, milieu))
@@ -49,11 +45,11 @@ void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
     }
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,milieu);
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const Champ_Don& ch_alpha = le_fluide.diffusivite();
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_alpha = le_fluide.diffusivite();
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
-      const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+      const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
       nu = std::max(tab_visco(0,0),DMINFLOAT);//visco cinematique supposee cste
     }
@@ -62,11 +58,11 @@ void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
       Cerr << "Viscosite non constante : cas non traite encore dans TBLE" << finl;
       exit();
     }
-  if (ch_alpha.non_nul())
+  if (le_fluide.has_diffusivite())
     {
-      if (sub_type(Champ_Uniforme,ch_alpha.valeur()))
+      if (sub_type(Champ_Uniforme,ch_alpha))
         {
-          const DoubleTab& tab_lambda = ch_alpha->valeurs();
+          const DoubleTab& tab_lambda = ch_alpha.valeurs();
           alpha = std::max(tab_lambda(0,0),DMINFLOAT);//lambda supposee cste
         }
       else
@@ -75,6 +71,4 @@ void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
           exit();
         }
     }
-
 }
-

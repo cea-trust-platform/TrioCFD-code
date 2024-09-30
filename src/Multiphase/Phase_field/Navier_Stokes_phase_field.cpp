@@ -161,7 +161,7 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
         {
           boussi_=1;
           diff_boussi_=0;
-          if (!betac_->non_nul())
+          if (!le_fluide->has_beta_c())
             {
               fonctionsALire = true;
               Cerr << "Approximation de Boussinesq utilisee mais beta_co non defini comme propriete du fluide"<< finl;
@@ -291,7 +291,7 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
     return Navier_Stokes_std::lire_motcle_non_standard(mot,is);
 }
 
-const Champ_Don& Navier_Stokes_phase_field::diffusivite_pour_transport() const
+const Champ_Don_base& Navier_Stokes_phase_field::diffusivite_pour_transport() const
 {
   if(boussi_==0)
     {
@@ -402,7 +402,7 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
         }
       if (rho_.le_nom()=="anonyme")
         {
-          if (boussi_ == 1 && betac_->non_nul())
+          if (boussi_ == 1 && le_fluide->has_beta_c())
             {
               Cerr << "Navier_Stokes_phase_field::creer_champ: should not be here (2)"<< finl;
               exit();
@@ -432,7 +432,7 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       i = 0;
       temps = schema_temps().temps_courant();
     }
-  if (boussi_==0 || !betac_->non_nul())
+  if (boussi_==0 || !le_fluide->has_beta_c())
     {
       // normalement, quelque chose comme 'rho_->mettre_a_jour(schema_temps().temps_futur(i))' devrait faire l'affaire
       // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
@@ -457,7 +457,7 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       if (type_systeme_naire==0)
         {
           drhodcTab=rho0_;
-          tab_multiply_any_shape(drhodcTab, betac_.valeur()->valeurs());
+          tab_multiply_any_shape(drhodcTab, betac_->valeurs());
           rhoTab=c;
           tab_multiply_any_shape(rhoTab, drhodcTab);
           rhoTab+=rho0_;
@@ -475,7 +475,7 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
             {
               for (int j=0; j<betacTab.line_size(); j++)
                 {
-                  betacTab(i,j)=betac_.valeur()->valeurs()(0,j);
+                  betacTab(i,j)=betac_->valeurs()(0,j);
                   beta_(i)+=betacTab(i,j);
                 }
             }
@@ -535,7 +535,7 @@ double Navier_Stokes_phase_field::calculer_pas_de_temps() const
   // RLT: plutot que de multiplier dt(diff) par rho ici comme c'est fait dans TrioCFD 1.8.0 (cf. coeff ci-dessous)
   // (en considerant qu'il a ete evalue dans l'operateur de diffusion (Op_Diff_VDF_Face_base) avec la viscosite dynamique - ce qui n'est vrai que pour boussi_==0)
   // on associe le champ masse volumique a l'operateur de diffusion dans le cas boussi_==0 pour que le calcul de son dt soit correct directement
-  double coeff = mp_min_vect(eq_ns.rho()->valeurs()); // eq_c.rho1(); // voir d'apres le FT
+  double coeff = mp_min_vect(eq_ns.rho().valeurs()); // eq_c.rho1(); // voir d'apres le FT
 
   double dt=0;
   double dt_op;
@@ -592,7 +592,7 @@ double Navier_Stokes_phase_field::calculer_pas_de_temps() const
 /*! @brief Interpole la masse volumique aux faces (pour l'assembleur pression en particulier)
  *
  */
-void Navier_Stokes_phase_field::rho_aux_faces(const DoubleTab& tab_rho, Champ_Don& rho_face_P)
+void Navier_Stokes_phase_field::rho_aux_faces(const DoubleTab& tab_rho, Champ_Don_base& rho_face_P)
 {
   const Domaine_VF& domaineVF = ref_cast(Domaine_VF,domaine_dis());
   const IntTab& face_voisins = domaineVF.face_voisins();
@@ -609,12 +609,12 @@ void Navier_Stokes_phase_field::rho_aux_faces(const DoubleTab& tab_rho, Champ_Do
       el0=face_voisins(fac,0);
       if(el0!=-1)
         {
-          rho_face_P->valeurs()(fac) = tab_rho(el0);
+          rho_face_P.valeurs()(fac) = tab_rho(el0);
         }
       else
         {
           el1=face_voisins(fac,1);
-          rho_face_P->valeurs()(fac) = tab_rho(el1);
+          rho_face_P.valeurs()(fac) = tab_rho(el1);
         }
     }
 
@@ -624,7 +624,7 @@ void Navier_Stokes_phase_field::rho_aux_faces(const DoubleTab& tab_rho, Champ_Do
       el1=face_voisins(fac,1);
       vol0=volumes(el0);
       vol1=volumes(el1);
-      rho_face_P->valeurs()(fac)=(vol0*tab_rho(el0)+vol1*tab_rho(el1))/(vol0+vol1);
+      rho_face_P.valeurs()(fac)=(vol0*tab_rho(el0)+vol1*tab_rho(el1))/(vol0+vol1);
     }
 }
 
@@ -658,7 +658,7 @@ int Navier_Stokes_phase_field::preparer_calcul()
 
   if(boussi_==0)
     {
-      Champ_Don rho_face_P;
+      OWN_PTR(Champ_Don_base) rho_face_P;
       rho_face_P.typer("Champ_Fonc_Face");
       rho_face_P->valeurs()=inconnue().valeurs();
       const DoubleTab& tab_rho=rho_->valeurs();
@@ -728,7 +728,7 @@ void Navier_Stokes_phase_field::mettre_a_jour(double temps)
 
   if(boussi_==0)
     {
-      Champ_Don rho_face_P;
+      OWN_PTR(Champ_Don_base) rho_face_P;
       rho_face_P.typer("Champ_Fonc_Face");
       rho_face_P->valeurs()=inconnue().valeurs();
       const DoubleTab& tab_rho=rho_->valeurs();
@@ -1134,7 +1134,7 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
 
       // Calcul de rho_face_P aux faces pour l'assemblage avec l'assembleur pression PF (cf AssembleurPVDF de BM)
       //Champ_Fonc_Face rho_face_P;
-      Champ_Don rho_face_P;
+      OWN_PTR(Champ_Don_base) rho_face_P;
       rho_face_P.typer("Champ_Fonc_Face");
       rho_face_P->valeurs()=inconnue().valeurs();
 

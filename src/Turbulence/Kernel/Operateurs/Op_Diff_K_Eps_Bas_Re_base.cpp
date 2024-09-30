@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
-#include <Champ_Don.h>
+
 #include <Champ_Uniforme.h>
 #include <Discretisation_base.h>
 
@@ -54,7 +54,7 @@ Sortie& Op_Diff_K_Eps_Bas_Re_negligeable::printOn(Sortie& s ) const
 
 /*! @brief Associe la diffusivite a l'operateur.
  *
- * @param (Champ_Don& ch) le champ representant la diffusivite
+ * @param (Champ_Don_base& ch) le champ representant la diffusivite
  */
 void Op_Diff_K_Eps_Bas_Re_negligeable::associer_diffusivite(const Champ_base& ch)
 {

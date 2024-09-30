@@ -23,8 +23,8 @@
 #define Calcul_Production_K_VEF_included
 
 #include <TRUSTTabs_forward.h>
-#include <Champ_Don.h>
 
+class Champ_Don_base;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
@@ -44,7 +44,7 @@ protected:
 
   DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&, const Domaine_VEF&, const Domaine_Cl_VEF&) const;
 
-  DoubleTab& calculer_terme_destruction_K_gen(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const Champ_Don&, const DoubleVect&, int) const;
+  DoubleTab& calculer_terme_destruction_K_gen(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const Champ_Don_base&, const DoubleVect&, int) const;
 
   void mettre_a_jour(double temps) { }
 };

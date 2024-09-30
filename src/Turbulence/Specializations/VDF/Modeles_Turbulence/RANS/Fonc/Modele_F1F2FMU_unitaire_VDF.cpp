@@ -54,7 +54,7 @@ void  Modele_F1F2FMU_unitaire_VDF::associer(const Domaine_dis_base& domaine_dis,
 {
 }
 
-DoubleTab&  Modele_F1F2FMU_unitaire_VDF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_F1F2FMU_unitaire_VDF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don_base& ch_visco ) const
 {
   Fmu=1;
 //  Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;
@@ -72,7 +72,7 @@ DoubleTab& Modele_F1F2FMU_unitaire_VDF::Calcul_F2( DoubleTab& F2, DoubleTab& D, 
   return F2;
 }
 
-DoubleTab&  Modele_F1F2FMU_unitaire_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_F1F2FMU_unitaire_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don_base& ch_visco ) const
 {
   Fmu=1;
   Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;

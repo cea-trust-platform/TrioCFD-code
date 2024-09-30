@@ -65,7 +65,7 @@ int Paroi_scal_analytique_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
   int schmidt = 0;
   if (sub_type(Convection_Diffusion_Concentration,eqn)) schmidt = 1;
-  const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
+  const Champ_Don_base& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
   // Boucle sur les bords:
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -107,14 +107,14 @@ int Paroi_scal_analytique_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               else
                 {
                   double d_alpha=0.;
-                  if (sub_type(Champ_Uniforme,alpha.valeur()))
-                    d_alpha = alpha->valeurs()(0,0);
+                  if (sub_type(Champ_Uniforme,alpha))
+                    d_alpha = alpha.valeurs()(0,0);
                   else
                     {
-                      if (alpha->nb_comp()==1)
-                        d_alpha = alpha->valeurs()(elem);
+                      if (alpha.nb_comp()==1)
+                        d_alpha = alpha.valeurs()(elem);
                       else
-                        d_alpha = alpha->valeurs()(elem,0);
+                        d_alpha = alpha.valeurs()(elem,0);
                     }
 
                   //Expression de d_eq formulee pour le cas nu_t imposee analytiquement

@@ -57,11 +57,11 @@ void  Modele_Launder_Sharma_VDF::associer(const Domaine_dis_base& domaine_dis,
   //  const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
 }
 
-DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don_base& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco->valeurs();
-  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
   // Cerr << " dans Jones Sharma Calc Fmu " << finl;
@@ -110,11 +110,11 @@ DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_
 
 
 
-DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don_base& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco->valeurs();
-  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
   // Cerr << " dans Jones Sharma Calc Fmu " << finl;

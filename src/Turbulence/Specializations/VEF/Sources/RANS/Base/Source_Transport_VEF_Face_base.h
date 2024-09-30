@@ -61,7 +61,7 @@ private:
   virtual const DoubleTab& get_cisaillement_paroi() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const DoubleTab& get_K_pour_production() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& get_modele_fonc_bas_reyn() const { return not_implemented<OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)&>(__func__); }
-  virtual void calcul_tabs_bas_reyn(const DoubleTrav& , const DoubleTab& , const DoubleTab& , const Champ_Don& , const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
+  virtual void calcul_tabs_bas_reyn(const DoubleTrav& , const DoubleTab& , const DoubleTab& , const Champ_Don_base& , const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual const Nom get_type_paroi() const { return not_implemented<Nom>(__func__); }
   virtual void calcul_tenseur_reyn(const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_bas_rey(const DoubleVect& , const DoubleTrav& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }

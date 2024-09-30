@@ -25,7 +25,7 @@
 #include <Transport_K_ou_Eps_base.h>
 #include <Op_Diff_K_Eps_base.h>
 #include <Operateur_Conv.h>
-#include <Champ_Don.h>
+
 
 class Motcle;
 
@@ -63,7 +63,7 @@ protected :
   Operateur_Conv terme_convectif;
 
   REF(Champ_Inc_base) inco_eqn_associee;
-  Champ_Don Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
+  OWN_PTR(Champ_Don_base) Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
 
 };
 

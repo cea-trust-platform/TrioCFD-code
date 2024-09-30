@@ -297,7 +297,7 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
   if (modele_cinetique_ == 2)
     Cerr << "Reaction model dependent of the turbulent Schmidt number which is defined as " << sc_t << finl;
 
-  const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant()->valeurs();
+  const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant().valeurs();
   double coeff_diffusivite = tab_diffusivite(0,0);
   const DoubleVect& volumes_entrelaces = ref_cast(Domaine_VF, domaine_dis()).volumes_entrelaces();
   const int dim = Objet_U::dimension;
@@ -305,8 +305,8 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
   const Fluide_Diphasique& fluide = ref_cast(Fluide_Diphasique, pb.milieu());
   const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-  const DoubleTab& tab_nu_phase_0 = phase_0.viscosite_cinematique()->valeurs();
-  const DoubleTab& tab_nu_phase_1 = phase_1.viscosite_cinematique()->valeurs();
+  const DoubleTab& tab_nu_phase_0 = phase_0.viscosite_cinematique().valeurs();
+  const DoubleTab& tab_nu_phase_1 = phase_1.viscosite_cinematique().valeurs();
   const double nu_phase_0 = tab_nu_phase_0(0,0);
   const double nu_phase_1 = tab_nu_phase_1(0,0);
   const double delta_nu = nu_phase_1 - nu_phase_0;

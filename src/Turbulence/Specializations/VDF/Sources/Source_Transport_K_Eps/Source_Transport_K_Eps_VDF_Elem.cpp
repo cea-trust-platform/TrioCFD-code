@@ -56,7 +56,7 @@ const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Source_Transport_K_Eps_VDF_Elem::g
   return ref_cast(Modele_turbulence_hyd_K_Eps,mon_eq_transport_K_Eps->modele_turbulence()).associe_modele_fonction();
 }
 
-void Source_Transport_K_Eps_VDF_Elem::calcul_D_E(const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don& ch_visco_cin, DoubleTab& D, DoubleTab& E) const
+void Source_Transport_K_Eps_VDF_Elem::calcul_D_E(const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don_base& ch_visco_cin, DoubleTab& D, DoubleTab& E) const
 {
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   get_modele_fonc_bas_reyn()->Calcul_D(D,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin);

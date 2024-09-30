@@ -29,7 +29,7 @@
 #include <Matrice_Morse.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
-#include <Champ_Don.h>
+
 
 
 class Champ_base;

@@ -26,7 +26,7 @@ Entree& Source_injection_masse_base::readOn(Entree& is)
 {
   Cerr << "Lecture du Champ de masse injectee" << finl;
 
-  Champ_Don flux_masse_lu_;
+  OWN_PTR(Champ_Don_base) flux_masse_lu_;
   Motcle type;
   is >> type;
 

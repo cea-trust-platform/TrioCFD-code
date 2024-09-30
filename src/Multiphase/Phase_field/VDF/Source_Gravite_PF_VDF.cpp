@@ -122,7 +122,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
         }
       else if (boussi == 1)
         {
-          const DoubleTab& rho = eq_NS_PF.rho()->valeurs();
+          const DoubleTab& rho = eq_NS_PF.rho().valeurs();
           double rho0 = eq_NS_PF.rho0();
           const IntTab& face_voisins = le_dom->face_voisins();
           const DoubleVect& volumes = le_dom->volumes();
@@ -184,7 +184,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
         }
       else if (boussi == 1)
         {
-          const DoubleTab& rho = eq_NS_PF.rho()->valeurs();
+          const DoubleTab& rho = eq_NS_PF.rho().valeurs();
           double rho0 = eq_NS_PF.rho0();
           const IntTab& face_voisins = le_dom->face_voisins();
           const DoubleVect& volumes = le_dom->volumes();

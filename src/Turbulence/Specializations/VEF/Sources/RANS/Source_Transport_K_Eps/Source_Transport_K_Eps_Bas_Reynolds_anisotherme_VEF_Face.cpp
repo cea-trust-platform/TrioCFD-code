@@ -43,7 +43,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::associer_pb(const
     {
       eq_thermique = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
       const Fluide_base& fluide_2 = eq_thermique->fluide();
-      if (fluide_2.beta_t().non_nul()) beta_t = fluide_2.beta_t();
+      if (fluide_2.has_beta_t()) beta_t = fluide_2.beta_t();
       gravite = fluide_2.gravite();
     }
   else gravite = pb.equation(0).milieu().gravite();
@@ -64,9 +64,9 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(), &g = gravite->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
   const Fluide_base& fluide = ref_cast(Fluide_base, eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   int nb_faces = domaine_VEF.nb_faces();

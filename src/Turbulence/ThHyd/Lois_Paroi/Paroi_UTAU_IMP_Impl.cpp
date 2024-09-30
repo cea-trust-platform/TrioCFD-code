@@ -18,10 +18,10 @@
 // Directory:   $TURBULENCE_ROOT/src/ThHyd/Lois_Paroi
 //
 //////////////////////////////////////////////////////////////////////////////
-#include <Paroi_UTAU_IMP_Impl.h>
-#include <Motcle.h>
-#include <Objet_U.h>
 
+#include <Paroi_UTAU_IMP_Impl.h>
+#include <Champ_Don_base.h>
+#include <Motcle.h>
 
 Entree& Paroi_UTAU_IMP_Impl::lire_donnees(Entree& s)
 {

@@ -38,9 +38,9 @@ DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTa
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin.valeur());
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
+  const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin);
 
   double visco = -1.;
   if (is_visco_const) visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -63,10 +63,10 @@ void Source_Transport_Realisable_VDF_Elem_base::ajouter_blocs(matrices_t matrice
   if(!mat) return;
 
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   const DoubleVect& porosite = le_dom_Cl_VDF->equation().milieu().porosite_elem(), &volumes=le_dom_VDF->volumes();
-  const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin.valeur());
+  const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin);
   double visco = -1.;
   if (is_visco_const) visco = std::max(tab_visco(0,0),DMINFLOAT);
   fill_coeff_matrice(is_visco_const,tab_visco,volumes,porosite,visco,*mat); // voir les classes filles

@@ -87,7 +87,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());
   // le_milieu =  SOLID
   const Milieu_base& le_milieu=ch.milieu();
-  int nb_comp = le_milieu.conductivite()->nb_comp();
+  int nb_comp = le_milieu.conductivite().nb_comp();
   assert(nb_comp==1);
 
 

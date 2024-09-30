@@ -47,7 +47,7 @@ public :
   Milieu_base& milieu() override;
   void associer_milieu_base(const Milieu_base& ) override;
   int impr(Sortie& os) const override;
-  const Champ_Don& diffusivite_pour_transport() const override;
+  const Champ_Don_base& diffusivite_pour_transport() const override;
   const Champ_base& diffusivite_pour_pas_de_temps() const override;
 
   const Motcle& domaine_application() const override;

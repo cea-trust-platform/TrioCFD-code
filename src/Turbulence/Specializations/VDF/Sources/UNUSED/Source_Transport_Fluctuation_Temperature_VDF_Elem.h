@@ -71,7 +71,7 @@ protected :
   REF(Transport_Fluctuation_Temperature) mon_eq_transport_Fluctu_Temp;
   REF(Transport_Flux_Chaleur_Turbulente) mon_eq_transport_Flux_Chaleur_Turb_;
   REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
+  REF(Champ_Don_base) beta_t;
   REF(Champ_Don_base) gravite;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
 

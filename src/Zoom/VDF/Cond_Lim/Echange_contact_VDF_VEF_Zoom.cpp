@@ -151,7 +151,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       REF(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
 
-      const int nb_comp = le_milieu->conductivite()->nb_comp();
+      const int nb_comp = le_milieu->conductivite().nb_comp();
       int i=0;
 
 
@@ -194,10 +194,10 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
           const int nfin = ndeb + front_vf_ext.nb_faces();
 
           // Calcul de tab = 1/(e/lambda + 1/h_paroi)
-          if(!sub_type(Champ_Uniforme,le_milieu->conductivite().valeur()))
+          if(!sub_type(Champ_Uniforme,le_milieu->conductivite()))
             {
               //Cerr << "raccord local homogene et conductivite non uniforme" << finl;
-              const DoubleTab& lambda = le_milieu->conductivite()->valeurs();
+              const DoubleTab& lambda = le_milieu->conductivite().valeurs();
               assert(h_paroi!=0.);
 
               if (lambda.nb_dim() == 1)
@@ -254,7 +254,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
           else  // la conductivite est un OWN_PTR(Champ_base) uniforme
             {
               assert(h_paroi!=0.);
-              const DoubleTab& lambda = le_milieu->conductivite()->valeurs();
+              const DoubleTab& lambda = le_milieu->conductivite().valeurs();
               for(i=0; i<nb_comp; i++)
                 assert(lambda(0,i)!=0.); // juste des asserts
 

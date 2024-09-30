@@ -76,7 +76,7 @@ protected :
   REF(Transport_K_Eps_Bas_Reynolds)  mon_eq_transport_K_Eps_Bas_Re_;
   REF(Transport_Fluctuation_Temperature_W) mon_eq_transport_Fluctu_Temp;
   REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
+  REF(Champ_Don_base) beta_t;
   REF(Champ_Don_base) gravite_;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
 

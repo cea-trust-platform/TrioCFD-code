@@ -87,11 +87,11 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
 
   // la vitesse resolue par l'equation hydr
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   double visco=-1.;
 
   // l_unif est le parametre de controle
@@ -100,7 +100,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
   // test si la viscosite est un champ uniforme
   // l_unif=0 la viscosite n'est pas uniforme
   // l_unif=1 la viscosite est uniforme
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;

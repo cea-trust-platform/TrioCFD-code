@@ -302,8 +302,8 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   int elem;
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_temp.probleme().equation(0).milieu());
-  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
-  const Champ_Don& alpha = le_fluide.diffusivite();
+  const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
+  const Champ_Don_base& alpha = le_fluide.diffusivite();
   DoubleTab alpha_t = diffusivite_turb.valeurs();
 
   int itmax=0,itmax_loc;
@@ -350,14 +350,14 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                 elem = face_voisins(num_face,1);
 
               double d_alpha=0.;
-              if (sub_type(Champ_Uniforme,alpha.valeur()))
-                d_alpha = alpha->valeurs()(0,0);
+              if (sub_type(Champ_Uniforme,alpha))
+                d_alpha = alpha.valeurs()(0,0);
               else
                 {
-                  if (alpha->nb_comp()==1)
-                    d_alpha = alpha->valeurs()(elem);
+                  if (alpha.nb_comp()==1)
+                    d_alpha = alpha.valeurs()(elem);
                   else
-                    d_alpha = alpha->valeurs()(elem,0);
+                    d_alpha = alpha.valeurs()(elem,0);
                 }
 
               surf2=0.;

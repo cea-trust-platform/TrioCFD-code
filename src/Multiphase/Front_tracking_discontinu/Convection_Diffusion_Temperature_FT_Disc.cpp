@@ -525,7 +525,7 @@ void Convection_Diffusion_Temperature_FT_Disc::calculer_mpoint(Champ_base& mpoin
     if (val[i] < invalid_test)
       val[i] = 0;
 
-  const double k = fluide_dipha_->fluide_phase(phase_).conductivite()->valeurs()(0,0);
+  const double k = fluide_dipha_->fluide_phase(phase_).conductivite().valeurs()(0,0);
   const double L = fluide_dipha_->chaleur_latente();
   // L est la chaleur latente de changement de phase pour passer de
   // la phase 0 a la phase 1.
@@ -614,7 +614,7 @@ void Convection_Diffusion_Temperature_FT_Disc::correct_mpoint()
   DoubleTab& temperature = inconnue().valeurs();
   const DoubleTab& temperature_passe = inconnue().passe();
   const double rhocp = fluide_dipha_->fluide_phase(phase_).masse_volumique().valeurs()(0,0)
-                       * fluide_dipha_->fluide_phase(phase_).capacite_calorifique()->valeurs()(0,0);
+                       * fluide_dipha_->fluide_phase(phase_).capacite_calorifique().valeurs()(0,0);
 
   const int nb_elem = mixed_elems_.size_array();
   //assert(mixed_elems_diffu_.size_array()==nb_elem);
@@ -1772,7 +1772,7 @@ double Convection_Diffusion_Temperature_FT_Disc::get_Twall(const int num_face) c
     d += (xyz_face[i] - P[i])*(xyz_face[i] - P[i]);
   d= sqrt(d);
   const double flux = get_flux_to_face(num_face);
-  const double k = fluide_dipha_->fluide_phase(phase_).conductivite()->valeurs()(0,0);
+  const double k = fluide_dipha_->fluide_phase(phase_).conductivite().valeurs()(0,0);
 //  Cerr << "flux/d/k" <<  flux << " " << d << " " << k <<  finl;
   // flux is incoming. So "-flux" is needed.
   const double Twall = temperature(elem) - d/k*flux;

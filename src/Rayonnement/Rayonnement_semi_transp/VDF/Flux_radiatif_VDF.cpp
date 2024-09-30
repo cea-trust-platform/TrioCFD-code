@@ -63,14 +63,14 @@ Entree& Flux_radiatif_VDF::readOn(Entree& s )
 /*! @brief
  *
  */
-void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don& coeff_abs, const Champ_Don& longueur_rayo,
-                                               const Champ_Don& indice,const Domaine_VF& zvf, const double sigma, double temps)
+void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don_base& coeff_abs, const Champ_Don_base& longueur_rayo,
+                                               const Champ_Don_base& indice,const Domaine_VF& zvf, const double sigma, double temps)
 {
   //  Cerr<<"Flux_radiatif_VDF::evaluer_cl_rayonnement() : Debut"<<finl;
-  const DoubleTab& l_rayo = longueur_rayo->valeurs();
-  const DoubleTab& n = indice->valeurs();
+  const DoubleTab& l_rayo = longueur_rayo.valeurs();
+  const DoubleTab& n = indice.valeurs();
   const DoubleTab& epsilon = emissivite().valeurs();
-  const DoubleTab& kappa = coeff_abs->valeurs();
+  const DoubleTab& kappa = coeff_abs.valeurs();
 
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,zvf);
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
@@ -105,22 +105,22 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
       double eF = zvdf.dist_norm_bord(face);
 
       double nn;
-      assert(indice->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,indice.valeur()))
+      assert(indice.nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,indice))
         nn = n(0,0);
       else
         nn = n(elem,0);
 
       double l_r;
-      assert(longueur_rayo->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,longueur_rayo.valeur()))
+      assert(longueur_rayo.nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,longueur_rayo))
         l_r = l_rayo(0,0);
       else
         l_r = l_rayo(elem,0);
 
       double k;
-      assert(coeff_abs->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,coeff_abs.valeur()))
+      assert(coeff_abs.nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,coeff_abs))
         k = kappa(0,0);
       else
         k = kappa(elem,0);
@@ -236,8 +236,8 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
   Flux.resize(le_bord.nb_faces(),1);
   Eq_rayo_semi_transp_VDF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VDF,domaine_Cl_dis().equation());
   Fluide_base& fluide = eq_rayo.fluide();
-  DoubleTab& kappa = fluide.kappa()->valeurs();
-  DoubleTab& indice = fluide.indice()->valeurs();
+  DoubleTab& kappa = fluide.kappa().valeurs();
+  DoubleTab& indice = fluide.indice().valeurs();
 
   DoubleTab& irradiance = eq_rayo.inconnue().valeurs();
 
@@ -259,8 +259,8 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
 
       double G_F = irradiance(elem);
       double kappa_F;
-      assert(fluide.kappa()->nb_comp()==1);
-      if(sub_type(Champ_Uniforme,fluide.kappa().valeur()))
+      assert(fluide.kappa().nb_comp()==1);
+      if(sub_type(Champ_Uniforme,fluide.kappa()))
         kappa_F = kappa(0,0);
       else
         kappa_F = kappa(elem,0);
@@ -272,8 +272,8 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
         epsi = emissivite().valeurs()(face,0);
       double eF = zvdf.dist_norm_bord(face+ndeb);
       double n;
-      assert(fluide.indice()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.indice().valeur()))
+      assert(fluide.indice().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide.indice()))
         n = indice(0,0);
       else
         n = indice(elem,0);

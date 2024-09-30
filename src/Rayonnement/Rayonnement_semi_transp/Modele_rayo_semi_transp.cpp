@@ -46,48 +46,11 @@ Implemente_instanciable(Modele_rayo_semi_transp,"Modele_rayo_semi_transp",Proble
 
 double const Modele_rayo_semi_transp::sigma = 5.67e-8;
 
-////////////////////////////////////////////////////////////////////
-// Description :
-//           Lecture du Modele_rayo_semi_transp
-//           On lit les parametres de l'equation de rayonnements
-// Precondition :
-// Parametre :
-//     Signification :
-//     Valeurs par defaut :
-//     Contraintes :
-//     Entree :
-//     Entree/Sortie :
-//     Sortie :
-// Retour :
-//     Signification :
-//     Contraintes :
-// Exception :
-// Effets de bord :
-// Postcondition :
-//
 Entree& Modele_rayo_semi_transp::readOn(Entree& is)
 {
   return Probleme_base::readOn(is);
 }
 
-////////////////////////////////////////////////////////////////////
-// Description :
-//
-// Precondition :
-// Parametre :
-//     Signification :
-//     Valeurs par defaut :
-//     Contraintes :
-//     Entree :
-//     Entree/Sortie :
-//     Sortie :
-// Retour :
-//     Signification :
-//     Contraintes :
-// Exception :
-// Effets de bord :
-// Postcondition :
-//
 Sortie& Modele_rayo_semi_transp::printOn(Sortie& os) const
 {
   return os;
@@ -299,15 +262,14 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
 
       if (fluide.is_rayo_semi_transp())
         {
-          Champ_Don& l_rayo = fluide.longueur_rayo();
-          Champ_Don& coeff_abs = fluide.kappa();
+          Champ_Don_base& coeff_abs = fluide.kappa();
 
-          if (sub_type(Champ_Uniforme,coeff_abs.valeur()))
+          if (sub_type(Champ_Uniforme,coeff_abs))
             {
-
-              // Typage du Champ_Don longueur_rayo_ comme un champ_uniforme
-              l_rayo.typer("Champ_Uniforme");
-              Champ_Uniforme& ch_l_rayo=ref_cast(Champ_Uniforme,l_rayo.valeur());
+              // Typage du OWN_PTR(Champ_Don_base) longueur_rayo_ comme un champ_uniforme
+              fluide.typer_longeur_rayo("Champ_Uniforme");
+              Champ_Don_base& l_rayo = fluide.longueur_rayo();
+              Champ_Uniforme& ch_l_rayo=ref_cast(Champ_Uniforme,l_rayo);
               ch_l_rayo.nommer("longueur_de_rayonnement");
               ch_l_rayo.fixer_nb_comp(1);
               // Le nombre de valeurs nodales est fixe a 1 ici car il s'agit d'un
@@ -376,25 +338,6 @@ void Modele_rayo_semi_transp::calculer_flux_radiatif()
     }
 }
 
-
-////////////////////////////////////////////////////////////////////
-// Description :
-//
-// Precondition :
-// Parametre :
-//     Signification :
-//     Valeurs par defaut :
-//     Contraintes :
-//     Entree :
-//     Entree/Sortie :
-//     Sortie :
-// Retour :
-//     Signification :
-//     Contraintes :
-// Exception :
-// Effets de bord :
-// Postcondition :
-//
 const Champ_front_base& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) const
 {
   //  Cerr<<"Modele_rayo_semi_transp::flux_radiatif const : Debut"<<finl;
@@ -432,5 +375,3 @@ const Champ_front_base& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bo
   return la_cl_rayon.flux_radiatif();
   //  Cerr<<"Modele_rayo_semi_transp::flux_radiatif const : Fin"<<finl;
 }
-
-

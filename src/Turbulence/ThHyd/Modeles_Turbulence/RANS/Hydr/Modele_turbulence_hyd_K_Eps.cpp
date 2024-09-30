@@ -115,11 +115,11 @@ Champ_Fonc_base& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(doub
       // pour avoir nu en incompressible et mu en QC
       // et non comme on a divise K et eps par rho (si on est en QC)
       // on veut toujours nu
-      const Champ_Don ch_visco = ref_cast(Fluide_base,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
-      const Champ_Don& ch_visco_cin = ref_cast(Fluide_base,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
-      // const Champ_Don& ch_visco_cin_ou_dyn =((const Op_Diff_K_Eps&) eqn_transp_K_Eps().operateur(0)).diffusivite();
+      const OWN_PTR(Champ_Don_base) ch_visco = ref_cast(Fluide_base,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
+      const Champ_Don_base& ch_visco_cin = ref_cast(Fluide_base,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
+      // const Champ_Don_base& ch_visco_cin_ou_dyn =((const Op_Diff_K_Eps&) eqn_transp_K_Eps().operateur(0)).diffusivite();
 
-      const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+      const DoubleTab& tab_visco = ch_visco_cin.valeurs();
       //      const DoubleTab& tab_visco = ch_visco.valeurs();
       Fmu.resize(tab_K_Eps.dimension_tot(0));
       const Domaine_dis_base& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
@@ -136,7 +136,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(doub
           if (lp != "negligeable_VEF")
             {
               DoubleTab visco_tab(visco_turb.dimension_tot(0));
-              assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
+              assert(sub_type(Champ_Uniforme,ch_visco_cin));
               visco_tab = tab_visco(0, 0);
               const int idt = mon_equation_->schema_temps().nb_pas_dt();
               const DoubleTab& tab_paroi = loi_paroi().Cisaillement_paroi();

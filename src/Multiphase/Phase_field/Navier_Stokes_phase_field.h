@@ -24,7 +24,7 @@
 #define Navier_Stokes_phase_field_included
 
 #include <Navier_Stokes_std.h>
-#include <Champ_Don.h>
+
 #include <time.h>
 #include <Constituant.h>
 #include <Source_Con_Phase_field.h>
@@ -71,18 +71,18 @@ public :
   void discretiser() override;
   void completer() override;
   int preparer_calcul() override;
-  virtual void rho_aux_faces(const DoubleTab&, Champ_Don&);
-  inline const Champ_Don& rho() const;
-  inline const Champ_Don& drhodc() const;
+  virtual void rho_aux_faces(const DoubleTab&, Champ_Don_base&);
+  inline const Champ_Don_base& rho() const;
+  inline const Champ_Don_base& drhodc() const;
   inline const double& rho0() const;
-  inline Champ_Don& mu();
-  inline const Champ_Don& mu() const;
+  inline Champ_Don_base& mu();
+  inline const Champ_Don_base& mu() const;
   inline int& get_boussi_();
   inline DoubleVect& get_g_();
   inline const DoubleVect& get_g_() const;
   DoubleTab& derivee_en_temps_inco(DoubleTab& ) override;
   void mettre_a_jour(double ) override;
-  const Champ_Don& diffusivite_pour_transport() const override;
+  const Champ_Don_base& diffusivite_pour_transport() const override;
   void creer_champ(const Motcle& motlu) override;
 
   /////////////////////////////////////////////////////
@@ -98,13 +98,13 @@ public :
 
 protected :
 
-  Champ_Don rho_; // soit lu dans le jdd (boussi_==0)
+  OWN_PTR(Champ_Don_base) rho_; // soit lu dans le jdd (boussi_==0)
   // soit construit comme rho0_*(1+betac_*c) (boussi_==1)
-  Champ_Don drhodc_; // soit lu dans le jdd (boussi_==0)
+  OWN_PTR(Champ_Don_base) drhodc_; // soit lu dans le jdd (boussi_==0)
   // soit construit comme rho0_*betac_ (boussi_==1 mais attention strictement valide seulement si betac_= Champs_Uniforme)
   double rho0_;
-  REF(Champ_Don) betac_;
-  Champ_Don mu_;// lu dans le jdd (boussi_==0) seulement pour boussi_==0 && diff_boussi_==0
+  REF(Champ_Don_base) betac_;
+  OWN_PTR(Champ_Don_base) mu_;// lu dans le jdd (boussi_==0) seulement pour boussi_==0 && diff_boussi_==0
 
   int boussi_;
   int diff_boussi_;
@@ -125,12 +125,12 @@ inline double& valeur(DoubleTab& valeurs, const int elem, const int dim)
   return valeurs(elem,dim);
 }
 
-inline const Champ_Don& Navier_Stokes_phase_field::rho() const
+inline const Champ_Don_base& Navier_Stokes_phase_field::rho() const
 {
   return rho_;
 }
 
-inline const Champ_Don& Navier_Stokes_phase_field::drhodc() const
+inline const Champ_Don_base& Navier_Stokes_phase_field::drhodc() const
 {
   return drhodc_;
 }
@@ -140,12 +140,12 @@ inline const double& Navier_Stokes_phase_field::rho0() const
   return rho0_;
 }
 
-inline Champ_Don& Navier_Stokes_phase_field::mu()
+inline Champ_Don_base& Navier_Stokes_phase_field::mu()
 {
   return mu_;
 }
 
-inline const Champ_Don& Navier_Stokes_phase_field::mu() const
+inline const Champ_Don_base& Navier_Stokes_phase_field::mu() const
 {
   return mu_;
 }

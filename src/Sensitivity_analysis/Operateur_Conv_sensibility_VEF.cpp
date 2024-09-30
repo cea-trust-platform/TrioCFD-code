@@ -130,8 +130,8 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           if(uncertain_var=="CP")
             {
               double lambda_div_Cp=-1.;
-              const double Cp = eq.fluide().capacite_calorifique()->valeurs()(0, 0);
-              const double lambda = eq.fluide().conductivite()->valeurs()(0, 0);
+              const double Cp = eq.fluide().capacite_calorifique().valeurs()(0, 0);
+              const double lambda = eq.fluide().conductivite().valeurs()(0, 0);
               lambda_div_Cp*=(lambda/Cp);
               add_diffusion_scalar_term(temperature_state, resu,lambda_div_Cp);
             }

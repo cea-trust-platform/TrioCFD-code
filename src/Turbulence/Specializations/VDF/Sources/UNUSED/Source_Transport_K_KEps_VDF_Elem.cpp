@@ -72,11 +72,11 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
 
   //Extraction de la viscosite moleculaire
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   double visco=-1;
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;

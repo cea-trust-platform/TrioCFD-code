@@ -36,13 +36,13 @@ class Modele_F1F2FMU_unitaire_VDF : public Modele_Jones_Launder_VDF
 
 public :
 
-  DoubleTab& Calcul_Fmu (DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const Champ_Don&) const override;
+  DoubleTab& Calcul_Fmu (DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const Champ_Don_base&) const override;
   DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis_base&, const DoubleTab&,const DoubleTab&,const Champ_base& ) const override ;
   DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const Champ_base&) const override ;
 
   DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const override;
   DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_base&) const override ;
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don_base& )const override ;
 
   void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ) override;
   Entree& lire(const Motcle&, Entree&);

@@ -105,7 +105,7 @@ void Echange_contact_Rayo_transp_VDF::mettre_a_jour(double temps)
   //  Echange_contact_VDF::mettre_a_jour(temps);
   Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());
   const Milieu_base& le_milieu=ch.milieu();
-  int nb_comp = le_milieu.conductivite()->nb_comp();
+  int nb_comp = le_milieu.conductivite().nb_comp();
 
   if (num_premiere_face_dans_pb_fluide==-1)
     {

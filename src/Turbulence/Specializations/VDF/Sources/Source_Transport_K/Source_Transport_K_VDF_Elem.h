@@ -24,7 +24,7 @@
 
 #include <Source_Transport_VDF_Elem_base.h>
 #include <TRUST_Ref.h>
-#include <Champ_Don.h>
+
 
 class Transport_K_ou_Eps;
 
@@ -48,7 +48,7 @@ private:
   const DoubleTab& get_visc_turb() const override;
   const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& get_modele_fonc_bas_reyn() const  override;
   void calculer_terme_production(const Champ_Face_VDF&, const DoubleTab& , const DoubleTab& , DoubleVect&) const override;
-  void calcul_D_E(const DoubleTab& , const DoubleTab& , const Champ_Don& , DoubleTab& , DoubleTab& ) const override;
+  void calcul_D_E(const DoubleTab& , const DoubleTab& , const Champ_Don_base& , DoubleTab& , DoubleTab& ) const override;
   void calcul_F1_F2(const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const override;
   void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const override;
   void fill_resu(const DoubleVect& , DoubleTab& ) const override;

@@ -84,7 +84,7 @@ void Energie_cinetique_turbulente_WIT::associer_milieu_base(const Milieu_base& u
   associer_fluide(un_fluide);
 }
 
-const Champ_Don& Energie_cinetique_turbulente_WIT::diffusivite_pour_transport() const
+const Champ_Don_base& Energie_cinetique_turbulente_WIT::diffusivite_pour_transport() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }

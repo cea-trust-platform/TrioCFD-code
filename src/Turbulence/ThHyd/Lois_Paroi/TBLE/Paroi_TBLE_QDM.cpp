@@ -270,12 +270,12 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Domaine_VF& domaine_dis, const Domaine
   Cerr << "Dimension de eq_vit = " << compteur_faces_paroi << finl;
   Cerr << "nb_faces_bord = " << domaine_dis.nb_faces_bord() << finl;
 
-  if (getPbBase().milieu().conductivite().non_nul() && sub_type(Champ_Fonc_Fonction,getPbBase().milieu().conductivite().valeur()))
+  if (getPbBase().milieu().has_conductivite() && sub_type(Champ_Fonc_Fonction,getPbBase().milieu().conductivite()))
     {
       lambda_fonction =1;
-      lambda_chaine=ref_cast(Champ_Fonc_Fonction,getPbBase().milieu().conductivite().valeur()).table().parser(0).getString().c_str();
+      lambda_chaine=ref_cast(Champ_Fonc_Fonction,getPbBase().milieu().conductivite()).table().parser(0).getString().c_str();
     }
-  const Champ_base& mu=ref_cast(Fluide_base,getPbBase().milieu()).viscosite_dynamique().valeur();
+  const Champ_base& mu=ref_cast(Fluide_base,getPbBase().milieu()).viscosite_dynamique();
   if (sub_type(Champ_Fonc_Fonction,mu))
     {
       mu_fonction =1;

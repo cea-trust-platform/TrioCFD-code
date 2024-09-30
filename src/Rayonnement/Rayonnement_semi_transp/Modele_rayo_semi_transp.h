@@ -26,8 +26,6 @@
 #include <Equation_rayonnement_base.h>
 #include <Probleme_base.h>
 
-
-
 class Nom;
 class Probleme_base;
 

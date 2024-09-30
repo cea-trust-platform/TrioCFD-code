@@ -95,14 +95,14 @@ int Paroi_std_scal_hyd_EF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   const DoubleVect& volumes_maille = domaine_EF.volumes();
   const DoubleVect& surfaces_face = domaine_EF.face_surfaces();
   int l_unif;
 
   double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       l_unif = 1;
       visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -126,19 +126,19 @@ int Paroi_std_scal_hyd_EF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Equation_base& eqn = mon_modele_turb_scal->equation();
   // Recuperation de la diffusivite en fonction du type d'equation:
   int schmidt = (sub_type(Convection_Diffusion_Concentration,eqn) ? 1 : 0);
-  const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
-  int alpha_uniforme = (sub_type(Champ_Uniforme,alpha.valeur()) ? 1 : 0);
+  const Champ_Don_base& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
+  int alpha_uniforme = (sub_type(Champ_Uniforme,alpha) ? 1 : 0);
 
   // Verifications (l'algorithme n'est valable que si d_alpha est le meme pour chaque constituant)
   if (schmidt)
     {
       if (alpha_uniforme)
         {
-          double d_alpha = alpha->valeurs()(0,0);
-          assert(ref_cast(Convection_Diffusion_Concentration,eqn).constituant().nb_constituants()==alpha->valeurs().line_size());
-          for (int nc=0; nc<alpha->valeurs().line_size(); nc++)
+          double d_alpha = alpha.valeurs()(0,0);
+          assert(ref_cast(Convection_Diffusion_Concentration,eqn).constituant().nb_constituants()==alpha.valeurs().line_size());
+          for (int nc=0; nc<alpha.valeurs().line_size(); nc++)
             {
-              if (d_alpha!=alpha->valeurs()(0,nc))
+              if (d_alpha!=alpha.valeurs()(0,nc))
                 {
                   Cerr << "Error!" << finl;
                   Cerr << "Law of the wall are not implemented yet for constituants with different diffusion coefficients." << finl;
@@ -148,12 +148,12 @@ int Paroi_std_scal_hyd_EF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
         }
       else
         {
-          for (int elem=0; elem<alpha->valeurs().dimension(0); elem++)
+          for (int elem=0; elem<alpha.valeurs().dimension(0); elem++)
             {
-              double d_alpha = alpha->valeurs()(elem,0);
-              for (int nc=0; nc<alpha->valeurs().line_size(); nc++)
+              double d_alpha = alpha.valeurs()(elem,0);
+              for (int nc=0; nc<alpha.valeurs().line_size(); nc++)
                 {
-                  if (d_alpha!=alpha->valeurs()(elem,nc))
+                  if (d_alpha!=alpha.valeurs()(elem,nc))
                     {
                       Cerr << "Error!" << finl;
                       Cerr << "Law of the wall are not implemented yet for constituants with different diffusion coefficients." << finl;
@@ -210,7 +210,7 @@ int Paroi_std_scal_hyd_EF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
               // Alex. C. : 11/04/2003
               double u_star = tab_u_star(num_face);
-              double d_alpha = (alpha_uniforme ? alpha->valeurs()(0,0) : alpha->valeurs()(elem,0) );
+              double d_alpha = (alpha_uniforme ? alpha.valeurs()(0,0) : alpha.valeurs()(elem,0) );
               if (u_star == 0 || d_alpha==0)
                 {
                   dist_equiv[ind_face] = dist;

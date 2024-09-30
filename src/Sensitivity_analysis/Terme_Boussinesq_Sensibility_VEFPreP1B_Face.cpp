@@ -234,7 +234,7 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
       // Calcul du terme source aux points d'integration :
       le_scalaire.valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire);
       T_etat->valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire_etat);
-      beta()->valeur_aux_elems(les_positions,les_polygones,valeurs_beta);
+      beta().valeur_aux_elems(les_positions,les_polygones,valeurs_beta);
 
       // Boucle sur les faces de l'element:
       for(int face=0; face<=dimension; face++)

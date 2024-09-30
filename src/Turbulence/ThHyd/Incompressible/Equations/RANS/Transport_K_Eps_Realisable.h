@@ -44,7 +44,7 @@ public :
 
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  virtual const Champ_Don& diffusivite_pour_transport() const;
+  virtual const Champ_Don_base& diffusivite_pour_transport() const;
   virtual const Champ_base& vitesse_pour_transport() const;
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
@@ -64,7 +64,7 @@ protected:
   Operateur_Conv terme_convectif;
 
   REF(Champ_Inc_base) inco_eqn_associee;
-  Champ_Don Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
+  OWN_PTR(Champ_Don_base) Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
 
 private :
 

@@ -60,7 +60,7 @@ void Energie_cinetique_turbulente::set_param(Param& param)
   param.ajouter_flag("limit_K",&limit_k_); // X_D attr limit_K entier limit_K 1 Flag to activate the limiter on K. Default value is 0 (deactivated)
 }
 
-const Champ_Don& Energie_cinetique_turbulente::diffusivite_pour_transport() const
+const Champ_Don_base& Energie_cinetique_turbulente::diffusivite_pour_transport() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }

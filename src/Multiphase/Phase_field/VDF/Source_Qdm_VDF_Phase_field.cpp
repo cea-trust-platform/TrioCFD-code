@@ -158,7 +158,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   double vol0,vol1;
 
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
-  DoubleTab rhoPF=eq_ns.rho()->valeurs();
+  DoubleTab rhoPF=eq_ns.rho().valeurs();
   double rho_face;
 
   // Forme en c*Grad(mutilde)
@@ -302,7 +302,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_2(DoubleTab& resu) const
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
       opgrad.calculer(div_alpha_rho_gradC, grad_div_alpha_rho_gradC);
 
-      DoubleTab rhoPF=eq_ns.rho()->valeurs();
+      DoubleTab rhoPF=eq_ns.rho().valeurs();
       double rho_face;
 
       // Division par rho0 necessaire dans le cas incompressible
@@ -385,7 +385,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_3(DoubleTab& resu) const
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
       opgrad.calculer(div_alpha_rho_gradC, grad_div_alpha_rho_gradC);
 
-      DoubleTab rhoPF=eq_ns.rho()->valeurs();
+      DoubleTab rhoPF=eq_ns.rho().valeurs();
       double rho_face;
 
       // Division par rho0 necessaire dans le cas incompressible
@@ -497,7 +497,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_4(DoubleTab& resu) const
       const DoubleTab& div_alpha_rho_gradC=eq_c.get_div_alpha_rho_gradC();
       double div_alpha_rho_gradCface;
 
-      DoubleTab rhoPF=eq_ns.rho()->valeurs();
+      DoubleTab rhoPF=eq_ns.rho().valeurs();
       double rho_face;
 
       if((compressible==0 && boussi_==1) || boussi_==0)

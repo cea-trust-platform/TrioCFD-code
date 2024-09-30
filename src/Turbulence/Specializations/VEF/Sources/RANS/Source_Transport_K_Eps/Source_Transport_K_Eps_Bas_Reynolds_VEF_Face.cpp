@@ -50,7 +50,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();
   const Modele_Fonc_Bas_Reynolds_Base& mon_modele_fonc = mod_turb.associe_modele_fonction().valeur();
   const Fluide_base& fluide = ref_cast(Fluide_base, eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& vol_ent = domaine_VEF.volumes_entrelaces();
   const int nb_faces = domaine_VEF.nb_faces();

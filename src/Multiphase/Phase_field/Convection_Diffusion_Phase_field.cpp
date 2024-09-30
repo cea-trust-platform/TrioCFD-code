@@ -29,7 +29,7 @@
 #include <Frontiere_dis_base.h>
 #include <Param.h>
 #include <Constituant.h>
-#include <Champ_Don.h>
+
 //#include <Mass_Redistribution_Phase_Field.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Phase_field,"Convection_Diffusion_Phase_field",Convection_Diffusion_Concentration);

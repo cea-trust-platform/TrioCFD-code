@@ -81,7 +81,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
       {
         if (fluide().longueur_rayo_is_discretised())
           {
-            const Champ_Don& long_rayo = fluide().longueur_rayo();
+            const Champ_Don_base& long_rayo = fluide().longueur_rayo();
             terme_diffusif.associer_diffusivite(long_rayo);
           }
         else
@@ -135,9 +135,9 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
 
 
   if (sub_type(Fluide_base,fluide()))
-    if (fluide().kappa().non_nul())
+    if (fluide().has_kappa())
       {
-        const Champ_Don& long_rayo = fluide().longueur_rayo();
+        const Champ_Don_base& long_rayo = fluide().longueur_rayo();
         terme_diffusif->associer_diffusivite(long_rayo);
         terme_diffusif.completer();
         terme_diffusif->dimensionner(la_matrice);
@@ -200,7 +200,7 @@ int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entre
 void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milieu)
 {
   if (sub_type(Fluide_base,un_milieu))
-    if (fluide().kappa().non_nul())
+    if (fluide().has_kappa())
       {
         const Fluide_base& un_fluide = ref_cast(Fluide_base,un_milieu);
         associer_fluide(un_fluide);

@@ -26,7 +26,7 @@
 #include <Champs_compris_interface.h>
 #include <Champ_Fonc_base.h>
 #include <Champs_compris.h>
-#include <Champ_Don.h>
+
 #include <TRUST_Ref.h>
 
 class Fluide_base;
@@ -109,7 +109,7 @@ protected :
   REF(Fluide_base) le_fluide;
   REF(Champ_Inc_base) la_vitesse_transportante;
   REF(Equation_base) eq_hydraulique;
-  REF(Champ_Don) visco_;
+  REF(Champ_Don_base) visco_;
 
   Nom nom_fic;
   OWN_PTR(Champ_Fonc_base)  BR_wall_length_;

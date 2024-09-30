@@ -39,7 +39,7 @@
 #include <TRUST_Ref.h>
 
 
-#include <Champ_Don.h>
+
 
 class Convection_Diffusion_Temperature;
 class Equation_base;
@@ -82,7 +82,7 @@ protected :
   REF(Transport_Fluctuation_Temperature)  mon_eq_transport_Fluctu_Temp_;
   REF(Convection_Diffusion_Temperature) eq_thermique;
   REF(Transport_Flux_Chaleur_Turbulente)  mon_eq_transport_Flux_Chaleur_Turb_;
-  REF(Champ_Don) beta_t;
+  REF(Champ_Don_base) beta_t;
   REF(Champ_Don_base) gravite_;
   REF(Modele_turbulence_hyd_K_Eps_Bas_Reynolds) le_modele;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;

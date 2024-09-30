@@ -140,7 +140,7 @@ int Paroi_TBLE_scal_VDF::init_lois_paroi()
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi();
   const Fluide_base& le_fluide   = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
+  const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
 
   if (!sub_type(ParoiVDF_TBLE,loi))
     {
@@ -258,21 +258,21 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr  = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide   = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin            = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin            = le_fluide.viscosite_cinematique();
   const double tps = eqn_temp.schema_temps().temps_courant();
   const double dt = eqn_temp.schema_temps().pas_de_temps();
   const double dt_min = eqn_temp.schema_temps().pas_temps_min();
-  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
+  const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems,1);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
   termes_sources /= rhoCp;
 
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   int l_unif;
   // double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       l_unif = 1;
       //  visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -295,7 +295,7 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
   // int schmidt = 0;
   //if (sub_type(Convection_Diffusion_Concentration,eqn_temp)) schmidt = 1;
-  //  const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn_temp).constituant().diffusivite_constituant():le_fluide.diffusivite());
+  //  const Champ_Don_base& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn_temp).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
   const DoubleVect& Temp = eqn_temp.inconnue().valeurs();
   const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis());

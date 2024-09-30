@@ -63,12 +63,12 @@ Entree& Flux_radiatif_VEF::readOn(Entree& s )
 /*! @brief
  *
  */
-void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don&
-                                               coeff_abs, const Champ_Don& longueur_rayo,
-                                               const Champ_Don& indice,const Domaine_VF& zvf,
+void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don_base&
+                                               coeff_abs, const Champ_Don_base& longueur_rayo,
+                                               const Champ_Don_base& indice,const Domaine_VF& zvf,
                                                const double sigma, double temps)
 {
-  const DoubleTab& n = indice->valeurs();
+  const DoubleTab& n = indice.valeurs();
   const DoubleTab& epsilon = emissivite().valeurs();
 
   //  int nb_elem = zvf.nb_elem();
@@ -93,12 +93,11 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
         epsi = epsilon(face-ndeb,0);
 
       double nn;
-      assert(indice->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,indice.valeur()))
+      assert(indice.nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,indice))
         nn = n(0,0);
       else
         nn = n(face,0);
-
 
       double T;
       assert(Tb.nb_comp() == 1);
@@ -178,7 +177,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   Flux.resize(le_bord.nb_faces(),1);
   Eq_rayo_semi_transp_VEF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VEF,domaine_Cl_dis().equation());
   Fluide_base& fluide = eq_rayo.fluide();
-  DoubleTab& indice = fluide.indice()->valeurs();
+  DoubleTab& indice = fluide.indice().valeurs();
   DoubleTab& irradiance = eq_rayo.inconnue().valeurs();
 
   const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_Cl_dis().domaine_dis());
@@ -199,8 +198,8 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
       else
         epsi = emissivite().valeurs()(face,0);
       double n;
-      assert(fluide.indice()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.indice().valeur()))
+      assert(fluide.indice().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide.indice()))
         n = indice(0,0);
       else
         n = indice(face+ndeb,0);

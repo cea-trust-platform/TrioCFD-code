@@ -73,12 +73,12 @@ void Source_Transport_K_Realisable_VEF_Face::mettre_a_jour(double temps)
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const double epsilon_minimum = eqn_k_Rea->modele_turbulence().get_EPS_MIN();
-  const Champ_Don& ch_visco_cin = ref_cast(Fluide_base,eqn_k_Rea->milieu()).viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = ref_cast(Fluide_base,eqn_k_Rea->milieu()).viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
   /*Paroi*/
   DoubleTab visco_tab(visco_turb.dimension_tot(0));
-  assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
+  assert(sub_type(Champ_Uniforme,ch_visco_cin));
   visco_tab = tab_visco(0, 0);
   const int idt = eq_hydraulique->schema_temps().nb_pas_dt();
   const DoubleTab& tab_paroi = mod_turb.loi_paroi().Cisaillement_paroi();

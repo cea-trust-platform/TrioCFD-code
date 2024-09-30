@@ -108,7 +108,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 {
   const Domaine_VDF& le_dom_vdf = domaine_VDF.valeur();
   const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
-  ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
+  ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite());
   ////double d_Lambda = Lambda(0,0);
   const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
@@ -125,8 +125,8 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
   double d_Cp =0;
 
   const DoubleTab& rho=le_milieu.masse_volumique().valeurs();
-  const DoubleTab& Lambda = le_milieu.conductivite()->valeurs();
-  const DoubleTab& Cp = le_milieu.capacite_calorifique()->valeurs();
+  const DoubleTab& Lambda = le_milieu.conductivite().valeurs();
+  const DoubleTab& Cp = le_milieu.capacite_calorifique().valeurs();
 
   if (sub_type(Champ_Uniforme,le_milieu.masse_volumique()))
     {
@@ -134,13 +134,13 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 
       d_rho= rho(0,0);
     }
-  if (sub_type(Champ_Uniforme,le_milieu.conductivite().valeur()))
+  if (sub_type(Champ_Uniforme,le_milieu.conductivite()))
     {
       is_conduc_unif=1;
       d_Lambda= Lambda(0,0);
     }
 
-  if (sub_type(Champ_Uniforme,le_milieu.capacite_calorifique().valeur()))
+  if (sub_type(Champ_Uniforme,le_milieu.capacite_calorifique()))
     {
       is_Cp_unif=1;
       d_Cp = Cp(0,0);

@@ -24,7 +24,7 @@
 
 #include <Convection_Diffusion_Temperature.h>
 
-#include <Champ_Don.h>
+
 #include <Assembleur_base.h>
 #include <TRUST_Ref.h>
 

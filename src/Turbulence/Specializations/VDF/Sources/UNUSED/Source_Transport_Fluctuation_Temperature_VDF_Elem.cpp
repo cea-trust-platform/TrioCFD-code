@@ -250,7 +250,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
   const DoubleTab& g = gravite->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
   int nb_elem = domaine_VDF.nb_elem();
   int nb_elem_tot = domaine_VDF.nb_elem_tot();
   //  int nb_face = domaine_VDF.nb_faces();
@@ -276,8 +276,8 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_VDF_Elem::ajouter(DoubleTab&
   // C'est l'objet de type domaine_Cl_dis de l'equation thermique
   // qui est utilise dans le calcul de G
 
-  const DoubleTab& tab_beta = ch_beta->valeurs();
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  const DoubleTab& tab_beta = ch_beta.valeurs();
+  if (sub_type(Champ_Uniforme,ch_beta))
     // calculer_terme_g(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
     {
       int nb_faces_elem =le_dom.nb_faces_elem();

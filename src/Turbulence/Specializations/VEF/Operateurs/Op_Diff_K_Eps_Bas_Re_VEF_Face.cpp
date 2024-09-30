@@ -21,7 +21,7 @@
 
 #include <Op_Diff_K_Eps_Bas_Re_VEF_Face.h>
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
-#include <Champ_Don.h>
+
 #include <Champ_Uniforme.h>
 #include <Champ_P1NC.h>
 #include <Domaine_VEF.h>

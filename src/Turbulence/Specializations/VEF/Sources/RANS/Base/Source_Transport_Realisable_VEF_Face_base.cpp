@@ -40,9 +40,9 @@ DoubleTab& Source_Transport_Realisable_VEF_Face_base::ajouter_keps_real(DoubleTa
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const Modele_Fonc_Realisable_base& mon_modele_fonc = get_modele_fonc(); // voir les classes filles
   const Fluide_base& fluide = ref_cast(Fluide_base, eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  int is_visco_const = sub_type(Champ_Uniforme, ch_visco_cin.valeur());
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
+  int is_visco_const = sub_type(Champ_Uniforme, ch_visco_cin);
 
   double visco = -1;
   if (is_visco_const) visco = std::max(tab_visco(0, 0), DMINFLOAT);
@@ -87,9 +87,9 @@ void Source_Transport_Realisable_VEF_Face_base::contribuer_a_avec(const DoubleTa
 {
   const int size = get_size_k_eps(); // voir les classes filles
   const Fluide_base& fluide = ref_cast(Fluide_base, eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const int is_visco_const = sub_type(Champ_Uniforme, ch_visco_cin.valeur());
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
+  const int is_visco_const = sub_type(Champ_Uniforme, ch_visco_cin);
   double visco = -1;
   if (is_visco_const) visco = std::max(tab_visco(0, 0), DMINFLOAT);
 

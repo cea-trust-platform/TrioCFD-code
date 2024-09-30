@@ -51,7 +51,7 @@ void Cond_lim_k_complique_transition_flux_nul_demi::me_calculer()
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis());
   const DoubleTab&       yp = corr_loi_paroi.get_tab("y_plus"), &u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab& nu_visc = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_pas_de_temps().passe(),
-                   &mu_visc = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_transport()->passe();
+                   &mu_visc = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_transport().passe();
 
   // On va chercher le mu turbulent de polymac et celui de vdf et on prend le bon dans la suite
   const DoubleTab* mu_poly = domaine.que_suis_je().debute_par("Domaine_PolyMAC") ? &ref_cast(Op_Diff_PolyMAC_P0_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).nu() : nullptr,

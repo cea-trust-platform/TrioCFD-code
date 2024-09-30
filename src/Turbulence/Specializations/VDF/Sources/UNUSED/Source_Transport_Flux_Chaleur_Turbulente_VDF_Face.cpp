@@ -522,8 +522,8 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
   const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp.inconnue().valeurs();
   const DoubleTab& Flux_Chaleur_Turb = mon_eq_transport_Flux_Chaleur_Turb_->inconnue().valeurs();
   const DoubleVect& g = eq_thermique->fluide().gravite().valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes();
   int nb_elem = domaine_VDF.nb_elem();
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
@@ -535,7 +535,7 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
   DoubleTab gteta2(nb_elem,dimension);
   DoubleTab uiuj(nb_elem);
 
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  if (sub_type(Champ_Uniforme,ch_beta))
     calculer_gteta2(domaine_VDF,gteta2 ,Fluctu_Temperature,tab_beta(0,0),g);
   else
     calculer_gteta2(domaine_VDF, gteta2 ,Fluctu_Temperature,tab_beta,g);

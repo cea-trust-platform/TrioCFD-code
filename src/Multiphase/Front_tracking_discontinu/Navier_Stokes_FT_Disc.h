@@ -26,7 +26,7 @@
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Navier_Stokes_FT_Disc_interne.h>
 #include <Navier_Stokes_Turbulent.h>
-#include <Champ_Don.h>
+
 #include <TRUST_Ref.h>
 
 class Probleme_FT_Disc_gen;
@@ -53,7 +53,7 @@ public:
   virtual const Champ_base& calculer_div_normale_interface();
   void correct_at_exit_bad_gradient(DoubleTab& u0) const;
   void calculer_delta_u_interface(Champ_base& u0, int phase_pilote, int ordre);
-  const Champ_Don& diffusivite_pour_transport() const override;
+  const Champ_Don_base& diffusivite_pour_transport() const override;
 
   virtual const Champ_base* get_delta_vitesse_interface() const;
   virtual const Fluide_Diphasique& fluide_diphasique() const;
@@ -96,9 +96,9 @@ protected:
   OWN_PTR(Champ_Fonc_base)  champ_rho_faces_;
   // Viscosite dynamique (calcul dans preparer_pas_de_temps)
   // champ du type requis pour l'operateur diffusion.
-  Champ_Don champ_mu_;
+  OWN_PTR(Champ_Don_base) champ_mu_;
   // Viscosite cinematique pour le calcul du pas de temps de diffusion
-  Champ_Don champ_nu_;
+  OWN_PTR(Champ_Don_base) champ_nu_;
 
 private:
   const Navier_Stokes_FT_Disc_interne& variables_internes() const;

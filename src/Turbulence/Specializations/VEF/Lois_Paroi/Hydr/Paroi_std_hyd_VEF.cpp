@@ -787,15 +787,15 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
 
   double visco=-1;
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
@@ -1184,14 +1184,14 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_2eq)
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
 
   double visco {-1};
   int l_unif {0};
-  if (sub_type(Champ_Uniforme, ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme, ch_visco_cin))
     {
       visco = std::max(tab_visco(0, 0), DMINFLOAT);
       l_unif = 1;
@@ -1680,14 +1680,14 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
 
   double visco0=-1;
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco0 = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;

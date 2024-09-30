@@ -56,8 +56,8 @@ public :
 
 
   virtual void set_param(Param& param);
-  DoubleTab& Calcul_D(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
-  DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
+  DoubleTab& Calcul_D(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&, const Champ_Don_base&) const override;
+  DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don_base&, const DoubleTab& ) const override ;
   DoubleTab& Calcul_Cmu(DoubleTab&,
                         const Domaine_dis_base&,  const Domaine_Cl_dis_base&,
                         const DoubleTab&, const DoubleTab&, const double) const override;
@@ -83,7 +83,7 @@ public :
                                            const Domaine_dis_base&,const DoubleTab&, const DoubleTab&, const DoubleTab&,
                                            const DoubleTab&, const Champ_base& K_Eps) const;
   DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const Champ_base&) const override ;
-  DoubleTab& Calcul_Fmu ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const Champ_Don& )const override ;
+  DoubleTab& Calcul_Fmu ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const Champ_Don_base& )const override ;
   Entree& lire(const Motcle&, Entree&);
   // void associer_pb(const Probleme_base& );
   void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ) override;
@@ -112,11 +112,11 @@ public :
                                                const Domaine_dis_base&,const DoubleTab&, const DoubleTab&, const DoubleTab&,
                                                const DoubleTab&, const Champ_base& K, const Champ_base& Eps) const;
 
-  DoubleTab& Calcul_D_BiK(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
-  DoubleTab& Calcul_E_BiK(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
+  DoubleTab& Calcul_D_BiK(DoubleTab&, const Domaine_dis_base&, const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don_base&) const override;
+  DoubleTab& Calcul_E_BiK(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don_base&, const DoubleTab& ) const override ;
   DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const override;
   DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_base&) const override ;
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,const Champ_Don_base& )const override ;
 
 protected:
 
@@ -125,7 +125,7 @@ protected:
   /*   REF(Fluide_Incompressible) le_fluide; */
   /*   REF(Champ_Inc_base) la_vitesse_transportante; */
   /*   REF(Transport_K_Eps_Bas_Reynolds) eq_transport_K_Eps_Bas_Re; */
-  /*   REF(Champ_Don) visco; */
+  /*   REF(Champ_Don_base) visco; */
 
 };
 

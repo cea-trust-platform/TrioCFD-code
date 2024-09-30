@@ -56,8 +56,8 @@ DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::ajouter(DoubleTab& resu) const
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,eq_rayo.domaine_dis());
   int nb_elem = zvdf.nb_elem();
   const Fluide_base& fluide = eq_rayo.fluide();
-  const DoubleTab& kappa = fluide.kappa()->valeurs();
-  const DoubleTab& indice = fluide.indice()->valeurs();
+  const DoubleTab& kappa = fluide.kappa().valeurs();
+  const DoubleTab& indice = fluide.indice().valeurs();
   const DoubleTab& G = eq_rayo.inconnue().valeurs();
   const double sigma = Modele().valeur_sigma();
 
@@ -69,15 +69,15 @@ DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::ajouter(DoubleTab& resu) const
   for(elem=0; elem<nb_elem; elem++)
     {
       double n;
-      assert(fluide.indice()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.indice().valeur()))
+      assert(fluide.indice().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide.indice()))
         n = indice(0,0);
       else
         n = indice(elem,0);
 
       double k;
-      assert(fluide.kappa()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.kappa().valeur()))
+      assert(fluide.kappa().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide.kappa()))
         k = kappa(0,0);
       else
         k = kappa(elem,0);

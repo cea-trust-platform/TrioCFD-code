@@ -74,7 +74,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
       //A VOIR !!!!!!!!!!!!!!!!!!!!!!!!
       //ch.inconnue() sort l'inconnue du probleme grossier
       const Milieu_base& le_milieu = ch.inconnue().equation().milieu();
-      int nb_comp = le_milieu.conductivite()->nb_comp();
+      int nb_comp = le_milieu.conductivite().nb_comp();
       int i;
 
 
@@ -150,7 +150,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
           //       // Calcul de tab = 1/(e/lambda + 1/h_paroi)
 
-          //       if(!sub_type(Champ_Uniforme,le_milieu.conductivite().valeur()))
+          //       if(!sub_type(Champ_Uniforme,le_milieu.conductivite()))
           //         {
           //           //Cerr << " Raccord distant homogene et conductivite non uniforme " << finl;
           //           DoubleTab lambda;
@@ -249,13 +249,13 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
             }
 
           // Calcul de tab = 1/(e/lambda + 1/h_paroi)
-          if(!sub_type(Champ_Uniforme,le_milieu.conductivite().valeur()))
+          if(!sub_type(Champ_Uniforme,le_milieu.conductivite()))
             {
               //Cerr << "raccord local homogene et conductivite non uniforme" << finl;
 
 
               //ON DOIT RECUPERER LE lambda DU MILIEU GROSSIER !!
-              const DoubleTab& lambda = le_milieu.conductivite()->valeurs();
+              const DoubleTab& lambda = le_milieu.conductivite().valeurs();
 
 
               assert(h_paroi!=0.);
@@ -303,8 +303,8 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
                   //    Cerr << "Dans Contact Zoom fin h = " << 1./(e(num_faceG)/le_milieu.conductivite()(0,0)+1./h_paroi) << finl;
                   for(i=0; i<nb_comp; i++)
                     {
-                      assert(le_milieu.conductivite()->valeurs()(0,i)!=0.);
-                      tab(face-ndeb,i) = 1./(e(num_faceG-ndebG)/le_milieu.conductivite()->valeurs()(0,i)+1./h_paroi);
+                      assert(le_milieu.conductivite().valeurs()(0,i)!=0.);
+                      tab(face-ndeb,i) = 1./(e(num_faceG-ndebG)/le_milieu.conductivite().valeurs()(0,i)+1./h_paroi);
                     }
                 }
             }

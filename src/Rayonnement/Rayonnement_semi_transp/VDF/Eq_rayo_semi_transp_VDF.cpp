@@ -74,7 +74,7 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
   //  Cerr<<"Eq_rayo_semi_transp_VDF::resoudre : Debut"<<finl;
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, domaine_dis());
   int nb_elem = domaine_VF.nb_elem();
-  const DoubleTab& kappa = fluide().kappa()->valeurs();
+  const DoubleTab& kappa = fluide().kappa().valeurs();
   //calcul du second membre
   DoubleTrav secmem(inconnue().valeurs());
   Probleme_base& pb = Modele().probleme();
@@ -82,21 +82,21 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
 
   assert(pb.equation(1).inconnue().le_nom()=="temperature");
   const DoubleTab& temper = pb.equation(1).inconnue().valeurs();
-  const DoubleTab& indice = fluide().indice()->valeurs();
+  const DoubleTab& indice = fluide().indice().valeurs();
   const double sigma = Modele().valeur_sigma();
 
   secmem = 0;
   int elem;
   for (elem=0; elem<nb_elem; elem++)
     {
-      assert(fluide().indice()->nb_comp());
-      if(sub_type(Champ_Uniforme,fluide().indice().valeur()))
+      assert(fluide().indice().nb_comp());
+      if(sub_type(Champ_Uniforme,fluide().indice()))
         n = indice(0,0);
       else
         n = indice(elem,0);
 
-      assert(fluide().kappa()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide().kappa().valeur()))
+      assert(fluide().kappa().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide().kappa()))
         k = kappa(0,0);
       else
         k = kappa(elem,0);
@@ -113,7 +113,7 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
   terme_diffusif->contribuer_au_second_membre(secmem);
 
   if (solveur->que_suis_je() == "Solv_GCP")
-    if (sub_type(Champ_Uniforme,fluide().kappa().valeur()))
+    if (sub_type(Champ_Uniforme,fluide().kappa()))
       {
         Matrice matrice_tmp;
         dimensionner_Mat_Bloc_Morse_Sym(matrice_tmp);
@@ -290,8 +290,8 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
         {
           Flux_radiatif_VDF& cl_radiatif = ref_cast(Flux_radiatif_VDF,la_cl.valeur());
           const DoubleTab& epsilon = cl_radiatif.emissivite().valeurs();
-          const DoubleTab& long_rayo = fluide().longueur_rayo()->valeurs();
-          const DoubleTab& kappa = fluide().kappa()->valeurs();
+          const DoubleTab& long_rayo = fluide().longueur_rayo().valeurs();
+          const DoubleTab& kappa = fluide().kappa().valeurs();
           double A = cl_radiatif.A();
 
           if (sub_type(Front_VF,la_cl->frontiere_dis()))
@@ -309,9 +309,9 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
 
                   double eF = zvdf.dist_norm_bord(face);
                   double k,l_r;
-                  assert(fluide().longueur_rayo()->nb_comp() == 1);
-                  assert(fluide().kappa()->nb_comp() == 1);
-                  if(sub_type(Champ_Uniforme,fluide().kappa().valeur()))
+                  assert(fluide().longueur_rayo().nb_comp() == 1);
+                  assert(fluide().kappa().nb_comp() == 1);
+                  if(sub_type(Champ_Uniforme,fluide().kappa()))
                     {
                       k = kappa(0,0);
                       l_r = long_rayo(0,0);
@@ -339,8 +339,7 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
                   double coeff = numer_coeff/denum_coeff;
 
                   // On rajoute ce coefficient sur la diagonale de la matrice de discretisation
-                  if(epsi<DMINFLOAT)
-                    ;
+                  if(epsi<DMINFLOAT) { /* rien */ }
                   else
                     la_matrice(elem,elem) +=  coeff;
                 }
@@ -403,7 +402,7 @@ void Eq_rayo_semi_transp_VDF::assembler_matrice()
   terme_diffusif->contribuer_a_avec(irradi,la_matrice);
 
   // Modification de la matrice pour prendre en compte le second membre en K*irradiance
-  const DoubleTab& kappa = fluide().kappa()->valeurs();
+  const DoubleTab& kappa = fluide().kappa().valeurs();
 
   Cerr<<"On verifie lors du calcul de la matrice de discretisation que "<<finl;
   Cerr<<"l'ordre de la matrice est bien egale au nombre d'elements"<<finl;
@@ -415,8 +414,8 @@ void Eq_rayo_semi_transp_VDF::assembler_matrice()
   double k;
   for (i=0; i<la_matrice.ordre(); i++)
     {
-      assert(fluide().kappa()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide().kappa().valeur()))
+      assert(fluide().kappa().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide().kappa()))
         k = kappa(0,0);
       else
         k = kappa(i,0);

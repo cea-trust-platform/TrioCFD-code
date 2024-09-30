@@ -2320,7 +2320,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
       opgrad.calculer(c,prov_face);
       eq_ns.solv_masse().appliquer(prov_face);
 
-      const DoubleTab rhoPF=eq_ns.rho()->valeurs();
+      const DoubleTab rhoPF=eq_ns.rho().valeurs();
       double rho_face;
 
       if (boussi_==1)
@@ -4800,15 +4800,15 @@ void Source_Con_Phase_field::calculer_pression_thermo(DoubleTab& pression_thermo
 }
 
 
-void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const
+void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don_base& champ_fonc_c, const DoubleTab& val_c) const
 {
-  if (sub_type(Champ_Fonc_Tabule,champ_fonc_c.valeur()))
+  if (sub_type(Champ_Fonc_Tabule,champ_fonc_c))
     {
-      const Champ_Fonc_Tabule& ch_champ_fonc_c=ref_cast(Champ_Fonc_Tabule, champ_fonc_c.valeur());
+      const Champ_Fonc_Tabule& ch_champ_fonc_c=ref_cast(Champ_Fonc_Tabule, champ_fonc_c);
       const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
       const Table& table = ch_champ_fonc_c.table();
       const int isfct = table.isfonction();
-      DoubleTab& mes_valeurs = champ_fonc_c->valeurs();
+      DoubleTab& mes_valeurs = champ_fonc_c.valeurs();
       // code ci-dessous adapte de Champ_Fonc_Tabule_P0_VDF.mettre_a_jour
       if (!(val_c.nb_dim() == mes_valeurs.nb_dim()))
         {

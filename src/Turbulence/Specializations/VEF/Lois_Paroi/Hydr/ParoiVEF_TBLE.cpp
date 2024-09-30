@@ -274,9 +274,9 @@ int ParoiVEF_TBLE::init_lois_paroi()
               const Terme_Boussinesq_base& terme_boussi = ref_cast(Terme_Boussinesq_base,ts);
               T0 = terme_boussi.Scalaire0(0);
               source_boussinesq=1;
-              const Champ_Don& ch_beta_t = le_fluide.beta_t();
-              const DoubleTab& tab_champ_beta_t = ch_beta_t->valeurs();
-              if (sub_type(Champ_Uniforme,ch_beta_t.valeur()))
+              const Champ_Don_base& ch_beta_t = le_fluide.beta_t();
+              const DoubleTab& tab_champ_beta_t = ch_beta_t.valeurs();
+              if (sub_type(Champ_Uniforme,ch_beta_t))
                 {
                   beta_t = std::max(tab_champ_beta_t(0,0),DMINFLOAT);
                 }
@@ -326,8 +326,8 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
   if (source_boussinesq==1)
     {
@@ -346,7 +346,7 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
 
   double visco=-1;
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
@@ -707,8 +707,8 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
   if (source_boussinesq==1)
     {
@@ -731,7 +731,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
   double visco=-1;
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;

@@ -65,8 +65,8 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Domaine_dis_base& doma
   const double rho_phase_0 = tab_rho_phase_0(0, 0);
   const double rho_phase_1 = tab_rho_phase_1(0, 0);
   const double delta_rho = rho_phase_1 - rho_phase_0;
-  const DoubleTab& tab_nu_phase_0 = phase_0.viscosite_cinematique()->valeurs();
-  const DoubleTab& tab_nu_phase_1 = phase_1.viscosite_cinematique()->valeurs();
+  const DoubleTab& tab_nu_phase_0 = phase_0.viscosite_cinematique().valeurs();
+  const DoubleTab& tab_nu_phase_1 = phase_1.viscosite_cinematique().valeurs();
   const double nu_phase_0 = tab_nu_phase_0(0, 0);
   const double nu_phase_1 = tab_nu_phase_1(0, 0);
   const double delta_nu = nu_phase_1 - nu_phase_0;
@@ -144,20 +144,20 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Domaine_dis_base& doma
   }
 }
 
-static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis, const Fluide_Incompressible& fluide, Champ_Fonc_base& champ_rho_elem_, Champ_Don& champ_mu_, Champ_Don& champ_nu_,
+static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis, const Fluide_Incompressible& fluide, Champ_Fonc_base& champ_rho_elem_, Champ_Don_base& champ_mu_, Champ_Don_base& champ_nu_,
                                                    Champ_Fonc_base& champ_rho_faces)
 {
 
-  if (sub_type(Champ_Uniforme,champ_rho_elem_) && (sub_type(Champ_Uniforme, champ_nu_.valeur())))
+  if (sub_type(Champ_Uniforme,champ_rho_elem_) && (sub_type(Champ_Uniforme, champ_nu_)))
     {
       const DoubleTab& tab_rho_phase_0 = fluide.masse_volumique().valeurs();
       const double rho = tab_rho_phase_0(0, 0);
-      const DoubleTab& tab_nu_phase_0 = fluide.viscosite_cinematique()->valeurs();
+      const DoubleTab& tab_nu_phase_0 = fluide.viscosite_cinematique().valeurs();
       const double nu = tab_nu_phase_0(0, 0);
       const double mu = nu * rho;
       champ_rho_elem_.valeurs() = rho;
-      champ_nu_->valeurs() = nu;
-      champ_mu_->valeurs() = mu;
+      champ_nu_.valeurs() = nu;
+      champ_mu_.valeurs() = mu;
       champ_rho_faces.valeurs() = rho;
     }
   else
@@ -177,12 +177,12 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Domaine_dis_base& zdis,
 
       const DoubleTab& cg = zvf.xp();
       DoubleTab& val_rho = champ_rho_elem_.valeurs();
-      DoubleTab& val_nu = champ_nu_->valeurs();
-      DoubleTab& val_mu = champ_mu_->valeurs();
+      DoubleTab& val_nu = champ_nu_.valeurs();
+      DoubleTab& val_mu = champ_mu_.valeurs();
       DoubleTab& val_rho_faces = champ_rho_faces.valeurs();
 
       fluide.masse_volumique().valeur_aux_elems(cg, les_polys, val_rho);
-      fluide.viscosite_dynamique()->valeur_aux_elems(cg, les_polys, val_mu);
+      fluide.viscosite_dynamique().valeur_aux_elems(cg, les_polys, val_mu);
       val_rho.echange_espace_virtuel();
       val_mu.echange_espace_virtuel();
 
@@ -585,7 +585,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
   return 1;
 }
 
-const Champ_Don& Navier_Stokes_FT_Disc::diffusivite_pour_transport() const
+const Champ_Don_base& Navier_Stokes_FT_Disc::diffusivite_pour_transport() const
 {
   return champ_mu_;
 }
@@ -2687,7 +2687,7 @@ void Navier_Stokes_FT_Disc::compute_boussinesq_additional_gravity(const Convecti
   const int phase_eq = eq.get_phase();
   const DoubleTab& temperature_eq = eq.inconnue().valeurs();
   const Fluide_Incompressible& fluide_phase_eq = fluide_dipha.fluide_phase(phase_eq);
-  const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t()->valeurs();
+  const DoubleTab& tab_beta_th_phase_eq = fluide_phase_eq.beta_t().valeurs();
   const double beta_th_phase_eq = tab_beta_th_phase_eq(0, 0);
 
   for (int face = 0; face < gravite_face.dimension(0); face++)

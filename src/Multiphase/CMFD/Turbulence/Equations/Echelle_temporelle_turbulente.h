@@ -41,7 +41,7 @@ public :
 
   void discretiser() override;
 
-  const Champ_Don& diffusivite_pour_transport() const override;
+  const Champ_Don_base& diffusivite_pour_transport() const override;
   const Champ_base& diffusivite_pour_pas_de_temps() const override;
 
   /* champ convecte : alpha (si Pb_Multiphase) * rho * k */

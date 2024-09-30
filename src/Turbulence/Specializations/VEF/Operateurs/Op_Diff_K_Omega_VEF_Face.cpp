@@ -25,7 +25,7 @@
 #include <Periodique.h>
 #include <Neumann_paroi.h>
 #include <Paroi_hyd_base_VEF.h>
-#include <Champ_Don.h>
+
 #include <Champ_Uniforme.h>
 #include <Fluide_Incompressible.h>
 

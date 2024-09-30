@@ -19,13 +19,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
-
 #ifndef Paroi_UTAU_IMP_Impl_included
 #define Paroi_UTAU_IMP_Impl_included
 
-#include <Champ_Don.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUST_Deriv.h>
 #include <Parser_U.h>
+
+class Champ_Don_base;
 
 /*! @brief CLASS: Paroi_UTAU_IMP_Impl
  *
@@ -40,14 +41,11 @@ public:
   double calculer_utau(const DoubleVect& pos, double norm_v, double d_visco);
 
 protected:
-  Champ_Don u_star;
-  Champ_Don diam_hydr;
+  OWN_PTR(Champ_Don_base) u_star;
+  OWN_PTR(Champ_Don_base) diam_hydr;
   Parser_U lambda_c;
   int u_star_ok;
   int lambda_c_ok;
-
 };
-
-
 
 #endif

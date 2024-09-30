@@ -83,7 +83,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   {
     Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());
     const Milieu_base& le_milieu=ch.milieu();
-    nb_comp = le_milieu.conductivite()->nb_comp();
+    nb_comp = le_milieu.conductivite().nb_comp();
     assert(nb_comp==1);
   }
   const DoubleTab& I = indicatrice_->valeurs_au_temps(temps);

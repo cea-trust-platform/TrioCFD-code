@@ -54,19 +54,19 @@ public:
   // L'appel a ces methodes est invalide et genere une erreur
   const Champ_base& masse_volumique() const override { return invalid_<const Champ_base&>(__func__); }
   Champ_base& masse_volumique() override { return invalid_<Champ_base&>(__func__); }
-  const Champ_Don& diffusivite() const override { return invalid_<const Champ_Don&>(__func__); }
-  Champ_Don& diffusivite() override { return invalid_<Champ_Don&>(__func__); }
-  const Champ_Don& conductivite() const override  { return invalid_<const Champ_Don&>(__func__); }
-  Champ_Don& conductivite() override { return invalid_<Champ_Don&>(__func__); }
-  const Champ_Don& capacite_calorifique() const override  { return invalid_<const Champ_Don&>(__func__); }
-  Champ_Don& capacite_calorifique() override { return invalid_<Champ_Don&>(__func__); }
-  const Champ_Don& beta_t() const override  { return invalid_<const Champ_Don&>(__func__); }
-  Champ_Don& beta_t() override { return invalid_<Champ_Don&>(__func__); }
+  const Champ_Don_base& diffusivite() const override { return invalid_<const Champ_Don_base&>(__func__); }
+  Champ_Don_base& diffusivite() override { return invalid_<Champ_Don_base&>(__func__); }
+  const Champ_Don_base& conductivite() const override  { return invalid_<const Champ_Don_base&>(__func__); }
+  Champ_Don_base& conductivite() override { return invalid_<Champ_Don_base&>(__func__); }
+  const Champ_Don_base& capacite_calorifique() const override  { return invalid_<const Champ_Don_base&>(__func__); }
+  Champ_Don_base& capacite_calorifique() override { return invalid_<Champ_Don_base&>(__func__); }
+  const Champ_Don_base& beta_t() const override  { return invalid_<const Champ_Don_base&>(__func__); }
+  Champ_Don_base& beta_t() override { return invalid_<Champ_Don_base&>(__func__); }
 
 private:
   OWN_PTR(Milieu_base) phase0_, phase1_;
-  Champ_Don sigma_; // Tension de surface (J/m^2)
-  Champ_Don chaleur_latente_; // Enthalpie de changement de phase h(phase1_) - h(phase0_) (J/kg/K)
+  OWN_PTR(Champ_Don_base) sigma_; // Tension de surface (J/m^2)
+  OWN_PTR(Champ_Don_base) chaleur_latente_; // Enthalpie de changement de phase h(phase1_) - h(phase0_) (J/kg/K)
   Motcle formule_mu_; // Formule utilisee pour le calcul de la moyenne de mu
 
   template <typename RETURN_TYPE>

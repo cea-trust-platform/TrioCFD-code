@@ -26,7 +26,7 @@
 #include <Operateur.h>
 #include <Probleme_base.h>
 #include <Milieu_base.h>
-#include <Champ_Don.h>
+
 #include <Champ_Uniforme.h>
 #include <Modele_turbulence_hyd_LES_SMAGO_DYN_VDF.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
@@ -150,8 +150,8 @@ void Modele_turbulence_scal_LES_dyn_VDF::mettre_a_jour(double)
   calculer_diffusivite_turbulente();
 
   const Milieu_base& le_milieu = equation().probleme().milieu();
-  const DoubleTab& tab_Cp = le_milieu.capacite_calorifique()->valeurs();
-  const bool Ccp = sub_type(Champ_Uniforme, le_milieu.capacite_calorifique().valeur());
+  const DoubleTab& tab_Cp = le_milieu.capacite_calorifique().valeurs();
+  const bool Ccp = sub_type(Champ_Uniforme, le_milieu.capacite_calorifique());
   const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
   const Probleme_base& mon_pb = mon_equation_->probleme();
   DoubleTab& lambda_t = conductivite_turbulente_->valeurs();
@@ -368,7 +368,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calculer_grad_teta(const DoubleVect& te
   const DoubleTab& xp = le_dom_VDF->xp();
 
   const Milieu_base& le_milieu = equation().probleme().milieu();
-  const Champ_Don& lambda = le_milieu.conductivite();
+  const Champ_Don_base& lambda = le_milieu.conductivite();
 
   //Calcul du gradient aux faces
 
@@ -376,9 +376,9 @@ void Modele_turbulence_scal_LES_dyn_VDF::calculer_grad_teta(const DoubleVect& te
   for (face = 0; face < nb_faces_bord; face++)
     grad_teta_face(face) = flux_bords(face) / faces_surfaces(face);
 
-  if ((sub_type(Champ_Uniforme, lambda.valeur())))
+  if ((sub_type(Champ_Uniforme, lambda)))
     {
-      double coef = lambda->valeurs()(0, 0);
+      double coef = lambda.valeurs()(0, 0);
       for (face = 0; face < nb_faces_bord; face++)
         grad_teta_face(face) /= coef;
     }
@@ -389,11 +389,11 @@ void Modele_turbulence_scal_LES_dyn_VDF::calculer_grad_teta(const DoubleVect& te
         {
           num_elem = face_voisins(face, 0);
           if (num_elem != -1)
-            grad_teta_face(face) /= (lambda->valeurs()(num_elem));
+            grad_teta_face(face) /= (lambda.valeurs()(num_elem));
           else
             {
               num_elem = face_voisins(face, 1);
-              grad_teta_face(face) /= (lambda->valeurs()(num_elem));
+              grad_teta_face(face) /= (lambda.valeurs()(num_elem));
             }
         }
     }

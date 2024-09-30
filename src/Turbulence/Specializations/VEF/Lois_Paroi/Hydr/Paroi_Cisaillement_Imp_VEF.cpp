@@ -81,9 +81,9 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
   const DoubleTab& xv = domaine_VEF.xv();    // centre de gravite des faces
@@ -99,7 +99,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
   tab_d_plus_.resize(le_dom_VEF->nb_faces_tot());
 
 
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;

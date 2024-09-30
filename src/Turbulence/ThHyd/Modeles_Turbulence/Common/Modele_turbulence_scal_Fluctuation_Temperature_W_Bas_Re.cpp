@@ -111,13 +111,13 @@ Champ_Fonc_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calcul
 
   //on recupere les proprietes physiques du fluide : viscosite cinematique et diffusivite
   const Fluide_base& fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const Champ_Don& ch_diffu = fluide.diffusivite();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const DoubleTab& tab_diffu = ch_diffu->valeurs();
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_diffu = fluide.diffusivite();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
+  const DoubleTab& tab_diffu = ch_diffu.valeurs();
   double visco,diffu;
 
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
@@ -128,7 +128,7 @@ Champ_Fonc_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calcul
       exit();
     }
 
-  if (sub_type(Champ_Uniforme,ch_diffu.valeur()))
+  if (sub_type(Champ_Uniforme,ch_diffu))
     {
       diffu = std::max(tab_diffu(0,0),DMINFLOAT);
     }

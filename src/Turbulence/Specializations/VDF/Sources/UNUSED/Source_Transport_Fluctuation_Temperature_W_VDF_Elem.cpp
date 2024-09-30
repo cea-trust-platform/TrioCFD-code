@@ -372,11 +372,11 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::calculer_u_teta_
     }
 
   const DoubleTab& g = gravite_->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
 
   //on calcule gteta2 pour corriger u_teta confermement au modele de Wrobel
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  if (sub_type(Champ_Uniforme,ch_beta))
     calculer_gteta2(domaine_VDF,gteta2 ,fluctu_temp,tab_beta(0,0),g);
   else
     calculer_gteta2(domaine_VDF, gteta2 ,fluctu_temp,tab_beta,g);
@@ -591,7 +591,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::ajouter(DoubleTa
     ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const DoubleTab& g = gravite_->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
   int nb_elem = domaine_VDF.nb_elem();
   int nb_elem_tot = domaine_VDF.nb_elem_tot();
   int nb_face = domaine_VDF.nb_faces();
@@ -604,7 +604,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::ajouter(DoubleTa
 
   // calculer_u_teta_W(domaine_VDF,domaine_Cl_VDF,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,utet);
 
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
 
 
   calculer_Prod_uteta_T(domaine_VDF,domaine_Cl_VDF,scalaire,utet,uteta_T);
@@ -624,13 +624,13 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_VDF_Elem::ajouter(DoubleTa
   // qui est utilise dans le calcul de G
 
 
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  if (sub_type(Champ_Uniforme,ch_beta))
     calculer_terme_destruction_K(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
   else
     calculer_terme_destruction_K(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);
 
   /*
-    if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+    if (sub_type(Champ_Uniforme,ch_beta))
     calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta(0,0),g);
     else
     calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta,g);

@@ -21,7 +21,7 @@
 
 #include <Diffu_k.h>
 #include <Fluide_Incompressible.h>
-#include <Champ_Don.h>
+
 #include <Mod_echelle_LRM_base.h>
 #include <MuLambda_TBLE_base.h>
 

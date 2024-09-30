@@ -501,7 +501,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           // On adimensionnalise eventuellement selon jeu de donnees (conseille):
           if (critere_cea_jaea_normalise_)
             {
-              double nu = ref_cast(Fluide_Incompressible,mon_equation->milieu()).viscosite_cinematique()->valeurs()(0,0);
+              double nu = ref_cast(Fluide_Incompressible,mon_equation->milieu()).viscosite_cinematique().valeurs()(0,0);
               double gz = mon_equation->milieu().gravite().valeurs()(0,2);
               alpha*=nu/(gz*haspi_);  	// alpha*=alpha*nu/(gh)
               gamma/=nu;	    		// gamma*=gamma/nu

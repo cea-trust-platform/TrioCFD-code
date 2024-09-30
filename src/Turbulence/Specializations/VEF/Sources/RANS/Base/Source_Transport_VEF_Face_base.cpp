@@ -71,7 +71,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
       DoubleTab& F2 = ref_cast_non_const(DoubleTab, mon_modele_fonc->get_champ("F2").valeurs());
 
       const Fluide_base& fluide = ref_cast(Fluide_base, eq_hydraulique->milieu());
-      const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
+      const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
       const Champ_base& ch_visco_cin_ou_dyn = ref_cast(Op_Diff_K_Eps_base, equation().operateur(0).l_op_base()).diffusivite();
       calcul_tabs_bas_reyn(P, vit, visco_turb, ch_visco_cin, ch_visco_cin_ou_dyn, D, E, F1, F2); // voir les classes filles
 
@@ -82,9 +82,9 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
       if (is_Reynolds_stress_isotrope == 0)
         {
           Cerr << "On utilise une diffusion turbulente non linaire dans le terme source P" << finl;
-          const DoubleTab& visco_scal = ch_visco_cin->valeurs();
+          const DoubleTab& visco_scal = ch_visco_cin.valeurs();
           DoubleTab visco_tab(nb_elem_tot);
-          assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
+          assert(sub_type(Champ_Uniforme,ch_visco_cin));
           visco_tab = visco_scal(0, 0);
           DoubleTab gradient_elem(nb_elem_tot, Objet_U::dimension, Objet_U::dimension);
           gradient_elem = 0.;
@@ -119,7 +119,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme(DoubleTab& resu) 
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   DoubleTab alpha_turb(le_modele_scalaire.diffusivite_turbulente().valeurs());
   const DoubleTab& g = gravite->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   const int nb_face = le_dom_VEF->nb_faces();
   DoubleTrav G(nb_face);
@@ -140,7 +140,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_concen(DoubleTab& resu) const
   const DoubleTab& lambda_turb = le_modele_scalaire.conductivite_turbulente().valeurs();
 //  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const DoubleVect& g = gravite->valeurs();
-  const Champ_Don& ch_beta_concen = beta_c.valeur();
+  const Champ_Don_base& ch_beta_concen = beta_c.valeur();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   const int nb_face = le_dom_VEF->nb_faces(), nb_consti = eq_concentration->constituant().nb_constituants();
   DoubleTrav G(nb_face);
@@ -164,10 +164,10 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme_concen(DoubleTab&
   // voila dans Source_Transport_K_Eps_Realisable_aniso_therm_concen_VEF_Face
   // const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   DoubleTab alpha_turb(le_modele_scalaire.conductivite_turbulente().valeurs());
-  double rhocp = eq_thermique->milieu().capacite_calorifique()->valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
+  double rhocp = eq_thermique->milieu().capacite_calorifique().valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
   alpha_turb /= rhocp;
   const DoubleVect& g = gravite->valeurs(), &volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
-  const Champ_Don& ch_beta_temper = beta_t.valeur(), &ch_beta_concen = beta_c.valeur();
+  const Champ_Don_base& ch_beta_temper = beta_t.valeur(), &ch_beta_concen = beta_c.valeur();
   const int nb_face = le_dom_VEF->nb_faces(), nb_consti = eq_concentration->constituant().nb_constituants();
   DoubleTrav G_t(nb_face), G_c(nb_face);
 

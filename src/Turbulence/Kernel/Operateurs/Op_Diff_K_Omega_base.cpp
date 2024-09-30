@@ -24,7 +24,7 @@
 #include <Discretisation_base.h>
 #include <stat_counters.h>
 #include <Champ_Uniforme.h>
-#include <Champ_Don.h>
+
 
 Implemente_base(Op_Diff_K_Omega_base, "Op_Diff_K_Omega_base", Operateur_base);
 

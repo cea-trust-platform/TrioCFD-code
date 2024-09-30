@@ -29,7 +29,7 @@
 #include <Op_Diff_Flux_Chaleur_Turb_Base.h>
 #include <TRUST_Deriv.h>
 
-#include <Champ_Don.h>
+
 #include <TRUSTTabs_forward.h>
 
 /*! @brief class Op_Diff_Flux_Chaleur_Turb_Base Sert a modeliser le terme diffusif dans l'equation de transport

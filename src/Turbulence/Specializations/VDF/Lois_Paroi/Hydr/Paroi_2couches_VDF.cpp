@@ -101,9 +101,9 @@ int Paroi_2couches_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k_eps)
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   double visco=-1.;
   Modele_turbulence_hyd_K_Eps_2_Couches& mod_2couches = ref_cast(Modele_turbulence_hyd_K_Eps_2_Couches,mon_modele_turb_hyd.valeur());
   const int nbcouches = mod_2couches.get_nbcouches();
@@ -119,7 +119,7 @@ int Paroi_2couches_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k_eps)
     valswitch = mod_2couches.get_nutswitch();
 
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;

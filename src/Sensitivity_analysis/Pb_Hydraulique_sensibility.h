@@ -23,7 +23,7 @@
 #define Pb_Hydraulique_sensibility_included
 
 #include <Pb_Fluide_base.h>
-#include <Champ_Don.h>
+
 #include <Navier_Stokes_std_sensibility.h>
 
 /*! @brief classe Pb_Hydraulique_sensibility Cette classe represente un probleme hydraulique standard dans lequel

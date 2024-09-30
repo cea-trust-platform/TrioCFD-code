@@ -30,7 +30,7 @@
 
 #include <TRUST_Ref.h>
 #include <Operateur.h>
-#include <Champ_Don.h>
+
 
 class Champ_base;
 
@@ -261,8 +261,8 @@ inline const Champ_base& Op_Diff_K_Omega::diffusivite() const
 
 /*! @brief Associe la diffusivite a l'operateur.
  *
- * @param (Champ_Don& nu) le champ representant la diffusivite
- * @return (Champ_Don&) le champ representant la diffusivite
+ * @param (Champ_Don_base& nu) le champ representant la diffusivite
+ * @return (Champ_Don_base&) le champ representant la diffusivite
  */
 inline Champ_base& Op_Diff_K_Omega::associer_diffusivite(const Champ_base& nu)
 {

@@ -77,7 +77,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_tu
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente K_Eps", tab_K_Eps);
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_transp_K_Eps().milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   int n = tab_K_Eps.dimension(0);
   DoubleTab Fmu(n);
 

@@ -23,7 +23,7 @@
 #define Tensors_Computation_VEF_included
 
 #include <TRUSTTabs_forward.h>
-#include <Champ_Don.h>
+
 #include <Front_VF.h>
 #include <Periodique.h>
 

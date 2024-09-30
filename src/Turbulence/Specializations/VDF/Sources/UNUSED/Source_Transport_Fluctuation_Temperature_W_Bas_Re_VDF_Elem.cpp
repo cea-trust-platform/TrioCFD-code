@@ -372,11 +372,11 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
     }
 
   const DoubleTab& g = gravite_->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
 
   //on calcule gteta2 pour corriger u_teta confermement au modele de Wrobel
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  if (sub_type(Champ_Uniforme,ch_beta))
     calculer_gteta2(domaine_VDF,gteta2 ,fluctu_temp,tab_beta(0,0),g);
   else
     calculer_gteta2(domaine_VDF, gteta2 ,fluctu_temp,tab_beta,g);
@@ -595,7 +595,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
   const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
   const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const DoubleTab& g = gravite_->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
   int nb_elem = domaine_VDF.nb_elem();
   int nb_elem_tot = domaine_VDF.nb_elem_tot();
   int nb_face = domaine_VDF.nb_faces();
@@ -613,13 +613,13 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
   //on recupere les proprietes physiques du fluide : viscosite cinematique et diffusivite
 
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const Champ_Don& ch_diffu = fluide.diffusivite();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const DoubleTab& tab_diffu = ch_diffu->valeurs();
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_diffu = fluide.diffusivite();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
+  const DoubleTab& tab_diffu = ch_diffu.valeurs();
   double visco,diffu;
 
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
@@ -630,7 +630,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
       exit();
     }
 
-  if (sub_type(Champ_Uniforme,ch_diffu.valeur()))
+  if (sub_type(Champ_Uniforme,ch_diffu))
     {
       diffu = std::max(tab_diffu(0,0),DMINFLOAT);
     }
@@ -657,7 +657,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
 
   // calculer_u_teta_W(domaine_VDF,domaine_Cl_VDF,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,utet);
 
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
 
 
   calculer_Prod_uteta_T(domaine_VDF,domaine_Cl_VDF,scalaire,utet,uteta_T);
@@ -677,13 +677,13 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
   // qui est utilise dans le calcul de G
 
   /*
-     if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+     if (sub_type(Champ_Uniforme,ch_beta))
      calculer_terme_destruction_K(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
      else
      calculer_terme_destruction_K(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);
   */
 
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  if (sub_type(Champ_Uniforme,ch_beta))
     calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta(0,0),g);
   else
     calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta,g);

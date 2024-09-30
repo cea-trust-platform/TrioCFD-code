@@ -170,12 +170,12 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1, int isKeps, DoubleTab& tab2
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   double visco = -1;
   int l_unif {0};
-  if (sub_type(Champ_Uniforme, ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme, ch_visco_cin))
     {
       visco = std::max(tab_visco(0, 0), DMINFLOAT);
       l_unif = 1;
@@ -425,15 +425,15 @@ int Paroi_std_hyd_VDF::compute_law_komega(DoubleTab& field_komega)
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   double visco = -1;
 
   // cAlan : devrait pouvoir être fait une seule fois au prépare ?
   // cAlan : si pas uniforme, on met à jour, sinon inutile de refaire ça.
   int l_unif {0};
-  if (sub_type(Champ_Uniforme, ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme, ch_visco_cin))
     {
       visco = std::max(tab_visco(0, 0), DMINFLOAT);
       l_unif = 1;
@@ -1183,8 +1183,8 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   const IntVect& orientation = domaine_VDF.orientation();
 
 //  double u_m1 = 0.; // moyenne des vitesses selon x, a la paroi 1 (y=0)
@@ -1209,7 +1209,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
   double visco = -1;
   int l_unif = 0;
 
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0, 0), DMINFLOAT);
       l_unif = 1;
@@ -1397,12 +1397,12 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   double visco = -1;
   int l_unif {0};
-  if (sub_type(Champ_Uniforme, ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme, ch_visco_cin))
     {
       visco = std::max(tab_visco(0, 0), DMINFLOAT);
       l_unif = 1;

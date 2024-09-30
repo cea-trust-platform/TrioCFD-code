@@ -24,9 +24,8 @@
 #define Flux_radiatif_VEF_included
 
 #include <Flux_radiatif_base.h>
-#include <Champ_Don.h>
 
-
+class Champ_Don_base;
 class Domaine_VF;
 
 /*! @brief Decrire ici la classe Flux_radiatif_VEF
@@ -41,8 +40,8 @@ class Flux_radiatif_VEF : public Flux_radiatif_base
   Declare_instanciable(Flux_radiatif_VEF);
 
 public :
-  void evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don&, const
-                              Champ_Don&, const Champ_Don&,
+  void evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don_base&, const
+                              Champ_Don_base&, const Champ_Don_base&,
                               const Domaine_VF&, const double, double);
 
 

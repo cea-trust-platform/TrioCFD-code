@@ -62,7 +62,7 @@ const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Source_Transport_Eps_VEF_Face::get
   return ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence()).associe_modele_fonction();
 }
 
-void Source_Transport_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don& ch_visco_cin, const Champ_base& ch_visco_cin_ou_dyn,
+void Source_Transport_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don_base& ch_visco_cin, const Champ_base& ch_visco_cin_ou_dyn,
                                                          DoubleTab& D, DoubleTab& E, DoubleTab& F1, DoubleTab& F2) const
 {
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();

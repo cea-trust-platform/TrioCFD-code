@@ -26,7 +26,7 @@
 #include <Op_Diff_K_Omega_base.h> // cAlan: mutualisé ?
 #include <Operateur_Conv.h>
 #include <Operateur_Grad.h>
-#include <Champ_Don.h>
+
 
 class Motcle;
 
@@ -71,7 +71,7 @@ protected :
   Operateur_Grad Op_Grad_komega;
 
   REF(Champ_Inc_base) inco_eqn_associee;
-  Champ_Don Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
+  OWN_PTR(Champ_Don_base) Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
 
 };
 
