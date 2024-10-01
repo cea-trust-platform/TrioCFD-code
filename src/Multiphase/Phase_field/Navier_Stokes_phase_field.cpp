@@ -358,11 +358,13 @@ void Navier_Stokes_phase_field::discretiser()
       exit();
       break;
     }
-  betac_ = le_fluide->beta_c();
 }
 
 void Navier_Stokes_phase_field::completer()
 {
+  if (le_fluide->has_beta_c())
+    betac_ = le_fluide->beta_c();
+
   Navier_Stokes_std::completer();
   creer_champ("masse_volumique");
   // RLT: cf. commentaire dans Navier_Stokes_phase_field::calculer_pas_de_temps

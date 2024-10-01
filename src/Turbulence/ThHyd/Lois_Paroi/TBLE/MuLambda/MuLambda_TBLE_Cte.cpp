@@ -46,7 +46,6 @@ void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,milieu);
   const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const Champ_Don_base& ch_alpha = le_fluide.diffusivite();
   if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       const DoubleTab& tab_visco = ch_visco_cin.valeurs();
@@ -60,6 +59,7 @@ void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
     }
   if (le_fluide.has_diffusivite())
     {
+      const Champ_Don_base& ch_alpha = le_fluide.diffusivite();
       if (sub_type(Champ_Uniforme,ch_alpha))
         {
           const DoubleTab& tab_lambda = ch_alpha.valeurs();
