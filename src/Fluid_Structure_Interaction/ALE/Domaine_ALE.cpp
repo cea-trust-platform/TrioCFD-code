@@ -1548,6 +1548,18 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
           str_mesh_model->setGridDtMin(var_double) ;
           continue ;
         }
+      if(motlu=="Configuration_Reset_Dt")
+        {
+          is >> var_double;
+          str_mesh_model->setConfigurationResetDt(var_double) ;
+          continue ;
+        }
+      if(motlu=="Max_Added_Mass_Ratio")
+        {
+          is >> var_double;
+          str_mesh_model->setMaxAddedMassRatio(var_double) ;
+          continue ;
+        }
       if (motlu == accolade_fermee)
         break;
     }
@@ -1570,6 +1582,21 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
   double t0 = tt ;
   bool loopOnGridProblem = true ;
   int nstepCurr = 0 ;
+
+  if (str_mesh_model->configurationResetDt > 0)
+    {
+      if (tt > str_mesh_model->gridResetTime)
+        {
+          str_mesh_model->doConfigurationReset=true ;
+          str_mesh_model->gridResetTime += str_mesh_model->configurationResetDt ;
+        }
+    }
+
+  if (str_mesh_model->maxAddedMassRatio > 0)
+    {
+      if (str_mesh_model->AddedMassRatioExceeded) str_mesh_model->doConfigurationReset=true ;
+      str_mesh_model->AddedMassRatioExceeded=false ;
+    }
 
   while (loopOnGridProblem)
     {
@@ -1624,6 +1651,8 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       dtmin = 1.E12 ; // Initialize dtmin at <huge>
       if (dtm > 0.) str_mesh_model->nodalScaleMass = 0. ; // Initialize nodal additional masses if needed
 
+      if (!str_mesh_model->isMassBuilt) str_mesh_model->totalMass = 0. ;
+
       for (int elem=0; elem<nbElem; elem++)
         {
           for (int i=0; i< nbn; i++)
@@ -1642,6 +1671,7 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
           if (!str_mesh_model->isMassBuilt)
             {
               str_mesh_model->setMassElem(volume * density) ;
+              str_mesh_model->totalMass += volume * density ;
               for (int i=0; i< nbn; i++)
                 {
                   int ii = elnodes[i] ;
@@ -1664,19 +1694,30 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
             }
         }
 
+      if (str_mesh_model->doConfigurationReset) str_mesh_model->doConfigurationReset=false ;
+
       str_mesh_model->gridDt = mp_min(dtmin) ;
 
       MD_Vector_tools::echange_espace_virtuel(str_mesh_model->ff, MD_Vector_tools::EV_SOMME_ECHANGE) ;
       if (!str_mesh_model->isMassBuilt)
         {
           MD_Vector_tools::echange_espace_virtuel(str_mesh_model->mass, MD_Vector_tools::EV_SOMME_ECHANGE) ;
+          str_mesh_model->totalMass = mp_sum(str_mesh_model->totalMass) ;
           str_mesh_model->isMassBuilt = true ;
         }
 
       if (dtm > 0.)
         {
           totalScaleMass = mp_sum(totalScaleMass) ;
-          if (totalScaleMass > 0.) MD_Vector_tools::echange_espace_virtuel(str_mesh_model->nodalScaleMass, MD_Vector_tools::EV_SOMME_ECHANGE) ;
+          if (totalScaleMass > 0.)
+            {
+              MD_Vector_tools::echange_espace_virtuel(str_mesh_model->nodalScaleMass, MD_Vector_tools::EV_SOMME_ECHANGE) ;
+              if (str_mesh_model->maxAddedMassRatio > 0.)
+                {
+                  double r = totalScaleMass / str_mesh_model->totalMass ;
+                  if (r > str_mesh_model->maxAddedMassRatio) str_mesh_model->doConfigurationReset=true ;
+                }
+            }
         }
 
       // Compute accelerations and full step velocities
@@ -1702,7 +1743,7 @@ void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& 
       nstepCurr += 1 ;
       if (dtm > 0.)
         {
-          Cerr << "Grid dynamic problem, internal step: "<< nstepCurr << ", dt= " << Dt << ", dt_stab= " << str_mesh_model->gridDt << ", [mass scaling] added_mass= "<< totalScaleMass << ", time= " << tt << ", target fluid time= " << temps << finl ;
+          Cerr << "Grid dynamic problem, internal step: "<< nstepCurr << ", dt= " << Dt << ", dt_stab= " << str_mesh_model->gridDt << ", [mass scaling] added_mass_ratio= "<< totalScaleMass / str_mesh_model->totalMass << ", time= " << tt << ", target fluid time= " << temps << finl ;
         }
       else
         {

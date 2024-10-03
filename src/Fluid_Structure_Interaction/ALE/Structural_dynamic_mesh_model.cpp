@@ -22,6 +22,13 @@ Structural_dynamic_mesh_model::Structural_dynamic_mesh_model()
   gridDt = 0. ;
   isMassBuilt = false ;
 
+  configurationResetDt = 0 ;
+  gridResetTime = 0 ;
+
+  maxAddedMassRatio = 0 ;
+
+  doConfigurationReset = false ;
+
 }
 Structural_dynamic_mesh_model::~Structural_dynamic_mesh_model()
 {
@@ -364,6 +371,41 @@ void Structural_dynamic_mesh_model::computeInternalForces(double& Vol, double& X
     {
       setB0_(B) ; // save B matrix on initial configuration
       B0l_ = B ;
+    }
+
+  if (doConfigurationReset)  // take current configuration as the reference configuration
+    // for further mesh deformation
+    {
+      setB0_(B) ;
+      B0l_ = B ;
+
+      for (int i=0; i<symSize_; i++) { Stress_(iel_,i) = 0. ; }
+      switch (dimension)
+        {
+        case (2) :
+
+          Ft_(iel_,0) = 1. ;
+          Ft_(iel_,1) = 1. ;
+          Ft_(iel_,2) = 1. ;
+          Ft_(iel_,3) = 0. ;
+          Ft_(iel_,4) = 0. ;
+
+          break ;
+
+        case (3) :
+
+          Ft_(iel_,0) = 1. ;
+          Ft_(iel_,1) = 1. ;
+          Ft_(iel_,2) = 1. ;
+          Ft_(iel_,3) = 0. ;
+          Ft_(iel_,4) = 0. ;
+          Ft_(iel_,5) = 0. ;
+          Ft_(iel_,6) = 0. ;
+          Ft_(iel_,7) = 0. ;
+          Ft_(iel_,8) = 0. ;
+
+          break ;
+        }
     }
 
   //  Next transformation gradient

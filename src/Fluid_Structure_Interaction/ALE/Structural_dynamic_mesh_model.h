@@ -49,6 +49,8 @@ public:
   inline void setInertialDamping(const double& D) ;
   inline void setDtSafetyCoefficient(const double& c) ;
   inline void setGridDtMin(const double& dt) ;
+  inline void setConfigurationResetDt(const double& dt) ;
+  inline void setMaxAddedMassRatio(const double& r) ;
   inline void addMaterialProperty(const std::string name, const std::vector<double> val) ;
   inline int getNbNodesPerElem() ;
   inline double getDensity() ;
@@ -82,6 +84,7 @@ public:
 
   DoubleVect mass ;
   DoubleVect nodalScaleMass ;
+  double totalMass ;
 
   // Public variables
   // ----------------
@@ -90,6 +93,14 @@ public:
   double gridTime ;
   double gridDt ;
   bool isMassBuilt ;
+
+  double configurationResetDt ;
+  double gridResetTime ;
+
+  double maxAddedMassRatio ;
+  bool AddedMassRatioExceeded ;
+
+  bool doConfigurationReset=false ;
 
 protected:
 
@@ -241,6 +252,17 @@ inline void Structural_dynamic_mesh_model::setDtSafetyCoefficient(const double& 
 inline void Structural_dynamic_mesh_model::setGridDtMin(const double& dt)
 {
   gridDtMin_ = dt ;
+}
+
+inline void Structural_dynamic_mesh_model::setConfigurationResetDt(const double& dt)
+{
+  configurationResetDt = dt ;
+  gridResetTime = configurationResetDt ; // first reset time
+}
+
+inline void Structural_dynamic_mesh_model::setMaxAddedMassRatio(const double& r)
+{
+  maxAddedMassRatio = r ;
 }
 
 inline void Structural_dynamic_mesh_model::addMaterialProperty(const std::string name, const std::vector<double> val)
