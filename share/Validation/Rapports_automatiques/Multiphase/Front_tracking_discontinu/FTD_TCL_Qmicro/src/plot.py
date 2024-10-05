@@ -45,7 +45,7 @@ rhov=800.  # kg/m3
 ti = np.r_[0.,ti]
 Gcl = Qcl* 2.*math.pi *rcl / Lvap # kg/(s)
 dVbdt_ana = Gcl/rhov # m3/(s)
-v_ana  = v[0]-np.r_[0.,integrate.cumtrapz(dVbdt_ana,ti[:-1])] # the np.r_ is to put the integral at the end of each
+v_ana  = v[0]-np.r_[0.,integrate.cumulative_trapezoid(dVbdt_ana,ti[:-1])] # the np.r_ is to put the integral at the end of each
 ti  = ti[:-1] # to delete the n+1
 
 np.savetxt("v_ana.txt", np.c_[ti,v_ana/v[0]])
