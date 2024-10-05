@@ -19,24 +19,25 @@ def getValeurMax(nomFichier, colonne):
                 try:
                     val = float(tabLigne[colonne])
                 except IndexError:
-                    print('Erreur : la ligne (%d : %s) n\'a pas %d valeurs !' % (ind, ligne, colonne))
+                    print('Error : line (%d : %s) has no %d values !' % (ind, ligne, colonne))
                     sys.exit()
                 except ValueError:
-                    print('Erreur : la ligne (%d : %s) ne contient pas de float a l\indice %d !' % (ind, ligne, colonne))
+                    print('Error : line (%d : %s) does not contain float at index  %d !' % (ind, ligne, colonne))
                     sys.exit()
                 if val>valmax:
                     valmax = val
                     xmax = float(tabLigne[0])
         return xmax, valmax
     else:
-        print('Erreur : fichier %s non trouve !' % (nomFichier))
+        print('Error: file %s not found!' % (nomFichier))
         sys.exit()
 
 if __name__ == '__main__':
     #recuperation des parametres passes en ligne de commande
     args = sys.argv
     if len(args)!=4:
-        print('Erreur sur le nb d\'arguments fournis : Usage\npython extraitMax.py LongueurCarac Tparoi Tfluide')
+        print(r'''Error: wrong number of passed arguments: Usage
+python extraitMax.py LongueurCarac Tparoi Tfluide''')
         sys.exit()
 
     L = float(args[1])
@@ -53,13 +54,13 @@ if __name__ == '__main__':
             ]
 
     properties = propertiesGeometry.getPropertiesFromdat()
-    print('Proprietes physiques= %s' % (properties))
+    print('Physical properties= %s' % (properties))
 
     f = open('vitesseMaxAdim.dat', 'w')
     #f.write('#xmax VitAdim Rayleigh Prandtl refVahlDavis errVahlsDavis refGresho errGresho refWinter errWinter\n')
     for nomFichier, colonne in cas:
         xmax, valmax = getValeurMax(nomFichier, colonne)
-        print('Valeur max %f trouvee en %f' % (valmax, xmax))
+        print('Max value %f not found at %f' % (valmax, xmax))
 
         #adimensionnalisation
         xadim = xmax / L
@@ -73,7 +74,8 @@ if __name__ == '__main__':
             valref = valsref[colonne]
             maxx = max(valadim, valref)
             err = 100 * abs(valadim - valref) / maxx
-            print('sonde %s Valeur max adimensionnee = %f trouvee en %f\nErreur relative (%s : %f) %f' % (nomFichier, valadim, xadim, valsref[0], valref, err))
+            print(r'''Probe %s Max dimensionless value = %f found at %f
+Relative error (%s : %f) %f''' % (nomFichier, valadim, xadim, valsref[0], valref, err))
             f.write(' %18.8f %18.8f' % (valref, err))
         f.write('\n')
     f.close()
