@@ -114,7 +114,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulent
 
   for (int so = 0; so < nb_var_; so++)
     {
-      REF(Champ_base) ch_ref;
+      OBS_PTR(Champ_base) ch_ref;
       ch_ref = mon_pb.get_champ(les_var[so]);
       const DoubleTab& source_so_val = ch_ref->valeurs();
       sources_val[so] = source_so_val;

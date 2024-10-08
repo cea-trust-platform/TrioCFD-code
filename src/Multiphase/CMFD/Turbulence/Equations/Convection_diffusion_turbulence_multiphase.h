@@ -52,7 +52,7 @@ public :
 protected :
 
   OWN_PTR(Champ_Inc_base) l_inco_ch;
-  REF(Fluide_base) le_fluide;
+  OBS_PTR(Fluide_base) le_fluide;
   Operateur_Grad Op_Grad_; // Pour calculer le gradient en VDF
 
 };

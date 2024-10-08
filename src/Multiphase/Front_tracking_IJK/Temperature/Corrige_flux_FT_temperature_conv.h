@@ -94,7 +94,7 @@ protected:
 
   /* On fait référence au champ thermique pour accéder surtout aux valeurs des
    * propriétés thermiques.
-   * TODO: Il faudrait créer un REF(IJK_Energie)
+   * TODO: Il faudrait créer un OBS_PTR(IJK_Energie)
    */
   IJK_MonofluidVar rho_cp_;
   IJK_MonofluidVar lda_;

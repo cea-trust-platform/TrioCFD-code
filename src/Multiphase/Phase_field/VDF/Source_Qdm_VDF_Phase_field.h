@@ -60,10 +60,10 @@ protected:
   DoubleTab gradC_;
   int boussi_;
 
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
-  REF(Probleme_base) le_probleme2;
+  OBS_PTR(Probleme_base) le_probleme2;
   DoubleTab& (Source_Qdm_VDF_Phase_field::*methode)(DoubleTab& ) const;
 };
 

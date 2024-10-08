@@ -48,7 +48,7 @@ public :
 
 protected :
 
-  REF(Modele_rayo_semi_transp) le_modele_;
+  OBS_PTR(Modele_rayo_semi_transp) le_modele_;
 };
 
 inline Modele_rayo_semi_transp& Source_rayo_semi_transp_base::Modele()

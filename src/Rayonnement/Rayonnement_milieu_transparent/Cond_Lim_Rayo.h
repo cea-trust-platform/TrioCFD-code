@@ -47,7 +47,7 @@ public:
 protected :
   DoubleVect Surf_i;
   DoubleVect Teta_i;
-  REF(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo;
+  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo;
 };
 
 inline Cond_Lim_Rayo::~Cond_Lim_Rayo()

@@ -96,7 +96,7 @@ protected:
     const int elem,
     ArrOfInt& liste_composantes_connexes_dans_element) const;
 
-  REF(IJK_Splitting) ref_splitting_;
+  OBS_PTR(IJK_Splitting) ref_splitting_;
   const Maillage_FT_IJK * mesh_;
 };
 

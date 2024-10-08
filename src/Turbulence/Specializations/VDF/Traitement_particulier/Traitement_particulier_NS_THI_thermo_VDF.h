@@ -48,7 +48,7 @@ public :
 
 protected :
 
-  REF(Convection_Diffusion_std) mon_equation_NRJ;
+  OBS_PTR(Convection_Diffusion_std) mon_equation_NRJ;
 
 private:
   void init_calc_spectre() override;

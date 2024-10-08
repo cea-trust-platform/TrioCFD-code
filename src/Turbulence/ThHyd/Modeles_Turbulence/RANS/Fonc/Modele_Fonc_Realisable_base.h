@@ -96,7 +96,7 @@ public:
   bool has_seconde_equation() const { return ma_seconde_equation.non_nul(); }
 
 public:
-  REF(Equation_base) ma_seconde_equation;
+  OBS_PTR(Equation_base) ma_seconde_equation;
 
 protected :
 
@@ -104,12 +104,12 @@ protected :
   DoubleTab Cmu_;
   DoubleTab C1_;
 
-  REF(Equation_base) mon_equation;
+  OBS_PTR(Equation_base) mon_equation;
 
-  REF(Fluide_base) le_fluide;
-  REF(Champ_Inc_base) la_vitesse_transportante;
-  REF(Equation_base) eq_hydraulique;
-  REF(Champ_Don_base) visco_;
+  OBS_PTR(Fluide_base) le_fluide;
+  OBS_PTR(Champ_Inc_base) la_vitesse_transportante;
+  OBS_PTR(Equation_base) eq_hydraulique;
+  OBS_PTR(Champ_Don_base) visco_;
 
   Nom nom_fic;
   OWN_PTR(Champ_Fonc_base)  BR_wall_length_;

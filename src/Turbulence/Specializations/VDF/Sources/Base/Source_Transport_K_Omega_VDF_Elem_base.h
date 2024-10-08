@@ -74,8 +74,8 @@ protected:
   // static constexpr double BETA_I_ONE = 0.075, BETA_I_TWO = 0.0828;
   // static constexpr double ALPHA_ONE = 0.31
 
-  REF(Domaine_VDF) le_domaine_VDF;
-  REF(Domaine_Cl_VDF) le_domaine_Cl_VDF;
+  OBS_PTR(Domaine_VDF) le_domaine_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_domaine_Cl_VDF;
 
 private:
   // methodes a surcharger sinon throw !!

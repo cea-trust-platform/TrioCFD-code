@@ -87,7 +87,7 @@ protected:
                                                     Champ_base& champ);
   virtual void calculer_gradient_indicatrice(const Champ_base& indicatrice, const DoubleTab& distance_interface_sommets, Champ_base& gradient_i);
 
-  REF(Probleme_FT_Disc_gen) probleme_ft_;
+  OBS_PTR(Probleme_FT_Disc_gen) probleme_ft_;
 
   // Masse volumique calculee aux elements
   OWN_PTR(Champ_Fonc_base)  champ_rho_elem_;

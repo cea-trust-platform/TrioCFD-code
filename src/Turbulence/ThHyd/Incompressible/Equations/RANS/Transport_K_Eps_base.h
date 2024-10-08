@@ -60,7 +60,7 @@ public:
 protected:
 
   OWN_PTR(Champ_Inc_base) le_champ_K_Eps;
-  REF(Modele_turbulence_hyd_RANS_K_Eps_base) mon_modele;
+  OBS_PTR(Modele_turbulence_hyd_RANS_K_Eps_base) mon_modele;
 
 };
 

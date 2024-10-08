@@ -63,8 +63,8 @@ protected:
   DoubleTab& calcul_derivees_premieres_croisees(DoubleTab& , const Domaine_dis_base& , const Domaine_Cl_dis_base& , const DoubleTab&  ) const;
   DoubleTab& calcul_derivees_secondes_croisees(DoubleTab& , const Domaine_dis_base& , const Domaine_Cl_dis_base& , const DoubleTab&  ) const;
 
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
 };
 
 #endif

@@ -55,7 +55,7 @@ public:
 protected:
   static constexpr double PRDT_K_DEFAUT = 1.0, PRDT_EPS_DEFAUT = 1.3;
   double Prdt_K, Prdt_Eps, Prdt[2];
-  REF(Champ_Fonc_base) diffusivite_turbulente_;
+  OBS_PTR(Champ_Fonc_base) diffusivite_turbulente_;
   DoubleVect dv_diffusivite_turbulente;
 };
 

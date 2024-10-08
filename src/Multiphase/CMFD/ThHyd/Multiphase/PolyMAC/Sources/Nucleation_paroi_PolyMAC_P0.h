@@ -53,7 +53,7 @@ public :
 protected:
   int n_l = -1 ; // liquid phase
 
-  REF(Source_base) src_flux_interfacial_ ; // pour aller cherche qpi
+  OBS_PTR(Source_base) src_flux_interfacial_ ; // pour aller cherche qpi
 };
 
 #endif

@@ -183,7 +183,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
           Nom nom_cl_rayo = la_cl_rayo->frontiere_dis().le_nom();
           int num_cl_temp = 0;
 
-          REF(Champ_front_base) Tb;
+          OBS_PTR(Champ_front_base) Tb;
           int test_remplissage_Tb = 0;
           for(num_cl_temp = 0; num_cl_temp<les_cl_temp.size(); num_cl_temp++)
             {

@@ -42,8 +42,8 @@ public :
   virtual void initialiser(const Milieu_base&) = 0 ;
 
   // "ind" represente le numero d'une maille TBLE sur l'instance eq_couch_lim referencee dans cette classe
-  virtual double getNu(REF(Eq_couch_lim) eq_T, int ind) = 0 ;
-  virtual double getAlpha(REF(Eq_couch_lim) eq_T, int ind) = 0 ;
+  virtual double getNu(OBS_PTR(Eq_couch_lim) eq_T, int ind) = 0 ;
+  virtual double getAlpha(OBS_PTR(Eq_couch_lim) eq_T, int ind) = 0 ;
 
 
 protected :

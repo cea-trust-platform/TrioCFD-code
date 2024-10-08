@@ -291,7 +291,7 @@ private :
   double facteur;
   double eps;
 
-  REF(Milieu_base) milieu;
+  OBS_PTR(Milieu_base) milieu;
 
 
 };

@@ -92,8 +92,8 @@ public:
 
 protected:
 
-  REF(Fluide_base) le_fluide;
-  REF(Modele_rayo_semi_transp) le_modele;
+  OBS_PTR(Fluide_base) le_fluide;
+  OBS_PTR(Modele_rayo_semi_transp) le_modele;
 
   Operateur_Diff terme_diffusif;
 

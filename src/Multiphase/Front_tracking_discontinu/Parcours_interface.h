@@ -142,8 +142,8 @@ protected:
   static void calcul_produit_matrice33_vecteur(const FTd_matrice33& matrice, const FTd_vecteur3& vect, FTd_vecteur3& res);
 
   // Variables persistantes de la classe :
-  REF(Domaine_VF) refdomaine_vf_;
-  REF(Connectivite_frontieres) refconnect_front_;
+  OBS_PTR(Domaine_VF) refdomaine_vf_;
+  OBS_PTR(Connectivite_frontieres) refconnect_front_;
   int nb_faces_elem_;
   int nb_elements_reels_;
   int nb_sommets_par_face_;

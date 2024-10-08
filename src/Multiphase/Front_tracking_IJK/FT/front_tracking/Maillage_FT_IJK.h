@@ -138,7 +138,7 @@ public:
   };
 
   double minimum_longueur_arrete() const;
-  const REF(IJK_Splitting) ref_splitting() const
+  const OBS_PTR(IJK_Splitting) ref_splitting() const
   {
     return ref_splitting_;
   }
@@ -157,7 +157,7 @@ protected:
                                  const ArrOfInt& facettes_send_pe_list,
                                  const ArrOfInt& facettes_recv_pe_list) override;
 
-  REF(IJK_Splitting) ref_splitting_;
+  OBS_PTR(IJK_Splitting) ref_splitting_;
 
 // Taille du domaine IJK sur chaque proc:
   int nbmailles_euler_i_;

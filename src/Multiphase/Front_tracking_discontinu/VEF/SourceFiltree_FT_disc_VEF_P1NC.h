@@ -52,9 +52,9 @@ protected :
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
   void associer_pb(const Probleme_base& ) override;
 
-  REF(Domaine_VEF) le_dom_VEF;
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  REF(Champ_Inc_base) Indic_;
+  OBS_PTR(Domaine_VEF) le_dom_VEF;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  OBS_PTR(Champ_Inc_base) Indic_;
 };
 
 #endif

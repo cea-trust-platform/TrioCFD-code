@@ -58,9 +58,9 @@ public :
 protected :
   DoubleTab& ajouter_komega(DoubleTab&) const;
 
-  REF(Domaine_VEF) le_dom_VEF;
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  REF(Modele_turbulence_hyd_K_Omega) turbulence_model;
+  OBS_PTR(Domaine_VEF) le_dom_VEF;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  OBS_PTR(Modele_turbulence_hyd_K_Omega) turbulence_model;
 
   // Constants for the classic k-omega model Wilcox 1988
   static constexpr double BETA_K = 0.09; // Cmu or BETA_STAR, but clearer with _K

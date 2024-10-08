@@ -64,7 +64,7 @@ public :
 protected :
 
   OWN_PTR(Champ_Inc_base) l_inco_ch;
-  REF(Fluide_base) le_fluide;
+  OBS_PTR(Fluide_base) le_fluide;
 };
 
 

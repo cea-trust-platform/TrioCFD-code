@@ -110,11 +110,11 @@ public :
 
 
 protected :
-  REF(IJK_FT_double) ref_ijk_ft_;
-  REF(IJK_FT_Post) ref_ijk_ft_post_;
-  REF(Switch_FT_double) ref_ijk_ft_switch_;
-  REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
-  REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_Post) ref_ijk_ft_post_;
+  OBS_PTR(Switch_FT_double) ref_ijk_ft_switch_;
+  OBS_PTR(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
+  OBS_PTR(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
 
   IJK_Ghost_Fluid_Fields ghost_fluid_fields_;
 

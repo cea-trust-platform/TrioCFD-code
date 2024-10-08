@@ -41,7 +41,7 @@ public:
 
 
 protected:
-  REF(Transport_K_ou_Eps) mon_eq_transport_K, mon_eq_transport_Eps;
+  OBS_PTR(Transport_K_ou_Eps) mon_eq_transport_K, mon_eq_transport_Eps;
   void associer_pb(const Probleme_base& pb) override;
 
 private:

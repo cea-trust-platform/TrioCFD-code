@@ -72,23 +72,23 @@ public:
   OWN_PTR(Champ_Fonc_base)  ai; // Eulerian interfacial area.
   OWN_PTR(Champ_Inc_base) vitesse_jump0_; // Extended Velocity of phase 0.
 
-  LIST(REF(Champ_base)) liste_champs_compris;
+  LIST(OBS_PTR(Champ_base)) liste_champs_compris;
 
   // Si matrice_pression_invariante != 0,
   //   on ne recalcule pas la matrice de pression a chaque pas de temps.
   int matrice_pression_invariante;
   // Si on veut ajouter une interface a vitesse imposee :
   //  reference a l'equation de transport correspondante :
-  VECT(REF(Transport_Interfaces_FT_Disc)) ref_eq_interf_vitesse_imposee;
+  VECT(OBS_PTR(Transport_Interfaces_FT_Disc)) ref_eq_interf_vitesse_imposee;
   // Si le fluide est diphasique, c'est l'indicatrice de l'equation suivante
   // qui est utilisee pour determiner les proprietes du fluide:
   // (masse volumique, viscosite, tension superficielle, ...)
-  REF(Transport_Interfaces_FT_Disc) ref_eq_interf_proprietes_fluide;
+  OBS_PTR(Transport_Interfaces_FT_Disc) ref_eq_interf_proprietes_fluide;
   // Si le fluide est diphasique, la reference au fluide:
-  REF(Fluide_Diphasique) ref_fluide_diphasique;
+  OBS_PTR(Fluide_Diphasique) ref_fluide_diphasique;
 
-  REF(Convection_Diffusion_Temperature_FT_Disc) ref_equation_mpoint_;
-  REF(Convection_Diffusion_Temperature_FT_Disc) ref_equation_mpoint_vap_;
+  OBS_PTR(Convection_Diffusion_Temperature_FT_Disc) ref_equation_mpoint_;
+  OBS_PTR(Convection_Diffusion_Temperature_FT_Disc) ref_equation_mpoint_vap_;
 
   // Valeur maximale de courbure autorisee pour calculer le
   // terme source de tension de surface (clipping si valeur superieur)

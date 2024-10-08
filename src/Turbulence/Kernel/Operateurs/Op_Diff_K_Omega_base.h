@@ -105,7 +105,7 @@ public:
   inline void associer_diffusivite_turbulente() override;
 
 protected:
-  REF(Champ_base) la_diffusivite;
+  OBS_PTR(Champ_base) la_diffusivite;
 };
 
 
@@ -137,7 +137,7 @@ public:
 
 protected :
 
-  REF(Champ_base) la_diffusivite;
+  OBS_PTR(Champ_base) la_diffusivite;
 };
 
 

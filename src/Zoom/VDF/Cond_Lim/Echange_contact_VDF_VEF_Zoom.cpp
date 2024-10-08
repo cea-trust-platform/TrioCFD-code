@@ -124,7 +124,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext());
       DoubleTab& Text_valeurs = T_ext().valeurs_au_temps(temps);
       int elemF;
-      REF(Pb_2G) le_pb2G;
+      OBS_PTR(Pb_2G) le_pb2G;
       Pb_MG& pbMG = ch.le_pb_MG();
 
       const Probleme_base& pbF = ch.le_pb_exterieur();
@@ -148,7 +148,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       const Front_VF& front_vf_ext=ref_cast(Front_VF, front_ext);
       const Front_VF& front_vf=ref_cast(Front_VF, front);
 
-      REF(Milieu_base) le_milieu;
+      OBS_PTR(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
 
       const int nb_comp = le_milieu->conductivite().nb_comp();

@@ -350,7 +350,7 @@ const Champ_base& Navier_Stokes_Turbulent_ALE::get_champ(const Motcle& nom) cons
       {
       }
   throw Champs_compris_erreur();
-  REF(Champ_base) ref_champ;
+  OBS_PTR(Champ_base) ref_champ;
 
   return ref_champ;
 }

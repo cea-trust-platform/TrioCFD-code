@@ -77,8 +77,8 @@ public:
 
 protected :
 
-  REF(Transport_Fluctuation_Temperature_W_Bas_Re) mon_equation;
-  REF(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re) mon_modele_turb_Bas_Re;
+  OBS_PTR(Transport_Fluctuation_Temperature_W_Bas_Re) mon_equation;
+  OBS_PTR(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re) mon_modele_turb_Bas_Re;
 
 private :
 

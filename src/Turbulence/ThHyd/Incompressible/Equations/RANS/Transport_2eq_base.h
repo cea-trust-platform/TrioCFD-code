@@ -52,8 +52,8 @@ public:
 
 protected:
 
-  REF(Milieu_base) le_fluide;
-  REF(Champ_Inc_base) la_vitesse_transportante;
+  OBS_PTR(Milieu_base) le_fluide;
+  OBS_PTR(Champ_Inc_base) la_vitesse_transportante;
 };
 
 inline void Transport_2eq_base::associer_vitesse(const Champ_base& vit)

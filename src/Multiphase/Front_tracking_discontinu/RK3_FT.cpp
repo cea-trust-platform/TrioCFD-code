@@ -274,14 +274,14 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
   double b2=15./16.;
   double b3=8./15.;
 
-  REF(Champ_Inc_base) * inconnues = new REF(Champ_Inc_base)[n_pb];
+  OBS_PTR(Champ_Inc_base) * inconnues = new OBS_PTR(Champ_Inc_base)[n_pb];
   VECT(DoubleTab) qNSi(n_pb);
   VECT(DoubleTab) qNSj(n_pb);
   DoubleTabFT  qIi;
   DoubleTabFT  qIj;
   for (i=0; i<n_pb; i++)
     {
-      // <REF(Champ_Inc_base)> = <Champ_Inc_base>
+      // <OBS_PTR(Champ_Inc_base)> = <Champ_Inc_base>
       Probleme_base& pb = ref_cast(Probleme_base,pbc.probleme(i));
       inconnues[i] = pb.equation(0).inconnue();
       qNSi[i] = inconnues[i]->valeurs();

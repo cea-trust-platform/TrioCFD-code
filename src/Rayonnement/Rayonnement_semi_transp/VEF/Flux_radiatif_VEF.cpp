@@ -121,7 +121,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   // On doit recuperer la temperature de bord
   const Front_VF& le_bord = ref_cast(Front_VF,frontiere_dis());
   int nb_faces = le_bord.nb_faces();
-  REF(Champ_front_base) Tb;
+  OBS_PTR(Champ_front_base) Tb;
   const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
   int num_cl_temp = 0;
 

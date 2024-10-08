@@ -223,7 +223,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
                                    IntVect& face_keps_imposee_,
                                    int& methode_calcul_face_keps_impose_,
                                    const Domaine_VEF& domaine_VEF,
-                                   const REF(Domaine_Cl_VEF) le_dom_Cl_VEF,
+                                   const OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF,
                                    int is_champ_P1NC)
 {
   if (flag_face_keps_imposee_==0)
@@ -511,7 +511,7 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,
                                int methode_calcul_face_keps_impose_,
                                IntVect& face_keps_imposee_,
                                const Domaine_VEF& domaine_VEF,
-                               const REF(Domaine_Cl_VEF) le_dom_Cl_VEF,
+                               const OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF,
                                int is_champ_P1NC)
 {
   // Deja calcule, on quitte

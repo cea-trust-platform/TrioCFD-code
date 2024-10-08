@@ -1075,7 +1075,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
   const ArrOfInt& index_facette_elem = intersections.index_facette();
   const DoubleTab& sommets = maillage.sommets();
-  //      REF(Transport_Interfaces_FT_Disc) & refeq_transport =
+  //      OBS_PTR(Transport_Interfaces_FT_Disc) & refeq_transport =
   //      variables_internes().ref_eq_interf_proprietes_fluide;
   //      const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
   const bool first_call_for_this_mesh = (tag_tcl_ != maillage.get_mesh_tag());

@@ -36,7 +36,7 @@ class Modele_turbulence_hyd_LES_selectif_VDF: public Modele_turbulence_hyd_LES_V
 public:
   Modele_turbulence_hyd_LES_selectif_VDF();
   void calculer_fonction_structure() override;
-  int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)&) const;
+  int a_pour_Champ_Fonc(const Motcle&, OBS_PTR(Champ_base)&) const;
   void discretiser() override;
 
 protected:

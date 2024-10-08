@@ -605,7 +605,7 @@ void Navier_Stokes_FT_Disc::associer_pb_base(const Probleme_base& un_probleme)
 
 const Fluide_Diphasique& Navier_Stokes_FT_Disc::fluide_diphasique() const
 {
-  const REF(Fluide_Diphasique) &fluide_dipha = variables_internes().ref_fluide_diphasique;
+  const OBS_PTR(Fluide_Diphasique) &fluide_dipha = variables_internes().ref_fluide_diphasique;
   if (!fluide_dipha.non_nul())
     {
       Cerr << "Error for the method Navier_Stokes_FT_Disc::fluide_diphasique()\n";
@@ -655,7 +655,7 @@ void Navier_Stokes_FT_Disc::discretiser()
   const Discretisation_base& dis = discretisation();
   const double temps = schema_temps().temps_courant();
   const Domaine_dis_base& mon_dom_dis = domaine_dis();
-  LIST(REF(Champ_base)) &champs_compris = variables_internes().liste_champs_compris;
+  LIST(OBS_PTR(Champ_base)) &champs_compris = variables_internes().liste_champs_compris;
 
   dis.discretiser_champ("champ_elem", mon_dom_dis, "diffusivite", "m^2/s", 1 /* composantes */, temps, champ_nu_);
   champs_compris.add(champ_nu_.valeur());
@@ -803,7 +803,7 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
     // les proprietes physiques du milieu.
     // Sinon, le milieu doit etre de type Fluide_Incompressible.
 
-    REF(Transport_Interfaces_FT_Disc) &ref_equation = variables_internes().ref_eq_interf_proprietes_fluide;
+    OBS_PTR(Transport_Interfaces_FT_Disc) &ref_equation = variables_internes().ref_eq_interf_proprietes_fluide;
 
     if (ref_equation.non_nul())
       {
@@ -1541,7 +1541,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(const Champ_base& indi
           else if (sub_type(Symetrie, la_cl.valeur())) { /* Do nothing */ }
           else if ((sub_type(Dirichlet, la_cl.valeur())) || (sub_type(Neumann_sortie_libre, la_cl.valeur())) || (sub_type(Dirichlet_homogene, la_cl.valeur())))
             {
-              REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+              OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
               const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
               const Maillage_FT_Disc& maillage = eq_transport.maillage_interface();
               const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
@@ -1688,7 +1688,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0, int
   const double un_sur_rho_0 = 1. / rho_0;
   const double un_sur_rho_1 = 1. / rho_1;
 
-  REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+  OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
   const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 
   // Pour permettre de calculer mpoint, mais sans l'utiliser pour le deplacement de l'interface,
@@ -2153,7 +2153,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) //const
   const DoubleTab& tab_vitesse = inconnue().valeurs();
   const IntTab& face_voisins = domaine_dis().face_voisins();
 
-  REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+  OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
   const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
   const DoubleTab& indicatrice = eq_transport.inconnue().valeurs();
   const Maillage_FT_Disc& maillage = eq_transport.maillage_interface();
@@ -2729,7 +2729,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   // S'il n'y a pas d'equation de transport des interfaces entre phases fluides,
   // on ne recalcule pas les proprietes.
   {
-    REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+    OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
     if (refeq_transport.non_nul())
       {
         FT_disc_calculer_champs_rho_mu_nu_dipha(domaine_dis(), fluide_diphasique(), refeq_transport->inconnue().valeurs(),
@@ -2771,7 +2771,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   {
     // Si une equation de transport est associee aux proprietes du fluide,
     // on ajoute le terme de tension de surface.
-    REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+    OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
 
     if (refeq_transport.non_nul())
       {
@@ -2872,7 +2872,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           // Boussinesq Approximation in use :
           if (variables_internes().is_boussinesq_)
             {
-              REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+              OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
               if (!refeq_transport.non_nul())
                 {
                   Cerr << "Trying to use Boussinesq approximation on a 2phase flow when the transport equation is not specified" << finl;
@@ -2957,7 +2957,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   int nb_eq_non_nul = 0;
   for (int k = 0; k < nb_eqs; k++)
     {
-      REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+      OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
 
       if (refeq_transport.non_nul())
         nb_eq_non_nul += 1;
@@ -2970,7 +2970,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       terme_mul = 0.;
     }
 
-  REF(Transport_Interfaces_FT_Disc) &refeq_transport_2pha = variables_internes().ref_eq_interf_proprietes_fluide;
+  OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport_2pha = variables_internes().ref_eq_interf_proprietes_fluide;
   if (refeq_transport_2pha.non_nul() && interf_vitesse_imposee_ok && variables_internes().is_penalized)
     {
       const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
@@ -2981,7 +2981,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       const int nb_faces_elem = elem_faces.line_size();
       for (int k = 0; k < nb_eqs; k++)
         {
-          REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+          OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
           const DoubleTab& indicatrice_faces = refeq_transport->get_compute_indicatrice_faces().valeurs();
           for (int i = 0; i < face_voisins.dimension(0); i++)
             {
@@ -3068,7 +3068,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       int nb_eqs_bis = variables_internes().ref_eq_interf_vitesse_imposee.size();
       for (int k = 0; k < nb_eqs_bis; k++)
         {
-          REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+          OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
 
           Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 
@@ -3166,7 +3166,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           DoubleTrav forces_totbis(vpoint);
           for (int k = 0; k < nb_eqs_bis; k++)
             {
-              REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+              OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
 
               Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 
@@ -3192,7 +3192,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           const DoubleTab& tab_rho_facesbis = champ_rho_faces_->valeurs();
           for (int k = 0; k < nb_eqs_bis; k++)
             {
-              REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+              OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
               Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
               eq_transport.calcul_effort_fluide_interface(vpoint, tab_rho_facesbis, forces_tot, variables_internes().is_explicite, variables_internes().eta);
               forces_tot.echange_espace_virtuel();
@@ -3312,7 +3312,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           const IntTab& face_voisins = domaine_vf.face_voisins();
           const IntTab& elem_faces = domaine_vf.elem_faces();
           const int nb_faces_elem = elem_faces.line_size();
-          REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+          OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
           const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 #if NS_VERBOSE
           const DoubleTab& indicatrice = eq_transport.inconnue().valeurs();
@@ -3487,7 +3487,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       int nb_eqs_bis = variables_internes().ref_eq_interf_vitesse_imposee.size();
       for (int k = 0; k < nb_eqs_bis; k++)
         {
-          REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+          OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
           Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
 
           if (eq_transport.get_vimp_regul() == 1)
@@ -3509,7 +3509,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                 {
                   for (int k = 0; k < nb_eqs; k++)
                     {
-                      REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+                      OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
                       Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
                       const DoubleTab& indicatrice_faces = eq_transport.get_indicatrice_faces().valeurs();
                       if (eq_transport.get_vimp_regul() == 1 && indicatrice_faces(i) > 0.0 && indicatrice_faces(i) != 1.)
@@ -3573,7 +3573,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                       int dejafait = 0;
                       for (int k = 0; k < nb_eqs_bis && dejafait == 0; k++)
                         {
-                          REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+                          OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
                           const DoubleTab& indicatrice_faces = refeq_transport->get_indicatrice_faces().valeurs();
                           if (indicatrice_faces(fglob) > 0.0)
                             {
@@ -3684,7 +3684,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       int nb_eqs_bis = variables_internes().ref_eq_interf_vitesse_imposee.size();
       for (int k = 0; k < nb_eqs_bis; k++)
         {
-          REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
+          OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
           Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
           // Impression des efforts
           eq_transport.impr_effort_fluide_interface(forces_tot_2, pressure_part, diffusion_part);
@@ -3739,7 +3739,7 @@ const Champ_base* Navier_Stokes_FT_Disc::get_delta_vitesse_interface() const
 // Faudrait deplacer cette methode dans transport interfaces...
 const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
 {
-  REF(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
+  OBS_PTR(Transport_Interfaces_FT_Disc) &refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
   const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
   // Distance a l'interface discretisee aux elements:
   const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();

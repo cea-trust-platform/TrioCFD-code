@@ -36,7 +36,7 @@ public :
   void mettre_a_jour(double temps) override;
 
 protected :
-  REF(Transport_K_Eps_Realisable) eqn_keps_Rea;
+  OBS_PTR(Transport_K_Eps_Realisable) eqn_keps_Rea;
 
 private:
   const DoubleTab& get_visc_turb() const override;

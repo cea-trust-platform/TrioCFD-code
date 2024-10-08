@@ -53,8 +53,8 @@ protected :
   DoubleTab& ajouter_concen(DoubleTab& ) const;
   DoubleTab& ajouter_anisotherme_concen(DoubleTab& ) const;
 
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
 
 private:
   // methodes a surcharger sinon throw !!

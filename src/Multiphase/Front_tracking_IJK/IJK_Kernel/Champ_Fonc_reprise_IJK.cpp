@@ -62,7 +62,7 @@ Entree& Champ_Fonc_reprise_IJK::readOn(Entree& s)
 
   // On recupere le pb, puis ensuite on cherche le champ; on recupere le domaine_dis
   const Probleme_base& pb =ref_cast(Probleme_base,Interprete::objet(nom_pb));
-  REF(Champ_base) ref_ch;
+  OBS_PTR(Champ_base) ref_ch;
 
   ref_ch = pb.get_champ(Motcle(nom_champ_inc));
   if (sub_type(Champ_Inc_base,ref_ch.valeur()) && nom_champ_inc == Nom("vitesse"))

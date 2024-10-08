@@ -198,8 +198,8 @@ void Convection_Diffusion_Temperature_sensibility::associate_evaluator_field(con
       exit();
     }
   Objet_U& ob= Interprete::objet(one_name_state_pb);
-  REF(Probleme_base) pb;
-  REF(Champ_base) rch;
+  OBS_PTR(Probleme_base) pb;
+  OBS_PTR(Champ_base) rch;
 
   if(sub_type(Probleme_base,ob))
     {
@@ -231,8 +231,8 @@ void Convection_Diffusion_Temperature_sensibility::update_evaluator_field(const 
   Cerr <<"Convection_Diffusion_Temperature_sensibility: update  state from "<<one_name_state_pb<< finl;
 
   Objet_U& ob= Interprete::objet(one_name_state_pb);
-  REF(Probleme_base) pb;
-  REF(Champ_base) rch;
+  OBS_PTR(Probleme_base) pb;
+  OBS_PTR(Champ_base) rch;
 
   pb = ref_cast(Probleme_base,ob);
   rch = pb->get_champ(one_name_state_field);

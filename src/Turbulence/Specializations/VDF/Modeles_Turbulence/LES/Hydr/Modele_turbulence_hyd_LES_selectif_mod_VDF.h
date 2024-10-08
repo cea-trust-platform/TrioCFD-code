@@ -44,7 +44,7 @@ public:
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void calculer_fonction_structure() override;
-  int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)&) const;
+  int a_pour_Champ_Fonc(const Motcle&, OBS_PTR(Champ_base)&) const;
   void discretiser() override;
 
 protected:

@@ -48,10 +48,10 @@ public :
   inline const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& modele_turbulence() const;
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
-  // int a_pour_Champ_Inc(const Motcle&, REF(Champ_base)& ) const;
+  // int a_pour_Champ_Inc(const Motcle&, OBS_PTR(Champ_base)& ) const;
 
 protected :
-  REF(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re) mon_modele_Fluctu_Temp;
+  OBS_PTR(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re) mon_modele_Fluctu_Temp;
 };
 
 

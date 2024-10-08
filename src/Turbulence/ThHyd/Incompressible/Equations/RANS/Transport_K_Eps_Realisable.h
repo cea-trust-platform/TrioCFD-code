@@ -63,12 +63,12 @@ protected:
   Op_Diff_K_Eps terme_diffusif;
   Operateur_Conv terme_convectif;
 
-  REF(Champ_Inc_base) inco_eqn_associee;
+  OBS_PTR(Champ_Inc_base) inco_eqn_associee;
   OWN_PTR(Champ_Don_base) Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
 
 private :
 
-  REF( OWN_PTR(Modele_Fonc_Realisable_base) ) mon_modele_fonc;
+  OBS_PTR( OWN_PTR(Modele_Fonc_Realisable_base) ) mon_modele_fonc;
 
 };
 

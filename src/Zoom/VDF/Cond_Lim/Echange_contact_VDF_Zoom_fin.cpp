@@ -48,7 +48,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
       DoubleTab& Text_valeurs = T_ext().valeurs_au_temps(temps);
 
       int elemG;
-      REF(Pb_2G) le_pb2G;
+      OBS_PTR(Pb_2G) le_pb2G;
       Pb_MG& pbMG = ch.le_pb_MG();
 
       int indice_pb=pbMG.indice_probleme(ch.le_pb_courant().le_nom());

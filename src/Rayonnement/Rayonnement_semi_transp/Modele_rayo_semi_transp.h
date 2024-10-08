@@ -116,7 +116,7 @@ public:
   void calculer_flux_radiatif();
 
 protected :
-  REF(Probleme_base) mon_probleme_;
+  OBS_PTR(Probleme_base) mon_probleme_;
   OWN_PTR(Equation_rayonnement_base) Eq_rayo_;
   static const double sigma;
 };

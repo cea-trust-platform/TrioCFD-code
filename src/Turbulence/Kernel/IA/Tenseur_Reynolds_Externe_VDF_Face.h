@@ -63,13 +63,13 @@ public:
 protected:
   void readNN();
 
-  REF(Navier_Stokes_Turbulent)           eqn_NS_;
-  REF(Modele_turbulence_hyd_K_Eps)       modele_K_Eps_;
-  REF(Probleme_base)                     probleme_;
-  REF(Transport_K_Eps)                   eqn_transport_K_Eps_;
+  OBS_PTR(Navier_Stokes_Turbulent)           eqn_NS_;
+  OBS_PTR(Modele_turbulence_hyd_K_Eps)       modele_K_Eps_;
+  OBS_PTR(Probleme_base)                     probleme_;
+  OBS_PTR(Transport_K_Eps)                   eqn_transport_K_Eps_;
 
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
 
   void Calcul_RSLambda();

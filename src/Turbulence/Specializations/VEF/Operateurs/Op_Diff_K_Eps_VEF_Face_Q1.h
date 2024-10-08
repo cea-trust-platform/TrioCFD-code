@@ -64,9 +64,9 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Domaine_VEF) le_dom_vef;
-  REF(Domaine_Cl_VEF) la_zcl_vef;
-  REF(Champ_Q1NC) inconnue_;
+  OBS_PTR(Domaine_VEF) le_dom_vef;
+  OBS_PTR(Domaine_Cl_VEF) la_zcl_vef;
+  OBS_PTR(Champ_Q1NC) inconnue_;
   //DoubleVect porosite_face;
 };
 

@@ -56,7 +56,7 @@ void Modele_turbulence_hyd_LES_1elt_selectif_mod_VEF::discretiser()
 }
 
 int Modele_turbulence_hyd_LES_1elt_selectif_mod_VEF::a_pour_Champ_Fonc(const Motcle& mot,
-                                                                       REF(Champ_base) &ch_ref) const
+                                                                       OBS_PTR(Champ_base) &ch_ref) const
 {
   Motcles les_motcles(7);
   {

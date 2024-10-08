@@ -70,7 +70,7 @@ private :
 
 
 protected :
-  REF(Champ_Fonc_base) la_viscosite_turbulente;
+  OBS_PTR(Champ_Fonc_base) la_viscosite_turbulente;
   Champ_Fonc_base& calculer_diffusivite_turbulente();
   // nous n'avons plus alpha_turb = visco_turb/Prdt_turb
 };

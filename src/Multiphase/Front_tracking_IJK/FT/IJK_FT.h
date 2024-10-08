@@ -529,9 +529,9 @@ protected :
 
   IJK_Splitting splitting_;
   // Le probleme ft disc qui porte le maillage vdf pour les algorithmes front-tracking
-  REF(Probleme_base) refprobleme_ft_disc_;
+  OBS_PTR(Probleme_base) refprobleme_ft_disc_;
   // Creation d'un probleme sur le domaine d'origine pour les sondes et pour faire leur VDF...
-  REF(Probleme_base) refprobleme_ns_;
+  OBS_PTR(Probleme_base) refprobleme_ns_;
 
   ArrOfDouble_with_ghost delta_z_local_;
 

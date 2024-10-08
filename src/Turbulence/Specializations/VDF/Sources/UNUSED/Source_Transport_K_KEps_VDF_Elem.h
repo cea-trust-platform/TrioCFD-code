@@ -40,7 +40,7 @@ public:
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected:
-  REF(Transport_K_KEps)  mon_eq_transport_K_Eps;
+  OBS_PTR(Transport_K_KEps)  mon_eq_transport_K_Eps;
   void associer_pb(const Probleme_base& pb) override;
 };
 

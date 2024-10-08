@@ -66,9 +66,9 @@ protected :
   Op_Diff_Flux_Chaleur_Turb terme_diffusif;
   Operateur_Conv terme_convectif;
 
-  REF(Fluide_base)le_fluide;
-  REF(Champ_Inc_base) la_vitesse_transportante;
-  REF(Modele_turbulence_scal_Fluctuation_Temperature) mon_modele_fluctu;
+  OBS_PTR(Fluide_base)le_fluide;
+  OBS_PTR(Champ_Inc_base) la_vitesse_transportante;
+  OBS_PTR(Modele_turbulence_scal_Fluctuation_Temperature) mon_modele_fluctu;
 
 
 };

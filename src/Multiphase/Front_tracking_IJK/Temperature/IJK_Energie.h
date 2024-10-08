@@ -135,7 +135,7 @@ protected:
   void compute_interfacial_temperature2(ArrOfDouble& interfacial_temperature,
                                         ArrOfDouble& interfacial_phin_ai) const;
 
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
   int rang_;
 
   Boundary_Conditions_Thermique boundary_conditions_;

@@ -50,7 +50,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
       Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext());
       DoubleTab& Text_valeurs = T_ext().valeurs_au_temps(temps);
       int elemF;
-      REF(Pb_2G) le_pb2G;
+      OBS_PTR(Pb_2G) le_pb2G;
       Pb_MG& pbMG = ch.le_pb_MG();
 
       //POUR LE MOMENT, CONSIDERONS QUE LE PB GROSSIER A UN SEUL PB FIN !!!!
@@ -93,7 +93,7 @@ void Echange_contact_VDF_Zoom_grossier::mettre_a_jour(double temps)
 
       //ON VEUT LE MILIEU FIN !!!!!!!!!
       //const Milieu_base& le_milieu = ch.inconnue().equation().milieu();
-      REF(Milieu_base) le_milieu;
+      OBS_PTR(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
 
       const int nb_comp = le_milieu->conductivite().nb_comp();

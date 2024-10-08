@@ -1294,7 +1294,7 @@ const Champ_base& Transport_Marqueur_FT::get_champ(const Motcle& nom) const
     {
     }
   throw Champs_compris_erreur();
-  REF(Champ_base) ref_champ;
+  OBS_PTR(Champ_base) ref_champ;
   return ref_champ;
 }
 

@@ -65,7 +65,7 @@ protected:
 
 private:
 
-  REF(Domaine_dis_base) domaine_dis;
+  OBS_PTR(Domaine_dis_base) domaine_dis;
 
   OWN_PTR(Champ_Inc_base) vrai_champ_;
   inline virtual const Champ_Inc_base& le_champ() const;

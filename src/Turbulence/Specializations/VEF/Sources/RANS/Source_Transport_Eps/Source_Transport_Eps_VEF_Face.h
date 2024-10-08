@@ -42,7 +42,7 @@ public:
 
 protected:
   void associer_pb(const Probleme_base& pb) override;
-  REF(Transport_K_ou_Eps) mon_eq_transport_K, mon_eq_transport_Eps;
+  OBS_PTR(Transport_K_ou_Eps) mon_eq_transport_K, mon_eq_transport_Eps;
 
 private:
   const DoubleTab& get_visc_turb() const override;

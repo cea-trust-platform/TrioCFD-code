@@ -56,7 +56,7 @@ protected:
   int phase_a_conserver_;
 
   // Quelle equation du probleme fournit l'indicatrice de phase ?
-  REF(Equation_base) ref_eq_transport_;
+  OBS_PTR(Equation_base) ref_eq_transport_;
 
   // Liste non vide => cette equation modelise le produit de la reaction avec les equations
   //  dont la liste contient les noms:

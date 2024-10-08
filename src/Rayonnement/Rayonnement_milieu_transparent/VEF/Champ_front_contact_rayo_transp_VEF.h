@@ -56,7 +56,7 @@ public :
 protected:
   DoubleVect flux_radiatif;
 
-  REF(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo;
+  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo;
 };
 
 

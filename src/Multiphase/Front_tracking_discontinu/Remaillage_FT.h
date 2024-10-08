@@ -137,7 +137,7 @@ protected:
 
   int nettoyer_maillage(Maillage_FT_Disc& maillage) const;
 
-  REF(Domaine_VF) refdomaine_VF_;
+  OBS_PTR(Domaine_VF) refdomaine_VF_;
 
   double temps_;
   double temps_dernier_remaillage_;

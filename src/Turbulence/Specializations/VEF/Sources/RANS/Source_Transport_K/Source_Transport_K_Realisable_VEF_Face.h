@@ -35,7 +35,7 @@ public :
   void mettre_a_jour(double temps) override;
 
 protected :
-  REF(Transport_K_ou_Eps_Realisable) eqn_k_Rea, eqn_eps_Rea;
+  OBS_PTR(Transport_K_ou_Eps_Realisable) eqn_k_Rea, eqn_eps_Rea;
 
 private:
   inline int get_size_k_eps() const override { return eqn_k_Rea->inconnue().valeurs().dimension(0); }

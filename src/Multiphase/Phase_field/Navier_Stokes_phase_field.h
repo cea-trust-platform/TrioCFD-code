@@ -103,7 +103,7 @@ protected :
   OWN_PTR(Champ_Don_base) drhodc_; // soit lu dans le jdd (boussi_==0)
   // soit construit comme rho0_*betac_ (boussi_==1 mais attention strictement valide seulement si betac_= Champs_Uniforme)
   double rho0_;
-  REF(Champ_Don_base) betac_;
+  OBS_PTR(Champ_Don_base) betac_;
   OWN_PTR(Champ_Don_base) mu_;// lu dans le jdd (boussi_==0) seulement pour boussi_==0 && diff_boussi_==0
 
   int boussi_;

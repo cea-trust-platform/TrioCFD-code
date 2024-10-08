@@ -40,7 +40,7 @@ class Modele_turbulence_hyd_LES_Fst_sel_VEF: public Modele_turbulence_hyd_LES_Fs
   Declare_instanciable_sans_constructeur(Modele_turbulence_hyd_LES_Fst_sel_VEF);
 public:
   Modele_turbulence_hyd_LES_Fst_sel_VEF();
-  int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)&) const;
+  int a_pour_Champ_Fonc(const Motcle&, OBS_PTR(Champ_base)&) const;
   void discretiser() override;
   void calculer_racine() override;
 

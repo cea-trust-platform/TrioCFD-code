@@ -218,7 +218,7 @@ protected :
   int index_end_=0;
   int reallocate_subproblems_ = 1;
   bool is_updated_ = 0;
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
 
   FixedVector<ArrOfInt, 3> ijk_indices_to_subproblem_;
   std::map<int, std::map<int, std::map<int, int>>> subproblem_to_ijk_indices_previous_;

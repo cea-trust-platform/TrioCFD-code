@@ -56,12 +56,12 @@ public :
 
 protected:
 
-  REF(Domaine_VEF) le_dom_VEF;
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  /*   REF(Fluide_Incompressible) le_fluide; */
-  /*   REF(Champ_Inc_base) la_vitesse_transportante; */
-  /*   REF(Transport_K_Eps_Bas_Reynolds) eq_transport_K_Eps_Bas_Re; */
-  /*   REF(Champ_Don_base) visco; */
+  OBS_PTR(Domaine_VEF) le_dom_VEF;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  /*   OBS_PTR(Fluide_Incompressible) le_fluide; */
+  /*   OBS_PTR(Champ_Inc_base) la_vitesse_transportante; */
+  /*   OBS_PTR(Transport_K_Eps_Bas_Reynolds) eq_transport_K_Eps_Bas_Re; */
+  /*   OBS_PTR(Champ_Don_base) visco; */
 };
 
 #endif

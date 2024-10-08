@@ -182,7 +182,7 @@ protected:
   const IJK_Interfaces *interfaces_;
   const IJK_Field_double *field_;
   const IJK_Splitting *splitting_;
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
 
 
   double rhocp_l_, rhocp_v_;

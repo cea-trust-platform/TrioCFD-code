@@ -32,11 +32,11 @@ public :
   void associer_champ(const Champ_P1NC&, const Champ_P1_isoP1Bulle&, const Champ_Don_base&, const Domaine_Cl_dis_base&);
 
 private:
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  REF(Champ_P1NC) vitesse_;
-  REF(Champ_P1_isoP1Bulle) pression_p1isop1b_;
-  REF(Champ_Don_base) viscosite_cinematique_;
-  REF(Champ_P1NC) source_qdm_;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  OBS_PTR(Champ_P1NC) vitesse_;
+  OBS_PTR(Champ_P1_isoP1Bulle) pression_p1isop1b_;
+  OBS_PTR(Champ_Don_base) viscosite_cinematique_;
+  OBS_PTR(Champ_P1NC) source_qdm_;
 };
 
 #endif /* Estimateur_Aposteriori_P0_VEF_included */

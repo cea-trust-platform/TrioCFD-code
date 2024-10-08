@@ -65,7 +65,7 @@ public:
   inline const Equation_base& seconde_equation() const;
 
 protected:
-  REF(Equation_base) ma_seconde_equation_;
+  OBS_PTR(Equation_base) ma_seconde_equation_;
 };
 
 /*! @brief Renvoie la seconde equation associee au modele de turbulence en formulation bicephale.

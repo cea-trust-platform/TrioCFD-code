@@ -59,11 +59,11 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Domaine_VEF) le_dom_vef;
-  REF(Champ_base) diffusivite_;
+  OBS_PTR(Domaine_VEF) le_dom_vef;
+  OBS_PTR(Champ_base) diffusivite_;
   mutable DoubleTab nu_;
-  REF(Domaine_Cl_VEF) la_zcl_vef;
-  REF(Champ_P1NC) inconnue_;
+  OBS_PTR(Domaine_Cl_VEF) la_zcl_vef;
+  OBS_PTR(Champ_P1NC) inconnue_;
 };
 /*! @brief on dimensionne notre matrice au moyen de la methode dimensionner de la classe Op_VEF_Face.
  *

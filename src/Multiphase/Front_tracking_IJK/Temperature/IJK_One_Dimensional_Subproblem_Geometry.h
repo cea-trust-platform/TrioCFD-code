@@ -116,7 +116,7 @@ protected :
                                double& tangential_distance_vertex_centre,
                                Vecteur3& tangential_distance_vector_vertex_centre);
 
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
   const IJK_Interfaces * interfaces_;
   int debug_ = 0;
 

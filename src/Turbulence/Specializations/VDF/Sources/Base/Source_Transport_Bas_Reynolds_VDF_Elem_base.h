@@ -36,7 +36,7 @@ public :
   void associer_pb(const Probleme_base& ) override;
 
 protected :
-  REF(Transport_K_Eps_Bas_Reynolds) eqn_keps_bas_re;
+  OBS_PTR(Transport_K_Eps_Bas_Reynolds) eqn_keps_bas_re;
 
 private:
   virtual void fill_resu_bas_reyn(const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , DoubleTab& ) const { return not_implemented<void>(__func__); }

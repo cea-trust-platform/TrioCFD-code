@@ -962,7 +962,7 @@ protected :
   int order_approx_temperature_ext_=1;
   int avoid_post_processing_all_terms_=0;
 
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
   bool is_updated_ = false;
   bool is_post_processed_local_ = false;
 

@@ -279,13 +279,13 @@ protected:
   void construire_noeuds(IntTab& def_noeud,const DoubleTab& soms);
   void calculer_coord_noeuds(const IntTab& def_noeud,const DoubleTab& soms,IntTab& renum);
 
-  REF(Transport_Interfaces_FT_Disc) refequation_transport_;
+  OBS_PTR(Transport_Interfaces_FT_Disc) refequation_transport_;
   // Pour pouvoir utiliser le maillage_FT_IJK sans equation de transport, j'ajoute une ref
   // au domaine_dis, et on l'utilise directement chaque fois que c'est possible au lieu de l'eq. transp.:
   // C'est initialise dans associer_domaine_dis.
-  REF(Domaine_dis_base) refdomaine_dis_;
+  OBS_PTR(Domaine_dis_base) refdomaine_dis_;
   // Pour la meme raison, ajout d'une ref au parcours de l'interface:
-  REF(Parcours_interface) refparcours_interface_;
+  OBS_PTR(Parcours_interface) refparcours_interface_;
 
   ArrOfIntFT som_init_util_; //Indique les positions de sommets qui sont effectivement
   //la propriete du domaine (ou sous domaine en parallele)

@@ -141,7 +141,7 @@ protected:
                                              const ConstIJK_double_ptr& structural_model, Simd_double& flux);
 
   Operateur_IJK_data_channel channel_data_;
-  REF(Boundary_Conditions) ref_bc_;
+  OBS_PTR(Boundary_Conditions) ref_bc_;
   bool perio_k_ ;
 
   // Pointers to input data (velocity at faces, diffustion coeffs at elements)

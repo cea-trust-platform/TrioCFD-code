@@ -892,7 +892,7 @@ static True_int fct_tri_facettes(const void *pt1, const void *pt2)
 void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
 {
   Domaine dom;
-  REF(Domaine) ref_dom;
+  OBS_PTR(Domaine) ref_dom;
   Nom filename;
   ArrOfInt phase_specifiee;
   DoubleTab points;

@@ -52,7 +52,7 @@ public:
   virtual const Cond_lim_base& la_cl() const=0;
 
 protected :
-  REF(Modele_rayo_semi_transp) mon_modele;
+  OBS_PTR(Modele_rayo_semi_transp) mon_modele;
   OWN_PTR(Champ_front_base) emissivite_;
   double A_;
 

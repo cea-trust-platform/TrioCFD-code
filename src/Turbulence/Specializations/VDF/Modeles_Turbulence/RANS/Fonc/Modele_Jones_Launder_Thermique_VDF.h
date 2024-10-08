@@ -56,11 +56,11 @@ public :
 
 protected:
 
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
-  REF(Fluide_base) le_fluide;
-  REF(Champ_Inc_base) la_vitesse_transportante;
-  REF(Transport_Fluctuation_Temperature_W_Bas_Re) eq_transport_Fluctu_Temp_Bas_Re;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Fluide_base) le_fluide;
+  OBS_PTR(Champ_Inc_base) la_vitesse_transportante;
+  OBS_PTR(Transport_Fluctuation_Temperature_W_Bas_Re) eq_transport_Fluctu_Temp_Bas_Re;
 
 };
 

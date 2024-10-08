@@ -48,7 +48,7 @@ public:
 protected :
   double calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp, double Diam_hyd_) const;
 
-  REF(Correlation_base) correlation_loi_paroi_;
+  OBS_PTR(Correlation_base) correlation_loi_paroi_;
 };
 
 #endif

@@ -55,9 +55,9 @@ public:
 
 protected :
   void associer_domaines(const Domaine_dis_base& domaine,const Domaine_Cl_dis_base& ) override;
-  REF(Domaine_VDF) le_dom;
-  REF(Domaine_Cl_VDF) le_dom_Cl;
-  REF(Probleme_base) le_probleme;
+  OBS_PTR(Domaine_VDF) le_dom;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl;
+  OBS_PTR(Probleme_base) le_probleme;
 };
 
 inline void Source_Gravite_PF_VDF::associer_pb(const Probleme_base& pb )

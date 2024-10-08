@@ -498,11 +498,11 @@ protected:
   IJK_Field_double d_T_rustine_; // Temperature increment to conserve the energy.
   IJK_Field_double RK3_F_rustine_; // Temporary storage for substeps in the RK3 algorithm for the rustine calculation.
 
-  REF(IJK_FT_double) ref_ijk_ft_;
-  REF(IJK_FT_Post) ref_ijk_ft_post_;
-  REF(Switch_FT_double) ref_ijk_ft_switch_;
-  REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
-  REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_Post) ref_ijk_ft_post_;
+  OBS_PTR(Switch_FT_double) ref_ijk_ft_switch_;
+  OBS_PTR(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
+  OBS_PTR(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
   OWN_PTR(Corrige_flux_FT_base) corrige_flux_;
   const IJK_Field_double& get_IJK_field(const Nom& nom) const;
   int rang_;

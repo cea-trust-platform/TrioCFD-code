@@ -60,7 +60,7 @@ public:
 protected:
 
   OWN_PTR(Champ_Inc_base) le_champ_K_Omega;
-  REF(Modele_turbulence_hyd_RANS_K_Omega_base) mon_modele;
+  OBS_PTR(Modele_turbulence_hyd_RANS_K_Omega_base) mon_modele;
 };
 
 /*! @brief Renvoie le champ inconnue de l'equation.

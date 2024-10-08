@@ -58,7 +58,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
       DoubleTab& Text_valeurs = ch.valeurs_au_temps(temps);
       int elemF;
       int  elemG;
-      REF(Pb_2G) le_pb2G;
+      OBS_PTR(Pb_2G) le_pb2G;
       Pb_MG& pbMG = ch.le_pb_MG();
       const double h_paroi=1.e30;
 
@@ -92,9 +92,9 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
 
 
 
-      REF(Milieu_base) le_milieu;
+      OBS_PTR(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
-      REF(Milieu_base) le_milieu_vdf;
+      OBS_PTR(Milieu_base) le_milieu_vdf;
       le_milieu_vdf = pbG.milieu();
 
       const int nb_comp_vef = le_milieu->conductivite().nb_comp();

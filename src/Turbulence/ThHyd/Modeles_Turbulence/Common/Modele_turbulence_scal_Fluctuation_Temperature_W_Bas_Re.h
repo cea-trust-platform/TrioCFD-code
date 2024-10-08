@@ -57,7 +57,7 @@ public:
 private :
 
 //Entree& lire(const Motcle&, Entree&);
-  REF(Transport_Fluctuation_Temperature_W_Bas_Re) eqn_transport_Fluctu_Temp;
+  OBS_PTR(Transport_Fluctuation_Temperature_W_Bas_Re) eqn_transport_Fluctu_Temp;
   OWN_PTR(Modele_Fonc_Bas_Reynolds_Thermique_Base) mon_modele_fonc;
 
 

@@ -78,8 +78,8 @@ protected:
   static constexpr double PRDT_K_DEFAUT = 2, PRDT_OMEGA_DEFAUT = 2; // cAlan: inverse of the litterature constant due to implementation in one over sigma.
   double Prdt_K, Prdt_Omega, db_diffusivite, Prdt[2];
   DoubleVect dv_diffusivite_turbulente, dv_mvol;
-  REF(Champ_Fonc_base) diffusivite_turbulente_;
-  REF(Champ_base) masse_volumique_, diffusivite_;
+  OBS_PTR(Champ_Fonc_base) diffusivite_turbulente_;
+  OBS_PTR(Champ_base) masse_volumique_, diffusivite_;
 };
 
 #endif /* Eval_Diff_K_Omega_VDF_included */

@@ -43,8 +43,8 @@ public:
   virtual int calculer_position(ArrOfDouble& pos) const;
 protected:
   Nom equation_interface_;
-  REF(Probleme_base) probleme_;
-  REF(Equation_base) equation_;
+  OBS_PTR(Probleme_base) probleme_;
+  OBS_PTR(Equation_base) equation_;
   ArrOfDouble segment_senseur_1_;
   ArrOfDouble segment_senseur_2_;
   // nombre de points tests du senseur (il doit y en avoir plus qu'un par maille)

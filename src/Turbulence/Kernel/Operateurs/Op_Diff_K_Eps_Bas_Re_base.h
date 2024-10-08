@@ -89,7 +89,7 @@ public:
   const Champ_base& diffusivite() const override;
 
 protected:
-  REF(Champ_base) la_diffusivite;
+  OBS_PTR(Champ_base) la_diffusivite;
 };
 
 
@@ -121,7 +121,7 @@ public:
 
 protected :
 
-  REF(Champ_base) la_diffusivite;
+  OBS_PTR(Champ_base) la_diffusivite;
 
 };
 

@@ -67,7 +67,7 @@ public:
 protected:
   int tpsaff;
   double rho0;
-  REF(Champ_Don_base) drhodc_;
+  OBS_PTR(Champ_Don_base) drhodc_;
   DoubleTab accr;
   DoubleVect u_carre_;
   DoubleTab prov_face_,prov_elem_;
@@ -144,9 +144,9 @@ protected:
   /*   virtual int non_lin_gmres(const DoubleTab&, const DoubleTab&, const Matrice_Morse&, DoubleTab&); */
   //---------------
 
-  REF(Probleme_base) le_probleme2;
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Probleme_base) le_probleme2;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
 };
 
 inline const DoubleVect& Source_Con_Phase_field::get_u_carre()

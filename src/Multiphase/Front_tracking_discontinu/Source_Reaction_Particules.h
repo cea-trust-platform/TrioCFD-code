@@ -57,7 +57,7 @@ protected:
   void associer_pb(const Probleme_base& ) override;
 
 
-  REF(Transport_Marqueur_FT) eq_marqueur_; //Reference a l equation de type Transport_Marqueur_FT
+  OBS_PTR(Transport_Marqueur_FT) eq_marqueur_; //Reference a l equation de type Transport_Marqueur_FT
   //permet d acceder source_stockage_
 };
 

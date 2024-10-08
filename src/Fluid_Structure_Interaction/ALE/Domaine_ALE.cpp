@@ -79,7 +79,7 @@ void Domaine_ALE::clear()
   resumption = 0;
   nbBeam = 0;
   beam.clear();
-  eq = REF(Equation_base)();
+  eq = OBS_PTR(Equation_base)();
   field_ALE_projection_ = Champs_front_ALE_projection();
   name_ALE_boundary_projection_ = Noms();
   associate_eq = false;

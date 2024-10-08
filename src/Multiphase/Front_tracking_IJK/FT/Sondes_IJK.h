@@ -48,7 +48,7 @@ public :
   void mettre_a_jour(double temps, double tinit);
 
 protected :
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
 
 };
 

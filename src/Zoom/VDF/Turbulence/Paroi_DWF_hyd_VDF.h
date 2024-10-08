@@ -73,7 +73,7 @@ protected :
 
   // Probleme multigrille pour connecter le probleme thermohydraulique avec le sous probleme fin en paroi
   Pb_MG pbMG;
-  REF(Probleme_base) pb_fin;
+  OBS_PTR(Probleme_base) pb_fin;
 
   int thermo,CHT;
 };

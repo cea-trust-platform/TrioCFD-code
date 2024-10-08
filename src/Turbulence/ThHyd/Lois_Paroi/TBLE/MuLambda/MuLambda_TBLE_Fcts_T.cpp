@@ -70,14 +70,14 @@ void MuLambda_TBLE_Fcts_T::initialiser(const Milieu_base& milieu)
   rhoCp = rho*milieu.capacite_calorifique().valeurs()(0,0);
 }
 
-double MuLambda_TBLE_Fcts_T::getNu(REF(Eq_couch_lim) eq_T, int ind)
+double MuLambda_TBLE_Fcts_T::getNu(OBS_PTR(Eq_couch_lim) eq_T, int ind)
 {
   double T = eq_T->get_Unp1(0,ind);
   p_mu.setVar(0, T);
   return p_mu.eval()/rho;
 }
 
-double MuLambda_TBLE_Fcts_T::getAlpha(REF(Eq_couch_lim) eq_T, int ind)
+double MuLambda_TBLE_Fcts_T::getAlpha(OBS_PTR(Eq_couch_lim) eq_T, int ind)
 {
   double T = eq_T->get_Unp1(0,ind);
   p_lambda.setVar(0, T);

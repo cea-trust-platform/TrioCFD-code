@@ -745,10 +745,10 @@ protected:
                                                   const double distmax);
 
 // reference vers le splitting_ft_ pour les interfaces :
-  REF(IJK_Splitting) ref_splitting_;
-  REF(Domaine_dis_base) refdomaine_dis_;
-  REF(IJK_FT_double) ref_ijk_ft_;
-  REF(Switch_FT_double) ref_ijk_ft_switch_;
+  OBS_PTR(IJK_Splitting) ref_splitting_;
+  OBS_PTR(Domaine_dis_base) refdomaine_dis_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(Switch_FT_double) ref_ijk_ft_switch_;
   // Interdit le constructeur par copie (car constructeurs par copie interdits
   // pour parcours_ et autres
   IJK_Interfaces(const IJK_Interfaces& x) : Objet_U(x)

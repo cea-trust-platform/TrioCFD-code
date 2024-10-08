@@ -69,8 +69,8 @@ protected :
   OWN_PTR(Champ_Inc_base) le_champ_Fluctu_Temperature;
   Op_Diff_Fluctu_Temp terme_diffusif;
 
-  REF(Fluide_base)le_fluide;
-  REF(Modele_turbulence_scal_Fluctuation_Temperature) mon_modele_Fluctu_Temp;
+  OBS_PTR(Fluide_base)le_fluide;
+  OBS_PTR(Modele_turbulence_scal_Fluctuation_Temperature) mon_modele_Fluctu_Temp;
 
 
 };

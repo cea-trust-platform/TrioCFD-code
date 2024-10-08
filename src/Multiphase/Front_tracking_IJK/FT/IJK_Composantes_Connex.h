@@ -136,7 +136,7 @@ public :
 
 protected :
   void fill_mixed_cell_compo();
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
   const IJK_Interfaces * interfaces_ = nullptr;
 
   IJK_Field_double eulerian_compo_connex_ft_;

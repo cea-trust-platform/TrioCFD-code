@@ -1334,7 +1334,7 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser()
   const Discretisation_base& dis = discretisation();
   const double temps = schema_temps().temps_courant();
   const Domaine_dis_base& un_domaine_dis = domaine_dis();
-  LIST(REF(Champ_base)) & champs_compris = liste_champs_compris_;
+  LIST(OBS_PTR(Champ_base)) & champs_compris = liste_champs_compris_;
   const int nb_valeurs_temps = schema_temps().nb_valeurs_temporelles();
 
   Nom nom;

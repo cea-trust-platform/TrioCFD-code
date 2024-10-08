@@ -64,7 +64,7 @@ public :
 protected :
 
   DoubleVect flux_radiatif;
-  REF(Modele_rayo_semi_transp) le_modele_rayo;
+  OBS_PTR(Modele_rayo_semi_transp) le_modele_rayo;
 
 };
 

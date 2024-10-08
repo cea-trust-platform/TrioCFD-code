@@ -53,8 +53,8 @@ public :
   void completer() override;
 
 protected :
-  REF(Domaine_VEF) le_dom_vef;
-  REF(Domaine_Cl_VEF) la_zcl_vef;
+  OBS_PTR(Domaine_VEF) le_dom_vef;
+  OBS_PTR(Domaine_Cl_VEF) la_zcl_vef;
   mutable ArrOfInt traitement_pres_bord_;
   mutable ArrOfInt est_une_face_de_dirichlet_;
 };

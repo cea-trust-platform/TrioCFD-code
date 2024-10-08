@@ -317,8 +317,8 @@ protected:
   void calcul_indicatrice_faces(const DoubleTab& indicatrice,
                                 const IntTab& face_voisins);
 
-  REF(Probleme_base) probleme_base_;
-  REF(Navier_Stokes_FT_Disc) equation_ns_;
+  OBS_PTR(Probleme_base) probleme_base_;
+  OBS_PTR(Navier_Stokes_FT_Disc) equation_ns_;
   // L'inconnue du probleme
   OWN_PTR(Champ_Inc_base) indicatrice_;
   OWN_PTR(Champ_Inc_base) indicatrice_faces_;
@@ -355,7 +355,7 @@ private:
 
   double temps_debut_;
 
-  REF(Milieu_base) ref_milieu_;
+  OBS_PTR(Milieu_base) ref_milieu_;
 
   int interpolation_repere_local_;
   ArrOfDouble force_;
@@ -486,7 +486,7 @@ public:
 
   enum Methode_transport { INDEFINI, VITESSE_IMPOSEE, LOI_HORAIRE, VITESSE_INTERPOLEE };
   Methode_transport      methode_transport;
-  REF(Navier_Stokes_std) refequation_vitesse_transport;
+  OBS_PTR(Navier_Stokes_std) refequation_vitesse_transport;
 
   enum Methode_interpolation_v { VALEUR_A_ELEM, VDF_LINEAIRE };
   Methode_interpolation_v methode_interpolation_v;
@@ -524,7 +524,7 @@ public:
 
   Noms                      expression_vitesse_imposee;
   // Reference a une loi horaire eventuelle
-  REF(Loi_horaire)         loi_horaire_;
+  OBS_PTR(Loi_horaire)         loi_horaire_;
 
   // Integration de la vitesse a partir du point de depart (x,y,z)
   //  pendant un temps dt.

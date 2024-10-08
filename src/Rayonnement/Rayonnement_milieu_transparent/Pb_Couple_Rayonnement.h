@@ -48,8 +48,8 @@ public:
   int postraiter(int force=1) override;
 
 protected:
-  REF(Modele_Rayonnement_base) le_modele_de_rayo;
-  REF(Cond_lim_base) les_cl;
+  OBS_PTR(Modele_Rayonnement_base) le_modele_de_rayo;
+  OBS_PTR(Cond_lim_base) les_cl;
 };
 
 inline Modele_Rayonnement_base& Pb_Couple_Rayonnement::le_modele_rayo()

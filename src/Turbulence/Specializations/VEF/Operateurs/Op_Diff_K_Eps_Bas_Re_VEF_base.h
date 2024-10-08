@@ -59,7 +59,7 @@ public:
 protected:
   double Prdt_K;
   double Prdt_Eps;
-  REF(Champ_Fonc_base) diffusivite_turbulente_;
+  OBS_PTR(Champ_Fonc_base) diffusivite_turbulente_;
 
 };
 

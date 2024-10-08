@@ -73,11 +73,11 @@ public:
 
 
 protected :
-  REF(Pb_MG) le_pb_MG_;
-  REF(Probleme_base) le_pb_ext_;
-  REF(Probleme_base) le_pb_courant_;
-  REF(Champ_Inc_base) l_inconnueF;
-  REF(Champ_Inc_base) l_inconnue;
+  OBS_PTR(Pb_MG) le_pb_MG_;
+  OBS_PTR(Probleme_base) le_pb_ext_;
+  OBS_PTR(Probleme_base) le_pb_courant_;
+  OBS_PTR(Champ_Inc_base) l_inconnueF;
+  OBS_PTR(Champ_Inc_base) l_inconnue;
   //  Nom dirichlet_ou_neumann;
   Nom nom_bord;
   Nom nom_pbMG_, nom_pbG_, nom_pbF_, bord_;

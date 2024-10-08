@@ -66,13 +66,13 @@ public:
 private :
 
 //Entree& lire(const Motcle&, Entree&);
-  REF(Transport_Fluctuation_Temperature_W) eqn_transport_Fluctu_Temp;
+  OBS_PTR(Transport_Fluctuation_Temperature_W) eqn_transport_Fluctu_Temp;
 
 
 
 protected :
   OWN_PTR(Equation_base) eqn;
-  REF(Champ_Fonc_base) la_viscosite_turbulente;
+  OBS_PTR(Champ_Fonc_base) la_viscosite_turbulente;
   // nous n'avons plus alpha_turb = visco_turb/Prdt_turb
 
 

@@ -47,7 +47,7 @@ public :
 protected :
   // Donnees
   Nom la_surface_libre_nom_; 			// Nom de la surface libre
-  REF(Front_VF) la_surface_libre_;		// Pointe vers la frontiere
+  OBS_PTR(Front_VF) la_surface_libre_;		// Pointe vers la frontiere
   double haspi_;				// Hauteur d'aspiration
   double C_;					// Constante AREVA
   int calculer_critere_areva_,calculer_critere_cea_jaea_; // Flags pour savoir si on calcule ou pas les criteres

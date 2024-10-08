@@ -79,8 +79,8 @@ protected:
   DoubleTab S_elem_;
   DoubleTab R_elem_;
 
-  REF(Domaine_VEF) le_dom_VEF;
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  OBS_PTR(Domaine_VEF) le_dom_VEF;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
   double A0_;
 };

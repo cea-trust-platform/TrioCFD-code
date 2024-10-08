@@ -70,7 +70,7 @@ protected:
   int check_stats_;
   int nb_thermal_fields_; // Number of objects thermique_ in the list
   int nvalt_;             // Number of variables post-processed per field
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
   // Last instantaneous value of the space average (only on processor 0)
   DoubleTab moyenne_spatiale_instantanee_temperature_; // (i,j,k) ->  (nvalt_,nb_elem_k_tot,nb_thermal_fields_)
   // Temporal integral of statistics variables

@@ -49,7 +49,7 @@ public :
 
 private :
 
-  REF(OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)) mon_modele_fonc;
+  OBS_PTR(OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)) mon_modele_fonc;
 
 };
 

@@ -72,10 +72,10 @@ protected:
   static constexpr double SIGMA_OMEGA1 = 0.5;
   static constexpr double SIGMA_OMEGA2 = 0.856;
 
-  REF(Champ_Fonc_base) diffusivite_turbulente_;
-  REF(Champ_Don_base) tmp;
-  REF(Champ_base) diffusivite_;
-  REF(Modele_turbulence_hyd_K_Omega) turbulence_model;
+  OBS_PTR(Champ_Fonc_base) diffusivite_turbulente_;
+  OBS_PTR(Champ_Don_base) tmp;
+  OBS_PTR(Champ_base) diffusivite_;
+  OBS_PTR(Modele_turbulence_hyd_K_Omega) turbulence_model;
 
 };
 

@@ -52,7 +52,7 @@ public:
 protected:
 
   IntVect num_face_Ensemble;//contient_;
-  REF(Cond_lim_base) les_cl_base;
+  OBS_PTR(Cond_lim_base) les_cl_base;
   Cond_Lim_Rayo* la_cond_lim_rayo_;
   int nb_faces_bord_;
   DoubleTab positions_;

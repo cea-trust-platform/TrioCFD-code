@@ -49,8 +49,8 @@ public :
   const Motcle& get_uncertain_variable_name() const;
 
 protected :
-  REF(Champ_Inc_base) velocity_state_field;  //Reference to the unknown velocity field of the state problem
-  REF(Champ_Inc_base) temperature_state_field;  //Reference to the unknown temperature field of the state problem
+  OBS_PTR(Champ_Inc_base) velocity_state_field;  //Reference to the unknown velocity field of the state problem
+  OBS_PTR(Champ_Inc_base) temperature_state_field;  //Reference to the unknown temperature field of the state problem
   Nom name_state_pb;                      //name of the problem state
   Motcle name_velocity_state_field;         //name of the unknown velocity field of the state problem
   Motcle name_temperature_state_field;      //name of the unknown temperature field of the state problem

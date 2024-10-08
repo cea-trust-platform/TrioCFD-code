@@ -37,7 +37,7 @@ protected:
   OWN_PTR(Champ_front_base) vitesse_; // velocity field
   double d; // hydraulic diameter
   double I; // intensity turbulence
-  //REF(Schema_Temps_base) sch;
+  //OBS_PTR(Schema_Temps_base) sch;
 };
 
 #endif

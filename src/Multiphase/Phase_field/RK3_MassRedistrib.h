@@ -32,8 +32,8 @@ public:
   int faire_un_pas_de_temps_eqn_base(Equation_base&) override;
 
 private:
-  int trouver_tous_les_pbs(Pb_MG&, VECT(REF(Probleme_base))&);
-  void associer_pb_fins(int, Pb_MG&, VECT(REF(Probleme_base))&);
+  int trouver_tous_les_pbs(Pb_MG&, VECT(OBS_PTR(Probleme_base))&);
+  void associer_pb_fins(int, Pb_MG&, VECT(OBS_PTR(Probleme_base))&);
   void nb_pb_fins(int&, Pb_MG&);
 };
 
