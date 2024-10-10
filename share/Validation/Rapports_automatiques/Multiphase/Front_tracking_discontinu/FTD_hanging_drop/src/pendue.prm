@@ -146,7 +146,7 @@ Casesetup {
 	}
 	Options_modele {
 		Description "This sheet deals with a generic Front-Tracking problem in the discontinuous version."
-		Description "Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared at the beginning of the problem in \latex_(\textit{solved\_equations} \latex_ block. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible)."
+		Description "Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared at the beginning of the problem in \latex_(\textit{solved\_equations} \latex_) block. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible)."
 	}
 }
 Results {

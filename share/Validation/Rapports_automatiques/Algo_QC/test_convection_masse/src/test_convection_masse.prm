@@ -12,6 +12,6 @@ Chapter {
 
 Description "\latex_(\input{../description_cas.tex}\latex_)"
 
-	description \include_text_file(test_convection_masse/integrale_d_rho.txt)
+	description include_text_file(test_convection_masse/integrale_d_rho.txt)
 }
 

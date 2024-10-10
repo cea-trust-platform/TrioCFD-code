@@ -72,14 +72,14 @@ ai      = np.r_[a0,ai]
 min_vi  = np.r_[vi_ana[0],min_vi]
 mean_vi = np.r_[vi_ana[0],mean_vi]
 max_vi  = np.r_[vi_ana[0],max_vi]
-v_theo  = v[0]-1./rhov*np.r_[0.,integrate.cumtrapz(mp*ai,t)] # the np.r_ is to put the integral at the end of each timestep.
+v_theo  = v[0]-1./rhov*np.r_[0.,integrate.cumulative_trapezoid(mp*ai,t)] # the np.r_ is to put the integral at the end of each timestep.
 if (len(tt)):
    # I add '0.' before the list of dV so that no dVolume is applied to the value v[0]; otherwise, vbis[0] would recieve the first dV 
    # integrated over the first timestep. 
-   vbis = v[0]+np.r_[0.,integrate.cumtrapz(dIdt,tt)]
-   vbis_brm = v[0]+np.r_[0.,integrate.cumtrapz(dIdt_brm,tt)]
-   vlagrange = v[0]+np.r_[0.,integrate.cumtrapz(dIdt_brm,tt)]
-   v_dIdt2 = v[0]-np.r_[0.,integrate.cumtrapz(dIdt2,tt)] # because it already has mp*ai/rhov = int_vol (mp*deltai/rhov) dv
+   vbis = v[0]+np.r_[0.,integrate.cumulative_trapezoid(dIdt,tt)]
+   vbis_brm = v[0]+np.r_[0.,integrate.cumulative_trapezoid(dIdt_brm,tt)]
+   vlagrange = v[0]+np.r_[0.,integrate.cumulative_trapezoid(dIdt_brm,tt)]
+   v_dIdt2 = v[0]-np.r_[0.,integrate.cumulative_trapezoid(dIdt2,tt)] # because it already has mp*ai/rhov = int_vol (mp*deltai/rhov) dv
 else:
    vbis = vbis_brm = v_dIdt2 = vlagrange = np.array([])
    pass

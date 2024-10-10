@@ -29,35 +29,6 @@ transformer dom x*24e-6 y*12.e-6
 Scatter DOM.Zones dom
 #
 
-Fluide_Incompressible  eau
-Lire eau
-{
-    mu champ_uniforme       1 2.8291e-4
-    rho champ_uniforme      1 958.63
-    lambda champ_uniforme   1 0.67897
-    cp champ_uniforme       1 4215.2
-    beta_th champ_uniforme  1 0.e-6
-}
-
-Fluide_Incompressible vapeur
-Lire vapeur
-{
-    mu champ_uniforme       1 1.2256e-5
-    rho champ_uniforme      1 958.  #  HACK, mettre 0.59034 au final #
-    lambda champ_uniforme   1 0.024
-    cp champ_uniforme       1 2078.4
-    beta_th champ_uniforme  1 0.e-6
-}
-
-Fluide_diphasique fluide
-Lire fluide
-{
-    fluide1 eau
-    fluide0 vapeur
-    sigma   Champ_Uniforme 1     0.0 #    0.058988 #
-    chaleur_latente Champ_Uniforme 1    -2.2574e6
-}
-
 Schema_Euler_explicite  sch
 Lire sch
 {
@@ -76,35 +47,7 @@ Lire sch
     facsec 0.30 # not necessary for this case 50x25 but necessary when refined #
 }
 
-Triple_Line_Model_FT_Disc TCL
-Read TCL
-{
-    Qtcl @Qi@ # W/m #
-    ym 3.e-7          # smaller ym to make sure Meso zone always exists even for refined cases #
-    # ymeso 5.e-6 #
-    n_extend_meso 4
-    sm @sm@ # TestCase at theta_app = @degliq@ degree #
-    # sm = ym / tan(theta) #
-    inout_method both
-}
-
-Champ_Uniforme gravite
-Lire gravite 2 0.0 0.0
-Associate fluide gravite
-
-Navier_stokes_FT_disc                         hydraulique
-Transport_interfaces_FT_disc                  interf
-convection_diffusion_temperature_ft_disc      thermique
 Associate pb dom
-Associate pb hydraulique
-Associate pb thermique
-Associate pb interf
-Associate pb fluide
-
-Associate TCL hydraulique
-Associate TCL thermique
-Associate TCL interf
-Associate pb TCL
 
 VDF dis
 Associate pb sch
@@ -112,6 +55,34 @@ Discretize pb dis
 system "mkdir -p lata"
 Lire pb
 {
+    solved_equations
+    {
+        Navier_stokes_FT_disc                         hydraulique
+        Transport_interFACES_FT_disc                  interf
+        convection_diffusion_temperature_ft_disc      thermique
+    }
+    Fluide_diphasique
+    {
+        fluide1 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 2.8291e-4
+            rho champ_uniforme      1 958.63
+            lambda champ_uniforme   1 0.67897
+            cp champ_uniforme       1 4215.2
+            beta_th champ_uniforme  1 0.e-6
+        }
+        fluide0 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 1.2256e-5
+            rho champ_uniforme      1 958.  #  HACK, mettre 0.59034 au final #
+            lambda champ_uniforme   1 0.024
+            cp champ_uniforme       1 2078.4
+            beta_th champ_uniforme  1 0.e-6
+        }
+        sigma   Champ_Uniforme 1     0.0 #    0.058988 #
+        chaleur_latente Champ_Uniforme 1    -2.2574e6
+        gravite Champ_Uniforme 2 0.0 0.0
+    }
     hydraulique
     {
         modele_turbulence sous_maille_wale
@@ -250,6 +221,20 @@ Lire pb
             conditions_initiales { Temperature_thermique_vapeur champ_fonc_xyz dom 1 0. }
         }
 #
+        Triple_Line_Model_FT_Disc
+        {
+            equation_navier_stokes hydraulique
+            equation_temperature thermique
+            equation_interface interf
+
+            Qtcl @Qi@ # W/m #
+            ym 3.e-7          # smaller ym to make sure Meso zone always exists even for refined cases #
+            # ymeso 5.e-6 #
+            n_extend_meso 4
+            sm @sm@ # TestCase at theta_app = @degliq@ degree #
+            # sm = ym / tan(theta) #
+            inout_method both
+        }
 #
         postraitement
         {
