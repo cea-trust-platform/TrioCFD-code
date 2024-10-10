@@ -31,12 +31,12 @@ int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   const double a2 = -5. / 9., a3 = -153. / 128.;
   const double b1 = 1. / 3., b2 = 15. / 16., b3 = 8. / 15.;
 
-  DoubleTab& xi=eqn.inconnue()->valeurs();
-  DoubleTab& xipls1=eqn.inconnue()->futur();
+  DoubleTab& xi=eqn.inconnue().valeurs();
+  DoubleTab& xipls1=eqn.inconnue().futur();
   DoubleTab qi(xi) ;
   DoubleTab present(xi);
 
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, eqn.domaine_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, eqn.domaine_dis());
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme->equation(1));
   Sources& list_sources = ref_cast_non_const(Sources, eq_c.sources());
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
@@ -95,7 +95,7 @@ int RK3_MassRedistrib::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   //Mass_Redistribution_Phase_Field::impose_mass_redistribution(zvdf, xi, minnX, maxxX);
 
   // Update boundary condition on futur:
-  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
   xipls1.echange_espace_virtuel();
 
   /*  Mass_Redistribution_Phase_Field::impose_mass_redistribution(zvdf, xi, minnX, maxxX);*/

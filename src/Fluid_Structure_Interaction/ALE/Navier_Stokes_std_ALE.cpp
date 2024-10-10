@@ -31,7 +31,6 @@
 #include <EcritureLectureSpecial.h>
 #include <Avanc.h>
 
-
 Implemente_instanciable(Navier_Stokes_std_ALE,"Navier_Stokes_standard_ALE",Navier_Stokes_std);
 // XD Navier_Stokes_std_ALE navier_stokes_standard Navier_Stokes_std_ALE -1 Resolution of hydraulic Navier-Stokes eq. on mobile domain (ALE)
 
@@ -42,9 +41,7 @@ Sortie& Navier_Stokes_std_ALE::printOn(Sortie& os ) const
 
 Entree& Navier_Stokes_std_ALE::readOn(Entree& is )
 {
-  Navier_Stokes_std::readOn(is);
-  //Nom pbb = probleme().que_suis_je();
-  return is;
+  return Navier_Stokes_std::readOn(is);
 }
 
 int Navier_Stokes_std_ALE::sauvegarder(Sortie& os) const
@@ -55,12 +52,14 @@ int Navier_Stokes_std_ALE::sauvegarder(Sortie& os) const
   const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
   if (a_faire)
     {
-      Champ_Inc JacobianOld = vitesse(); // Initialize with same discretization
+      OWN_PTR(Champ_Inc_base) JacobianOld = vitesse(); // Initialize with same discretization
       JacobianOld->nommer("JacobianOld");
       JacobianOld->valeurs() = dom_ale.getOldJacobian(); // Use good values
-      Champ_Inc JacobianNew = vitesse(); // Initialize with same discretization
+
+      OWN_PTR(Champ_Inc_base) JacobianNew = vitesse(); // Initialize with same discretization
       JacobianNew->nommer("JacobianNew");
       JacobianNew->valeurs() = dom_ale.getNewJacobian(); // Use good values
+
       if (special && Process::nproc() > 1)
         Cerr << "ATTENTION : For a parallel calculation, the field Jacobian is not saved in xyz format ... " << finl;
       else
@@ -76,14 +75,16 @@ int Navier_Stokes_std_ALE::reprendre(Entree& is)
 {
 // start resuming
   Navier_Stokes_std::reprendre(is);
+
   // resumption Jacobian
-  Champ_Inc JacobianOld = vitesse(); // Initialize with same discretization
+  OWN_PTR(Champ_Inc_base) JacobianOld = vitesse(); // Initialize with same discretization
   JacobianOld->nommer("JacobianOld");
   Nom field_tag_JOld(JacobianOld->le_nom());
   field_tag_JOld += JacobianOld->que_suis_je();
   field_tag_JOld += probleme().domaine().le_nom();
   field_tag_JOld += Nom(probleme().schema_temps().temps_courant(),probleme().reprise_format_temps());
-  Champ_Inc JacobianNew = vitesse(); // Initialize with same discretization
+
+  OWN_PTR(Champ_Inc_base) JacobianNew = vitesse(); // Initialize with same discretization
   JacobianNew->nommer("JacobianNew");
   Nom field_tag_JNew(JacobianNew->le_nom());
   field_tag_JNew += JacobianNew->que_suis_je();
@@ -109,9 +110,6 @@ int Navier_Stokes_std_ALE::reprendre(Entree& is)
   dom_ale.resumptionJacobian(JacobianOld->valeurs(), JacobianNew->valeurs());
   return 1;
 }
-
-
-
 
 void Navier_Stokes_std_ALE::renewing_jacobians( DoubleTab& derivee )
 {
@@ -178,7 +176,7 @@ void Navier_Stokes_std_ALE::div_ale_derivative( DoubleTrav& deriveeALE, double t
   Debog::verifier("secmemP Navier_Stokes_std::corriger_derivee_impl",secmemP);
 }
 
-void Navier_Stokes_std_ALE::update_pressure_matrix( void )
+void Navier_Stokes_std_ALE::update_pressure_matrix()
 {
   //In case of zero ALE mesh velocity (..._coeffs()=1), BM-1Bt matrix stays unchanged.
   Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
@@ -194,11 +192,11 @@ void Navier_Stokes_std_ALE::discretiser()
   Navier_Stokes_std::discretiser();
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
   Cerr << "Mesh Velocity discretization" << finl;
-  dis.discretiser_champ("vitesse", domaine_dis().valeur(), "ALEMeshVelocity","m/s", dimension,1,schema_temps().temps_courant(), ALEMeshVelocity_);
+  dis.discretiser_champ("vitesse", domaine_dis(), "ALEMeshVelocity","m/s", dimension,1,schema_temps().temps_courant(), ALEMeshVelocity_);
   champs_compris_.ajoute_champ(ALEMeshVelocity_);
   ALEMeshVelocity_->add_synonymous(Nom("ALEMeshVelocity"));
   Cerr << "Mesh Velocity discretization" << finl;
-  dis.discretiser_champ("vitesse",domaine_dis().valeur(),"ALEMeshTotalDisplacement","m/s",dimension,1,schema_temps().temps_courant(),ALEMeshTotalDisplacement_);
+  dis.discretiser_champ("vitesse",domaine_dis(),"ALEMeshTotalDisplacement","m/s",dimension,1,schema_temps().temps_courant(),ALEMeshTotalDisplacement_);
   champs_compris_.ajoute_champ(ALEMeshTotalDisplacement_);
   ALEMeshTotalDisplacement_->add_synonymous(Nom("ALEMeshTotalDisplacement"));
 }

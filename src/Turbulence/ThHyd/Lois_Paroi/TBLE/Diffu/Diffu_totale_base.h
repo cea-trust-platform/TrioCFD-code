@@ -63,8 +63,8 @@ public :
 
 protected :
 
-  REF(Eq_couch_lim) eq_couch_lim;
-  REF(MuLambda_TBLE_base) mu_lambda;
+  OBS_PTR(Eq_couch_lim) eq_couch_lim;
+  OBS_PTR(MuLambda_TBLE_base) mu_lambda;
 
 private:
   double Kappa;

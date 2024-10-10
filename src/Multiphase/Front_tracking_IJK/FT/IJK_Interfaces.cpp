@@ -463,7 +463,7 @@ void IJK_Interfaces::compute_vinterp()
 
 int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
                                const IJK_Splitting& splitting_NS,
-                               const Domaine_dis& domaine_dis,
+                               const Domaine_dis_base& domaine_dis,
                                const int thermal_probes_ghost_cells,
                                const bool compute_vint,
                                const bool is_switch)
@@ -636,7 +636,7 @@ int IJK_Interfaces::initialize(const IJK_Splitting& splitting_FT,
     }
 
   parcours_.associer_domaine_dis(domaine_dis);
-  Domaine_VF& domaine_vf = ref_cast_non_const(Domaine_VF, domaine_dis.valeur());
+  Domaine_VF& domaine_vf = ref_cast_non_const(Domaine_VF, domaine_dis);
   connectivite_frontieres_.associer_domaine_vf(domaine_vf);
   parcours_.associer_connectivite_frontieres(connectivite_frontieres_);
 
@@ -3497,7 +3497,7 @@ void IJK_Interfaces::calculer_indicatrice(IJK_Field_double& indic)
     statistiques().new_counter(2, "calcul rho mu indicatrice: calcul de l'indicatrice");
   statistiques().begin_count(calculer_indicatrice_counter_);
 
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_->valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur());
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const IntTab& faces_voisins = domaine_vf.face_voisins();
   const Intersections_Elem_Facettes& intersec = maillage_ft_ijk_.intersections_elem_facettes();
@@ -3765,7 +3765,7 @@ void IJK_Interfaces::calculer_indicatrices(FixedVector<IJK_Field_double, 3>& ind
     statistiques().new_counter(2, "calcul rho mu indicatrice: calcul des indicatrices");
   statistiques().begin_count(calculer_indicatrice_counter_);
 
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_->valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur());
   const Domaine& domaine = domaine_vf.domaine();
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const IntTab& faces_voisins = domaine_vf.face_voisins();
@@ -4107,7 +4107,7 @@ void IJK_Interfaces::convert_to_IntVect(const ArrOfInt& in, IntVect& out) const
   // Cree un tableau parallele structure comme un tableau aux elements
   // du maillage vdf, initialise a zero.
 
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_->valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur());
   const Domaine& domaine = domaine_vf.domaine();
   domaine.creer_tableau_elements(out);
 
@@ -4133,8 +4133,8 @@ void IJK_Interfaces::convert_to_IntVect(const ArrOfInt& in, IntVect& out) const
 // Ajout d'un terme en d(rho*v)/dt
 // delta_rho = rho_liq - rho_vap
 // la variable vpoint correspond a d(v)/dt, ou v correspond a nptquel valeur
-// vrepul : Champ etendu de potentiel de repulsion seul
-// vabsrepul : Champ etendu de la valeur absolue des repulsions.
+// vrepul : OWN_PTR(Champ_base) etendu de potentiel de repulsion seul
+// vabsrepul : OWN_PTR(Champ_base) etendu de la valeur absolue des repulsions.
 void IJK_Interfaces::ajouter_terme_source_interfaces(
   FixedVector<IJK_Field_double, 3>& vpoint,
   FixedVector<IJK_Field_double, 3>& vrepul,
@@ -4577,7 +4577,7 @@ void IJK_Interfaces::compute_drapeaux_vapeur_v4(const IntVect& vecteur_composant
   const ArrOfInt& index_elem = maillage_ft_ijk_.intersections_elem_facettes().index_elem();
   const ArrOfInt& index_facette = maillage_ft_ijk_.intersections_elem_facettes().index_facette();
 
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_->valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, refdomaine_dis_.valeur());
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const IntTab& faces_voisins = domaine_vf.face_voisins();
 

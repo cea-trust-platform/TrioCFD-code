@@ -13,12 +13,12 @@
 *
 *****************************************************************************/
 #include <Cond_lim.h>
-#include <Domaine_Cl_dis.h>
+
 
 /*! @brief Interface du module ThHyd.
  *
  * Contient 1 fonction:
- *       int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& , const Domaine_Cl_dis& )
+ *       int tester_compatibilite_hydr_turb(const Domaine_Cl_dis_base& , const Domaine_Cl_dis_base& )
  *     qui servent a tester la coherence des conditions aux limites
  *     et la fonction
  *       int message_erreur_turb(const Cond_lim& , const Cond_lim& , int& )
@@ -28,6 +28,6 @@
  */
 // Fonctions qui servent a tester la coherence des conditions aux limites
 
-int tester_compatibilite_hydr_turb(const Domaine_Cl_dis& , const Domaine_Cl_dis& );
+int tester_compatibilite_hydr_turb(const Domaine_Cl_dis_base& , const Domaine_Cl_dis_base& );
 
 int message_erreur_turb(const Cond_lim& , const Cond_lim& , int& );

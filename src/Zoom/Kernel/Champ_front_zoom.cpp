@@ -109,7 +109,7 @@ void Champ_front_zoom::creer(Nom& nom_pbMG,
       //nature des conditions aux limites
       //dirichlet_ou_neumann = nature;
       //reference au champ inconnue
-      REF(Champ_base) rch;
+      OBS_PTR(Champ_base) rch;
       rch =  pbF.get_champ(nom_inco);
       if (sub_type(Champ_Inc_base,rch.valeur()))
         {
@@ -271,7 +271,7 @@ const Equation_base& Champ_front_zoom::equation() const
  */
 const Domaine_Cl_dis_base& Champ_front_zoom::domaine_Cl_dis() const
 {
-  return equation().domaine_Cl_dis().valeur();
+  return equation().domaine_Cl_dis();
 }
 
 /*! @brief Renvoie la frontiere discretisee correspondante au domaine sur lequel prend la trace.

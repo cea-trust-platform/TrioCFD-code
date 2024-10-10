@@ -47,7 +47,7 @@ public :
   const Motcle& get_uncertain_variable_name() const;
 
 protected :
-  REF(Champ_Inc_base) state_field;  //Reference to the unknown field of the state problem
+  OBS_PTR(Champ_Inc_base) state_field;  //Reference to the unknown field of the state problem
   Nom name_state_pb;                      //name of the problem state
   Motcle name_state_field;                 //name of the unknown field of the state problem
   Motcle uncertain_var;     				//name of the unknown field of the uncertain variable

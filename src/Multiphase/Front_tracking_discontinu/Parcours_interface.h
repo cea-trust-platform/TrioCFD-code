@@ -27,7 +27,7 @@
 #include <Maillage_FT_Disc.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 
 class Zone_VF;
 class Maillage_FT_Disc;
@@ -38,7 +38,7 @@ class Parcours_interface : public Objet_U
   Declare_instanciable_sans_constructeur(Parcours_interface);
 public:
   Parcours_interface();
-  void associer_domaine_dis(const Domaine_dis& domaine_dis);
+  void associer_domaine_dis(const Domaine_dis_base& domaine_dis);
   void associer_connectivite_frontieres(const Connectivite_frontieres& connect);
   int calculer_face_sortie_element(const Domaine_VF& domaine_vf,
                                    const int num_element,
@@ -142,8 +142,8 @@ protected:
   static void calcul_produit_matrice33_vecteur(const FTd_matrice33& matrice, const FTd_vecteur3& vect, FTd_vecteur3& res);
 
   // Variables persistantes de la classe :
-  REF(Domaine_VF) refdomaine_vf_;
-  REF(Connectivite_frontieres) refconnect_front_;
+  OBS_PTR(Domaine_VF) refdomaine_vf_;
+  OBS_PTR(Connectivite_frontieres) refconnect_front_;
   int nb_faces_elem_;
   int nb_elements_reels_;
   int nb_sommets_par_face_;

@@ -46,11 +46,11 @@ Entree& Source_LDC_VDF::readOn(Entree& s )
 }
 
 
-void Source_LDC_VDF::associer_domaines(const Domaine_dis& domaine_dis,
-                                       const Domaine_Cl_dis& domaine_cl_dis)
+void Source_LDC_VDF::associer_domaines(const Domaine_dis_base& domaine_dis,
+                                       const Domaine_Cl_dis_base& domaine_cl_dis)
 {
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
+  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis);
 
   // const Domaine& mon_dom = zvdf.domaine();
   Champ_Inc_base& inco = equation().inconnue();
@@ -77,14 +77,14 @@ void Source_LDC_VDF::associer_domaines(const Domaine_dis& domaine_dis,
 DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_IndGros& connect, Restriction_base& restriction, Equation_base& eq_fine)
 {
   Equation_base& eq = equation();
-  DoubleTab& passe = eq.inconnue()->passe();
+  DoubleTab& passe = eq.inconnue().passe();
   double dtgros = eq.schema_temps().pas_de_temps();
-  DoubleTab& present = eq.inconnue()->valeurs();
-  DoubleTab& present_fin = eq_fine.inconnue()->valeurs();
-  DoubleTab& passe_fin = eq_fine.inconnue()->passe();
+  DoubleTab& present = eq.inconnue().valeurs();
+  DoubleTab& present_fin = eq_fine.inconnue().valeurs();
+  DoubleTab& passe_fin = eq_fine.inconnue().passe();
   double dt = eq_fine.schema_temps().pas_de_temps();
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eq.domaine_dis().valeur());
-  const Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eq_fine.domaine_dis().valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eq.domaine_dis());
+  const Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eq_fine.domaine_dis());
   const DoubleVect& volumes = le_dom.volumes();
   const DoubleVect& volumes_fin = le_dom_fine.volumes();
   const IntVect& indice_gros = connect.indice_gros();
@@ -98,7 +98,7 @@ DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_IndGros& connect, Restr
   //TENONS COMPTE DU NOMBRE DE COMPOSANTES DE L'INCONNUE
 
   /* --> JR */
-  nb_compo = eq_fine.inconnue()->nb_comp();
+  nb_compo = eq_fine.inconnue().nb_comp();
   /* <-- JR */
 
   if(nb_compo == 1)

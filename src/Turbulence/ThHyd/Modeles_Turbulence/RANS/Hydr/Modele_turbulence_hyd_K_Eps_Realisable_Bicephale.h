@@ -19,8 +19,8 @@
 #include <Modele_turbulence_hyd_RANS_Bicephale_base.h>
 #include <Transport_K_ou_Eps_Realisable.h>
 #include <Modele_Fonc_Realisable_base.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
 
 /*! @brief class Modele_turbulence_hyd_K_Eps_Realisable_Bicephale
  *
@@ -40,10 +40,10 @@ public:
   void mettre_a_jour(double) override;
   const Equation_base& equation_k_eps(int) const override;
 
-  virtual inline Champ_Inc& K() { return eqn_transport_K_Rea_.inconnue(); }
-  virtual inline const Champ_Inc& K() const { return eqn_transport_K_Rea_.inconnue(); }
-  virtual inline Champ_Inc& Eps() { return eqn_transport_Eps_Rea_.inconnue(); }
-  virtual inline const Champ_Inc& Eps() const { return eqn_transport_Eps_Rea_.inconnue(); }
+  virtual inline Champ_Inc_base& K() { return eqn_transport_K_Rea_.inconnue(); }
+  virtual inline const Champ_Inc_base& K() const { return eqn_transport_K_Rea_.inconnue(); }
+  virtual inline Champ_Inc_base& Eps() { return eqn_transport_Eps_Rea_.inconnue(); }
+  virtual inline const Champ_Inc_base& Eps() const { return eqn_transport_Eps_Rea_.inconnue(); }
 
   inline Transport_K_ou_Eps_base& eqn_transp_K() override { return eqn_transport_K_Rea_; }
   inline const Transport_K_ou_Eps_base& eqn_transp_K() const override { return eqn_transport_K_Rea_; }
@@ -58,7 +58,7 @@ public:
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
 
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  virtual Champ_Fonc_base& calculer_viscosite_turbulente(double temps);
   void controler()
   {
     eqn_transport_K_Rea_.controler_variable();

@@ -44,11 +44,11 @@ public :
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void check_multiphase_compatibility() const override {}; //of course
 
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:
-  Correlation correlation_; //correlation donnant le coeff de coalescence
+  OWN_PTR(Correlation_base) correlation_; //correlation donnant le coeff de coalescence
 
   double beta_k_ = 0.09;
   int n_l = -1 ; // liquid phase

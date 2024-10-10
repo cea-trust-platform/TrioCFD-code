@@ -47,11 +47,11 @@ void Source_Transport_K_KEps_VDF_Elem::associer_pb(const Probleme_base& pb)
 void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
-  const Domaine_VDF& domaine_VDF_NS = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
-  const Domaine_Cl_VDF& domaine_Cl_VDF_NS = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis().valeur());
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
-  const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente()->valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const Domaine_VDF& domaine_VDF_NS = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
+  const Domaine_Cl_VDF& domaine_Cl_VDF_NS = ref_cast(Domaine_Cl_VDF,eq_hydraulique->domaine_Cl_dis());
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
+  const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& porosite_vol = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
@@ -72,11 +72,11 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
 
   //Extraction de la viscosite moleculaire
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   double visco=-1;
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
@@ -244,12 +244,12 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
 
   if (axi)
     {
-      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
       calculer_terme_production_K_Axi(domaine_VDF,vitesse,P,K_eps,visco_turb);
     }
   else
     {
-      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
       calculer_terme_production_K(domaine_VDF,domaine_Cl_VDF_NS,P,K_eps,vit,vitesse,visco_turb);
     }
 

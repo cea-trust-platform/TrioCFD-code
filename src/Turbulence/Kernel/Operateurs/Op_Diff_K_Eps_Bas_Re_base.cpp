@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
-#include <Champ_Don.h>
+
 #include <Champ_Uniforme.h>
 #include <Discretisation_base.h>
 
@@ -54,7 +54,7 @@ Sortie& Op_Diff_K_Eps_Bas_Re_negligeable::printOn(Sortie& s ) const
 
 /*! @brief Associe la diffusivite a l'operateur.
  *
- * @param (Champ_Don& ch) le champ representant la diffusivite
+ * @param (Champ_Don_base& ch) le champ representant la diffusivite
  */
 void Op_Diff_K_Eps_Bas_Re_negligeable::associer_diffusivite(const Champ_base& ch)
 {
@@ -127,40 +127,44 @@ Entree& Op_Diff_K_Eps_Bas_Re::readOn(Entree& s )
 void Op_Diff_K_Eps_Bas_Re::typer()
 {
   Cerr << "dans Op_Diff_K_Eps_Bas_Re::typer()  typ = " << typ << finl;
-  if (typ=="negligeable")
-    {
-      OWN_PTR(Op_Diff_K_Eps_Bas_Re_base)::typer("Op_Diff_K_Eps_Bas_Re_negligeable");
-      valeur().associer_diffusivite_turbulente();
-    }
+  if (typ == "negligeable")
+    OWN_PTR(Op_Diff_K_Eps_Bas_Re_base)::typer("Op_Diff_K_Eps_Bas_Re_negligeable");
   else
     {
       assert(la_diffusivite.non_nul());
       Nom nom_type;
       Cerr << "equation().valeur() " << equation() << finl;
       //if ( (!sub_type(Transport_K_Eps,equation().que_suis_je())) && (!sub_type(Transport_K_Eps_Bas_Re,equation().que_suis_je())) )
-      nom_type="Op_Diff_K_Eps_Bas_Re_";
+      nom_type = "Op_Diff_K_Eps_Bas_Re_";
       Nom discr = equation().discretisation().que_suis_je();
-      if (discr=="VEFPreP1B") discr = "VEF";
+      if (discr == "VEFPreP1B")
+        discr = "VEF";
       Nom type_diff;
-      nom_type +=discr;
-      if (discr!="VDF_Hyper")
+      nom_type += discr;
+      if (discr != "VDF_Hyper")
         {
-          if(sub_type(Champ_Uniforme,diffusivite()))
-            type_diff="_const_";
+          if (sub_type(Champ_Uniforme, diffusivite()))
+            type_diff = "_const_";
           else
-            type_diff="_var_";
-          nom_type+= type_diff;
-          Nom type_inco=equation().inconnue()->que_suis_je();
-          nom_type+=(type_inco.suffix("Champ_"));
+            type_diff = "_var_";
+          nom_type += type_diff;
+          Nom type_inco = equation().inconnue().que_suis_je();
+          nom_type += (type_inco.suffix("Champ_"));
           if (axi)
             nom_type += "_Axi";
         }
       Cerr << " type = " << nom_type << finl;
       OWN_PTR(Op_Diff_K_Eps_Bas_Re_base)::typer(nom_type);
       valeur().associer_eqn(equation());
-      valeur().associer_diffusivite_turbulente();
       valeur().associer_diffusivite(diffusivite());
     }
   Cerr << " fin du typage on a " << valeur().que_suis_je() << finl;
 }
 
+void Op_Diff_K_Eps_Bas_Re::completer()
+{
+  Operateur::completer();
+
+  /* XXX : Elie Saikali => j'associe ici apres la discr de la viscosite turb */
+  valeur().associer_diffusivite_turbulente();
+}

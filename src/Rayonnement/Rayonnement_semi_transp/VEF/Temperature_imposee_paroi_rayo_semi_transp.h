@@ -40,7 +40,7 @@ public :
   void associer_modele(const Modele_rayo_semi_transp& ) override;
   int compatible_avec_eqn(const Equation_base&) const override;
   const Cond_lim_base& la_cl() const override;
-  Champ_front& temperature_bord();
+  Champ_front_base& temperature_bord();
   void calculer_temperature_bord(double temps);
   void completer() override;
 

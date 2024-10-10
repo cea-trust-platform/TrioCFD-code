@@ -23,12 +23,12 @@
 #ifndef Ensemble_Faces_base_included
 #define Ensemble_Faces_base_included
 
+#include <Domaine_forward.h>
 #include <Cond_Lim_Rayo.h>
-#include <Motcle.h>
 #include <TRUST_Ref.h>
+#include <Motcle.h>
 
 class Cond_lim_base;
-
 
 class Ensemble_Faces_base : public Objet_U
 {
@@ -52,7 +52,7 @@ public:
 protected:
 
   IntVect num_face_Ensemble;//contient_;
-  REF(Cond_lim_base) les_cl_base;
+  OBS_PTR(Cond_lim_base) les_cl_base;
   Cond_Lim_Rayo* la_cond_lim_rayo_;
   int nb_faces_bord_;
   DoubleTab positions_;

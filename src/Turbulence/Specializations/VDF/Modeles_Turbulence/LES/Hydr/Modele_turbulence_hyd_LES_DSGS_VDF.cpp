@@ -42,7 +42,7 @@ Entree& Modele_turbulence_hyd_LES_DSGS_VDF::readOn(Entree& s)
   return Modele_turbulence_hyd_LES_Smago_VDF::readOn(s);
 }
 
-void Modele_turbulence_hyd_LES_DSGS_VDF::associer(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Modele_turbulence_hyd_LES_DSGS_VDF::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   Modele_turbulence_hyd_LES_Smago_VDF::associer(domaine_dis, domaine_Cl_dis);
 
@@ -61,9 +61,9 @@ void Modele_turbulence_hyd_LES_DSGS_VDF::associer(const Domaine_dis& domaine_dis
   // model_coeff.resize(le_dom_VDF->nb_elem_tot());
 }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_DSGS_VDF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_DSGS_VDF::calculer_viscosite_turbulente()
 {
-  double temps = mon_equation_->inconnue()->temps();
+  double temps = mon_equation_->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   int nb_elem = ref_cast(Domaine_VDF, le_dom_VF_.valeur()).nb_elem();
   int nb_elem_tot = ref_cast(Domaine_VDF, le_dom_VF_.valeur()).nb_elem_tot();
@@ -108,7 +108,7 @@ Champ_Fonc& Modele_turbulence_hyd_LES_DSGS_VDF::calculer_viscosite_turbulente()
 
 void Modele_turbulence_hyd_LES_DSGS_VDF::calculer_cell_cent_vel(DoubleTab& cell_cent_vel)
 {
-  const DoubleTab& vitesse = mon_equation_->inconnue()->valeurs();
+  const DoubleTab& vitesse = mon_equation_->inconnue().valeurs();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
@@ -581,7 +581,7 @@ void Modele_turbulence_hyd_LES_DSGS_VDF::calculer_model_coefficient(const Double
 
 void Modele_turbulence_hyd_LES_DSGS_VDF::calculer_Sij(const DoubleTab& in_vel, DoubleTab& out_vel)
 {
-  Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, mon_equation_->inconnue().valeur());
+  Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, mon_equation_->inconnue());
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
 
   int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot();

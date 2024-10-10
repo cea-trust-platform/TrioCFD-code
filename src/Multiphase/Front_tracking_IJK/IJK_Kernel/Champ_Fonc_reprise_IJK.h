@@ -20,16 +20,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-/*! @brief
- *
- */
 #ifndef Champ_Fonc_reprise_IJK_included
 #define Champ_Fonc_reprise_IJK_included
 
-
-
 #include <Champ_Fonc_base.h>
-#include <Champ_Inc.h>
+#include <Champ_Inc_base.h>
+
 
 /*! @brief classe Champ_Fonc_reprise_IJK Cette classe permet de relire un champ de vitesse SEULEMENT sauvegarde par IJK
  *
@@ -69,9 +65,9 @@ protected:
 
 private:
 
-  REF(Domaine_dis_base) domaine_dis;
+  OBS_PTR(Domaine_dis_base) domaine_dis;
 
-  Champ_Inc vrai_champ_;
+  OWN_PTR(Champ_Inc_base) vrai_champ_;
   inline virtual const Champ_Inc_base& le_champ() const;
   inline virtual Champ_Inc_base& le_champ();
 };

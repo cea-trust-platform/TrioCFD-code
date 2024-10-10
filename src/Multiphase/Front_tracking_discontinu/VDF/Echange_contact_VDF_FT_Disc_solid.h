@@ -45,14 +45,14 @@ public :
   void changer_temps_futur(double temps,int i) override;
   int avancer(double temps) override;
   int reculer(double temps) override;
-  inline Champ_front& T_autre_pb() override
+  inline Champ_front_base& T_autre_pb() override
   {
     if (numero_T_==0)
       return T_autre_pb_;
     assert(numero_T_==1);
     return T2_autre_pb_;
   };
-  inline const Champ_front& T_autre_pb() const override
+  inline const Champ_front_base& T_autre_pb() const override
   {
     if (numero_T_==0)
       return T_autre_pb_;
@@ -60,7 +60,7 @@ public :
     return T2_autre_pb_;
   };
 protected :
-  Champ_front T2_autre_pb_;
+  OWN_PTR(Champ_front_base) T2_autre_pb_;
   int numero_T_;
   Nom nom_champ_T2_autre_pb_;
   double dt_impr_Tw_=DMAXFLOAT;

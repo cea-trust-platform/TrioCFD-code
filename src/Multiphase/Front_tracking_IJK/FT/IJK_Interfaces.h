@@ -38,7 +38,7 @@
 #include <TRUST_Ref.h>
 #include <Intersection_Interface_ijk.h>
 #include <IJK_Composantes_Connex.h>
-#include <Domaine_dis.h>
+
 
 class IJK_FT_double;
 class Switch_FT_double;
@@ -62,7 +62,7 @@ public :
   IJK_Interfaces();
   int initialize(const IJK_Splitting& splitting_FT,
                  const IJK_Splitting& splitting_NS,
-                 const Domaine_dis& domaine_dis,
+                 const Domaine_dis_base& domaine_dis,
                  const int thermal_probes_ghost_cells=0,
                  const bool compute_vint=true,
                  const bool is_switch=false);
@@ -135,7 +135,7 @@ public :
 
   int lire_motcle_non_standard(const Motcle& un_mot, Entree& is) override;
   // fin de methode pour bulles fixes
-  const Domaine_dis& get_domaine_dis() const
+  const Domaine_dis_base& get_domaine_dis() const
   {
     return refdomaine_dis_.valeur();
   };
@@ -745,10 +745,10 @@ protected:
                                                   const double distmax);
 
 // reference vers le splitting_ft_ pour les interfaces :
-  REF(IJK_Splitting) ref_splitting_;
-  REF(Domaine_dis) refdomaine_dis_;
-  REF(IJK_FT_double) ref_ijk_ft_;
-  REF(Switch_FT_double) ref_ijk_ft_switch_;
+  OBS_PTR(IJK_Splitting) ref_splitting_;
+  OBS_PTR(Domaine_dis_base) refdomaine_dis_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(Switch_FT_double) ref_ijk_ft_switch_;
   // Interdit le constructeur par copie (car constructeurs par copie interdits
   // pour parcours_ et autres
   IJK_Interfaces(const IJK_Interfaces& x) : Objet_U(x)

@@ -15,14 +15,10 @@
 
 #ifndef Source_injection_masse_base_included
 #define Source_injection_masse_base_included
-#include <Sources_Multiphase_base.h>
-#include <Champ_Don.h>
 
-/*! @brief
- *
- *
- *
- */
+#include <Sources_Multiphase_base.h>
+#include <Champ_Don_base.h>
+
 
 class Source_injection_masse_base : public Sources_Multiphase_base
 {
@@ -30,12 +26,12 @@ class Source_injection_masse_base : public Sources_Multiphase_base
 
 public:
   // full explicit for now as only for mass equation, will add in the future effects on energy, qdm and ia
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override {} ;
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override {}
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void mettre_a_jour(double temps) override;
 
 protected:
-  Champ_Don flux_masse_;
+  OWN_PTR(Champ_Don_base) flux_masse_;
 };
 
 #endif

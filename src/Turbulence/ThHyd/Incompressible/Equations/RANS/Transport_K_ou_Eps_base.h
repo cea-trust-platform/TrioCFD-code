@@ -26,7 +26,7 @@
 #include <Equation_base.h>
 #include <Modele_turbulence_hyd_RANS_Bicephale_base.h>
 #include <TRUST_Ref.h>
-#include <Champ_Inc.h>
+
 
 class Milieu_base;
 class Champ_Inc_base;
@@ -52,12 +52,11 @@ public:
   Milieu_base& milieu() override ;
   void associer(const Equation_base&);
   void discretiser() override;
-  virtual void discretiser_K_Eps(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;
 
   virtual int controler_variable();
   void valider_iteration() override;
-  inline const Champ_Inc& inconnue() const override;
-  inline Champ_Inc& inconnue() override;
+  inline const Champ_Inc_base& inconnue() const override;
+  inline Champ_Inc_base& inconnue() override;
   inline const Modele_turbulence_hyd_RANS_Bicephale_base& modele_turbulence() const;
   inline Modele_turbulence_hyd_RANS_Bicephale_base& modele_turbulence();
 
@@ -70,12 +69,12 @@ public:
 
 protected:
 
-  Champ_Inc le_champ_;
-  Champ_Fonc residu_;
+  OWN_PTR(Champ_Inc_base) le_champ_;
+  OWN_PTR(Champ_Fonc_base)  residu_;
 
-  REF(Milieu_base) le_fluide;
-  REF(Champ_Inc_base) la_vitesse_transportante;
-  REF(Modele_turbulence_hyd_RANS_Bicephale_base) mon_modele;
+  OBS_PTR(Milieu_base) le_fluide;
+  OBS_PTR(Champ_Inc_base) la_vitesse_transportante;
+  OBS_PTR(Modele_turbulence_hyd_RANS_Bicephale_base) mon_modele;
 
   bool transporte_K_;
 };
@@ -83,9 +82,9 @@ protected:
  *
  * Un champ vecteur contenant K ou epsilon.
  *
- * @return (Champ_Inc&) le champ inconnue de l'equation
+ * @return (Champ_Inc_base&) le champ inconnue de l'equation
  */
-inline Champ_Inc& Transport_K_ou_Eps_base::inconnue()
+inline Champ_Inc_base& Transport_K_ou_Eps_base::inconnue()
 {
   return le_champ_;
 }
@@ -96,9 +95,9 @@ inline Champ_Inc& Transport_K_ou_Eps_base::inconnue()
  * Un champ vecteur contenant K ou epsilon.
  *     (version const)
  *
- * @return (Champ_Inc&) le champ inconnue de l'equation
+ * @return (Champ_Inc_base&) le champ inconnue de l'equation
  */
-inline const Champ_Inc& Transport_K_ou_Eps_base::inconnue() const
+inline const Champ_Inc_base& Transport_K_ou_Eps_base::inconnue() const
 {
   return le_champ_;
 }

@@ -36,15 +36,15 @@ public:
   void mettre_a_jour(double ) override;
   //void associer_eqn(const Equation_base&);
 
-  inline Champ_Inc& Fluctu_Temperature() override;
-  inline const Champ_Inc& Fluctu_Temperature() const override;
+  inline Champ_Inc_base& Fluctu_Temperature() override;
+  inline const Champ_Inc_base& Fluctu_Temperature() const override;
 
   inline Transport_Fluctuation_Temperature_W& equation_Fluctu() override;
   inline const Transport_Fluctuation_Temperature_W& equation_Fluctu() const override;
 
   inline Modele_Fonc_Bas_Reynolds_Thermique_Base& associe_modele_fonction();
   inline const Modele_Fonc_Bas_Reynolds_Thermique_Base& associe_modele_fonction() const;
-  Champ_Fonc& calculer_diffusivite_turbulente() override;
+  Champ_Fonc_base& calculer_diffusivite_turbulente() override;
   void set_param(Param&) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   //////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ public:
 private :
 
 //Entree& lire(const Motcle&, Entree&);
-  REF(Transport_Fluctuation_Temperature_W_Bas_Re) eqn_transport_Fluctu_Temp;
+  OBS_PTR(Transport_Fluctuation_Temperature_W_Bas_Re) eqn_transport_Fluctu_Temp;
   OWN_PTR(Modele_Fonc_Bas_Reynolds_Thermique_Base) mon_modele_fonc;
 
 
@@ -75,12 +75,12 @@ inline const Transport_Fluctuation_Temperature_W& Modele_turbulence_scal_Fluctua
   return eqn_transport_Fluctu_Temp.valeur();
 }
 
-inline const Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature() const
+inline const Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature() const
 {
   return eqn_transport_Fluctu_Temp->inconnue();
 }
 
-inline Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature()
+inline Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::Fluctu_Temperature()
 {
   return eqn_transport_Fluctu_Temp->inconnue();
 }

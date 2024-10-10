@@ -30,19 +30,13 @@
 #include <Milieu_base.h>
 #include <Champ_front_fonc.h>
 #include <Champ_Uniforme.h>
-#include <Turbulence_paroi.h>
 #include <Temperature_imposee_paroi.h>
-
-
-
 
 /*! @brief classe : Echange_contact_VEF_VDF_Zoom
  *
  *
  *
  */
-
-////////////////////////////////////////////////////////////////
 
 class Echange_contact_VEF_VDF_Zoom  : public Temperature_imposee_paroi
 {

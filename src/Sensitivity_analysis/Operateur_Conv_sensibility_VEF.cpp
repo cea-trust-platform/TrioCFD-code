@@ -60,13 +60,13 @@ Entree&  Operateur_Conv_sensibility_VEF::readOn(Entree& is)
   return is;
 }
 
-void  Operateur_Conv_sensibility_VEF::associer (const Domaine_dis& domaine_dis ,
-                                                const Domaine_Cl_dis& domaine_cl_dis,
-                                                const Champ_Inc& inco )
+void  Operateur_Conv_sensibility_VEF::associer (const Domaine_dis_base& domaine_dis ,
+                                                const Domaine_Cl_dis_base& domaine_cl_dis,
+                                                const Champ_Inc_base& inco )
 {
   Cerr << " Operateur_Conv_sensibility_VEF::associer" << finl;
-  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis.valeur());
-  const Domaine_Cl_VEF& zclvef = ref_cast(Domaine_Cl_VEF,domaine_cl_dis.valeur());
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis);
+  const Domaine_Cl_VEF& zclvef = ref_cast(Domaine_Cl_VEF,domaine_cl_dis);
 
   le_dom_vef = zvef;
   la_zcl_vef = zclvef;
@@ -130,8 +130,8 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           if(uncertain_var=="CP")
             {
               double lambda_div_Cp=-1.;
-              const double Cp = eq.fluide().capacite_calorifique()->valeurs()(0, 0);
-              const double lambda = eq.fluide().conductivite()->valeurs()(0, 0);
+              const double Cp = eq.fluide().capacite_calorifique().valeurs()(0, 0);
+              const double lambda = eq.fluide().conductivite().valeurs()(0, 0);
               lambda_div_Cp*=(lambda/Cp);
               add_diffusion_scalar_term(temperature_state, resu,lambda_div_Cp);
             }

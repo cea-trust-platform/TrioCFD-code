@@ -46,7 +46,7 @@ public :
   void check_multiphase_compatibility() const override {}; //of course
   void completer() override;
 
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override { };
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:
@@ -57,8 +57,7 @@ protected:
   int n_l = -1; //phase liquide
   int is_turb = 0;
   int use_bif_ = 0;
-  REF(Correlation) correlation_lift_;
-  REF(Correlation) correlation_dispersion_;
+  OBS_PTR(Correlation_base) correlation_lift_, correlation_dispersion_;
   double beta_lift_ =  1. ; // To adjust the force in .data
   double beta_disp_ =  1. ; // To adjust the force in .data
   double portee_disp_= 1. ; // To push further than the diameter

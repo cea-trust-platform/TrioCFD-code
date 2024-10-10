@@ -40,7 +40,7 @@ void Source_Transport_K_Eps_concen_VDF_Elem::associer_pb(const Probleme_base& pb
 
 void Source_Transport_K_Eps_concen_VDF_Elem::fill_resu_concen(const DoubleVect& G, const DoubleVect& volumes, const DoubleVect& porosite_vol, DoubleTab& resu) const
 {
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   double C3_loc, LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_K_MIN();
   for (int elem = 0; elem < le_dom_VDF->nb_elem(); elem++)
     {

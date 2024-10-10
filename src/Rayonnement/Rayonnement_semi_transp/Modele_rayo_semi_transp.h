@@ -25,8 +25,6 @@
 
 #include <Equation_rayonnement_base.h>
 #include <Probleme_base.h>
-#include <Champ_front.h>
-#include <Champ_Inc.h>
 
 class Nom;
 class Probleme_base;
@@ -108,17 +106,17 @@ public:
   //////////////////////////////////////////////////////////////
 
   inline void associer_probleme(Probleme_base& Pb);
-  Champ_Inc& put_irradience();
+  Champ_Inc_base& put_irradience();
   inline Probleme_base& probleme();
   inline const Probleme_base& probleme() const;
   inline Equation_rayonnement_base& eq_rayo();
   inline const Equation_rayonnement_base& eq_rayo() const;
   inline const double& valeur_sigma() const;
-  const Champ_front& flux_radiatif(const Nom& nom_bord) const;
+  const Champ_front_base& flux_radiatif(const Nom& nom_bord) const;
   void calculer_flux_radiatif();
 
 protected :
-  REF(Probleme_base) mon_probleme_;
+  OBS_PTR(Probleme_base) mon_probleme_;
   OWN_PTR(Equation_rayonnement_base) Eq_rayo_;
   static const double sigma;
 };

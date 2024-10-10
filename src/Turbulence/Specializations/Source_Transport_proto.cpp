@@ -153,7 +153,7 @@ void Source_Transport_proto::verifier_milieu_anisotherme_concen(const Probleme_b
 
 void Source_Transport_proto::verifier_beta_concen(const Fluide_base& fluide)
 {
-  if (!fluide.beta_c().non_nul())
+  if (!fluide.has_beta_c())
     {
       Cerr << "You forgot to define beta_co field in the fluid. It is mandatory when using the K-Eps model (buoyancy effects)." << finl;
       Cerr << "If you don't want buoyancy effects, then specify: beta_co champ_uniforme 1 0." << finl;

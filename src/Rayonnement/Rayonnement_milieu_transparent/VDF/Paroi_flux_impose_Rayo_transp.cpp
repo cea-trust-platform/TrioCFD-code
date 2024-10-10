@@ -22,7 +22,7 @@
 
 #include <Paroi_flux_impose_Rayo_transp.h>
 #include <Domaine_VDF.h>
-#include <Champ_Inc.h>
+
 #include <Equation_base.h>
 #include <Milieu_base.h>
 #include <Champ_Uniforme.h>
@@ -53,15 +53,15 @@ void Paroi_flux_impose_Rayo_transp::completer()
   preparer_surface(frontiere_dis(),domaine_Cl_dis());
   is_VDF_=0;
 
-  if (sub_type(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur()))
+  if (sub_type(Domaine_VDF,domaine_Cl_dis().domaine_dis()))
     {
       is_VDF_=1;
-      domaine_VDF = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+      domaine_VDF = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
 
       // initialisation de Teta_i
       const Domaine_VDF& zvdf = domaine_VDF.valeur();
 
-      const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue()->valeurs();
+      const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
       int ndeb = la_frontiere_VF.num_premiere_face();
       int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -81,7 +81,7 @@ void Paroi_flux_impose_Rayo_transp::completer()
   else
     {
       // initialisation de Teta_i en VEF
-      const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue()->valeurs();
+      const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
       const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
       int ndeb = la_frontiere_VF.num_premiere_face();
       int nb_faces_bord = la_frontiere_VF.nb_faces();
@@ -108,13 +108,13 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 {
   const Domaine_VDF& le_dom_vdf = domaine_VDF.valeur();
   const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
-  ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite().valeur());
+  ////const Champ_Uniforme& Lambda = ref_cast(Champ_Uniforme,le_milieu.conductivite());
   ////double d_Lambda = Lambda(0,0);
-  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue()->valeurs();
+  const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   int nb_faces_bord = la_frontiere_VF.nb_faces();
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const IntTab& face_voisins = zvdf.face_voisins();
   int is_rho_unif=0;
   int is_conduc_unif=0;
@@ -124,23 +124,23 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
   double d_Lambda=0;
   double d_Cp =0;
 
-  const DoubleTab& rho=le_milieu.masse_volumique()->valeurs();
-  const DoubleTab& Lambda = le_milieu.conductivite()->valeurs();
-  const DoubleTab& Cp = le_milieu.capacite_calorifique()->valeurs();
+  const DoubleTab& rho=le_milieu.masse_volumique().valeurs();
+  const DoubleTab& Lambda = le_milieu.conductivite().valeurs();
+  const DoubleTab& Cp = le_milieu.capacite_calorifique().valeurs();
 
-  if (sub_type(Champ_Uniforme,le_milieu.masse_volumique().valeur()))
+  if (sub_type(Champ_Uniforme,le_milieu.masse_volumique()))
     {
       is_rho_unif=1;
 
       d_rho= rho(0,0);
     }
-  if (sub_type(Champ_Uniforme,le_milieu.conductivite().valeur()))
+  if (sub_type(Champ_Uniforme,le_milieu.conductivite()))
     {
       is_conduc_unif=1;
       d_Lambda= Lambda(0,0);
     }
 
-  if (sub_type(Champ_Uniforme,le_milieu.capacite_calorifique().valeur()))
+  if (sub_type(Champ_Uniforme,le_milieu.capacite_calorifique()))
     {
       is_Cp_unif=1;
       d_Cp = Cp(0,0);
@@ -213,7 +213,7 @@ void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VDF()
 
 void Paroi_flux_impose_Rayo_transp::calculer_Teta_i_VEF()
 {
-  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue()->valeurs();
+  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
   double Temp;
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();

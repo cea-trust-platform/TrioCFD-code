@@ -23,23 +23,23 @@
 #define Eval_Diff_K_Eps_VDF_var_included
 
 #include <Eval_Diff_K_Eps_VDF.h>
-#include <Champ_Don.h>
+
 
 class Eval_Diff_K_Eps_VDF_var : public Eval_Diff_K_Eps_VDF
 {
 public:
 
-  inline void associer(const Champ_Don& diffu)
+  inline void associer(const Champ_Don_base& diffu)
   {
-    diffusivite_ = diffu.valeur();
-    dv_diffusivite.ref(diffu->valeurs());
+    diffusivite_ = diffu;
+    dv_diffusivite.ref(diffu.valeurs());
   }
 
   inline void mettre_a_jour()  override
   {
     (diffusivite_->valeurs().echange_espace_virtuel());
     dv_diffusivite.ref(diffusivite_->valeurs());
-    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeur().valeurs());
+    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs());
   }
 
   // Methods used by the flux computation in template class:

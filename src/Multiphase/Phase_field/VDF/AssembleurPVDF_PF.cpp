@@ -534,7 +534,7 @@ void AssembleurPVDF_PF::modifier_secmem_pression_imposee(const Neumann_sortie_li
                                                          const Front_VF& frontiere_vf,
                                                          DoubleTab& secmem)
 {
-  const Champ_front_base& champ_front = cond_lim.champ_front().valeur();
+  const Champ_front_base& champ_front = cond_lim.champ_front();
   const Domaine_VDF& le_dom = le_dom_VDF.valeur();
   const IntTab& face_voisins = le_dom.face_voisins();
 
@@ -580,7 +580,7 @@ void AssembleurPVDF_PF::modifier_secmem_vitesse_imposee(const Entree_fluide_vite
                                                         const Front_VF& frontiere_vf,
                                                         DoubleTab& secmem)
 {
-  const Champ_front_base& champ_front = cond_lim.champ_front().valeur();
+  const Champ_front_base& champ_front = cond_lim.champ_front();
   const Domaine_VDF& le_dom = le_dom_VDF.valeur();
   const DoubleVect& face_surfaces = le_dom.face_surfaces();
   const IntTab& face_voisins = le_dom.face_voisins();

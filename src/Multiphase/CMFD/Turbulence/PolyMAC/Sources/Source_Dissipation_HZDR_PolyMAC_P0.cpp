@@ -62,7 +62,7 @@ void Source_Dissipation_HZDR_PolyMAC_P0::ajouter_blocs(matrices_t matrices, Doub
   // le terme de dissipation s'écrit : C_epsilon / (C_nu * d_b * sqrt(k)) Prod_HZDR ; avec Prod_HZDR = C_k * (3/4 C_drag/d_b * alpha * rho_l * |u_r|**3) / (alpha_l * rho_l)
   // Le coefficient de trainée C_drag sera calculé avec le modèle de Tomiyama (codé en dur)
 
-  const Domaine_PolyMAC_P0&             domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0&             domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleTab&                          vit = equation().probleme().get_champ("vitesse").passe();

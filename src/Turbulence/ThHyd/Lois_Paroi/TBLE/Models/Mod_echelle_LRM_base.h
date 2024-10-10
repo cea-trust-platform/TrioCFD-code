@@ -47,7 +47,7 @@ public:
 
 
 protected:
-  /*REF(Eq_couch_lim) eq_couch_lim;*/
+  /*OBS_PTR(Eq_couch_lim) eq_couch_lim;*/
 
 private:
 

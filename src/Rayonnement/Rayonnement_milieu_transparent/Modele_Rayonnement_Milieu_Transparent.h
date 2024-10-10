@@ -25,10 +25,11 @@
 
 #define Sigma_DEFAULT 5.67e-8
 
-#include <TRUST_Vector.h>
-#include <Face_Rayonnante.h>
 #include <Modele_Rayonnement_base.h>
+#include <Face_Rayonnante.h>
+#include <Domaine_forward.h>
 #include <Matrice_Morse.h>
+#include <TRUST_Vector.h>
 
 class Schema_Temps_base;
 class Discretisation_base;

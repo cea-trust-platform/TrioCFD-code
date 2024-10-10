@@ -25,7 +25,7 @@
 #include <Periodique.h>
 #include <Neumann_paroi.h>
 #include <Paroi_hyd_base_VEF.h>
-#include <Champ_Don.h>
+
 #include <Champ_Uniforme.h>
 #include <Fluide_Incompressible.h>
 
@@ -44,13 +44,13 @@ Entree& Op_Diff_K_Omega_VEF_Face::readOn(Entree& s )
 /*! @brief complete l'evaluateur
  *
  */
-void Op_Diff_K_Omega_VEF_Face::associer(const Domaine_dis& domaine_dis,
-                                        const Domaine_Cl_dis& domaine_cl_dis,
-                                        const Champ_Inc& ch_diffuse)
+void Op_Diff_K_Omega_VEF_Face::associer(const Domaine_dis_base& domaine_dis,
+                                        const Domaine_Cl_dis_base& domaine_cl_dis,
+                                        const Champ_Inc_base& ch_diffuse)
 {
-  inconnue_  = ref_cast(Champ_P1NC, ch_diffuse.valeur());
-  le_dom_vef = ref_cast(Domaine_VEF, domaine_dis.valeur());
-  la_zcl_vef = ref_cast(Domaine_Cl_VEF, domaine_cl_dis.valeur());
+  inconnue_  = ref_cast(Champ_P1NC, ch_diffuse);
+  le_dom_vef = ref_cast(Domaine_VEF, domaine_dis);
+  la_zcl_vef = ref_cast(Domaine_Cl_VEF, domaine_cl_dis);
 }
 
 void Op_Diff_K_Omega_VEF_Face::associer_diffusivite_turbulente()
@@ -62,7 +62,7 @@ void Op_Diff_K_Omega_VEF_Face::associer_diffusivite_turbulente()
   const Modele_turbulence_hyd_K_Omega& mod_turb = ref_cast(Modele_turbulence_hyd_K_Omega,
                                                            eqn_transport.modele_turbulence());
   turbulence_model = mod_turb;
-  const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+  const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
   Op_Diff_K_Omega_VEF_base::associer_diffusivite_turbulente(diff_turb);
 }
 
@@ -112,7 +112,7 @@ DoubleTab& Op_Diff_K_Omega_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTa
 
   const int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   const int nb_front = domaine_VEF.nb_front_Cl();
-  const DoubleTab& mu_turb = diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb = diffusivite_turbulente_->valeurs();
   // double inverse_Prdt_K = 1.0/Prdt_K;
   //double inverse_Prdt_Omega = 1.0/Prdt_Omega;
 
@@ -293,7 +293,7 @@ void Op_Diff_K_Omega_VEF_Face::ajouter_contribution(const DoubleTab& transporte,
   ArrOfDouble inv_Prdt(2),diffu_tot(2);
   inv_Prdt[0]=1./Prdt_K;
   inv_Prdt[1]=1./Prdt_Omega;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
   const int is_mu_unif=sub_type(Champ_Uniforme,diffusivite_.valeur());
   const DoubleTab& mu=diffusivite_->valeurs();
@@ -487,9 +487,9 @@ void Op_Diff_K_Omega_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
 {
   // on recupere le tableau
   const Transport_K_Omega& eqn_k_omega = ref_cast(Transport_K_Omega, equation());
-  const DoubleTab& val = equation().inconnue()->valeurs();
-  const Turbulence_paroi& mod = eqn_k_omega.modele_turbulence().loi_paroi();
-  const Paroi_hyd_base_VEF& paroi = ref_cast(Paroi_hyd_base_VEF, mod.valeur());
+  const DoubleTab& val = equation().inconnue().valeurs();
+  const Turbulence_paroi_base& mod = eqn_k_omega.modele_turbulence().loi_paroi();
+  const Paroi_hyd_base_VEF& paroi = ref_cast(Paroi_hyd_base_VEF, mod);
   const ArrOfInt& face_komega_imposee = paroi.face_keps_imposee();
   int size = secmem.dimension(0);
   const IntVect& tab1 = matrice.get_tab1();

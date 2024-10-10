@@ -268,8 +268,8 @@ void Triple_Line_Model_FT_Disc::completer()
 {
   // Via the temperature transport equation, we directly get access to a Fluide_Incompressible:
   const Milieu_base& milieu = ref_eq_temp_->milieu();
-  kl_cond_ = milieu.conductivite()->valeurs()(0,0);
-  rhocpl_ =  milieu.masse_volumique()->valeurs()(0,0) * milieu.capacite_calorifique()->valeurs()(0,0);
+  kl_cond_ = milieu.conductivite().valeurs()(0,0);
+  rhocpl_ =  milieu.masse_volumique().valeurs()(0,0) * milieu.capacite_calorifique().valeurs()(0,0);
 
   if ((n_ext_meso_ != 1)and(ymeso_>DMINFLOAT))
     {
@@ -289,7 +289,7 @@ void Triple_Line_Model_FT_Disc::completer()
     {
       // ymeso has not been initialised. n_ext_meso is used instead:
       const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
-      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
+      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis();
       // get wall BC frontiere nb
       int num_bord = -1;
       for (int i=0; i<zcldis.nb_cond_lim(); i++)
@@ -310,7 +310,7 @@ void Triple_Line_Model_FT_Disc::completer()
 
       const Frontiere& fr=zcldis.les_conditions_limites(num_bord)->frontiere_dis().frontiere();
       const int nb_face = fr.nb_faces();
-      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
+      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis());
       // get TCL cells
       if (nb_face>0)
         {
@@ -329,7 +329,7 @@ void Triple_Line_Model_FT_Disc::completer()
   if (reinjection_tcl())
     {
       const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
-      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
+      const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis();
       // get wall BC frontiere nb
       int num_bord = -1;
       for (int i=0; i<zcldis.nb_cond_lim(); i++)
@@ -350,7 +350,7 @@ void Triple_Line_Model_FT_Disc::completer()
 
       const Frontiere& fr=zcldis.les_conditions_limites(num_bord)->frontiere_dis().frontiere();
       const int nb_face = fr.nb_faces();
-      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
+      const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis());
       // supposing deltax = deltay in the first thermal layer
       if (nb_face>0)
         {
@@ -727,11 +727,11 @@ void Triple_Line_Model_FT_Disc::get_in_out_coords(const Domaine_VDF& zvdf, const
   in_out(1,1) = yr;
 }
 
-// const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis().valeur());
+// const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis());
 // const IntTab& faces_elem = domaine_vf.face_voisins();
 // // One of the neighbours doesnot exist so it has "-1". We get the other elem by:
 // const int elem = faces_elem(num_face, 0) + faces_elem(num_face, 1) +1;
-//  const double d = compute_distance(ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis().valeur()),
+//  const double d = compute_distance(ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis()),
 //                   num_face, elem);
 //
 // Computes the distance between a face centre and an element centre.
@@ -1056,13 +1056,13 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
 {
   const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur();
   const double dt = ns.schema_temps().pas_de_temps();
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ns.domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ns.domaine_dis());
   const DoubleVect& volumes = domaine_vf.volumes();
   const Fluide_Diphasique& fluide = ns.fluide_diphasique();
   const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
   const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
-  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique()->valeurs();
-  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique()->valeurs();
+  const DoubleTab& tab_rho_phase_0 = phase_0.masse_volumique().valeurs();
+  const DoubleTab& tab_rho_phase_1 = phase_1.masse_volumique().valeurs();
   const double rho_phase_0 = tab_rho_phase_0(0,0);
   const double rho_phase_1 = tab_rho_phase_1(0,0);
   const double jump_inv_rho = 1./rho_phase_1 - 1./rho_phase_0;
@@ -1075,7 +1075,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   const Intersections_Elem_Facettes& intersections = maillage.intersections_elem_facettes();
   const ArrOfInt& index_facette_elem = intersections.index_facette();
   const DoubleTab& sommets = maillage.sommets();
-  //      REF(Transport_Interfaces_FT_Disc) & refeq_transport =
+  //      OBS_PTR(Transport_Interfaces_FT_Disc) & refeq_transport =
   //      variables_internes().ref_eq_interf_proprietes_fluide;
   //      const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
   const bool first_call_for_this_mesh = (tag_tcl_ != maillage.get_mesh_tag());
@@ -1126,7 +1126,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
   // list of Qtot W/m from TCL model for printing
   ArrOfDouble list_micro_fraction;
 
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis().valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis());
   const IntTab& face_voisins = zvdf.face_voisins();
   const IntVect& orientation = zvdf.orientation();
   // const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis);
@@ -1141,7 +1141,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     // const double temps = ns.schema_temps().temps_courant();
     Cerr <<  " ****************************** TCL ****************************** " << finl;
     Cerr << que_suis_je() << "::compute_TCL_fluxes_in_all_boundary_cells() searching TCL cells" <<finl;
-    const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis().valeur();
+    const Domaine_Cl_dis_base& zcldis = ns.domaine_Cl_dis();
     // get wall BC frontiere nb
     int num_bord = -1;
     int nbwall_found = 0;
@@ -1170,7 +1170,7 @@ void Triple_Line_Model_FT_Disc::compute_TCL_fluxes_in_all_boundary_cells(ArrOfIn
     const Frontiere& fr=zcldis.les_conditions_limites(num_bord)->frontiere_dis().frontiere();
     const int nb_first_face = fr.num_premiere_face();
     const int nb_face = fr.nb_faces();
-    const DoubleTab& indica = eq_transport.inconnue ()->valeurs ();
+    const DoubleTab& indica = eq_transport.inconnue().valeurs();
 
     // get TCL cells
     for (int ii = 0; ii < nb_face; ii++)
@@ -2017,7 +2017,7 @@ void Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution(DoubleTab& temperat
   const int elem = 0; //closest_liquid_neighbour has to be determined;
   Cerr << "Code unfinished in Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution" << finl;
   Process::exit();
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis());
   const double vol = domaine_vf.volumes(elem);
   // Minus sign because we want to compensate the disequilibrium
   const double deltaT = -disequilibrium/(rhocpl_*vol);
@@ -2026,7 +2026,7 @@ void Triple_Line_Model_FT_Disc::correct_TCL_energy_evolution(DoubleTab& temperat
 
 void Triple_Line_Model_FT_Disc::correct_wall_adjacent_temperature_according_to_TCL_fluxes(DoubleTab& temperature) const
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, ref_eq_temp_->domaine_dis());
   const int nb_contact_line_contribution = elems_.size_array();
   for (int idx = 0; idx < nb_contact_line_contribution; idx++)
     {
@@ -2101,8 +2101,7 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
     {
 
       double Twall = 0.;
-      const Domaine_Cl_dis_base& zcldis = ref_cast(
-                                            Domaine_Cl_dis_base, ref_eq_temp_->domaine_Cl_dis ().valeur ());
+      const Domaine_Cl_dis_base& zcldis = ref_eq_temp_->domaine_Cl_dis();
       const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
       const Cond_lim& la_cl = zclvdf.la_cl_de_la_face (num_face);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
@@ -2162,7 +2161,7 @@ double Triple_Line_Model_FT_Disc:: get_theta_app(const int num_face)
       if ( Rc_tcl_GridN() >= 1 && !reinjection_tcl())
         {
           const Navier_Stokes_FT_Disc& ns = ref_ns_.valeur ();
-          const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis ().valeur ());
+          const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, ns.domaine_dis());
 
           const IntVect& orientation = zvdf.orientation();
           const IntTab& elem_faces = zvdf.elem_faces();

@@ -41,7 +41,7 @@ void Source_Transport_K_Eps_Realisable_VEF_Face::associer_pb(const Probleme_base
 
 const DoubleTab& Source_Transport_K_Eps_Realisable_VEF_Face::get_visc_turb() const
 {
-  return ref_cast(Modele_turbulence_hyd_K_Eps_Realisable, eqn_keps_Rea->modele_turbulence()).viscosite_turbulente()->valeurs();
+  return ref_cast(Modele_turbulence_hyd_K_Eps_Realisable, eqn_keps_Rea->modele_turbulence()).viscosite_turbulente().valeurs();
 }
 
 const Modele_Fonc_Realisable_base& Source_Transport_K_Eps_Realisable_VEF_Face::get_modele_fonc() const
@@ -51,14 +51,14 @@ const Modele_Fonc_Realisable_base& Source_Transport_K_Eps_Realisable_VEF_Face::g
 
 void Source_Transport_K_Eps_Realisable_VEF_Face::calculer_terme_production_real(const DoubleTab& vitesse_filtree,const DoubleTab& visco_turb, DoubleTrav& P) const
 {
-  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue()->valeurs();
+  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
   calculer_terme_production_K(le_dom_VEF.valeur(), le_dom_Cl_VEF.valeur(), P, K_eps_Rea, vitesse_filtree, visco_turb, _interpolation_viscosite_turbulente, _coefficient_limiteur);
 }
 
 void Source_Transport_K_Eps_Realisable_VEF_Face::fill_resu_real(const int num_face, const DoubleVect& vol_ent, const DoubleTrav& P, const DoubleTab& CC1, const DoubleTab& S, const double visco,
                                                                 DoubleTab& resu) const
 {
-  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue()->valeurs();
+  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable, eqn_keps_Rea->modele_turbulence());
   const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
 
@@ -77,22 +77,22 @@ void Source_Transport_K_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
 {
   Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable, eqn_keps_Rea->modele_turbulence());
   Modele_Fonc_Realisable_base& mon_modele_fonc = mod_turb.associe_modele_fonction();
-  const DoubleTab& visco_turb = mod_turb.viscosite_turbulente()->valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const double epsilon_minimum = eqn_keps_Rea->modele_turbulence().get_EPS_MIN();
-  const Champ_Don& ch_visco_cin = ref_cast(Fluide_base,eqn_keps_Rea->milieu()).viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = ref_cast(Fluide_base,eqn_keps_Rea->milieu()).viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
   /*Paroi*/
   DoubleTab visco_tab(visco_turb.dimension_tot(0));
-  assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
+  assert(sub_type(Champ_Uniforme,ch_visco_cin));
   visco_tab = tab_visco(0, 0);
   const int idt = eq_hydraulique->schema_temps().nb_pas_dt();
-  const DoubleTab& tab_paroi = mod_turb.loi_paroi()->Cisaillement_paroi();
+  const DoubleTab& tab_paroi = mod_turb.loi_paroi().Cisaillement_paroi();
 
-  const Domaine_Cl_dis& zcl_keps = eqn_keps_Rea->domaine_Cl_dis();
-  const Domaine_dis& domaine_dis_keps = eqn_keps_Rea->domaine_dis();
-  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue()->valeurs();
+  const Domaine_Cl_dis_base& zcl_keps = eqn_keps_Rea->domaine_Cl_dis();
+  const Domaine_dis_base& domaine_dis_keps = eqn_keps_Rea->domaine_dis();
+  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
   mon_modele_fonc.Contributions_Sources_Paroi(domaine_dis_keps, zcl_keps, vit, K_eps_Rea, epsilon_minimum, visco_tab, visco_turb, tab_paroi, idt);
 
   Calcul_Production_K_VEF::mettre_a_jour(temps);
@@ -100,7 +100,7 @@ void Source_Transport_K_Eps_Realisable_VEF_Face::mettre_a_jour(double temps)
 
 void Source_Transport_K_Eps_Realisable_VEF_Face::fill_coeff_matrice(const int face, const DoubleVect& porosite_face, const DoubleVect& volumes_entrelaces, const double visco, Matrice_Morse& matrice) const
 {
-  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue()->valeurs();
+  const DoubleTab& K_eps_Rea = eqn_keps_Rea->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable, eqn_keps_Rea->modele_turbulence());
   const double LeK_MIN = mod_turb.get_K_MIN(), LeEPS_MIN = mod_turb.get_EPS_MIN();
 

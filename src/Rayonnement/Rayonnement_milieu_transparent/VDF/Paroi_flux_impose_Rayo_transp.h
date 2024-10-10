@@ -43,7 +43,7 @@ public :
 protected:
   void calculer_Teta_i_VDF();
   void calculer_Teta_i_VEF();
-  REF(Domaine_VDF) domaine_VDF;
+  OBS_PTR(Domaine_VDF) domaine_VDF;
   int is_VDF_;
 };
 #endif

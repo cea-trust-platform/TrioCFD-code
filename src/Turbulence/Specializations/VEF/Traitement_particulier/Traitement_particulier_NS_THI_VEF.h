@@ -44,8 +44,8 @@ class Traitement_particulier_NS_THI_VEF : public Traitement_particulier_NS_THI
 public :
 
   Entree& lire(Entree& ) override;
-  void preparer_calcul_particulier(void) override ;
-  void post_traitement_particulier(void) override ;
+  void preparer_calcul_particulier() override ;
+  void post_traitement_particulier() override ;
   void determine_tab_fft_VEF_3D(IntTab& , DoubleTab& , IntVect& , int& , int& );
   void determine_tab_fft_VEF_1D(const IntTab& , const DoubleTab& , const IntVect& , IntVect& , IntVect& );
   void calcul_spectre_3D(const DoubleTab& , Nom , double& );
@@ -54,23 +54,23 @@ public :
 
 protected :
 
-  double calcul_volume_elem(void) ;
-  void renorm_Ec(void) override;
+  double calcul_volume_elem() ;
+  void renorm_Ec() override;
 
   double calcul_Ec_spatial(const DoubleTab& , Nom ) ;
   void calcul_Df_spatial(double& ) ;
   void calcul_Sk(DoubleTab& ) ;
-  void calcul_nu_t(void);
-  void init_calc_spectre(void) override;
+  void calcul_nu_t();
+  void init_calc_spectre() override;
   void calcul_vitesse_moyenne(const DoubleTab& , DoubleVect& ) ;
   void calcul_moyenne(const DoubleTab& , double& ) ;
-  void impression_moyenne(void);
-  void suppression_vitesse_moyenne(void);
-  void conservation_Ec(void);
-  void calcul_spectre(void) override;
+  void impression_moyenne();
+  void suppression_vitesse_moyenne();
+  void conservation_Ec();
+  void calcul_spectre() override;
   void calcul_correlations(const DoubleTab&);
   void isotropie(const DoubleTab& , Nom );
-  void sorties_globales(void) override;
+  void sorties_globales() override;
 
   void ch_pour_fft_VEF_3D(const DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& , int ) const;
   void ch_pour_fft_VEF_1D(const DoubleTab& , DoubleVect& , DoubleVect& , DoubleVect& , int , int ) const;

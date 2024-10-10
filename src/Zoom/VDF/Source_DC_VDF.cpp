@@ -47,11 +47,11 @@ Entree& Source_DC_VDF::readOn(Entree& s )
 }
 
 
-void Source_DC_VDF::associer_domaines(const Domaine_dis& domaine_dis,
-                                      const Domaine_Cl_dis& domaine_cl_dis)
+void Source_DC_VDF::associer_domaines(const Domaine_dis_base& domaine_dis,
+                                      const Domaine_Cl_dis_base& domaine_cl_dis)
 {
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
+  // const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis);
 
   // const Domaine& mon_dom = zvdf.domaine();
 
@@ -80,13 +80,13 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(OWN_
       OWN_PTR(Prolongement_base)& P1 = P(0);
 
       Equation_base& eqF = equation();
-      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
-      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis().valeur());
-      DoubleTab& present = eqG.inconnue()->valeurs();
-      DoubleTab& passe = eqG.inconnue()->passe();
+      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis());
+      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis());
+      DoubleTab& present = eqG.inconnue().valeurs();
+      DoubleTab& passe = eqG.inconnue().passe();
       //int tailleG = present.dimension(0);
-      DoubleTab& presentF = eqF.inconnue()->valeurs();
-      //DoubleTab& passeF = eqF.inconnue()->passe();
+      DoubleTab& presentF = eqF.inconnue().valeurs();
+      //DoubleTab& passeF = eqF.inconnue().passe();
       int tailleF = presentF.dimension(0);
       const DoubleVect& volumes_fin = le_dom_fine.volumes();
       //const DoubleVect& volumes_gros = le_dom.volumes();
@@ -176,13 +176,13 @@ DoubleTab& Source_DC_VDF::calculer_residu(Connectivites_base& connect, LIST(OWN_
       OWN_PTR(Prolongement_base)& P1 = P(2);
 
       Equation_base& eqF = equation();
-      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
-      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis().valeur());
-      DoubleTab& present = eqG.inconnue()->valeurs();
-      DoubleTab& passe = eqG.inconnue()->passe();
+      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis());
+      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis());
+      DoubleTab& present = eqG.inconnue().valeurs();
+      DoubleTab& passe = eqG.inconnue().passe();
       //int tailleG = present.dimension(0);
-      DoubleTab& presentF = eqF.inconnue()->valeurs();
-      //DoubleTab& passeF = eqF.inconnue()->passe();
+      DoubleTab& presentF = eqF.inconnue().valeurs();
+      //DoubleTab& passeF = eqF.inconnue().passe();
       int tailleF = presentF.dimension(0);
       const DoubleVect& volumes_fin = le_dom_fine.volumes();
       //const DoubleVect& volumes_gros = le_dom.volumes();

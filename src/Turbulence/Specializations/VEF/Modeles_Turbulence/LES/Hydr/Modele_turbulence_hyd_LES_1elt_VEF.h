@@ -29,7 +29,7 @@ class Modele_turbulence_hyd_LES_1elt_VEF: public Modele_turbulence_hyd_LES_VEF_b
 {
   Declare_instanciable(Modele_turbulence_hyd_LES_1elt_VEF);
 protected:
-  Champ_Fonc& calculer_viscosite_turbulente() override;
+  Champ_Fonc_base& calculer_viscosite_turbulente() override;
   virtual void calculer_fonction_structure();
   void calculer_delta_c(DoubleTab&);
 

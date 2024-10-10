@@ -24,7 +24,7 @@
 
 #include <Source_base.h>
 #include <TRUST_Ref.h>
-#include <Champ_Don.h>
+
 
 class Convection_Diffusion_Concentration;
 class Convection_Diffusion_Temperature;
@@ -75,11 +75,11 @@ protected:
   int _interpolation_viscosite_turbulente = interpolation_viscosite_turbulente__;
   double _coefficient_limiteur = coefficient_limiteur__;
 
-  REF(Champ_Don) beta_t, beta_c;
-  REF(Champ_Don_base) gravite;
-  REF(Equation_base) eq_hydraulique;
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
+  OBS_PTR(Champ_Don_base) beta_t, beta_c;
+  OBS_PTR(Champ_Don_base) gravite;
+  OBS_PTR(Equation_base) eq_hydraulique;
+  OBS_PTR(Convection_Diffusion_Temperature) eq_thermique;
+  OBS_PTR(Convection_Diffusion_Concentration) eq_concentration;
 };
 
 inline void error_keps(const Nom& source, const Nom& nom)

@@ -23,7 +23,7 @@
 #include <Flux_parietal_adaptatif.h>
 #include <Loi_paroi_adaptative.h>
 #include <Pb_Multiphase.h>
-#include <Domaine_dis.h>
+
 #include <Domaine_VF.h>
 #include <Op_Diff_PolyMAC_P0P1NC_base.h>
 #include <Op_Diff_PolyMAC_P0_base.h>
@@ -42,9 +42,9 @@ void Flux_parietal_adaptatif::completer()
 
 void Flux_parietal_adaptatif::qp(const input_t& in, output_t& out) const
 {
-  const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_->valeur());
+  const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur());
   const double u_tau = corr_loi_paroi.get_utau(in.f);
-  int e = ref_cast(Domaine_VF, pb_->domaine_dis().valeur()).face_voisins()(in.f,0);
+  int e = ref_cast(Domaine_VF, pb_->domaine_dis()).face_voisins()(in.f,0);
   const DoubleTab& diffu_th = sub_type(Op_Diff_PolyMAC_P0P1NC_base, pb_->equation(2).operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_P0P1NC_base, pb_->equation(2).operateur(0).l_op_base()).nu() :
                               ref_cast(Op_Diff_PolyMAC_P0_base, pb_->equation(2).operateur(0).l_op_base()).nu();
 

@@ -288,7 +288,7 @@ Entree& Transport_Marqueur_FT::lire_transformation(Entree& is)
 }
 
 //Discretisation du champ inconnu (champ_bidon_)
-void Transport_Marqueur_FT::discretiser(void)
+void Transport_Marqueur_FT::discretiser()
 {
   const Probleme_base&  pb = get_probleme_base();
   const Discretisation_base& discr = pb.discretisation();
@@ -298,7 +298,7 @@ void Transport_Marqueur_FT::discretiser(void)
   suffix += le_nom();
   fieldname = "CHAMP_BIDON";
   fieldname += suffix;
-  const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
+  const Domaine_dis_base& un_domaine_dis = domaine_dis();
   const double temps = schema_temps().temps_courant();
   const int nb_valeurs_temps = schema_temps().nb_valeurs_temporelles();
 
@@ -324,7 +324,7 @@ void Transport_Marqueur_FT::completer()
 {
   les_sources.completer();
   ////le_dom_Cl_dis->completer();
-  const Domaine& domaine = le_dom_dis->valeur().domaine();
+  const Domaine& domaine = le_dom_dis->domaine();
 
   Maillage_FT_Disc& ens_points = maillage_interface();
   ens_points.associer_domaine(domaine);
@@ -365,12 +365,12 @@ int Transport_Marqueur_FT::preparer_calcul()
   return 1;
 }
 
-const Champ_Inc& Transport_Marqueur_FT::inconnue(void) const
+const Champ_Inc_base& Transport_Marqueur_FT::inconnue() const
 {
   return champ_bidon_;
 }
 
-Champ_Inc& Transport_Marqueur_FT::inconnue(void)
+Champ_Inc_base& Transport_Marqueur_FT::inconnue()
 {
   return champ_bidon_;
 }
@@ -480,12 +480,13 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
   const Champ_base& champ_vitesse =  eq_ns.inconnue();
   const Champ_base& champ_pression =  eq_ns.pression();
 
-  const Solveur_Masse& le_solveur_masse_ns = eq_ns.solv_masse();
+  const Solveur_Masse_base& le_solveur_masse_ns = eq_ns.solv_masse();
   const Operateur_Grad& gradient = eq_ns.operateur_gradient();
 
-  Champ_Inc champ_grad_p(eq_ns.grad_P());
+  OWN_PTR(Champ_Inc_base) champ_grad_p = eq_ns.grad_P();
+
   gradient.calculer(champ_pression.valeurs(), champ_grad_p->valeurs());
-  le_solveur_masse_ns->appliquer(champ_grad_p->valeurs());
+  le_solveur_masse_ns.appliquer(champ_grad_p->valeurs());
   champ_grad_p->valeurs().echange_espace_virtuel();
   DoubleTabFT tab_som;
   const DoubleTab& pos = ens_points.sommets();
@@ -540,16 +541,16 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
         {
           const Fluide_Diphasique& fluide_diph = ref_cast(Fluide_Diphasique,mil);
           const Fluide_Incompressible& fluide = fluide_diph.fluide_phase(phase_marquee_);
-          const DoubleTab& rho = fluide.masse_volumique()->valeurs();
-          const DoubleTab& visco_dyn = fluide.viscosite_dynamique()->valeurs();
+          const DoubleTab& rho = fluide.masse_volumique().valeurs();
+          const DoubleTab& visco_dyn = fluide.viscosite_dynamique().valeurs();
           rho_fluide_som_ = rho(0,0);
           visco_dyn_fluide_som_ = visco_dyn(0,0);
         }
       else
         {
           const Fluide_base& fluide = ref_cast(Fluide_base,mil);
-          const DoubleTab& rho = fluide.masse_volumique()->valeurs();
-          const DoubleTab& visco_dyn = fluide.viscosite_dynamique()->valeurs();
+          const DoubleTab& rho = fluide.masse_volumique().valeurs();
+          const DoubleTab& visco_dyn = fluide.viscosite_dynamique().valeurs();
           rho_fluide_som_ = rho(0,0);
           visco_dyn_fluide_som_ = visco_dyn(0,0);
         }
@@ -573,8 +574,8 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
   else
     {
       const Fluide_base& fluide = ref_cast(Fluide_base,eq_ns.milieu());
-      const Champ_base& champ_masse_vol =  fluide.masse_volumique().valeur();
-      const Champ_base& champ_visco_dyn =  fluide.viscosite_dynamique().valeur();
+      const Champ_base& champ_masse_vol =  fluide.masse_volumique();
+      const Champ_base& champ_visco_dyn =  fluide.viscosite_dynamique();
 
       DoubleTab& les_positions = tableaux_positions();
       IntVect& les_elements = vecteur_elements();
@@ -678,7 +679,7 @@ void Transport_Marqueur_FT::transformation(Maillage_FT_Disc& marqueurs,Propriete
   const Equation_base& eq = probleme_base_->get_equation_by_name(nom_eq_interf_);
   Transport_Interfaces_FT_Disc& eq_interf = ref_cast_non_const(Transport_Interfaces_FT_Disc,eq);
   const Equation_base& eqn_hydraulique = probleme_base_->equation(0);
-  const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
+  const Champ_base& champ_vitesse = eqn_hydraulique.inconnue();
   DoubleTab& vitesse_p = proprietes.vitesse_particules();
 
   IntVect num_compo;
@@ -724,7 +725,7 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
                                                            ArrOfDouble&         volumes,
                                                            DoubleTab&                 positions)
 {
-  const Domaine_dis_base& zdis_base = domaine_dis().valeur();
+  const Domaine_dis_base& zdis_base = domaine_dis();
   const Domaine_VF& zvf = ref_cast(Domaine_VF,zdis_base);
   const DoubleVect& vol_elem = zvf.volumes();
   const DoubleTab& xp_elem = zvf.xp();
@@ -774,7 +775,7 @@ void Transport_Marqueur_FT::detection_groupes_a_supprimer(const ArrOfDouble& vol
                                                           const DoubleTab&    positions,
                                                           ArrOfInt&               flags_compo_a_supprimer)
 {
-  const Domaine_VF& zvf = ref_cast(Domaine_VF, domaine_dis().valeur());
+  const Domaine_VF& zvf = ref_cast(Domaine_VF, domaine_dis());
   const Domaine& domaine_geom = zvf.domaine();
   const DoubleVect& volume_elem = zvf.volumes();
 
@@ -859,7 +860,7 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
 {
   int phase_transfo = (phase_marquee_==0?1:0);
   const Fluide_Diphasique& fluide_diph = ref_cast(Fluide_Diphasique,probleme().equation(0).milieu());
-  const DoubleTab& rho = fluide_diph.fluide_phase(phase_transfo).masse_volumique()->valeurs();
+  const DoubleTab& rho = fluide_diph.fluide_phase(phase_transfo).masse_volumique().valeurs();
   double rho_val = rho(0,0);
 
   const int dim = positions.dimension(1);
@@ -870,7 +871,7 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
       size_new++;
 
   //remplir sommets_lu et proprietes
-  const Domaine& domaine = le_dom_dis->valeur().domaine();
+  const Domaine& domaine = le_dom_dis->domaine();
   ens_points.associer_domaine(domaine);
 
   DoubleTab&   soms_tmp =  ens_points.sommets_lu();
@@ -932,7 +933,7 @@ void Transport_Marqueur_FT::calcul_vitesse_p(DoubleTab& deplacement) const
       //Pour une equation de transport d interface solide, la REF refequation_vitesse_transport est vide
       //On utilise directement l equation de N_S et non pas efequation_vitesse_transport.valeur()
       const Equation_base& eqn_hydraulique = probleme_base_->equation(0);
-      const Champ_base& champ_vitesse = eqn_hydraulique.inconnue().valeur();
+      const Champ_base& champ_vitesse = eqn_hydraulique.inconnue();
       calculer_vitesse_transport_interpolee(champ_vitesse,
                                             maillage_interface(),
                                             deplacement, 1 /* recalculer le champ de vitesse L2 */);
@@ -1037,7 +1038,7 @@ void Transport_Marqueur_FT::resoudre_edo(DoubleTab& vitesse_p, DoubleTab& une_so
 
 void Transport_Marqueur_FT::imposer_cond_lim()
 {
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis());
   DoubleTab& vitesse_p =  proprietes_particules().vitesse_particules();
   const Maillage_FT_Disc& maillage = maillage_interface();
   const DoubleTab& pos = maillage.sommets();
@@ -1238,7 +1239,7 @@ void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
         {
           //const & discr = ref_cast(Discret_Thyd, discretisation());
           const Discretisation_base& discr = probleme().discretisation();
-          const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
+          const Domaine_dis_base& un_domaine_dis = domaine_dis();
           const double temps = schema_temps().temps_courant();
           Nom nom="densite_particules";
           Nom unite="sans_dimension";
@@ -1253,7 +1254,7 @@ void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
         {
           //const Discret_Thyd& discr = ref_cast(Discret_Thyd, discretisation());
           const Discretisation_base& discr = probleme().discretisation();
-          const Domaine_dis_base& un_domaine_dis = domaine_dis().valeur();
+          const Domaine_dis_base& un_domaine_dis = domaine_dis();
           const double temps = schema_temps().temps_courant();
           Nom nom="volume_particules";
           Nom unite="sans_dimension";
@@ -1293,7 +1294,7 @@ const Champ_base& Transport_Marqueur_FT::get_champ(const Motcle& nom) const
     {
     }
   throw Champs_compris_erreur();
-  REF(Champ_base) ref_champ;
+  OBS_PTR(Champ_base) ref_champ;
   return ref_champ;
 }
 

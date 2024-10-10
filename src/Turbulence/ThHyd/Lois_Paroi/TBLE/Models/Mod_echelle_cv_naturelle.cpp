@@ -23,7 +23,7 @@
 #include <EFichier.h>
 #include <SFichier.h>
 #include <Fluide_Incompressible.h>
-#include <Champ_Don.h>
+
 
 Implemente_instanciable(Mod_echelle_cv_naturelle,"Mod_echelle_convection_naturelle",Mod_echelle_LRM_base);
 

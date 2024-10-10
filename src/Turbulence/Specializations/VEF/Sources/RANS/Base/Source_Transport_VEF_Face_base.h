@@ -39,7 +39,7 @@ public :
   Source_Transport_VEF_Face_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   void associer_pb(const Probleme_base& pb) override;
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
   DoubleTab& calculer(DoubleTab& ) const override;
   DoubleTab& ajouter(DoubleTab& ) const override = 0; // XXX XXX XXX Elie Saikali : like that !!;
 
@@ -52,8 +52,8 @@ protected :
   DoubleTab& ajouter_concen(DoubleTab& ) const;
   DoubleTab& ajouter_anisotherme_concen(DoubleTab& ) const;
 
-  REF(Domaine_VEF) le_dom_VEF;
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  OBS_PTR(Domaine_VEF) le_dom_VEF;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
 private:
   // methodes a surcharger sinon throw !!
@@ -61,7 +61,7 @@ private:
   virtual const DoubleTab& get_cisaillement_paroi() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const DoubleTab& get_K_pour_production() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& get_modele_fonc_bas_reyn() const { return not_implemented<OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)&>(__func__); }
-  virtual void calcul_tabs_bas_reyn(const DoubleTrav& , const DoubleTab& , const DoubleTab& , const Champ_Don& , const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
+  virtual void calcul_tabs_bas_reyn(const DoubleTrav& , const DoubleTab& , const DoubleTab& , const Champ_Don_base& , const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual const Nom get_type_paroi() const { return not_implemented<Nom>(__func__); }
   virtual void calcul_tenseur_reyn(const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_bas_rey(const DoubleVect& , const DoubleTrav& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }

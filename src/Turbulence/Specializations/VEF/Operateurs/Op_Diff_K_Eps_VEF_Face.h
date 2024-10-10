@@ -25,10 +25,10 @@
 #include <Op_VEF_Face.h>
 #include <Domaine_VEF.h>
 #include <TRUST_Ref.h>
-#include <Champ_Fonc.h>
-#include <Champ_Inc.h>
-#include <Domaine_Cl_dis.h>
-#include <Domaine_dis.h>
+
+
+
+
 
 class Domaine_Cl_VEF;
 class Champ_P1NC;
@@ -47,10 +47,10 @@ class Op_Diff_K_Eps_VEF_Face : public Op_Diff_K_Eps_VEF_base, public Op_VEF_Face
 
 public:
 
-  void associer(const Domaine_dis& , const Domaine_Cl_dis& ,
-                const Champ_Inc& ) override;
+  void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ,
+                const Champ_Inc_base& ) override;
   void associer_diffusivite_turbulente() override;
-  const Champ_Fonc& diffusivite_turbulente() const;
+  const Champ_Fonc_base& diffusivite_turbulente() const;
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline double viscA(int, int, int, double) const;
@@ -65,9 +65,9 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Domaine_VEF) le_dom_vef;
-  REF(Domaine_Cl_VEF) la_zcl_vef;
-  REF(Champ_P1NC) inconnue_;
+  OBS_PTR(Domaine_VEF) le_dom_vef;
+  OBS_PTR(Domaine_Cl_VEF) la_zcl_vef;
+  OBS_PTR(Champ_P1NC) inconnue_;
 };
 
 // ATTENTION le diffu intervenant dans les fonctions n'est que LOCAL (on appelle d_mu apres)

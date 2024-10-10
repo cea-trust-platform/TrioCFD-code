@@ -36,7 +36,7 @@ void Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem::associer_pb(co
 
 void Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem::fill_resu_anisotherme_concen(const DoubleVect& G_t, const DoubleVect& G_c, const DoubleVect& volumes, const DoubleVect& porosite_vol, DoubleTab& resu) const
 {
-  const DoubleTab& K_Rea = eqn_k_Rea->inconnue()->valeurs(), &eps_Rea = eqn_eps_Rea->inconnue()->valeurs();
+  const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs();
   // C1 value is not a constant in Realizable K-Epsilon model but here, we take the default value of C1 used in standard K-Epsilon, as proposed by litterature
   double C3_loc, G_sum, C1_loc = C1__, LeK_MIN = eqn_k_Rea->modele_turbulence().get_K_MIN();
 

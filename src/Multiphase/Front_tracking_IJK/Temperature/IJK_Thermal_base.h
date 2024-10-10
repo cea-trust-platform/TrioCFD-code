@@ -416,11 +416,11 @@ public:
   void compute_eulerian_curvature();
   void compute_eulerian_curvature_from_interface();
 
-  virtual void update_intersections() { ; };
-  virtual void clean_ijk_intersections() { ; };
+  virtual void update_intersections() { }
+  virtual void clean_ijk_intersections() { }
   virtual void set_thermal_subresolution_outputs(const Nom& interfacial_quantities_thermal_probes,
                                                  const Nom& overall_bubbles_quantities,
-                                                 const Nom& local_quantities_thermal_probes_time_index_folder) { ; };
+                                                 const Nom& local_quantities_thermal_probes_time_index_folder) { }
   virtual void compute_temperature_init();
   virtual void recompute_temperature_init();
 
@@ -435,8 +435,8 @@ protected:
   virtual void add_temperature_diffusion();
   virtual void compute_diffusion_increment()=0;
   virtual void correct_temperature_for_eulerian_fluxes()=0;
-  virtual void store_temperature_before_extrapolation() { ; };
-  virtual void correct_temperature_increment_for_interface_leaving_cell() { ; };
+  virtual void store_temperature_before_extrapolation() { }
+  virtual void correct_temperature_increment_for_interface_leaving_cell() { }
   void enforce_zero_value_eulerian_distance();
   void enforce_zero_value_eulerian_curvature();
   void enforce_max_value_eulerian_curvature();
@@ -451,18 +451,18 @@ protected:
   void compute_temperature_gradient_elem();
   void compute_temperature_hessian_diag_elem();
   void compute_temperature_hessian_cross_elem();
-  virtual void correct_temperature_for_visu() { ; };
-  virtual void correct_operators_for_visu() { ; };
-  virtual void clip_temperature_values() { ; };
-  virtual void clip_max_temperature_values() { ; };
-  virtual void compute_thermal_subproblems() { ; };
-  virtual void compute_convective_diffusive_fluxes_face_centre() { ; };
-  virtual void compute_convective_fluxes_face_centre() { ; };
-  virtual void compute_diffusive_fluxes_face_centre() { ; };
-  virtual void prepare_ij_fluxes_k_layers() { ; };
-  virtual void compute_temperature_cell_centres(const int first_corr) { ; };
-  virtual void set_zero_temperature_increment() { ; };
-  virtual void clean_thermal_subproblems() { ; };
+  virtual void correct_temperature_for_visu() { }
+  virtual void correct_operators_for_visu() { }
+  virtual void clip_temperature_values() { }
+  virtual void clip_max_temperature_values() { }
+  virtual void compute_thermal_subproblems() { }
+  virtual void compute_convective_diffusive_fluxes_face_centre() { }
+  virtual void compute_convective_fluxes_face_centre() { }
+  virtual void compute_diffusive_fluxes_face_centre() { }
+  virtual void prepare_ij_fluxes_k_layers() { }
+  virtual void compute_temperature_cell_centres(const int first_corr) { }
+  virtual void set_zero_temperature_increment() { }
+  virtual void clean_thermal_subproblems() { }
 
   void calculer_gradient_temperature(const IJK_Field_double& temperature,
                                      FixedVector<IJK_Field_double, 3>& grad_T);
@@ -486,7 +486,7 @@ protected:
   void force_upstream_temperature(IJK_Field_double& temperature, double T_imposed,
                                   const IJK_Interfaces& interfaces, double nb_diam, int upstream_dir,
                                   int gravity_dir, int upstream_stencil);
-  virtual void enforce_periodic_temperature_boundary_value() { ; } ;
+  virtual void enforce_periodic_temperature_boundary_value() {  }
 
   int debug_;
   int latastep_reprise_, latastep_reprise_ini_;
@@ -498,11 +498,11 @@ protected:
   IJK_Field_double d_T_rustine_; // Temperature increment to conserve the energy.
   IJK_Field_double RK3_F_rustine_; // Temporary storage for substeps in the RK3 algorithm for the rustine calculation.
 
-  REF(IJK_FT_double) ref_ijk_ft_;
-  REF(IJK_FT_Post) ref_ijk_ft_post_;
-  REF(Switch_FT_double) ref_ijk_ft_switch_;
-  REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
-  REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_Post) ref_ijk_ft_post_;
+  OBS_PTR(Switch_FT_double) ref_ijk_ft_switch_;
+  OBS_PTR(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
+  OBS_PTR(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
   OWN_PTR(Corrige_flux_FT_base) corrige_flux_;
   const IJK_Field_double& get_IJK_field(const Nom& nom) const;
   int rang_;

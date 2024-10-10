@@ -30,9 +30,6 @@
 #include <Milieu_base.h>
 #include <Champ_front_fonc.h>
 #include <Champ_Uniforme.h>
-#include <Turbulence_paroi.h>
-
-
 
 
 /*! @brief classe : Echange_contact_VDF_VEF_Zoom
@@ -40,8 +37,6 @@
  *
  *
  */
-
-////////////////////////////////////////////////////////////////
 
 class Echange_contact_VDF_VEF_Zoom  : public Echange_contact_VDF_Zoom_base
 {

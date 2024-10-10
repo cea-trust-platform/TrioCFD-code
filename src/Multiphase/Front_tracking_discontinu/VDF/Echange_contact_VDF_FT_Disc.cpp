@@ -64,12 +64,12 @@ Entree& Echange_contact_VDF_FT_Disc::readOn( Entree& s )
   nom_bord_oppose_=nom_bord;
 
   h_paroi=1e10; // why not git 1/h_paroi = 0....?
-  // T_autre_pb(): temp type front from other calculation/Champ dans le domaine
-  T_autre_pb().typer("Champ_front_calc");
+  // T_autre_pb(): temp type front from other calculation/OWN_PTR(Champ_base) dans le domaine
+  T_autre_pb_.typer("Champ_front_calc");
   // T_ext(): mettre_a_jour utilise des donnees externes,
   // Peut aussi initialized by a champ dans le domaine.
-  T_ext().typer("Ch_front_var_instationnaire_dep");
-  T_ext()->fixer_nb_comp(1);
+  le_champ_front.typer("Ch_front_var_instationnaire_dep");
+  T_ext().fixer_nb_comp(1);
 
   return s;
 }
@@ -79,15 +79,15 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   //  par default distant_= 1
   //  trace the value corresponding from champ inconnu
   //   Champ_Inc_P0_base::trace(), trace the element from distant
-  T_autre_pb()->mettre_a_jour(temps);
+  T_autre_pb().mettre_a_jour(temps);
   indicatrice_->mettre_a_jour(temps);
 
   const DoubleTab& I = indicatrice_->valeurs_au_temps(temps);
 
-  Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
+  Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());
   // le_milieu =  SOLID
   const Milieu_base& le_milieu=ch.milieu();
-  int nb_comp = le_milieu.conductivite()->nb_comp();
+  int nb_comp = le_milieu.conductivite().nb_comp();
   assert(nb_comp==1);
 
 
@@ -102,7 +102,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
 
   // juste acceder la valeur..., et les remplir
   // pas forcement des chose dedans et valable.
-  DoubleTab& mon_Tex= T_ext()-> valeurs();
+  DoubleTab& mon_Tex= T_ext(). valeurs();
   calculer_Teta_equiv(mon_Tex,mon_h,autre_h,is_pb_fluide,temps);
 
   // Attention: Ti_wall_ should be updated after TCL model
@@ -140,7 +140,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
   Probleme_base& pb_gen=ref_cast(Probleme_base, Interprete::objet(nom_pb));
   Probleme_FT_Disc_gen *pbft = dynamic_cast<Probleme_FT_Disc_gen*>(&pb_gen);
 
-  const Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis().valeur());
+  const Domaine_VF& le_dom=ref_cast(Domaine_VF, mon_dom_cl_dis -> domaine_dis());
   const DoubleVect& surface= le_dom.face_surfaces();
 
 
@@ -202,7 +202,7 @@ void Echange_contact_VDF_FT_Disc::mettre_a_jour(double temps)
                 {
                   if (!est_egal(mon_phi(ii, jj), 0.))
                     {
-                      mon_Ti(ii, jj) = T_ext()->valeurs()(ii, jj) - mon_phi(ii, jj) /autre_h(ii) ;
+                      mon_Ti(ii, jj) = T_ext().valeurs()(ii, jj) - mon_phi(ii, jj) /autre_h(ii) ;
                       mon_h(ii,jj) = 0.;
                     }
                 }
@@ -287,7 +287,7 @@ void Echange_contact_VDF_FT_Disc::completer()
   // changer distant = 0; for indicatrice_...
   // par default, 1;
   ch.set_distant(distant);
-  ch.associer_fr_dis_base(T_ext()->frontiere_dis());
+  ch.associer_fr_dis_base(T_ext().frontiere_dis());
   ch.completer();
   int nb_cases=domaine_Cl_dis().equation().schema_temps().nb_valeurs_temporelles();
   ch.fixer_nb_valeurs_temporelles(nb_cases);

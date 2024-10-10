@@ -53,8 +53,8 @@ public:
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
-  const Champ_Inc& inconnue() const override;
-  Champ_Inc& inconnue() override;
+  const Champ_Inc_base& inconnue() const override;
+  Champ_Inc_base& inconnue() override;
   void discretiser() override;
   inline Fluide_base& fluide();
   inline const Fluide_base& fluide() const;
@@ -92,12 +92,12 @@ public:
 
 protected:
 
-  REF(Fluide_base) le_fluide;
-  REF(Modele_rayo_semi_transp) le_modele;
+  OBS_PTR(Fluide_base) le_fluide;
+  OBS_PTR(Modele_rayo_semi_transp) le_modele;
 
   Operateur_Diff terme_diffusif;
 
-  Champ_Inc irradiance_;
+  OWN_PTR(Champ_Inc_base) irradiance_;
   SolveurSys solveur;
   Matrice_Morse la_matrice;
 

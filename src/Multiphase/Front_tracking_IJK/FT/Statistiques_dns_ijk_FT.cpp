@@ -1592,7 +1592,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
               AJOUT(VVWI_MOY,v*v*w*chi);
               AJOUT(VWWI_MOY,v*w*w*chi);
               AJOUT(WWWI_MOY,w*w*w*chi);
-              // Correlation vitesse/pression :
+              // correlation vitesse/pression :
               AJOUT(UPI_MOY,u*p*chi);
               AJOUT(VPI_MOY,v*p*chi);
               AJOUT(WPI_MOY,w*p*chi);

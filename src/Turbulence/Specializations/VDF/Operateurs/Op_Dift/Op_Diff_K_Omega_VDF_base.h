@@ -26,9 +26,9 @@
 #include <Op_Diff_K_Omega_base.h>
 #include <Iterateur_VDF_Elem.h>
 #include <Op_VDF_Elem.h>
-#include <Domaine_Cl_dis.h>
-#include <Domaine_dis.h>
-#include <Champ_Inc.h>
+
+
+
 
 class Op_Diff_K_Omega_VDF_base : public Op_Diff_K_Omega_base, public Op_VDF_Elem
 {
@@ -40,7 +40,7 @@ public:
   void associer_diffusivite(const Champ_base& ch_diff) override;
   void associer_diffusivite_turbulente() override;
   void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
-  const Champ_Fonc& diffusivite_turbulente() const;
+  const Champ_Fonc_base& diffusivite_turbulente() const;
   const Champ_base& diffusivite() const override;
 
   virtual inline void mettre_a_jour_diffusivite() const { assert(mon_equation.non_nul()); }
@@ -69,11 +69,11 @@ class Op_Diff_K_Omega_VDF_Generique
 protected:
 
   template <typename EVAL_TYPE>
-  inline void associer_impl(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_cl_dis, const Champ_Inc& ch_diffuse)
+  inline void associer_impl(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_cl_dis, const Champ_Inc_base& ch_diffuse)
   {
-    const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse.valeur());
-    const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
-    const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis.valeur());
+    const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse);
+    const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
+    const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_cl_dis);
     iter_()->associer(zvdf, zclvdf,static_cast<OP_TYPE&>(*this));
     EVAL_TYPE& eval_diff = static_cast<EVAL_TYPE&> (iter_()->evaluateur());
     eval_diff.associer_domaines(zvdf, zclvdf );

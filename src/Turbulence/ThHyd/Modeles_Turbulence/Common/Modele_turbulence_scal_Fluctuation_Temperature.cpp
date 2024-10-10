@@ -85,7 +85,7 @@ int Modele_turbulence_scal_Fluctuation_Temperature::lire_motcle_non_standard(con
   return 1;
 }
 
-void Modele_turbulence_scal_Fluctuation_Temperature::associer_viscosite_turbulente(const Champ_Fonc& visc_turb)
+void Modele_turbulence_scal_Fluctuation_Temperature::associer_viscosite_turbulente(const Champ_Fonc_base& visc_turb)
 {
   la_viscosite_turbulente = visc_turb;
 }
@@ -108,11 +108,11 @@ bool Modele_turbulence_scal_Fluctuation_Temperature::initTimeStep(double dt)
   return ok;
 }
 
-Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature::calculer_diffusivite_turbulente()
+Champ_Fonc_base& Modele_turbulence_scal_Fluctuation_Temperature::calculer_diffusivite_turbulente()
 {
   DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
-  const DoubleTab& nu_t = la_viscosite_turbulente.valeur()->valeurs();
-  double temps = la_viscosite_turbulente.valeur()->temps();
+  const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
+  double temps = la_viscosite_turbulente->temps();
 
   if (temps != diffusivite_turbulente_->temps())
     {
@@ -136,18 +136,18 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature::calculer_diffusivite
 
 void Modele_turbulence_scal_Fluctuation_Temperature::mettre_a_jour(double temps)
 {
-  //  Champ_Inc& ch_Fluctu_Temp = Fluctu_Temperature();
+  //  Champ_Inc_base& ch_Fluctu_Temp = Fluctu_Temperature();
   Schema_Temps_base& sch1 = eqn_transport_Fluctu_Temp.schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_Fluctu_Temp.domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transport_Fluctu_Temp.domaine_Cl_dis().mettre_a_jour(temps);
   sch1.faire_un_pas_de_temps_eqn_base(eqn_transport_Fluctu_Temp);
   //eqn_transport_Fluctu_Temp.inconnue().mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp.mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp.controler_grandeur();
-  //  Champ_Inc& ch_Flux_Chaleur_Turb = Flux_Chaleur_Turb();
+  //  Champ_Inc_base& ch_Flux_Chaleur_Turb = Flux_Chaleur_Turb();
   Schema_Temps_base& sch2 = eqn_transport_Flux_Chaleur_Turb.schema_temps();
   // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
-  eqn_transport_Flux_Chaleur_Turb.domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transport_Flux_Chaleur_Turb.domaine_Cl_dis().mettre_a_jour(temps);
   sch2.faire_un_pas_de_temps_eqn_base(eqn_transport_Flux_Chaleur_Turb);
   //eqn_transport_Flux_Chaleur_Turb.inconnue().mettre_a_jour(temps);
   eqn_transport_Flux_Chaleur_Turb.mettre_a_jour(temps);
@@ -162,7 +162,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature::completer()
   const Probleme_base& mon_pb = mon_equation_->probleme();
   const RefObjU& modele_turbulence = mon_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
-  const Champ_Fonc& visc_turb = mod_turb_hydr.viscosite_turbulente();
+  const Champ_Fonc_base& visc_turb = mod_turb_hydr.viscosite_turbulente();
   associer_viscosite_turbulente(visc_turb);
 }
 

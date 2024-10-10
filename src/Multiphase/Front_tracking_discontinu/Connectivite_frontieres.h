@@ -40,7 +40,7 @@ protected:
   void remplir_def_face_aretes(const Domaine_VF& domaine_vf);
   void remplir_faces_voisins(const Domaine_VF& domaine_vf);
 
-  REF(Domaine_VF) refdomaine_vf_;
+  OBS_PTR(Domaine_VF) refdomaine_vf_;
 
   // Tableau faces_voisins_ :
   //  dimension(0) = domaine.nb_faces_frontiere()

@@ -27,7 +27,7 @@
 #include <Modele_turbulence_scal_base.h>
 #include <Transport_Fluctuation_Temperature_W.h>
 #include <TRUST_Ref.h>
-#include <Champ_Fonc.h>
+
 
 class Transport_Fluctuation_Temperature_W;
 
@@ -42,15 +42,15 @@ public:
   bool initTimeStep(double dt) override;
   void mettre_a_jour(double ) override;
   //virtual void associer_eqn(const Equation_base&);
-  void associer_viscosite_turbulente(const Champ_Fonc& );
-  inline virtual Champ_Inc& Fluctu_Temperature();
-  inline virtual const Champ_Inc& Fluctu_Temperature() const;
+  void associer_viscosite_turbulente(const Champ_Fonc_base& );
+  inline virtual Champ_Inc_base& Fluctu_Temperature();
+  inline virtual const Champ_Inc_base& Fluctu_Temperature() const;
   inline virtual Transport_Fluctuation_Temperature_W& equation_Fluctu();
   inline virtual const Transport_Fluctuation_Temperature_W& equation_Fluctu() const;
 
   int sauvegarder(Sortie& os) const override;
   int reprendre(Entree& is) override;
-  virtual Champ_Fonc& calculer_diffusivite_turbulente();
+  virtual Champ_Fonc_base& calculer_diffusivite_turbulente();
   void imprimer(Sortie&) const override;
 
   void set_param(Param&) override;
@@ -66,13 +66,13 @@ public:
 private :
 
 //Entree& lire(const Motcle&, Entree&);
-  REF(Transport_Fluctuation_Temperature_W) eqn_transport_Fluctu_Temp;
+  OBS_PTR(Transport_Fluctuation_Temperature_W) eqn_transport_Fluctu_Temp;
 
 
 
 protected :
   OWN_PTR(Equation_base) eqn;
-  REF(Champ_Fonc) la_viscosite_turbulente;
+  OBS_PTR(Champ_Fonc_base) la_viscosite_turbulente;
   // nous n'avons plus alpha_turb = visco_turb/Prdt_turb
 
 
@@ -99,12 +99,12 @@ inline const Transport_Fluctuation_Temperature_W& Modele_turbulence_scal_Fluctua
 }
 
 
-inline const Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W::Fluctu_Temperature() const
+inline const Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature_W::Fluctu_Temperature() const
 {
   return eqn_transport_Fluctu_Temp->inconnue();
 }
 
-inline Champ_Inc& Modele_turbulence_scal_Fluctuation_Temperature_W::Fluctu_Temperature()
+inline Champ_Inc_base& Modele_turbulence_scal_Fluctuation_Temperature_W::Fluctu_Temperature()
 {
   return eqn_transport_Fluctu_Temp->inconnue();
 }

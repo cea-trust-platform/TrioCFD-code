@@ -41,7 +41,7 @@ class Diffu_totale_scal_base : public Diffu_totale_base
 public :
 
 
-  REF(Diffu_totale_base) visco_tot;
+  OBS_PTR(Diffu_totale_base) visco_tot;
 
   Diffu_totale_scal_base() ;
   void set_visco_tot(Diffu_totale_base& a)

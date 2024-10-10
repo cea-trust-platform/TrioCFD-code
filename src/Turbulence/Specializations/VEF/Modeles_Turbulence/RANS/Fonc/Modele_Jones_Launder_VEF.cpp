@@ -67,23 +67,23 @@ Entree& Modele_Jones_Launder_VEF::lire(const Motcle& , Entree& is)
 //   Implementation des fonctions de la classe
 ///////////////////////////////////////////////////////////////
 
-void  Modele_Jones_Launder_VEF::associer(const Domaine_dis& domaine_dis,
-                                         const Domaine_Cl_dis& domaine_Cl_dis)
+void  Modele_Jones_Launder_VEF::associer(const Domaine_dis_base& domaine_dis,
+                                         const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  //  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
-  //  const Domaine_Cl_VEF& le_dom_Cl = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  //  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
+  //  const Domaine_Cl_VEF& le_dom_Cl = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
 }
 
-DoubleTab& Modele_Jones_Launder_VEF::Calcul_D(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
-                                              const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re, const Champ_Don& ch_visco ) const
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_D(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
+                                              const DoubleTab& vitesse,const DoubleTab& K_eps_Bas_Re, const Champ_Don_base& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco->valeurs();
-  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
-  //  const Domaine_Cl_VEF& le_dom_Cl = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
+  //  const Domaine_Cl_VEF& le_dom_Cl = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   const DoubleVect& volumes = le_dom.volumes();
   //  int nb_faces = le_dom.nb_faces();
   int nb_faces_tot = le_dom.nb_faces();
@@ -168,15 +168,15 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_D(DoubleTab& D,const Domaine_dis& do
    }
 */
 
-DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_eps_Bas_Re,const Champ_Don_base& ch_visco, const DoubleTab& visco_turb ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco->valeurs();
-  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  //const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
-  const Domaine_VEF& domaine_VEF =  ref_cast(Domaine_VEF,domaine_dis.valeur());
+  //const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
+  const Domaine_VEF& domaine_VEF =  ref_cast(Domaine_VEF,domaine_dis);
   E = 0;
   //return E;
   //  const IntTab& elem_faces = domaine_VEF.elem_faces();
@@ -228,8 +228,8 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Domaine_dis& do
   int fac=-1,elem1,comp;
   // Rque methode non const Pourquoi ?
 
-  const Champ_P1NC& vitesse = ref_cast(Champ_P1NC,eq_hydraulique->inconnue().valeur());
-  ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(transporte,gradient_elem,ref_cast(Domaine_Cl_VEF,eq_hydraulique->domaine_Cl_dis().valeur()));
+  const Champ_P1NC& vitesse = ref_cast(Champ_P1NC,eq_hydraulique->inconnue());
+  ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(transporte,gradient_elem,ref_cast(Domaine_Cl_VEF,eq_hydraulique->domaine_Cl_dis()));
 
   gradient_elem.echange_espace_virtuel();
   // On a les gradient_elem par elements
@@ -278,7 +278,7 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Domaine_dis& do
         for (fac=0; fac<nb_faces; fac++)
           champ_face(fac,comp)=gradient(fac, comp, i);
 
-      ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(champ_face,champ_elem,ref_cast(Domaine_Cl_VEF,eq_hydraulique->domaine_Cl_dis().valeur()));
+      ref_cast_non_const(Champ_P1NC,vitesse).calcul_gradient(champ_face,champ_elem,ref_cast(Domaine_Cl_VEF,eq_hydraulique->domaine_Cl_dis()));
 
       for (comp=0; comp<ncomp_ch_transporte; comp++)
         for ( elem=0; elem<nb_elem; elem++)
@@ -377,23 +377,23 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Domaine_dis& do
   return E;
 }
 
-DoubleTab& Modele_Jones_Launder_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
   int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
   return F1;
 }
 
-DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis& domaine_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco ) const
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis_base& domaine_dis,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -430,9 +430,9 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
   return F2;
 }
 /*
-  DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& D, const Domaine_dis& domaine_dis,const DoubleTab& K_eps_Bas_Re, const DoubleTab& tab_visco ) const
+  DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& D, const Domaine_dis_base& domaine_dis,const DoubleTab& K_eps_Bas_Re, const DoubleTab& tab_visco ) const
   {
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
   int nb_faces = le_dom.nb_faces();
   int num_face,elem0,elem1;
   double Re,nulam;
@@ -463,14 +463,14 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
   }
 
 */
-DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don_base& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco->valeurs();
-  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -505,9 +505,9 @@ DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_d
 }
 
 /*
-  DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const DoubleTab& K_eps_Bas_Re,const DoubleTab& tab_visco ) const
+  DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const DoubleTab& K_eps_Bas_Re,const DoubleTab& tab_visco ) const
   {
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
   int nb_faces = le_dom.nb_faces();
   int num_face,elem0,elem1;
   double Re,nulam;
@@ -544,14 +544,14 @@ void  Modele_Jones_Launder_VEF::mettre_a_jour(double temps)
   ;
 }
 
-DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don_base& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco->valeurs();
-  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -586,14 +586,14 @@ DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Domai
 }
 
 
-DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis& domaine_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Domaine_dis_base& domaine_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
 {
   double visco=-1;
   const DoubleTab& tab_visco=ch_visco.valeurs();
   int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
   int nb_faces = le_dom.nb_faces();
   int num_face;
   double Re;
@@ -630,9 +630,9 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& De
   return F2;
 }
 
-DoubleTab& Modele_Jones_Launder_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
 {
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
   int nb_faces = le_dom.nb_faces();
   for (int num_face=0; num_face <nb_faces; num_face ++ )
     F1[num_face] = 1.;
@@ -640,21 +640,21 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_F1_BiK( DoubleTab& F1, const Domaine
 }
 
 
-DoubleTab& Modele_Jones_Launder_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_E_BiK(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don_base& ch_visco, const DoubleTab& visco_turb ) const
 {
   return Calcul_E( E, domaine_dis, domaine_Cl_dis, transporte, K_Bas_Re, ch_visco, visco_turb );
 }
 
-DoubleTab& Modele_Jones_Launder_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
-                                                  const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_D_BiK(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
+                                                  const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don_base& ch_visco ) const
 {
   double visco=-1;
-  const DoubleTab& tab_visco=ch_visco->valeurs();
-  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
   if (is_visco_const)
     visco=tab_visco(0,0);
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis.valeur());
-  //  const Domaine_Cl_VEF& le_dom_Cl = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,domaine_dis);
+  //  const Domaine_Cl_VEF& le_dom_Cl = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
   const DoubleVect& volumes = le_dom.volumes();
   //  int nb_faces = le_dom.nb_faces();
   int nb_faces_tot = le_dom.nb_faces();

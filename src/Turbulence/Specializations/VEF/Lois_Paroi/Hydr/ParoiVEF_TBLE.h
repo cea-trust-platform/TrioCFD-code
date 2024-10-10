@@ -23,13 +23,13 @@
 #define ParoiVEF_TBLE_included
 
 #include <Paroi_hyd_base_VEF.h>
-#include <Domaine_Cl_dis.h>
+
 #include <TRUST_Vector.h>
 #include <Eq_couch_lim.h>
 #include <Milieu_base.h>
 #include <Paroi_TBLE_QDM.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
 #include <Paroi_log_QDM.h>
 
 class Champ_Fonc_base;

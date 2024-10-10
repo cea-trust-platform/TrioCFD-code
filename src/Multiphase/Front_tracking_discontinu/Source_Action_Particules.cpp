@@ -36,7 +36,7 @@ Entree& Source_Action_Particules::readOn(Entree& is)
   return is;
 }
 
-void Source_Action_Particules::associer_domaines(const Domaine_dis& zdis,const Domaine_Cl_dis& zcldis)
+void Source_Action_Particules::associer_domaines(const Domaine_dis_base& zdis,const Domaine_Cl_dis_base& zcldis)
 {
   //Ne fait rien
 }

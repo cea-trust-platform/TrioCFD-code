@@ -130,9 +130,9 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
-  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
 
   const DoubleTab& xv=domaine_VEF.xv() ;                   // centres de gravite des faces
   const IntTab& elem_faces = domaine_VEF.elem_faces();
@@ -140,10 +140,10 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   ArrOfDouble v(dimension);
   static DoubleVect pos(dimension);
 
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   int l_unif;
   double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       l_unif = 1;
       visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -164,7 +164,7 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
   int elem;
   double d_visco;
-  const Champ_Don& alpha = le_fluide.diffusivite();
+  const Champ_Don_base& alpha = le_fluide.diffusivite();
   DoubleTab alpha_t = diffusivite_turb.valeurs();
 
   // Boucle sur les bords:
@@ -194,14 +194,14 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                 d_visco = tab_visco[elem];
 
               double d_alpha=0.;
-              if (sub_type(Champ_Uniforme,alpha.valeur()))
-                d_alpha = alpha->valeurs()(0,0);
+              if (sub_type(Champ_Uniforme,alpha))
+                d_alpha = alpha.valeurs()(0,0);
               else
                 {
-                  if (alpha->nb_comp()==1)
-                    d_alpha = alpha->valeurs()(elem);
+                  if (alpha.nb_comp()==1)
+                    d_alpha = alpha.valeurs()(elem);
                   else
-                    d_alpha = alpha->valeurs()(elem,0);
+                    d_alpha = alpha.valeurs()(elem,0);
                 }
               double Pr = d_visco/d_alpha;
 
@@ -260,10 +260,10 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& conductivite = le_fluide.conductivite();
-  const DoubleTab& temperature = eqn.probleme().equation(1).inconnue()->valeurs();
+  const Champ_Don_base& conductivite = le_fluide.conductivite();
+  const DoubleTab& temperature = eqn.probleme().equation(1).inconnue().valeurs();
 
-  const DoubleTab& conductivite_turbulente =  mon_modele_turb_scal->conductivite_turbulente()->valeurs();
+  const DoubleTab& conductivite_turbulente =  mon_modele_turb_scal->conductivite_turbulente().valeurs();
 
   EcrFicPartage Nusselt;
   ouvrir_fichier_partage(Nusselt,"Nusselt");
@@ -279,7 +279,7 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
            || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
            || (sub_type(Symetrie,la_cl.valeur())) )
         {
-          const Domaine_Cl_VEF& domaine_Cl_VEF_th = ref_cast(Domaine_Cl_VEF, eqn.probleme().equation(1).domaine_Cl_dis().valeur());
+          const Domaine_Cl_VEF& domaine_Cl_VEF_th = ref_cast(Domaine_Cl_VEF, eqn.probleme().equation(1).domaine_Cl_dis());
           const Cond_lim& la_cl_th = domaine_Cl_VEF_th.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
@@ -345,14 +345,14 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
               elem = face_voisins(num_face,0);
               if (elem == -1)
                 elem = face_voisins(num_face,1);
-              if (sub_type(Champ_Uniforme,conductivite.valeur()))
-                lambda = conductivite->valeurs()(0,0);
+              if (sub_type(Champ_Uniforme,conductivite))
+                lambda = conductivite.valeurs()(0,0);
               else
                 {
-                  if (conductivite->nb_comp()==1)
-                    lambda = conductivite->valeurs()(elem);
+                  if (conductivite.nb_comp()==1)
+                    lambda = conductivite.valeurs()(elem);
                   else
-                    lambda = conductivite->valeurs()(elem,0);
+                    lambda = conductivite.valeurs()(elem,0);
                 }
 
               lambda_t=conductivite_turbulente(elem);

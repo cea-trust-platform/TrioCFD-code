@@ -107,9 +107,9 @@ public:
 
 private:
 
-  REF(Probleme_base) probleme_grossier;
+  OBS_PTR(Probleme_base) probleme_grossier;
   LIST(Pb_2G) problemes_2G;
-  REF(Algo_MG_base) mon_algo_;
+  OBS_PTR(Algo_MG_base) mon_algo_;
 
 };
 

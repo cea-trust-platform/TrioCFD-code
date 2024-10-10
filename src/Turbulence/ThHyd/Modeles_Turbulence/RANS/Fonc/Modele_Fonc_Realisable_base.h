@@ -23,20 +23,18 @@
 #define Modele_Fonc_Realisable_base_included
 
 
-#include <Champ_Fonc.h>
-#include <Champs_compris.h>
 #include <Champs_compris_interface.h>
-#include <Champ_Don.h>
+#include <Champ_Fonc_base.h>
+#include <Champs_compris.h>
+
 #include <TRUST_Ref.h>
-#include <Champ_Inc.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
 
 class Fluide_base;
 class Motcle;
 class Equation_base;
 class Probleme_base;
 class Discretisation_base;
+class Champ_Inc_base;
 class Champ_base;
 
 class Modele_Fonc_Realisable_base : public Champs_compris_interface, public Objet_U
@@ -52,10 +50,10 @@ public:
   inline  Equation_base& seconde_equation();
   inline const DoubleTab& get_S() const;
   inline  DoubleTab& get_S();
-  inline const DoubleTab& get_Cmu( void ) const;
-  inline DoubleTab& get_Cmu( void );
-  inline const DoubleTab& get_C1( void ) const;
-  inline DoubleTab& get_C1( void );
+  inline const DoubleTab& get_Cmu() const;
+  inline DoubleTab& get_Cmu();
+  inline const DoubleTab& get_C1() const;
+  inline DoubleTab& get_C1();
 
 
   virtual int preparer_calcul();
@@ -63,23 +61,23 @@ public:
   virtual void discretiser();
   virtual void completer();
   virtual void associer_pb(const Probleme_base& ) ;
-  virtual void associer(const Domaine_dis& , const Domaine_Cl_dis& )= 0;
+  virtual void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& )= 0;
   int sauvegarder(Sortie& ) const override;
   int reprendre(Entree& ) override;
   virtual int Calcul_is_Reynolds_stress_isotrope() const;
   virtual int Calcul_is_Cmu_constant() const;
 
-  virtual void Calcul_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse) =0;
-  virtual void Calcul_C1(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) =0;
-  virtual void Calcul_Cmu_et_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)  =0;
-  virtual void Contributions_Sources(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) =0;
-  virtual void Contributions_Sources_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
+  virtual void Calcul_S(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse) =0;
+  virtual void Calcul_C1(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) =0;
+  virtual void Calcul_Cmu_et_S(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)  =0;
+  virtual void Contributions_Sources(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN) =0;
+  virtual void Contributions_Sources_Paroi(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                            const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) =0;
 
-  virtual void Calcul_C1_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
-  virtual void Calcul_Cmu_et_S_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)  =0;
-  virtual void Contributions_Sources_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
-  virtual void Contributions_Sources_Paroi_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
+  virtual void Calcul_C1_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
+  virtual void Calcul_Cmu_et_S_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)  =0;
+  virtual void Contributions_Sources_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
+  virtual void Contributions_Sources_Paroi_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
                                                const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) =0;
 
   Entree& lire(const Motcle&, Entree&);
@@ -98,7 +96,7 @@ public:
   bool has_seconde_equation() const { return ma_seconde_equation.non_nul(); }
 
 public:
-  REF(Equation_base) ma_seconde_equation;
+  OBS_PTR(Equation_base) ma_seconde_equation;
 
 protected :
 
@@ -106,15 +104,15 @@ protected :
   DoubleTab Cmu_;
   DoubleTab C1_;
 
-  REF(Equation_base) mon_equation;
+  OBS_PTR(Equation_base) mon_equation;
 
-  REF(Fluide_base) le_fluide;
-  REF(Champ_Inc) la_vitesse_transportante;
-  REF(Equation_base) eq_hydraulique;
-  REF(Champ_Don) visco_;
+  OBS_PTR(Fluide_base) le_fluide;
+  OBS_PTR(Champ_Inc_base) la_vitesse_transportante;
+  OBS_PTR(Equation_base) eq_hydraulique;
+  OBS_PTR(Champ_Don_base) visco_;
 
   Nom nom_fic;
-  Champ_Fonc BR_wall_length_;
+  OWN_PTR(Champ_Fonc_base)  BR_wall_length_;
   int is_Cmu_constant_;
   int is_Reynolds_stress_isotrope_;
 
@@ -170,22 +168,22 @@ inline DoubleTab& Modele_Fonc_Realisable_base::get_S()
   return S_;
 }
 
-inline DoubleTab& Modele_Fonc_Realisable_base::get_Cmu( void )
+inline DoubleTab& Modele_Fonc_Realisable_base::get_Cmu()
 {
   return Cmu_;
 }
 
-inline const DoubleTab& Modele_Fonc_Realisable_base::get_Cmu( void ) const
+inline const DoubleTab& Modele_Fonc_Realisable_base::get_Cmu() const
 {
   return Cmu_;
 }
 
-inline DoubleTab& Modele_Fonc_Realisable_base::get_C1( void )
+inline DoubleTab& Modele_Fonc_Realisable_base::get_C1()
 {
   return C1_;
 }
 
-inline const DoubleTab& Modele_Fonc_Realisable_base::get_C1( void ) const
+inline const DoubleTab& Modele_Fonc_Realisable_base::get_C1() const
 {
   return C1_;
 }

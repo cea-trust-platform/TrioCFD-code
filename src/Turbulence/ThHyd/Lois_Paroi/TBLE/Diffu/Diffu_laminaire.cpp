@@ -21,7 +21,7 @@
 
 #include <Diffu_laminaire.h>
 #include <Fluide_Incompressible.h>
-#include <Champ_Don.h>
+
 #include <MuLambda_TBLE_base.h>
 
 Implemente_instanciable(Diffu_laminaire,"laminaire",Diffu_totale_hyd_base);

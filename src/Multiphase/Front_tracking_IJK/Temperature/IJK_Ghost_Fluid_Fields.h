@@ -163,7 +163,7 @@ protected :
   IJK_Field_int dummy_int_field_;
   IJK_Field_double dummy_double_field_;
 
-  REF(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
   int compute_distance_ = 1;
   int compute_curvature_ = 1;
   int n_iter_distance_ = 6;

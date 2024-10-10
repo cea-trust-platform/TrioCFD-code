@@ -38,12 +38,12 @@ Sortie& Modele_turbulence_hyd_LES_axi_VDF::printOn(Sortie& s) const { return s <
 
 Entree& Modele_turbulence_hyd_LES_axi_VDF::readOn(Entree& s) { return Modele_turbulence_hyd_LES_VDF::readOn(s); }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_axi_VDF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_axi_VDF::calculer_viscosite_turbulente()
 {
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   static const double Csm1 = CSM1;
-  double temps = mon_equation_->inconnue()->temps();
+  double temps = mon_equation_->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   int nb_poly = domaine_VDF.domaine().nb_elem();
   int nb_poly_tot = domaine_VDF.domaine().nb_elem_tot();
@@ -85,7 +85,7 @@ Champ_Fonc& Modele_turbulence_hyd_LES_axi_VDF::calculer_viscosite_turbulente()
 
 void Modele_turbulence_hyd_LES_axi_VDF::calculer_fonction_structure()
 {
-  const DoubleTab& vitesse = mon_equation_->inconnue()->valeurs();
+  const DoubleTab& vitesse = mon_equation_->inconnue().valeurs();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   int nb_poly = domaine_VDF.domaine().nb_elem();
   const IntTab& face_voisins = domaine_VDF.face_voisins();

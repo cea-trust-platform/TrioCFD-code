@@ -66,18 +66,18 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::lire_motcle_non_standard(const Mot
     return Modele_turbulence_hyd_RANS_K_Eps_base::lire_motcle_non_standard(mot, is);
 }
 
-Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente(double temps)
+Champ_Fonc_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente(double temps)
 {
 
-  const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue().valeur();
-  const Domaine_dis& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
-  const Domaine_Cl_dis& le_dom_Cl_dis = eqn_transp_K_Eps().domaine_Cl_dis();
+  const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue();
+  const Domaine_dis_base& le_dom_dis = eqn_transp_K_Eps().domaine_dis();
+  const Domaine_Cl_dis_base& le_dom_Cl_dis = eqn_transp_K_Eps().domaine_Cl_dis();
   Nom type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente K_Eps", tab_K_Eps);
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_transp_K_Eps().milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   int n = tab_K_Eps.dimension(0);
   DoubleTab Fmu(n);
 
@@ -97,9 +97,9 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
 
   if (non_prepare == 1)
     {
-      Champ_Inc visco_turb_au_format_K_eps_Bas_Re;
+      OWN_PTR(Champ_Inc_base) visco_turb_au_format_K_eps_Bas_Re;
       visco_turb_au_format_K_eps_Bas_Re.typer(type);
-      DoubleTab& visco_turb_K_eps_Bas_Re = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis().valeur(), visco_turb_au_format_K_eps_Bas_Re);
+      DoubleTab& visco_turb_K_eps_Bas_Re = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis(), visco_turb_au_format_K_eps_Bas_Re);
 
       if (visco_turb_K_eps_Bas_Re.size() != n)
         {
@@ -137,7 +137,7 @@ int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::preparer_calcul()
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
-  eqn_transp_K_Eps().domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
   sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
   eqn_transp_K_Eps().mettre_a_jour(temps);
 

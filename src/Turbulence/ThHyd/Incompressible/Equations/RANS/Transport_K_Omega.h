@@ -26,7 +26,7 @@
 #include <Op_Diff_K_Omega_base.h> // cAlan: mutualisé ?
 #include <Operateur_Conv.h>
 #include <Operateur_Grad.h>
-#include <Champ_Don.h>
+
 
 class Motcle;
 
@@ -47,7 +47,7 @@ class Transport_K_Omega: public Transport_K_Omega_base
 public:
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  inline void associer_Champ_Inconnu(const Champ_Inc& );
+  inline void associer_Champ_Inconnu(const Champ_Inc_base& );
 
   void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Omega_base& ) override;
 
@@ -70,17 +70,17 @@ protected :
   Operateur_Conv terme_convectif;
   Operateur_Grad Op_Grad_komega;
 
-  REF(Champ_Inc) inco_eqn_associee;
-  Champ_Don Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
+  OBS_PTR(Champ_Inc_base) inco_eqn_associee;
+  OWN_PTR(Champ_Don_base) Champ_don_nul_;  // on y met 0 si on ne veut pas de nu
 
 };
 
 
 /*! @brief Associe un champ de vitesse (transportante) a l'equation.
  *
- * @param (Champ_Inc& vit) le champ de vitesse a associer a l'equation
+ * @param (Champ_Inc_base& vit) le champ de vitesse a associer a l'equation
  */
-inline void Transport_K_Omega::associer_Champ_Inconnu(const Champ_Inc& vit)
+inline void Transport_K_Omega::associer_Champ_Inconnu(const Champ_Inc_base& vit)
 {
   inco_eqn_associee = vit;
 }

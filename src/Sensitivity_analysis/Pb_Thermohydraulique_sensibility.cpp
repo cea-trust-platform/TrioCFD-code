@@ -136,14 +136,14 @@ void Pb_Thermohydraulique_sensibility::associer_milieu_base(const Milieu_base& m
  * Le test se fait sur les conditions
  *     aux limites discretisees de chaque equation.
  *     Appel la fonction de librairie hors classe:
- *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis&,const Domaine_Cl_dis&)
+ *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base&,const Domaine_Cl_dis_base&)
  *
  * @return (int) code de retour propage
  */
 int Pb_Thermohydraulique_sensibility::verifier()
 {
-  const Domaine_Cl_dis& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
-  const Domaine_Cl_dis& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_hydr = eq_hydraulique.domaine_Cl_dis();
+  const Domaine_Cl_dis_base& domaine_Cl_th = eq_thermique.domaine_Cl_dis();
   return tester_compatibilite_hydr_thermique(domaine_Cl_hydr,domaine_Cl_th);
 }
 
@@ -153,7 +153,7 @@ int Pb_Thermohydraulique_sensibility::verifier()
   Probleme_base::finir();
 
   Navier_Stokes_std& eqnNS = ref_cast(Navier_Stokes_std,equation(0));
-  const  DoubleTab& vitesse=  eqnNS.inconnue().valeur();
+  const  DoubleTab& vitesse=  eqnNS.inconnue();
   if( equation(0).que_suis_je() == "Navier_Stokes_standard")
     {
       Nom   nom_fichier_vitesse("Velocity_state.txt");
@@ -181,7 +181,7 @@ int Pb_Thermohydraulique_sensibility::verifier()
   if(nombre_d_equations() == 2 )
     {
       Convection_Diffusion_Temperature& eqnCDT = ref_cast(Convection_Diffusion_Temperature,equation(1));
-      const  DoubleTab& temperature=  eqnCDT.inconnue().valeur();
+      const  DoubleTab& temperature=  eqnCDT.inconnue();
       if (equation(1).que_suis_je() == "Convection_Diffusion_Temperature")
         {
           Nom   nom_fichier_temp("Temperature_state.txt");

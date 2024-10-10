@@ -38,16 +38,16 @@ public :
   inline ~Traitement_particulier_NS_CEG() override {};
 
   Entree& lire(Entree& ) override;
-  void preparer_calcul_particulier(void) override ;
-  void post_traitement_particulier(void) override ;
+  void preparer_calcul_particulier() override ;
+  void post_traitement_particulier() override ;
   inline void en_cours_de_resolution(int , DoubleTab&, DoubleTab& ,double) override {};
-  inline void sauver_stat(void) const override {};
-  inline void reprendre_stat(void) override {};
+  inline void sauver_stat() const override {};
+  inline void reprendre_stat() override {};
 
 protected :
   // Donnees
   Nom la_surface_libre_nom_; 			// Nom de la surface libre
-  REF(Front_VF) la_surface_libre_;		// Pointe vers la frontiere
+  OBS_PTR(Front_VF) la_surface_libre_;		// Pointe vers la frontiere
   double haspi_;				// Hauteur d'aspiration
   double C_;					// Constante AREVA
   int calculer_critere_areva_,calculer_critere_cea_jaea_; // Flags pour savoir si on calcule ou pas les criteres

@@ -58,7 +58,7 @@ public:
   void completer() override;
   void mettre_a_jour(double) override;
   int preparer_calcul() override;
-  Champ_Fonc& calculer_viscosite_turbulente() override;
+  Champ_Fonc_base& calculer_viscosite_turbulente() override;
   void calculer_energie_cinetique_turb() override { /* Do nothing */ }
   inline int nombre_sources() { return nb_var_; }
 

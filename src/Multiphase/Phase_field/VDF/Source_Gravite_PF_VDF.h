@@ -26,8 +26,8 @@
 
 #include <Source_base.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
 
 class Probleme_base;
 class Domaine_Cl_VDF;
@@ -54,10 +54,10 @@ public:
   void mettre_a_jour(double temps) override { }
 
 protected :
-  void associer_domaines(const Domaine_dis& domaine,const Domaine_Cl_dis& ) override;
-  REF(Domaine_VDF) le_dom;
-  REF(Domaine_Cl_VDF) le_dom_Cl;
-  REF(Probleme_base) le_probleme;
+  void associer_domaines(const Domaine_dis_base& domaine,const Domaine_Cl_dis_base& ) override;
+  OBS_PTR(Domaine_VDF) le_dom;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl;
+  OBS_PTR(Probleme_base) le_probleme;
 };
 
 inline void Source_Gravite_PF_VDF::associer_pb(const Probleme_base& pb )

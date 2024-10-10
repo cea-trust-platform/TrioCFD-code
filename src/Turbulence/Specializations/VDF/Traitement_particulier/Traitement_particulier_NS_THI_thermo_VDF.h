@@ -48,13 +48,13 @@ public :
 
 protected :
 
-  REF(Convection_Diffusion_std) mon_equation_NRJ;
+  OBS_PTR(Convection_Diffusion_std) mon_equation_NRJ;
 
 private:
-  void init_calc_spectre(void) override;
-  void calcul_spectre(void) override;
-  void sorties_fichiers(void);
-  double calcul_enstrophie(void);
+  void init_calc_spectre() override;
+  void calcul_spectre() override;
+  void sorties_fichiers();
+  double calcul_enstrophie();
 
 };
 #endif

@@ -73,7 +73,7 @@ Entree& Echelle_temporelle_turbulente::readOn(Entree& is)
   return is;
 }
 
-const Champ_Don& Echelle_temporelle_turbulente::diffusivite_pour_transport() const
+const Champ_Don_base& Echelle_temporelle_turbulente::diffusivite_pour_transport() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }
@@ -104,7 +104,7 @@ void Echelle_temporelle_turbulente::discretiser()
 void Echelle_temporelle_turbulente::calculer_tau(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
   const Equation_base& eqn = ref_cast(Equation_base, obj);
-  const DoubleTab& tau = eqn.inconnue()->valeurs();
+  const DoubleTab& tau = eqn.inconnue().valeurs();
 
   /* valeurs du champ */
   int i, n, N = val.line_size(), Nl = val.dimension_tot(0);
@@ -112,7 +112,7 @@ void Echelle_temporelle_turbulente::calculer_tau(const Objet_U& obj, DoubleTab& 
     for (n = 0; n < N; n++) val(i, n) = tau(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  const DoubleTab& b_tau = eqn.inconnue()->valeur_aux_bords();
+  const DoubleTab& b_tau = eqn.inconnue().valeur_aux_bords();
   int Nb = b_tau.dimension_tot(0);
   for (i = 0; i < Nb; i++)
     for (n = 0; n < N; n++) bval(i, n) = b_tau(i, n);

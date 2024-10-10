@@ -23,9 +23,9 @@
 #define Eval_Diff_K_Eps_Bas_Re_VDF_var_included
 
 #include <Eval_Diff_VDF.h>
-#include <Champ_Fonc.h>
 #include <TRUST_Ref.h>
 
+class Champ_Fonc_base;
 class Champ_Uniforme;
 
 class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF
@@ -37,9 +37,9 @@ public:
     Prdt[1]=Prandt_Eps;
   }
 
-  inline void associer_diff_turb(const Champ_Fonc& diffu) { diffusivite_turbulente_ = diffu; }
-  inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }
-  inline void mettre_a_jour() override { dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeur().valeurs()); }
+  inline void associer_diff_turb(const Champ_Fonc_base& diffu) { diffusivite_turbulente_ = diffu; }
+  inline const Champ_Fonc_base& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }
+  inline void mettre_a_jour() override { dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs()); }
 
   // pour CRTP
   inline double nu_1_impl(int i, int compo) const
@@ -55,7 +55,7 @@ public:
 protected:
   static constexpr double PRDT_K_DEFAUT = 1.0, PRDT_EPS_DEFAUT = 1.3;
   double Prdt_K, Prdt_Eps, Prdt[2];
-  REF(Champ_Fonc) diffusivite_turbulente_;
+  OBS_PTR(Champ_Fonc_base) diffusivite_turbulente_;
   DoubleVect dv_diffusivite_turbulente;
 };
 

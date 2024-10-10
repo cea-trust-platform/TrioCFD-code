@@ -42,13 +42,13 @@ Entree& Echange_contact_VDF_Zoom_fin::readOn(Entree& s )
 void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 {
   int num_faceG;
-  if(sub_type(Champ_front_zoom, T_ext().valeur()))
+  if(sub_type(Champ_front_zoom, T_ext()))
     {
-      Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext().valeur());
-      DoubleTab& Text_valeurs = T_ext()->valeurs_au_temps(temps);
+      Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext());
+      DoubleTab& Text_valeurs = T_ext().valeurs_au_temps(temps);
 
       int elemG;
-      REF(Pb_2G) le_pb2G;
+      OBS_PTR(Pb_2G) le_pb2G;
       Pb_MG& pbMG = ch.le_pb_MG();
 
       int indice_pb=pbMG.indice_probleme(ch.le_pb_courant().le_nom());
@@ -74,7 +74,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
       //A VOIR !!!!!!!!!!!!!!!!!!!!!!!!
       //ch.inconnue() sort l'inconnue du probleme grossier
       const Milieu_base& le_milieu = ch.inconnue().equation().milieu();
-      int nb_comp = le_milieu.conductivite()->nb_comp();
+      int nb_comp = le_milieu.conductivite().nb_comp();
       int i;
 
 
@@ -87,7 +87,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
       DoubleVect e;
 
-      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
       //MODIF
@@ -123,7 +123,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
           //           if (dequiv)
           //             {
-          //               const Turbulence_paroi& loipar =  eq_turb.modele_turbulence().loi_paroi();
+          //               const Turbulence_paroi_base& loipar =  eq_turb.modele_turbulence().loi_paroi();
 
           //               if (sub_type(Paroi_std_scal_hyd_VDF,loipar.valeur()))
           //                 {
@@ -150,7 +150,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
 
           //       // Calcul de tab = 1/(e/lambda + 1/h_paroi)
 
-          //       if(!sub_type(Champ_Uniforme,le_milieu.conductivite().valeur()))
+          //       if(!sub_type(Champ_Uniforme,le_milieu.conductivite()))
           //         {
           //           //Cerr << " Raccord distant homogene et conductivite non uniforme " << finl;
           //           DoubleTab lambda;
@@ -174,7 +174,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
           //                 tab(face,i) = 1./(e(face)/lambda(face,i)+1./h_paroi);
           //               }
           //         }
-          //       else  // la conductivite est un Champ uniforme
+          //       else  // la conductivite est un OWN_PTR(Champ_base) uniforme
           //         {
           //           //Cerr << "cas d'une conductivite uniforme " << finl;
           //           const DoubleTab& lambda = le_milieu.conductivite().valeurs();
@@ -214,10 +214,10 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
                 }
 
               const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,mod.valeur());
-              const Turbulence_paroi_scal& loipar =  le_mod_turb_th.loi_paroi();
-              if (sub_type(Turbulence_paroi_scal_base,loipar.valeur()))
+              const Turbulence_paroi_scal_base& loipar =  le_mod_turb_th.loi_paroi();
+              if (sub_type(Turbulence_paroi_scal_base,loipar))
                 {
-                  const Turbulence_paroi_scal_base& paroi_vdf = ref_cast(Turbulence_paroi_scal_base,loipar.valeur());
+                  const Turbulence_paroi_scal_base& paroi_vdf = ref_cast(Turbulence_paroi_scal_base,loipar);
                   for (int face=ndeb; face<nfin; face++)
                     {
                       num_faceG = connect(face);
@@ -249,13 +249,13 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
             }
 
           // Calcul de tab = 1/(e/lambda + 1/h_paroi)
-          if(!sub_type(Champ_Uniforme,le_milieu.conductivite().valeur()))
+          if(!sub_type(Champ_Uniforme,le_milieu.conductivite()))
             {
               //Cerr << "raccord local homogene et conductivite non uniforme" << finl;
 
 
               //ON DOIT RECUPERER LE lambda DU MILIEU GROSSIER !!
-              const DoubleTab& lambda = le_milieu.conductivite()->valeurs();
+              const DoubleTab& lambda = le_milieu.conductivite().valeurs();
 
 
               assert(h_paroi!=0.);
@@ -291,7 +291,7 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
                       }
                   }
             }
-          else  // la conductivite est un Champ uniforme
+          else  // la conductivite est un OWN_PTR(Champ_base) uniforme
             {
               //Cerr << "raccord local homogene et conductivite uniforme " << finl;
               assert(h_paroi!=0.);
@@ -303,8 +303,8 @@ void Echange_contact_VDF_Zoom_fin::mettre_a_jour(double temps)
                   //    Cerr << "Dans Contact Zoom fin h = " << 1./(e(num_faceG)/le_milieu.conductivite()(0,0)+1./h_paroi) << finl;
                   for(i=0; i<nb_comp; i++)
                     {
-                      assert(le_milieu.conductivite()->valeurs()(0,i)!=0.);
-                      tab(face-ndeb,i) = 1./(e(num_faceG-ndebG)/le_milieu.conductivite()->valeurs()(0,i)+1./h_paroi);
+                      assert(le_milieu.conductivite().valeurs()(0,i)!=0.);
+                      tab(face-ndeb,i) = 1./(e(num_faceG-ndebG)/le_milieu.conductivite().valeurs()(0,i)+1./h_paroi);
                     }
                 }
             }

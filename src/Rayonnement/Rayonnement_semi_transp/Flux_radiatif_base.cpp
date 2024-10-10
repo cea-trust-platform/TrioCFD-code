@@ -84,11 +84,11 @@ Entree& Flux_radiatif_base::readOn(Entree& is)
       ind++;
     }
 
-  champ_front().typer("Champ_front_fonc");
-  champ_front()->fixer_nb_comp(1);
+  le_champ_front.typer("Champ_front_fonc");
+  champ_front().fixer_nb_comp(1);
 
-  flux_radiatif().typer("Champ_front_fonc");
-  flux_radiatif()->fixer_nb_comp(1);
+  flux_radiatif_.typer("Champ_front_fonc");
+  flux_radiatif().fixer_nb_comp(1);
 
   return is;
 }
@@ -107,12 +107,12 @@ void Flux_radiatif_base::completer()
   const Front_VF& front_vf=ref_cast(Front_VF, le_champ_front->frontiere_dis());
   int nb_comp = 1;
 
-  flux_radiatif()->nommer(front_vf.le_nom());
-  DoubleTab& tab_flux = flux_radiatif()->valeurs();
+  flux_radiatif().nommer(front_vf.le_nom());
+  DoubleTab& tab_flux = flux_radiatif().valeurs();
   tab_flux.resize(front_vf.nb_faces(),nb_comp);
 
-  champ_front()->nommer(front_vf.le_nom());
-  DoubleTab& tab= champ_front()->valeurs();
+  champ_front().nommer(front_vf.le_nom());
+  DoubleTab& tab= champ_front().valeurs();
   tab.resize(front_vf.nb_faces(),nb_comp);
   emissivite_->associer_fr_dis_base(front_vf);
 }

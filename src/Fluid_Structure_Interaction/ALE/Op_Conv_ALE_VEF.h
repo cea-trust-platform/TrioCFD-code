@@ -38,7 +38,7 @@ class Op_Conv_ALE_VEF : public Op_Conv_ALE, public Op_VEF_Face
   Declare_instanciable(Op_Conv_ALE_VEF);
 
 public :
-  void associer (const Domaine_dis& , const Domaine_Cl_dis& ,const Champ_Inc& ) override;
+  void associer (const Domaine_dis_base& , const Domaine_Cl_dis_base& ,const Champ_Inc_base& ) override;
   double calculer_dt_stab() const override ;
   virtual void remplir_fluent_ALEincluded(DoubleVect& ) const;
   virtual void calculateALEMeshVelocityGradientOnFaces( DoubleTab& ) const;
@@ -53,8 +53,8 @@ public :
   void completer() override;
 
 protected :
-  REF(Domaine_VEF) le_dom_vef;
-  REF(Domaine_Cl_VEF) la_zcl_vef;
+  OBS_PTR(Domaine_VEF) le_dom_vef;
+  OBS_PTR(Domaine_Cl_VEF) la_zcl_vef;
   mutable ArrOfInt traitement_pres_bord_;
   mutable ArrOfInt est_une_face_de_dirichlet_;
 };

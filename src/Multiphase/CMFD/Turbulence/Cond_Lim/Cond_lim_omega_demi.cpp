@@ -60,7 +60,7 @@ void Cond_lim_omega_demi::completer()
   if (sub_type(Echelle_temporelle_turbulente, domaine_Cl_dis().equation())) Process::exit(que_suis_je() + " : you cannot define such a BC for tau equation, only for omega. Use scalaire_impose_paroi Champ_front_uniforme 1 0 for tau.");
   else if (!sub_type(Taux_dissipation_turbulent, domaine_Cl_dis().equation())) Process::exit(que_suis_je() + " : equation must be tau/omega !");
 
-  int N = domaine_Cl_dis().equation().inconnue()->valeurs().line_size();
+  int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size();
   if (N > 1)  Process::exit(que_suis_je() + " : Only one phase for turbulent wall law is coded for now");
 
   correlation_loi_paroi_ = ref_cast(Pb_Multiphase, domaine_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
@@ -68,8 +68,8 @@ void Cond_lim_omega_demi::completer()
 
 void Cond_lim_omega_demi::me_calculer()
 {
-  Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_->valeur());
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis().valeur());
+  Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().domaine_dis());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&      nu_visc = ref_cast(Convection_diffusion_turbulence_multiphase, domaine_Cl_dis().equation()).diffusivite_pour_pas_de_temps().passe();
 

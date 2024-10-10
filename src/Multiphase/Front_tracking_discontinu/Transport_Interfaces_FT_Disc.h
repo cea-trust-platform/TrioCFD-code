@@ -26,14 +26,14 @@
 #include <Equation_base.h>
 #include <Transport_Interfaces_base.h>
 #include <Postraitement_base.h>
-#include <Champ_Inc.h>
+
 #include <Remaillage_FT.h>
 #include <Parcours_interface.h>
 #include <Marching_Cubes.h>
 #include <Connectivite_frontieres.h>
 #include <Topologie_Maillage_FT.h>
 #include <Algorithmes_Transport_FT_Disc.h>
-#include <Champ_Fonc.h>
+
 #include <Navier_Stokes_FT_Disc.h>
 #include <Proprietes_part_vol.h>
 #include <TRUSTTabs_forward.h>
@@ -58,11 +58,11 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   // Methodes virtuelles pures de Equation_base
   //
-  int            nombre_d_operateurs(void) const override; // Zero, y'en a pas.
+  int            nombre_d_operateurs() const override; // Zero, y'en a pas.
   const Operateur& operateur(int i) const override;    // Erreur
   Operateur&        operateur(int i) override;         // Erreur
-  const Champ_Inc& inconnue(void) const override;         // C'est l'indicatrice
-  Champ_Inc&        inconnue(void) override;
+  const Champ_Inc_base& inconnue() const override;         // C'est l'indicatrice
+  Champ_Inc_base&        inconnue() override;
   //
   // Methodes surchargees de Equation_base
   //
@@ -73,10 +73,10 @@ public:
   Milieu_base&        milieu() override;       // Erreur
   const Milieu_base& milieu() const override;  // Erreur
   void    associer_pb_base(const Probleme_base& probleme) override;
-  void    discretiser(void) override;
+  void    discretiser() override;
   Entree& lire_cond_init(Entree& is) override;
   int  verif_Cl() const override;
-  double  calculer_pas_de_temps(void) const override;
+  double  calculer_pas_de_temps() const override;
   DoubleTab& derivee_en_temps_inco(DoubleTab& derivee) override;
   void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override ;
 
@@ -163,7 +163,7 @@ public:
                      const double eta);
   void modifie_source(DoubleTab& so_modif,const DoubleTab& so_val,const DoubleTab& rho_faces,
                       const int n,const int m, const int is_QC,
-                      const DoubleVect& vol_entrelaces,const Solveur_Masse& solv_masse);
+                      const DoubleVect& vol_entrelaces,const Solveur_Masse_base& solv_masse);
 
   void calcul_effort_fluide_interface(const DoubleTab& vpoint,const DoubleTab& rho_faces,
                                       DoubleTab& source_val,const int is_explicite,const double eta);
@@ -317,11 +317,11 @@ protected:
   void calcul_indicatrice_faces(const DoubleTab& indicatrice,
                                 const IntTab& face_voisins);
 
-  REF(Probleme_base) probleme_base_;
-  REF(Navier_Stokes_FT_Disc) equation_ns_;
+  OBS_PTR(Probleme_base) probleme_base_;
+  OBS_PTR(Navier_Stokes_FT_Disc) equation_ns_;
   // L'inconnue du probleme
-  Champ_Inc indicatrice_;
-  Champ_Inc indicatrice_faces_;
+  OWN_PTR(Champ_Inc_base) indicatrice_;
+  OWN_PTR(Champ_Inc_base) indicatrice_faces_;
   // Utiliser ces accesseurs :
   Maillage_FT_Disc& maillage_interface();
   // Utiliser ces accesseurs :
@@ -345,7 +345,7 @@ protected:
 
   Nom suppression_interfaces_sous_domaine_;
 
-  Champ_Fonc vitesse_imp_interp_;
+  OWN_PTR(Champ_Fonc_base)  vitesse_imp_interp_;
 
 
 private:
@@ -355,7 +355,7 @@ private:
 
   double temps_debut_;
 
-  REF(Milieu_base) ref_milieu_;
+  OBS_PTR(Milieu_base) ref_milieu_;
 
   int interpolation_repere_local_;
   ArrOfDouble force_;
@@ -415,7 +415,7 @@ public:
   int reprendre(Entree& is) override;
 
   // Les membres suivantes sont sauvegardes et repris:
-  Champ_Inc        indicatrice_cache;     // L'indicatrice calculee par get_update_indicatrice
+  OWN_PTR(Champ_Inc_base)        indicatrice_cache;     // L'indicatrice calculee par get_update_indicatrice
   int           indicatrice_cache_tag; // Le tag du maillage correspondant
   Maillage_FT_Disc maillage_interface;          // Objet qui peut se reduire a un ensemble de sommets
   // quand il represente les positions de particules
@@ -458,21 +458,21 @@ public:
   // Si non nul, le calcul de l'integrale pour le volume impose porte sur cette sous-domaine
   Nom    nom_domaine_volume_impose_;
 
-  Champ_Inc vitesse_filtree;
+  OWN_PTR(Champ_Inc_base) vitesse_filtree;
   DoubleTab doubletab_pos;
   DoubleTab doubletab_vitesses;
   IntVect   intvect_elements;
 
-  Champ_Fonc distance_interface; // Distance a l'interface (aux elements)
-  Champ_Fonc normale_interface;  // Une normale etalee
-  Champ_Fonc surface_interface;  // GB : La surface d'interface dans chaque element
-  Champ_Fonc tmp_flux;           // Tableau temporaire pour le ramasse-miettes
-  Champ_Fonc distance_interface_faces; // CF : Distance a l'interface (aux faces)
+  OWN_PTR(Champ_Fonc_base)  distance_interface; // Distance a l'interface (aux elements)
+  OWN_PTR(Champ_Fonc_base)  normale_interface;  // Une normale etalee
+  OWN_PTR(Champ_Fonc_base)  surface_interface;  // GB : La surface d'interface dans chaque element
+  OWN_PTR(Champ_Fonc_base)  tmp_flux;           // Tableau temporaire pour le ramasse-miettes
+  OWN_PTR(Champ_Fonc_base)  distance_interface_faces; // CF : Distance a l'interface (aux faces)
   DoubleTab  distance_interface_sommets; // Distance a l'interface (aux sommets)
-  Champ_Fonc distance_interface_faces_corrigee; // CI : Distance a l'interface corrigee (aux faces)
-  Champ_Fonc distance_interface_faces_difference; // CI : Distance a l'interface corrigee - Distance a l'interface calculee (aux faces)
-  Champ_Fonc index_element; // CI : indexation des elements
-  Champ_Fonc nelem_par_direction; // CI : nombre d'elements par direction
+  OWN_PTR(Champ_Fonc_base)  distance_interface_faces_corrigee; // CI : Distance a l'interface corrigee (aux faces)
+  OWN_PTR(Champ_Fonc_base)  distance_interface_faces_difference; // CI : Distance a l'interface corrigee - Distance a l'interface calculee (aux faces)
+  OWN_PTR(Champ_Fonc_base)  index_element; // CI : indexation des elements
+  OWN_PTR(Champ_Fonc_base)  nelem_par_direction; // CI : nombre d'elements par direction
   // Note de B.M. : zut, y'a pas de champ aux sommets en VDF... donc DoubleTab et
   // du coup on ne peut pas postraiter facilement. C'est trop con...
   int     n_iterations_distance;
@@ -486,7 +486,7 @@ public:
 
   enum Methode_transport { INDEFINI, VITESSE_IMPOSEE, LOI_HORAIRE, VITESSE_INTERPOLEE };
   Methode_transport      methode_transport;
-  REF(Navier_Stokes_std) refequation_vitesse_transport;
+  OBS_PTR(Navier_Stokes_std) refequation_vitesse_transport;
 
   enum Methode_interpolation_v { VALEUR_A_ELEM, VDF_LINEAIRE };
   Methode_interpolation_v methode_interpolation_v;
@@ -524,7 +524,7 @@ public:
 
   Noms                      expression_vitesse_imposee;
   // Reference a une loi horaire eventuelle
-  REF(Loi_horaire)         loi_horaire_;
+  OBS_PTR(Loi_horaire)         loi_horaire_;
 
   // Integration de la vitesse a partir du point de depart (x,y,z)
   //  pendant un temps dt.

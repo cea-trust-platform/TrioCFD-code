@@ -202,10 +202,10 @@ void Remaillage_FT::set_param(Param& p)
  * @param (domaine_dis) domaine discretisee de calcul
  * @return le flot d'entree
  */
-void Remaillage_FT::associer_domaine(const Domaine_dis& domaine_dis)
+void Remaillage_FT::associer_domaine(const Domaine_dis_base& domaine_dis)
 {
   Cerr<<"Remaillage_FT::associer_domaine_dis"<<finl;
-  refdomaine_VF_ = ref_cast(Domaine_VF,domaine_dis.valeur());
+  refdomaine_VF_ = ref_cast(Domaine_VF,domaine_dis);
 }
 
 int Remaillage_FT::a_remailler(double temps, const Maillage_FT_Disc& maillage) const

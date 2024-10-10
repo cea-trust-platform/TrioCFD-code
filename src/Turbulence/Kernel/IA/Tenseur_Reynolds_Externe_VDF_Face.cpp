@@ -21,7 +21,7 @@
 
 #include <Tenseur_Reynolds_Externe_VDF_Face.h>
 #include <Champ_Uniforme.h>
-#include <Domaine_Cl_dis.h>
+
 #include <Domaine_VDF.h>
 #include <Domaine_Cl_VDF.h>
 #include <Neumann_sortie_libre.h>
@@ -146,9 +146,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
 
       eqn_NS_ = ref_cast(Navier_Stokes_Turbulent,eqn);
 
-      const Modele_turbulence_hyd& modele_turbulence = eqn_NS_->modele_turbulence();
+      const Modele_turbulence_hyd_base& modele_turbulence = eqn_NS_->modele_turbulence();
 
-      const Modele_turbulence_hyd_K_Eps& modele_turbulence_keps = ref_cast(Modele_turbulence_hyd_K_Eps,modele_turbulence.valeur());
+      const Modele_turbulence_hyd_K_Eps& modele_turbulence_keps = ref_cast(Modele_turbulence_hyd_K_Eps,modele_turbulence);
 
       modele_K_Eps_ = modele_turbulence_keps;
 
@@ -156,11 +156,11 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
     }
 }
 
-void Tenseur_Reynolds_Externe_VDF_Face::associer_domaines(const Domaine_dis& domaine_dis,
-                                                          const Domaine_Cl_dis& domaine_Cl_dis)
+void Tenseur_Reynolds_Externe_VDF_Face::associer_domaines(const Domaine_dis_base& domaine_dis,
+                                                          const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis);
 
   nelem_ = le_dom_VDF->nb_elem();
 }
@@ -223,15 +223,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
 
             }
           else if (sub_type(Symetrie,la_cl.valeur()))
-            ;
-          else if ( (sub_type(Dirichlet,la_cl.valeur()))
-                    ||
-                    (sub_type(Dirichlet_homogene,la_cl.valeur()))
-                  )
-            {
-              // do nothing
-              ;
-            }
+            { /* do nothing */ }
+          else if ((sub_type(Dirichlet, la_cl.valeur())) || (sub_type(Dirichlet_homogene, la_cl.valeur())))
+            { /* do nothing */ }
         }
 
 
@@ -286,12 +280,9 @@ void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
 
             }
           else if (sub_type(Symetrie,la_cl.valeur()))
-            ;
-          else if ( (sub_type(Dirichlet,la_cl.valeur()))
-                    ||
-                    (sub_type(Dirichlet_homogene,la_cl.valeur()))
-                  )
-            ;
+            { /* do nothing */ }
+          else if ((sub_type(Dirichlet, la_cl.valeur())) || (sub_type(Dirichlet_homogene, la_cl.valeur())))
+            { /* do nothing */ }
           else if (sub_type(Periodique,la_cl.valeur()))
             {
               double s_face;
@@ -430,7 +421,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
   const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eqn_NS_->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eqn_NS_->inconnue() );
   assert (vitesse.valeurs().line_size() == 1);
   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
@@ -441,7 +432,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
   DoubleTab lambda_4(nb_elem_tot);
   DoubleTab lambda_5(nb_elem_tot);
 
-  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue()->valeurs();
+  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue().valeurs();
 
   DoubleTab S_etoile(nb_elem_tot,dimension,dimension);
   DoubleTab R_etoile(nb_elem_tot,dimension,dimension);
@@ -631,7 +622,7 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::Calcul_Tenseur_Reynolds(DoubleTab&
 {
   DoubleTab bij = Calcul_bij_TBNN(resu);
 
-  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue()->valeurs();
+  const DoubleTab& K_eps = eqn_transport_K_Eps_->inconnue().valeurs();
 
   for (int elem=0; elem<nelem_; elem++)
     {

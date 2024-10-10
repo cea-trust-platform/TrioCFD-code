@@ -48,7 +48,7 @@ protected:
   double Csm1_ = CSM1; // constante du modele (differente d'une classe fille a l'autre)
   double Csm2_ = CSM2; // constante pour calcul de l'energie ( idem )
 
-  Champ_Fonc& calculer_viscosite_turbulente() override;
+  Champ_Fonc_base& calculer_viscosite_turbulente() override;
   void calculer_energie_cinetique_turb() override;
   virtual void calculer_fonction_structure();
 };

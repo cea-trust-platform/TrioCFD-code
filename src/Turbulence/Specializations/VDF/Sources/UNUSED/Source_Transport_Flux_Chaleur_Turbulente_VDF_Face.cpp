@@ -111,11 +111,11 @@ void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_pb(const Proble
   gravite_ = fluide.gravite();
 }
 
-void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_domaines(const Domaine_dis& domaine_dis,
-                                                                          const Domaine_Cl_dis& domaine_Cl_dis)
+void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_domaines(const Domaine_dis_base& domaine_dis,
+                                                                          const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis);
 }
 
 ////////////////////////////////////////////////////////////
@@ -508,22 +508,22 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
   const Domaine_Cl_VDF& domaine_Cl_VDF = le_dom_Cl_VDF.valeur();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntVect& orientation = domaine_VDF.orientation();
-  const DoubleTab& temper = eq_thermique->inconnue()->valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& temper = eq_thermique->inconnue().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const RefObjU& modele_turbulence_hydr = eq_hydraulique->get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mon_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const DoubleTab& visco_turb = mon_modele.viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = mon_modele.viscosite_turbulente().valeurs();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& modele_bas_Re = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,mon_modele);
   const Transport_K_Eps_base& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.eqn_transp_K_Eps();
-  const DoubleTab& K_Eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue()->valeurs();
+  const DoubleTab& K_Eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_Fluctuation_Temperature& modele_Fluctu_Temp = ref_cast(Modele_turbulence_scal_Fluctuation_Temperature,le_modele_scalaire);
   const Transport_Fluctuation_Temperature& mon_eq_transport_Fluctu_Temp =  modele_Fluctu_Temp.equation_Fluctu();
-  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp.inconnue()->valeurs();
-  const DoubleTab& Flux_Chaleur_Turb = mon_eq_transport_Flux_Chaleur_Turb_->inconnue()->valeurs();
+  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp.inconnue().valeurs();
+  const DoubleTab& Flux_Chaleur_Turb = mon_eq_transport_Flux_Chaleur_Turb_->inconnue().valeurs();
   const DoubleVect& g = eq_thermique->fluide().gravite().valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
   const DoubleVect& volumes = domaine_VDF.volumes();
   int nb_elem = domaine_VDF.nb_elem();
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
@@ -535,7 +535,7 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
   DoubleTab gteta2(nb_elem,dimension);
   DoubleTab uiuj(nb_elem);
 
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  if (sub_type(Champ_Uniforme,ch_beta))
     calculer_gteta2(domaine_VDF,gteta2 ,Fluctu_Temperature,tab_beta(0,0),g);
   else
     calculer_gteta2(domaine_VDF, gteta2 ,Fluctu_Temperature,tab_beta,g);

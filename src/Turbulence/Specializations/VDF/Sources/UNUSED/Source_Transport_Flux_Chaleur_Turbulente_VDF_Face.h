@@ -37,9 +37,9 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
-#include <Domaine_Cl_dis.h>
-#include <Domaine_dis.h>
-#include <Champ_Don.h>
+
+
+
 
 class Convection_Diffusion_Temperature;
 class Equation_base;
@@ -75,17 +75,17 @@ public :
 protected :
 
   double C1, C2, C3;
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
-  REF(Equation_base) eq_hydraulique;
-  REF(Transport_K_Eps_Bas_Reynolds)  mon_eq_transport_K_Eps_Bas_Re_;
-  REF(Transport_Fluctuation_Temperature)  mon_eq_transport_Fluctu_Temp_;
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Transport_Flux_Chaleur_Turbulente)  mon_eq_transport_Flux_Chaleur_Turb_;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite_;
-  REF(Modele_turbulence_hyd_K_Eps_Bas_Reynolds) le_modele;
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Equation_base) eq_hydraulique;
+  OBS_PTR(Transport_K_Eps_Bas_Reynolds)  mon_eq_transport_K_Eps_Bas_Re_;
+  OBS_PTR(Transport_Fluctuation_Temperature)  mon_eq_transport_Fluctu_Temp_;
+  OBS_PTR(Convection_Diffusion_Temperature) eq_thermique;
+  OBS_PTR(Transport_Flux_Chaleur_Turbulente)  mon_eq_transport_Flux_Chaleur_Turb_;
+  OBS_PTR(Champ_Don_base) beta_t;
+  OBS_PTR(Champ_Don_base) gravite_;
+  OBS_PTR(Modele_turbulence_hyd_K_Eps_Bas_Reynolds) le_modele;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
 
 };
 

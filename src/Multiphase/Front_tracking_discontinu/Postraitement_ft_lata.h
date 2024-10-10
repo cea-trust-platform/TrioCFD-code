@@ -44,7 +44,7 @@ protected:
   void filter_out_array(const DoubleTab& dtab, DoubleTab& new_dtab) const;
 
   // L'equation de transport contenant les interfaces a postraiter
-  REF(Transport_Interfaces_FT_Disc) refequation_interfaces;
+  OBS_PTR(Transport_Interfaces_FT_Disc) refequation_interfaces;
   // Quels champs d'interface faut-il postraiter ?
   Motcles liste_champs_i_aux_sommets;
   Motcles liste_champs_i_aux_elements;

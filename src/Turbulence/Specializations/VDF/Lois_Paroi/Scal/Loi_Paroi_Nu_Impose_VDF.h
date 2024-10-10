@@ -24,7 +24,7 @@
 #define Loi_Paroi_Nu_Impose_VDF_included
 
 #include <Paroi_std_scal_hyd_VDF.h>
-#include <Champ_Don.h>
+
 #include <Parser_U.h>
 
 /*! @brief classe Loi_Paroi_Nu_Impose_VDF
@@ -60,7 +60,7 @@ public:
 
 protected:
 
-  Champ_Don diam_hydr;
+  OWN_PTR(Champ_Don_base) diam_hydr;
   Parser_U nusselt;
 
 };

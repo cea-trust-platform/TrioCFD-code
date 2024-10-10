@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Robin.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
 #include <Domaine_VEF.h>
 #include <Domaine_Cl_VEF.h>
 #include <Equation_base.h>
@@ -74,9 +74,9 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
   const Domaine_VEF& domaine_VEF             = le_dom_VEF.valeur();
   const Domaine_Cl_VEF& domaine_Cl_VEF       = le_dom_Cl_VEF.valeur();
   const Navier_Stokes_Turbulent& eq_ns = ref_cast(Navier_Stokes_Turbulent,equation());
-  const DoubleTab& cisaillement        = eq_ns.modele_turbulence()->loi_paroi()->Cisaillement_paroi();
-//  const DoubleVect& u_star             = eq_ns.modele_turbulence().loi_paroi()->tab_u_star();
-//  double temps = mon_equation->inconnue()->temps();
+  const DoubleTab& cisaillement        = eq_ns.modele_turbulence().loi_paroi().Cisaillement_paroi();
+//  const DoubleVect& u_star             = eq_ns.modele_turbulence().loi_paroi().tab_u_star();
+//  double temps = mon_equation->inconnue().temps();
 //  static double temps_dernier_post = -1;
 //  const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
 //  double nu = fluide.viscosite_cinematique().valeurs()(0,0);
@@ -144,8 +144,8 @@ DoubleTab& Source_Robin::calculer(DoubleTab& resu) const
 
 
 // associer_domaines
-void Source_Robin::associer_domaines(const Domaine_dis& z, const Domaine_Cl_dis& zcl)
+void Source_Robin::associer_domaines(const Domaine_dis_base& z, const Domaine_Cl_dis_base& zcl)
 {
-  le_dom_VEF = ref_cast(Domaine_VEF,z.valeur());
-  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,zcl.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,z);
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,zcl);
 }

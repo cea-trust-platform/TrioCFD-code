@@ -26,7 +26,7 @@
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Navier_Stokes_FT_Disc_interne.h>
 #include <Navier_Stokes_Turbulent.h>
-#include <Champ_Don.h>
+
 #include <TRUST_Ref.h>
 
 class Probleme_FT_Disc_gen;
@@ -53,7 +53,7 @@ public:
   virtual const Champ_base& calculer_div_normale_interface();
   void correct_at_exit_bad_gradient(DoubleTab& u0) const;
   void calculer_delta_u_interface(Champ_base& u0, int phase_pilote, int ordre);
-  const Champ_Don& diffusivite_pour_transport() const override;
+  const Champ_Don_base& diffusivite_pour_transport() const override;
 
   virtual const Champ_base* get_delta_vitesse_interface() const;
   virtual const Fluide_Diphasique& fluide_diphasique() const;
@@ -62,7 +62,7 @@ public:
                                              const DoubleVect& volumes_entrelaces, const IntVect& orientation, const DoubleTab& indicatrice, const ArrOfDouble& g, DoubleTab& gravite_face) const;
 
   int is_terme_gravite_rhog() const;
-  const Champ_Fonc& champ_rho_faces() const;
+  const Champ_Fonc_base& champ_rho_faces() const;
 
   virtual void calculer_dI_dt(DoubleVect& dI_dt); // const;
   const int& get_is_penalized() const;
@@ -87,18 +87,18 @@ protected:
                                                     Champ_base& champ);
   virtual void calculer_gradient_indicatrice(const Champ_base& indicatrice, const DoubleTab& distance_interface_sommets, Champ_base& gradient_i);
 
-  REF(Probleme_FT_Disc_gen) probleme_ft_;
+  OBS_PTR(Probleme_FT_Disc_gen) probleme_ft_;
 
   // Masse volumique calculee aux elements
-  Champ_Fonc champ_rho_elem_;
+  OWN_PTR(Champ_Fonc_base)  champ_rho_elem_;
   // Masse volumique calculee pour les volumes de controle de la vitesse
   // (pour division   v = (rho.v) / rho et pour matrice de pression)
-  Champ_Fonc champ_rho_faces_;
+  OWN_PTR(Champ_Fonc_base)  champ_rho_faces_;
   // Viscosite dynamique (calcul dans preparer_pas_de_temps)
   // champ du type requis pour l'operateur diffusion.
-  Champ_Don champ_mu_;
+  OWN_PTR(Champ_Don_base) champ_mu_;
   // Viscosite cinematique pour le calcul du pas de temps de diffusion
-  Champ_Don champ_nu_;
+  OWN_PTR(Champ_Don_base) champ_nu_;
 
 private:
   const Navier_Stokes_FT_Disc_interne& variables_internes() const;

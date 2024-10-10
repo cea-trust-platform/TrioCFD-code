@@ -68,10 +68,10 @@ const Cond_lim_base& Echange_contact_rayo_semi_transp_VDF::la_cl() const
 
 
 
-/*! @brief Renvoie le Champ_front des temperatures de bord.
+/*! @brief Renvoie le champ_front des temperatures de bord.
  *
  */
-Champ_front& Echange_contact_rayo_semi_transp_VDF::temperature_bord()
+Champ_front_base& Echange_contact_rayo_semi_transp_VDF::temperature_bord()
 {
   return T_ext();
 }
@@ -88,10 +88,10 @@ Champ_front& Echange_contact_rayo_semi_transp_VDF::temperature_bord()
  */
 void Echange_contact_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
 {
-  if (T_autre_pb()->valeurs_au_temps(temps).size()==0)
+  if (T_autre_pb().valeurs_au_temps(temps).size()==0)
     {
-      T_autre_pb()->associer_fr_dis_base(T_ext()->frontiere_dis());
-      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
       if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene")
         verifier_correspondance();
@@ -126,19 +126,19 @@ void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
 {
   //  Cerr<<"Echange_contact_rayo_semi_transp_VDF::mettre_a_jour : Debut"<<finl;
 
-  Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
+  Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());
   const Milieu_base& le_milieu=ch.milieu();
-  int nb_comp = le_milieu.conductivite()->nb_comp();
+  int nb_comp = le_milieu.conductivite().nb_comp();
 
   if (num_premiere_face_dans_pb_fluide==-1)
     {
       Cerr<<"fin de construction dans "<<que_suis_je()<<finl;
-      T_autre_pb()->associer_fr_dis_base(T_ext()->frontiere_dis());
+      T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
       // on regarde qui est le pb fluide
       const Equation_base* eqn = nullptr;
       const Equation_base& mon_eqn = domaine_Cl_dis().equation();
 
-      const Champ_front_calc& chcal=ref_cast(Champ_front_calc,T_autre_pb().valeur());
+      const Champ_front_calc& chcal=ref_cast(Champ_front_calc,T_autre_pb());
       const  Equation_base& autre_eqn=chcal.inconnue().equation();
       int m=0;
       ////if (mon_eqn.probleme().equation(0).comprend_mot("vitesse"))
@@ -187,16 +187,16 @@ void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
           exit();
         }
 
-      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis()->frontiere_dis(frontiere_dis().le_nom()));
+      const Front_VF& frontvf=ref_cast(Front_VF,eqn->domaine_dis().frontiere_dis(frontiere_dis().le_nom()));
       num_premiere_face_dans_pb_fluide=frontvf.num_premiere_face();
 
-      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       Nom nom_racc1=frontiere_dis().frontiere().le_nom();
       if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() !="Raccord_distant_homogene")
         verifier_correspondance();
     }
 
-  T_autre_pb()->mettre_a_jour(temps);
+  T_autre_pb().mettre_a_jour(temps);
   assert(nb_comp==1);
 
   DoubleTab& mon_h= h_imp_->valeurs();
@@ -208,7 +208,7 @@ void Echange_contact_rayo_semi_transp_VDF::mettre_a_jour(double temps)
   calculer_h_mon_pb(mon_h,0.,opt);
 
   int is_pb_fluide=0;
-  calculer_Teta_equiv(T_ext()->valeurs_au_temps(temps),mon_h,autre_h,is_pb_fluide,temps);
+  calculer_Teta_equiv(T_ext().valeurs_au_temps(temps),mon_h,autre_h,is_pb_fluide,temps);
 
   // on a calcule T_ext, on peut calculer heq dans himp (= mon_h)
   int taille=mon_h.dimension(0);
@@ -258,8 +258,8 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_p
   // Tautre=Text;
   //  Tw=(autr_h*Tautre+mon_h*monT)/(autr_h+mon_h)
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
-  const DoubleTab& mon_inco=mon_eqn.inconnue()->valeurs();
-  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis().valeur());
+  const DoubleTab& mon_inco=mon_eqn.inconnue().valeurs();
+  const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
   const Front_VF& ma_front_vf = ref_cast(Front_VF,frontiere_dis());
 
   //DoubleTab& mon_h=h_imp_->valeurs();
@@ -269,10 +269,10 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_p
   int ind_fac,elem;
   //DoubleTab& Teta_i=T_ext().valeurs();
   Teta_p.resize(nb_faces_bord,1);
-  DoubleTab& t_autre=T_autre_pb()->valeurs_au_temps(temps);
+  DoubleTab& t_autre=T_autre_pb().valeurs_au_temps(temps);
 
   const Modele_rayo_semi_transp& le_modele = modele();
-  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom())->valeurs();
+  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom()).valeurs();
   for (int numfa=0; numfa<nb_faces_bord; numfa++)
     {
       ind_fac = numfa+ndeb;
@@ -313,8 +313,8 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_equiv(DoubleTab& Teta_e
   assert(Teta_eq.dimension(0)==nb_faces_bord);
   assert(Teta_eq.dimension(1)==1);
   const Modele_rayo_semi_transp& le_modele = modele();
-  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom())->valeurs();
-  DoubleTab& t_autre=T_autre_pb()->valeurs_au_temps(temps);
+  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  DoubleTab& t_autre=T_autre_pb().valeurs_au_temps(temps);
   for (int numfa=0; numfa<nb_faces_bord; numfa++)
     Teta_eq(numfa,0) = t_autre(numfa,0) - (1/lautre_h(numfa,0))*flux_radiatif(numfa,0);
 
@@ -327,7 +327,7 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_equiv(DoubleTab& Teta_e
  */
 Echange_contact_rayo_semi_transp_VDF& Echange_contact_rayo_semi_transp_VDF::la_Cl_opposee()
 {
-  Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb().valeur());
+  Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb());
   const Domaine_Cl_dis_base& zcld = ch.domaine_Cl_dis();
   for (int i=0; i<zcld.nb_cond_lim(); i++)
     {

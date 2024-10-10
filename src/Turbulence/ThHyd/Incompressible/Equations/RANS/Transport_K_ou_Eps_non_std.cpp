@@ -129,7 +129,7 @@ Operateur& Transport_K_ou_Eps_non_std::operateur(int i)
   return terme_diffusif;
 }
 
-const Champ_Don& Transport_K_ou_Eps_non_std::diffusivite_pour_transport() const
+const Champ_Don_base& Transport_K_ou_Eps_non_std::diffusivite_pour_transport() const
 {
   const Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
   return fluide_inc.viscosite_cinematique();

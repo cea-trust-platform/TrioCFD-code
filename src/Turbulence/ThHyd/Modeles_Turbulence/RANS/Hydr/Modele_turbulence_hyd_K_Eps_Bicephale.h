@@ -41,10 +41,10 @@ public:
   void verifie_loi_paroi() override;
   bool initTimeStep(double dt) override;
   void mettre_a_jour(double) override;
-  virtual inline Champ_Inc& K();
-  virtual inline const Champ_Inc& K() const;
-  virtual inline Champ_Inc& Eps();
-  virtual inline const Champ_Inc& Eps() const;
+  virtual inline Champ_Inc_base& K();
+  virtual inline const Champ_Inc_base& K() const;
+  virtual inline Champ_Inc_base& Eps();
+  virtual inline const Champ_Inc_base& Eps() const;
 
   inline Transport_K_ou_Eps_base& eqn_transp_K() override;
   inline const Transport_K_ou_Eps_base& eqn_transp_K() const override;
@@ -57,7 +57,7 @@ public:
 
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
-  virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
+  virtual Champ_Fonc_base& calculer_viscosite_turbulente(double temps);
 
   void controler()
   {
@@ -76,9 +76,9 @@ protected:
  *     par l equation de transport K porte par le modele.
  *     (version const)
  *
- * @return (Champ_Inc&) le champ inconnue (K)
+ * @return (Champ_Inc_base&) le champ inconnue (K)
  */
-inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K() const
+inline const Champ_Inc_base& Modele_turbulence_hyd_K_Eps_Bicephale::K() const
 {
   return eqn_transport_K_.inconnue();
 }
@@ -87,9 +87,9 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K() const
  *
  *     par l equation de transport K porte par le modele.
  *
- * @return (Champ_Inc&) le champ inconnue (K)
+ * @return (Champ_Inc_base&) le champ inconnue (K)
  */
-inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K()
+inline Champ_Inc_base& Modele_turbulence_hyd_K_Eps_Bicephale::K()
 {
   return eqn_transport_K_.inconnue();
 }
@@ -99,9 +99,9 @@ inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K()
  *     par l equation de transport epsilon porte par le modele.
  *     (version const)
  *
- * @return (Champ_Inc&) le champ inconnue (epsilon)
+ * @return (Champ_Inc_base&) le champ inconnue (epsilon)
  */
-inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps() const
+inline const Champ_Inc_base& Modele_turbulence_hyd_K_Eps_Bicephale::Eps() const
 {
   return eqn_transport_Eps_.inconnue();
 }
@@ -110,9 +110,9 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps() const
  *
  *     par l equation de transport epsilon porte par le modele.
  *
- * @return (Champ_Inc&) le champ inconnue (epsilon)
+ * @return (Champ_Inc_base&) le champ inconnue (epsilon)
  */
-inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps()
+inline Champ_Inc_base& Modele_turbulence_hyd_K_Eps_Bicephale::Eps()
 {
   return eqn_transport_Eps_.inconnue();
 }

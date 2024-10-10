@@ -41,7 +41,7 @@ public:
 
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  virtual const Champ_Don& diffusivite_pour_transport() const;
+  virtual const Champ_Don_base& diffusivite_pour_transport() const;
   virtual const Champ_base& vitesse_pour_transport() const;
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;

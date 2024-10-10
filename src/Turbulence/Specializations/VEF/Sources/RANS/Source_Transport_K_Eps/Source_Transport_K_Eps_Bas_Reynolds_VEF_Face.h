@@ -36,7 +36,7 @@ public :
   void associer_pb(const Probleme_base& ) override;
 
 protected :
-  REF(Transport_K_Eps_Bas_Reynolds) eqn_keps_bas_re;
+  OBS_PTR(Transport_K_Eps_Bas_Reynolds) eqn_keps_bas_re;
 };
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_VEF_Face_included */

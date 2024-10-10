@@ -71,11 +71,11 @@ Entree& Modele_Jones_Launder_Thermique_VDF::lire(const Motcle& , Entree& is)
 //   Implementation des fonctions de la classe
 ///////////////////////////////////////////////////////////////
 
-void  Modele_Jones_Launder_Thermique_VDF::associer(const Domaine_dis& domaine_dis,
-                                                   const Domaine_Cl_dis& domaine_Cl_dis)
+void  Modele_Jones_Launder_Thermique_VDF::associer(const Domaine_dis_base& domaine_dis,
+                                                   const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  //const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  //  const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  //const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
+  //  const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
 }
 
 void Modele_Jones_Launder_Thermique_VDF::associer_pb(const Probleme_base& pb )
@@ -83,14 +83,14 @@ void Modele_Jones_Launder_Thermique_VDF::associer_pb(const Probleme_base& pb )
   eq_transport_Fluctu_Temp_Bas_Re = ref_cast(Transport_Fluctuation_Temperature_W_Bas_Re,equation());
 }
 
-DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_D(DoubleTab& D,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,
+DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_D(DoubleTab& D,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,
                                                         const DoubleTab& vitesse,const DoubleTab& Fluctu_Temp, double diffu ) const
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
+  const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
   D = 0;
   //  const DoubleVect& volumes = le_dom.volumes();
-  const DoubleVect& porosite_surf = domaine_Cl_dis->equation().milieu().porosite_face();
+  const DoubleVect& porosite_surf = domaine_Cl_dis.equation().milieu().porosite_face();
   const DoubleVect& volume_entrelaces = le_dom.volumes_entrelaces();
   //  int nb_elem = le_dom.nb_elem();
   //  int nb_elem_tot = le_dom.nb_elem_tot();
@@ -173,10 +173,10 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_D(DoubleTab& D,const Domai
   return D;
 }
 
-DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_E(DoubleTab& E,const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis, const DoubleTab& temp,const DoubleTab& Fluctu_Temp,double diffu, const DoubleTab& diffu_turb ) const
+DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_E(DoubleTab& E,const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& temp,const DoubleTab& Fluctu_Temp,double diffu, const DoubleTab& diffu_turb ) const
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
+  const Domaine_Cl_VDF& le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
   E = 0;
   const DoubleVect& volumes = le_dom.volumes();
   //  const DoubleVect& porosite_vol = la_equation().milieu().porosite_elem();
@@ -302,18 +302,18 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_E(DoubleTab& E,const Domai
   return E;
 }
 
-DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F1( DoubleTab& F1, const Domaine_dis& domaine_dis,const DoubleTab& K_Eps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
+DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis,const DoubleTab& K_Eps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
   int nb_elem = le_dom.nb_elem();
   for (int elem=0; elem <nb_elem; elem ++ )
     F1[elem] = 1.;
   return F1;
 }
 
-DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F2( DoubleTab& F2, const Domaine_dis& domaine_dis,const DoubleTab& K_Eps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
+DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F2( DoubleTab& F2, const Domaine_dis_base& domaine_dis,const DoubleTab& K_Eps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
   int nb_elem = le_dom.nb_elem();
   /* DoubleTab Re(nb_elem);
      int elem;
@@ -328,17 +328,17 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F2( DoubleTab& F2, const D
   return F2;
 }
 
-DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F3( DoubleTab& F3, const Domaine_dis& domaine_dis,const DoubleTab& K_Eps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
+DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F3( DoubleTab& F3, const Domaine_dis_base& domaine_dis,const DoubleTab& K_Eps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
   int nb_elem = le_dom.nb_elem();
   for (int elem=0; elem <nb_elem; elem ++ )
     F3[elem] = 1.;
   return F3;
 }
-DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F4( DoubleTab& F4, const Domaine_dis& domaine_dis,const DoubleTab& K_Eps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
+DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F4( DoubleTab& F4, const Domaine_dis_base& domaine_dis,const DoubleTab& K_Eps_Bas_Re,const DoubleTab& FluctuTemp_Bas_Re,double visco,double diffu) const
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
   int nb_elem = le_dom.nb_elem();
   for (int elem=0; elem <nb_elem; elem ++ )
     F4[elem] = 1.;
@@ -346,9 +346,9 @@ DoubleTab& Modele_Jones_Launder_Thermique_VDF::Calcul_F4( DoubleTab& F4, const D
 }
 
 
-DoubleTab&  Modele_Jones_Launder_Thermique_VDF::Calcul_Flambda( DoubleTab& Flambda,const Domaine_dis& domaine_dis,const DoubleTab& K_Eps_Bas_Re, const DoubleTab& FluctuTemp_Bas_Re, double visco, double diffu) const
+DoubleTab&  Modele_Jones_Launder_Thermique_VDF::Calcul_Flambda( DoubleTab& Flambda,const Domaine_dis_base& domaine_dis,const DoubleTab& K_Eps_Bas_Re, const DoubleTab& FluctuTemp_Bas_Re, double visco, double diffu) const
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,domaine_dis);
   Flambda = 0;
   int nb_elem = le_dom.nb_elem();
   DoubleTab Rt(nb_elem);

@@ -60,7 +60,7 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
 
   const DoubleVect& volumes = domaine_VEF.volumes();
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
-  const Champ_Inc& le_scalaire = equation_scalaire().inconnue();
+  const Champ_Inc_base& le_scalaire = equation_scalaire().inconnue();
   const DoubleVect& g = gravite().valeurs();
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   const IntTab& elem_sommets = domaine_VEF.domaine().les_elems();
@@ -71,7 +71,7 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
   // Verifie la validite de T0:
   check();
   ArrOfDouble T0_etat=T0;
-  Champ_Inc T_etat(le_scalaire);
+  OWN_PTR(Champ_Inc_base) T_etat = le_scalaire;
   T_etat->valeurs()=0.;
 
   const Convection_Diffusion_Temperature_sensibility& eqn_conv_diff_temp_sens=ref_cast(Convection_Diffusion_Temperature_sensibility,equation_scalaire());
@@ -156,7 +156,7 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
   else
     assert(0);
 
-  int nb_comp = le_scalaire->nb_comp(); // Vaut 1 si temperature, nb_constituents si concentration
+  int nb_comp = le_scalaire.nb_comp(); // Vaut 1 si temperature, nb_constituents si concentration
   IntVect les_polygones(nbpts);
   DoubleTab les_positions(nbpts,dimension);
   DoubleTab valeurs_scalaire(nbpts,nb_comp);
@@ -232,9 +232,9 @@ DoubleTab& Terme_Boussinesq_Sensibility_VEFPreP1B_Face::ajouter(DoubleTab& resu)
         assert(0);
 
       // Calcul du terme source aux points d'integration :
-      le_scalaire->valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire);
+      le_scalaire.valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire);
       T_etat->valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire_etat);
-      beta()->valeur_aux_elems(les_positions,les_polygones,valeurs_beta);
+      beta().valeur_aux_elems(les_positions,les_polygones,valeurs_beta);
 
       // Boucle sur les faces de l'element:
       for(int face=0; face<=dimension; face++)

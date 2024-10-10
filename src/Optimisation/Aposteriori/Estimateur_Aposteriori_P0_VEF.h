@@ -18,7 +18,7 @@
 
 #include <Champ_Fonc_P0_VEF.h>
 #include <TRUST_Ref.h>
-#include <Champ_Don.h>
+
 
 class Champ_P1NC;
 class Champ_P1_isoP1Bulle;
@@ -29,14 +29,14 @@ class Estimateur_Aposteriori_P0_VEF : public Champ_Fonc_P0_VEF
   Declare_instanciable( Estimateur_Aposteriori_P0_VEF ) ;
 public :
   void mettre_a_jour(double ) override;
-  void associer_champ(const Champ_P1NC&, const Champ_P1_isoP1Bulle&, const Champ_Don&, const Domaine_Cl_dis_base&);
+  void associer_champ(const Champ_P1NC&, const Champ_P1_isoP1Bulle&, const Champ_Don_base&, const Domaine_Cl_dis_base&);
 
 private:
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  REF(Champ_P1NC) vitesse_;
-  REF(Champ_P1_isoP1Bulle) pression_p1isop1b_;
-  REF(Champ_Don) viscosite_cinematique_;
-  REF(Champ_P1NC) source_qdm_;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  OBS_PTR(Champ_P1NC) vitesse_;
+  OBS_PTR(Champ_P1_isoP1Bulle) pression_p1isop1b_;
+  OBS_PTR(Champ_Don_base) viscosite_cinematique_;
+  OBS_PTR(Champ_P1NC) source_qdm_;
 };
 
 #endif /* Estimateur_Aposteriori_P0_VEF_included */

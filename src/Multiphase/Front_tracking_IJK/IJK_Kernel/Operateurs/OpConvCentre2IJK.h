@@ -114,8 +114,8 @@ protected:
   // Pointer to div_rho_u, filled by operator if ajouter_avec_u_div_rhou() is called
   IJK_Field_double *div_rho_u_;
   int last_computed_klayer_for_div_rhou_;
-  REF(Boundary_Conditions) ref_bc_;
-  REF(Boundary_Conditions_Thermique) ref_bc_Thermique_;
+  OBS_PTR(Boundary_Conditions) ref_bc_;
+  OBS_PTR(Boundary_Conditions_Thermique) ref_bc_Thermique_;
 private:
   void calculer_div_rhou(const IJK_Field_double& rhovx, const IJK_Field_double& rhovy, const IJK_Field_double& rhovz,
                          IJK_Field_double& resu, int k_layer, const Operateur_IJK_data_channel& channel);

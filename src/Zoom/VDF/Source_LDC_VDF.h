@@ -25,9 +25,9 @@
 
 #include <Source_Correction_Deficitaire.h>
 #include <Equation_base.h>
-#include <Champ_Inc.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
+
 class Probleme_base;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,7 @@ class Source_LDC_VDF : public  Source_Correction_Deficitaire
 
 public:
 
-  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis_base& ) override;
 
 
 
@@ -61,7 +61,7 @@ inline DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_base& connect, L
   Cerr<<"N'est pas codee avec ces arguments dans la classe Source_LDC_VDF_NS !!"<<finl;
   exit();
   /* pour les compilateurs ---> il faut retourner un DoubleTab quelconque */
-  return eqG.inconnue()->valeurs();
+  return eqG.inconnue().valeurs();
 }
 
 

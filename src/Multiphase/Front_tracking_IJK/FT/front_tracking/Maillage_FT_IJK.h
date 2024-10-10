@@ -27,7 +27,7 @@
 #include <Linear_algebra_tools.h>
 #include <IJK_Splitting.h>
 #include <TRUSTTab.h>
-#include <Domaine_dis.h>
+
 
 class Parcours_interface;
 /*! @brief : class Maillage_FT_IJK
@@ -44,7 +44,7 @@ class Maillage_FT_IJK : public Maillage_FT_Disc
 
 public:
   Maillage_FT_IJK(const Maillage_FT_IJK&) = default;
-  void initialize(const IJK_Splitting&, const Domaine_dis&, const Parcours_interface&);
+  void initialize(const IJK_Splitting&, const Domaine_dis_base&, const Parcours_interface&);
   const ArrOfInt& compo_connexe_facettes() const
   {
     return compo_connexe_facettes_;
@@ -138,7 +138,7 @@ public:
   };
 
   double minimum_longueur_arrete() const;
-  const REF(IJK_Splitting) ref_splitting() const
+  const OBS_PTR(IJK_Splitting) ref_splitting() const
   {
     return ref_splitting_;
   }
@@ -157,7 +157,7 @@ protected:
                                  const ArrOfInt& facettes_send_pe_list,
                                  const ArrOfInt& facettes_recv_pe_list) override;
 
-  REF(IJK_Splitting) ref_splitting_;
+  OBS_PTR(IJK_Splitting) ref_splitting_;
 
 // Taille du domaine IJK sur chaque proc:
   int nbmailles_euler_i_;

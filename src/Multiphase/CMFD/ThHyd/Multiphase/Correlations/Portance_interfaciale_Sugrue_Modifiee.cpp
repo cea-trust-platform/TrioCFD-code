@@ -56,7 +56,7 @@ void Portance_interfaciale_Sugrue_Modifiee::coefficient(const input_t& in, outpu
         double dv0 = 0.2, epsilon = 1.e-4; // Initialize dv at random
         int step = 1, iter_max = 20;
         DoubleTab dv(N, N), coeff(N, N, 2), alpha_l(N);
-        const Frottement_interfacial_base& correlation_fi = ref_cast(Frottement_interfacial_base, pbm.get_correlation("frottement_interfacial").valeur());
+        const Frottement_interfacial_base& correlation_fi = ref_cast(Frottement_interfacial_base, pbm.get_correlation("frottement_interfacial"));
         double sum_alpha = 0;
         for (int n=0; n<N ; n++) alpha_l(n)= std::max(in.alpha(n), alpha_lim_), sum_alpha+=alpha_l(n);
         for (int n=0; n<N ; n++) alpha_l(n)/=sum_alpha;

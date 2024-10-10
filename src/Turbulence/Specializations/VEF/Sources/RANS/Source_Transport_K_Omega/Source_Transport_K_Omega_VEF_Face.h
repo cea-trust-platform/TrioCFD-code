@@ -50,10 +50,10 @@ public:
 
 protected:
   void associer_pb(const Probleme_base& pb) override;
-  REF(Transport_K_Omega) eqn_K_Omega;
+  OBS_PTR(Transport_K_Omega) eqn_K_Omega;
 
 private:
-  Champ_Fonc grad_k_omega_; /* produit : grad (K) * grad (omega)*/
+  OWN_PTR(Champ_Fonc_base)  grad_k_omega_; /* produit : grad (K) * grad (omega)*/
   const DoubleTab& get_visc_turb() const override;
   const DoubleTab& get_cisaillement_paroi() const override;
   const DoubleTab& get_K_pour_production() const override;

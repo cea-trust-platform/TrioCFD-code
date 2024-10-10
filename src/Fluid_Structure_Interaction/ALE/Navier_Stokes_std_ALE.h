@@ -34,15 +34,15 @@ class Navier_Stokes_std_ALE: public Navier_Stokes_std
 public :
   void renewing_jacobians( DoubleTab& derivee ) override;
   void div_ale_derivative( DoubleTrav& deriveeALE, double timestep, DoubleTab& derivee, DoubleTrav& secmemP ) override;
-  void update_pressure_matrix( void ) override;
+  void update_pressure_matrix() override;
   void discretiser() override;
   void mettre_a_jour(double) override;
   virtual int sauvegarder(Sortie&) const override;
   virtual int reprendre(Entree&) override;
 
 protected :
-  Champ_Inc ALEMeshVelocity_;
-  Champ_Inc ALEMeshTotalDisplacement_;
+  OWN_PTR(Champ_Inc_base) ALEMeshVelocity_;
+  OWN_PTR(Champ_Inc_base) ALEMeshTotalDisplacement_;
 };
 
 #endif

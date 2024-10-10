@@ -50,10 +50,10 @@ Entree& Paroi_loi_WW_scal_VEF::readOn(Entree& s)
   return s ;
 }
 
-void Paroi_loi_WW_scal_VEF::associer(const Domaine_dis& domaine_dis,const Domaine_Cl_dis& domaine_Cl_dis)
+void Paroi_loi_WW_scal_VEF::associer(const Domaine_dis_base& domaine_dis,const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
-  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,domaine_dis);
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,domaine_Cl_dis);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -86,9 +86,9 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
 
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   int l_unif;
 
   if (axi)
@@ -99,7 +99,7 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
     }
 
   double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       l_unif = 1;
       visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -120,13 +120,13 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   double d_visco;
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi& loi = le_modele.loi_paroi();
-  const DoubleVect& tab_u_star = loi->tab_u_star();
+  const Turbulence_paroi_base& loi = le_modele.loi_paroi();
+  const DoubleVect& tab_u_star = loi.tab_u_star();
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
 
   int schmidt = 0;
   if (sub_type(Convection_Diffusion_Concentration,eqn)) schmidt = 1;
-  const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
+  const Champ_Don_base& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
   // Boucle sur les bords:
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
@@ -170,14 +170,14 @@ int Paroi_loi_WW_scal_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               double (*pf)(double,double,double);
               pf = &FthparVEF_WW;
               double d_alpha=0.;
-              if (sub_type(Champ_Uniforme,alpha.valeur()))
-                d_alpha = alpha->valeurs()(0,0);
+              if (sub_type(Champ_Uniforme,alpha))
+                d_alpha = alpha.valeurs()(0,0);
               else
                 {
-                  if (alpha->nb_comp()==1)
-                    d_alpha = alpha->valeurs()(elem);
+                  if (alpha.nb_comp()==1)
+                    d_alpha = alpha.valeurs()(elem);
                   else
-                    d_alpha = alpha->valeurs()(elem,0);
+                    d_alpha = alpha.valeurs()(elem,0);
                 }
               double Pr = d_visco/d_alpha;
               double Beta = pow(3.85*pow(Pr,1./3.)-1.3,2.)+2.12*log(Pr);

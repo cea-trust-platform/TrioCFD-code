@@ -53,8 +53,8 @@ public :
   void postraiter();
 protected :
 
-  REF(IJK_FT_double) ref_ijk_ft_;
-  REF(IJK_Field_double) ref_ijk_field_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_Field_double) ref_ijk_field_;
   Postraitement post_bidon_;
   Nom nom_;                                // le nom de la sonde
   int ncomp;                           // Numero de la composante a sonder

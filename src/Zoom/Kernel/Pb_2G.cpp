@@ -60,12 +60,12 @@ void Pb_2G::calculer_connectivites_2G()
   Probleme_base& pbF = pb_Fin();
   Probleme_base& pb_G = pbG();
 
-  Domaine_dis& domF = pbF.domaine_dis();
+  Domaine_dis_base& domF = pbF.domaine_dis();
   Domaine_dis_base& domaine_disF = domF;
   Domaine_VF& domaine_VFF = ref_cast(Domaine_VF, domaine_disF);
 
   Domaine& domaineG = pb_G.domaine();
-  Domaine_dis& domG = pb_G.domaine_dis();
+  Domaine_dis_base& domG = pb_G.domaine_dis();
   Domaine_dis_base& domaine_disG = domG;
   Domaine_VF& domaine_VFG = ref_cast(Domaine_VF, domaine_disG);
 

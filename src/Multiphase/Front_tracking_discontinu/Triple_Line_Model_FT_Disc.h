@@ -91,7 +91,7 @@ public :
 
   enum InoutMethod { EXACT, APPROX, BOTH };
 
-  //InoutMethod inout_method() const { return inout_method_;} ;
+  //InoutMethod inout_method() const { return inout_method_; }
   inline ArrOfInt& elems();
 
   inline const ArrOfInt& elems() const
@@ -197,10 +197,10 @@ protected:
 
   Nom nom_eq_hydr_, nom_eq_therm_, nom_eq_interf_;
 
-  REF(Probleme_base) pb_base_;
-  REF(Convection_Diffusion_Temperature_FT_Disc) ref_eq_temp_;
-  REF(Transport_Interfaces_FT_Disc) ref_eq_interf_;
-  REF(Navier_Stokes_FT_Disc) ref_ns_;
+  OBS_PTR(Probleme_base) pb_base_;
+  OBS_PTR(Convection_Diffusion_Temperature_FT_Disc) ref_eq_temp_;
+  OBS_PTR(Transport_Interfaces_FT_Disc) ref_eq_interf_;
+  OBS_PTR(Navier_Stokes_FT_Disc) ref_ns_;
 };
 
 inline ArrOfInt& Triple_Line_Model_FT_Disc::elems()

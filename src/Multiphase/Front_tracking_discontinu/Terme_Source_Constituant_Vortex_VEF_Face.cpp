@@ -64,8 +64,8 @@ void Terme_Source_Constituant_Vortex_VEF_Face::associer_pb (const Probleme_base&
 DoubleTab& Terme_Source_Constituant_Vortex_VEF_Face::calculer(DoubleTab& tab) const
 {
   const Equation_base& eq = equation();
-  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, eq.domaine_dis().valeur());
-  const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, eq.domaine_Cl_dis().valeur());
+  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, eq.domaine_dis());
+  const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, eq.domaine_Cl_dis());
   const DoubleVect& volumes = domaine_vef.volumes_entrelaces();
   const DoubleVect& volumes_cl = domaine_cl_vef.volumes_entrelaces_Cl();
   const int premiere_face_std = domaine_vef.premiere_face_std();
@@ -133,7 +133,7 @@ void Terme_Source_Constituant_Vortex_VEF_Face::mettre_a_jour(double temps)
 void Terme_Source_Constituant_Vortex_VEF_Face::ajouter_terme_div_u(DoubleVect& secmem_pression, double dt) const
 {
   const Equation_base& eq = equation();
-  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, eq.domaine_dis().valeur());
+  const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, eq.domaine_dis());
   const DoubleVect& volumes = domaine_vef.volumes();
   const DoubleTab& xp = domaine_vef.xp();  // Centres des elements
   const int nb_elem = domaine_vef.domaine().nb_elem();

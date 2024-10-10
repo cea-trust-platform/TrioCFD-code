@@ -69,14 +69,14 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::lire_motcle_non_standard(const Motcle
 /*! @brief Calcule la viscosite turbulente au temps demande.
  *
  * @param (double temps) le temps auquel il faut calculer la viscosite
- * @return (Champ_Fonc&) la viscosite turbulente au temps demande
+ * @return (Champ_Fonc_base&) la viscosite turbulente au temps demande
  * @throws erreur de taille de visco_turb_K_eps
  */
-Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente(double temps)
+Champ_Fonc_base& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente(double temps)
 {
-  const Champ_base& chK = eqn_transp_K().inconnue().valeur(), &chEps = eqn_transp_Eps().inconnue().valeur();
-  const Domaine_dis& le_dom_dis = eqn_transp_K().domaine_dis();
-  const Domaine_Cl_dis& le_dom_Cl_dis = eqn_transp_K().domaine_Cl_dis();
+  const Champ_base& chK = eqn_transp_K().inconnue(), &chEps = eqn_transp_Eps().inconnue();
+  const Domaine_dis_base& le_dom_dis = eqn_transp_K().domaine_dis();
+  const Domaine_Cl_dis_base& le_dom_Cl_dis = eqn_transp_K().domaine_Cl_dis();
 
   const Nom& type = chK.que_suis_je();
   const DoubleTab& tab_K = chK.valeurs(), &tab_Eps = chEps.valeurs();
@@ -90,14 +90,14 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
   if (n < 0)
     {
       if (sub_type(Champ_Inc_P0_base, chK))
-        n = eqn_transp_K().domaine_dis()->domaine().nb_elem();
+        n = eqn_transp_K().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K field in Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente" << finl;
           Process::exit(-1);
         }
       if (sub_type(Champ_Inc_P0_base, chEps))
-        n = eqn_transp_Eps().domaine_dis()->domaine().nb_elem();
+        n = eqn_transp_Eps().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported epsilon field in Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente" << finl;
@@ -111,10 +111,10 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
     {
       // pour avoir nu en incompressible et mu en QC
       // et non comme on a divise K et eps par rho (si on est en QC) on veut toujours nu
-      const Champ_Don ch_visco = ref_cast(Fluide_base,eqn_transp_K().milieu()).viscosite_cinematique();
-      const Champ_Don& ch_visco_cin = ref_cast(Fluide_base,eqn_transp_K().milieu()).viscosite_cinematique();
+      const OWN_PTR(Champ_Don_base) ch_visco = ref_cast(Fluide_base,eqn_transp_K().milieu()).viscosite_cinematique();
+      const Champ_Don_base& ch_visco_cin = ref_cast(Fluide_base,eqn_transp_K().milieu()).viscosite_cinematique();
 
-      const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+      const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
       Fmu.resize(tab_K.dimension_tot(0));
 
@@ -124,18 +124,18 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
       if (is_Cmu_constant == 0)
         {
           Cerr << " On utilise un Cmu non constant " << finl;
-          const DoubleTab& vitesse = mon_equation_->inconnue()->valeurs();
+          const DoubleTab& vitesse = mon_equation_->inconnue().valeurs();
           mon_modele_fonc_->Calcul_Cmu_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, vitesse, tab_K, tab_Eps, EPS_MIN_);
 
           /*Paroi*/
-          Nom lp = eqn_transp_K().modele_turbulence().loi_paroi()->que_suis_je();
+          Nom lp = eqn_transp_K().modele_turbulence().loi_paroi().que_suis_je();
           if (lp != "negligeable_VEF")
             {
               DoubleTab visco_tab(visco_turb.dimension_tot(0));
-              assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
+              assert(sub_type(Champ_Uniforme,ch_visco_cin));
               visco_tab = tab_visco(0, 0);
               const int idt = mon_equation_->schema_temps().nb_pas_dt();
-              const DoubleTab& tab_paroi = loi_paroi()->Cisaillement_paroi();
+              const DoubleTab& tab_paroi = loi_paroi().Cisaillement_paroi();
               mon_modele_fonc_->Calcul_Cmu_Paroi_BiK(Cmu, le_dom_dis, le_dom_Cl_dis, visco_tab, visco_turb, tab_paroi, idt, vitesse, tab_K, tab_Eps, EPS_MIN_);
             }
         }
@@ -154,9 +154,9 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
 
   if (non_prepare == 1)
     {
-      Champ_Inc visco_turb_au_format_K_eps;
+      OWN_PTR(Champ_Inc_base) visco_turb_au_format_K_eps;
       visco_turb_au_format_K_eps.typer(type);
-      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transp_K().domaine_dis().valeur(), visco_turb_au_format_K_eps);
+      DoubleTab& visco_turb_K_eps = complete_viscosity_field(n, eqn_transp_K().domaine_dis(), visco_turb_au_format_K_eps);
 
       if (visco_turb_K_eps.size() != n)
         {
@@ -215,8 +215,8 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul()
       const RefObjU& modele_turbulence = equation().probleme().equation(1).get_modele(TURBULENCE);
       if (sub_type(Modele_turbulence_scal_base, modele_turbulence.valeur()))
         {
-          Turbulence_paroi_scal& loi_paroi_T = ref_cast_non_const(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi();
-          loi_paroi_T->init_lois_paroi();
+          Turbulence_paroi_scal_base& loi_paroi_T = ref_cast_non_const(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi();
+          loi_paroi_T.init_lois_paroi();
         }
     }
 
@@ -241,8 +241,8 @@ bool Modele_turbulence_hyd_K_Eps_Bicephale::initTimeStep(double dt)
 void Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K().schema_temps(), &sch2 = eqn_transp_Eps().schema_temps();
-  eqn_transp_K().domaine_Cl_dis()->mettre_a_jour(temps);
-  eqn_transp_Eps().domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transp_K().domaine_Cl_dis().mettre_a_jour(temps);
+  eqn_transp_Eps().domaine_Cl_dis().mettre_a_jour(temps);
 
   if (!eqn_transp_K().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K());

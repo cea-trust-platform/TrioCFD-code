@@ -37,7 +37,7 @@ public:
   // Source_Transport_VDF_Elem_base(double cs1, double cs2) : Source_Transport_proto(cs1,cs2) { }
 
   DoubleTab& calculer(DoubleTab&) const override;
-  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis&) override;
+  void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis_base&) override;
   void associer_pb(const Probleme_base&) override;
 
   inline int has_interface_blocs() const override { return 1; }
@@ -74,8 +74,8 @@ protected:
   // static constexpr double BETA_I_ONE = 0.075, BETA_I_TWO = 0.0828;
   // static constexpr double ALPHA_ONE = 0.31
 
-  REF(Domaine_VDF) le_domaine_VDF;
-  REF(Domaine_Cl_VDF) le_domaine_Cl_VDF;
+  OBS_PTR(Domaine_VDF) le_domaine_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_domaine_Cl_VDF;
 
 private:
   // methodes a surcharger sinon throw !!

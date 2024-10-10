@@ -23,8 +23,8 @@
 #define Paroi_TAU_NUL_VDF_included
 
 #include <Paroi_std_hyd_VDF.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
 class Champ_Fonc_base;
 
 

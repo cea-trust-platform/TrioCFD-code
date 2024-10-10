@@ -130,19 +130,19 @@ int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
-  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
   const IntVect& orientation = domaine_VDF.orientation();
   const DoubleTab& xv=domaine_VDF.xv() ;                   // centres de gravite des faces
   const IntTab& elem_faces = domaine_VDF.elem_faces();
 
   DoubleVect pos(dimension);
 
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   int l_unif;
   double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       l_unif = 1;
       visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -168,7 +168,7 @@ int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   double d_visco;
 
   //  const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
-  const Champ_Don& alpha = le_fluide.diffusivite();
+  const Champ_Don_base& alpha = le_fluide.diffusivite();
 
   // Boucle sur les bords:
   for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
@@ -204,14 +204,14 @@ int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                 d_visco = tab_visco[elem];
 
               double d_alpha=0.;
-              if (sub_type(Champ_Uniforme,alpha.valeur()))
-                d_alpha = alpha->valeurs()(0,0);
+              if (sub_type(Champ_Uniforme,alpha))
+                d_alpha = alpha.valeurs()(0,0);
               else
                 {
-                  if (alpha->nb_comp()==1)
-                    d_alpha = alpha->valeurs()(elem);
+                  if (alpha.nb_comp()==1)
+                    d_alpha = alpha.valeurs()(elem);
                   else
-                    d_alpha = alpha->valeurs()(elem,0);
+                    d_alpha = alpha.valeurs()(elem,0);
                 }
               double Pr = d_visco/d_alpha;
 
@@ -282,8 +282,8 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
-  const Champ_Don& conductivite = le_fluide.conductivite();
-  const DoubleTab& temperature = eqn.probleme().equation(1).inconnue()->valeurs();
+  const Champ_Don_base& conductivite = le_fluide.conductivite();
+  const DoubleTab& temperature = eqn.probleme().equation(1).inconnue().valeurs();
 
   EcrFicPartage Nusselt;
   ouvrir_fichier_partage(Nusselt,"Nusselt");
@@ -299,7 +299,7 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
       if ( (sub_type(Dirichlet_paroi_fixe,la_cl.valeur())) ||
            (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ))
         {
-          const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF, eqn.probleme().equation(1).domaine_Cl_dis().valeur());
+          const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF, eqn.probleme().equation(1).domaine_Cl_dis());
           const Cond_lim& la_cl_th = domaine_Cl_VDF_th.les_conditions_limites(n_bord);
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
@@ -353,14 +353,14 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                   elem = face_voisins(num_face,0);
                   if (elem == -1)
                     elem = face_voisins(num_face,1);
-                  if (sub_type(Champ_Uniforme,conductivite.valeur()))
-                    lambda = conductivite->valeurs()(0,0);
+                  if (sub_type(Champ_Uniforme,conductivite))
+                    lambda = conductivite.valeurs()(0,0);
                   else
                     {
-                      if (conductivite->nb_comp()==1)
-                        lambda = conductivite->valeurs()(elem);
+                      if (conductivite.nb_comp()==1)
+                        lambda = conductivite.valeurs()(elem);
                       else
-                        lambda = conductivite->valeurs()(elem,0);
+                        lambda = conductivite.valeurs()(elem,0);
                     }
 
                   if (dimension == 2)
@@ -423,14 +423,14 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                   elem = face_voisins(num_face,0);
                   if (elem == -1)
                     elem = face_voisins(num_face,1);
-                  if (sub_type(Champ_Uniforme,conductivite.valeur()))
-                    lambda = conductivite->valeurs()(0,0);
+                  if (sub_type(Champ_Uniforme,conductivite))
+                    lambda = conductivite.valeurs()(0,0);
                   else
                     {
-                      if (conductivite->nb_comp()==1)
-                        lambda = conductivite->valeurs()(elem);
+                      if (conductivite.nb_comp()==1)
+                        lambda = conductivite.valeurs()(elem);
                       else
-                        lambda = conductivite->valeurs()(elem,0);
+                        lambda = conductivite.valeurs()(elem,0);
                     }
                   if (dimension == 2)
                     Nusselt << x << "\t| " << y;

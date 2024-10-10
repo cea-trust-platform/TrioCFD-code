@@ -25,7 +25,7 @@
 
 
 #include <Neumann_sortie_libre.h>
-#include <Champ_front.h>
+
 #include <TRUST_Ref.h>
 
 class Modele_rayo_semi_transp;
@@ -44,16 +44,16 @@ public:
 
   virtual void recherche_emissivite_et_A();
 
-  inline Champ_front& emissivite();
-  inline const Champ_front& emissivite() const;
+  inline Champ_front_base& emissivite();
+  inline const Champ_front_base& emissivite() const;
   inline double& A();
   inline const double& A() const;
 
   virtual const Cond_lim_base& la_cl() const=0;
 
 protected :
-  REF(Modele_rayo_semi_transp) mon_modele;
-  Champ_front emissivite_;
+  OBS_PTR(Modele_rayo_semi_transp) mon_modele;
+  OWN_PTR(Champ_front_base) emissivite_;
   double A_;
 
   inline virtual ~Cond_Lim_rayo_semi_transp();
@@ -87,12 +87,12 @@ inline Modele_rayo_semi_transp& Cond_Lim_rayo_semi_transp::modele()
   return mon_modele.valeur();
 }
 
-inline Champ_front& Cond_Lim_rayo_semi_transp::emissivite()
+inline Champ_front_base& Cond_Lim_rayo_semi_transp::emissivite()
 {
   return emissivite_;
 }
 
-inline const Champ_front& Cond_Lim_rayo_semi_transp::emissivite() const
+inline const Champ_front_base& Cond_Lim_rayo_semi_transp::emissivite() const
 {
   return emissivite_;
 }

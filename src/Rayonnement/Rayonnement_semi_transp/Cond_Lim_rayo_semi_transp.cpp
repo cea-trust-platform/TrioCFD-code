@@ -45,12 +45,12 @@ void Cond_Lim_rayo_semi_transp::recherche_emissivite_et_A()
   int num_cl_rayo=0;
 
   Equation_rayonnement_base& eq_rayo = modele().eq_rayo();
-  Conds_lim& les_cl_rayo = eq_rayo.domaine_Cl_dis()->les_conditions_limites();
+  Conds_lim& les_cl_rayo = eq_rayo.domaine_Cl_dis().les_conditions_limites();
 
   int test_nom=0;
   for(num_cl_rayo = 0; num_cl_rayo<les_cl_rayo.size(); num_cl_rayo++)
     {
-      Cond_lim& la_cl_rayo = eq_rayo.domaine_Cl_dis()->les_conditions_limites(num_cl_rayo);
+      Cond_lim& la_cl_rayo = eq_rayo.domaine_Cl_dis().les_conditions_limites(num_cl_rayo);
       Nom nom_cl_rayo = la_cl_rayo->frontiere_dis().le_nom();
       Nom nom_cl_temp = la_cl().frontiere_dis().le_nom();
       if(nom_cl_temp == nom_cl_rayo)

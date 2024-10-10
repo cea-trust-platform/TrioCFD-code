@@ -40,17 +40,17 @@ Entree& Source_Diffusion_supplementaire_echelle_temp_turb::readOn(Entree& is) { 
 
 void Source_Diffusion_supplementaire_echelle_temp_turb::completer()
 {
-  for (int j = 0 ; j<equation().domaine_Cl_dis()->nb_cond_lim(); j++)
+  for (int j = 0 ; j<equation().domaine_Cl_dis().nb_cond_lim(); j++)
     {
-      const Cond_lim& cond_lim_loc = equation().domaine_Cl_dis()->les_conditions_limites(j);
+      const Cond_lim& cond_lim_loc = equation().domaine_Cl_dis().les_conditions_limites(j);
       if sub_type(Echange_impose_base, cond_lim_loc.valeur()) f_grad_tau_fixe = 0;
     }
 }
 
 void Source_Diffusion_supplementaire_echelle_temp_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const DoubleTab& tau 	 = equation().inconnue()->valeurs();
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
+  const DoubleTab& tau 	 = equation().inconnue().valeurs();
   const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), N = tau.line_size();
 
   for (auto &&n_m : matrices)

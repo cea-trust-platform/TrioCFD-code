@@ -25,7 +25,7 @@
 #include <Discretisation_base.h>
 #include <stat_counters.h>
 #include <Champ_Uniforme.h>
-#include <Champ_Don.h>
+
 
 Implemente_base(Op_Diff_K_Eps_base,"Op_Diff_K_Eps_base",Operateur_base);
 Implemente_instanciable(Op_Diff_K_Eps_negligeable,"Op_Diff_K_Eps_negligeable",Op_Diff_K_Eps_base);
@@ -104,10 +104,7 @@ Entree& Op_Diff_K_Eps::readOn(Entree& s )
 void Op_Diff_K_Eps::typer()
 {
   if (typ=="negligeable")
-    {
-      OWN_PTR(Op_Diff_K_Eps_base)::typer("Op_Diff_K_Eps_negligeable");
-      valeur().associer_diffusivite_turbulente();
-    }
+    OWN_PTR(Op_Diff_K_Eps_base)::typer("Op_Diff_K_Eps_negligeable");
   else
     {
       Nom nom_type="Op_Diff_K_Eps_";
@@ -154,14 +151,13 @@ void Op_Diff_K_Eps::typer()
           if (discr!="VDF_Hyper")
             {
               nom_type += "_";
-              Nom type_inco=equation().inconnue()->que_suis_je();
+              Nom type_inco=equation().inconnue().que_suis_je();
               nom_type+=(type_inco.suffix("Champ_"));
               if (axi)
                 nom_type += "_Axi";
             }
           OWN_PTR(Op_Diff_K_Eps_base)::typer(nom_type);
           valeur().associer_eqn(equation());
-          valeur().associer_diffusivite_turbulente();
           valeur().associer_diffusivite(diffusivite());
           Cerr << valeur().que_suis_je() << finl;
         }
@@ -188,20 +184,26 @@ void Op_Diff_K_Eps::typer()
           if (discr!="VDF_Hyper")
             {
               nom_type += "_";
-              Nom type_inco=equation().inconnue()->que_suis_je();
+              Nom type_inco=equation().inconnue().que_suis_je();
               nom_type+=(type_inco.suffix("Champ_"));
               if (axi)
                 nom_type += "_Axi";
             }
           OWN_PTR(Op_Diff_K_Eps_base)::typer(nom_type);
           valeur().associer_eqn(equation());
-          valeur().associer_diffusivite_turbulente();
           valeur().associer_diffusivite(diffusivite());
           Cerr << valeur().que_suis_je() << finl;
         }
     }
 }
 
+void Op_Diff_K_Eps::completer()
+{
+  Operateur::completer();
+
+  /* XXX : Elie Saikali => j'associe ici apres la discr de la viscosite turb */
+  valeur().associer_diffusivite_turbulente();
+}
 /*! @brief Appel a l'objet sous-jacent.
  *
  * Ajoute la contribution de l'operateur au tableau

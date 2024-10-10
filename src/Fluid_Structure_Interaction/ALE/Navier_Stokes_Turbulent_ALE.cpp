@@ -136,7 +136,7 @@ int Navier_Stokes_Turbulent_ALE::lire_motcle_non_standard(const Motcle& mot, Ent
     return Navier_Stokes_std_ALE::lire_motcle_non_standard(mot,is);
 }
 
-const Champ_Don& Navier_Stokes_Turbulent_ALE::diffusivite_pour_transport() const
+const Champ_Don_base& Navier_Stokes_Turbulent_ALE::diffusivite_pour_transport() const
 {
   return fluide().viscosite_cinematique();
 }
@@ -166,7 +166,7 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
     nb_inc = "_Multi_inco_";
   type+= nb_inc ;
 
-  Nom type_inco=inconnue()->que_suis_je();
+  Nom type_inco=inconnue().que_suis_je();
   type+=(type_inco.suffix("Champ_"));
 
   if (axi)
@@ -239,7 +239,7 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
 
 /*! @brief Prepare le calcul.
  *
- * Simple appe a Modele_turbulence_hyd::preparer_caclul() sur
+ * Simple appe a Modele_turbulence_hyd_base::preparer_caclul() sur
  *     le membre reprresentant la turbulence.
  *
  * @return (int) renvoie toujours 1
@@ -247,9 +247,9 @@ Entree& Navier_Stokes_Turbulent_ALE::lire_op_diff_turbulent(Entree& is)
 int Navier_Stokes_Turbulent_ALE::preparer_calcul()
 {
 
-  Turbulence_paroi& loipar=le_modele_turbulence->loi_paroi();
-  if (loipar.non_nul())
-    loipar->init_lois_paroi();
+  Turbulence_paroi_base& loipar=le_modele_turbulence->loi_paroi();
+  if (le_modele_turbulence->has_loi_paroi_hyd())
+    loipar.init_lois_paroi();
 
   Navier_Stokes_std_ALE::preparer_calcul();
   le_modele_turbulence->preparer_calcul();
@@ -350,7 +350,7 @@ const Champ_base& Navier_Stokes_Turbulent_ALE::get_champ(const Motcle& nom) cons
       {
       }
   throw Champs_compris_erreur();
-  REF(Champ_base) ref_champ;
+  OBS_PTR(Champ_base) ref_champ;
 
   return ref_champ;
 }

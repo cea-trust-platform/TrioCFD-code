@@ -39,11 +39,11 @@ Sortie& Modele_turbulence_hyd_LES_Fst_VEF::printOn(Sortie& s) const { return s <
 
 Entree& Modele_turbulence_hyd_LES_Fst_VEF::readOn(Entree& is) { return Modele_turbulence_hyd_LES_VEF_base::readOn(is); }
 
-Champ_Fonc& Modele_turbulence_hyd_LES_Fst_VEF::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_LES_Fst_VEF::calculer_viscosite_turbulente()
 {
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
-  double temps = mon_equation_->inconnue()->temps();
+  double temps = mon_equation_->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   const int nb_elem = domaine_VEF.nb_elem();
 
@@ -70,7 +70,7 @@ Champ_Fonc& Modele_turbulence_hyd_LES_Fst_VEF::calculer_viscosite_turbulente()
 
 void Modele_turbulence_hyd_LES_Fst_VEF::calculer_racine()
 {
-  const DoubleTab& la_vitesse = mon_equation_->inconnue()->valeurs();
+  const DoubleTab& la_vitesse = mon_equation_->inconnue().valeurs();
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, le_dom_Cl_.valeur());
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   const int nb_elem = domaine_VEF.nb_elem();
@@ -94,7 +94,7 @@ void Modele_turbulence_hyd_LES_Fst_VEF::calculer_racine()
 
   DoubleTrav vorticite(nb_elem, dimension);
   vorticite = 0;
-  Champ_P1NC& vit = ref_cast(Champ_P1NC, mon_equation_->inconnue().valeur());
+  Champ_P1NC& vit = ref_cast(Champ_P1NC, mon_equation_->inconnue());
   vit.cal_rot_ordre1(vorticite);
 
   // On calcule Racine

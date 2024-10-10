@@ -65,9 +65,9 @@ void Modele_Shih_Zhu_Lumley_VDF::set_param(Param& param)
 }
 
 
-void Modele_Shih_Zhu_Lumley_VDF::Initialisation(const Domaine_dis& domaine_dis)
+void Modele_Shih_Zhu_Lumley_VDF::Initialisation(const Domaine_dis_base& domaine_dis)
 {
-  const Domaine_VDF&  domaine_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF&  domaine_VDF = ref_cast(Domaine_VDF,domaine_dis);
 
   nelem_ = domaine_VDF.nb_elem();
 
@@ -77,13 +77,13 @@ void Modele_Shih_Zhu_Lumley_VDF::Initialisation(const Domaine_dis& domaine_dis)
 }
 
 // Calcul de la norme S SUR LES ELEMENTS
-void Modele_Shih_Zhu_Lumley_VDF::Calcul_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vit)
+void Modele_Shih_Zhu_Lumley_VDF::Calcul_S(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vit)
 {
-  const Domaine_VDF&       domaine_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  const Domaine_VDF&       domaine_VDF = ref_cast(Domaine_VDF,domaine_dis);
+  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue() );
   assert (vitesse.valeurs().line_size() == 1);
   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
@@ -105,7 +105,7 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_S(const Domaine_dis& domaine_dis, const 
 
 
 
-void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1 (const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
+void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1 (const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
 {
 #ifdef __INTEL_COMPILER
 #pragma novector // Desactive vectorisation sur Intel car crash sinon
@@ -126,7 +126,7 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1 (const Domaine_dis& domaine_dis, cons
 
 
 
-void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1_BiK (const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K,const DoubleTab& Eps, const double EPS_MIN)
+void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1_BiK (const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K,const DoubleTab& Eps, const double EPS_MIN)
 {
 #ifdef __INTEL_COMPILER
 #pragma novector // Desactive vectorisation sur Intel car crash sinon
@@ -145,13 +145,13 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1_BiK (const Domaine_dis& domaine_dis, 
 
 }
 
-void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vit, const DoubleTab& K_Eps, const double EPS_MIN)
+void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vit, const DoubleTab& K_Eps, const double EPS_MIN)
 {
-  const Domaine_VDF&       domaine_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  const Domaine_VDF&       domaine_VDF = ref_cast(Domaine_VDF,domaine_dis);
+  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue() );
   assert (vitesse.valeurs().line_size() == 1);
   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
@@ -210,13 +210,13 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S(const Domaine_dis& domaine_dis
     }
 }
 
-void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vit, const DoubleTab& K, const DoubleTab&  Eps, const double EPS_MIN)
+void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vit, const DoubleTab& K, const DoubleTab&  Eps, const double EPS_MIN)
 {
-  const Domaine_VDF&       domaine_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  const Domaine_VDF&       domaine_VDF = ref_cast(Domaine_VDF,domaine_dis);
+  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
 
   int nb_elem_tot=domaine_VDF.nb_elem_tot();
-  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue().valeur() );
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF,eq_hydraulique->inconnue() );
   assert (vitesse.valeurs().line_size() == 1);
   DoubleTab gij(nb_elem_tot,dimension,dimension, vitesse.valeurs().line_size());
   ref_cast_non_const(Champ_Face_VDF,vitesse).calcul_duidxj( vitesse.valeurs(),gij,domaine_Cl_VDF );
@@ -276,11 +276,11 @@ void  Modele_Shih_Zhu_Lumley_VDF::Calcul_Cmu_et_S_BiK(const Domaine_dis& domaine
 }
 
 
-void  Modele_Shih_Zhu_Lumley_VDF::associer(const Domaine_dis& domaine_dis,
-                                           const Domaine_Cl_dis& domaine_Cl_dis)
+void  Modele_Shih_Zhu_Lumley_VDF::associer(const Domaine_dis_base& domaine_dis,
+                                           const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Domaine_VDF,domaine_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF,domaine_dis);
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
 
   Initialisation( domaine_dis );
 }
@@ -291,13 +291,13 @@ void  Modele_Shih_Zhu_Lumley_VDF::mettre_a_jour(double temps)
 }
 
 
-void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
+void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
 {
   Calcul_Cmu_et_S(domaine_dis,domaine_Cl_dis,vitesse,K_Eps,EPS_MIN);
   Calcul_C1(domaine_dis,domaine_Cl_dis,vitesse,K_Eps,EPS_MIN);
 }
 
-void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources_Paroi(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
+void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources_Paroi(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                                              const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt)
 {
   // identique a Contributions_Sources pour l'instant
@@ -306,13 +306,13 @@ void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources_Paroi(const Domaine_dis& 
 }
 
 
-void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K,const DoubleTab& Eps, const double EPS_MIN)
+void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K,const DoubleTab& Eps, const double EPS_MIN)
 {
   Calcul_Cmu_et_S_BiK(domaine_dis,domaine_Cl_dis,vitesse,K,Eps,EPS_MIN);
   Calcul_C1_BiK(domaine_dis,domaine_Cl_dis,vitesse,K,Eps,EPS_MIN);
 }
 
-void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources_Paroi_BiK(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K,const DoubleTab& Eps, const double EPS_MIN,
+void Modele_Shih_Zhu_Lumley_VDF::Contributions_Sources_Paroi_BiK(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K,const DoubleTab& Eps, const double EPS_MIN,
                                                                  const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt)
 {
   // identique a Contributions_Sources pour l'instant

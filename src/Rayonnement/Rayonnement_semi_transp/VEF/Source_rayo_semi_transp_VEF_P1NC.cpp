@@ -53,33 +53,33 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::calculer(DoubleTab& resu) const
 DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
 {
   const Equation_rayonnement_base& eq_rayo = Modele().eq_rayo();
-  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,eq_rayo.domaine_dis().valeur());
+  const Domaine_VEF& zvef = ref_cast(Domaine_VEF,eq_rayo.domaine_dis());
   int nb_faces = zvef.nb_faces();
 
   const Fluide_base& fluide = eq_rayo.fluide();
-  const DoubleTab& kappa = fluide.kappa()->valeurs();
-  const DoubleTab& indice = fluide.indice()->valeurs();
-  const DoubleTab& G = eq_rayo.inconnue()->valeurs();
+  const DoubleTab& kappa = fluide.kappa().valeurs();
+  const DoubleTab& indice = fluide.indice().valeurs();
+  const DoubleTab& G = eq_rayo.inconnue().valeurs();
 
   const DoubleVect& volumes_entrelaces =  zvef.volumes_entrelaces();
 
   double sigma = Modele().valeur_sigma();
 
-  const DoubleTab& temperature = equation().inconnue()->valeurs();
+  const DoubleTab& temperature = equation().inconnue().valeurs();
 
   // boucle sur les elements
   int face=0;
   for(face=0; face<nb_faces; face++)
     {
       double n,k;
-      assert(fluide.indice()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.indice().valeur()))
+      assert(fluide.indice().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide.indice()))
         n = indice(0,0);
       else
         n = indice(face,0);
 
-      assert(fluide.kappa()->nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.kappa().valeur()))
+      assert(fluide.kappa().nb_comp() == 1);
+      if(sub_type(Champ_Uniforme,fluide.kappa()))
         k = kappa(0,0);
       else
         k = kappa(face,0);
@@ -98,8 +98,8 @@ void Source_rayo_semi_transp_VEF_P1NC::associer_pb(const Probleme_base& pb)
 }
 
 
-void Source_rayo_semi_transp_VEF_P1NC::associer_domaines(const Domaine_dis& domaine_dis,
-                                                         const Domaine_Cl_dis& domaine_Cl_dis)
+void Source_rayo_semi_transp_VEF_P1NC::associer_domaines(const Domaine_dis_base& domaine_dis,
+                                                         const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
   ;
 }

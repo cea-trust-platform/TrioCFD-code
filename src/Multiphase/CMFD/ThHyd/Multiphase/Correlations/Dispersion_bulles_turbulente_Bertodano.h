@@ -37,7 +37,7 @@ public:
   void coefficient(const input_t& input, output_t& output) const override;
 
 protected:
-  Correlation correlation_drag_;
+  OWN_PTR(Correlation_base) correlation_drag_;
   int n_l = -1; //phase liquide
   double Prt_ = .9 ; // Turbulent Prandtl number
 };

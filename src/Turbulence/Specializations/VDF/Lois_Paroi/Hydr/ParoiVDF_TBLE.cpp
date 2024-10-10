@@ -107,7 +107,7 @@ int ParoiVDF_TBLE::init_lois_paroi()
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const DoubleVect& vit = eqn_hydr.inconnue()->valeurs();
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   int compteur_faces_paroi = 0;
   int elem;
@@ -303,9 +303,9 @@ int ParoiVDF_TBLE::init_lois_paroi()
               const Terme_Boussinesq_base& terme_boussi = ref_cast(Terme_Boussinesq_base,ts);
               T0 = terme_boussi.Scalaire0(0);
               source_boussinesq=1;
-              const Champ_Don& ch_beta_t = le_fluide.beta_t();
-              const DoubleTab& tab_champ_beta_t = ch_beta_t->valeurs();
-              if (sub_type(Champ_Uniforme,ch_beta_t.valeur()))
+              const Champ_Don_base& ch_beta_t = le_fluide.beta_t();
+              const DoubleTab& tab_champ_beta_t = ch_beta_t.valeurs();
+              if (sub_type(Champ_Uniforme,ch_beta_t))
                 {
                   beta_t = std::max(tab_champ_beta_t(0,0),DMINFLOAT);
                 }
@@ -357,8 +357,8 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
   if (source_boussinesq==1)
     {
@@ -373,7 +373,7 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
   double visco=-1;
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
@@ -398,15 +398,15 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   int itmax=0;
 
   double gradient_de_pression0 = 0., gradient_de_pression1 = 0., vmoy = 0., ts0 =0., ts1=0.;
-  const DoubleTab& vit = eqn_hydr.inconnue()->valeurs(); //vitesse
+  const DoubleTab& vit = eqn_hydr.inconnue().valeurs(); //vitesse
   Navier_Stokes_std& eqnNS = ref_cast_non_const(Navier_Stokes_std, eqn_hydr);
 
   // Calcul du gradient de pression
   DoubleTab grad_p(vit);
-  const DoubleTab& p = eqnNS.pression()->valeurs();
+  const DoubleTab& p = eqnNS.pression().valeurs();
   const Operateur_Grad& gradient = eqnNS.operateur_gradient();
   gradient.calculer(p, grad_p);
-  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente().valeurs();
 
 
   DoubleTab termes_sources;
@@ -502,7 +502,7 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                       const DoubleVect& gravite = ch_gravite.valeurs();
                       const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
                       const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
-                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi();
                       Paroi_TBLE_scal_VDF& loi_tble_T = ref_cast_non_const(Paroi_TBLE_scal_VDF,loi);
 
                       if (loi_tble_T.est_initialise())
@@ -734,7 +734,7 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                       const DoubleVect& gravite = ch_gravite.valeurs();
                       const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
                       const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
-                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi();
                       Paroi_TBLE_scal_VDF& loi_tble_T = ref_cast_non_const(Paroi_TBLE_scal_VDF,loi);
                       if (loi_tble_T.est_initialise())
                         {
@@ -904,8 +904,8 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
   if (source_boussinesq==1)
     {
@@ -920,7 +920,7 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
   double visco=-1;
   int l_unif;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
@@ -945,15 +945,15 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   int itmax=0;
 
   double gradient_de_pression0 = 0., gradient_de_pression1 = 0., vmoy = 0., ts0 =0., ts1=0.;
-  const DoubleTab& vit = eqn_hydr.inconnue()->valeurs(); //vitesse
+  const DoubleTab& vit = eqn_hydr.inconnue().valeurs(); //vitesse
   Navier_Stokes_std& eqnNS = ref_cast_non_const(Navier_Stokes_std, eqn_hydr);
 
   // Calcul du gradient de pression
   DoubleTab grad_p(vit);
-  const DoubleTab& p = eqnNS.pression()->valeurs();
+  const DoubleTab& p = eqnNS.pression().valeurs();
   const Operateur_Grad& gradient = eqnNS.operateur_gradient();
   gradient.calculer(p, grad_p);
-  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente()->valeurs();
+  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente().valeurs();
 
 
   DoubleTab termes_sources;
@@ -1049,7 +1049,7 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                       const DoubleVect& gravite = ch_gravite.valeurs();
                       const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
                       const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
-                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi();
                       Paroi_TBLE_scal_VDF& loi_tble_T = ref_cast_non_const(Paroi_TBLE_scal_VDF,loi);
 
                       if (loi_tble_T.est_initialise())
@@ -1294,7 +1294,7 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
                       const DoubleVect& gravite = ch_gravite.valeurs();
                       const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
                       const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
-                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi();
                       Paroi_TBLE_scal_VDF& loi_tble_T = ref_cast_non_const(Paroi_TBLE_scal_VDF,loi);
                       if (loi_tble_T.est_initialise())
                         {
@@ -1470,7 +1470,7 @@ int ParoiVDF_TBLE::calculer_stats()
   const IntVect& orientation = domaine_VDF.orientation();
 
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const double tps = eqn_hydr.inconnue()->temps();
+  const double tps = eqn_hydr.inconnue().temps();
   const double dt = eqn_hydr.schema_temps().pas_de_temps();
 
 
@@ -1542,7 +1542,7 @@ int ParoiVDF_TBLE::calculer_stats()
 void ParoiVDF_TBLE::imprimer_ustar(Sortie& os) const
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const double tps = eqn_hydr.inconnue()->temps();
+  const double tps = eqn_hydr.inconnue().temps();
 
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const IntVect& orientation = domaine_VDF.orientation();
@@ -1588,7 +1588,7 @@ void ParoiVDF_TBLE::imprimer_ustar(Sortie& os) const
 int ParoiVDF_TBLE::sauvegarder(Sortie& os) const
 {
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
-  double tps =  mon_modele_turb_hyd->equation().inconnue()->temps();
+  double tps =  mon_modele_turb_hyd->equation().inconnue().temps();
   return Paroi_TBLE_QDM::sauvegarder(os, domaine_VDF, le_dom_Cl_VDF.valeur(), tps);
 }
 

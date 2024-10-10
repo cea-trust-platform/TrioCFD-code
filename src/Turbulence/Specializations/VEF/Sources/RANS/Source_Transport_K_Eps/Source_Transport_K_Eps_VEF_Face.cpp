@@ -45,18 +45,18 @@ void Source_Transport_K_Eps_VEF_Face::associer_pb(const Probleme_base& pb)
 }
 const DoubleTab& Source_Transport_K_Eps_VEF_Face::get_visc_turb() const
 {
-  return mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente()->valeurs();
+  return mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente().valeurs();
 }
 
 const DoubleTab& Source_Transport_K_Eps_VEF_Face::get_cisaillement_paroi() const
 {
   const Modele_turbulence_hyd_K_Eps& mod  = ref_cast(Modele_turbulence_hyd_K_Eps,mon_eq_transport_K_Eps->modele_turbulence());
-  return mod.loi_paroi()->Cisaillement_paroi();
+  return mod.loi_paroi().Cisaillement_paroi();
 }
 
 const DoubleTab& Source_Transport_K_Eps_VEF_Face::get_K_pour_production() const
 {
-  return mon_eq_transport_K_Eps->inconnue()->valeurs();
+  return mon_eq_transport_K_Eps->inconnue().valeurs();
 }
 
 const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Source_Transport_K_Eps_VEF_Face::get_modele_fonc_bas_reyn() const
@@ -64,10 +64,10 @@ const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Source_Transport_K_Eps_VEF_Face::g
   return ref_cast(Modele_turbulence_hyd_K_Eps,mon_eq_transport_K_Eps->modele_turbulence()).associe_modele_fonction();
 }
 
-void Source_Transport_K_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don& ch_visco_cin,
+void Source_Transport_K_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don_base& ch_visco_cin,
                                                            const Champ_base& ch_visco_cin_ou_dyn, DoubleTab& D, DoubleTab& E, DoubleTab& F1, DoubleTab& F2) const
 {
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   get_modele_fonc_bas_reyn()->Calcul_D(D,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin);
   get_modele_fonc_bas_reyn()->Calcul_E(E,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin,visco_turb);
   D.echange_espace_virtuel();
@@ -79,7 +79,7 @@ void Source_Transport_K_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, 
 const Nom Source_Transport_K_Eps_VEF_Face::get_type_paroi() const
 {
   const Modele_turbulence_hyd_K_Eps& mod  = ref_cast(Modele_turbulence_hyd_K_Eps,mon_eq_transport_K_Eps->modele_turbulence());
-  return mod.loi_paroi()->que_suis_je();
+  return mod.loi_paroi().que_suis_je();
 }
 
 void Source_Transport_K_Eps_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco_turb, const DoubleTab& gradient_elem, DoubleTab& Re) const
@@ -89,7 +89,7 @@ void Source_Transport_K_Eps_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco
 
 void Source_Transport_K_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
 {
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_K_MIN();
   for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     {
@@ -101,7 +101,7 @@ void Source_Transport_K_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volume
 
 void Source_Transport_K_Eps_VEF_Face::fill_resu(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, DoubleTab& resu) const
 {
-  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue()->valeurs();
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_K_MIN();
   for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     {
@@ -118,7 +118,7 @@ DoubleTab& Source_Transport_K_Eps_VEF_Face::ajouter(DoubleTab& resu) const
 
 void Source_Transport_K_Eps_VEF_Face::contribuer_a_avec(const DoubleTab& a, Matrice_Morse& matrice) const
 {
-  const DoubleTab& K_eps = equation().inconnue()->valeurs();
+  const DoubleTab& K_eps = equation().inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_K_MIN();
   const DoubleVect& porosite_face = mon_eq_transport_K_Eps->milieu().porosite_face();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();

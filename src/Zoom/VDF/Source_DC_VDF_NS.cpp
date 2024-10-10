@@ -46,10 +46,10 @@ Entree& Source_DC_VDF_NS::readOn(Entree& s )
 }
 
 
-void Source_DC_VDF_NS::associer_domaines(const Domaine_dis& domaine_dis,
-                                         const Domaine_Cl_dis& domaine_cl_dis)
+void Source_DC_VDF_NS::associer_domaines(const Domaine_dis_base& domaine_dis,
+                                         const Domaine_Cl_dis_base& domaine_cl_dis)
 {
-  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis.valeur());
+  const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
 
   int nb_face = zvdf.nb_faces();
   la_correction.resize(nb_face);
@@ -85,19 +85,19 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(O
 
       /* Recuperation des equations de bases et des domaines                     */
       Navier_Stokes_std& eqF = ref_cast(Navier_Stokes_std, equation());
-      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis().valeur());
-      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis().valeur());
+      Domaine_VDF& le_dom = ref_cast(Domaine_VDF, eqG.domaine_dis());
+      Domaine_VDF& le_dom_fine = ref_cast(Domaine_VDF, eqF.domaine_dis());
 
       /* Recuperation des inconnues vitesses fines et grossieres              */
-      DoubleTab& presentG = eqG.inconnue()->valeurs();
-      DoubleTab& presentF = eqF.inconnue()->valeurs();
+      DoubleTab& presentG = eqG.inconnue().valeurs();
+      DoubleTab& presentF = eqF.inconnue().valeurs();
       int tailleF = presentF.dimension(0); // = nombre de faces fines
       int tailleG = presentG.dimension(0); // = nombre de faces grossieres
 
       /* on recupere la pression grossiere et fine                            */
       Navier_Stokes_std& eqG_typee = ref_cast(Navier_Stokes_std, eqG);
-      DoubleTab& pressionG = eqG_typee.pression()->valeurs();
-      DoubleTab& pressionF = eqF.pression()->valeurs();
+      DoubleTab& pressionG = eqG_typee.pression().valeurs();
+      DoubleTab& pressionF = eqF.pression().valeurs();
 
       const Bord front_fictive; // Pour les prolongements 0 et 1
 
@@ -193,7 +193,7 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(O
       */
 
       /* Recuperation du domaine fin de base */
-      Domaine_Cl_dis_base& domaineCL_baseF = eqF.domaine_Cl_dis().valeur();
+      Domaine_Cl_dis_base& domaineCL_baseF = eqF.domaine_Cl_dis();
 
       /* recuperation des conditions limites existantes */
       Conds_lim& conds_limF = domaineCL_baseF.les_conditions_limites();
@@ -206,13 +206,12 @@ DoubleTab& Source_DC_VDF_NS::calculer_residu(Connectivites_base& connect, LIST(O
       Entree_fluide_vitesse_imposee&   CL_vitesse_imposeeF = ref_cast(Entree_fluide_vitesse_imposee,conds_limF[0].valeur());
 
 
-      const Champ_front& champ_frontF = CL_vitesse_imposeeF.champ_front();
-      const Frontiere& frontiereF =champ_frontF->frontiere_dis().frontiere();
+      const Frontiere& frontiereF =CL_vitesse_imposeeF.champ_front().frontiere_dis().frontiere();
 
       /* ---> On remplit ici les valeurs de la vitesse imposee en prenant celles de la grille grossiere prolongee */
-      DoubleTab& vitesse_imposeeF = CL_vitesse_imposeeF.champ_front()->valeurs();
+      DoubleTab& vitesse_imposeeF = CL_vitesse_imposeeF.champ_front().valeurs();
       const int nb_faces_bords    = frontiereF.nb_faces();//eqF.domaine_Cl_dis().nb_faces_Cl();
-      const int nb_faces_bords_tot    = eqF.domaine_Cl_dis()->nb_faces_Cl();
+      const int nb_faces_bords_tot    = eqF.domaine_Cl_dis().nb_faces_Cl();
 
       Cerr << "nb_faces_bords :"<<nb_faces_bords<< finl;
 

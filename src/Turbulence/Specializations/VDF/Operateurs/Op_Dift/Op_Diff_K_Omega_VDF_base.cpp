@@ -40,7 +40,7 @@ void Op_Diff_K_Omega_VDF_base::completer()
   Operateur_base::completer();
   iter->completer_();
   iter->associer_champ_convecte_ou_inc(equation().inconnue(), nullptr);
-  iter->set_name_champ_inco(equation().inconnue()->le_nom().getString());
+  iter->set_name_champ_inco(equation().inconnue().le_nom().getString());
   iter->set_convective_op_pb_type(false /* diff op */, 0 /* pas pb_multiphase */);
 
   // diffuse_k_seul   = false;
@@ -83,7 +83,7 @@ void Op_Diff_K_Omega_VDF_base::associer_diffusivite_turbulente()
       const Transport_K_Omega_base& eqn_transport = ref_cast(Transport_K_Omega_base,mon_equation.valeur());
       {
         const Modele_turbulence_hyd_RANS_K_Omega_base& mod_turb = ref_cast(Modele_turbulence_hyd_RANS_K_Omega_base,eqn_transport.modele_turbulence());
-        const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+        const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
         Eval_Diff_K_Omega_VDF& eval_diff = dynamic_cast<Eval_Diff_K_Omega_VDF&> (iter->evaluateur());
         eval_diff.associer_diff_turb(diff_turb);
       }
@@ -97,12 +97,12 @@ void Op_Diff_K_Omega_VDF_base::associer_diffusivite_turbulente()
   {
     Eval_Diff_K_Omega_VDF& eval_diff = dynamic_cast<Eval_Diff_K_Omega_VDF&> (iter->evaluateur());
     const Fluide_base& mil = ref_cast(Fluide_base,mon_equation->milieu());
-    const Champ_base& mvol = mil.masse_volumique().valeur();
+    const Champ_base& mvol = mil.masse_volumique();
     eval_diff.associer_mvolumique(mvol);
   }
 }
 
-const Champ_Fonc& Op_Diff_K_Omega_VDF_base::diffusivite_turbulente() const
+const Champ_Fonc_base& Op_Diff_K_Omega_VDF_base::diffusivite_turbulente() const
 {
   const Eval_Diff_K_Omega_VDF& eval_diff = dynamic_cast<const Eval_Diff_K_Omega_VDF&> (iter->evaluateur());
   return eval_diff.diffusivite_turbulente();
@@ -113,10 +113,10 @@ void Op_Diff_K_Omega_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
   Op_VDF_Elem::modifier_pour_Cl(iter->domaine(), iter->domaine_Cl(), matrice, secmem);
 
   const Navier_Stokes_Turbulent& eqn_hydr = ref_cast(Navier_Stokes_Turbulent,equation().probleme().equation(0) ) ;
-  const Modele_turbulence_hyd& mod_turb = eqn_hydr.modele_turbulence();
-  const Turbulence_paroi& loipar = mod_turb->loi_paroi();
+  const Modele_turbulence_hyd_base& mod_turb = eqn_hydr.modele_turbulence();
+  const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();
 
-  Nom type_loi = loipar->que_suis_je();
+  const Nom& type_loi = loipar.que_suis_je();
 
   if ( !(type_loi.debute_par("negligeable")) )
     {
@@ -128,9 +128,9 @@ void Op_Diff_K_Omega_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
       if(sub_type(Transport_K_Omega,mon_equation.valeur()))
         {
           const Transport_K_Omega& eqn_k_omega=ref_cast(Transport_K_Omega,equation());
-          const DoubleTab& val=eqn_k_omega.inconnue()->valeurs();
+          const DoubleTab& val=eqn_k_omega.inconnue().valeurs();
 
-          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis().valeur());
+          const Domaine_Cl_dis_base& domaine_Cl_dis_base = ref_cast(Domaine_Cl_dis_base,eqn_hydr.domaine_Cl_dis());
 
           const Conds_lim& les_cl = domaine_Cl_dis_base.les_conditions_limites();
           int nb_cl=les_cl.size();
@@ -173,7 +173,7 @@ void Op_Diff_K_Omega_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTa
 
 void Op_Diff_K_Omega_VDF_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
   Op_VDF_Elem::dimensionner(iter->domaine(), iter->domaine_Cl(), mat2);
   mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
@@ -183,9 +183,9 @@ void Op_Diff_K_Omega_VDF_base::dimensionner_blocs(matrices_t matrices, const tab
 void Op_Diff_K_Omega_VDF_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   statistiques().begin_count(diffusion_counter_);
-  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
-  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue()->valeurs();
+  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue().valeurs();
 
   if(mat) iter->ajouter_contribution(inco, *mat);
   mettre_a_jour_diffusivite();

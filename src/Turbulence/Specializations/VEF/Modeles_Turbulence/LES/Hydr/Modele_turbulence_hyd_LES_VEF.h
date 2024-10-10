@@ -36,7 +36,7 @@ class Modele_turbulence_hyd_LES_VEF: public Modele_turbulence_hyd_LES_VEF_base
 protected:
   DoubleVect F2_, r_;
 
-  Champ_Fonc& calculer_viscosite_turbulente() override;
+  Champ_Fonc_base& calculer_viscosite_turbulente() override;
   virtual void calculer_fonction_structure();
 };
 

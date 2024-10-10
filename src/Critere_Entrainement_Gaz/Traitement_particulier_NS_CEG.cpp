@@ -95,7 +95,7 @@ Entree& Traitement_particulier_NS_CEG::lire(Entree& is)
        mon_equation->milieu().gravite().valeurs()(0,1)!=0 ||
        mon_equation->milieu().gravite().valeurs()(0,2)>=0 ) error("Error ! Gravity should be defined and oriented parallel to Z, downwards.");
   // Verification VEF 3D
-  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   if (vitesse.nb_dim()!=2 || vitesse.dimension(1)!=3) error("Error ! Only works in VEF 3D.");
 
   // XD traitement_particulier_ceg traitement_particulier_base ceg 1  Keyword for a CEG ( Gas Entrainment Criteria)  calculation. An objective is deepening gas entrainment on the free surface. Numerical analysis can be performed to predict the hydraulic and geometric conditions that can   handle gas entrainment from the free surface.
@@ -139,13 +139,13 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
 {
   // Recherche de la frontiere surface libre:
   int trouve=0;
-  const Conds_lim& les_cls=mon_equation->domaine_Cl_dis()->les_conditions_limites();
+  const Conds_lim& les_cls=mon_equation->domaine_Cl_dis().les_conditions_limites();
   for (int num_cl=0; num_cl<les_cls.size(); num_cl++)
     {
       // Surface libre trouvee
       if (les_cls[num_cl]->frontiere_dis().le_nom()==la_surface_libre_nom_)
         {
-          const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue()->domaine_dis_base());
+          const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
           la_surface_libre_ = ref_cast(Front_VF,les_cls[num_cl]->frontiere_dis());
           trouve=1;
           int nb_faces=la_surface_libre_->nb_faces();
@@ -163,7 +163,7 @@ void Traitement_particulier_NS_CEG::preparer_calcul_particulier()
     }
   // KEps si critere AREVA
   if (calculer_critere_areva_)
-    if (!sub_type(Pb_Hydraulique_Turbulent,mon_equation->probleme()) || !sub_type(Modele_turbulence_hyd_RANS_K_Eps_base,ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0)).modele_turbulence().valeur()))
+    if (!sub_type(Pb_Hydraulique_Turbulent,mon_equation->probleme()) || !sub_type(Modele_turbulence_hyd_RANS_K_Eps_base,ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0)).modele_turbulence()))
       error("AREVA criterion can only be calculated with a RANS K-eps simulation.");
 
   // Vorticite dans le jeu de donnees si AREVA
@@ -195,11 +195,11 @@ void Traitement_particulier_NS_CEG::post_traitement_particulier()
 
 void Traitement_particulier_NS_CEG::critere_areva()
 {
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue()->domaine_dis_base());
-  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
+  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const DoubleTab& vorticite = mon_equation->get_champ("vorticite").valeurs();
   const Navier_Stokes_Turbulent& eqn = ref_cast(Navier_Stokes_Turbulent,ref_cast(Pb_Hydraulique_Turbulent,mon_equation->probleme()).equation(0));
-  const DoubleTab& KEps = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base,eqn.modele_turbulence().valeur()).equation_k_eps(0).inconnue()->valeurs();
+  const DoubleTab& KEps = ref_cast(Modele_turbulence_hyd_RANS_K_Eps_base,eqn.modele_turbulence()).equation_k_eps(0).inconnue().valeurs();
 
   double gz = mon_equation->milieu().gravite().valeurs()(0,2);
   double K_max_local=0;
@@ -272,7 +272,7 @@ int Traitement_particulier_NS_CEG::lpost(double temps_courant, double dt_post) c
 
 void Traitement_particulier_NS_CEG::critere_cea_jaea()
 {
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue()->domaine_dis_base());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, mon_equation->inconnue().domaine_dis_base());
   int nb_faces=la_surface_libre_->nb_faces();
   int nb_elem=domaine_VF.nb_elem();
 
@@ -284,7 +284,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
 
   // GF on laisse faire NS...
   // DoubleTab critereQ(nb_elem);
-  //ref_cast(Champ_P1NC,mon_equation->inconnue().valeur()).calcul_critere_Q(critereQ);
+  //ref_cast(Champ_P1NC,mon_equation->inconnue()).calcul_critere_Q(critereQ);
   const DoubleTab& critereQ = mon_equation->get_champ("critere_Q").valeurs();
 
 
@@ -411,7 +411,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               points(i_theta,2)=centre_vortex[2];
             }
           // On cherche les elements contenant le point x,y,z:
-          mon_equation->domaine_dis()->domaine().chercher_elements(points,elements);
+          mon_equation->domaine_dis().domaine().chercher_elements(points,elements);
           for (int i_theta=0; i_theta<nb_dtheta; i_theta++)
             {
               int elem=elements[i_theta];
@@ -481,7 +481,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               //if (e>=0) Cerr << "Sur process " << Process::me() << " critere_Q=" << critereQ(e) << finl;
             }
           // On evalue la vitesse aux points:
-          mon_equation->inconnue()->valeur_aux(points,u);
+          mon_equation->inconnue().valeur_aux(points,u);
           double alpha=0;
           double gamma=0;
           // On integre sur le cercle pour calcul alpha et gamma:
@@ -501,7 +501,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           // On adimensionnalise eventuellement selon jeu de donnees (conseille):
           if (critere_cea_jaea_normalise_)
             {
-              double nu = ref_cast(Fluide_Incompressible,mon_equation->milieu()).viscosite_cinematique()->valeurs()(0,0);
+              double nu = ref_cast(Fluide_Incompressible,mon_equation->milieu()).viscosite_cinematique().valeurs()(0,0);
               double gz = mon_equation->milieu().gravite().valeurs()(0,2);
               alpha*=nu/(gz*haspi_);  	// alpha*=alpha*nu/(gh)
               gamma/=nu;	    		// gamma*=gamma/nu
@@ -597,7 +597,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
                           file << " x= " << x << " y= " << y << " z= " << z;
                         }
                       file << finl;
-                      file << "# Champ CRITERE" << finl;
+                      file << "# OWN_PTR(Champ_base) CRITERE" << finl;
                       file << "# Type POINTS" << finl;
                       file << sch.temps_courant();
                       //for (int i_theta=0;i_theta<nb_dtheta;i_theta++) file << " " << Critere_max(critere);
@@ -616,7 +616,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
                   file << "# Temps";
                   for (int vortex=0; vortex<nb_vortex; vortex++) file << " x= " << Centre(vortex,0) << " y= " << Centre(vortex,1) << " z= " << Centre(vortex,2)+2*R0;
                   file << finl;
-                  file << "# Champ RAYON" << finl;
+                  file << "# OWN_PTR(Champ_base) RAYON" << finl;
                   file << "# Type POINTS" << finl;
                   file << sch.temps_courant();
                   for (int vortex=0; vortex<nb_vortex; vortex++) file << " " << Rayon[vortex];

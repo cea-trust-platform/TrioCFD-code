@@ -45,18 +45,18 @@ Entree& Schema_Euler_explicite_ALE::readOn(Entree& s)
 int Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 {
 
-  DoubleTab& present = eqn.inconnue()->valeurs(); // Un
-  DoubleTab& futur   = eqn.inconnue()->futur();   // Un+1
+  DoubleTab& present = eqn.inconnue().valeurs(); // Un
+  DoubleTab& futur   = eqn.inconnue().futur();   // Un+1
   DoubleTab dudt(futur);
   Debog::verifier("Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base -futur avant", futur);
 
   // Boundary conditions applied on Un+1:
-  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
 
   // On tourne la roue pour que les operateurs utilisent les champs au temps futur
-  eqn.inconnue()->avancer();
+  eqn.inconnue().avancer();
   eqn.derivee_en_temps_inco(dudt);
-  eqn.inconnue()->reculer();
+  eqn.inconnue().reculer();
 
   // Un+1=Un+dt_*dU/dt
   futur=dudt;
@@ -80,7 +80,7 @@ int Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base(Equation_base& eq
   futur.echange_espace_virtuel();
   Debog::verifier("Schema_Euler_explicite_ALE::faire_un_pas_de_temps_eqn_base -futur apres", futur);
 
-  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
+  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
   update_critere_statio(dudt, eqn);
 
   return 1;

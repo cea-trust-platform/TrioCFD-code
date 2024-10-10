@@ -43,7 +43,7 @@ double Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::calculer_dt_stab() const
   double dt_stab, coef;
   const Domaine_VDF& domaine_VDF = iter->domaine();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
-  const DoubleVect& alpha = diffusivite().valeurs(), &alpha_t = diffusivite_turbulente()->valeurs();
+  const DoubleVect& alpha = diffusivite().valeurs(), &alpha_t = diffusivite_turbulente().valeurs();
 
   // Calcul du pas de temps de stabilite :
   //  - La diffusivite est non constante donc: dt_stab = Min (1/(2*(diff_lam(i)+diff_turb(i))*coeff(elem))

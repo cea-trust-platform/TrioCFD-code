@@ -52,8 +52,8 @@ public:
   Equation_base& getset_equation_by_name(const Nom& le_nom) override;
   void associer_milieu_base(const Milieu_base& milieu) override;
   int associer_(Objet_U& ob) override;
-  void completer(void) override;
-  double calculer_pas_de_temps(void) const override;
+  void completer() override;
+  double calculer_pas_de_temps() const override;
   void mettre_a_jour(double temps) override;
   virtual bool updateGivenFields() override;
 
@@ -69,7 +69,7 @@ public:
 private:
   void add_FT_equation(const Nom& , const Nom& );
   LIST(OWN_PTR(Equation_base)) equations_; // Par convention : dans le vecteur, N.S. en premier, puis Transport_Interfaces, puis ConvDiff.
-  REF(Chimie) la_chimie_;
+  OBS_PTR(Chimie) la_chimie_;
   Triple_Line_Model_FT_Disc tcl_;
 };
 

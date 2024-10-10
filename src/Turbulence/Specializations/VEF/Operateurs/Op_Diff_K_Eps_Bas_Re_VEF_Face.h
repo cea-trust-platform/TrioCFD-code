@@ -39,10 +39,10 @@ class Op_Diff_K_Eps_Bas_Re_VEF_Face : public Op_Diff_K_Eps_Bas_Re_VEF_base, publ
 
 public:
 
-  void associer(const Domaine_dis& , const Domaine_Cl_dis& ,
-                const Champ_Inc& ) override;
+  void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& ,
+                const Champ_Inc_base& ) override;
   void associer_diffusivite_turbulente() override;
-  const Champ_Fonc& diffusivite_turbulente() const;
+  const Champ_Fonc_base& diffusivite_turbulente() const;
   void associer_diffusivite(const Champ_base& ) override ;
   const Champ_base& diffusivite() const override;
   void remplir_nu(DoubleTab&) const;
@@ -59,11 +59,11 @@ public:
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
 protected :
-  REF(Domaine_VEF) le_dom_vef;
-  REF(Champ_base) diffusivite_;
+  OBS_PTR(Domaine_VEF) le_dom_vef;
+  OBS_PTR(Champ_base) diffusivite_;
   mutable DoubleTab nu_;
-  REF(Domaine_Cl_VEF) la_zcl_vef;
-  REF(Champ_P1NC) inconnue_;
+  OBS_PTR(Domaine_Cl_VEF) la_zcl_vef;
+  OBS_PTR(Champ_P1NC) inconnue_;
 };
 /*! @brief on dimensionne notre matrice au moyen de la methode dimensionner de la classe Op_VEF_Face.
  *

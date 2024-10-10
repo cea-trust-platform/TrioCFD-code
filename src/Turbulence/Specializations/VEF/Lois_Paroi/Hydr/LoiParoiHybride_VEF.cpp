@@ -22,8 +22,8 @@
 #include <LoiParoiHybride_VEF.h>
 #include <Domaine_Cl_VEF.h>
 #include <Domaine_VEF.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
 #include <LoiParoiHybride.h>
 
 Implemente_instanciable(LoiParoiHybride_VEF,"Loi_Paroi_Hybride_VEF",Paroi_hyd_base_VEF);
@@ -47,11 +47,11 @@ Entree& LoiParoiHybride_VEF::readOn(Entree& s)
   return s ;
 }
 
-void LoiParoiHybride_VEF::associer(const Domaine_dis& zd, const Domaine_Cl_dis& zcl)
+void LoiParoiHybride_VEF::associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcl)
 {
   LoiParoiHybride::associer(zd,zcl);
-  le_dom_VEF = ref_cast(Domaine_VEF,zd.valeur());
-  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,zcl.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF,zd);
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF,zcl);
 }
 
 

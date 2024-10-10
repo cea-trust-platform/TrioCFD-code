@@ -40,11 +40,11 @@ class Modele_turbulence_hyd_LES_1elt_selectif_mod_VEF: public Modele_turbulence_
 public:
   Modele_turbulence_hyd_LES_1elt_selectif_mod_VEF();
   void calculer_fonction_structure() override;
-  int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)&) const;
+  int a_pour_Champ_Fonc(const Motcle&, OBS_PTR(Champ_base)&) const;
   void discretiser() override;
 
 protected:
-  Champ_Fonc la_vorticite_;
+  OWN_PTR(Champ_Fonc_base)  la_vorticite_;
   void cutoff();
   void calculer_angle_limite(const double, double&);
 };

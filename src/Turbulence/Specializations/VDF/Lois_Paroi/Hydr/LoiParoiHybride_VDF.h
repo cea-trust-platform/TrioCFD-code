@@ -41,7 +41,7 @@ class LoiParoiHybride_VDF : public Paroi_hyd_base_VDF, LoiParoiHybride
 
 public:
 
-  void associer(const Domaine_dis&, const Domaine_Cl_dis& ) override;
+  void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base& ) override;
   int init_lois_paroi() override;
   int calculer_hyd(DoubleTab& ) override;
   int calculer_hyd(DoubleTab& , DoubleTab& ) override;

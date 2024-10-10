@@ -26,7 +26,7 @@
 #include <Modele_turbulence_hyd_RANS_K_Omega_base.h>
 #include <Transport_2eq_base.h>
 #include <TRUST_Ref.h>
-#include <Champ_Inc.h>
+
 
 class Modele_turbulence_hyd_RANS_K_Omega_base;
 class Champ_Inc_base;
@@ -45,12 +45,11 @@ public:
 
   virtual void associer_modele_turbulence(const Modele_turbulence_hyd_RANS_K_Omega_base& )=0;
   void discretiser() override;
-  void discretiser_K_Omega(const Schema_Temps_base&, Domaine_dis&, Champ_Inc&) const;
 
   int controler_K_Omega();
   void valider_iteration() override;
-  inline const Champ_Inc& inconnue() const override;
-  inline Champ_Inc& inconnue() override;
+  inline const Champ_Inc_base& inconnue() const override;
+  inline Champ_Inc_base& inconnue() override;
   inline const Modele_turbulence_hyd_RANS_K_Omega_base& modele_turbulence() const;
   inline Modele_turbulence_hyd_RANS_K_Omega_base& modele_turbulence();
 
@@ -60,17 +59,17 @@ public:
 
 protected:
 
-  Champ_Inc le_champ_K_Omega;
-  REF(Modele_turbulence_hyd_RANS_K_Omega_base) mon_modele;
+  OWN_PTR(Champ_Inc_base) le_champ_K_Omega;
+  OBS_PTR(Modele_turbulence_hyd_RANS_K_Omega_base) mon_modele;
 };
 
 /*! @brief Renvoie le champ inconnue de l'equation.
  *
  * Un champ vecteur contenant K et epsilon.
  *
- * @return (Champ_Inc&) le champ inconnue de l'equation
+ * @return (Champ_Inc_base&) le champ inconnue de l'equation
  */
-inline Champ_Inc& Transport_K_Omega_base::inconnue() { return le_champ_K_Omega; }
+inline Champ_Inc_base& Transport_K_Omega_base::inconnue() { return le_champ_K_Omega; }
 
 
 /*! @brief Renvoie le champ inconnue de l'equation.
@@ -78,9 +77,9 @@ inline Champ_Inc& Transport_K_Omega_base::inconnue() { return le_champ_K_Omega; 
  * Un champ vecteur contenant K et epsilon.
  *     (version const)
  *
- * @return (Champ_Inc&) le champ inconnue de l'equation
+ * @return (Champ_Inc_base&) le champ inconnue de l'equation
  */
-inline const Champ_Inc& Transport_K_Omega_base::inconnue() const { return le_champ_K_Omega; }
+inline const Champ_Inc_base& Transport_K_Omega_base::inconnue() const { return le_champ_K_Omega; }
 
 /*! @brief Renvoie le modele de turbulence associe a l'equation.
  *

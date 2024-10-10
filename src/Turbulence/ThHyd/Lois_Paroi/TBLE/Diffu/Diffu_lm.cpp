@@ -148,8 +148,8 @@ double Diffu_lm::calculer_D_local(int ind)
   Eq_couch_lim& leq = eq_couch_lim.valeur();
   const Milieu_base& le_milieu = leq.get_milieu();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, le_milieu);
-  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
 
   double visco_cin = std::max(tab_visco(0,0),DMINFLOAT);//visco cinematique supposee cste
 

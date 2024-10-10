@@ -67,9 +67,10 @@ Entree& Echange_contact_VDF_FT_Disc_solid::readOn( Entree& s )
   nom_bord_oppose_=nom_bord;
   h_paroi=1e10;
   numero_T_=0;
-  T_autre_pb().typer("Champ_front_calc");
-  T_ext().typer("Ch_front_var_instationnaire_dep");
-  T_ext()->fixer_nb_comp(1);
+
+  T_autre_pb_.typer("Champ_front_calc");
+  le_champ_front.typer("Ch_front_var_instationnaire_dep");
+  T_ext().fixer_nb_comp(1);
   return s;
 }
 void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
@@ -80,9 +81,9 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   indicatrice_->mettre_a_jour(temps);
   int nb_comp;
   {
-    Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb().valeur());
+    Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());
     const Milieu_base& le_milieu=ch.milieu();
-    nb_comp = le_milieu.conductivite()->nb_comp();
+    nb_comp = le_milieu.conductivite().nb_comp();
     assert(nb_comp==1);
   }
   const DoubleTab& I = indicatrice_->valeurs_au_temps(temps);
@@ -92,7 +93,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
   DoubleTab& hh_imp= h_imp_->valeurs();
   hh_imp=0;
   DoubleTab mon_h(hh_imp);
-  DoubleTab& Text=T_ext()-> valeurs();
+  DoubleTab& Text=T_ext(). valeurs();
   DoubleTab& mon_Ti= Ti_wall_-> valeurs();
 
   DoubleTab Texttmp(Text);
@@ -134,7 +135,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
         }
     }
   const Domaine_VF& le_dom = ref_cast(
-                               Domaine_VF, mon_dom_cl_dis->domaine_dis ().valeur ());
+                               Domaine_VF, mon_dom_cl_dis->domaine_dis());
 
 
   Probleme_base& pb_gen = ref_cast(Probleme_base, Interprete::objet (nom_autre_pb_));
@@ -147,7 +148,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
       // Numero_T = 0 corresponding I_ref_=1. Liquid side
       // use T_autre_pb_ for ref_cast
       numero_T_=0;
-      const Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb ().valeur ());
+      const Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb());
       const Domaine_Cl_dis_base& zcldis = ch.domaine_Cl_dis();
       const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF, zcldis);
       const Front_VF& front_vf = ref_cast(Front_VF, ch.front_dis ());
@@ -160,7 +161,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
           const Echange_contact_VDF_FT_Disc& la_cl_typee = ref_cast(
                                                              Echange_contact_VDF_FT_Disc, la_cl);
 
-          const DoubleTab& autre_phi  = la_cl_typee.phi_ext()->valeurs ();
+          const DoubleTab& autre_phi  = la_cl_typee.phi_ext().valeurs ();
 
 
 
@@ -170,7 +171,7 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
 
 
           const Equation_base& autre_eqn = ref_cast(Equation_base, ch.domaine_Cl_dis().equation());
-          const DoubleTab& autre_inco =autre_eqn.inconnue ()->valeurs ();
+          const DoubleTab& autre_inco =autre_eqn.inconnue().valeurs();
 
           DoubleTab phi_filed(autre_inco);
           phi_filed = 0.;
@@ -200,29 +201,26 @@ void Echange_contact_VDF_FT_Disc_solid::mettre_a_jour(double temps)
             }
         }
 
-      const Equation_base& mon_eqn = domaine_Cl_dis ().equation ();
-      const DoubleTab& mon_inco = mon_eqn.inconnue ()->valeurs ();
-      const IntTab& face_voisins = le_dom.face_voisins ();
+      const Equation_base& mon_eqn = domaine_Cl_dis().equation();
+      const DoubleTab& mon_inco = mon_eqn.inconnue().valeurs();
+      const IntTab& face_voisins = le_dom.face_voisins();
 
       // replace mon_h and mon_Ti;
-      int taille = mon_h.dimension (0);
+      int taille = mon_h.dimension(0);
       for (int jj = 0; jj < nb_comp; jj++)
         {
           for (int ii = 0; ii < taille; ii++)
             {
-              if (!est_egal (mon_phi (ii, jj), 0.))
+              if (!est_egal(mon_phi(ii, jj), 0.))
                 {
-                  mon_phi (ii, jj) = - mon_phi (ii, jj);
+                  mon_phi(ii, jj) = -mon_phi(ii, jj);
 
-                  hh_imp (ii, jj) = 0.;
+                  hh_imp(ii, jj) = 0.;
 
-                  const int face = ii
-                                   + frontiere_dis ().frontiere ().num_premiere_face ();
+                  const int face = ii + frontiere_dis().frontiere().num_premiere_face();
 
-                  const int elemi = face_voisins (face, 0)
-                                    + face_voisins (face, 1) + 1;
-                  mon_Ti (ii, jj) = mon_inco (elemi, 0)
-                                    + mon_phi (ii, jj) / mon_h (ii);
+                  const int elemi = face_voisins(face, 0) + face_voisins(face, 1) + 1;
+                  mon_Ti(ii, jj) = mon_inco(elemi, 0) + mon_phi(ii, jj) / mon_h(ii);
                 }
             }
         }
@@ -314,7 +312,7 @@ void Echange_contact_VDF_FT_Disc_solid::completer()
 
   ch.creer(nom_autre_pb_, nom_bord_oppose_, nom_champ_T2_autre_pb_);
 
-  ch.associer_fr_dis_base(T_ext()->frontiere_dis());
+  ch.associer_fr_dis_base(T_ext().frontiere_dis());
   ch.completer();
   int nb_cases=domaine_Cl_dis().equation().schema_temps().nb_valeurs_temporelles();
   ch.fixer_nb_valeurs_temporelles(nb_cases);

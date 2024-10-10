@@ -58,7 +58,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
       DoubleTab& Text_valeurs = ch.valeurs_au_temps(temps);
       int elemF;
       int  elemG;
-      REF(Pb_2G) le_pb2G;
+      OBS_PTR(Pb_2G) le_pb2G;
       Pb_MG& pbMG = ch.le_pb_MG();
       const double h_paroi=1.e30;
 
@@ -92,17 +92,17 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
 
 
 
-      REF(Milieu_base) le_milieu;
+      OBS_PTR(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
-      REF(Milieu_base) le_milieu_vdf;
+      OBS_PTR(Milieu_base) le_milieu_vdf;
       le_milieu_vdf = pbG.milieu();
 
-      const int nb_comp_vef = le_milieu->conductivite()->nb_comp();
-      const int nb_comp_vdf = le_milieu_vdf->conductivite()->nb_comp();
+      const int nb_comp_vef = le_milieu->conductivite().nb_comp();
+      const int nb_comp_vdf = le_milieu_vdf->conductivite().nb_comp();
       int i;
 
 
-      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       const Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
 
@@ -161,10 +161,10 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
                 }
 
               const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,mod.valeur());
-              const Turbulence_paroi_scal& loipar =  le_mod_turb_th.loi_paroi();
-              if (sub_type(Turbulence_paroi_scal_base,loipar.valeur()))
+              const Turbulence_paroi_scal_base& loipar =  le_mod_turb_th.loi_paroi();
+              if (sub_type(Turbulence_paroi_scal_base,loipar))
                 {
-                  const Turbulence_paroi_scal_base& paroi_vdf = ref_cast(Turbulence_paroi_scal_base,loipar.valeur());
+                  const Turbulence_paroi_scal_base& paroi_vdf = ref_cast(Turbulence_paroi_scal_base,loipar);
                   for (face=ndeb; face<nfin; face++)
                     {
                       num_faceG = connect(face);
@@ -196,11 +196,11 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
 
 
           // Calcul de tab = 1/(e/lambda + 1/h_paroi)
-          if(!sub_type(Champ_Uniforme,le_milieu->conductivite().valeur()))
+          if(!sub_type(Champ_Uniforme,le_milieu->conductivite()))
             {
               //Cerr << "raccord local homogene et conductivite non uniforme" << finl;
-              const DoubleTab& lambda = le_milieu->conductivite()->valeurs();
-              const DoubleTab& lambda_vdf = le_milieu_vdf->conductivite()->valeurs();
+              const DoubleTab& lambda = le_milieu->conductivite().valeurs();
+              const DoubleTab& lambda_vdf = le_milieu_vdf->conductivite().valeurs();
               assert(h_paroi!=0.);
 
               if (lambda.nb_dim() == 1)
@@ -252,11 +252,11 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
                       }
                   }
             }
-          else  // la conductivite est un Champ uniforme
+          else  // la conductivite est un OWN_PTR(Champ_base) uniforme
             {
               assert(h_paroi!=0.);
-              const DoubleTab& lambda = le_milieu->conductivite()->valeurs();
-              const DoubleTab& lambda_vdf = le_milieu_vdf->conductivite()->valeurs();
+              const DoubleTab& lambda = le_milieu->conductivite().valeurs();
+              const DoubleTab& lambda_vdf = le_milieu_vdf->conductivite().valeurs();
               for(i=0; i<nb_comp_vef; i++)
                 assert(lambda(0,i)!=0.); // juste des asserts
 
@@ -311,7 +311,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
                   {
                     const Champ_Inc_base& incoG = eqG.inconnue();
                     const DoubleTab& T_VDF = incoG.valeurs();
-                    const DoubleTab& T_VEF = eqF.inconnue()->valeurs();
+                    const DoubleTab& T_VEF = eqF.inconnue().valeurs();
                     DoubleVect cumulHiSi(nb_faces_front_vdf);
                     DoubleVect Tparoi(nb_faces_front_vdf);
 

@@ -68,12 +68,34 @@ void Transport_K_ou_Eps_base::discretiser()
   if (sub_type(Discret_Thyd,discretisation()))
     {
       Cerr << "K,Eps transport equation ("<< que_suis_je() <<") discretization" << finl;
-      discretiser_K_Eps(schema_temps(),domaine_dis(),le_champ_);
-      champs_compris_.ajoute_champ(le_champ_);
-      if (modele_turbulence().equation().calculate_time_derivative())
+      Cerr << "K_or_Eps field discretization" << finl;
+      Noms noms(1);
+      Noms unit(1);
+
+      if ( transporte_K_ )
         {
-          set_calculate_time_derivative(1);
+          Cerr << "K field discretization" << finl;
+          noms[0]="K";
         }
+      else
+        {
+          Cerr << "Epsilon field discretization" << finl;
+          noms[0]="Eps";
+        }
+
+      unit[0]="m2/s2";
+
+      discretisation().discretiser_champ("temperature",domaine_dis(),multi_scalaire,noms,unit,1,schema_temps().nb_valeurs_temporelles(),schema_temps().temps_courant(),le_champ_);
+
+      if ( transporte_K_ )
+        le_champ_->nommer("K");
+      else
+        le_champ_->nommer("Eps");
+
+      champs_compris_.ajoute_champ(le_champ_);
+
+      if (modele_turbulence().equation().calculate_time_derivative())
+        set_calculate_time_derivative(1);
 
       Equation_base::discretiser();
     }
@@ -84,40 +106,6 @@ void Transport_K_ou_Eps_base::discretiser()
       exit();
     }
   creer_champ( "residu" );
-
-}
-
-void Transport_K_ou_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
-                                                Domaine_dis& z, Champ_Inc& ch) const
-{
-  Cerr << "K_or_Eps field discretization" << finl;
-  Noms noms(1);
-  Noms unit(1);
-
-  if ( transporte_K_ )
-    {
-      Cerr << "K field discretization" << finl;
-      noms[0]="K";
-    }
-  else
-    {
-      Cerr << "Epsilon field discretization" << finl;
-      noms[0]="Eps";
-    }
-
-  unit[0]="m2/s2";
-
-  const Discretisation_base& dis = discretisation();
-  dis.discretiser_champ("temperature",z.valeur(),multi_scalaire,noms,unit,1,sch.nb_valeurs_temporelles(),sch.temps_courant(),ch);
-
-  if ( transporte_K_ )
-    {
-      ch->nommer("K");
-    }
-  else
-    {
-      ch->nommer("Eps");
-    }
 }
 
 /*! @brief Associe un milieu physique a l'equation.
@@ -181,7 +169,7 @@ int Transport_K_ou_Eps_base::controler_variable()
   if (size<0)
     {
       if (sub_type(Champ_Inc_P0_base, le_champ_.valeur()))
-        size = le_champ_->equation().domaine_dis()->domaine().nb_elem();
+        size = le_champ_->equation().domaine_dis().domaine().nb_elem();
       else
         {
           Cerr << "Unsupported K_ou_Eps field in Transport_K_ou_Eps_base::controler_variable()" << finl;
@@ -202,7 +190,7 @@ int Transport_K_ou_Eps_base::controler_variable()
      if (this->que_suis_je()=="Transport_K_Eps") control=0;
      #endif
   */
-  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis().valeur());
+  const Domaine_VF& domaine_vf = ref_cast(Domaine_VF,domaine_dis());
 
   double Le_MIN = modele_turbulence().get_EPS_MIN();
 

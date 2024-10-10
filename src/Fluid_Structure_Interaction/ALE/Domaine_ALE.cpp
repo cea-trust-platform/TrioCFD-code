@@ -70,7 +70,7 @@ void Domaine_ALE::clear()
   som_faces_bords.reset();
   solv = SolveurSys();
   mat = Matrice_Morse_Sym();
-  les_champs_front = Champs_front();
+  les_champs_front = TRUST_Vector<OWN_PTR(Champ_front_base)>();
   nb_bords_ALE = 0;
   les_bords_ALE.vide();
   update_or_not_matrix_coeffs_ = 1;
@@ -79,7 +79,7 @@ void Domaine_ALE::clear()
   resumption = 0;
   nbBeam = 0;
   beam.clear();
-  eq = REF(Equation_base)();
+  eq = OBS_PTR(Equation_base)();
   field_ALE_projection_ = Champs_front_ALE_projection();
   name_ALE_boundary_projection_ = Noms();
   associate_eq = false;
@@ -101,7 +101,7 @@ Entree& Domaine_ALE::readOn(Entree& is)
   return is ;
 }
 
-void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Probleme_base& pb)
+void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis_base& le_domaine_dis, Probleme_base& pb)
 {
   invalide_octree();
   //Modification des coordonnees du maillage
@@ -127,7 +127,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
 
       //On recalcule les vitesses aux faces
-      Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis.valeur());
+      Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis);
 
       int nb_faces=le_dom_VF.nb_faces();
       int nb_som_face=le_dom_VF.nb_som_face();
@@ -154,13 +154,13 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
       /* if(sub_type(Domaine_VDF, le_dom_VF))
          {
-           Domaine_VDF& le_dom_VDF=ref_cast(Domaine_VDF,le_domaine_dis.valeur());
+           Domaine_VDF& le_dom_VDF=ref_cast(Domaine_VDF,le_domaine_dis);
            le_dom_VF.volumes_entrelaces()=0;
            le_dom_VDF.calculer_volumes_entrelaces();
          }*/
       if(sub_type(Domaine_VEF, le_dom_VF))
         {
-          Domaine_VEF& le_dom_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
+          Domaine_VEF& le_dom_VEF=ref_cast(Domaine_VEF,le_domaine_dis);
           DoubleTab& normales=le_dom_VEF.face_normales();
           DoubleTab& facette_normales_=le_dom_VEF.facette_normales();
           IntVect& rang_elem_non_standard=le_dom_VEF.rang_elem_non_std();
@@ -193,8 +193,8 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
           IntVect fait(nb_faces_tot);
           fait=0;
-          const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
-          const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+          const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis);
+          const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis());
           for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -226,8 +226,8 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           int nb_eqn=pb.nombre_d_equations();
           for(int num_eq=0; num_eq<nb_eqn; num_eq++)
             {
-              Domaine_Cl_dis& zcl_dis=pb.equation(num_eq).domaine_Cl_dis();
-              Domaine_Cl_VEF& la_zcl_VEF=ref_cast(Domaine_Cl_VEF, zcl_dis.valeur());
+              Domaine_Cl_dis_base& zcl_dis=pb.equation(num_eq).domaine_Cl_dis();
+              Domaine_Cl_VEF& la_zcl_VEF=ref_cast(Domaine_Cl_VEF, zcl_dis);
               la_zcl_VEF.remplir_volumes_entrelaces_Cl(le_dom_VEF);
               la_zcl_VEF.remplir_normales_facettes_Cl(le_dom_VEF );
             }
@@ -265,7 +265,7 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
   const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
   const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
-  const Domaine_VEF& le_dom_vef=ref_cast(Domaine_VEF,op_grad.equation().domaine_dis().valeur());
+  const Domaine_VEF& le_dom_vef=ref_cast(Domaine_VEF,op_grad.equation().domaine_dis());
   const DoubleTab& xv=le_dom_vef.xv();
   DoubleTab& flux_bords_grad=op_grad.flux_bords();
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
@@ -335,7 +335,7 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
   const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
   const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
-  const Domaine_VEF& le_dom_vef=ref_cast(Domaine_VEF,op_grad.equation().domaine_dis().valeur());
+  const Domaine_VEF& le_dom_vef=ref_cast(Domaine_VEF,op_grad.equation().domaine_dis());
   const DoubleTab& xv=le_dom_vef.xv();
   DoubleTab& flux_bords_grad=op_grad.flux_bords();
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
@@ -400,7 +400,7 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 
 }
 
-void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
+void Domaine_ALE::initialiser (double temps, Domaine_dis_base& le_domaine_dis,Probleme_base& pb)
 {
   Cerr << "Domaine_ALE::initialize " << finl;
   invalide_octree();
@@ -408,7 +408,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
   ALE_mesh_velocity=calculer_vitesse(temps,le_domaine_dis,pb,  check_NoZero_ALE);
 
   //On initialise les vitesses aux faces
-  Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis.valeur());
+  Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis);
   int nb_faces=le_dom_VF.nb_faces();
   int nb_faces_tot=le_dom_VF.nb_faces_tot();
   int nb_som_face=le_dom_VF.nb_som_face();
@@ -472,7 +472,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
     }
 
   //checking correct type of BC on the moving boundary
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis());
   for (int j=0; j<nb_bords_ALE; j++)
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(j).le_nom();
@@ -511,7 +511,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
 
 }
 
-DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
+DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis_base& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
 {
 
   int n; // A activer ou desactiver si on utilise le laplacien ou non
@@ -528,7 +528,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
       int rang=rang_frontiere(le_nom_bord_ALE);
-      const Frontiere_dis_base& la_fr_dis=le_domaine_dis->frontiere_dis(rang);
+      const Frontiere_dis_base& la_fr_dis=le_domaine_dis.frontiere_dis(rang);
       les_champs_front[n]->associer_fr_dis_base(la_fr_dis);
       const Nom& le_nom_ch_front_courant=les_champs_front[n]->que_suis_je();
       if (le_nom_ch_front_courant == "Champ_front_ALE")
@@ -670,16 +670,16 @@ DoubleTab& Domaine_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_fa
   return vf;
 }
 
-DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
+DoubleTab& Domaine_ALE::laplacien(Domaine_dis_base& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
 {
   //Cerr << "Domaine_ALE::laplacien" << finl;
   int nb_elem_t = nb_elem_tot();
   //int nbsom = nb_som();
   int nbsom = nb_som_tot();
   int nb_som_ele = nb_som_elem();
-  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
+  const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis);
   const DoubleTab& normales=domaine_VEF.face_normales();
-  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis());
   const IntTab& elem_som = les_elems();
   const IntTab& elem_faces=domaine_VEF.elem_faces();
   double mijK;
@@ -1260,11 +1260,11 @@ DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const int& i, const double& 
   return beam[i].interpolationOnThe3DSurface(x,y,z, u, R);
 }
 
-/*double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
+/*double Domaine_ALE::computeDtBeam(Domaine_dis_base& le_domaine_dis)
 {
 
 double dt = 0.;
-const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
+const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis);
 const DoubleVect& surfaces = domaine_VEF.face_surfaces();
 double minSurf = mp_min_vect(surfaces);
 minSurf = Process::mp_min(minSurf);
@@ -1326,7 +1326,7 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
   const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
   const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
-  const Domaine_VEF& le_dom_vef=ref_cast(Domaine_VEF,op_grad.equation().domaine_dis().valeur());
+  const Domaine_VEF& le_dom_vef=ref_cast(Domaine_VEF,op_grad.equation().domaine_dis());
   const DoubleTab& xv=le_dom_vef.xv();
   DoubleTab& flux_bords_grad=op_grad.flux_bords();
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
@@ -1345,9 +1345,9 @@ void  Domaine_ALE::computeFluidForceOnBeam(const int& i)
   double norme_op_diff=mp_norme_vect(flux_bords_diff);
   if(resumption && norme_op_diff==0. )
     {
-      DoubleTab resu=eqn_hydr.vitesse()->valeurs();
+      DoubleTab resu=eqn_hydr.vitesse().valeurs();
       resu=0.;
-      op_diff.ajouter(eqn_hydr.vitesse()->valeurs(),resu);
+      op_diff.ajouter(eqn_hydr.vitesse().valeurs(),resu);
     }
   //end resumption
 

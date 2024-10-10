@@ -48,12 +48,12 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(m
 {
   Source_Diffusion_supplementaire_echelle_temp_turb::dimensionner_blocs(matrices, semi_impl) ;
 
-  const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  const Champ_Elem_PolyMAC_P0&                   tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());
+  const Domaine_PolyMAC_P0&       domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
+  const Champ_Elem_PolyMAC_P0&                   tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue());
 
   if (!matrices.count("tau") || semi_impl.count("tau")) return;
 
-  int N = equation().inconnue()->valeurs().line_size(), ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot() ;
+  int N = equation().inconnue().valeurs().line_size(), ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot() ;
 
   tau.init_grad(0);
   const IntTab& fg_d = tau.fgrad_d, &fg_e = tau.fgrad_e, &e_f = domaine.elem_faces();             // Tables used in domaine_PolyMAC_P0::fgrad
@@ -84,10 +84,10 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(m
 
 void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_PolyMAC_P0&             domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
-  const Domaine_Cl_PolyMAC&                 zcl = ref_cast(Domaine_Cl_PolyMAC, equation().domaine_Cl_dis().valeur());
+  const Domaine_PolyMAC_P0&             domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
+  const Domaine_Cl_PolyMAC&                 zcl = ref_cast(Domaine_Cl_PolyMAC, equation().domaine_Cl_dis());
 //  const Echelle_temporelle_turbulente&       eq = ref_cast(Echelle_temporelle_turbulente, equation());
-  const Champ_Elem_PolyMAC_P0&              tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur());
+  const Champ_Elem_PolyMAC_P0&              tau = ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue());
   const DoubleTab&                      tab_tau = semi_impl.count("tau") ? semi_impl.at("tau") : tau.valeurs();
   const DoubleTab&                tab_tau_passe = tau.passe();
   const DoubleTab& k = equation().probleme().get_champ("k").valeurs();

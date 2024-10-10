@@ -24,8 +24,8 @@
 
 #include <Source_base.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
@@ -51,9 +51,9 @@ public:
   };
 
 protected:
-  REF(Domaine_VEF) le_dom_VEF;
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  void associer_domaines(const Domaine_dis&, const Domaine_Cl_dis&) override;
+  OBS_PTR(Domaine_VEF) le_dom_VEF;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis_base&) override;
 //  double dt_post;
   Noms noms_parois;
   mutable DoubleVect tab_u_star_;	// mutable pour etre modifie dans ajouter() => pas top, devrait etre modifie dans mettre_a_jour

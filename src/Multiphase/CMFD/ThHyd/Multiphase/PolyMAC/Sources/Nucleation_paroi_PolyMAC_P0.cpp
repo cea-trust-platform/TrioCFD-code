@@ -51,7 +51,7 @@ Entree& Nucleation_paroi_PolyMAC_P0::readOn(Entree& is)
   if (n_l != 0) Process::exit(que_suis_je() + " : liquid phase must be the first declared phase !");
 
   if (!pbm->has_correlation("flux_parietal")) Process::exit("Nucleation_paroi_PolyMAC_P0 : wall heat flux correlation needed !");
-  const Flux_parietal_base& correlation_fp = ref_cast(Flux_parietal_base, pbm->get_correlation("flux_parietal").valeur());
+  const Flux_parietal_base& correlation_fp = ref_cast(Flux_parietal_base, pbm->get_correlation("flux_parietal"));
 
   if (!correlation_fp.calculates_bubble_nucleation_diameter()) Process::exit("Nucleation_paroi_PolyMAC_P0 : wall heat flux correlation must calculate the nucleated bubble diameter !");
 
@@ -72,11 +72,11 @@ void Nucleation_paroi_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const 
 void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const IntTab& f_e = domaine.face_voisins();
 
-  const DoubleTab& rho = pbm.milieu().masse_volumique()->passe(),
-                   &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression()->passe(),
+  const DoubleTab& rho = pbm.milieu().masse_volumique().passe(),
+                   &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
                     &qpi = ref_cast(Flux_interfacial_PolyMAC_P0P1NC, src_flux_interfacial_.valeur()).qpi(),
                      &dnuc = ref_cast(Op_Diff_PolyMAC_P0_Elem, pbm.equation(2).operateur(0).l_op_base()).d_nucleation();
 

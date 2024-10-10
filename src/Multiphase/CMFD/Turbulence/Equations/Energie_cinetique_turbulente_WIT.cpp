@@ -84,7 +84,7 @@ void Energie_cinetique_turbulente_WIT::associer_milieu_base(const Milieu_base& u
   associer_fluide(un_fluide);
 }
 
-const Champ_Don& Energie_cinetique_turbulente_WIT::diffusivite_pour_transport() const
+const Champ_Don_base& Energie_cinetique_turbulente_WIT::diffusivite_pour_transport() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }
@@ -173,7 +173,7 @@ void Energie_cinetique_turbulente_WIT::associer_fluide(const Fluide_base& un_flu
 void Energie_cinetique_turbulente_WIT::calculer_alpha_rho_k_WIT(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
   const Equation_base& eqn = ref_cast(Equation_base, obj);
-  const DoubleTab& k = eqn.inconnue()->valeurs();
+  const DoubleTab& k = eqn.inconnue().valeurs();
 
   /* valeurs du champ */
   int i, n, N = val.line_size(), Nl = val.dimension_tot(0);
@@ -181,7 +181,7 @@ void Energie_cinetique_turbulente_WIT::calculer_alpha_rho_k_WIT(const Objet_U& o
     for (n = 0; n < N; n++) val(i, n) = k(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  DoubleTab b_k = eqn.inconnue()->valeur_aux_bords();
+  DoubleTab b_k = eqn.inconnue().valeur_aux_bords();
   int Nb = b_k.dimension_tot(0);
 
   for (i = 0; i < Nb; i++)

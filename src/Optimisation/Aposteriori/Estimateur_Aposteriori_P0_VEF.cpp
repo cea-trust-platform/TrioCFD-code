@@ -18,7 +18,7 @@
 #include <Terme_Source_Qdm_VEF_Face.h>
 #include <Champ_P1_isoP1Bulle.h>
 #include <Champ_P1NC.h>
-#include <Champ_Don.h>
+
 #include <Source.h>
 
 Implemente_instanciable( Estimateur_Aposteriori_P0_VEF, "Estimateur_Aposteriori_P0_VEF", Champ_Fonc_P0_VEF ) ;
@@ -27,7 +27,7 @@ Sortie& Estimateur_Aposteriori_P0_VEF::printOn( Sortie& s ) const { return s << 
 
 Entree& Estimateur_Aposteriori_P0_VEF::readOn( Entree& s ) { return s; }
 
-void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Champ_P1_isoP1Bulle& la_pression, const Champ_Don& la_viscosite_cinematique, const Domaine_Cl_dis_base& le_dom_Cl_dis_base)
+void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Champ_P1_isoP1Bulle& la_pression, const Champ_Don_base& la_viscosite_cinematique, const Domaine_Cl_dis_base& le_dom_Cl_dis_base)
 {
   le_dom_Cl_VEF  = ref_cast(Domaine_Cl_VEF, le_dom_Cl_dis_base);
   vitesse_= la_vitesse;
@@ -74,7 +74,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   Navier_Stokes_Aposteriori& eq = ref_cast(Navier_Stokes_Aposteriori,vitesse_->equation());
   //const Sources& sources_eq =  eq.sources();
 
-  Champ espace_stockage;
+  OWN_PTR(Champ_base) espace_stockage;
   const Champ_base& ch_bs = eq.get_champ_source().get_champ(espace_stockage);
   const DoubleTab& src = ch_bs.valeurs();
 
@@ -83,7 +83,7 @@ void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
   le_terme_source = src;
   DoubleTab gradient_elem(nb_elem_tot,dim,dim);
   gradient_elem=0.;
-  const DoubleTab tabnu=viscosite_cinematique_->valeur().valeurs();
+  const DoubleTab tabnu=viscosite_cinematique_->valeurs();
   int sz=tabnu.size();
 
   DoubleVect visc(nb_elem);

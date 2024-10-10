@@ -26,7 +26,7 @@
 #include <Periodique.h>
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>
-#include <Domaine_Cl_dis.h>
+
 #include <Navier_Stokes_phase_field.h>
 #include <Convection_Diffusion_Phase_field.h>
 #include <Probleme_base.h>
@@ -63,10 +63,10 @@ Entree& Source_Gravite_PF_VDF::readOn(Entree& is)
  * @param (Entree& is) le flot d'entree pour la lecture des parametres
  * @return le flot d'entree modifie
  */
-void Source_Gravite_PF_VDF::associer_domaines(const Domaine_dis& domaine,const Domaine_Cl_dis& domaine_cl)
+void Source_Gravite_PF_VDF::associer_domaines(const Domaine_dis_base& dds,const Domaine_Cl_dis_base& domaine_cl)
 {
-  le_dom = ref_cast(Domaine_VDF,domaine.valeur());
-  le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_cl.valeur());
+  le_dom = ref_cast(Domaine_VDF,dds);
+  le_dom_Cl = ref_cast(Domaine_Cl_VDF,domaine_cl);
 }
 
 
@@ -122,7 +122,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
         }
       else if (boussi == 1)
         {
-          const DoubleTab& rho = eq_NS_PF.rho()->valeurs();
+          const DoubleTab& rho = eq_NS_PF.rho().valeurs();
           double rho0 = eq_NS_PF.rho0();
           const IntTab& face_voisins = le_dom->face_voisins();
           const DoubleVect& volumes = le_dom->volumes();
@@ -184,7 +184,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
         }
       else if (boussi == 1)
         {
-          const DoubleTab& rho = eq_NS_PF.rho()->valeurs();
+          const DoubleTab& rho = eq_NS_PF.rho().valeurs();
           double rho0 = eq_NS_PF.rho0();
           const IntTab& face_voisins = le_dom->face_voisins();
           const DoubleVect& volumes = le_dom->volumes();

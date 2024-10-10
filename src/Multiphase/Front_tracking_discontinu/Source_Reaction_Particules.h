@@ -53,11 +53,11 @@ public :
 
 protected:
 
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
   void associer_pb(const Probleme_base& ) override;
 
 
-  REF(Transport_Marqueur_FT) eq_marqueur_; //Reference a l equation de type Transport_Marqueur_FT
+  OBS_PTR(Transport_Marqueur_FT) eq_marqueur_; //Reference a l equation de type Transport_Marqueur_FT
   //permet d acceder source_stockage_
 };
 

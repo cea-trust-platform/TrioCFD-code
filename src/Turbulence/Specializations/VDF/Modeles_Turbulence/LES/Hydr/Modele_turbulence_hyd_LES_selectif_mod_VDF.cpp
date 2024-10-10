@@ -83,7 +83,7 @@ void Modele_turbulence_hyd_LES_selectif_mod_VDF::discretiser()
 }
 
 int Modele_turbulence_hyd_LES_selectif_mod_VDF::a_pour_Champ_Fonc(const Motcle& mot,
-                                                                  REF(Champ_base) &ch_ref) const
+                                                                  OBS_PTR(Champ_base) &ch_ref) const
 {
   Motcles les_motcles(7);
   {
@@ -132,7 +132,7 @@ void Modele_turbulence_hyd_LES_selectif_mod_VDF::calculer_fonction_structure()
 void Modele_turbulence_hyd_LES_selectif_mod_VDF::cutoff()
 {
   double Sin2Angl;
-  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF, mon_equation_->inconnue().valeur());
+  const Champ_Face_VDF& vitesse = ref_cast(Champ_Face_VDF, mon_equation_->inconnue());
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, le_dom_VF_.valeur());
   const IntTab& face_voisins = domaine_VDF.face_voisins();
   const IntTab& elem_faces = domaine_VDF.elem_faces();

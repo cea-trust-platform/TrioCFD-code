@@ -64,7 +64,7 @@ public:
 
 protected :
 
-  REF(Pb_MG) mon_probleme;
+  OBS_PTR(Pb_MG) mon_probleme;
 
 };
 

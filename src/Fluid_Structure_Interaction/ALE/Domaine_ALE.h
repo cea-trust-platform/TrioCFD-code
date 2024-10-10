@@ -23,14 +23,13 @@
 #ifndef Domaine_ALE_included
 #define Domaine_ALE_included
 
-#include <Domaine.h>
+#include <Champs_front_ALE_projection.h>
+#include <Champ_front_base.h>
 #include <TRUSTLists.h>
-#include <Champs_front.h>
 #include <Champ_P1NC.h>
 #include <Beam_model.h>
-#include <Champs_front_ALE_projection.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+#include <Domaine.h>
 
 class Equation_base;
 class Beam_model;
@@ -60,10 +59,10 @@ public :
   inline const DoubleTab& vitesse() const;
   inline DoubleTab& vitesse_faces();
   inline const DoubleTab& vitesse_faces() const;
-  void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&) override;
+  void mettre_a_jour (double temps, Domaine_dis_base&, Probleme_base&) override;
   void update_after_post(double temps) override;
-  void initialiser (double temps, Domaine_dis&, Probleme_base&) override;
-  DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, bool&);
+  void initialiser (double temps, Domaine_dis_base&, Probleme_base&) override;
+  DoubleTab calculer_vitesse(double temps,Domaine_dis_base&, Probleme_base&, bool&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
   void reading_vit_bords_ALE(Entree& is);
   void reading_solver_moving_mesh_ALE(Entree& is);
@@ -73,7 +72,7 @@ public :
   void reading_ALE_Neumann_BC_for_grid_problem(Entree& is);
   void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
   void  update_ALE_projection(const double);
-  DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
+  DoubleTab& laplacien(Domaine_dis_base&, Probleme_base&, const DoubleTab&, DoubleTab&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
   void resumptionJacobian(DoubleTab&, DoubleTab&);
@@ -84,7 +83,7 @@ public :
 
 
   DoubleVect interpolationOnThe3DSurface(const int&, const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
-  //double computeDtBeam(Domaine_dis&);
+  //double computeDtBeam(Domaine_dis_base&);
   const DoubleTab& getBeamDisplacement(const int&, const int&) const;
   const DoubleTab& getBeamRotation(const int&, const int&) const;
   inline const int& getBeamDirection(const int&) const;
@@ -111,7 +110,7 @@ protected:
   IntTab som_faces_bords;
   SolveurSys solv;
   Matrice_Morse_Sym mat;
-  Champs_front les_champs_front;
+  TRUST_Vector<OWN_PTR(Champ_front_base)> les_champs_front;
   int nb_bords_ALE;
   Bords les_bords_ALE;
   int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Domaine_ALE::calculer_vitesse).
@@ -121,7 +120,7 @@ protected:
   int nbBeam;
 //  Beam_model *beam; // Mechanical model: a beam model
   std::vector<Beam_model> beam;
-  REF(Equation_base) eq;
+  OBS_PTR(Equation_base) eq;
   Champs_front_ALE_projection field_ALE_projection_; // Definition of the modes of vibration in view of projection of the IFS force
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
   bool associate_eq;

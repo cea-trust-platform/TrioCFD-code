@@ -118,11 +118,11 @@ void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_pb(con
   gravite_ = fluide.gravite();
 }
 
-void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_domaines(const Domaine_dis& domaine_dis,
-                                                                                   const Domaine_Cl_dis& domaine_Cl_dis)
+void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_domaines(const Domaine_dis_base& domaine_dis,
+                                                                                   const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis);
 }
 
 
@@ -372,11 +372,11 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
     }
 
   const DoubleTab& g = gravite_->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
 
   //on calcule gteta2 pour corriger u_teta confermement au modele de Wrobel
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  if (sub_type(Champ_Uniforme,ch_beta))
     calculer_gteta2(domaine_VDF,gteta2 ,fluctu_temp,tab_beta(0,0),g);
   else
     calculer_gteta2(domaine_VDF, gteta2 ,fluctu_temp,tab_beta,g);
@@ -572,30 +572,30 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::calculer_
 
 DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(DoubleTab& resu) const
 {
-  const Domaine_Cl_dis& zcl = eq_hydraulique->domaine_Cl_dis();
-  const Domaine_dis& z = eq_hydraulique->domaine_dis();
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis().valeur());
-  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl.valeur());
+  const Domaine_Cl_dis_base& zcl = eq_hydraulique->domaine_Cl_dis();
+  const Domaine_dis_base& z = eq_hydraulique->domaine_dis();
+  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,eq_hydraulique->domaine_dis());
+  const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,zcl);
   const RefObjU& modele_turbulence_hydr = eq_hydraulique->get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& modele_bas_Re =
     ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,le_modele);
   const Transport_K_Eps_base& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.eqn_transp_K_Eps();
-  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis().valeur());
-  const Domaine_Cl_dis& zcl_VDF_th_dis = eq_thermique->domaine_Cl_dis();
-  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue()->valeurs();
-  const DoubleTab& scalaire = eq_thermique->inconnue()->valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
-  const DoubleTab& visco_turb = le_modele.viscosite_turbulente()->valeurs();
-  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue()->valeurs();
+  const Domaine_Cl_VDF& zcl_VDF_th = ref_cast(Domaine_Cl_VDF,eq_thermique->domaine_Cl_dis());
+  const Domaine_Cl_dis_base& zcl_VDF_th_dis = eq_thermique->domaine_Cl_dis();
+  const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue().valeurs();
+  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
+  const DoubleTab& visco_turb = le_modele.viscosite_turbulente().valeurs();
+  const DoubleTab& Fluctu_Temperature = mon_eq_transport_Fluctu_Temp->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire =
     ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& modele_Flux_Chaleur = ref_cast(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re,le_modele_scalaire);
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& porosite_vol = equation().milieu().porosite_elem();
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente()->valeurs();
+  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const DoubleTab& g = gravite_->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
+  const Champ_Don_base& ch_beta = beta_t.valeur();
   int nb_elem = domaine_VDF.nb_elem();
   int nb_elem_tot = domaine_VDF.nb_elem_tot();
   int nb_face = domaine_VDF.nb_faces();
@@ -613,13 +613,13 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
   //on recupere les proprietes physiques du fluide : viscosite cinematique et diffusivite
 
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const Champ_Don& ch_diffu = fluide.diffusivite();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const DoubleTab& tab_diffu = ch_diffu->valeurs();
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_diffu = fluide.diffusivite();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
+  const DoubleTab& tab_diffu = ch_diffu.valeurs();
   double visco,diffu;
 
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
@@ -630,7 +630,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
       exit();
     }
 
-  if (sub_type(Champ_Uniforme,ch_diffu.valeur()))
+  if (sub_type(Champ_Uniforme,ch_diffu))
     {
       diffu = std::max(tab_diffu(0,0),DMINFLOAT);
     }
@@ -657,19 +657,19 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
 
   // calculer_u_teta_W(domaine_VDF,domaine_Cl_VDF,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,utet);
 
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
 
 
   calculer_Prod_uteta_T(domaine_VDF,domaine_Cl_VDF,scalaire,utet,uteta_T);
 
   if (axi)
     {
-      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
       calculer_terme_production_K_Axi(domaine_VDF,vitesse,P,K_eps_Bas_Re,visco_turb);
     }
   else
     {
-      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
+      Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
       calculer_terme_production_K(domaine_VDF,domaine_Cl_VDF,P,K_eps_Bas_Re,vit,vitesse,visco_turb);
     }
 
@@ -677,13 +677,13 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
   // qui est utilise dans le calcul de G
 
   /*
-     if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+     if (sub_type(Champ_Uniforme,ch_beta))
      calculer_terme_destruction_K(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
      else
      calculer_terme_destruction_K(domaine_VDF,zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);
   */
 
-  if (sub_type(Champ_Uniforme,ch_beta.valeur()))
+  if (sub_type(Champ_Uniforme,ch_beta))
     calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta(0,0),g);
   else
     calculer_terme_destruction_K_W(domaine_VDF,zcl_VDF_th,G,scalaire,Fluctu_Temperature,K_eps_Bas_Re,alpha_turb,tab_beta,g);

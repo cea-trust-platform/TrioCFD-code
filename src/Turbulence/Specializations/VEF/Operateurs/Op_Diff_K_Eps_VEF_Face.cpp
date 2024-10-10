@@ -27,7 +27,7 @@
 #include <Periodique.h>
 #include <Neumann_paroi.h>
 #include <Paroi_hyd_base_VEF.h>
-#include <Champ_Don.h>
+
 #include <Champ_Uniforme.h>
 #include <Fluide_Incompressible.h>
 
@@ -43,13 +43,13 @@ Entree& Op_Diff_K_Eps_VEF_Face::readOn(Entree& s )
 /*! @brief complete l'evaluateur
  *
  */
-void Op_Diff_K_Eps_VEF_Face::associer(const Domaine_dis& domaine_dis,
-                                      const Domaine_Cl_dis& domaine_cl_dis,
-                                      const Champ_Inc& ch_diffuse)
+void Op_Diff_K_Eps_VEF_Face::associer(const Domaine_dis_base& domaine_dis,
+                                      const Domaine_Cl_dis_base& domaine_cl_dis,
+                                      const Champ_Inc_base& ch_diffuse)
 {
-  const Champ_P1NC& inco = ref_cast(Champ_P1NC,ch_diffuse.valeur());
-  const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis.valeur());
-  const Domaine_Cl_VEF& zclVEF = ref_cast(Domaine_Cl_VEF,domaine_cl_dis.valeur());
+  const Champ_P1NC& inco = ref_cast(Champ_P1NC,ch_diffuse);
+  const Domaine_VEF& zVEF = ref_cast(Domaine_VEF,domaine_dis);
+  const Domaine_Cl_VEF& zclVEF = ref_cast(Domaine_Cl_VEF,domaine_cl_dis);
   inconnue_ = inco;
   le_dom_vef = zVEF;
   la_zcl_vef=zclVEF;
@@ -64,21 +64,21 @@ void Op_Diff_K_Eps_VEF_Face::associer_diffusivite_turbulente()
     {
       const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
     }
   else if ( sub_type( Transport_K_Eps_Realisable,mon_equation.valeur() ) )
     {
       const Transport_K_Eps_Realisable& eqn_transport = ref_cast(Transport_K_Eps_Realisable,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
     }
   else if ( sub_type( Transport_K_ou_Eps,mon_equation.valeur() ) )
     {
       const Transport_K_ou_Eps& eqn_transport = ref_cast(Transport_K_ou_Eps,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      const Champ_Fonc_base& diff_turb = mod_turb.viscosite_turbulente();
       Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
     }
 }
@@ -116,7 +116,7 @@ DoubleTab& Op_Diff_K_Eps_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleTab&
 
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   int nb_front=domaine_VEF.nb_front_Cl();
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
   // double inverse_Prdt_K = 1.0/Prdt_K;
   //double inverse_Prdt_Eps = 1.0/Prdt_Eps;
   int j;
@@ -491,7 +491,7 @@ void Op_Diff_K_Eps_VEF_Face::ajouter_contribution(const DoubleTab& transporte, M
   ArrOfDouble inv_Prdt(2),diffu_tot(2);
   inv_Prdt[0]=1./Prdt_K;
   inv_Prdt[1]=1./Prdt_Eps;
-  const DoubleTab& mu_turb=diffusivite_turbulente_->valeur().valeurs();
+  const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
   int is_mu_unif=sub_type(Champ_Uniforme,diffusivite_.valeur());
   const DoubleTab& mu=diffusivite_->valeurs();
@@ -1000,9 +1000,9 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
   if ( sub_type( Transport_K_Eps,equation() ) )
     {
       const Transport_K_Eps& eqn_k_eps=ref_cast(Transport_K_Eps,equation());
-      const DoubleTab& val=equation().inconnue()->valeurs();
-      const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
-      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
+      const DoubleTab& val=equation().inconnue().valeurs();
+      const Turbulence_paroi_base& mod=eqn_k_eps.modele_turbulence().loi_paroi();
+      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod);
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
       int size=secmem.dimension(0);
       const IntVect& tab1=matrice.get_tab1();
@@ -1037,9 +1037,9 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
   else if ( sub_type( Transport_K_Eps_Realisable,equation() ) )
     {
       const Transport_K_Eps_Realisable& eqn_k_eps=ref_cast(Transport_K_Eps_Realisable,equation());
-      const DoubleTab& val=equation().inconnue()->valeurs();
-      const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
-      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
+      const DoubleTab& val=equation().inconnue().valeurs();
+      const Turbulence_paroi_base& mod=eqn_k_eps.modele_turbulence().loi_paroi();
+      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod);
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
       int size=secmem.dimension(0);
       const IntVect& tab1=matrice.get_tab1();
@@ -1073,9 +1073,9 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
   else if ( sub_type( Transport_K_ou_Eps,equation() ) )
     {
       const Transport_K_ou_Eps& eqn_k_eps=ref_cast(Transport_K_ou_Eps,equation());
-      const DoubleTab& val=equation().inconnue()->valeurs();
-      const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
-      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
+      const DoubleTab& val=equation().inconnue().valeurs();
+      const Turbulence_paroi_base& mod=eqn_k_eps.modele_turbulence().loi_paroi();
+      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod);
       const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
       int size=secmem.dimension(0);
       const IntVect& tab1=matrice.get_tab1();

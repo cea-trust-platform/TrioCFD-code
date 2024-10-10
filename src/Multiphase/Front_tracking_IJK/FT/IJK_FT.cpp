@@ -1969,7 +1969,7 @@ int IJK_FT_double::initialise()
     }
 
   // On peut recuperer le domainevf:
-  const Domaine_dis& domaine_dis = refprobleme_ft_disc_->domaine_dis();
+  const Domaine_dis_base& domaine_dis = refprobleme_ft_disc_->domaine_dis();
 
   // TODO: a valider
   // if (!disable_diphasique_)

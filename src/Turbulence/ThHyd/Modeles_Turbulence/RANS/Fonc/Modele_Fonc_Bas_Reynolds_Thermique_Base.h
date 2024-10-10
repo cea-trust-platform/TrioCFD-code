@@ -22,14 +22,15 @@
 #ifndef Modele_Fonc_Bas_Reynolds_Thermique_Base_included
 #define Modele_Fonc_Bas_Reynolds_Thermique_Base_included
 
-
-#include <Champ_Fonc.h>
-#include <Champs_compris.h>
 #include <Champs_compris_interface.h>
+#include <TRUSTTabs_forward.h>
+#include <Champs_compris.h>
+#include <TRUST_Deriv.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+#include <TRUST_Ref.h>
 
+class Domaine_dis_base;
+class Domaine_Cl_dis_base;
 class Champ_base;
 class Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re;
 class Transport_Fluctuation_Temperature_W_Bas_Re;
@@ -55,17 +56,17 @@ public:
   virtual void completer();
   virtual void associer_pb(const Probleme_base& ) = 0;
   virtual void associer_eqn(const Equation_base& );
-  virtual void associer(const Domaine_dis& , const Domaine_Cl_dis& )= 0;
+  virtual void associer(const Domaine_dis_base& , const Domaine_Cl_dis_base& )= 0;
   int sauvegarder(Sortie& ) const override;
   int reprendre(Entree& ) override;
 
-  virtual DoubleTab& Calcul_D(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const = 0;
-  virtual DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis&,const Domaine_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const = 0;
-  virtual DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
-  virtual DoubleTab& Calcul_F2(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
-  virtual DoubleTab& Calcul_F3(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
-  virtual DoubleTab& Calcul_F4(DoubleTab&, const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
-  virtual DoubleTab& Calcul_Flambda ( DoubleTab&,const Domaine_dis&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_D(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&, double) const = 0;
+  virtual DoubleTab& Calcul_E(DoubleTab&,const Domaine_dis_base&,const Domaine_Cl_dis_base&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const = 0;
+  virtual DoubleTab& Calcul_F1(DoubleTab&, const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_F2(DoubleTab&, const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_F3(DoubleTab&, const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_F4(DoubleTab&, const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
+  virtual DoubleTab& Calcul_Flambda ( DoubleTab&,const Domaine_dis_base&,const DoubleTab&,const DoubleTab&,double,double) const = 0;
 
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
@@ -76,8 +77,8 @@ public:
 
 protected :
 
-  REF(Transport_Fluctuation_Temperature_W_Bas_Re) mon_equation;
-  REF(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re) mon_modele_turb_Bas_Re;
+  OBS_PTR(Transport_Fluctuation_Temperature_W_Bas_Re) mon_equation;
+  OBS_PTR(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re) mon_modele_turb_Bas_Re;
 
 private :
 

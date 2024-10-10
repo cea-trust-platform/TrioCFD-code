@@ -102,7 +102,7 @@ Sortie& Echange_contact_VDF_VEF_Zoom::printOn(Sortie& s ) const
 Entree& Echange_contact_VDF_VEF_Zoom::readOn(Entree& s )
 {
 
-  s >> T_ext();
+  s >> le_champ_front;
 
   h_paroi=1.e30;
   // GF on le type plus tard
@@ -118,13 +118,13 @@ Entree& Echange_contact_VDF_VEF_Zoom::readOn(Entree& s )
 void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
 {
   int num_faceG;
-  if(sub_type(Champ_front_zoom, T_ext().valeur()))
+  if(sub_type(Champ_front_zoom, T_ext()))
     {
-      //   Cout << "Dans Echange_contact_VDF_VEF_Zoom Text = " << T_ext()->valeurs() << finl;
-      Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext().valeur());
-      DoubleTab& Text_valeurs = T_ext()->valeurs_au_temps(temps);
+      //   Cout << "Dans Echange_contact_VDF_VEF_Zoom Text = " << T_ext().valeurs() << finl;
+      Champ_front_zoom& ch = ref_cast(Champ_front_zoom, T_ext());
+      DoubleTab& Text_valeurs = T_ext().valeurs_au_temps(temps);
       int elemF;
-      REF(Pb_2G) le_pb2G;
+      OBS_PTR(Pb_2G) le_pb2G;
       Pb_MG& pbMG = ch.le_pb_MG();
 
       const Probleme_base& pbF = ch.le_pb_exterieur();
@@ -148,10 +148,10 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       const Front_VF& front_vf_ext=ref_cast(Front_VF, front_ext);
       const Front_VF& front_vf=ref_cast(Front_VF, front);
 
-      REF(Milieu_base) le_milieu;
+      OBS_PTR(Milieu_base) le_milieu;
       le_milieu = pbF.milieu();
 
-      const int nb_comp = le_milieu->conductivite()->nb_comp();
+      const int nb_comp = le_milieu->conductivite().nb_comp();
       int i=0;
 
 
@@ -160,7 +160,7 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
       DoubleTab& tab= h_imp_->valeurs();
 
 
-      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis().valeur();
+      const Domaine_dis_base& domaine_dis1 = domaine_Cl_dis().domaine_dis();
       const Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
 
@@ -194,10 +194,10 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
           const int nfin = ndeb + front_vf_ext.nb_faces();
 
           // Calcul de tab = 1/(e/lambda + 1/h_paroi)
-          if(!sub_type(Champ_Uniforme,le_milieu->conductivite().valeur()))
+          if(!sub_type(Champ_Uniforme,le_milieu->conductivite()))
             {
               //Cerr << "raccord local homogene et conductivite non uniforme" << finl;
-              const DoubleTab& lambda = le_milieu->conductivite()->valeurs();
+              const DoubleTab& lambda = le_milieu->conductivite().valeurs();
               assert(h_paroi!=0.);
 
               if (lambda.nb_dim() == 1)
@@ -251,10 +251,10 @@ void Echange_contact_VDF_VEF_Zoom::mettre_a_jour(double temps)
                     if (cumulSurfaces(face)>0.) tab(face,i) = tab(face,i)/ cumulSurfaces(face);
                 }
             }
-          else  // la conductivite est un Champ uniforme
+          else  // la conductivite est un OWN_PTR(Champ_base) uniforme
             {
               assert(h_paroi!=0.);
-              const DoubleTab& lambda = le_milieu->conductivite()->valeurs();
+              const DoubleTab& lambda = le_milieu->conductivite().valeurs();
               for(i=0; i<nb_comp; i++)
                 assert(lambda(0,i)!=0.); // juste des asserts
 

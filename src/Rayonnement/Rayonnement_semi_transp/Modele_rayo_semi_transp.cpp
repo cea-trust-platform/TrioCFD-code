@@ -46,48 +46,11 @@ Implemente_instanciable(Modele_rayo_semi_transp,"Modele_rayo_semi_transp",Proble
 
 double const Modele_rayo_semi_transp::sigma = 5.67e-8;
 
-////////////////////////////////////////////////////////////////////
-// Description :
-//           Lecture du Modele_rayo_semi_transp
-//           On lit les parametres de l'equation de rayonnements
-// Precondition :
-// Parametre :
-//     Signification :
-//     Valeurs par defaut :
-//     Contraintes :
-//     Entree :
-//     Entree/Sortie :
-//     Sortie :
-// Retour :
-//     Signification :
-//     Contraintes :
-// Exception :
-// Effets de bord :
-// Postcondition :
-//
 Entree& Modele_rayo_semi_transp::readOn(Entree& is)
 {
   return Probleme_base::readOn(is);
 }
 
-////////////////////////////////////////////////////////////////////
-// Description :
-//
-// Precondition :
-// Parametre :
-//     Signification :
-//     Valeurs par defaut :
-//     Contraintes :
-//     Entree :
-//     Entree/Sortie :
-//     Sortie :
-// Retour :
-//     Signification :
-//     Contraintes :
-// Exception :
-// Effets de bord :
-// Postcondition :
-//
 Sortie& Modele_rayo_semi_transp::printOn(Sortie& os) const
 {
   return os;
@@ -139,9 +102,9 @@ void Modele_rayo_semi_transp::associer_sch_tps_base(const Schema_Temps_base& un_
 // Effets de bord :
 // Postcondition :
 //
-Champ_Inc& Modele_rayo_semi_transp::put_irradience()
+Champ_Inc_base& Modele_rayo_semi_transp::put_irradience()
 {
-  Champ_Inc& irradiance = eq_rayo().inconnue();
+  Champ_Inc_base& irradiance = eq_rayo().inconnue();
   return irradiance;
 }
 
@@ -201,10 +164,10 @@ void Modele_rayo_semi_transp::preparer_calcul()
     {
 
       // Associer le modele au CL rayonnantes.
-      Domaine_Cl_dis& la_zcl = probleme().equation(j).domaine_Cl_dis();
-      for (int num_cl=0; num_cl<la_zcl->nb_cond_lim(); num_cl++)
+      Domaine_Cl_dis_base& la_zcl = probleme().equation(j).domaine_Cl_dis();
+      for (int num_cl=0; num_cl<la_zcl.nb_cond_lim(); num_cl++)
         {
-          Cond_lim_base& la_cl = la_zcl->les_conditions_limites(num_cl).valeur();
+          Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
           Cond_Lim_rayo_semi_transp* la_cl_rayo_semi_transp;
 
           if (is_la_cl_rayo(la_cl,la_cl_rayo_semi_transp))
@@ -278,9 +241,9 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
   le_domaine_->init_renum_perio();
 
   dis.associer_domaine(le_domaine_.valeur());
-  dis.discretiser(le_domaine_dis_);
+  le_domaine_dis_ = dis.discretiser();
   // Can not do this before, since the Domaine_dis is not typed yet:
-  le_domaine_dis_->valeur().associer_domaine(le_domaine_);
+  le_domaine_dis_->associer_domaine(le_domaine_);
 
   Cerr << "Discretisation des equations" << finl;
   for(int i=0; i<nombre_d_equations(); i++)
@@ -299,15 +262,14 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
 
       if (fluide.is_rayo_semi_transp())
         {
-          Champ_Don& l_rayo = fluide.longueur_rayo();
-          Champ_Don& coeff_abs = fluide.kappa();
+          Champ_Don_base& coeff_abs = fluide.kappa();
 
-          if (sub_type(Champ_Uniforme,coeff_abs.valeur()))
+          if (sub_type(Champ_Uniforme,coeff_abs))
             {
-
-              // Typage du Champ_Don longueur_rayo_ comme un champ_uniforme
-              l_rayo.typer("Champ_Uniforme");
-              Champ_Uniforme& ch_l_rayo=ref_cast(Champ_Uniforme,l_rayo.valeur());
+              // Typage du OWN_PTR(Champ_Don_base) longueur_rayo_ comme un champ_uniforme
+              fluide.typer_longeur_rayo("Champ_Uniforme");
+              Champ_Don_base& l_rayo = fluide.longueur_rayo();
+              Champ_Uniforme& ch_l_rayo=ref_cast(Champ_Uniforme,l_rayo);
               ch_l_rayo.nommer("longueur_de_rayonnement");
               ch_l_rayo.fixer_nb_comp(1);
               // Le nombre de valeurs nodales est fixe a 1 ici car il s'agit d'un
@@ -319,7 +281,7 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
             }
           else
             {
-              Cerr <<"le coefficient d'absorption n'est pas un Champ Uniforme "<<finl;
+              Cerr <<"le coefficient d'absorption n'est pas un OWN_PTR(Champ_base) Uniforme "<<finl;
               Cerr <<"mais un "<<coeff_abs.que_suis_je()<<". modifier la methode "<<finl;
               Cerr <<"Pb_Couple_rayo_semi_transp::discretiser pour pouvoir prendre"<<finl;
               Cerr <<"en compte ce type de Champ_Don"<<finl;
@@ -351,12 +313,12 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
 // On met a jour le flux radiatif pour tous les bords du probleme
 void Modele_rayo_semi_transp::calculer_flux_radiatif()
 {
-  Conds_lim& les_cl_rayo = eq_rayo().domaine_Cl_dis()->les_conditions_limites();
+  Conds_lim& les_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites();
 
   int num_cl_rayo=0;
   for(num_cl_rayo=0; num_cl_rayo<les_cl_rayo.size(); num_cl_rayo++)
     {
-      Cond_lim& la_cl_rayo = eq_rayo().domaine_Cl_dis()->les_conditions_limites(num_cl_rayo);
+      Cond_lim& la_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites(num_cl_rayo);
       if(sub_type(Flux_radiatif_base,la_cl_rayo.valeur()))
         {
           Flux_radiatif_base& la_cl_rayon = ref_cast(Flux_radiatif_base,la_cl_rayo.valeur());
@@ -376,36 +338,17 @@ void Modele_rayo_semi_transp::calculer_flux_radiatif()
     }
 }
 
-
-////////////////////////////////////////////////////////////////////
-// Description :
-//
-// Precondition :
-// Parametre :
-//     Signification :
-//     Valeurs par defaut :
-//     Contraintes :
-//     Entree :
-//     Entree/Sortie :
-//     Sortie :
-// Retour :
-//     Signification :
-//     Contraintes :
-// Exception :
-// Effets de bord :
-// Postcondition :
-//
-const Champ_front& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) const
+const Champ_front_base& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) const
 {
   //  Cerr<<"Modele_rayo_semi_transp::flux_radiatif const : Debut"<<finl;
   // On fait une boucle sur les bords pour trouver celui dont le nom est nom_bord
-  const Conds_lim& les_cl_rayo = eq_rayo().domaine_Cl_dis()->les_conditions_limites();
+  const Conds_lim& les_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites();
 
 
   int num_cl_rayo=0;
   for(num_cl_rayo=0; num_cl_rayo<les_cl_rayo.size(); num_cl_rayo++)
     {
-      const Cond_lim& la_cl_rayo = eq_rayo().domaine_Cl_dis()->les_conditions_limites(num_cl_rayo);
+      const Cond_lim& la_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites(num_cl_rayo);
 
       if(la_cl_rayo->frontiere_dis().le_nom()==nom_bord)
         {
@@ -427,10 +370,8 @@ const Champ_front& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) c
   Cerr<<"il n'y a pas de condition a la limite portant le nom "<<nom_bord<<finl;
   exit();
   //pour les compilos
-  const Cond_lim& la_cl_rayo = eq_rayo().domaine_Cl_dis()->les_conditions_limites(0);
+  const Cond_lim& la_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites(0);
   Flux_radiatif_base& la_cl_rayon = ref_cast_non_const(Flux_radiatif_base,la_cl_rayo.valeur());
   return la_cl_rayon.flux_radiatif();
   //  Cerr<<"Modele_rayo_semi_transp::flux_radiatif const : Fin"<<finl;
 }
-
-

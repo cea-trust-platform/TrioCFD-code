@@ -146,19 +146,19 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   const IntTab& face_voisins = domaine_VDF.face_voisins();
 
   const Equation_base& eqn_temp = mon_modele_turb_scal->equation();
-  const DoubleTab& Temp = eqn_temp.inconnue()->valeurs();
-  const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis().valeur());
+  const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
+  const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis());
 
   const double t0 = eqn_temp.schema_temps().temps_courant();
   double T0=0.;
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Milieu_base& le_milieu_fluide = eqn_hydr.milieu();
-  const Champ_Don& ch_lambda = le_milieu_fluide.conductivite();
-  const Champ_Don& ch_Cp = le_milieu_fluide.capacite_calorifique();
-  const Champ& ch_rho = le_milieu_fluide.masse_volumique();
-  const DoubleTab& lambda_f = ch_lambda->valeurs();
-  const DoubleTab& Cp_f     = ch_Cp->valeurs();
-  const DoubleTab& rho_f    = ch_rho->valeurs();
+  const Champ_Don_base& ch_lambda = le_milieu_fluide.conductivite();
+  const Champ_Don_base& ch_Cp = le_milieu_fluide.capacite_calorifique();
+  const Champ_base& ch_rho = le_milieu_fluide.masse_volumique();
+  const DoubleTab& lambda_f = ch_lambda.valeurs();
+  const DoubleTab& Cp_f     = ch_Cp.valeurs();
+  const DoubleTab& rho_f    = ch_rho.valeurs();
 
   int lambda_unif = 0;
   int Cp_unif = 0;
@@ -167,17 +167,17 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   double Cp_f_loc = -1;;
   double rho_f_loc = -1.;
 
-  if (sub_type(Champ_Uniforme,ch_lambda.valeur()))
+  if (sub_type(Champ_Uniforme,ch_lambda))
     {
       lambda_unif = 1;
       lambda_f_loc = std::max(lambda_f(0,0),DMINFLOAT);
     }
-  if (sub_type(Champ_Uniforme,ch_Cp.valeur()))
+  if (sub_type(Champ_Uniforme,ch_Cp))
     {
       Cp_unif = 1;
       Cp_f_loc = std::max(Cp_f(0,0),DMINFLOAT);
     }
-  if (sub_type(Champ_Uniforme,ch_rho.valeur()))
+  if (sub_type(Champ_Uniforme,ch_rho))
     {
       rho_unif = 1;
       rho_f_loc = std::max(rho_f(0,0),DMINFLOAT);
@@ -250,11 +250,11 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
           else if(sub_type(Echange_contact_VDF,la_cl_th.valeur()))
             {
               const Echange_contact_VDF& la_cl_couplee = ref_cast(Echange_contact_VDF,la_cl_th.valeur());
-              const Champ_front_calc& ch_solide = ref_cast(Champ_front_calc, la_cl_couplee.T_autre_pb().valeur());
+              const Champ_front_calc& ch_solide = ref_cast(Champ_front_calc, la_cl_couplee.T_autre_pb());
               const Milieu_base& le_milieu_solide=ch_solide.milieu();
-              const DoubleTab& lambda_s = le_milieu_solide.conductivite()->valeurs();
-              const DoubleTab& Cp_s     = le_milieu_solide.capacite_calorifique()->valeurs();
-              const DoubleTab& rho_s    = le_milieu_solide.masse_volumique()->valeurs();
+              const DoubleTab& lambda_s = le_milieu_solide.conductivite().valeurs();
+              const DoubleTab& Cp_s     = le_milieu_solide.capacite_calorifique().valeurs();
+              const DoubleTab& rho_s    = le_milieu_solide.masse_volumique().valeurs();
 
               double K;
               for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -324,10 +324,10 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide   = ref_cast(Fluide_base,eqn_hydr.milieu());
-  const Champ_Don& ch_visco_cin            = le_fluide.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin            = le_fluide.viscosite_cinematique();
   const Milieu_base& le_milieu_fluide      = eqn_hydr.milieu();
-  const DoubleTab& lambda_f                = le_milieu_fluide.conductivite()->valeurs();
-  const double rhoCp = le_milieu_fluide.capacite_calorifique()->valeurs()(0, 0) * le_milieu_fluide.masse_volumique()->valeurs()(0, 0);
+  const DoubleTab& lambda_f                = le_milieu_fluide.conductivite().valeurs();
+  const double rhoCp = le_milieu_fluide.capacite_calorifique().valeurs()(0, 0) * le_milieu_fluide.masse_volumique().valeurs()(0, 0);
 
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems,1);
@@ -363,10 +363,10 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   SFichier fic_sonde_temp_95("sonde_ODVM_yp_9_5.dat",ios::app); // impression sonde 9
   ////////////////////////////////////////////////////////////////////////////////
 #endif
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   int l_unif;
   double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  if (sub_type(Champ_Uniforme,ch_visco_cin))
     {
       l_unif = 1;
       visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -394,15 +394,15 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
-  const DoubleVect& tab_ustar = loi->tab_u_star();
+  const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi();
+  const DoubleVect& tab_ustar = loi.tab_u_star();
 
   int schmidt = 0;
   if (sub_type(Convection_Diffusion_Concentration,eqn_temp)) schmidt = 1;
-  const Champ_Don& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn_temp).constituant().diffusivite_constituant():le_fluide.diffusivite());
+  const Champ_Don_base& alpha = (schmidt==1?ref_cast(Convection_Diffusion_Concentration,eqn_temp).constituant().diffusivite_constituant():le_fluide.diffusivite());
 
-  const DoubleVect& Temp = eqn_temp.inconnue()->valeurs();
-  const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis().valeur());
+  const DoubleVect& Temp = eqn_temp.inconnue().valeurs();
+  const Domaine_Cl_VDF& domaine_Cl_VDF_th = ref_cast(Domaine_Cl_VDF,eqn_temp.domaine_Cl_dis());
 
 
   const double tps = eqn_temp.schema_temps().temps_courant();
@@ -437,11 +437,11 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                   if ((elem = face_voisins(num_face,0)) == -1) elem = face_voisins(num_face,1);
                   if (l_unif) visco_cin = visco;
                   else visco_cin = tab_visco[elem];
-                  if (sub_type(Champ_Uniforme,alpha.valeur())) diff = alpha->valeurs()(0,0);
+                  if (sub_type(Champ_Uniforme,alpha)) diff = alpha.valeurs()(0,0);
                   else
                     {
-                      if (alpha->nb_comp()==1) diff = alpha->valeurs()(elem);
-                      else diff = alpha->valeurs()(elem,0);
+                      if (alpha.nb_comp()==1) diff = alpha.valeurs()(elem);
+                      else diff = alpha.valeurs()(elem,0);
                     }
                   T0 = la_cl_ech.T_ext(num_face-ndeb);
                   if(compt) eq_odvm[num_face].set_U_tau(tab_ustar(num_face),1);
@@ -518,17 +518,17 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
               // On fait une supposition sur le schema en temps
               // (CLs prises au temps futur)
-              const DoubleTab& t_autre=la_cl_couplee.T_autre_pb()->valeurs_au_temps(tps+dtG);
+              const DoubleTab& t_autre=la_cl_couplee.T_autre_pb().valeurs_au_temps(tps+dtG);
               for (int num_face=ndeb; num_face<nfin; num_face++)
                 {
                   if ((elem = face_voisins(num_face,0)) == -1) elem = face_voisins(num_face,1);
                   if (l_unif) visco_cin = visco;
                   else visco_cin = tab_visco[elem];
-                  if (sub_type(Champ_Uniforme,alpha.valeur())) diff = alpha->valeurs()(0,0);
+                  if (sub_type(Champ_Uniforme,alpha)) diff = alpha.valeurs()(0,0);
                   else
                     {
-                      if (alpha->nb_comp()==1) diff = alpha->valeurs()(elem);
-                      else diff = alpha->valeurs()(elem,0);
+                      if (alpha.nb_comp()==1) diff = alpha.valeurs()(elem);
+                      else diff = alpha.valeurs()(elem,0);
                     }
 
                   const double Temp_solid = t_autre(num_face-ndeb,0);

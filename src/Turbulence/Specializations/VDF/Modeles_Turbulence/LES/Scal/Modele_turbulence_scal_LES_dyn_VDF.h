@@ -25,11 +25,11 @@
 
 #include <Modele_turbulence_scal_base.h>
 #include <Motcle.h>
-#include <Champ_Fonc.h>
+
 #include <TRUSTTab.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
-#include <Domaine_Cl_dis.h>
+
+
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 
@@ -40,7 +40,7 @@ class Modele_turbulence_scal_LES_dyn_VDF: public Modele_turbulence_scal_base
 
 public:
 
-  void associer(const Domaine_dis&, const Domaine_Cl_dis&) override;
+  void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&) override;
   ////virtual Entree& lire(const Motcle&, Entree&);
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
@@ -59,7 +59,7 @@ protected:
   DoubleVect model_coeff;
 
   void mettre_a_jour(double) override;
-  Champ_Fonc& calculer_diffusivite_turbulente();
+  Champ_Fonc_base& calculer_diffusivite_turbulente();
 
   ////void calculer_length_scale(DoubleVect& );
   ////void calculer_cell_cent_vel(DoubleTab& );
@@ -88,8 +88,8 @@ protected:
 
 private:
 
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
 
 };
 

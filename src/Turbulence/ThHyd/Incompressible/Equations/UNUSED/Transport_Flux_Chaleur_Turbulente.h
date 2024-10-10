@@ -40,7 +40,7 @@ public :
   Transport_Flux_Chaleur_Turbulente();
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  inline void associer_vitesse(const Champ_Inc& );
+  inline void associer_vitesse(const Champ_Inc_base& );
   void associer_milieu_base(const Milieu_base& ) override;
   void associer_modele_turbulence(const Modele_turbulence_scal_Fluctuation_Temperature& );
   void discretiser() override;
@@ -52,9 +52,9 @@ public :
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
-  inline const Champ_Inc& vitesse_transportante();
-  const Champ_Inc& inconnue() const override;
-  Champ_Inc& inconnue() override;
+  inline const Champ_Inc_base& vitesse_transportante();
+  const Champ_Inc_base& inconnue() const override;
+  Champ_Inc_base& inconnue() override;
 
   /////////////////////////////////////////////////////
   const Motcle& domaine_application() const override;
@@ -62,13 +62,13 @@ public :
 
 protected :
 
-  Champ_Inc le_Flux_Chaleur_Turbulente;
+  OWN_PTR(Champ_Inc_base) le_Flux_Chaleur_Turbulente;
   Op_Diff_Flux_Chaleur_Turb terme_diffusif;
   Operateur_Conv terme_convectif;
 
-  REF(Fluide_base)le_fluide;
-  REF(Champ_Inc) la_vitesse_transportante;
-  REF(Modele_turbulence_scal_Fluctuation_Temperature) mon_modele_fluctu;
+  OBS_PTR(Fluide_base)le_fluide;
+  OBS_PTR(Champ_Inc_base) la_vitesse_transportante;
+  OBS_PTR(Modele_turbulence_scal_Fluctuation_Temperature) mon_modele_fluctu;
 
 
 };
@@ -76,7 +76,7 @@ protected :
 /*! @brief renvoie le champ inconnue.
  *
  */
-inline Champ_Inc& Transport_Flux_Chaleur_Turbulente::inconnue()
+inline Champ_Inc_base& Transport_Flux_Chaleur_Turbulente::inconnue()
 {
   return le_Flux_Chaleur_Turbulente;
 }
@@ -84,7 +84,7 @@ inline Champ_Inc& Transport_Flux_Chaleur_Turbulente::inconnue()
 /*! @brief renvoie le champ inconnue.
  *
  */
-inline const Champ_Inc& Transport_Flux_Chaleur_Turbulente::inconnue() const
+inline const Champ_Inc_base& Transport_Flux_Chaleur_Turbulente::inconnue() const
 {
   return le_Flux_Chaleur_Turbulente;
 }
@@ -101,7 +101,7 @@ inline Modele_turbulence_scal_Fluctuation_Temperature& Transport_Flux_Chaleur_Tu
   return mon_modele_fluctu.valeur();
 }
 
-inline void Transport_Flux_Chaleur_Turbulente::associer_vitesse(const Champ_Inc& vit)
+inline void Transport_Flux_Chaleur_Turbulente::associer_vitesse(const Champ_Inc_base& vit)
 {
   la_vitesse_transportante = vit;
 }

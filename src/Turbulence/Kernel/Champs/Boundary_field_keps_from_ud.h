@@ -23,7 +23,7 @@
 #define Boundary_field_keps_from_ud_included
 
 #include <Ch_front_var_instationnaire_dep.h>
-#include <Champ_front.h>
+
 
 class Boundary_field_keps_from_ud : public Ch_front_var_instationnaire_dep
 {
@@ -34,10 +34,10 @@ public:
   int initialiser(double temps, const Champ_Inc_base& inco) override;
   void mettre_a_jour(double temps) override ;
 protected:
-  Champ_front vitesse_; // velocity field
+  OWN_PTR(Champ_front_base) vitesse_; // velocity field
   double d; // hydraulic diameter
   double I; // intensity turbulence
-  //REF(Schema_Temps_base) sch;
+  //OBS_PTR(Schema_Temps_base) sch;
 };
 
 #endif

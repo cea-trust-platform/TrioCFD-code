@@ -29,8 +29,8 @@
 #include <TRUST_Deriv.h>
 #include <TRUSTTabs_forward.h>
 #include <TRUST_Ref.h>
-#include <Champ_Don.h>
-#include <Champ_Fonc.h>
+
+
 
 class Champ_base;
 
@@ -91,7 +91,7 @@ class Op_Diff_K_Eps_negligeable : public Operateur_negligeable,
 
 public:
 
-  inline void associer(const Domaine_dis&, const Domaine_Cl_dis&, const Champ_Inc& ) override;
+  inline void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base& ) override;
   inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
@@ -101,7 +101,7 @@ public:
   inline void associer_diffusivite_turbulente() override;
 
 protected:
-  REF(Champ_base) la_diffusivite;
+  OBS_PTR(Champ_base) la_diffusivite;
 };
 
 
@@ -123,32 +123,32 @@ public:
 
   inline Operateur_base& l_op_base() override;
   inline const Operateur_base& l_op_base() const override;
-  inline void associer_diffusivite_turbulente();
   DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline Champ_base& associer_diffusivite(const Champ_base&);
   inline const Champ_base& diffusivite() const;
   void typer() override;
+  void completer() override;
   inline int op_non_nul() const override;
 
 protected :
 
-  REF(Champ_base) la_diffusivite;
+  OBS_PTR(Champ_base) la_diffusivite;
 };
 
 
-/*! @brief Associe divers objets a un operateurs negligeable: NE FAIT RIEN Simple appel a Operateur_negligeable::associer(const Domaine_dis&,
+/*! @brief Associe divers objets a un operateurs negligeable: NE FAIT RIEN Simple appel a Operateur_negligeable::associer(const Domaine_dis_base&,
  *
- *                                                      const Domaine_Cl_dis&,
- *                                                      const Champ_Inc&)
+ *                                                      const Domaine_Cl_dis_base&,
+ *                                                      const Champ_Inc_base&)
  *
- * @param (Domaine_dis& domaine_dis)
- * @param (Domaine_Cl_dis& domaine_cl_dis)
- * @param (Champ_Inc& inco)
+ * @param (Domaine_dis_base& domaine_dis)
+ * @param (Domaine_Cl_dis_base& domaine_cl_dis)
+ * @param (Champ_Inc_base& inco)
  */
-inline void Op_Diff_K_Eps_negligeable::associer(const Domaine_dis& domaine_dis,
-                                                const Domaine_Cl_dis& domaine_cl_dis,
-                                                const Champ_Inc& inco)
+inline void Op_Diff_K_Eps_negligeable::associer(const Domaine_dis_base& domaine_dis,
+                                                const Domaine_Cl_dis_base& domaine_cl_dis,
+                                                const Champ_Inc_base& inco)
 {
   Operateur_negligeable::associer(domaine_dis,domaine_cl_dis,inco);
 }
@@ -182,14 +182,9 @@ inline DoubleTab& Op_Diff_K_Eps_negligeable::calculer(const DoubleTab& x, Double
   return Operateur_negligeable::calculer(x,y);
 }
 
-
-/*! @brief NE FAIT RIEN
- *
- */
 inline void Op_Diff_K_Eps_negligeable::contribuer_a_avec(const DoubleTab& inco,
                                                          Matrice_Morse& matrice) const
 {
-  ;
 }
 
 /*! @brief on ajoute la contribution du second membre.
@@ -197,23 +192,19 @@ inline void Op_Diff_K_Eps_negligeable::contribuer_a_avec(const DoubleTab& inco,
  */
 inline void Op_Diff_K_Eps_negligeable::contribuer_au_second_membre(DoubleTab& resu) const
 {
-  ;
 }
 
 // Modification des Cl
 inline void  Op_Diff_K_Eps_negligeable::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& resu) const
 {
-  ;
 }
 
 inline void  Op_Diff_K_Eps_negligeable::dimensionner(Matrice_Morse& matrice) const
 {
-  ;
 }
 
 inline void Op_Diff_K_Eps_negligeable::associer_diffusivite_turbulente()
 {
-  ;
 }
 
 /*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base
@@ -240,17 +231,6 @@ inline const Operateur_base& Op_Diff_K_Eps::l_op_base() const
   return valeur();
 }
 
-
-/*! @brief Appel a l'objet sous-jacent.
- *
- */
-inline void Op_Diff_K_Eps::associer_diffusivite_turbulente()
-{
-  valeur().associer_diffusivite_turbulente();
-}
-
-
-
 inline int Op_Diff_K_Eps::op_non_nul() const
 {
   if (non_nul())
@@ -258,7 +238,6 @@ inline int Op_Diff_K_Eps::op_non_nul() const
   else
     return 0;
 }
-
 
 /*! @brief Appel a l'objet sous-jacent.
  *
@@ -277,8 +256,8 @@ inline const Champ_base& Op_Diff_K_Eps::diffusivite() const
 
 /*! @brief Associe la diffusivite a l'operateur.
  *
- * @param (Champ_Don& nu) le champ representant la diffusivite
- * @return (Champ_Don&) le champ representant la diffusivite
+ * @param (Champ_Don_base& nu) le champ representant la diffusivite
+ * @return (Champ_Don_base&) le champ representant la diffusivite
  */
 inline Champ_base& Op_Diff_K_Eps::associer_diffusivite(const Champ_base& nu)
 {
@@ -286,11 +265,4 @@ inline Champ_base& Op_Diff_K_Eps::associer_diffusivite(const Champ_base& nu)
   return la_diffusivite.valeur();
 }
 
-
-
-
 #endif
-
-
-
-

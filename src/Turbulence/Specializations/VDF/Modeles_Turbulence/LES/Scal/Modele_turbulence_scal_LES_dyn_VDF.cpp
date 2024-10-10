@@ -26,7 +26,7 @@
 #include <Operateur.h>
 #include <Probleme_base.h>
 #include <Milieu_base.h>
-#include <Champ_Don.h>
+
 #include <Champ_Uniforme.h>
 #include <Modele_turbulence_hyd_LES_SMAGO_DYN_VDF.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
@@ -55,10 +55,10 @@ void Modele_turbulence_scal_LES_dyn_VDF::set_param(Param& param)
   Modele_turbulence_scal_base::set_param(param);
 }
 
-void Modele_turbulence_scal_LES_dyn_VDF::associer(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Modele_turbulence_scal_LES_dyn_VDF::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis.valeur());
-  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis.valeur());
+  le_dom_VDF = ref_cast(Domaine_VDF, domaine_dis);
+  le_dom_Cl_VDF = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis);
 }
 
 int Modele_turbulence_scal_LES_dyn_VDF::lire_motcle_non_standard(const Motcle& motlu, Entree& is)
@@ -150,9 +150,9 @@ void Modele_turbulence_scal_LES_dyn_VDF::mettre_a_jour(double)
   calculer_diffusivite_turbulente();
 
   const Milieu_base& le_milieu = equation().probleme().milieu();
-  const DoubleTab& tab_Cp = le_milieu.capacite_calorifique()->valeurs();
-  const bool Ccp = sub_type(Champ_Uniforme, le_milieu.capacite_calorifique().valeur());
-  const DoubleTab& tab_rho = le_milieu.masse_volumique()->valeurs();
+  const DoubleTab& tab_Cp = le_milieu.capacite_calorifique().valeurs();
+  const bool Ccp = sub_type(Champ_Uniforme, le_milieu.capacite_calorifique());
+  const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
   const Probleme_base& mon_pb = mon_equation_->probleme();
   DoubleTab& lambda_t = conductivite_turbulente_->valeurs();
   lambda_t = diffusivite_turbulente_->valeurs();
@@ -169,16 +169,16 @@ void Modele_turbulence_scal_LES_dyn_VDF::mettre_a_jour(double)
 }
 
 //////////////////////////////////////////////////////////////////////
-Champ_Fonc& Modele_turbulence_scal_LES_dyn_VDF::calculer_diffusivite_turbulente()
+Champ_Fonc_base& Modele_turbulence_scal_LES_dyn_VDF::calculer_diffusivite_turbulente()
 {
   DoubleTab& alpha_t = diffusivite_turbulente_->valeurs();
   Equation_base& eq_NS_turb = equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_NS_turb.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base, modele_turbulence_hydr.valeur());
-  const Champ_Fonc& champ = mod_turb_hydr.viscosite_turbulente();
+  const Champ_Fonc_base& champ = mod_turb_hydr.viscosite_turbulente();
 
-  Debog::verifier("la_viscosite_turbulente", champ->valeurs());
-  double temps = champ->temps();
+  Debog::verifier("la_viscosite_turbulente", champ.valeurs());
+  double temps = champ.temps();
   int nb_elem_tot = le_dom_VDF->domaine().nb_elem_tot();
   DoubleTab l(nb_elem_tot);
   cell_cent_vel.resize(nb_elem_tot, dimension);
@@ -186,7 +186,7 @@ Champ_Fonc& Modele_turbulence_scal_LES_dyn_VDF::calculer_diffusivite_turbulente(
   DoubleTab filt_vel(0, dimension);
   le_dom_VDF->domaine().creer_tableau_elements(filt_vel);
 
-  const DoubleTab& teta = equation().inconnue()->valeurs();
+  const DoubleTab& teta = equation().inconnue().valeurs();
   DoubleTab filt_teta;
   le_dom_VDF->domaine().creer_tableau_elements(filt_teta);
   DoubleTab Lj(filt_vel);
@@ -368,7 +368,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calculer_grad_teta(const DoubleVect& te
   const DoubleTab& xp = le_dom_VDF->xp();
 
   const Milieu_base& le_milieu = equation().probleme().milieu();
-  const Champ_Don& lambda = le_milieu.conductivite();
+  const Champ_Don_base& lambda = le_milieu.conductivite();
 
   //Calcul du gradient aux faces
 
@@ -376,9 +376,9 @@ void Modele_turbulence_scal_LES_dyn_VDF::calculer_grad_teta(const DoubleVect& te
   for (face = 0; face < nb_faces_bord; face++)
     grad_teta_face(face) = flux_bords(face) / faces_surfaces(face);
 
-  if ((sub_type(Champ_Uniforme, lambda.valeur())))
+  if ((sub_type(Champ_Uniforme, lambda)))
     {
-      double coef = lambda->valeurs()(0, 0);
+      double coef = lambda.valeurs()(0, 0);
       for (face = 0; face < nb_faces_bord; face++)
         grad_teta_face(face) /= coef;
     }
@@ -389,11 +389,11 @@ void Modele_turbulence_scal_LES_dyn_VDF::calculer_grad_teta(const DoubleVect& te
         {
           num_elem = face_voisins(face, 0);
           if (num_elem != -1)
-            grad_teta_face(face) /= (lambda->valeurs()(num_elem));
+            grad_teta_face(face) /= (lambda.valeurs()(num_elem));
           else
             {
               num_elem = face_voisins(face, 1);
-              grad_teta_face(face) /= (lambda->valeurs()(num_elem));
+              grad_teta_face(face) /= (lambda.valeurs()(num_elem));
             }
         }
     }
@@ -899,7 +899,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calcul_voisins(const int element_number
  }
  */
 //////////////////////////////////////////////////////////////////////
-void Modele_turbulence_scal_LES_dyn_VDF::calc_elem_elem(void)
+void Modele_turbulence_scal_LES_dyn_VDF::calc_elem_elem()
 {
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const IntTab& face_voisins = domaine_VDF.face_voisins();
@@ -1015,7 +1015,7 @@ void Modele_turbulence_scal_LES_dyn_VDF::calc_elem_elem(void)
 void Modele_turbulence_scal_LES_dyn_VDF::calcul_tableaux_correspondance(int& N_c, IntVect& compt_c, IntVect& corresp_c)
 {
   // Initialisation de : Yuv + compt_c + corresp_c
-  const Domaine_dis_base& zdisbase = mon_equation_->inconnue()->domaine_dis_base();
+  const Domaine_dis_base& zdisbase = mon_equation_->inconnue().domaine_dis_base();
   const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF, zdisbase);
   const DoubleTab& xp = domaine_VDF.xp();
   int nb_elems = domaine_VDF.domaine().nb_elem();

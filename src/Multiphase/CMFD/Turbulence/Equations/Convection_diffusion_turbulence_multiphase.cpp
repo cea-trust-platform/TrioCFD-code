@@ -73,15 +73,15 @@ void Convection_diffusion_turbulence_multiphase::completer()
 {
   Convection_Diffusion_std::completer(); // en fait c'est Equation_base::completer() mais on sais pas un jour ...
 
-  const Domaine_dis& zdis = domaine_dis();
-  if (zdis->que_suis_je().debute_par("Domaine_VDF"))
+  const Domaine_dis_base& zdis = domaine_dis();
+  if (zdis.que_suis_je().debute_par("Domaine_VDF"))
     {
       // initialiser l'operateur grad SI VDF
       Op_Grad_.associer_eqn(*this);
       Op_Grad_.typer();
       Op_Grad_.l_op_base().associer_eqn(*this);
-      const Domaine_Cl_dis& zcl = domaine_Cl_dis();
-      const Champ_Inc& inco = inconnue();
+      const Domaine_Cl_dis_base& zcl = domaine_Cl_dis();
+      const Champ_Inc_base& inco = inconnue();
       Op_Grad_->associer(zdis, zcl, inco);
     }
 }

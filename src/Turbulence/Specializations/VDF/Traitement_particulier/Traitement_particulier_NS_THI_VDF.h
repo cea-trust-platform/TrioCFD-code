@@ -42,10 +42,10 @@ public :
 
 protected :
 
-  void renorm_Ec(void) override;
-  void init_calc_spectre(void) override;
-  void calcul_spectre(void) override;
-  void sorties_globales(void) override;
+  void renorm_Ec() override;
+  void init_calc_spectre() override;
+  void calcul_spectre() override;
+  void sorties_globales() override;
   void calcul_Ec_D(double&, double&) ;
 
   void ch_vit_pour_fft(DoubleTab& );

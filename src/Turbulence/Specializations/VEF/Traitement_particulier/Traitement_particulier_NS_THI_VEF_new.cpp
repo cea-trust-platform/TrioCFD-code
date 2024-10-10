@@ -53,10 +53,10 @@ Entree& Traitement_particulier_NS_THI_VEF_new::readOn(Entree& is)
   return is;
 }
 
-void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
+void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre()
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   calcul_nb_som_dir(domaine);
   int nsize, nsizes2, nl;
 
@@ -118,7 +118,7 @@ void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
 
 
   SFichier fic2 ("Sorties_THI_2",ios::app);
-  double temps_crt = mon_equation->inconnue()->temps();
+  double temps_crt = mon_equation->inconnue().temps();
   //  fic2 << temps_crt << (Ec1+Ec2+Ec3)/3.  << (D1+D2+D3)/3.  << finl;
   //  Cerr << " Ec_tot = " << (Ec1+Ec2+Ec3)/3. << finl;
   fic2 << temps_crt << Ec1  << D1  << finl;
@@ -127,10 +127,10 @@ void Traitement_particulier_NS_THI_VEF_new::init_calc_spectre(void)
 }
 
 
-void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
+void Traitement_particulier_NS_THI_VEF_new::calcul_spectre()
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   calcul_nb_som_dir(domaine);
   int nsize, nsizes2, nl;
 
@@ -163,7 +163,7 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
   Df1=0.;
   Df2=0.;
 
-  double temps_crt = mon_equation->inconnue()->temps();
+  double temps_crt = mon_equation->inconnue().temps();
   double dt_post_inst = 0.5;
 
 
@@ -200,16 +200,16 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
 
 
 
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
-  DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const int nb_faces = domaine_VEF.nb_faces();
   double Ectot=0.0;
   double Ec_ub=0.0;
   double Ec_up=0.0;
   double Ec_ubp=0.0;
   DoubleTab ub(vitesse);
-  const Champ_P1NC& chp=ref_cast(Champ_P1NC, mon_equation->inconnue().valeur());
+  const Champ_P1NC& chp=ref_cast(Champ_P1NC, mon_equation->inconnue());
   chp.filtrer_L2(ub);
 
 
@@ -248,11 +248,11 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
 }
 
 
-void Traitement_particulier_NS_THI_VEF_new::renorm_Ec(void)
+void Traitement_particulier_NS_THI_VEF_new::renorm_Ec()
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
-  DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const int nb_faces = domaine_VEF.nb_faces();
   double Ectot=0.0;
 
@@ -277,7 +277,7 @@ void Traitement_particulier_NS_THI_VEF_new::renorm_Ec(void)
   {
   Ectot=0.0;
 
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
   const Domaine& domaine = zdis.domaine();
   int nb_som = domaine.nb_som();
   double nb=pow(nb_som*1.,1./3.);
@@ -296,7 +296,7 @@ void Traitement_particulier_NS_THI_VEF_new::renorm_Ec(void)
   DoubleVect Dk(nsizes2+1);
   double Ec,Ec1,Ec2,Df,Df1,Df2;
 
-  double temps_crt = mon_equation->inconnue()->temps();
+  double temps_crt = mon_equation->inconnue().temps();
 
   ch_vit_pour_fft_VEF(vit_u,vit_v,vit_w);
   calculer_spectre_new(vit_u, vit_v, vit_w, nsize, nl, 1000.+temps_crt, Ek, Ec, Dk, Df);
@@ -330,12 +330,12 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF(DoubleTab& vit_u
   nsize = 3*nl;
   //  nsizes2=nsize/2;
 
-  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   int num_face;
   int i,j,k;
 
   DoubleTab ubar(vitesse);
-  const Champ_P1NC& chp=ref_cast(Champ_P1NC, mon_equation->inconnue().valeur());
+  const Champ_P1NC& chp=ref_cast(Champ_P1NC, mon_equation->inconnue());
   chp.filtrer_L2(ubar);
 
   for (i=0; i<nl; i++)
@@ -357,12 +357,12 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_1(DoubleTab& vit
   nsize = 3*nl;
   //  nsizes2=nsize/2;
 
-  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   int num_face;
   int i,j,k;
 
   DoubleTab ubar(vitesse);
-  const Champ_P1NC& chp=ref_cast(Champ_P1NC, mon_equation->inconnue().valeur());
+  const Champ_P1NC& chp=ref_cast(Champ_P1NC, mon_equation->inconnue());
   chp.filtrer_L2(ubar);
 
   for (i=0; i<nl; i++)
@@ -384,7 +384,7 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_2(DoubleTab& vit
   nsize = 3*nl;
   //  nsizes2=nsize/2;
 
-  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
+  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   int num_face;
   int i,j,k;
 
@@ -402,20 +402,20 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_2(DoubleTab& vit
 
 void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_s(DoubleTab& vit_u_s, DoubleTab& vit_v_s, DoubleTab& vit_w_s) const
 {
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   int nb_som = domaine.nb_som();
   int nl;
 
   nl = nb_som_dir; // anciennement nb_som_dir
 
-  const DoubleTab& vitesse = mon_equation->inconnue()->valeurs();
-  double temps_crt = mon_equation->inconnue()->temps();
+  const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
+  double temps_crt = mon_equation->inconnue().temps();
   int num_som;
   int i,j,k;
 
   //int nb_faces=vitesse.dimension(0);
-  Champ_P1NC& chp=ref_cast_non_const(Champ_P1NC, mon_equation->inconnue().valeur());
+  Champ_P1NC& chp=ref_cast_non_const(Champ_P1NC, mon_equation->inconnue());
   //DoubleTab vit_fac(chp.valeurs());
   const int nb_comp = vitesse.line_size();
   DoubleTab vit_som(nb_som, nb_comp);
@@ -466,11 +466,11 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_s(DoubleTab& vit
 
 void Traitement_particulier_NS_THI_VEF_new::determine_new_tab_fft_VEF()
 {
-  const Domaine_dis_base& zdisbase=mon_equation->inconnue()->domaine_dis_base();
+  const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const DoubleTab& xv = domaine_VEF.xv();
-  const Domaine_dis& zdis = mon_equation->domaine_dis();
-  const Domaine& domaine = zdis->domaine();
+  const Domaine_dis_base& zdis = mon_equation->domaine_dis();
+  const Domaine& domaine = zdis.domaine();
   const DoubleTab& coord = domaine.coord_sommets();
   int nb_som = domaine.nb_som();
   calcul_nb_som_dir(domaine);

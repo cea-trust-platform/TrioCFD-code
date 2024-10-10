@@ -39,10 +39,10 @@ Sortie& Source_Transport_K_Omega_VEF_Face_base::printOn(Sortie& os) const { retu
 
 Entree& Source_Transport_K_Omega_VEF_Face_base::readOn(Entree& is) { return Source_Transport_proto::readOn_proto(is, que_suis_je()); }
 
-void Source_Transport_K_Omega_VEF_Face_base::associer_domaines(const Domaine_dis& domaine_dis, const Domaine_Cl_dis& domaine_Cl_dis)
+void Source_Transport_K_Omega_VEF_Face_base::associer_domaines(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis)
 {
-  le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis.valeur());
-  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis.valeur());
+  le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis);
+  le_dom_Cl_VEF = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis);
 }
 
 void Source_Transport_K_Omega_VEF_Face_base::associer_pb(const Probleme_base& pb) { Source_Transport_proto::associer_pb_proto(pb); }
@@ -103,9 +103,9 @@ void Source_Transport_K_Omega_VEF_Face_base::elem_to_face(const Domaine_VF& doma
 DoubleTab& Source_Transport_K_Omega_VEF_Face_base::ajouter_komega(DoubleTab& resu) const
 {
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,
-                                                  eq_hydraulique->domaine_Cl_dis().valeur());
+                                                  eq_hydraulique->domaine_Cl_dis());
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
-  const DoubleTab& velocity = eq_hydraulique->inconnue()->valeurs();
+  const DoubleTab& velocity = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
   // const DoubleTab& tab = get_cisaillement_paroi(); // voir les classes filles
   const int nb_faces_tot = le_dom_VEF->nb_faces_tot();

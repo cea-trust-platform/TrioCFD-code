@@ -590,7 +590,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
           Cerr << " " << err;
           if (!Process::je_suis_maitre())
             {
-              Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+              Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : OWN_PTR(Champ_base) ECART_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
             }
         }
       Cerr << finl;
@@ -649,7 +649,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
       Cerr << " " << err;
       if (!Process::je_suis_maitre())
         {
-          Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_P_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+          Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : OWN_PTR(Champ_base) ECART_P_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
         }
       ecart_p_ana_.echange_espace_virtuel(ecart_p_ana_.ghost());
       Cerr << finl;
@@ -680,7 +680,7 @@ void IJK_FT_Post::posttraiter_champs_instantanes(const char *lata_name, double c
             Cerr << " " << err;
             if (!Process::je_suis_maitre())
               {
-                Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : Champ ECART_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
+                Process::Journal() << "IJK_FT_Post::posttraiter_champs_instantanes : OWN_PTR(Champ_base) ECART_ANA sur ce proc (ni,nj,nk,ntot):" << " " << ni << " " << nj << " " << nk << " " << ntot << finl;
               }
           }
         Cerr << finl;

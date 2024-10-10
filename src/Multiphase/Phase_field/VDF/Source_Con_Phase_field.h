@@ -26,7 +26,7 @@
 
 #include <Source_Con_Phase_field_base.h>
 #include <Matrice_Morse.h>
-#include <Champ_Don.h>
+
 #include <Table.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Equation_base.h>
@@ -34,7 +34,7 @@
 #include <SolveurSys.h>
 #include <EChaine.h>
 #include <TRUST_Ref.h>
-#include <Domaine_Cl_dis.h>
+
 
 class Domaine_Cl_VDF;
 class Domaine_VDF;
@@ -62,12 +62,12 @@ public:
 
   inline double drhodc(const int n_elem) const;
 
-  void calculer_champ_fonc_c(const double t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const override;
+  void calculer_champ_fonc_c(const double t, Champ_Don_base& champ_fonc_c, const DoubleTab& val_c) const override;
 
 protected:
   int tpsaff;
   double rho0;
-  REF(Champ_Don) drhodc_;
+  OBS_PTR(Champ_Don_base) drhodc_;
   DoubleTab accr;
   DoubleVect u_carre_;
   DoubleTab prov_face_,prov_elem_;
@@ -114,7 +114,7 @@ protected:
   int nkr, nit;
   double rec_min, rec_max, epsGMRES;
 
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
   DoubleTab& laplacien(const DoubleTab&, DoubleTab&) const;
   DoubleTab& div_kappa_grad(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
   void calculer_alpha_gradC_carre(DoubleTab&) const;
@@ -144,9 +144,9 @@ protected:
   /*   virtual int non_lin_gmres(const DoubleTab&, const DoubleTab&, const Matrice_Morse&, DoubleTab&); */
   //---------------
 
-  REF(Probleme_base) le_probleme2;
-  REF(Domaine_VDF) le_dom_VDF;
-  REF(Domaine_Cl_VDF) le_dom_Cl_VDF;
+  OBS_PTR(Probleme_base) le_probleme2;
+  OBS_PTR(Domaine_VDF) le_dom_VDF;
+  OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
 };
 
 inline const DoubleVect& Source_Con_Phase_field::get_u_carre()
@@ -159,7 +159,7 @@ inline const int& Source_Con_Phase_field::get_type_systeme_naire()
 }
 inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 {
-  const DoubleTab& tab = drhodc_->valeur().valeurs();
+  const DoubleTab& tab = drhodc_->valeurs();
   if (tab.dimension(0)==1)
     {
       int dim = tab.nb_dim();

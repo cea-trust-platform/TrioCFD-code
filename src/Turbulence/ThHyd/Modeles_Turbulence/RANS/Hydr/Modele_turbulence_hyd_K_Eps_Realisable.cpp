@@ -76,9 +76,9 @@ int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcl
     return Modele_turbulence_hyd_RANS_K_Eps_base::lire_motcle_non_standard(mot, is);
 }
 
-Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente(double temps)
+Champ_Fonc_base& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente(double temps)
 {
-  const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue().valeur();
+  const Champ_base& chK_Eps = eqn_transp_K_Eps().inconnue();
   const Nom& type = chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente K_Eps", tab_K_Eps);
@@ -94,9 +94,9 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
 
   if (non_prepare == 1)
     {
-      Champ_Inc visco_turb_au_format_K_eps_Rea;
+      OWN_PTR(Champ_Inc_base) visco_turb_au_format_K_eps_Rea;
       visco_turb_au_format_K_eps_Rea.typer(type);
-      DoubleTab& visco_turb_K_eps_Rea = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis().valeur(), visco_turb_au_format_K_eps_Rea);
+      DoubleTab& visco_turb_K_eps_Rea = complete_viscosity_field(n, eqn_transp_K_Eps().domaine_dis(), visco_turb_au_format_K_eps_Rea);
 
       if (visco_turb_K_eps_Rea.size() != n)
         {
@@ -139,7 +139,7 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
 void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
 {
   Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
-  eqn_transp_K_Eps().domaine_Cl_dis()->mettre_a_jour(temps);
+  eqn_transp_K_Eps().domaine_Cl_dis().mettre_a_jour(temps);
   if (!eqn_transp_K_Eps().equation_non_resolue())
     sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
   eqn_transp_K_Eps().mettre_a_jour(temps);

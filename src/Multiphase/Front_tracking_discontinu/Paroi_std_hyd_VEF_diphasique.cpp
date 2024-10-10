@@ -77,22 +77,22 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const DoubleTab& vitesse = eqn_hydr.inconnue()->valeurs();
+  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   // Physical properties of both phases
   const Fluide_Diphasique& le_fluide = ref_cast(Fluide_Diphasique, eqn_hydr.milieu());
   const Fluide_Incompressible& phase_1 = le_fluide.fluide_phase(1);
   const Fluide_Incompressible& phase_0 = le_fluide.fluide_phase(0);
-  const Champ_Don& ch_visco_cin_ph1 = phase_1.viscosite_cinematique();
-  const Champ_Don& ch_visco_cin_ph0 = phase_0.viscosite_cinematique();
-  const DoubleTab& tab_visco_ph1 = phase_1.viscosite_cinematique()->valeurs();
-  const DoubleTab& tab_visco_ph0 = phase_0.viscosite_cinematique()->valeurs();
+  const Champ_Don_base& ch_visco_cin_ph1 = phase_1.viscosite_cinematique();
+  const Champ_Don_base& ch_visco_cin_ph0 = phase_0.viscosite_cinematique();
+  const DoubleTab& tab_visco_ph1 = phase_1.viscosite_cinematique().valeurs();
+  const DoubleTab& tab_visco_ph0 = phase_0.viscosite_cinematique().valeurs();
   const double delta_nu = tab_visco_ph1(0,0) - tab_visco_ph0(0,0);
 
   // One way to get the Transport equation to pass the indicator DoubleTab
-  const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis().valeur();
+  const Domaine_Cl_dis_base& domaine_Cl_dis_base = eqn_hydr.domaine_Cl_dis();
   const Equation_base& eqn_trans = domaine_Cl_dis_base.equation().probleme().equation("Transport_Interfaces_FT_Disc");
   const Transport_Interfaces_FT_Disc& eqn_interf = ref_cast(Transport_Interfaces_FT_Disc, eqn_trans);
-  const DoubleTab& indic = eqn_interf.inconnue()->valeurs();
+  const DoubleTab& indic = eqn_interf.inconnue().valeurs();
 
   const Domaine& domaine = domaine_VEF.domaine();
   int nfac = domaine.nb_faces_elem();
@@ -100,7 +100,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
   double visco_ph0=-1;
   int l_unif;
 
-  if (sub_type(Champ_Uniforme,ch_visco_cin_ph1.valeur()) && sub_type(Champ_Uniforme,ch_visco_cin_ph0.valeur()) )
+  if (sub_type(Champ_Uniforme,ch_visco_cin_ph1) && sub_type(Champ_Uniforme,ch_visco_cin_ph0))
     {
       visco_ph0 = std::max(tab_visco_ph0(0,0),DMINFLOAT);
       l_unif = 1;
@@ -122,7 +122,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
 
   double dist_corr=1.;
   double coef_vit=nfac;
-  if (sub_type(Champ_P1NC,eqn_hydr.inconnue().valeur()))
+  if (sub_type(Champ_P1NC,eqn_hydr.inconnue()))
     {
       dist_corr=double(dimension+1)/double(dimension);
       coef_vit=nfac-1;

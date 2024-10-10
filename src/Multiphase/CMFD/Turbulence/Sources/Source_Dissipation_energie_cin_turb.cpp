@@ -64,8 +64,8 @@ void Source_Dissipation_energie_cin_turb::completer()
 
 void Source_Dissipation_energie_cin_turb::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const DoubleTab& k 	 = equation().inconnue()->valeurs();
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
+  const DoubleTab& k 	 = equation().inconnue().valeurs();
   const int ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), Nk = k.line_size();
 
   std::string Type_diss = ""; // omega or tau dissipation
@@ -102,13 +102,13 @@ void Source_Dissipation_energie_cin_turb::dimensionner_blocs(matrices_t matrices
 
 void Source_Dissipation_energie_cin_turb::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
-  const Domaine_VF&             domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
-  const DoubleTab&                    k = equation().inconnue()->valeurs();
+  const Domaine_VF&             domaine = ref_cast(Domaine_VF, equation().domaine_dis());
+  const DoubleTab&                    k = equation().inconnue().valeurs();
   const Champ_Inc_base&  ch_alpha_rho_k = equation().champ_conserve();
   const DoubleTab&          alpha_rho_k = ch_alpha_rho_k.passe();
   const tabs_t&         der_alpha_rho_k = ref_cast(Champ_Inc_base, ch_alpha_rho_k).derivees(); // dictionnaire des derivees
   const Navier_Stokes_std&       eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
-  const Viscosite_turbulente_base& visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
+  const Viscosite_turbulente_base& visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()));
   const DoubleTab& nu = equation().probleme().get_champ("viscosite_cinematique").passe();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
   double dt = equation().schema_temps().pas_de_temps();

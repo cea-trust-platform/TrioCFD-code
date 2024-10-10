@@ -19,6 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <Convection_Diffusion_Concentration.h>
 #include <Calcul_Production_K_VEF.h>
 #include <TRUSTTab.h>
 #include <Domaine_VEF.h>
@@ -28,7 +29,7 @@
 #include <Champ_P1NC.h>
 #include <Periodique.h>
 #include <Champ_Uniforme.h>
-#include <Convection_Diffusion_Concentration.h>
+#include <Champ_Don_base.h>
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -740,7 +741,7 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
   DoubleTab& G,
   const DoubleTab& inconnue, // scalar, concentration, temperature, etc.
   const DoubleTab& alpha_turb,
-  const Champ_Don& ch_beta,
+  const Champ_Don_base& ch_beta,
   const DoubleVect& gravite,
   int nb_consti ) const
 {
@@ -759,12 +760,12 @@ DoubleTab& Calcul_Production_K_VEF::calculer_terme_destruction_K_gen(
   int dimension=Objet_U::dimension;
   //DoubleVect coef(Objet_U::dimension);
 
-  const DoubleTab& tab_beta = ch_beta->valeurs();
+  const DoubleTab& tab_beta = ch_beta.valeurs();
   G = 0;
 
-  if ( ! sub_type(Champ_Uniforme,ch_beta.valeur()) )
+  if ( ! sub_type(Champ_Uniforme,ch_beta) )
     {
-      nb_compo=ch_beta->nb_comp() ;
+      nb_compo=ch_beta.nb_comp() ;
     }
 
   if (nb_consti==0 || nb_consti==1)

@@ -52,7 +52,7 @@ public :
   };
 
 protected:
-  REF(Mod_echelle_LRM_base) mod_echelle_LRM_base;
+  OBS_PTR(Mod_echelle_LRM_base) mod_echelle_LRM_base;
 };
 
 #endif

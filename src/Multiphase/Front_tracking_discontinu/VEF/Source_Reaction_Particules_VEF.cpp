@@ -57,7 +57,7 @@ DoubleTab& Source_Reaction_Particules_VEF::ajouter(DoubleTab& resu) const
   const DoubleTab& source_action = eq_marqueur_->source_stockage();
   const Domaine_dis_base& zdis = equation().domaine_dis();
   const Domaine_VF& zvf = ref_cast(Domaine_VF,zdis);
-  const Domaine_Cl_dis_base& zcldis = equation().domaine_Cl_dis().valeur();
+  const Domaine_Cl_dis_base& zcldis = equation().domaine_Cl_dis();
   const Domaine& domaine_geom = zdis.domaine();
   const DoubleTab& coord = domaine_geom.coord_sommets();
   const IntTab& sommet_poly = domaine_geom.les_elems();
@@ -89,7 +89,7 @@ DoubleTab& Source_Reaction_Particules_VEF::ajouter(DoubleTab& resu) const
   if (sub_type(Navier_Stokes_FT_Disc,equation()))
     is_FT = 1;
 
-  const Champ_base& champ_rho = (is_FT==1?ref_cast(Navier_Stokes_FT_Disc,equation()).champ_rho_faces():equation().milieu().masse_volumique().valeur());
+  const Champ_base& champ_rho = (is_FT==1?ref_cast(Navier_Stokes_FT_Disc,equation()).champ_rho_faces():equation().milieu().masse_volumique());
   const DoubleTab& rho_faces = champ_rho.valeurs();
 
   //Remplissage de source_som (interpolation de source_stockage aux sommets)

@@ -60,10 +60,10 @@ Entree& Implicit_steady::readOn(Entree& is )
 void test_impose_bound_cond(Equation_base& eqn,DoubleTab& current2,const char * msg,int flag)
 {
   return;
-  DoubleTab& present = eqn.inconnue()->futur();
+  DoubleTab& present = eqn.inconnue().futur();
   DoubleTab sauv(present);
   const Schema_Temps_base& sch = eqn.probleme().schema_temps();
-  eqn.domaine_Cl_dis()->imposer_cond_lim(eqn.inconnue(),sch.temps_courant()+sch.pas_de_temps());
+  eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),sch.temps_courant()+sch.pas_de_temps());
   present -= sauv;
   // BM, je remplace max_abs par mp_pax_abs: du coup la methode doit etre appelee simultanement par tous les procs.
   double ecart_max=mp_max_abs_vect(present);
@@ -164,7 +164,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
     calcul_mat_masse_diviser_par_dt_vef(eqnNS, m_dt, dt_locaux);
 
   //DoubleVect  m_dt(dt_locaux);
-  //eqnNS.solv_masse()->get_masse_divide_by_local_dt(m_dt, dt_locaux, 0);
+  //eqnNS.solv_masse().get_masse_divide_by_local_dt(m_dt, dt_locaux, 0);
 
 
   //Construction de matrice_en_pression_2 = B*dt_locaux*M-1Bt
@@ -176,7 +176,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
   correction_en_pression.echange_espace_virtuel();
   //Calcul de M^-1BtP'=gradP
   gradient->multvect(correction_en_pression,gradP);
-  eqn.solv_masse()->appliquer(gradP);
+  eqn.solv_masse().appliquer(gradP);
   //Calcul de Un+1 = U* -dt_locaux*gradP -M*dt_locaux*deltaU/dt
   //dt = pas de temps global
   //deltaU = Un+1 -Un
@@ -204,7 +204,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
     }
   DoubleVect  dt_locaux_masse (dt_locaux_taille_vitesse);
   //Calcul du M*dt_locaux
-  eqnNS.solv_masse()->get_masse_dt_local(dt_locaux_masse, dt_locaux_taille_vitesse, 0);
+  eqnNS.solv_masse().get_masse_dt_local(dt_locaux_masse, dt_locaux_taille_vitesse, 0);
 
 
   for(int i=0; i<size; i++)
@@ -239,9 +239,9 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
 //Calcule M/dt_locaux
 void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqnNS, DoubleVect& m_dt, DoubleVect& dt_locaux)
 {
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis().valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis());
   const DoubleVect& volumes_entrelaces_ref=le_dom.volumes_entrelaces();
-  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis().valeur());
+  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis());
   const DoubleVect& volumes_entrelaces_cl=le_dom_cl.volumes_entrelaces_Cl();
   DoubleVect volumes_entrelaces(volumes_entrelaces_ref);
   int size_cl=volumes_entrelaces_cl.size();
@@ -255,7 +255,7 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqn
 
   int size=volumes_entrelaces.size_totale();
   // Si rho n'est pas constant
-  const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique()->valeurs();
+  const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique().valeurs();
   if(masse_volumique.size_totale()==size)
     {
       for (int face=0; face<size; face++)
@@ -276,11 +276,11 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vef(Navier_Stokes_std& eqn
 
 void Implicit_steady::calcul_mat_masse_diviser_par_dt_vdf(Navier_Stokes_std& eqnNS, DoubleVect& m_dt, DoubleVect& dt_locaux)
 {
-  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,eqnNS.domaine_dis().valeur());
+  const Domaine_VDF& le_dom = ref_cast(Domaine_VDF,eqnNS.domaine_dis());
   const DoubleVect& volumes_entrelaces=le_dom.volumes_entrelaces();
   int size=volumes_entrelaces.size_totale();
   // Si rho n'est pas constant
-  const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique()->valeurs();
+  const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique().valeurs();
   if(masse_volumique.size_totale()==size)
     {
       for (int face=0; face<size; face++)
@@ -303,8 +303,8 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vdf(Navier_Stokes_std& eqn
 void Implicit_steady::test_periodic_solution(Navier_Stokes_std& eqnNS, DoubleTab& current) const
 {
 
-  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis().valeur());
-  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis().valeur());
+  const Domaine_VEF& le_dom = ref_cast(Domaine_VEF,eqnNS.domaine_dis());
+  const Domaine_Cl_VEF& le_dom_cl = ref_cast(Domaine_Cl_VEF,eqnNS.domaine_Cl_dis());
   int nb_comp=current.dimension(1);
   for (int n_bord=0; n_bord<le_dom.nb_front_Cl(); n_bord++)
     {

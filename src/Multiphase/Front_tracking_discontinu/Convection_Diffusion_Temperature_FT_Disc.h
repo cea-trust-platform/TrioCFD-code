@@ -23,8 +23,8 @@
 #define Convection_Diffusion_Temperature_FT_Disc_included
 
 #include <Convection_Diffusion_Temperature.h>
-#include <Champ_Fonc.h>
-#include <Champ_Don.h>
+
+
 #include <Assembleur_base.h>
 #include <TRUST_Ref.h>
 
@@ -41,7 +41,7 @@ public:
   Convection_Diffusion_Temperature_FT_Disc();
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  virtual void preparer_pas_de_temps(void);
+  virtual void preparer_pas_de_temps();
   virtual void corriger_pas_de_temps(double dt);
   void compute_divergence_free_velocity_extension();
   DoubleTab&   derivee_en_temps_inco(DoubleTab&) override;
@@ -58,7 +58,7 @@ public:
   Milieu_base&        milieu() override;
   const Milieu_base& milieu() const override;
   const Champ_base& vitesse_pour_transport() const override;
-  void    discretiser(void) override;
+  void    discretiser() override;
 
   int get_phase() const;
   void discretiser_assembleur_pression();
@@ -103,33 +103,33 @@ protected:
   double prescribed_mpoint_;
   ArrOfInt correction_mpoint_diff_conv_energy_ ; // on attend trois flags 0 ou 1
 
-  REF(Fluide_Diphasique) fluide_dipha_;
+  OBS_PTR(Fluide_Diphasique) fluide_dipha_;
 
   // Champs compris par le postraitement
-  LIST(REF(Champ_base)) liste_champs_compris_;
+  LIST(OBS_PTR(Champ_base)) liste_champs_compris_;
 
   // Reference a l'equation de transport de l'interface pour l'indicatrice de phase
-  REF(Transport_Interfaces_FT_Disc) ref_eq_interface_;
+  OBS_PTR(Transport_Interfaces_FT_Disc) ref_eq_interface_;
   // Reference a l'equation de navier_stokes pour le champ de vitesse (convection)
-  REF(Navier_Stokes_std) ref_eq_ns_;
+  OBS_PTR(Navier_Stokes_std) ref_eq_ns_;
 
   // Gradient normal de temperature a l'interface phase 0
   // (grad T scalaire normale a l'interface, normale dirigee
   //  vers la phase 1)
-  Champ_Fonc grad_t_;
-  Champ_Fonc mpoint_;
-  Champ_Fonc mpoint_uncorrected_;
-  Champ_Inc vitesse_convection_;
+  OWN_PTR(Champ_Fonc_base)  grad_t_;
+  OWN_PTR(Champ_Fonc_base)  mpoint_;
+  OWN_PTR(Champ_Fonc_base)  mpoint_uncorrected_;
+  OWN_PTR(Champ_Inc_base) vitesse_convection_;
 
   // To make a divergence-free velocity extension :
   int divergence_free_velocity_extension_;
   OWN_PTR(Assembleur_base) assembleur_pression_;
-  Champ_Inc la_pression; // Of course, it's a fake :D
-  Champ_Inc gradient_pression_;
-  Champ_Inc divergence_delta_U;
+  OWN_PTR(Champ_Inc_base) la_pression; // Of course, it's a fake :D
+  OWN_PTR(Champ_Inc_base) gradient_pression_;
+  OWN_PTR(Champ_Inc_base) divergence_delta_U;
   SolveurSys solveur_pression_;
   Matrice matrice_pression_;
-  Domaine_Cl_dis zcl_fictitious_;
+  OWN_PTR(Domaine_Cl_dis_base) zcl_fictitious_;
   Noms name_bc_opening_pressure_; // Liste de noms pour laisser sortir la source de div(delta u)
 
   ArrOfInt mixed_elems_;

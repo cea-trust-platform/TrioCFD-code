@@ -95,7 +95,7 @@ public :
   void create_folders_for_probes();
   void create_folders(Nom folder_name_base);
   void set_first_step_thermals_post(int& first_step_thermals_post);
-  void set_post_pro_first_call() { post_pro_first_call_ = 1; } ;
+  void set_post_pro_first_call() { post_pro_first_call_ = 1; }
   void set_temperature_ini();
   void recompute_interface_smoothing();
   void compute_new_thermal_field(Switch_FT_double& switch_double_ft,
@@ -110,11 +110,11 @@ public :
 
 
 protected :
-  REF(IJK_FT_double) ref_ijk_ft_;
-  REF(IJK_FT_Post) ref_ijk_ft_post_;
-  REF(Switch_FT_double) ref_ijk_ft_switch_;
-  REF(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
-  REF(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
+  OBS_PTR(IJK_FT_double) ref_ijk_ft_;
+  OBS_PTR(IJK_FT_Post) ref_ijk_ft_post_;
+  OBS_PTR(Switch_FT_double) ref_ijk_ft_switch_;
+  OBS_PTR(Intersection_Interface_ijk_cell) ref_intersection_ijk_cell_;
+  OBS_PTR(Intersection_Interface_ijk_face) ref_intersection_ijk_face_;
 
   IJK_Ghost_Fluid_Fields ghost_fluid_fields_;
 

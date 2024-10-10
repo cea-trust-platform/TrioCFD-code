@@ -25,7 +25,7 @@
 
 #include <Pb_Fluide_base.h>
 #include <Navier_Stokes_Turbulent_ALE.h>
-#include <Champ_Fonc.h>
+
 
 
 /*! @brief classe Pb_Hydraulique_Turbulent_ALE Cette classe represente un probleme d'hydraulique turbulent dans
@@ -45,7 +45,7 @@ public :
   int nombre_d_equations() const override;
   const Equation_base& equation(int) const override;
   Equation_base& equation(int) override;
-  inline const Champ_Fonc& viscosite_turbulente() const;
+  inline const Champ_Fonc_base& viscosite_turbulente() const;
   void associer_milieu_base(const Milieu_base& ) override;
   int verifier() override;
   void associer_sch_tps_base(const Schema_Temps_base&) override;
@@ -61,9 +61,9 @@ protected :
 
 /*! @brief Renvoie le champ representant la viscosite turbulente du probleme.
  *
- * @return (Champ_Fonc&) le champ representant la viscosite turbulente
+ * @return (Champ_Fonc_base&) le champ representant la viscosite turbulente
  */
-inline const Champ_Fonc& Pb_Hydraulique_Turbulent_ALE::viscosite_turbulente() const
+inline const Champ_Fonc_base& Pb_Hydraulique_Turbulent_ALE::viscosite_turbulente() const
 {
   return eq_hydraulique.viscosite_turbulente();
 }

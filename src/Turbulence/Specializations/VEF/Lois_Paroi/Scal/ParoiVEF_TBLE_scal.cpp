@@ -109,13 +109,13 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
   const int nfac = domaine.nb_faces_elem();
 
   const Equation_base& eqn_temp = mon_modele_turb_scal->equation();
-  const DoubleTab& Temp = eqn_temp.inconnue()->valeurs();
+  const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
   const Equation_base& eq_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi& loi = le_modele.loi_paroi();
+  const Turbulence_paroi_base& loi = le_modele.loi_paroi();
 
-  if (!sub_type(ParoiVEF_TBLE,loi.valeur()))
+  if (!sub_type(ParoiVEF_TBLE,loi))
     {
       Cerr << "Une loi de paroi TBLE en thermique doit etre utilisee obligatoirement avec une loi de paroi TBLE sur la QDM " << finl;
       exit();
@@ -298,12 +298,12 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const DoubleVect& volumes_entrelaces = domaine_VEF.volumes_entrelaces();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const DoubleVect& Temp = eqn_temp.inconnue()->valeurs();
+  const DoubleVect& Temp = eqn_temp.inconnue().valeurs();
   int elem;
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_temp.probleme().equation(0).milieu());
-  const double rhoCp = le_fluide.capacite_calorifique()->valeurs()(0, 0) * le_fluide.masse_volumique()->valeurs()(0, 0);
-  const Champ_Don& alpha = le_fluide.diffusivite();
+  const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
+  const Champ_Don_base& alpha = le_fluide.diffusivite();
   DoubleTab alpha_t = diffusivite_turb.valeurs();
 
   int itmax=0,itmax_loc;
@@ -350,14 +350,14 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                 elem = face_voisins(num_face,1);
 
               double d_alpha=0.;
-              if (sub_type(Champ_Uniforme,alpha.valeur()))
-                d_alpha = alpha->valeurs()(0,0);
+              if (sub_type(Champ_Uniforme,alpha))
+                d_alpha = alpha.valeurs()(0,0);
               else
                 {
-                  if (alpha->nb_comp()==1)
-                    d_alpha = alpha->valeurs()(elem);
+                  if (alpha.nb_comp()==1)
+                    d_alpha = alpha.valeurs()(elem);
                   else
-                    d_alpha = alpha->valeurs()(elem,0);
+                    d_alpha = alpha.valeurs()(elem,0);
                 }
 
               surf2=0.;
@@ -496,13 +496,13 @@ int ParoiVEF_TBLE_scal::calculer_stats()
   const DoubleTab& face_normale = domaine_VEF.face_normales();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const double tps = eqn_temp.inconnue()->temps();
+  const double tps = eqn_temp.inconnue().temps();
   const double dt = eqn_temp.schema_temps().pas_de_temps();
   const Equation_base& eq_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi& loi = le_modele.loi_paroi();
-  ParoiVEF_TBLE& loi_tble_hyd = ref_cast_non_const(ParoiVEF_TBLE,loi.valeur());
+  const Turbulence_paroi_base& loi = le_modele.loi_paroi();
+  ParoiVEF_TBLE& loi_tble_hyd = ref_cast_non_const(ParoiVEF_TBLE,loi);
 
   int num_face;
   double surf;
@@ -600,7 +600,7 @@ int ParoiVEF_TBLE_scal::calculer_stats()
 void ParoiVEF_TBLE_scal::imprimer_nusselt(Sortie& os) const
 {
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const double tps = eqn_temp.inconnue()->temps();
+  const double tps = eqn_temp.inconnue().temps();
   Paroi_scal_hyd_base_VEF::imprimer_nusselt(os);
   Paroi_TBLE_QDM_Scal::imprimer_sondes(os, tps, equivalent_distance_);
   Paroi_TBLE_QDM_Scal::imprimer_stat(os, tps);
@@ -609,7 +609,7 @@ void ParoiVEF_TBLE_scal::imprimer_nusselt(Sortie& os) const
 int ParoiVEF_TBLE_scal::sauvegarder(Sortie& os) const
 {
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
-  double tps =  mon_modele_turb_scal->equation().inconnue()->temps();
+  double tps =  mon_modele_turb_scal->equation().inconnue().temps();
   return Paroi_TBLE_QDM_Scal::sauvegarder(os, domaine_VEF, le_dom_Cl_VEF.valeur(), tps);
 }
 
@@ -637,7 +637,7 @@ Paroi_TBLE_QDM& ParoiVEF_TBLE_scal::getLoiParoiHydraulique()
   const Equation_base& eqn_hydr = pb_base.equation(0);
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& le_modele = ref_cast(Modele_turbulence_hyd_base,modele_turbulence_hydr.valeur());
-  const Turbulence_paroi_base& loi = le_modele.loi_paroi().valeur();
+  const Turbulence_paroi_base& loi = le_modele.loi_paroi();
 
   if (sub_type(ParoiVEF_TBLE,loi))
     {

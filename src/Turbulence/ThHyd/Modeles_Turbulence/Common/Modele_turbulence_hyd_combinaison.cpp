@@ -94,13 +94,13 @@ void Modele_turbulence_hyd_combinaison::mettre_a_jour(double temps)
   statistiques().end_count(nut_counter_);
 }
 
-Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
+Champ_Fonc_base& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
 {
-  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab& xp = domaine_VF.xp();
   DoubleTab& viscosite_valeurs = la_viscosite_turbulente_->valeurs();
   const Probleme_base& mon_pb = equation().probleme();
-  double temps = equation().inconnue()->temps();
+  double temps = equation().inconnue().temps();
   int nb_ddl = domaine_VF.nb_elem();
   double x = 0;
   double y = 0;
@@ -114,7 +114,7 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
 
   for (int so = 0; so < nb_var_; so++)
     {
-      REF(Champ_base) ch_ref;
+      OBS_PTR(Champ_base) ch_ref;
       ch_ref = mon_pb.get_champ(les_var[so]);
       const DoubleTab& source_so_val = ch_ref->valeurs();
       sources_val[so] = source_so_val;
@@ -164,13 +164,13 @@ Champ_Fonc& Modele_turbulence_hyd_combinaison::calculer_viscosite_turbulente()
   IntTab *elem_contr = nullptr;
   if (go_conv == 1) // Specialization domaine EF
     {
-      nb_loop_contr = ref_cast(Domaine_EF,equation().domaine_dis().valeur()).domaine().nb_som_elem();
-      elem_contr = &ref_cast(Domaine_EF,equation().domaine_dis().valeur()).domaine().les_elems();
+      nb_loop_contr = ref_cast(Domaine_EF,equation().domaine_dis()).domaine().nb_som_elem();
+      elem_contr = &ref_cast(Domaine_EF,equation().domaine_dis()).domaine().les_elems();
     }
   else if (go_conv == 2) // Specialization domaine VEF
     {
-      nb_loop_contr = ref_cast(Domaine_VEF,equation().domaine_dis().valeur()).domaine().nb_faces_elem();
-      elem_contr = &ref_cast(Domaine_VEF,equation().domaine_dis().valeur()).elem_faces();
+      nb_loop_contr = ref_cast(Domaine_VEF,equation().domaine_dis()).domaine().nb_faces_elem();
+      elem_contr = &ref_cast(Domaine_VEF,equation().domaine_dis()).elem_faces();
     }
 
   for (int i = 0; i < nb_ddl; i++) // boucle sur les elements

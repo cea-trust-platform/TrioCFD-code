@@ -60,7 +60,7 @@ public:
 
 private :
   double xmin, xmax, ymin, ymax, zmin, zmax;
-  REF(Domaine) dom_qui_coincide;
+  OBS_PTR(Domaine) dom_qui_coincide;
 
 };
 

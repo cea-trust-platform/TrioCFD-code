@@ -58,7 +58,7 @@ public :
   inline int get_switch() const;
   inline int get_nutswitch() const;
   inline int get_impr() const;
-  inline const Champ_Inc& vitesse_transportante();
+  inline const Champ_Inc_base& vitesse_transportante();
 
   const Motcle& domaine_application() const override;
   Loi_2couches_base& loi2couches()

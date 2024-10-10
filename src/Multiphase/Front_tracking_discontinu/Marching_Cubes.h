@@ -99,7 +99,7 @@ protected:
 
   // Champs remplis lors de l'association avec le domaine
   // *********** DEBUT
-  REF(Domaine_VF) ref_domaine_vf_;
+  OBS_PTR(Domaine_VF) ref_domaine_vf_;
 
   int nb_sommets_element;
   // Definition des aretes de l'element de base eulerien

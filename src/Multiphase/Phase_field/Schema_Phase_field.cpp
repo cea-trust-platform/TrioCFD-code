@@ -328,13 +328,13 @@ bool Schema_Phase_field::iterateTimeStep(bool& converged)
           // On calcule une fois la derivee pour avoir les flux bord
           if (eqn_i.schema_temps().nb_pas_dt()==0)
             {
-              DoubleTab inconnue_valeurs(eqn_i.inconnue()->valeurs());
+              DoubleTab inconnue_valeurs(eqn_i.inconnue().valeurs());
               eqn_i.derivee_en_temps_inco(inconnue_valeurs);
             }
         }
       else
         {
-          eqn_i.domaine_Cl_dis()->mettre_a_jour(temps);
+          eqn_i.domaine_Cl_dis().mettre_a_jour(temps);
           faire_un_pas_de_temps_eqn_base(eqn_i);
         }
     }
@@ -380,7 +380,7 @@ int Schema_Phase_field::premier_dt(Convection_Diffusion_Phase_field& eq_c)
  */
 int Schema_Phase_field::deuxieme_dt(Convection_Diffusion_Phase_field& eq_c)
 {
-  DoubleTab& present = eq_c.inconnue()->valeurs();
+  DoubleTab& present = eq_c.inconnue().valeurs();
   DoubleTab intermediaire(present);
   intermediaire = present;
 

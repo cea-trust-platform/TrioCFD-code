@@ -113,7 +113,7 @@ int Transport_K_Omega::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   else if (mot=="convection")
     {
       Cerr << "Reading and typing of the convection operator : " << finl;
-      const Champ_Inc& vitesse_transportante = probleme().equation(0).inconnue();
+      const Champ_Inc_base& vitesse_transportante = probleme().equation(0).inconnue();
       associer_vitesse(vitesse_transportante);
       terme_convectif.associer_vitesse(vitesse_transportante);
       is >> terme_convectif;
@@ -242,7 +242,7 @@ DoubleTab& Transport_K_Omega::corriger_derivee_impl(DoubleTab& d)
   Nom pbb = probleme().que_suis_je();
   if (pbb.contient("ALE")) corriger_derivee_impl_ALE(d);
 
-  const Turbulence_paroi_base& loi_paroi = modele_turbulence().loi_paroi().valeur();
+  const Turbulence_paroi_base& loi_paroi = modele_turbulence().loi_paroi();
   loi_paroi.corriger_derivee_impl(d);
   return Transport_K_Omega_base::corriger_derivee_impl(d);
 }

@@ -28,8 +28,8 @@
 #include <Matrice_Morse.h>
 #include <Op_Diff_Flux_Chaleur_Turb_Base.h>
 #include <TRUST_Deriv.h>
-#include <Champ_Fonc.h>
-#include <Champ_Don.h>
+
+
 #include <TRUSTTabs_forward.h>
 
 /*! @brief class Op_Diff_Flux_Chaleur_Turb_Base Sert a modeliser le terme diffusif dans l'equation de transport
@@ -61,7 +61,7 @@ class   Op_Diff_Flux_Chaleur_Turb_negligeable : public Operateur_negligeable, pu
 
 public:
 
-  inline void associer(const Domaine_dis&, const Domaine_Cl_dis&, const Champ_Inc& ) override;
+  inline void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base& ) override;
   inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
@@ -89,10 +89,10 @@ public:
 
   inline Operateur_base& l_op_base() override;
   inline const Operateur_base& l_op_base() const override;
-  inline void associer_diffusivite_turbulente();
   inline DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
   inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   void typer() override;
+  void completer() override;
   inline int op_non_nul() const override;
 
 
@@ -102,9 +102,9 @@ public:
 //   Fonctions inline de la classe Op_Diff_Flux_Chaleur_Turb_negligeable
 ///////////////////////////////////////////////////////////////
 
-inline void Op_Diff_Flux_Chaleur_Turb_negligeable::associer(const Domaine_dis& domaine_dis,
-                                                            const Domaine_Cl_dis& domaine_cl_dis,
-                                                            const Champ_Inc& inco)
+inline void Op_Diff_Flux_Chaleur_Turb_negligeable::associer(const Domaine_dis_base& domaine_dis,
+                                                            const Domaine_Cl_dis_base& domaine_cl_dis,
+                                                            const Champ_Inc_base& inco)
 {
   Operateur_negligeable::associer(domaine_dis,domaine_cl_dis,inco);
 }
@@ -125,7 +125,6 @@ inline DoubleTab& Op_Diff_Flux_Chaleur_Turb_negligeable::calculer(const DoubleTa
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::contribuer_a_avec(const DoubleTab& inco,
                                                                      Matrice_Morse& matrice) const
 {
-  ;
 }
 
 /*! @brief on ajoute la contribution du second membre.
@@ -133,28 +132,21 @@ inline void Op_Diff_Flux_Chaleur_Turb_negligeable::contribuer_a_avec(const Doubl
  */
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::contribuer_au_second_membre(DoubleTab& resu) const
 {
-  ;
 }
 
 // Modification des Cl
 inline void  Op_Diff_Flux_Chaleur_Turb_negligeable::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& resu) const
 {
-  ;
 }
 
 inline void  Op_Diff_Flux_Chaleur_Turb_negligeable::dimensionner(Matrice_Morse& matrice) const
 {
-  ;
 }
 
 inline void Op_Diff_Flux_Chaleur_Turb_negligeable::associer_diffusivite_turbulente()
 {
-  ;
 }
 
-/*! @brief
- *
- */
 inline Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base()
 {
   if(!non_nul())
@@ -162,19 +154,11 @@ inline Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base()
   return valeur();
 }
 
-/*! @brief
- *
- */
 inline const Operateur_base& Op_Diff_Flux_Chaleur_Turb::l_op_base() const
 {
   if(!non_nul())
     Cerr << "Op_Diff_Flux_Chaleur_Turb n'a pas ete typer" << finl;
   return valeur();
-}
-
-inline void Op_Diff_Flux_Chaleur_Turb::associer_diffusivite_turbulente()
-{
-  valeur().associer_diffusivite_turbulente();
 }
 
 inline DoubleTab& Op_Diff_Flux_Chaleur_Turb::ajouter(const DoubleTab& inconnue, DoubleTab& resu) const

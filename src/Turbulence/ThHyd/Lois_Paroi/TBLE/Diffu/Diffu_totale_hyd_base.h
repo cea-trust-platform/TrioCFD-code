@@ -48,7 +48,7 @@ public :
 
 protected :
 
-  REF(Eq_couch_lim) eq_couch_lim_T; // ref a equation de Temperature quand elle existe (!) : sert alors pour evaluer nu(T), lambda(T).
+  OBS_PTR(Eq_couch_lim) eq_couch_lim_T; // ref a equation de Temperature quand elle existe (!) : sert alors pour evaluer nu(T), lambda(T).
   // si elle sert pas on la laisse vide :-> peut mieux faire surement.
 
 };

@@ -45,10 +45,10 @@ void Production_energie_cin_turb_VDF::completer()
 
 void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Domaine_VF&                   domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Domaine_VF&                   domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const Probleme_base&                     pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&             eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
-  const Viscosite_turbulente_base&  visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()).valeur());
+  const Viscosite_turbulente_base&  visc_turb = ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, eq_qdm.operateur(0).l_op_base()).correlation_viscosite_turbulente()));
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
 
   std::string Type_diss = ""; // omega or tau dissipation
@@ -59,7 +59,7 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
     }
 
   int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = domaine.nb_elem(), D = dimension ;
-  int N = equation().inconnue()->valeurs().line_size(),
+  int N = equation().inconnue().valeurs().line_size(),
       Np = equation().probleme().get_champ("pression").valeurs().line_size(),
       Nt = equation().probleme().get_champ("temperature").valeurs().line_size(),
       Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
@@ -77,14 +77,14 @@ void Production_energie_cin_turb_VDF::ajouter_blocs(matrices_t matrices, DoubleT
                         *diss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).valeurs() : nullptr,
                          *pdiss = equation().probleme().has_champ(Type_diss) ? &equation().probleme().get_champ(Type_diss).passe() : nullptr;
 
-  const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).equation_masse().champ_conserve() : equation().milieu().masse_volumique().valeur();
+  const Champ_base&   ch_alpha_rho = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).equation_masse().champ_conserve() : equation().milieu().masse_volumique();
 //  const DoubleTab&       alpha_rho = ch_alpha_rho.valeurs();
   const tabs_t&      der_alpha_rho = ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
 
   if (Type_diss == "")
     {
       DoubleTrav nut(0, Nph);
-      MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), nut); //Necessary to compare size in eddy_viscosity()
+      MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression().valeurs().get_md_vector(), nut); //Necessary to compare size in eddy_viscosity()
       visc_turb.eddy_viscosity(nut);
 
       Matrice_Morse *mat = matrices.count("k") ? matrices.at("k") : nullptr;

@@ -159,7 +159,7 @@ void Transport_Flux_Chaleur_Turbulente::completer()
 {
   Cerr << "Method Transport_Flux_Chaleur_Turbulente::completer() " << finl;
   les_sources.completer();
-  inconnue()->associer_eqn(*this);
+  inconnue().associer_eqn(*this);
   for(int i=0; i<nombre_d_operateurs(); i++)
     {
       operateur(i).completer();

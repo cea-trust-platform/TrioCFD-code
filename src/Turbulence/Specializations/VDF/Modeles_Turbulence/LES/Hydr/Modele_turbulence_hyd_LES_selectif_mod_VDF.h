@@ -44,13 +44,13 @@ public:
   void set_param(Param& param) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void calculer_fonction_structure() override;
-  int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)&) const;
+  int a_pour_Champ_Fonc(const Motcle&, OBS_PTR(Champ_base)&) const;
   void discretiser() override;
 
 protected:
   int kc_ = -123, ki_ = -123, thi_ = 0, canal_ = 0, dir_par_ = -123;
   double demi_h_ = -123.;
-  Champ_Fonc la_vorticite_;
+  OWN_PTR(Champ_Fonc_base)  la_vorticite_;
 
   void cutoff();
 };

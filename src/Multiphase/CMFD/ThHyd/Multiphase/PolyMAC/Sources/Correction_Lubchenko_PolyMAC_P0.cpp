@@ -79,12 +79,15 @@ void Correction_Lubchenko_PolyMAC_P0::completer() // We must wait for all readOn
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
 
   for (int i = 0 ; i < equation().sources().size() ; i++)
-    if sub_type(Portance_interfaciale_PolyMAC_P0, equation().sources()(i).valeur()) correlation_lift_ = ref_cast(Portance_interfaciale_PolyMAC_P0, equation().sources()(i).valeur()).correlation();
+    if sub_type(Portance_interfaciale_PolyMAC_P0, equation().sources()(i).valeur())
+      correlation_lift_ = ref_cast(Portance_interfaciale_PolyMAC_P0, equation().sources()(i).valeur()).correlation();
 
   for (int i = 0 ; i < equation().sources().size() ; i++)
-    if sub_type(Dispersion_bulles_PolyMAC_P0, equation().sources()(i).valeur()) correlation_dispersion_ = ref_cast(Dispersion_bulles_PolyMAC_P0, equation().sources()(i).valeur()).correlation();
+    if sub_type(Dispersion_bulles_PolyMAC_P0, equation().sources()(i).valeur())
+      correlation_dispersion_ = ref_cast(Dispersion_bulles_PolyMAC_P0, equation().sources()(i).valeur()).correlation();
 
-  if ( (!correlation_lift_.non_nul()) || (!correlation_dispersion_.non_nul()) ) Process::exit("Correction_Lubchenko_PolyMAC_P0::completer() : a dispersion_bulles and a portance_interfaciale force must be defined !");
+  if ( (!correlation_lift_.non_nul()) || (!correlation_dispersion_.non_nul()) )
+    Process::exit("Correction_Lubchenko_PolyMAC_P0::completer() : a dispersion_bulles and a portance_interfaciale force must be defined !");
 
   if sub_type(Op_Diff_Turbulent_PolyMAC_P0_Face, equation().operateur(0).l_op_base()) is_turb = 1;
 
@@ -101,24 +104,24 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
   ajouter_blocs_disp(matrices, secmem, semi_impl);
   ajouter_blocs_lift(matrices, secmem, semi_impl);
   // Le terme source_BIF peut entrainer une mauvaise prédiction des forces normales à la paroi : une correction est mise en place
-  if ((use_bif_) && (sub_type(Viscosite_turbulente_multiple, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, ref_cast(Navier_Stokes_std, equation().probleme().equation(0)).operateur(0).l_op_base()).correlation().valeur())))
+  if ((use_bif_) && (sub_type(Viscosite_turbulente_multiple, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, ref_cast(Navier_Stokes_std, equation().probleme().equation(0)).operateur(0).l_op_base()).correlation())))
     ajouter_blocs_BIF(matrices, secmem, semi_impl);
 }
 
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = pbm.equation_masse().inconnue()->passe(),
-                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression()->passe(),
-                     &temp  = pbm.equation_energie().inconnue()->passe(),
-                      &rho   = equation().milieu().masse_volumique()->passe(),
-                       &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique()->passe(),
+                   &alpha = pbm.equation_masse().inconnue().passe(),
+                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
+                     &temp  = pbm.equation_energie().inconnue().passe(),
+                      &rho   = equation().milieu().masse_volumique().passe(),
+                       &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
                         &y_elem = domaine.y_elem(),
                          &y_faces = domaine.y_faces(),
                           &n_y_elem = domaine.normale_paroi_elem(),
@@ -133,13 +136,23 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
       cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
 
   DoubleTrav nut(domaine.nb_elem_tot(), N); //viscosite turbulente
-  if (is_turb) ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, equation().operateur(0).l_op_base()).correlation().valeur()).eddy_viscosity(nut); //remplissage par la correlation
+  if (is_turb)
+    ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, equation().operateur(0).l_op_base()).correlation()).eddy_viscosity(nut); //remplissage par la correlation
 
   // Input-output
-  const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_dispersion_->valeur());
+  const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_dispersion_.valeur());
   Dispersion_bulles_base::input_t in;
   Dispersion_bulles_base::output_t out;
-  in.alpha.resize(N), in.T.resize(N), in.p.resize(N), in.rho.resize(N), in.mu.resize(N), in.sigma.resize(N*(N-1)/2), in.k_turb.resize(N), in.nut.resize(N), in.d_bulles.resize(N), in.nv.resize(N, N);
+  in.alpha.resize(N);
+  in.T.resize(N);
+  in.p.resize(N);
+  in.rho.resize(N);
+  in.mu.resize(N);
+  in.sigma.resize(N*(N-1)/2);
+  in.k_turb.resize(N);
+  in.nut.resize(N);
+  in.d_bulles.resize(N);
+  in.nv.resize(N, N);
   out.Ctd.resize(N, N);
 
   // There is no need to calculate the gradient of alpha here
@@ -271,17 +284,17 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_disp(matrices_t matrices, Do
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue().valeur());
-  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Champ_Face_PolyMAC_P0& ch = ref_cast(Champ_Face_PolyMAC_P0, equation().inconnue());
+  const Domaine_PolyMAC_P0& domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl(), &e_f = domaine.elem_faces();
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces();
   const DoubleTab& vf_dir = domaine.volumes_entrelaces_dir(), &n_f = domaine.face_normales();
   const DoubleTab& pvit = ch.passe(),
-                   &alpha = pbm.equation_masse().inconnue()->passe(),
-                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression()->passe(),
-                     &temp  = pbm.equation_energie().inconnue()->passe(),
-                      &rho   = equation().milieu().masse_volumique()->passe(),
-                       &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique()->passe(),
+                   &alpha = pbm.equation_masse().inconnue().passe(),
+                    &press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().passe(),
+                     &temp  = pbm.equation_energie().inconnue().passe(),
+                      &rho   = equation().milieu().masse_volumique().passe(),
+                       &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
                         &vort  = equation().probleme().get_champ("vorticite").valeurs(),
                          &y_elem = domaine.y_elem(),
                           &y_faces = domaine.y_faces(),
@@ -296,7 +309,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
 
   DoubleTrav vr_l(N,D), scal_ur(N), scal_u(N), pvit_l(N, D), vort_l( D==2 ? 1 :D), grad_l(D,D), scal_grad(D); // Requis pour corrections vort et u_l-u-g
 
-  const Portance_interfaciale_base& correlation_pi = ref_cast(Portance_interfaciale_base, correlation_lift_->valeur());
+  const Portance_interfaciale_base& correlation_pi = ref_cast(Portance_interfaciale_base, correlation_lift_.valeur());
   double vl_norm ;
 
   Portance_interfaciale_base::input_t in;
@@ -536,7 +549,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_lift(matrices_t matrices, Do
 
 void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_BIF(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl ) const
 {
-  const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis().valeur());
+  const Domaine_PolyMAC_P0&                      domaine = ref_cast(Domaine_PolyMAC_P0, equation().domaine_dis());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const Op_Diff_Turbulent_PolyMAC_P0_Face& Op_diff = ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, eq_qdm.operateur(0).l_op_base());
@@ -551,17 +564,17 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs_BIF(matrices_t matrices, Dou
   const DoubleTab& normales_f = domaine.face_normales();
   const IntTab& voisins_f = domaine.face_voisins(), &e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
 
-  const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.correlation().valeur());
+  const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.correlation());
 
   int N = pb.get_champ("vitesse").valeurs().dimension(1), D = dimension, nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot() ;
 
   // On recupere les tensions de reynolds des termes de BIF
   DoubleTrav Rij(0, N, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression().valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress_BIF(Rij);
 
   DoubleTrav grad_Rij(0, N, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.vitesse()->valeurs().get_md_vector(), grad_Rij); //Necessary to exchange virtual elements after calculation of the gradient at the faces()
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.vitesse().valeurs().get_md_vector(), grad_Rij); //Necessary to exchange virtual elements after calculation of the gradient at the faces()
 
   const Champ_Elem_PolyMAC_P0& ch_alpha = ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("alpha"));	// Champ alpha qui servira à obtenir les coeffs du gradient ; normalement toujours des CAL de Neumann ; terme source qui n'apparait qu'en multiphase
   ch_alpha.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires

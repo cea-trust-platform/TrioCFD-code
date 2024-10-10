@@ -78,12 +78,12 @@ void Paroi_frottante_simple::mettre_a_jour(double tps)
 
 void Paroi_frottante_simple::me_calculer()
 {
-  Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_->valeur());
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().probleme().domaine_dis().valeur());
+  Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().probleme().domaine_dis());
 
   const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces du domaine
   const DoubleTab& nu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().passe(),
-                   &mu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_transport()->passe(),
+                   &mu_visc  = ref_cast(Navier_Stokes_std, domaine_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_transport().passe(),
                     &vit   = domaine_Cl_dis().equation().probleme().get_champ("vitesse").passe(),
                      &rho = domaine_Cl_dis().equation().probleme().get_champ("masse_volumique").passe(),
                       *alp = sub_type(Pb_Multiphase, domaine_Cl_dis().equation().probleme()) ? &domaine_Cl_dis().equation().probleme().get_champ("alpha").passe() : nullptr;
@@ -94,7 +94,7 @@ void Paroi_frottante_simple::me_calculer()
   assert((mu_poly) || (mu_vdf));
 
   int nf = la_frontiere_dis->frontiere().nb_faces(), nf_tot = domaine.nb_faces_tot(), f1 = la_frontiere_dis->frontiere().num_premiere_face();
-  int N = domaine_Cl_dis().equation().inconnue()->valeurs().line_size(), D = dimension;
+  int N = domaine_Cl_dis().equation().inconnue().valeurs().line_size(), D = dimension;
 
   const DoubleTab& n_f = domaine.face_normales();
   const DoubleVect& fs = domaine.face_surfaces();
@@ -103,7 +103,7 @@ void Paroi_frottante_simple::me_calculer()
   DoubleTab pvit_elem(0, N * dimension);
   if (mu_vdf)
     {
-      const Champ_Face_base& ch = ref_cast(Champ_Face_base, domaine_Cl_dis().equation().probleme().equation(0).inconnue().valeur());
+      const Champ_Face_base& ch = ref_cast(Champ_Face_base, domaine_Cl_dis().equation().probleme().equation(0).inconnue());
       domaine.domaine().creer_tableau_elements(pvit_elem);
       ch.get_elem_vector_field(pvit_elem, true);
     }

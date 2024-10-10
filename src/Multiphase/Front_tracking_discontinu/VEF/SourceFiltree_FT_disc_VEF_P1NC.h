@@ -26,8 +26,8 @@
 #include <Source_base.h>
 #include <SourceFiltree_FT_disc_base.h>
 #include <TRUST_Ref.h>
-#include <Champ_Inc.h>
 
+class Champ_Inc_base;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
@@ -49,12 +49,12 @@ public :
 
 protected :
   Entree& lire(Entree& is);
-  void associer_domaines(const Domaine_dis& ,const Domaine_Cl_dis& ) override;
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
   void associer_pb(const Probleme_base& ) override;
 
-  REF(Domaine_VEF) le_dom_VEF;
-  REF(Domaine_Cl_VEF) le_dom_Cl_VEF;
-  REF(Champ_Inc) Indic_;
+  OBS_PTR(Domaine_VEF) le_dom_VEF;
+  OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
+  OBS_PTR(Champ_Inc_base) Indic_;
 };
 
 #endif

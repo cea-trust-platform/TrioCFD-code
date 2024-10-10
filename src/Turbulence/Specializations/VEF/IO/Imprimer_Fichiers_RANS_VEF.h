@@ -24,11 +24,11 @@
 
 #include <Interprete.h>
 #include <Domaine_VEF.h>
-#include <Domaine_dis.h>
+
 #include <Equation_base.h>
 #include <TRUSTVect.h>
 #include <TRUST_Ref.h>
-#include <Domaine_dis.h>
+
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 class Champ_Fonc_base;

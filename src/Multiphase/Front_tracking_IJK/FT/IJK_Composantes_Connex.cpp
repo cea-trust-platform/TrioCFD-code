@@ -227,7 +227,7 @@ void IJK_Composantes_Connex::compute_compo_connex_from_interface()
 void IJK_Composantes_Connex::fill_mixed_cell_compo()
 {
 
-  const Domaine_dis_base& mon_dom_dis = interfaces_->get_domaine_dis().valeur();
+  const Domaine_dis_base& mon_dom_dis = interfaces_->get_domaine_dis();
   const int nb_elem = mon_dom_dis.domaine().nb_elem();
   const Maillage_FT_IJK& maillage = interfaces_->maillage_ft_ijk();
 

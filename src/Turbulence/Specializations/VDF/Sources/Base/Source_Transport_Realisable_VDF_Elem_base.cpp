@@ -36,11 +36,11 @@ DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTa
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
   const Modele_Fonc_Realisable_base& mon_modele_fonc = get_modele_fonc(); // voir les classes filles
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const DoubleTab& vit = eq_hydraulique->inconnue()->valeurs();
-  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue().valeur());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin.valeur());
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
+  Champ_Face_VDF& vitesse = ref_cast_non_const(Champ_Face_VDF,eq_hydraulique->inconnue());
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
+  const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin);
 
   double visco = -1.;
   if (is_visco_const) visco = std::max(tab_visco(0,0),DMINFLOAT);
@@ -58,15 +58,15 @@ DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTa
 
 void Source_Transport_Realisable_VDF_Elem_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const std::string& nom_inco = equation().inconnue()->le_nom().getString();
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
   if(!mat) return;
 
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
-  const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  const Champ_Don_base& ch_visco_cin = fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ch_visco_cin.valeurs();
   const DoubleVect& porosite = le_dom_Cl_VDF->equation().milieu().porosite_elem(), &volumes=le_dom_VDF->volumes();
-  const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin.valeur());
+  const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin);
   double visco = -1.;
   if (is_visco_const) visco = std::max(tab_visco(0,0),DMINFLOAT);
   fill_coeff_matrice(is_visco_const,tab_visco,volumes,porosite,visco,*mat); // voir les classes filles

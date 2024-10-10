@@ -37,12 +37,12 @@ public :
   void initialiser(const Milieu_base&) override;
 
   // "ind" represente le numero d'une maille TBLE sur l'instance eq_couch_lim referencee dans cette classe
-  double getNu(REF(Eq_couch_lim) eq_T, int ind) override
+  double getNu(OBS_PTR(Eq_couch_lim) eq_T, int ind) override
   {
     return nu;
   }
 
-  double getAlpha(REF(Eq_couch_lim) eq_T, int ind) override
+  double getAlpha(OBS_PTR(Eq_couch_lim) eq_T, int ind) override
   {
     return alpha;
   }

@@ -83,7 +83,7 @@ public:
   void associer_probleme_fin(Pb_MG& mg, int index);
 
 private:
-  REF(Pb_MG) pb_MG;
+  OBS_PTR(Pb_MG) pb_MG;
   int index_pb_fin;
   OWN_PTR(Connectivites_base) connectivites_ff_ee;
   LIST(OWN_PTR(Prolongement_base)) mon_prolongement_;

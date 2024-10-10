@@ -45,7 +45,7 @@ void  Cond_Lim_Rayo::preparer_surface(const Frontiere_dis_base& fr ,const Domain
   Surf_i.resize(nb_faces_bord);
   Teta_i.resize(nb_faces_bord);
   // recuperation des surfaces de bords.
-  const Domaine_VF& domaine=ref_cast(Domaine_VF,zcl.domaine_dis().valeur());
+  const Domaine_VF& domaine=ref_cast(Domaine_VF,zcl.domaine_dis());
   for (int numfa=0; numfa<nb_faces_bord; numfa++)
     Surf_i[numfa]= domaine.face_surfaces(numfa+ndeb);
 }
