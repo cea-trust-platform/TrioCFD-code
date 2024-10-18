@@ -800,7 +800,7 @@ void Sonde_IJK::initialiser()
 
   envoyer_broadcast(prop, 0);
 
-  reprise = ref_ijk_ft_->get_reprise();
+  //reprise = ref_ijk_ft_->get_reprise();
   les_positions_sondes_=les_positions_;
 
   nbre_points_tot=nbre_points;
@@ -1046,7 +1046,7 @@ void Sonde_IJK::mettre_a_jour(const double un_temps, const double dt)
   if (nb>nb_bip)
     {
       nb_bip=nb; // On met a jour l'attribut de classe.
-      reprise=1;
+      //reprise=1;
       postraiter();
     }
 }
