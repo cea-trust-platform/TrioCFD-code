@@ -35,7 +35,7 @@ Sortie& Op_Conv_RT_VEF_Face::printOn(Sortie& s ) const
 //
 Entree& Op_Conv_RT_VEF_Face::readOn(Entree& s )
 {
-  ordre=1;
+  ordre_=1;
   return s ;
 }
 
