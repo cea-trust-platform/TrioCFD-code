@@ -73,6 +73,27 @@ void Navier_Stokes_Aposteriori::get_noms_champs_postraitables(Noms& nom,Option o
     nom.add(noms_compris);
 }
 
+bool Navier_Stokes_Aposteriori::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
+{
+  if (nom == "estimateur_aposteriori")
+    {
+      ref_champ = get_champ(nom);
+      return true;
+    }
+  else
+    return Navier_Stokes_std::has_champ(nom, ref_champ);
+
+  return false; /* rien trouve */
+}
+
+bool Navier_Stokes_Aposteriori::has_champ(const Motcle& nom) const
+{
+  if (nom == "estimateur_aposteriori")
+    return true;
+  else
+    return Navier_Stokes_std::has_champ(nom);
+}
+
 const Champ_base& Navier_Stokes_Aposteriori::get_champ(const Motcle& nom) const
 {
   const double temps_init = schema_temps().temps_init();

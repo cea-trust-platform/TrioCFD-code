@@ -61,7 +61,8 @@ public:
   inline Modele_turbulence_hyd_RANS_Bicephale_base& modele_turbulence();
 
   const Champ_base& get_champ( const Motcle& nom ) const override;
-//  void creer_champ( const Motcle& motlu );
+  bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
+  bool has_champ(const Motcle& nom) const override;
 
   inline void transporte_K();
   inline void transporte_Eps();

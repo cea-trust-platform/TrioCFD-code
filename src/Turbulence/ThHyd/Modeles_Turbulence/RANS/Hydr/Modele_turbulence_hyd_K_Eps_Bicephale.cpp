@@ -271,29 +271,43 @@ const Equation_base& Modele_turbulence_hyd_K_Eps_Bicephale::equation_k_eps(int i
       return eqn_transport_Eps_;
     }
 }
+
+bool Modele_turbulence_hyd_K_Eps_Bicephale::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
+{
+  if (Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom))
+    return Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom, ref_champ);
+
+  if (mon_modele_fonc_.non_nul())
+    if (mon_modele_fonc_->has_champ(nom))
+      return mon_modele_fonc_->has_champ(nom, ref_champ);
+
+  return false; /* rien trouve */
+}
+
+bool Modele_turbulence_hyd_K_Eps_Bicephale::has_champ(const Motcle& nom) const
+{
+  if (Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom))
+    return true;
+
+  if (mon_modele_fonc_.non_nul())
+    if (mon_modele_fonc_->has_champ(nom))
+      return true;
+
+  return false; /* rien trouve */
+}
+
 const Champ_base& Modele_turbulence_hyd_K_Eps_Bicephale::get_champ(const Motcle& nom) const
 {
+  if (Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom))
+    return Modele_turbulence_hyd_RANS_Bicephale_base::get_champ(nom);
 
-  try
-    {
-      return Modele_turbulence_hyd_RANS_Bicephale_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
   if (mon_modele_fonc_.non_nul())
-    {
-      try
-        {
-          return mon_modele_fonc_->get_champ(nom);
-        }
-      catch (Champs_compris_erreur&)
-        {
-        }
-    }
-  throw Champs_compris_erreur();
+    if (mon_modele_fonc_->has_champ(nom))
+      return mon_modele_fonc_->get_champ(nom);
 
+  throw std::runtime_error("Field not found !");
 }
+
 void Modele_turbulence_hyd_K_Eps_Bicephale::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
   Modele_turbulence_hyd_RANS_Bicephale_base::get_noms_champs_postraitables(nom, opt);

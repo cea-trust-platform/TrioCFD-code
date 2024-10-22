@@ -1264,40 +1264,58 @@ void Transport_Marqueur_FT::creer_champ(const Motcle& motlu)
     }
 }
 
+bool Transport_Marqueur_FT::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
+{
+  if (nom == "densite_particules" || nom == "volume_particules")
+    {
+      ref_champ = get_champ(nom);
+      return true;
+    }
+
+  if (Transport_Interfaces_FT_Disc::has_champ(nom))
+    return Transport_Interfaces_FT_Disc::has_champ(nom, ref_champ);
+
+  return false; /* rien trouve */
+}
+
+bool Transport_Marqueur_FT::has_champ(const Motcle& nom) const
+{
+  if (nom == "densite_particules" || nom == "volume_particules")
+    return true;
+
+  if (Transport_Interfaces_FT_Disc::has_champ(nom))
+    return true;
+
+  return false; /* rien trouve */
+}
+
 const Champ_base& Transport_Marqueur_FT::get_champ(const Motcle& nom) const
 {
-  if (nom=="densite_particules")
+  if (nom == "densite_particules")
     {
       double temps = schema_temps().temps_courant();
-      Champ_Fonc_base& ch_densite=ref_cast_non_const(Champ_Fonc_base,densite_particules_.valeur());
-      DoubleTab& val_densite =  ch_densite.valeurs();
+      Champ_Fonc_base& ch_densite = ref_cast_non_const(Champ_Fonc_base, densite_particules_.valeur());
+      DoubleTab& val_densite = ch_densite.valeurs();
       calculer_valeurs_densite(val_densite);
       ch_densite.changer_temps(temps);
       return champs_compris_.get_champ(nom);
     }
 
-  if (nom=="volume_particules")
+  if (nom == "volume_particules")
     {
       double temps = schema_temps().temps_courant();
-      Champ_Fonc_base& ch_vol=ref_cast_non_const(Champ_Fonc_base,volume_particules_.valeur());
-      DoubleTab& val_vol =  ch_vol.valeurs();
+      Champ_Fonc_base& ch_vol = ref_cast_non_const(Champ_Fonc_base, volume_particules_.valeur());
+      DoubleTab& val_vol = ch_vol.valeurs();
       calculer_valeurs_volumes(val_vol);
       ch_vol.changer_temps(temps);
       return champs_compris_.get_champ(nom);
     }
 
-  try
-    {
-      return Transport_Interfaces_FT_Disc::get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
-  throw Champs_compris_erreur();
-  OBS_PTR(Champ_base) ref_champ;
-  return ref_champ;
-}
+  if (Transport_Interfaces_FT_Disc::has_champ(nom))
+    return Transport_Interfaces_FT_Disc::get_champ(nom);
 
+  throw std::runtime_error("Field not found !");
+}
 
 //Calcul des valeurs du champ postraitable densite_particules_
 //Estimation du nombre de particules par maille

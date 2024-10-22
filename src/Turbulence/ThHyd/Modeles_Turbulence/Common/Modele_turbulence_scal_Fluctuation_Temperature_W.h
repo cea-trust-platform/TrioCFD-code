@@ -58,24 +58,18 @@ public:
 
   //////////////////////////////////////////////////////
   //Methode creer_champ pas codee a surcharger si necessaire
-  //virtual void creer_champ(const Motcle& motlu);
   const Champ_base& get_champ(const Motcle& nom) const override;
+  bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
+  bool has_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
 private :
-
-//Entree& lire(const Motcle&, Entree&);
   OBS_PTR(Transport_Fluctuation_Temperature_W) eqn_transport_Fluctu_Temp;
-
-
 
 protected :
   OWN_PTR(Equation_base) eqn;
   OBS_PTR(Champ_Fonc_base) la_viscosite_turbulente;
-  // nous n'avons plus alpha_turb = visco_turb/Prdt_turb
-
-
 };
 
 

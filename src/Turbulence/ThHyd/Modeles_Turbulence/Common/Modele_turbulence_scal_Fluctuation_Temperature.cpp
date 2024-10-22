@@ -200,32 +200,46 @@ void Modele_turbulence_scal_Fluctuation_Temperature::imprimer(Sortie&) const
 {
 }
 
+bool Modele_turbulence_scal_Fluctuation_Temperature::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
+{
+  if (Modele_turbulence_scal_base::has_champ(nom))
+    return Modele_turbulence_scal_base::has_champ(nom, ref_champ);
+
+  if (eqn_transport_Fluctu_Temp.has_champ(nom))
+    return eqn_transport_Fluctu_Temp.has_champ(nom, ref_champ);
+
+  if (eqn_transport_Flux_Chaleur_Turb.has_champ(nom))
+    return eqn_transport_Flux_Chaleur_Turb.has_champ(nom, ref_champ);
+
+  return false; /* rien trouve */
+}
+
+bool Modele_turbulence_scal_Fluctuation_Temperature::has_champ(const Motcle& nom) const
+{
+  if (Modele_turbulence_scal_base::has_champ(nom))
+    return true;
+
+  if (eqn_transport_Fluctu_Temp.has_champ(nom))
+    return true;
+
+  if (eqn_transport_Flux_Chaleur_Turb.has_champ(nom))
+    return true;
+
+  return false; /* rien trouve */
+}
+
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature::get_champ(const Motcle& nom) const
 {
-  try
-    {
-      return Modele_turbulence_scal_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
+  if (Modele_turbulence_scal_base::has_champ(nom))
+    return Modele_turbulence_scal_base::get_champ(nom);
 
-  try
-    {
-      return eqn_transport_Fluctu_Temp.get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
-  try
-    {
-      return eqn_transport_Flux_Chaleur_Turb.get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
+  if (eqn_transport_Fluctu_Temp.has_champ(nom))
+    return eqn_transport_Fluctu_Temp.get_champ(nom);
 
-  throw Champs_compris_erreur();
+  if (eqn_transport_Flux_Chaleur_Turb.has_champ(nom))
+    return eqn_transport_Flux_Chaleur_Turb.get_champ(nom);
+
+  throw std::runtime_error("Field not found !");
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature::get_noms_champs_postraitables(Noms& nom,Option opt) const

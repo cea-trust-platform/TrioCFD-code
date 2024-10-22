@@ -56,6 +56,8 @@ public:
   inline const OWN_PTR(Modele_Fonc_Realisable_base)& get_modele_fonction() const { return mon_modele_fonc_; }
 
   const Champ_base& get_champ(const Motcle& nom) const override;
+  bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
+  bool has_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
 
   virtual Champ_Fonc_base& calculer_viscosite_turbulente(double temps);

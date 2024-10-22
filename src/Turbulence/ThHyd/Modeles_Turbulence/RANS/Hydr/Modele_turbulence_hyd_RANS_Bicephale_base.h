@@ -49,6 +49,8 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
   const Champ_base& get_champ(const Motcle& nom) const override;
+  bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
+  bool has_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
 
   int nombre_d_equations() const override { return 2; }

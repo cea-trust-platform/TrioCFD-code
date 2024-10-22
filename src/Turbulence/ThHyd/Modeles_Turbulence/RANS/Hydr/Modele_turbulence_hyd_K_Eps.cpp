@@ -251,28 +251,42 @@ void Modele_turbulence_hyd_K_Eps::mettre_a_jour(double temps)
   statistiques().end_count(nut_counter_);
 }
 
+bool Modele_turbulence_hyd_K_Eps::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
+{
+  if (Modele_turbulence_hyd_RANS_K_Eps_base::has_champ(nom))
+    return Modele_turbulence_hyd_RANS_K_Eps_base::has_champ(nom, ref_champ);
+
+  if (mon_modele_fonc_.non_nul())
+    if (mon_modele_fonc_->has_champ(nom))
+      return mon_modele_fonc_->has_champ(nom, ref_champ);
+
+  return false; /* rien trouve */
+}
+
+bool Modele_turbulence_hyd_K_Eps::has_champ(const Motcle& nom) const
+{
+  if (Modele_turbulence_hyd_RANS_K_Eps_base::has_champ(nom))
+    return true;
+
+  if (mon_modele_fonc_.non_nul())
+    if (mon_modele_fonc_->has_champ(nom))
+      return true;
+
+  return false; /* rien trouve */
+}
+
 const Champ_base& Modele_turbulence_hyd_K_Eps::get_champ(const Motcle& nom) const
 {
-  try
-    {
-      return Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
-  if (mon_modele_fonc_.non_nul())
-    {
-      try
-        {
-          return mon_modele_fonc_->get_champ(nom);
-        }
-      catch (Champs_compris_erreur&)
-        {
-        }
-    }
-  throw Champs_compris_erreur();
+  if (Modele_turbulence_hyd_RANS_K_Eps_base::has_champ(nom))
+    return Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(nom);
 
+  if (mon_modele_fonc_.non_nul())
+    if (mon_modele_fonc_->has_champ(nom))
+      return mon_modele_fonc_->get_champ(nom);
+
+  throw std::runtime_error("Field not found !");
 }
+
 void Modele_turbulence_hyd_K_Eps::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
   Modele_turbulence_hyd_RANS_K_Eps_base::get_noms_champs_postraitables(nom, opt);

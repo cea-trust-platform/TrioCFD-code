@@ -43,27 +43,40 @@ void Modele_turbulence_hyd_RANS_K_Eps_base::completer()
   verifie_loi_paroi();
 }
 
-const Champ_base& Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(const Motcle& nom) const
+bool Modele_turbulence_hyd_RANS_K_Eps_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
 {
-  try
-    {
-      return Modele_turbulence_hyd_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
+  if (Modele_turbulence_hyd_base::has_champ(nom))
+    return Modele_turbulence_hyd_base::has_champ(nom, ref_champ);
 
   for (int i = 0; i < nombre_d_equations(); i++)
-    {
-      try
-        {
-          return equation_k_eps(i).get_champ(nom);
-        }
-      catch (Champs_compris_erreur&)
-        {
-        }
-    }
-  throw Champs_compris_erreur();
+    if (equation_k_eps(i).has_champ(nom))
+      return equation_k_eps(i).has_champ(nom, ref_champ);
+
+  return false; /* rien trouve */
+}
+
+bool Modele_turbulence_hyd_RANS_K_Eps_base::has_champ(const Motcle& nom) const
+{
+  if (Modele_turbulence_hyd_base::has_champ(nom))
+    return true;
+
+  for (int i = 0; i < nombre_d_equations(); i++)
+    if (equation_k_eps(i).has_champ(nom))
+      return true;
+
+  return false; /* rien trouve */
+}
+
+const Champ_base& Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(const Motcle& nom) const
+{
+  if (Modele_turbulence_hyd_base::has_champ(nom))
+    return Modele_turbulence_hyd_base::get_champ(nom);
+
+  for (int i = 0; i < nombre_d_equations(); i++)
+    if (equation_k_eps(i).has_champ(nom))
+      return equation_k_eps(i).get_champ(nom);
+
+  throw std::runtime_error("Field not found !");
 }
 
 void Modele_turbulence_hyd_RANS_K_Eps_base::get_noms_champs_postraitables(Noms& nom, Option opt) const

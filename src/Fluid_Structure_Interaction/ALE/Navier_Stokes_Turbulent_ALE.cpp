@@ -332,27 +332,40 @@ void Navier_Stokes_Turbulent_ALE::creer_champ(const Motcle& motlu)
     le_modele_turbulence->creer_champ(motlu);
 }
 
+bool Navier_Stokes_Turbulent_ALE::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
+{
+  if (Navier_Stokes_std_ALE::has_champ(nom))
+    return Navier_Stokes_std_ALE::has_champ(nom, ref_champ);
+
+  if (le_modele_turbulence.non_nul())
+    if (le_modele_turbulence->has_champ(nom))
+      return le_modele_turbulence->has_champ(nom, ref_champ);
+
+  return false; /* rien trouve */
+}
+
+bool Navier_Stokes_Turbulent_ALE::has_champ(const Motcle& nom) const
+{
+  if (Navier_Stokes_std_ALE::has_champ(nom))
+    return true;
+
+  if (le_modele_turbulence.non_nul())
+    if (le_modele_turbulence->has_champ(nom))
+      return true;
+
+  return false; /* rien trouve */
+}
+
 const Champ_base& Navier_Stokes_Turbulent_ALE::get_champ(const Motcle& nom) const
 {
-  try
-    {
-      return Navier_Stokes_std_ALE::get_champ(nom);
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
-  if (le_modele_turbulence.non_nul())
-    try
-      {
-        return le_modele_turbulence->get_champ(nom);
-      }
-    catch (Champs_compris_erreur&)
-      {
-      }
-  throw Champs_compris_erreur();
-  OBS_PTR(Champ_base) ref_champ;
+  if (Navier_Stokes_std_ALE::has_champ(nom))
+    return Navier_Stokes_std_ALE::get_champ(nom);
 
-  return ref_champ;
+  if (le_modele_turbulence.non_nul())
+    if (le_modele_turbulence->has_champ(nom))
+      return le_modele_turbulence->get_champ(nom);
+
+  throw std::runtime_error("Field not found !");
 }
 
 void Navier_Stokes_Turbulent_ALE::get_noms_champs_postraitables(Noms& nom,Option opt) const

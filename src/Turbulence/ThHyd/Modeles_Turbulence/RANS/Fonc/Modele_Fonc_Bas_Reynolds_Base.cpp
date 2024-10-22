@@ -188,29 +188,29 @@ bool Modele_Fonc_Bas_Reynolds_Base::calcul_tenseur_Re_BiK(const DoubleTab&, cons
   return false;
 }
 
+bool Modele_Fonc_Bas_Reynolds_Base::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
+{
+  return champs_compris_.has_champ(nom, ref_champ);
+}
 
+bool Modele_Fonc_Bas_Reynolds_Base::has_champ(const Motcle& nom) const
+{
+  return champs_compris_.has_champ(nom);
+}
 
 const Champ_base& Modele_Fonc_Bas_Reynolds_Base::get_champ(const Motcle& nom) const
 {
   return champs_compris_.get_champ(nom);
 }
 
-void Modele_Fonc_Bas_Reynolds_Base::get_noms_champs_postraitables(Noms& nom,Option opt) const
+void Modele_Fonc_Bas_Reynolds_Base::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
-  if (opt==DESCRIPTION)
-    Cerr<<"Modele_Fonc_Bas_Reynolds_Base : "<<champs_compris_.liste_noms_compris()<<finl;
+  if (opt == DESCRIPTION)
+    Cerr << "Modele_Fonc_Bas_Reynolds_Base : " << champs_compris_.liste_noms_compris() << finl;
   else
     nom.add(champs_compris_.liste_noms_compris());
 }
 
-void Modele_Fonc_Bas_Reynolds_Base::lire_distance_paroi( )
+void Modele_Fonc_Bas_Reynolds_Base::lire_distance_paroi()
 {
-  //Cerr << " Le calcul de la distance a la paroi n'est pas implemente avec le modele fonc que vous avez donnez " << finl;
-  //exit();
-
 }
-/*DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_F1( DoubleTab& F1, const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const
-{
-	return F1;
-}
-*/
