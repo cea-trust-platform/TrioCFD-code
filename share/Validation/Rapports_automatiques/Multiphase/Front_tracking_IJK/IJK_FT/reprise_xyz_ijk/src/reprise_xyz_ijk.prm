@@ -9,6 +9,7 @@ Parametres {
 	CasTest . SEQ_reprise_TrioCFD_fromPARIJK.data
 	CasTest . PAR_reprise_TrioCFD_fromSEQIJK.data 8
 	CasTest . PAR_reprise_TrioCFD_fromPARIJK.data 8
+	# DISABLE_PARALLEL_RUN #
 }
 
 Chapter

@@ -11,6 +11,7 @@ Parametres {
 	CasTest . SEQ_FTD_swarm_n101.data
 	CasTest . PAR_IJK_swarm_n101.data 8
 	CasTest . PAR_FTD_swarm_n101.data 8
+        # DISABLE_PARALLEL_RUN #
 }
 
 Chapter

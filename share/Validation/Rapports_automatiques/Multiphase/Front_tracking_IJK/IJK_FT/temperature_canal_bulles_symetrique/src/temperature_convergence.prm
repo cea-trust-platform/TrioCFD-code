@@ -12,6 +12,7 @@ Parametres {
 	Auteur "A.S."
 	CasTest . pre_run.data 1
 	CasTest . canal_bulles_sym.data 2
+	# DISABLE_PARALLEL_RUN #
 }
 
 Chapitre {
