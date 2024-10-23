@@ -284,7 +284,7 @@ const Champ_base& Modele_turbulence_hyd_K_Eps::get_champ(const Motcle& nom) cons
     if (mon_modele_fonc_->has_champ(nom))
       return mon_modele_fonc_->get_champ(nom);
 
-  throw std::runtime_error("Field not found !");
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
 void Modele_turbulence_hyd_K_Eps::get_noms_champs_postraitables(Noms& nom, Option opt) const

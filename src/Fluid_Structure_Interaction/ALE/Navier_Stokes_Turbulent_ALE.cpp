@@ -365,7 +365,7 @@ const Champ_base& Navier_Stokes_Turbulent_ALE::get_champ(const Motcle& nom) cons
     if (le_modele_turbulence->has_champ(nom))
       return le_modele_turbulence->get_champ(nom);
 
-  throw std::runtime_error("Field not found !");
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
 void Navier_Stokes_Turbulent_ALE::get_noms_champs_postraitables(Noms& nom,Option opt) const

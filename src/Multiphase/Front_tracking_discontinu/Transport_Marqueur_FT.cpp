@@ -1314,7 +1314,7 @@ const Champ_base& Transport_Marqueur_FT::get_champ(const Motcle& nom) const
   if (Transport_Interfaces_FT_Disc::has_champ(nom))
     return Transport_Interfaces_FT_Disc::get_champ(nom);
 
-  throw std::runtime_error("Field not found !");
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
 //Calcul des valeurs du champ postraitable densite_particules_

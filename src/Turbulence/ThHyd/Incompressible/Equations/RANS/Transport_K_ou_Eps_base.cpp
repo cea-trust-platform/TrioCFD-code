@@ -458,5 +458,5 @@ const Champ_base& Transport_K_ou_Eps_base::get_champ(const Motcle& nom) const
   if (Equation_base::has_champ(nom))
     return Equation_base::get_champ(nom);
 
-  throw std::runtime_error("Field not found !");
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }

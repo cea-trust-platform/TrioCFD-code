@@ -226,7 +226,7 @@ const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_c
     if (mon_modele_fonc->has_champ(nom))
       return mon_modele_fonc->get_champ(nom);
 
-  throw std::runtime_error("Field not found !");
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_noms_champs_postraitables(Noms& nom,Option opt) const
