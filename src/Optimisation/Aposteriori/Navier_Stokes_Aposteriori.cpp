@@ -77,7 +77,7 @@ bool Navier_Stokes_Aposteriori::has_champ(const Motcle& nom, OBS_PTR(Champ_base)
 {
   if (nom == "estimateur_aposteriori")
     {
-      ref_champ = get_champ(nom);
+      ref_champ = Navier_Stokes_Aposteriori::get_champ(nom);
       return true;
     }
   else

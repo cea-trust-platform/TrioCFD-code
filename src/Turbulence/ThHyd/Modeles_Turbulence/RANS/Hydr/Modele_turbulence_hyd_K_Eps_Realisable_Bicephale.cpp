@@ -172,12 +172,12 @@ const Equation_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::equation_
 
 bool Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
 {
-  if (Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom))
-    return Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom, ref_champ);
+  if (Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom, ref_champ))
+    return true;
 
   if (mon_modele_fonc_.non_nul())
-    if (mon_modele_fonc_->has_champ(nom))
-      return mon_modele_fonc_->has_champ(nom, ref_champ);
+    if (mon_modele_fonc_->has_champ(nom, ref_champ))
+      return true;
 
   return false; /* rien trouve */
 }
@@ -196,12 +196,14 @@ bool Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::has_champ(const Motcle& n
 
 const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable_Bicephale::get_champ(const Motcle& nom) const
 {
-  if (Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom))
-    return Modele_turbulence_hyd_RANS_Bicephale_base::get_champ(nom);
+  OBS_PTR(Champ_base) ref_champ;
+
+  if (Modele_turbulence_hyd_RANS_Bicephale_base::has_champ(nom, ref_champ))
+    return ref_champ;
 
   if (mon_modele_fonc_.non_nul())
-    if (mon_modele_fonc_->has_champ(nom))
-      return mon_modele_fonc_->get_champ(nom);
+    if (mon_modele_fonc_->has_champ(nom, ref_champ))
+      return ref_champ;
 
   throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }

@@ -195,12 +195,12 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::mettre_a_jour(doub
 
 bool Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
 {
-  if (Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom))
-    return Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom, ref_champ);
+  if (Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom, ref_champ))
+    return true;
 
   if (mon_modele_fonc.non_nul())
-    if (mon_modele_fonc->has_champ(nom))
-      return mon_modele_fonc->has_champ(nom, ref_champ);
+    if (mon_modele_fonc->has_champ(nom, ref_champ))
+      return true;
 
   return false; /* rien trouve */
 }
@@ -219,12 +219,14 @@ bool Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::has_champ(const Mo
 
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_champ(const Motcle& nom) const
 {
-  if (Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom))
-    return Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(nom);
+  OBS_PTR(Champ_base) ref_champ;
+
+  if (Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom, ref_champ))
+    return ref_champ;
 
   if (mon_modele_fonc.non_nul())
-    if (mon_modele_fonc->has_champ(nom))
-      return mon_modele_fonc->get_champ(nom);
+    if (mon_modele_fonc->has_champ(nom, ref_champ))
+      return ref_champ;
 
   throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }

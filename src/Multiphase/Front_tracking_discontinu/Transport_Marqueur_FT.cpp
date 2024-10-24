@@ -1268,12 +1268,12 @@ bool Transport_Marqueur_FT::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &re
 {
   if (nom == "densite_particules" || nom == "volume_particules")
     {
-      ref_champ = get_champ(nom);
+      ref_champ = Transport_Marqueur_FT::get_champ(nom);
       return true;
     }
 
-  if (Transport_Interfaces_FT_Disc::has_champ(nom))
-    return Transport_Interfaces_FT_Disc::has_champ(nom, ref_champ);
+  if (Transport_Interfaces_FT_Disc::has_champ(nom, ref_champ))
+    return true;
 
   return false; /* rien trouve */
 }
@@ -1311,8 +1311,10 @@ const Champ_base& Transport_Marqueur_FT::get_champ(const Motcle& nom) const
       return champs_compris_.get_champ(nom);
     }
 
-  if (Transport_Interfaces_FT_Disc::has_champ(nom))
-    return Transport_Interfaces_FT_Disc::get_champ(nom);
+  OBS_PTR(Champ_base) ref_champ;
+
+  if (Transport_Interfaces_FT_Disc::has_champ(nom, ref_champ))
+    return ref_champ;
 
   throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }

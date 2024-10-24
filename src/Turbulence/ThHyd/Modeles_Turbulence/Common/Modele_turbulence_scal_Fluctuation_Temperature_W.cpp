@@ -199,11 +199,11 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::imprimer(Sortie& os) cons
 
 bool Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
 {
-  if (Modele_turbulence_scal_base::has_champ(nom))
-    return Modele_turbulence_scal_base::has_champ(nom, ref_champ);
+  if (Modele_turbulence_scal_base::has_champ(nom, ref_champ))
+    return true;
 
-  if (eqn->has_champ(nom))
-    return eqn->has_champ(nom, ref_champ);
+  if (eqn->has_champ(nom, ref_champ))
+    return true;
 
   return false; /* rien trouve */
 }
@@ -221,11 +221,13 @@ bool Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(const Motcle& n
 
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(const Motcle& nom) const
 {
-  if (Modele_turbulence_scal_base::has_champ(nom))
-    return Modele_turbulence_scal_base::get_champ(nom);
+  OBS_PTR(Champ_base) ref_champ;
 
-  if (eqn->has_champ(nom))
-    return eqn->get_champ(nom);
+  if (Modele_turbulence_scal_base::has_champ(nom, ref_champ))
+    return ref_champ;
+
+  if (eqn->has_champ(nom, ref_champ))
+    return ref_champ;
 
   throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
