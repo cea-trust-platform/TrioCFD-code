@@ -16,7 +16,8 @@
 #ifndef OpConvDiscQuickIJKScalar_TPP_included
 #define OpConvDiscQuickIJKScalar_TPP_included
 
-#include <IJK_Field_simd_tools.h>
+#include <IJK_ptr.h>
+#include <Simd_template.h>
 
 template <DIRECTION _DIR_>
 void OpConvDiscQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu, const int k_layer)
@@ -94,10 +95,10 @@ void OpConvDiscQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu
           velocity_dir.get_center(i, velocity);
           double indm1, ind0, ind1, ind2;
           input_indicatrice.get_leftleft_left_center_right(_DIR_,i, indm1, ind0, ind1, ind2);
-          const double diphm1 = select_double(indm1*(1-indm1),DMINFLOAT,0,1);
-          const double diph0 = select_double(ind0*(1-ind0),DMINFLOAT,0,1);
-          const double diph1 = select_double(ind1*(1-ind1),DMINFLOAT,0,1);
-          const double diph2 = select_double(ind2*(1-ind2),DMINFLOAT,0,1);
+          const double diphm1 = indm1*(1-indm1)<DMINFLOAT?0:1;
+          const double diph0 = ind0*(1-ind0)<DMINFLOAT?0:1;
+          const double diph1 = ind1*(1-ind1)<DMINFLOAT?0:1;
+          const double diph2 = ind2*(1-ind2)<DMINFLOAT?0:1;
           //TODO: completer les conditions
           if ((!diphm1) && (!diph0) && (!diph1) && (!diph2)) //normal
             {
@@ -107,9 +108,9 @@ void OpConvDiscQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu
               input_field.get_left_center(_DIR_, i, T0, T1);
               fram_values.get_left_center(_DIR_, i, fram0, fram1);
               curv_values.get_left_center(_DIR_, i, curv0, curv1);
-              Simd_double fram = max(fram0, fram1);
-              Simd_double curv    = select_double(velocity, 0., curv1, curv0);
-              Simd_double T_amont = select_double(velocity, 0., T1 /* if velocity < 0 */, T0 /* if velocity > 0 */);
+              Simd_double fram = SimdMax(fram0, fram1);
+              Simd_double curv    = SimdSelect<double>(velocity, 0., curv1, curv0);
+              Simd_double T_amont = SimdSelect<double>(velocity, 0., T1 /* if velocity < 0 */, T0 /* if velocity > 0 */);
               Simd_double flux = (T0 + T1) * 0.5 - dx_squared_over_8 * curv;
               flux = ((1. - fram) * flux + fram * T_amont) * velocity * surface;
               resu_ptr.put_val(i, flux);

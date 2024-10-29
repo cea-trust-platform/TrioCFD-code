@@ -80,9 +80,9 @@ void OpConvQuickIJKScalar_double::compute_flux_(IJK_Field_local_double& resu, co
           input_field.get_left_center(_DIR_, i, T0, T1);
           fram_values.get_left_center(_DIR_, i, fram0, fram1);
           curv_values.get_left_center(_DIR_, i, curv0, curv1);
-          Simd_double fram = max(fram0, fram1);
-          Simd_double curv	   = select_double(velocity, 0., curv1, curv0);
-          Simd_double T_amont = select_double(velocity, 0., T1 /* if velocity < 0 */, T0 /* if velocity > 0 */);
+          Simd_double fram = SimdMax(fram0, fram1);
+          Simd_double curv	   = SimdSelect<double>(velocity, 0., curv1, curv0);
+          Simd_double T_amont = SimdSelect<double>(velocity, 0., T1 /* if velocity < 0 */, T0 /* if velocity > 0 */);
           Simd_double flux	   = (T0 + T1) * 0.5 - delta_xyz_squared_over_8 * curv;
           flux		   = ((1. - fram) * flux + fram * T_amont) * velocity * surface;
           resu_ptr.put_val(i, flux);

@@ -125,8 +125,8 @@ double Corrige_flux_FT_temperature_conv::quick(
     }
 
   const double fram = std::max(fram0, fram1);
-  const double curv = select_double(velocity, 0., curv1, curv0);
-  const double T_amont = select_double(velocity, 0., Ti /* if velocity < 0 */, Tip1 /* if velocity > 0 */);
+  const double curv = velocity < 0. ? curv1 : curv0;
+  const double T_amont = velocity < 0. ? Ti : Tip1;
   double T_interp = (Ti + Tip1) * 0.5 - dx_squared_over_8 * curv;
   T_interp = (1. - fram) * T_interp + fram * T_amont;
   return T_interp;

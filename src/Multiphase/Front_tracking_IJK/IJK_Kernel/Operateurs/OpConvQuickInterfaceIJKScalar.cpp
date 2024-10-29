@@ -25,13 +25,8 @@
  *OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : OpConvIJKQuickScalar_interface.cpp
-// Directory : $IJK_ROOT/src/IJK/OpVDF
-//
-/////////////////////////////////////////////////////////////////////////////
-#include <IJK_Field_simd_tools.h>
+
+#include <IJK_ptr.h>
 #include <OpConvQuickInterfaceIJKScalar.h>
 #include <Operateur_IJK_base.h>
 

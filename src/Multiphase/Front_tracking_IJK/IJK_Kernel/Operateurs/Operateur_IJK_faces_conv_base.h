@@ -16,7 +16,7 @@
 #ifndef Operateur_IJK_faces_conv_base_included
 #define Operateur_IJK_faces_conv_base_included
 #include <IJK_Field.h>
-#include <IJK_Field_simd_tools.h>
+#include <IJK_ptr.h>
 #include <TRUSTTab.h>
 #include <IJK_Splitting.h>
 #include <Operateur_IJK_base.h>
