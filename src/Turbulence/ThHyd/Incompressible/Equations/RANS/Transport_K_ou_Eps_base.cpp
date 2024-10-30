@@ -418,27 +418,47 @@ double Transport_K_ou_Eps_base::calculer_pas_de_temps() const
   return probleme().equation(0).calculer_pas_de_temps();
 }
 
-const Champ_base& Transport_K_ou_Eps_base::get_champ( const Motcle& nom ) const
+bool Transport_K_ou_Eps_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
 {
-  double temps_init = schema_temps().temps_init();
-
-  if (nom=="residu")
+  if (nom == "residu")
     {
-      Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,residu_.valeur());
-      if ( (( ch.temps()!=le_champ_->temps() ) || ( ch.temps()==temps_init))  )
-        {
-          ch.mettre_a_jour( le_champ_->temps() );
-        }
-      return champs_compris_.get_champ( nom );
+      ref_champ = Transport_K_ou_Eps_base::get_champ(nom);
+      return true;
     }
 
-  try
+  if (Equation_base::has_champ(nom, ref_champ))
+    return true;
+
+  return false; /* rien trouve */
+}
+
+bool Transport_K_ou_Eps_base::has_champ(const Motcle& nom) const
+{
+  if (nom == "residu")
+    return true;
+
+  if (Equation_base::has_champ(nom))
+    return true;
+
+  return false; /* rien trouve */
+}
+
+const Champ_base& Transport_K_ou_Eps_base::get_champ(const Motcle& nom) const
+{
+  if (nom == "residu")
     {
-      return Equation_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
+      double temps_init = schema_temps().temps_init();
+      Champ_Fonc_base& ch = ref_cast_non_const(Champ_Fonc_base, residu_.valeur());
+      if (((ch.temps() != le_champ_->temps()) || (ch.temps() == temps_init)))
+        ch.mettre_a_jour(le_champ_->temps());
+
+      return champs_compris_.get_champ(nom);
     }
 
-  throw Champs_compris_erreur();
+  OBS_PTR(Champ_base) ref_champ;
+
+  if (Equation_base::has_champ(nom, ref_champ))
+    return ref_champ;
+
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }

@@ -57,28 +57,20 @@ public:
 
   //////////////////////////////////////////////////////
   //Methode creer_champ pas codee a surcharger si necessaire
-  //virtual void creer_champ(const Motcle& motlu);
   const Champ_base& get_champ(const Motcle& nom) const override;
+  bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
+  bool has_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
 private :
-
   Transport_Fluctuation_Temperature eqn_transport_Fluctu_Temp;
   Transport_Flux_Chaleur_Turbulente eqn_transport_Flux_Chaleur_Turb;
-  //Entree& lire(const Motcle&, Entree&);
-
 
 protected :
   OBS_PTR(Champ_Fonc_base) la_viscosite_turbulente;
   Champ_Fonc_base& calculer_diffusivite_turbulente();
-  // nous n'avons plus alpha_turb = visco_turb/Prdt_turb
 };
-
-
-//
-//  Fonctions inline de la classe Modele_turbulence_hyd_K_Eps
-//
 
 inline Transport_Fluctuation_Temperature& Modele_turbulence_scal_Fluctuation_Temperature::equation_Fluctu()
 {

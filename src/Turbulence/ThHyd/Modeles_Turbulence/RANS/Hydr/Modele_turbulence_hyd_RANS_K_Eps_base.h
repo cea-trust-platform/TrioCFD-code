@@ -45,6 +45,8 @@ public:
   int reprendre(Entree& is) override;
 
   const Champ_base& get_champ(const Motcle& nom) const override;
+  bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
+  bool has_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
 
   virtual Transport_K_Eps_base& eqn_transp_K_Eps()=0;

@@ -193,27 +193,42 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::mettre_a_jour(doub
   diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
 
-const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_champ(const Motcle& nom) const
+bool Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
 {
-  try
-    {
-      return Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(nom);
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
+  if (Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom, ref_champ))
+    return true;
 
   if (mon_modele_fonc.non_nul())
-    {
-      try
-        {
-          return mon_modele_fonc->get_champ(nom);
-        }
-      catch (Champs_compris_erreur&)
-        {
-        }
-    }
-  throw Champs_compris_erreur();
+    if (mon_modele_fonc->has_champ(nom, ref_champ))
+      return true;
+
+  return false; /* rien trouve */
+}
+
+bool Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::has_champ(const Motcle& nom) const
+{
+  if (Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom))
+    return true;
+
+  if (mon_modele_fonc.non_nul())
+    if (mon_modele_fonc->has_champ(nom))
+      return true;
+
+  return false; /* rien trouve */
+}
+
+const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_champ(const Motcle& nom) const
+{
+  OBS_PTR(Champ_base) ref_champ;
+
+  if (Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom, ref_champ))
+    return ref_champ;
+
+  if (mon_modele_fonc.non_nul())
+    if (mon_modele_fonc->has_champ(nom, ref_champ))
+      return ref_champ;
+
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_noms_champs_postraitables(Noms& nom,Option opt) const

@@ -131,19 +131,25 @@ int Modele_Fonc_Realisable_base::Calcul_is_Reynolds_stress_isotrope() const
   return 1;
 }
 
+bool Modele_Fonc_Realisable_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
+{
+  return champs_compris_.has_champ(nom, ref_champ);
+}
+
+bool Modele_Fonc_Realisable_base::has_champ(const Motcle& nom) const
+{
+  return champs_compris_.has_champ(nom);
+}
 
 const Champ_base& Modele_Fonc_Realisable_base::get_champ(const Motcle& nom) const
 {
   return champs_compris_.get_champ(nom);
 }
 
-void Modele_Fonc_Realisable_base::get_noms_champs_postraitables(Noms& nom,Option opt) const
+void Modele_Fonc_Realisable_base::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
-  if (opt==DESCRIPTION)
-    Cerr<<"Modele_Fonc_Realisable_base : "<<champs_compris_.liste_noms_compris()<<finl;
+  if (opt == DESCRIPTION)
+    Cerr << "Modele_Fonc_Realisable_base : " << champs_compris_.liste_noms_compris() << finl;
   else
     nom.add(champs_compris_.liste_noms_compris());
 }
-
-
-
