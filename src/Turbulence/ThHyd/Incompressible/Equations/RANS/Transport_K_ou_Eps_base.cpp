@@ -431,14 +431,5 @@ const Champ_base& Transport_K_ou_Eps_base::get_champ( const Motcle& nom ) const
         }
       return champs_compris_.get_champ( nom );
     }
-
-  try
-    {
-      return Equation_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
-
-  throw Champs_compris_erreur();
+  return Equation_base::get_champ(nom);
 }

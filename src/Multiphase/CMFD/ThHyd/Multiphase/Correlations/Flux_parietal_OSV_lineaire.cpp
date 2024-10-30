@@ -23,9 +23,8 @@
 #include <Flux_parietal_OSV_lineaire.h>
 #include <Flux_parietal_adaptatif.h>
 #include <Loi_paroi_adaptative.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 #include <Pb_Multiphase.h>
-#include <Domaine_dis.h>
 #include <TRUSTTrav.h>
 #include <Milieu_composite.h>
 #include <Saturation_base.h>
@@ -39,7 +38,7 @@ Sortie& Flux_parietal_OSV_lineaire::printOn(Sortie& os) const { return Flux_pari
 Entree& Flux_parietal_OSV_lineaire::readOn(Entree& is)
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, pb_.valeur());
-  correlation_monophasique_.typer_lire(pbm, "Flux_parietal", is);
+  Correlation_base::typer_lire_correlation(correlation_monophasique_, pbm, "Flux_parietal", is);
   Cout << que_suis_je() << " : single-phase wall heat flux is " << correlation_monophasique_->que_suis_je() << finl;
   correlation_loi_paroi_ = ref_cast(Pb_Multiphase, pb_.valeur()).get_correlation("Loi_paroi");
 

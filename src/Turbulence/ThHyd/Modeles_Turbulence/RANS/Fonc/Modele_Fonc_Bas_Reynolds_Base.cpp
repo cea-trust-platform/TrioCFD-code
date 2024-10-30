@@ -203,6 +203,15 @@ void Modele_Fonc_Bas_Reynolds_Base::get_noms_champs_postraitables(Noms& nom,Opti
     nom.add(champs_compris_.liste_noms_compris());
 }
 
+bool Modele_Fonc_Bas_Reynolds_Base::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
+{
+  return champs_compris_.has_champ(nom, ref_champ);
+}
+bool Modele_Fonc_Bas_Reynolds_Base::has_champ(const Motcle& nom) const
+{
+  return champs_compris_.has_champ(nom);
+}
+
 void Modele_Fonc_Bas_Reynolds_Base::lire_distance_paroi( )
 {
   //Cerr << " Le calcul de la distance a la paroi n'est pas implemente avec le modele fonc que vous avez donnez " << finl;

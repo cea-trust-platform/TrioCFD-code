@@ -1286,16 +1286,7 @@ const Champ_base& Transport_Marqueur_FT::get_champ(const Motcle& nom) const
       return champs_compris_.get_champ(nom);
     }
 
-  try
-    {
-      return Transport_Interfaces_FT_Disc::get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
-  throw Champs_compris_erreur();
-  OBS_PTR(Champ_base) ref_champ;
-  return ref_champ;
+  return Transport_Interfaces_FT_Disc::get_champ(nom);
 }
 
 

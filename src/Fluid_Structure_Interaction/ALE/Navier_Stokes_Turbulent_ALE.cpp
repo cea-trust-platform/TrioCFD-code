@@ -334,25 +334,11 @@ void Navier_Stokes_Turbulent_ALE::creer_champ(const Motcle& motlu)
 
 const Champ_base& Navier_Stokes_Turbulent_ALE::get_champ(const Motcle& nom) const
 {
-  try
-    {
-      return Navier_Stokes_std_ALE::get_champ(nom);
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
-  if (le_modele_turbulence.non_nul())
-    try
-      {
-        return le_modele_turbulence->get_champ(nom);
-      }
-    catch (Champs_compris_erreur&)
-      {
-      }
-  throw Champs_compris_erreur();
-  OBS_PTR(Champ_base) ref_champ;
-
-  return ref_champ;
+  if (Navier_Stokes_std_ALE::has_champ(nom))
+    return Navier_Stokes_std_ALE::get_champ(nom);
+  if (le_modele_turbulence.non_nul() && le_modele_turbulence->has_champ(nom))
+    return le_modele_turbulence->get_champ(nom);
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
 void Navier_Stokes_Turbulent_ALE::get_noms_champs_postraitables(Noms& nom,Option opt) const

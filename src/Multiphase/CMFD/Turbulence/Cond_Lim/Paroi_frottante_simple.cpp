@@ -47,7 +47,7 @@ Entree& Paroi_frottante_simple::readOn(Entree& s )
 void Paroi_frottante_simple::completer()
 {
   if (!ref_cast(Operateur_Diff_base, domaine_Cl_dis().equation().operateur(0).l_op_base()).is_turb()) Process::exit(que_suis_je() + " : diffusion operator must be turbulent !");
-  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().probleme().domaine_dis().valeur());
+  const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_Cl_dis().equation().probleme().domaine_dis());
   if (domaine.que_suis_je().debute_par("Domaine_PolyVEF")) is_externe_ = 1;
 }
 

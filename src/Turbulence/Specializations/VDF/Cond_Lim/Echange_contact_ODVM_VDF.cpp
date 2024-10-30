@@ -51,14 +51,7 @@ void Echange_contact_ODVM_VDF::calculer_Teta_equiv(DoubleTab& La_T_ext,const Dou
   int nb_faces_bord = ma_front_vf.nb_faces();
   int ind_fac,elem, isfluide=0;
   //La_T_ext.resize(nb_faces_bord,1);
-  try
-    {
-      mon_eqn.probleme().equation(0).get_champ("vitesse");
-      isfluide=1;
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
+  isfluide = mon_eqn.probleme().equation(0).has_champ("vitesse");
 
   const Champ_front_calc& chcal=ref_cast(Champ_front_calc,T_autre_pb());
   const Equation_base& eq = (isfluide==1?mon_eqn:chcal.inconnue().equation());

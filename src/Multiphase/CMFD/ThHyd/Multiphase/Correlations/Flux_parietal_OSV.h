@@ -24,7 +24,7 @@
 #define Flux_parietal_OSV_included
 #include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
-#include <Correlation.h>
+#include <Correlation_base.h>
 #include <Param.h>
 
 /*! @brief Flux_parietal_OSV class that implements an onset of significant void-based heat flux partition
@@ -49,8 +49,8 @@ public:
   virtual int T_at_wall() const override {return 0;};
 
 protected :
-  Correlation correlation_monophasique_;
-  REF(Correlation) correlation_loi_paroi_;
+  OWN_PTR(Correlation_base) correlation_monophasique_;
+  OBS_PTR(Correlation_base) correlation_loi_paroi_;
   double Dh_ = -1. ;
   int Water_  = 0;
   int R12_   = 0;

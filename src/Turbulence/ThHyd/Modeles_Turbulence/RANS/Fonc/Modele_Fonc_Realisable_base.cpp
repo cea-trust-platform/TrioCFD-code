@@ -145,5 +145,14 @@ void Modele_Fonc_Realisable_base::get_noms_champs_postraitables(Noms& nom,Option
     nom.add(champs_compris_.liste_noms_compris());
 }
 
+bool Modele_Fonc_Realisable_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
+{
+  return champs_compris_.has_champ(nom, ref_champ);
+}
+bool Modele_Fonc_Realisable_base::has_champ(const Motcle& nom) const
+{
+  return champs_compris_.has_champ(nom);
+}
+
 
 

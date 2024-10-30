@@ -199,22 +199,11 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W::imprimer(Sortie& os) cons
 
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(const Motcle& nom) const
 {
-  try
-    {
-      return Modele_turbulence_scal_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
-  try
-    {
-      return eqn->get_champ(nom);
-    }
-  catch (Champs_compris_erreur)
-    {
-    }
-
-  throw Champs_compris_erreur();
+  if (Modele_turbulence_scal_base::has_champ(nom))
+    return Modele_turbulence_scal_base::get_champ(nom);
+  if (eqn->has_champ(nom))
+    return eqn->get_champ(nom);
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));;
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature_W::get_noms_champs_postraitables(Noms& nom,Option opt) const

@@ -195,25 +195,11 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::mettre_a_jour(doub
 
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_champ(const Motcle& nom) const
 {
-  try
-    {
-      return Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(nom);
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
-
-  if (mon_modele_fonc.non_nul())
-    {
-      try
-        {
-          return mon_modele_fonc->get_champ(nom);
-        }
-      catch (Champs_compris_erreur&)
-        {
-        }
-    }
-  throw Champs_compris_erreur();
+  if (Modele_turbulence_scal_Fluctuation_Temperature_W::has_champ(nom))
+    return Modele_turbulence_scal_Fluctuation_Temperature_W::get_champ(nom);
+  if (mon_modele_fonc.non_nul() && mon_modele_fonc->has_champ(nom))
+    return mon_modele_fonc->get_champ(nom);
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_noms_champs_postraitables(Noms& nom,Option opt) const

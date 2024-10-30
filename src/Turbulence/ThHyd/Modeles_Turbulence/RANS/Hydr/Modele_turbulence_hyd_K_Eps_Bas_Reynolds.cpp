@@ -160,26 +160,11 @@ const Equation_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::equation_k_eps(in
 
 const Champ_base& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_champ(const Motcle& nom) const
 {
-  try
-    {
-      return Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(nom);
-    }
-  catch (Champs_compris_erreur&)
-    {
-    }
-
-  if (mon_modele_fonc_.non_nul())
-    {
-      try
-        {
-          return mon_modele_fonc_->get_champ(nom);
-        }
-      catch (Champs_compris_erreur&)
-        {
-        }
-    }
-
-  throw Champs_compris_erreur();
+  if (Modele_turbulence_hyd_RANS_K_Eps_base::has_champ(nom))
+    return Modele_turbulence_hyd_RANS_K_Eps_base::get_champ(nom);
+  if (mon_modele_fonc_.non_nul() && mon_modele_fonc_->has_champ(nom))
+    return mon_modele_fonc_->get_champ(nom);
+  throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::get_noms_champs_postraitables(Noms& nom, Option opt) const

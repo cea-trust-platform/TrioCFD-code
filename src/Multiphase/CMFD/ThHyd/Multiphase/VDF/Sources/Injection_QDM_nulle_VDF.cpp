@@ -47,9 +47,9 @@ Entree& Injection_QDM_nulle_VDF::readOn(Entree& is) { return Source_injection_QD
 
 void Injection_QDM_nulle_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF, equation().inconnue().valeur());
-  const Champ_P0_VDF& cha= ref_cast(Champ_P0_VDF, equation().probleme().equation(1).inconnue().valeur()); // volume fraction
-  const Domaine_VF&  domaine = ref_cast(Domaine_VF, equation().domaine_dis().valeur());
+  const Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF, equation().inconnue());
+  const Champ_P0_VDF& cha= ref_cast(Champ_P0_VDF, equation().probleme().equation(1).inconnue()); // volume fraction
+  const Domaine_VF&  domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const Conds_lim&      clsa = cha.domaine_Cl_dis().les_conditions_limites();
   const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
 
@@ -68,7 +68,7 @@ void Injection_QDM_nulle_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secm
   Matrice_Morse *mat = matrices.count(ch.le_nom().getString()) ? matrices.at(ch.le_nom().getString()) : nullptr; // Derivee locale/QDM
 
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
-  const Masse_ajoutee_base *corr = pbm && pbm->has_correlation("masse_ajoutee") ? &ref_cast(Masse_ajoutee_base, pbm->get_correlation("masse_ajoutee").valeur()) : nullptr;
+  const Masse_ajoutee_base *corr = pbm && pbm->has_correlation("masse_ajoutee") ? &ref_cast(Masse_ajoutee_base, pbm->get_correlation("masse_ajoutee")) : nullptr;
 
   int N = vit.line_size(), nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot();
 
@@ -110,7 +110,7 @@ void Injection_QDM_nulle_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secm
   if ( (pbm) && pbm->has_correlation("flux_parietal") )
     {
       const DoubleTab& qpi = ref_cast(Source_Flux_interfacial_base, pbm->equation_energie().sources().dernier().valeur()).qpi(),
-                       &press = ref_cast(QDM_Multiphase, pbm->equation_qdm()).pression()->passe();
+                       &press = ref_cast(QDM_Multiphase, pbm->equation_qdm()).pression().passe();
       int nb_max_sat = N*(N-1)/2;
 
       /* limiteur de changement de phase : pas mis dans la V0 de cette force */
