@@ -12,25 +12,25 @@ VEFPreP1B dis
 Schema_Euler_implicite sch
 Read sch
 {
-	tinit 0.
+    tinit 0.
 	nb_pas_dt_max 3
-	tmax 600.
-	# dt_min 1.e-6 #
-	dt_max 1.e+2
-	dt_impr 1000.
-	dt_sauv 600.0
-	seuil_statio 1.e-5
-	facsec 2
-        facsec_max 50
-       Solveur
-           implicite
-           {
-                seuil_convergence_solveur 1.e-5
-           }
+    tmax 600.
+# dt_min 1.e-6 #
+    dt_max 1.e+2
+    dt_impr 1000.
+    dt_sauv 600.0
+    seuil_statio 1.e-5
+    facsec 2
+    facsec_max 50
+    Solveur
+    implicite
+    {
+        seuil_convergence_solveur 1.e-5
+    }
 }
 
 
- 
+
 Associate pb dom01234
 Associate pb sch
 
@@ -38,128 +38,126 @@ Discretize pb dis
 
 domaine paroi_chauf
 extraire_surface {
-	domaine paroi_chauf
-	probleme pb
-	avec_certains_bords 1 paroi
-	}
+    domaine paroi_chauf
+    probleme pb
+    avec_certains_bords 1 paroi
+}
 
 
 
 Read pb
 {
-   
-   fluide_incompressible {
-   
-        gravite champ_uniforme 3 0 0 0
-   	mu Champ_Uniforme       1 3.93e-5
-    	rho Champ_Uniforme      1 3.
-           lambda Champ_Uniforme   1 0.303
-           Cp Champ_Uniforme       1 5193
-           beta_th Champ_Uniforme  1 1.24e-3
-   }
-   
-   	Navier_Stokes_Turbulent	
-	{
-		solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-6 }	
-		convection { EF_stab { } }
-		diffusion { }
-		conditions_initiales {
-			vitesse champ_fonc_xyz dom01234 3  0. 0. 1.31*(1-x*x-y*y)
-			}
-        	Sources {
-			Canal_perio { bord sortie }
-			}
-		boundary_conditions {
-			sortie  periodique
-			paroi  paroi_fixe
-		}
-                 Modele_turbulence K_Epsilon {
-			Transport_K_Epsilon
-                        {
-                         convection { amont } 
-                         diffusion { }
-                         boundary_conditions
-                            {
-			     sortie  periodique 
-                             paroi  paroi
-                            }
-                         conditions_initiales
-                           {
-                             k_Eps Champ_Uniforme 2 4.23e-3 3.740e-3
-                           }
-                        }
-                        Turbulence_paroi  loi_standard_hydr dt_impr_ustar 2000
-                }
-		Traitement_particulier { temperature { bord sortie direction 2 } }
-		Ecrire_fichier_xyz_valeur  {
-		    dt 3000.
-		    fields 2 vitesse k_eps
-		    boundaries 1 sortie
-         }
 
+    fluide_incompressible {
+
+        gravite champ_uniforme 3 0 0 0
+        mu Champ_Uniforme       1 3.93e-5
+        rho Champ_Uniforme      1 3.
+        lambda Champ_Uniforme   1 0.303
+        Cp Champ_Uniforme       1 5193
+        beta_th Champ_Uniforme  1 1.24e-3
+    }
+
+    Navier_Stokes_Turbulent
+    {
+        solveur_pression petsc cholesky { }
+        convection { EF_stab { } }
+        diffusion { }
+        conditions_initiales {
+            vitesse champ_fonc_xyz dom01234 3  0. 0. 1.31*(1-x*x-y*y)
+        }
+        Sources {
+            Canal_perio { bord sortie }
+        }
+        boundary_conditions {
+            sortie  periodique
+            paroi  paroi_fixe
+        }
+        Modele_turbulence K_Epsilon {
+            Transport_K_Epsilon
+            {
+                convection { amont }
+                diffusion { }
+                boundary_conditions
+                {
+                    sortie  periodique
+                    paroi  paroi
+                }
+                conditions_initiales
+                {
+                    k_Eps Champ_Uniforme 2 4.23e-3 3.740e-3
+                }
+            }
+            Turbulence_paroi  loi_standard_hydr dt_impr_ustar 2000
+        }
+        Traitement_particulier { temperature { bord sortie direction 2 } }
+        Ecrire_fichier_xyz_valeur  {
+            dt 3000.
+            fields 2 vitesse k_eps
+            boundaries 1 sortie
         }
 
-        Convection_Diffusion_Temperature_Turbulent
-                {
-                diffusion { }
-		convection { EF_stab { } }
+    }
 
-                Modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire 
-						dt_impr_nusselt 10000.
-                                          }
-                boundary_conditions
-                        {
-                        sortie periodique 
-                        paroi   paroi_flux_impose Champ_Front_Uniforme 1 1000.
-                        }
-                conditions_initiales { Temperature Champ_Fonc_xyz dom01234 1 0. }
-		        Ecrire_fichier_xyz_valeur  {
-		            dt 3000.
-		            fields 1 temperature 
-		            boundaries 1 sortie
-                 }
-                }
+    Convection_Diffusion_Temperature_Turbulent
+    {
+        diffusion { }
+        convection { EF_stab { } }
 
-
-
-	Postraitement
-	{
+        Modele_turbulence Prandtl {
+            Turbulence_paroi loi_standard_hydr_scalaire
+            dt_impr_nusselt 10000.
+        }
+        boundary_conditions
+        {
+            sortie periodique
+            paroi   paroi_flux_impose Champ_Front_Uniforme 1 1000.
+        }
+        conditions_initiales { Temperature Champ_Fonc_xyz dom01234 1 0. }
+        Ecrire_fichier_xyz_valeur  {
+            dt 3000.
+            fields 1 temperature
+            boundaries 1 sortie
+        }
+    }
 
 
 
-	Definition_champs
-          {
-            temperature_paroi_chauf interpolation 
-              { 
+    Postraitement
+    {
+
+
+
+        Definition_champs
+        {
+            temperature_paroi_chauf interpolation
+            {
                 localisation elem
                 domaine paroi_chauf
                 sources_reference { temperature_physique }
-              }	
-           temperature_max reduction_0d
-             {
-               methode max
-               sources_reference { temperature_physique }
-                 
-             }
-           temperature_moy reduction_0d
-             {
-               methode moyenne
-               sources_reference { temperature_physique }
-            }	
-	   temperature_max_paroi_chauf reduction_0d 
-              { 
+            }
+            temperature_max reduction_0d
+            {
+                methode max
+                sources_reference { temperature_physique }
+
+            }
+            temperature_moy reduction_0d
+            {
+                methode moyenne
+                sources_reference { temperature_physique }
+            }
+            temperature_max_paroi_chauf reduction_0d
+            {
                 methode max
                 sources_reference { temperature_paroi_chauf }
-              }	
-	   temperature_moy_paroi_chauf reduction_0d 
-              { 
+            }
+            temperature_moy_paroi_chauf reduction_0d
+            {
                 methode moyenne
                 sources_reference { temperature_paroi_chauf }
-              }	
-          }
-	
-
-	
+            }
+        }
 
 
 
@@ -167,49 +165,52 @@ Read pb
 
 
 
- 
-
-         format lml
-		Champs dt_post 150.0
-		{
-			vitesse elem
-			temperature elem
-			temperature
-		       
-			y_plus elem
-			viscosite_turbulente elem
-			diffusivite_turbulente elem
-			}
-	Sondes
-	       {
-	       sonde_v vitesse periode 10. point     3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0	
-	       sonde_t temperature periode 10. point 3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0	
-	       sonde_vp vitesse periode 10. segment                    20 -1.0 0. 20.0 1. 0. 20.0
-	       sonde_nut viscosite_turbulente periode 10. segment      30 -1.0 0. 1.0 1. 0. 1.0
-	       sonde_alphat diffusivite_turbulente periode 10. segment 20 -1.0 0. 20.0 1. 0. 20.0
-
-	       sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 20.0 1. 0. 20.0
- 	       sonde_tp  temperature periode 10. segment               45 -1.0 0. 20.0 1. 0. 20.0
- 	       sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 20.0 1. 0. 20.0
- 	       point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  20.   1.0  0.  20.    0.  -1.  20.  0.   1.  20. 
-
-	       sonde_t_phys_max temperature_max periode 10. numero_elem_sur_maitre 0
-	       sonde_t_phys_moy temperature_moy periode 10. numero_elem_sur_maitre 0
-	       sonde_t_phys_paroi_max temperature_max_paroi_chauf periode 10. numero_elem_sur_maitre 0
-	       sonde_t_phys_paroi_moy temperature_moy_paroi_chauf periode 10. numero_elem_sur_maitre 0
 
 
-             }
-	}
-	Sauvegarde binaire Conduite.sauv
+
+
+
+        format lml
+        Champs dt_post 150.0
+        {
+            vitesse elem
+            temperature elem
+            temperature
+           
+            y_plus elem
+            viscosite_turbulente elem
+            diffusivite_turbulente elem
+        }
+        Sondes
+        {
+            sonde_v vitesse periode 10. point     3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0
+            sonde_t temperature periode 10. point 3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0
+            sonde_vp vitesse periode 10. segment                    20 -1.0 0. 20.0 1. 0. 20.0
+            sonde_nut viscosite_turbulente periode 10. segment      30 -1.0 0. 1.0 1. 0. 1.0
+            sonde_alphat diffusivite_turbulente periode 10. segment 20 -1.0 0. 20.0 1. 0. 20.0
+
+            sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 20.0 1. 0. 20.0
+            sonde_tp  temperature periode 10. segment               45 -1.0 0. 20.0 1. 0. 20.0
+            sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 20.0 1. 0. 20.0
+            point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1.
+
+            sonde_t_phys_max temperature_max periode 10. numero_elem_sur_maitre 0
+            sonde_t_phys_moy temperature_moy periode 10. numero_elem_sur_maitre 0
+            sonde_t_phys_paroi_max temperature_max_paroi_chauf periode 10. numero_elem_sur_maitre 0
+            sonde_t_phys_paroi_moy temperature_moy_paroi_chauf periode 10. numero_elem_sur_maitre 0
+
+
+        }
+    }
+    Sauvegarde binaire Conduite.sauv
 }
 EcritureLectureSpecial 0
 Solve pb
 End
 
- 			temperature_paroi_chauf
-			temperature_max
-			temperature_moy
-			temperature_max_paroi_chauf
-			temperature_moy_paroi_chauf
- 
+temperature_paroi_chauf
+temperature_max
+temperature_moy
+temperature_max_paroi_chauf
+temperature_moy_paroi_chauf
+
