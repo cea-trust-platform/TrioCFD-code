@@ -45,7 +45,7 @@ void Production_energie_cin_turb_PolyVEF::ajouter_blocs(matrices_t matrices, Dou
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyVEF_Face, eq_qdm.operateur(0).l_op_base()).correlation());
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes();
   const IntTab& e_f = domaine.elem_faces();
 
   std::string Type_diss = ""; // omega or tau dissipation
@@ -57,7 +57,7 @@ void Production_energie_cin_turb_PolyVEF::ajouter_blocs(matrices_t matrices, Dou
 
   int D = dimension, Nph = pb.get_champ("vitesse").valeurs().dimension(1)/D, nb_elem = domaine.nb_elem() ;
   int N = equation().inconnue().valeurs().line_size();
-  int e, n;
+  int e, f, n, i, ok;
 
   const DoubleTab& tab_rho = equation().probleme().get_champ("masse_volumique").passe(),
                    *palp = sub_type(Pb_Multiphase, pb) ? &equation().probleme().get_champ("alpha").passe() : nullptr,
@@ -79,57 +79,66 @@ void Production_energie_cin_turb_PolyVEF::ajouter_blocs(matrices_t matrices, Dou
   if (Type_diss == "")
     {
       for( e = 0 ; e < nb_elem ; e++)
-        for( n = 0; n<N ; n++)
-          {
-            double secmem_en = 0.;
-            for (int d_U = 0; d_U < D; d_U++)
-              for (int d_X = 0; d_X < D; d_X++)
-                secmem_en += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
-            secmem_en *= pe(e) * ve(e) * (palp ? (*palp)(e, n) : 1) * tab_rho(e, n) * nut(e, n) ;
+        {
+          for (i = 0, ok = 1; ok && i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
+            ok &= std::abs(pf(f) - pe(e)) < 1e-8;
+          if (!ok) break;
+          for( n = 0; n < N ; n++)
+            {
+              double secmem_en = 0.;
+              for (int d_U = 0; d_U < D; d_U++)
+                for (int d_X = 0; d_X < D; d_X++)
+                  secmem_en += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
+              secmem_en *= pe(e) * ve(e) * (palp ? (*palp)(e, n) : 1) * tab_rho(e, n) * nut(e, n) ;
 
-            secmem(e, n) += std::max(secmem_en, 0.);
-          }
+              secmem(e, n) += std::max(secmem_en, 0.);
+            }
+        }
     }
-
   else
     {
       for( e = 0 ; e < nb_elem ; e++)
-        for(n = 0; n<N ; n++)
-          {
-            double grad_grad = 0.;
-            for (int d_U = 0; d_U < D; d_U++)
-              for (int d_X = 0; d_X < D; d_X++)
-                grad_grad += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
-            double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
+        {
+          for (i = 0, ok = 1; ok && i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
+            ok &= std::abs(pf(f) - pe(e)) < 1e-8;
+          if (!ok) break;
+          for(n = 0; n<N ; n++)
+            {
+              double grad_grad = 0.;
+              for (int d_U = 0; d_U < D; d_U++)
+                for (int d_X = 0; d_X < D; d_X++)
+                  grad_grad += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
+              double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) ;
 
-            double utau = 0., yloc = 0., nut_p = nut(e, n);
-            int floc, cloc;
-            for (cloc = 0 ; cloc < e_f.dimension(1) && (floc = e_f(e, cloc)) >= 0 ; cloc++)
-              if (lp.get_utau(floc) > utau) utau = lp.get_utau(floc), yloc = domaine.dist_face_elem0(floc,e);
+              double utau = 0., yloc = 0., nut_p = nut(e, n);
+              int floc, cloc;
+              for (cloc = 0 ; cloc < e_f.dimension(1) && (floc = e_f(e, cloc)) >= 0 ; cloc++)
+                if (lp.get_utau(floc) > utau) utau = lp.get_utau(floc), yloc = domaine.dist_face_elem0(floc,e);
 
-            fac += 0.5 * std::pow(utau,4)/(nut_p*nut_p) * pe(e) * ve(e) * std::tanh( std::pow(1./80. * utau*yloc/nu(!c_nu * e,n), 3) ) ;
-            secmem(e, n) += fac * nut_p;
+              fac += 0.5 * std::pow(utau,4)/(nut_p*nut_p) * pe(e) * ve(e) * std::tanh( std::pow(1./80. * utau*yloc/nu(!c_nu * e,n), 3) ) ;
+              secmem(e, n) += fac * nut_p;
 
-            // if (Type_diss == "tau")
-            //   {
-            //     secmem(e, n) += fac * nut_p;
-            //     for (auto &&i_m : matrices)
-            //       {
-            //         Matrice_Morse& mat = *i_m.second;
-            //         if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * (*diss)(e,n) ;
-            //         if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * k(e,n);
-            //       }
-            //   }
-            // else if (Type_diss == "omega")
-            //   {
-            //     secmem(e, n) += fac * std::max(k(e, n) / std::max((*pdiss)(e, n), omega_min_), limiter_ * nu(!c_nu * e,n));
-            //     if (k(e, n) / std::max((*pdiss)(e, n), omega_min_) >= limiter_ * nu(!c_nu * e,n))
-            //     for (auto &&i_m : matrices)
-            //       {
-            //         Matrice_Morse& mat = *i_m.second;
-            //         if (i_m.first == "k") mat(N * e + n,  N * e + n) -= fac / std::max((*pdiss)(e, n), omega_min_);
-            //       }
-            //   }
-          }
+              // if (Type_diss == "tau")
+              //   {
+              //     secmem(e, n) += fac * nut_p;
+              //     for (auto &&i_m : matrices)
+              //       {
+              //         Matrice_Morse& mat = *i_m.second;
+              //         if (i_m.first == "k")         mat(N * e + n,  N * e + n) -= fac * (*diss)(e,n) ;
+              //         if (i_m.first == "tau")       mat(N * e + n,  N * e + n) -= fac * k(e,n);
+              //       }
+              //   }
+              // else if (Type_diss == "omega")
+              //   {
+              //     secmem(e, n) += fac * std::max(k(e, n) / std::max((*pdiss)(e, n), omega_min_), limiter_ * nu(!c_nu * e,n));
+              //     if (k(e, n) / std::max((*pdiss)(e, n), omega_min_) >= limiter_ * nu(!c_nu * e,n))
+              //     for (auto &&i_m : matrices)
+              //       {
+              //         Matrice_Morse& mat = *i_m.second;
+              //         if (i_m.first == "k") mat(N * e + n,  N * e + n) -= fac / std::max((*pdiss)(e, n), omega_min_);
+              //       }
+              //   }
+            }
+        }
     }
 }

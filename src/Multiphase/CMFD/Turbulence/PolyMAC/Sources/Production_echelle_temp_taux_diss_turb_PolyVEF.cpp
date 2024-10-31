@@ -43,13 +43,14 @@ void Production_echelle_temp_taux_diss_turb_PolyVEF::ajouter_blocs(matrices_t ma
   const DoubleTab&                     tab_diss = equation().inconnue().valeurs(); // tau ou omega selon l'equation
   const DoubleTab&                    tab_pdiss = equation().inconnue().passe(); // tau ou omega selon l'equation
   const DoubleTab&                     tab_grad = equation().probleme().get_champ("gradient_vitesse").passe();
-  const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = domaine.volumes();
+  const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes();
   const Probleme_base&                     pb = ref_cast(Probleme_base, equation().probleme());
 
   int ne = domaine.nb_elem(), D = dimension ;
   int N = equation().inconnue().valeurs().line_size();
   int Nph = pb.get_champ("vitesse").valeurs().dimension(1)/D;
-  int e, n;
+  const IntTab& e_f = domaine.elem_faces();
+  int e, n, f, i, ok;
 
   std::string Type_diss = ""; // omega or tau dissipation
   if sub_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
@@ -58,21 +59,26 @@ void Production_echelle_temp_taux_diss_turb_PolyVEF::ajouter_blocs(matrices_t ma
 
   // Second membre
   for(e = 0 ; e < ne ; e++)
-    for(n = 0; n<N ; n++)
-      {
-        double grad_grad = 0.;
-        for (int d_U = 0; d_U < D; d_U++)
-          for (int d_X = 0; d_X < D; d_X++)
-            grad_grad += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
+    {
+      for (i = 0, ok = 1; ok && i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
+        ok &= std::abs(pf(f) - pe(e)) < 1e-8;
+      if (!ok) break;
+      for(n = 0; n<N ; n++)
+        {
+          double grad_grad = 0.;
+          for (int d_U = 0; d_U < D; d_U++)
+            for (int d_X = 0; d_X < D; d_X++)
+              grad_grad += ( tab_grad( e, Nph * ( D*d_U+d_X ) + n) + tab_grad( e,  Nph * ( D*d_X+d_U ) + n) ) * tab_grad( e,  Nph * ( D*d_U+d_X ) + n) ;
 
-        double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) * alpha_omega_ ;
+          double fac = std::max(grad_grad, 0.) * pe(e) * ve(e) * alpha_omega_ ;
 
-        if (Type_diss == "tau")
-          {
-            secmem(e, n) -= fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) ; // tau has negative production
-            for (auto &&i_m : matrices)
-              if (i_m.first == "tau")    (*i_m.second)(N*e+n, N *e+n) += fac *  2*tab_pdiss(e, n) ;
-          }
-        else if (Type_diss == "omega")  secmem(e, n) +=   fac ;
-      }
+          if (Type_diss == "tau")
+            {
+              secmem(e, n) -= fac * (2*tab_diss(e, n)-tab_pdiss(e, n)) * tab_pdiss(e, n) ; // tau has negative production
+              for (auto &&i_m : matrices)
+                if (i_m.first == "tau")    (*i_m.second)(N*e+n, N *e+n) += fac *  2*tab_pdiss(e, n) ;
+            }
+          else if (Type_diss == "omega")  secmem(e, n) +=   fac ;
+        }
+    }
 }
