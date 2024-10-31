@@ -881,9 +881,9 @@ void Sonde_IJK::postraiter()
   if(je_suis_maitre())
     {
       ouvrir_fichier();
-      fichier().ouvrir(nom_fichier_,ios::app);
-      fichier().setf(ios::scientific);
-      fichier().precision(8);
+      //fichier().ouvrir(nom_fichier_,ios::app);
+      //fichier().setf(ios::scientific);
+      //fichier().precision(8);
       int p;
       int nbproc = Process::nproc();
       DoubleTab valeurs_pe;
@@ -1023,7 +1023,7 @@ void Sonde_IJK::postraiter()
             }
         }
       fichier().flush();
-      fichier().close();
+      //fichier().close();
     }
   else
     {
