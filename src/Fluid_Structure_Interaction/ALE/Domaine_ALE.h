@@ -28,14 +28,11 @@
 #include <TRUSTLists.h>
 #include <Champ_P1NC.h>
 #include <Beam_model.h>
-
 #include <Structural_dynamic_mesh_model.h>
-#include <Champs_front_ALE_projection.h>
-
 #include <TRUST_Ref.h>
 #include <Domaine.h>
 
-  class Equation_base;
+class Equation_base;
 class Beam_model;
 class Structural_dynamic_mesh_model;
 
@@ -130,12 +127,8 @@ protected:
   int nbBeam;
 //  Beam_model *beam; // Mechanical model: a beam model
   std::vector<Beam_model> beam;
-
-  OBS_PTR(Equation_base) eq;
-
   Structural_dynamic_mesh_model *str_mesh_model; // Fictitious structural model for mesh motion
-  REF(Equation_base) eq;
-
+  OBS_PTR(Equation_base) eq;
   Champs_front_ALE_projection field_ALE_projection_; // Definition of the modes of vibration in view of projection of the IFS force
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
   bool associate_eq;
@@ -147,14 +140,12 @@ protected:
   IntTab les_elems_extrait_surf_reference_; // list of elements belonging to the extracted surface on a moving boundary defines at the initialization.
 
   bool extrait_surf_dom_deformable_ = false;
-
   int meshMotionModel_ = 0 ; // Model for ALE mesh motion: 0 = Laplacien, 1 = Structural_dynamics
-  void solveDynamicMeshProblem_(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
-                                DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
-                                const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets) ;
-
 };
 
+void solveDynamicMeshProblem_(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
+                                DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
+                                const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets) ;
 
 inline const DoubleTab& Domaine_ALE::vitesse() const
 {
@@ -200,7 +191,6 @@ inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
 {
   eq = une_eq;
 }
-
 
 inline const IntTab& Domaine_ALE::les_elems_extrait_surf_reference() const
 {

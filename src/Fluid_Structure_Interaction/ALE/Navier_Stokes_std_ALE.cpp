@@ -192,32 +192,13 @@ void Navier_Stokes_std_ALE::discretiser()
   Navier_Stokes_std::discretiser();
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
   Cerr << "Mesh Velocity discretization" << finl;
-  dis.discretiser_champ("vitesse", domaine_dis().valeur(), "ALEMeshVelocity","m/s", dimension,1,schema_temps().temps_courant(), ALEMeshVelocity_);
+  dis.discretiser_champ("vitesse", domaine_dis(), "ALEMeshVelocity","m/s", dimension,1,schema_temps().temps_courant(), ALEMeshVelocity_);
   champs_compris_.ajoute_champ(ALEMeshVelocity_);
-  ALEMeshVelocity_.valeur().add_synonymous(Nom("ALEMeshVelocity"));
+  ALEMeshVelocity_->add_synonymous(Nom("ALEMeshVelocity"));
   Cerr << "Mesh Velocity discretization" << finl;
-  dis.discretiser_champ("vitesse",domaine_dis().valeur(),"ALEMeshTotalDisplacement","m/s",dimension,1,schema_temps().temps_courant(),ALEMeshTotalDisplacement_);
+  dis.discretiser_champ("vitesse",domaine_dis(),"ALEMeshTotalDisplacement","m/s",dimension,1,schema_temps().temps_courant(),ALEMeshTotalDisplacement_);
   champs_compris_.ajoute_champ(ALEMeshTotalDisplacement_);
-  ALEMeshTotalDisplacement_.valeur().add_synonymous(Nom("ALEMeshTotalDisplacement"));
-
-  const Domaine_ALE& domaine_ALE=ref_cast(Domaine_ALE, probleme().domaine()) ;
-  if (domaine_ALE.getMeshMotionModel() == 1)
-    {
-      dis.discretiser_champ("champ_elem",domaine_dis().valeur(),"ALEMeshStructuralPressure","Pa",1,1,schema_temps().temps_courant(),ALEMeshStructuralPressure_);
-      champs_compris_.ajoute_champ(ALEMeshStructuralPressure_);
-      ALEMeshStructuralPressure_.valeur().add_synonymous(Nom("ALEMeshStructuralPressure"));
-      Cerr << "Mesh Fictitious Structural Pressure discretization" << finl;
-      dis.discretiser_champ("champ_elem",domaine_dis().valeur(),"ALEMeshStructuralVonMises","Pa",1,1,schema_temps().temps_courant(),ALEMeshStructuralVonMises_);
-      champs_compris_.ajoute_champ(ALEMeshStructuralVonMises_);
-      ALEMeshStructuralVonMises_.valeur().add_synonymous(Nom("ALEMeshStructuralVonMises"));
-      Cerr << "Mesh Fictitious Structural Von Mises discretization" << finl;
-      //Rq.: "champ_sommets" would have seemed a better type for ALEMeshStructuralForces field, but it raises an error with unknown "Champ_P1_VEF" type
-      //     in VEF field discretization ; to investigate ?
-      dis.discretiser_champ("vitesse",domaine_dis().valeur(),"ALEMeshStructuralForces","N",dimension,1,schema_temps().temps_courant(),ALEMeshStructuralForces_);
-      champs_compris_.ajoute_champ(ALEMeshStructuralForces_);
-      ALEMeshStructuralForces_.valeur().add_synonymous(Nom("ALEMeshStructuralForces"));
-      Cerr << "Mesh Fictitious Structural Internal Forces discretization" << finl;
-    }
+  ALEMeshTotalDisplacement_->add_synonymous(Nom("ALEMeshTotalDisplacement"));
 }
 
 void Navier_Stokes_std_ALE::mettre_a_jour(double temps)
@@ -247,11 +228,11 @@ void Navier_Stokes_std_ALE::mettre_a_jour(double temps)
       if (dom_ale.getMeshMotionModel() == 1)
         {
           const DoubleVect& meshPbPressure = dom_ale.getMeshPbPressure(); //we access the cell pressure in the fictitious structure problem for the mesh
-          ALEMeshStructuralPressure_.valeurs() = meshPbPressure ;
+          ALEMeshStructuralPressure_->valeurs() = meshPbPressure ;
           const DoubleVect& meshPbVonMises = dom_ale.getMeshPbVonMises(); //we access the cell von mises stress in the fictitious structure problem for the mesh
-          ALEMeshStructuralVonMises_.valeurs() = meshPbVonMises ;
+          ALEMeshStructuralVonMises_->valeurs() = meshPbVonMises ;
           const DoubleTab& meshPbForceFace = dom_ale.getMeshPbForceFace(); //we access the internal forces in the fictitious structure problem for the mesh
-          ALEMeshStructuralForces_.valeurs() = meshPbForceFace ;
+          ALEMeshStructuralForces_->valeurs() = meshPbForceFace ;
         }
 
     }

@@ -50,9 +50,14 @@
 #include <NettoieNoeuds.h>
 #include <TRUST_2_MED.h>
 
-
 Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 // XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
+
+Domaine_ALE::Domaine_ALE()
+{
+  clear();
+}
+
 void Domaine_ALE::clear()
 {
   Domaine::clear();
@@ -84,6 +89,11 @@ void Domaine_ALE::clear()
   str_mesh_model = new Structural_dynamic_mesh_model() ;
 }
 
+Domaine_ALE::~Domaine_ALE()
+{
+
+  delete str_mesh_model ;
+}
 
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
@@ -400,13 +410,14 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
 void Domaine_ALE::initialiser (double temps, Domaine_dis_base& le_domaine_dis,Probleme_base& pb)
 {
   Cerr << "Domaine_ALE::initialize " << finl;
-  invalide_octree();
+
   //On initialise les vitesses aux faces
-  Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis.valeur());
+  Domaine_VF& le_dom_VF=ref_cast(Domaine_VF,le_domaine_dis);
   int nb_faces=le_dom_VF.nb_faces();
   int nb_faces_tot=le_dom_VF.nb_faces_tot();
   int nb_som_face=le_dom_VF.nb_som_face();
   IntTab& face_sommets=le_dom_VF.face_sommets();
+  const MD_Vector& mdf = le_dom_VF.md_vector_faces();
 
   if(meshMotionModel_ == 1)
     {
@@ -419,10 +430,12 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis_base& le_domaine_dis,Pr
       const MD_Vector& mde = md_vector_elements();
       str_mesh_model->initDynamicMeshProblem(nsom, nelem, nb_faces, md, mde, mdf) ;
     }
+
+  invalide_octree();
   bool  check_NoZero_ALE= true;
   ALE_mesh_velocity=calculer_vitesse(temps,le_domaine_dis,pb,  check_NoZero_ALE);
 
-  //On initialise les vitesses aux faces
+
   if(!associate_eq)
     {
       const Equation_base& equation=pb.equation(0);

@@ -41,12 +41,11 @@ public :
   virtual int reprendre(Entree&) override;
 
 protected :
-
   OWN_PTR(Champ_Inc_base) ALEMeshVelocity_;
   OWN_PTR(Champ_Inc_base) ALEMeshTotalDisplacement_;
-  Champ_Inc ALEMeshStructuralPressure_;
-  Champ_Inc ALEMeshStructuralVonMises_;
-  Champ_Inc ALEMeshStructuralForces_;
+  OWN_PTR(Champ_Inc_base) ALEMeshStructuralPressure_;
+  OWN_PTR(Champ_Inc_base) ALEMeshStructuralVonMises_;
+  OWN_PTR(Champ_Inc_base) ALEMeshStructuralForces_;
 
 };
 
