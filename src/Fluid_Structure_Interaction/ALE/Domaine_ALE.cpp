@@ -89,11 +89,11 @@ void Domaine_ALE::clear()
   str_mesh_model = new Structural_dynamic_mesh_model() ;
 }
 
-Domaine_ALE::~Domaine_ALE()
+/*Domaine_ALE::~Domaine_ALE()
 {
 
   delete str_mesh_model ;
-}
+}*/
 
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
@@ -667,13 +667,13 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis_base& le_domai
           {
             // Tag nodes with imposed velocity
             tag_nodes_bords = 0 ;
-            const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis.valeur());
-            const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis().valeur());
+            const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF,le_domaine_dis);
+            const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, pb.equation(0).domaine_Cl_dis());
             for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
               {
                 //for n_bord
                 const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
-                const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+                const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
                 int num1 = le_bord.num_premiere_face();
                 int num2 = num1 + le_bord.nb_faces();
 
@@ -705,8 +705,8 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis_base& le_domai
             int nbSomFace = domaine_VEF.nb_som_face() ;
             const IntTab& face_sommets = domaine_VEF.face_sommets() ;
 
-            solveDynamicMeshProblem_(temps, vit_bords, tag_nodes_bords, vit_maillage, nbSom, nbElem, nbSomElem, sommets,
-                                     nbFace, nbSomFace, face_sommets) ;
+            solveDynamicMeshProblem(temps, vit_bords, tag_nodes_bords, vit_maillage, nbSom, nbElem, nbSomElem, sommets,
+                                    nbFace, nbSomFace, face_sommets) ;
           }
           break ;
 
@@ -1597,9 +1597,9 @@ void Domaine_ALE::reading_structural_dynamic_mesh_model(Entree& is)
 
 }
 
-void Domaine_ALE::solveDynamicMeshProblem_(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
-                                           DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
-                                           const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets)
+void Domaine_ALE::solveDynamicMeshProblem(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
+                                          DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
+                                          const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets)
 {
 
   DoubleTab x0(str_mesh_model->x) ; // Copy coordinates at the beginning of the step

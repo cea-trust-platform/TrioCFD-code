@@ -108,6 +108,9 @@ public :
 
   inline bool extrait_surf_dom_deformable() const;
   inline void set_extrait_surf_dom_deformable(bool def);
+  void solveDynamicMeshProblem(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
+                               DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
+                               const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets) ;
 
 protected:
 
@@ -143,9 +146,7 @@ protected:
   int meshMotionModel_ = 0 ; // Model for ALE mesh motion: 0 = Laplacien, 1 = Structural_dynamics
 };
 
-void solveDynamicMeshProblem_(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
-                                DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
-                                const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets) ;
+
 
 inline const DoubleTab& Domaine_ALE::vitesse() const
 {
