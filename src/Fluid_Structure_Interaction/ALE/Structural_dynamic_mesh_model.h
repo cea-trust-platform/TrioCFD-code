@@ -30,6 +30,7 @@ class Structural_dynamic_mesh_model : public Interprete_geometrique_base
 {
   Declare_instanciable_sans_constructeur_ni_destructeur(Structural_dynamic_mesh_model);
 
+
 public:
   Structural_dynamic_mesh_model();
   ~Structural_dynamic_mesh_model();
