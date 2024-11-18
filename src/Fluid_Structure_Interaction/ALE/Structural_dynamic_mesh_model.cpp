@@ -7,6 +7,33 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Structural_dynamic_mesh_model,"Structural_dynamic_mesh_model",Interprete_geometrique_base);
 
+// Syntaxe:
+//Structural_dynamic_mesh_model NOMDOMAINE
+//{
+//        Mfront_library path_to_libBehaviour.so
+//        Mfront_model_name Ogden|SaintVenantKirchhoffElasticity
+//        Mfront_material_property
+//        [ Grid_dt_min ]
+//        [ YoungModulus ]
+//        [ Density ]
+//        [ Inertial_Damping ]
+//}
+
+// XD Structural_dynamic_mesh_model interprete Structural_dynamic_mesh_model 0 Fictitious structural model for mesh motion. Link with MGIS library
+// XD  attr dom ref_domaine dom 0 domain name
+// XD  attr bloc bloc_lecture_Structural_dynamic_mesh_model bloc 0 not_set
+
+// XD bloc_lecture_Structural_dynamic_mesh_model objet_lecture nul 0 bloc
+// XD  attr aco chaine(into=["{"]) aco 0 Opening curly bracket.
+// XD  attr Mfront_library chaine(into=["Mfront_library"]) Mfront_library 0 Keyword to specify the path_to_libBehaviour.so
+// XD  attr Mfront_model_name chaine(into=["Mfront_model_name"]) Mfront_model 0 keyword to specify the Mfront model. Choice between Ogden and SaintVenantKirchhoffElasticity.
+// XD  attr Mfront_material_property chaine(into=["Mfront_material_property"]) Mfront_material_property 0 keyword to specify the material property. Eg. Ogden_alpha_, Ogden_mu_, Ogden_K
+// XD  attr YoungModulus floattant young 1 Young Module
+// XD  attr Density floattant rho 1 fictitious structural density
+// XD  attr Inertial_Damping floattant inertial_Damping 1 fictitious structural inertial damping
+// XD  attr Grid_dt_min floattant grid_dt_min 1 fictitious structural time step
+// XD  attr acof chaine(into=["}"]) acof 0 Closing curly bracket.
+
 Structural_dynamic_mesh_model::Structural_dynamic_mesh_model()
 {
 
