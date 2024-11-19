@@ -33,7 +33,7 @@
 #include <Debog.h>
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps, "Modele_turbulence_hyd_K_Epsilon", Modele_turbulence_hyd_RANS_K_Eps_base);
-// XD k_epsilon mod_turb_hyd_rans k_epsilon -1 Turbulence model (k-eps).
+// XD k_epsilon mod_turb_hyd_rans_keps k_epsilon -1 Turbulence model (k-eps).
 
 Sortie& Modele_turbulence_hyd_K_Eps::printOn(Sortie& s) const
 {
