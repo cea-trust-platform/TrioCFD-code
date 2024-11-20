@@ -128,8 +128,8 @@ plt.rc('font', family='serif', size=18) #font of axislabels and title, write r b
 plt.plot(t[window-1:]/T, Cl,color =cea_darkblue)
 plt.xlabel(r'$t/T_0$')
 plt.ylabel(r'$C_L$')
-plt.ylim(-1.,1.)
-plt.xlim(nb_p_i,19)
+plt.ylim(-0.8,0.8)
+plt.xlim(nb_p_i, nb_p)
 plt.grid(True)
 plt.tight_layout()
 plt.savefig('Cl.png', bbox_inches='tight')
@@ -158,8 +158,8 @@ plt.close()
 
 #Cl en fonction de alpha
 
-plt.plot(alpha[window-1:] ,Cl, label=r'Étude actuelle', color=cea_darkblue, ls='-', zorder=1)
-plt.scatter(placzek[:,0], placzek[:,1], label = r'Article Placzek',marker='+', color = cea_red, s=30, zorder=2)
+plt.plot(alpha[window-1:] ,Cl, label=r'Current study', color=cea_darkblue, ls='-', zorder=1)
+plt.scatter(placzek[:,0], placzek[:,1], label = r'Ref. [1], Placzek',marker='+', color = cea_red, s=30, zorder=2)
 
 plt.xlabel(r'$\alpha$')
 plt.ylabel(r'$C_L$')

@@ -159,8 +159,8 @@ plt.close()
 
 #Cl en fonction de alpha
 
-plt.plot(alpha[window-1:] ,Cl, label=r'Étude actuelle', color=cea_darkblue, ls='-', zorder=1)
-plt.scatter(placzek[:,0], placzek[:,1], label = r'Article Placzek',marker='+', color = cea_red, s=30, zorder=2)
+plt.plot(alpha[window-1:] ,Cl, label=r'Current study', color=cea_darkblue, ls='-', zorder=1)
+plt.scatter(placzek[:,0], placzek[:,1], label = r'Ref. [1], Placzek',marker='+', color = cea_red, s=30, zorder=2)
 
 plt.xlabel(r'$\alpha$')
 plt.ylabel(r'$C_L$')
