@@ -34,7 +34,7 @@
 /*! @brief Compute the production term for the turbulent kinetic energy.
  *
  * The total production term writes
- * \f$ P = -\frac{2}{3}k\text{div}(U) + 2\nu_t S_{ij}S_{ij}
+ * \f$ P = -\frac{2}{3}k\text{div}(U) + 2\nu_t S_{ij}S_{ij}\f$
  * Being in a incompressible flow, the first part is not computed.
  *
  * Like the TKE and epsilon, P is discretised on face centers.
