@@ -1,0 +1,142 @@
+# Hydraulique 2D laminar with ALE : Cylinder configuration #
+# Moving domain #
+# SEQUENTIAL CALCULATION #
+
+dimension 2
+
+Pb_hydraulique_ALE pb
+Domaine_ALE dom
+
+
+
+# BEGIN SCATTER #
+Scatter ../DOM.Zones dom
+# END SCATTER #
+
+# For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile 
+boundaries of the domain and specify the speed that must be imposed on them #
+
+Imposer_vit_bords_ALE dom
+{
+	1 # number of mobile boundaries  #
+	Wall Champ_front_ALE 2 0.0 0.00025*16.87*0.9*2*3.14159*cos(16.87*0.9*2*3.14159*t) # name and speed of the border #
+}
+
+# Solver used to solve the system giving the moving mesh velocity #
+Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9 impr } } 
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+
+# Time scheme, choice between: explicit or implicit #
+Scheme_euler_implicit mon_schema
+Read mon_schema
+{
+ 	# Time step #
+        # Initial time [s] #
+        tinit 0.
+	# Min time step #
+        dt_min 1.e-15
+	# Output criteria #
+        # .out files printing period #
+        dt_impr 5.e-6
+	tcpumax 47
+	# .sauv files printing period #
+        periode_sauvegarde_securite_en_heures 7
+ 	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+	facsec 8
+        facsec_max 10
+	solveur implicite_ALE
+	{
+          solveur gmres { diag seuil 1.e-12 nb_it_max 3 } 
+	}
+	# Stop if one of the following criteria is checked: #
+        # End time [s] #
+	tmax 3.
+	# Max number of time steps #
+        # nb_pas_dt_max 5 #
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-15
+}
+
+
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Discretize pb ma_discretisation
+
+Read pb
+{
+   fluide_incompressible {
+   
+    	mu Champ_Uniforme 1 1.e-3
+   	rho Champ_Uniforme 1 1000
+   }
+	Navier_Stokes_standard_ALE
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression	PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9 impr }
+		# Two operators are defined #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework : choice between: amont and muscl  #
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Fonc_Reprise ../Cylindre_fixe/Cas_pb.xyz pb vitesse last_time
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			Wall frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 2 0.0 0.00025*16.87*0.9*2*3.14159*cos(16.87*0.9*2*3.14159*t)
+			Outlet frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+			Inlet frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0.1 0. 
+			Box_x symetrie
+			
+		}
+	}
+	Post_processing
+	{
+          
+		# Probes
+		{
+                        Note: periode with small value to print at each time step (necessary for spectral analysis) 
+			sonde_P_CENTRAL nodes pression periode 0.001 segment 500 0.00051 0 0.0525 0
+			
+			sonde_P1 nodes pression periode 0.001 circle 500 0 0 0.00051 0 360
+			
+			sonde_yp nodes y_plus periode 0.001 circle 500 0 0 0.000501 0 360
+
+                        
+		} 
+		#
+
+          	# Fields #
+		format lata 
+		fields dt_post 0.5
+		{
+			pression_pa som
+			vitesse som
+			y_plus elem
+                       vorticite elem       
+		}
+		
+	} 
+	Post_processing
+	{
+	# Statistiques dt_post 0.2
+		{
+			t_deb 0.4 t_fin 15
+				
+			moyenne vitesse
+			moyenne pression
+		} #
+	
+	} 
+	# Resume_last_time single_hdf Cas.sauv #
+	Sauvegarde_simple single_hdf Cas.sauv
+	
+}
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End

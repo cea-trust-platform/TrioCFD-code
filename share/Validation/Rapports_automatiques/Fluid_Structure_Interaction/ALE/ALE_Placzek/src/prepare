@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp post_run F_0.5/
+cp post_run F_0.9/

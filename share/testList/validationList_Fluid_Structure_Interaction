@@ -4,4 +4,5 @@
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/SquareObstacleALE
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/TwoCylindersALE
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/TwoOscillatingCylindersALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/ALE_Placzek
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/Beam/Beam_Free_Vibration
