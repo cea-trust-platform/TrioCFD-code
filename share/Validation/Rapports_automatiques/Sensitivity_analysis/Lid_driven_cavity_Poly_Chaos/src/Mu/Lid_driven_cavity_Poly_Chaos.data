@@ -178,7 +178,7 @@ Read pb_sensibilite
               
 		}
 	# Fields #
-	fichier sensibilite
+	fichier Lid_driven_cavity_Poly_Chaos
         format Lata # lata for VisIt tool #
 	fields dt_post 1.e+5  # Note: Warning to memory space if dt_post too small #
 	{

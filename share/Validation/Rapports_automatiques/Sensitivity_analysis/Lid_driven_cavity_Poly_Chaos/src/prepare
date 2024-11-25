@@ -2,6 +2,9 @@
 
 cp post_run Mu
 cp post_run Velocity
-
+cp carre150.med Mu
+cp carre150.med Velocity
+cp -r Reprise Mu
+cp -r Reprise Velocity
 
 
