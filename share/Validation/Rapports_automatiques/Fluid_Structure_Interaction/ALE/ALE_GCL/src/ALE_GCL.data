@@ -37,7 +37,7 @@ imposer_vit_bords_ale dom
 }
 
 # Solver used in order to solve the system giving the moving mesh velocity #
-Solver_moving_mesh_ALE dom { Petsc Cholesky {  } } 
+Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9 } } 
 
 
 # I select a discretization #
@@ -48,7 +48,7 @@ Schema_Euler_explicite_ALE sch
 Lire sch
 {
 	tinit 0
-	# nb_pas_dt_max 3 #
+	nb_pas_dt_max 500
 	dt_min 1e-6
 	dt_max 1e+6
 	dt_impr 1e-6
@@ -56,7 +56,6 @@ Lire sch
 	precision_impr 8
 	seuil_statio 1e-7
 }
-
 
 # Association between the different objects #
 Associer pb dom
@@ -74,7 +73,7 @@ Lire pb
    
    	Navier_Stokes_standard_ALE
 	{
-		Solveur_pression	PETSC Cholesky { impr }
+ 		solveur_pression	PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9 }
 		Convection		{ ALE { MUSCL } }
 		Diffusion		{ }
 		Conditions_initiales	{
@@ -324,26 +323,21 @@ Lire pb
 					    
 					}
 		Sondes			{
-					sonde_diagonale_pression	pression	periode 1e+6 segment 100 0 0 0 1 1 1
-					sonde_diagonale_vitesse		vitesse		periode 1e+6 segment 100 0 0 0 1 1 1
 					sonde_H_pression	pression	periode 1e+6 segment 100 0 0 0 1 0 0
 					sonde_H_vitesse		vitesse		periode 1e+6 segment 100 0 0 0 1 0 0
 					sonde_V_pression	pression	periode 1e+6 segment 100 0 0 0 0 1 0
 					sonde_V_vitesse		vitesse		periode 1e+6 segment 100 0 0 0 0 1 0
 					sonde_Z_pression	pression	periode 1e+6 segment 100 0 0 0 0 0 1
 					sonde_Z_vitesse		vitesse		periode 1e+6 segment 100 0 0 0 0 0 1
-					erru				erru		periode 1e+6 numero_elem_sur_maitre 0
-					errp				errp		periode 1e+6 numero_elem_sur_maitre 0
-					errp_elem			errp_elem	periode 1e+6 numero_elem_sur_maitre 0
-					errdivu				errdivu		periode 1e+6 numero_elem_sur_maitre 0
-					sonde_diagonale_solution_p_som	solution_p_som	periode 1e+6 segment 100 0 0 0 1 1 1
-					sonde_diagonale_solution_u	solution_u	periode 1e+6 segment 100 0 0 0 1 1 1
 					sonde_H_solution_p_som	solution_p_som	periode 1e+6 segment 100 0 0 0 1 0 0
 					sonde_H_solution_u	solution_u	periode 1e+6 segment 100 0 0 0 1 0 0
 					sonde_V_solution_p_som	solution_p_som	periode 1e+6 segment 100 0 0 0 0 1 0
 					sonde_V_solution_u	solution_u	periode 1e+6 segment 100 0 0 0 0 1 0
 					sonde_Z_solution_p_som	solution_p_som	periode 1e+6 segment 100 0 0 0 0 0 1
 					sonde_Z_solution_u	solution_u	periode 1e+6 segment 100 0 0 0 0 0 1
+					erru			erru		periode 1e+6 numero_elem_sur_maitre 0
+					errp			errp		periode 1e+6 numero_elem_sur_maitre 0
+					errdivu			errdivu		periode 1e+6 numero_elem_sur_maitre 0
 					}
 		Format lata
 		Champs binaire dt_post 1e+6
