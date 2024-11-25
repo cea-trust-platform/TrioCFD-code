@@ -1,6 +1,6 @@
-# Hydraulique 2D laminar with ALE : Sensitivity equation method for the Navier-Stokes #
-# Estimate of the variance of the velocity field when the
-inflow condition on boundary Inlet is uncertain #
+# Hydraulique 2D laminar: Sensitivity equation method for the Navier-Stokes #
+# Estimate of the variance of the velocity field when the inflow condition on boundary Inlet is uncertain #
+# Sensitivity analysis  based on  Taylor expansion #
 dimension 2    
 
 # Time scheme explicit or implicit #
@@ -145,7 +145,7 @@ Fluide_Incompressible
 		state { pb_champ_evaluateur pb_etat  vitesse } # here it is always the keyword 'vitesse' #
       		solveur_pression gcp  { precond ssor { omega 1.5 } seuil 1.e-10 }  
 		# solveur_pression PETSc Cholesky { } #
-                convection { Sensibility { amont } } # choice between amont and muscl #
+                convection { Sensibility { amont } } 
                 diffusion { }
                 initial_conditions {
                         vitesse Champ_Uniforme 2 0. 0.
