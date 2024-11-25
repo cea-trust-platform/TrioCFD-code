@@ -345,8 +345,6 @@ Lire pb
 					pression som
 					vitesse som
 					ALEMeshVelocity som
-					solution_u
-					solution_p_som
 					}
 	}
 	Sauvegarde_simple single_hdf Cas.sauv

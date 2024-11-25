@@ -1,6 +1,5 @@
 # Hydraulique 2D laminar with ALE : Cylinder configuration #
-# Moving domain #
-# SEQUENTIAL CALCULATION #
+# PARALLEL ONLY 4 #
 
 dimension 2
 
