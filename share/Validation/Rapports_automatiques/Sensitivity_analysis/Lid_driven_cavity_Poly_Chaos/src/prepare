@@ -1,0 +1,7 @@
+# This is a prepare script for the validation test case Lid_driven_cavity_Poly_Chaos #
+
+cp post_run Mu
+cp post_run Velocity
+
+
+

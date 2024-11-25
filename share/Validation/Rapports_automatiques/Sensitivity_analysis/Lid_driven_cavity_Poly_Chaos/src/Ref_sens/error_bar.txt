@@ -1,0 +1,17 @@
+plot "IC_U_V_y.txt" with errorbars, "IC_U_V_y.txt" u 1:2 w l
+
+gnuplot> set style data linespoints
+gnuplot> set termoption dash
+gnuplot> set style line 1 lt -1 lw 1 linecolor rgb "red" 
+gnuplot> set style line 2 lt -1 lw 1 linecolor rgb "blue" 
+gnuplot> set style line 3 lt -1 lw 1 linecolor rgb "black" 
+gnuplot> set style line 4 lt -1 lw 1 linecolor rgb "green" 
+gnuplot> plot "IC_U_V_x.txt" w errorbars ls 1 notitle,  "IC_U_V_y.txt" with errorbars ls 2 notitle, "IC_U_V_x.txt" u 1:2 ls 1 title 'u_x', "IC_U_V_y.txt" u 1:2 ls 2 title 'u_y'
+gnuplot> set key left
+gnuplot> set key spacing 1.5
+gnuplot> set yrange [-0.4:1] 
+gnuplot> set xlabel 'y'
+gnuplot> set ylabel 'u_x, u_y' 
+gnuplot> plot "IC_U_V_x.txt" w errorbars ls 1 notitle,  "IC_U_V_y.txt" with errorbars ls 2 notitle, "IC_U_V_x.txt" u 1:2 ls 1 title 'u_x', "IC_U_V_y.txt" u 1:2 ls 2 title 'u_y'
+gnuplot> plot "IC_U_V_x.txt" w errorbars ls 1 notitle,  "IC_U_V_y.txt" with errorbars ls 2 notitle, "IC_U_V_x.txt" u 1:2 ls 1 title 'u_x', "IC_U_V_y.txt" u 1:2 ls 2 title 'u_y'
+
