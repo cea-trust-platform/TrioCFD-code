@@ -1,0 +1,25 @@
+#!/bin/bash
+
+
+extrait_coupe Sensibility_Rayleigh_Bernard PRESSION_ETAT_X_C
+extrait_coupe Sensibility_Rayleigh_Bernard PRESSION_ETAT_Y_C
+
+extrait_coupe Sensibility_Rayleigh_Bernard PRESSION_SENSIBILITE_X_C
+extrait_coupe Sensibility_Rayleigh_Bernard PRESSION_SENSIBILITE_Y_C
+
+extrait_coupe Sensibility_Rayleigh_Bernard TEMPERATURE_ETAT_X_C
+extrait_coupe Sensibility_Rayleigh_Bernard TEMPERATURE_ETAT_Y_C
+
+extrait_coupe Sensibility_Rayleigh_Bernard TEMPERATURE_SENSIBILITE_X_C
+extrait_coupe Sensibility_Rayleigh_Bernard TEMPERATURE_SENSIBILITE_Y_C
+
+extrait_coupe Sensibility_Rayleigh_Bernard VITESSE_ETAT_X_C
+extrait_coupe Sensibility_Rayleigh_Bernard VITESSE_ETAT_Y_C
+
+extrait_coupe Sensibility_Rayleigh_Bernard VITESSE_SENSIBILITE_X_C
+extrait_coupe Sensibility_Rayleigh_Bernard VITESSE_SENSIBILITE_Y_C
+
+
+cd ../..  
+python Variance_mixed.py
+gnuplot gnuplot.txt

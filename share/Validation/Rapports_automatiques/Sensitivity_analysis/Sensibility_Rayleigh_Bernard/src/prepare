@@ -1,0 +1,41 @@
+# This is a prepare script for the validation test case  Rayleigh Bernard #
+
+cd Sensibility_Rayleigh_Bernard_PCM/Beta
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_PCM/Tbottom
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_PCM/Ttop
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_PCM/Lambda_prime
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_PCM/Mu
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_Taylor/Beta
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_Taylor/Tbottom
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_Taylor/Ttop
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_Taylor/Lambda_prime
+cp ../../post_run .
+cd ../../
+
+cd Sensibility_Rayleigh_Bernard_Taylor/Mu
+cp ../../post_run .
+cd ../../
