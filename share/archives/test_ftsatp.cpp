@@ -3,7 +3,7 @@
 extern "C"
 {
 #ifdef F77_Majuscule
-  entier F77DECLARE(FTSATP)(const entier *nsca, const entier* ienc, const double *pv,
+  True_int F77DECLARE(FTSATP)(const True_int *nsca, const True_int* ienc, const double *pv,
 			   double *tspv, double *dtspvv, double *d2tsdpvv,
                             double *hlsv, double *dhlsvv,
 			   double *hvsv, double *dhvsvv,
@@ -12,7 +12,7 @@ extern "C"
                            double *rlsv, double *drlsvv,
                            double *rvsv, double *drvsvv);
 #else
-  entier F77DECLARE(ftsatp)(const entier *nsca, const entier* ienc, const double *pv,
+  True_int F77DECLARE(ftsatp)(const True_int *nsca, const True_int* ienc, const double *pv,
 			   double *tspv, double *dtspvv, double *d2tsdpvv,
 			   double *hlsv, double *dhlsvv,
 			   double *hvsv, double *dhvsvv,
@@ -24,7 +24,7 @@ extern "C"
 }
 
 #ifndef F77_Majuscule
-inline entier F77NAME(FTSATP)(const entier *nsca, const entier* ienc,const double *pv,
+inline True_int F77NAME(FTSATP)(const True_int *nsca, const True_int* ienc,const double *pv,
 			     double *tspv, double *dtspvv, double *d2tsdpvv,
 			     double *hlsv, double *dhlsvv,
 			     double *hvsv, double *dhvsvv,
