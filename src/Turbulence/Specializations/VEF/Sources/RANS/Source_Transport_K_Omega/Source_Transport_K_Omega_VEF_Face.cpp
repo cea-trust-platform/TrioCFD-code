@@ -227,8 +227,8 @@ void Source_Transport_K_Omega_VEF_Face::fill_resu(const DoubleVect& volumes_entr
       const double tke = K_Omega(face, 0);
       const double omega = K_Omega(face, 1);
 
-      resu(face, 0) += (ProdK(face) - BETA_K*tke*omega);
-      resu(face, 0) *= volumes_entrelaces(face);
+
+      resu(face, 0) += (ProdK(face) - BETA_K*tke*omega)*volumes_entrelaces(face);
 
       if (tke >= LeK_MIN)
         {
@@ -242,10 +242,12 @@ void Source_Transport_K_Omega_VEF_Face::fill_resu(const DoubleVect& volumes_entr
                                 ? 2*(1 - turbulence_model->get_blenderF1()(face)*SIGMA_OMEGA2)
                                 : (gradKgradOmega(face) > 0)*1/8;
 
-          resu(face, 1) += cALPHA*ProdK(face)*omega/tke; // production
-          resu(face, 1) += - cBETA*omega*omega; // dissipation
-          resu(face, 1) += cSIGMA/omega*gradKgradOmega(face); // cross diffusion
-          resu(face, 1) *= volumes_entrelaces(face);
+          double contrib {0};
+          contrib += cALPHA*ProdK(face)*omega/tke; // production
+          contrib += - cBETA*omega*omega; // dissipation
+          contrib += cSIGMA/omega*gradKgradOmega(face); // cross diffusion
+          contrib *= volumes_entrelaces(face);
+          resu(face, 1) += contrib;
         }
     }
 }
