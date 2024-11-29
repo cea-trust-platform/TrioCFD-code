@@ -46,7 +46,7 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Beam_model, "Beam_model
 // Syntaxe:
 //  Beam_model NOMDOMAINE {
 //    nb_beam
-//	  Name
+//    Name
 //     nb_modes number of modes
 //     direction 0|1|2
 //     NewmarkTimeScheme MA|FD|HHT
@@ -72,7 +72,10 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Beam_model, "Beam_model
 // XD  attr nb_beam_val entier nb_beam_val 0 Number of beams
 // XD  attr Name chaine(into=["name"]) BeamName 0 keyword to specify the Name of the beam (the name must match with the name of the edge in the fluid domain)
 // XD  attr Name_of_beam chaine Name_of_beam 0 keyword to specify the Name of the beam (the name must match with the name of the edge in the fluid domain)
-// XD  attr bloc bloc_poutre nul 0 not_set
+// XD  attr bloc bloc_poutre bloc 0 not_set
+// XD  attr Name2 chaine(into=["name"]) BeamName2 1 keyword to specify the Name of the beam (the name must match with the name of the edge in the fluid domain)
+// XD  attr Name_of_beam2 chaine Name_of_beam2 1 keyword to specify the Name of the beam (the name must match with the name of the edge in the fluid domain)
+// XD  attr bloc2 bloc_poutre bloc2 1 not_set
 // XD  attr acof chaine(into=["}"]) acof 0 Closing curly bracket.
 
 // XD NewmarkTimeScheme_deriv objet_lecture NewmarkTimeScheme_deriv -1 Solve the beam dynamics. Selection of time integration scheme.
