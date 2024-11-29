@@ -45,7 +45,7 @@ void Fluide_Diphasique::set_param(Param& param)
   param.ajouter("fluide1|phase1", &phase1_, Param::REQUIRED); // XD_ADD_P fluid_diph_lu second phase fluid
   param.ajouter("chaleur_latente", &chaleur_latente_); // XD_ADD_P champ_don_base phase changement enthalpy h(phase1_) - h(phase0_) (J/kg/K)
   param.ajouter("formule_mu", &formule_mu_); // XD_ADD_P chaine (into=[standard,arithmetic,harmonic]) formula used to calculate average
-  Milieu_base::set_additional_params(param); // XD ref gravite field_base
+  Milieu_base::set_additional_params(param); // XD attr gravite field_base gravite 1 not_set
 }
 
 void Fluide_Diphasique::verifier_coherence_champs(int& err, Nom& msg)
