@@ -86,19 +86,18 @@ Read pb
 
     }
 
-    modele_turbulence K_Omega {
-      model_variant std
-      Transport_K_Omega
+    modele_turbulence k_epsilon {
+      transport_k_epsilon
       {
         convection { amont }
-        diffusion { negligeable }
+        diffusion { }
         boundary_conditions {
           WALL1 paroi
           WALL2 paroi
-          INLET frontiere_ouverte_K_omega_impose Champ_front_Uniforme 2 .00004356 3.31439394
-          OUTLT frontiere_ouverte K_OMEGA_EXT Champ_Front_Uniforme 2 .00004356 3.31439394
+          INLET frontiere_ouverte_K_eps_impose Champ_front_Uniforme 2 .00004356 1.44e-4
+          OUTLT frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 .00004356 1.44e-4
         }
-        conditions_initiales { k_omega Champ_Uniforme 2 .00004356 3.31439394 }
+        conditions_initiales { k_eps Champ_Uniforme 2 .00004356 1.44e-4 }
       }
       turbulence_paroi loi_standard_hydr
     }
@@ -119,7 +118,7 @@ Read pb
       y_plus elem
       viscosite_turbulente elem
       k elem
-      omega elem
+      eps elem
     }
   }
 }
