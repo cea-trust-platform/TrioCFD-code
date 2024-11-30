@@ -252,7 +252,7 @@ Lire pb
       lift lift periode 1e8 position_like k
       disp disp periode 1e8 position_like k
       lub lub periode 1e8 position_like k
-      viscosite viscosite_turbulente_liquide_eau periode 1e8 position_like k
+      viscosite nu_turbulente_liquide_eau periode 1e8 position_like k
       gradv gradient_vitesse_liquide_eau periode 1e8 position_like k
       BIF BIF periode 1e8 position_like k
     }
@@ -265,7 +265,7 @@ Lire pb
       temperature elem
       vitesse elem
       pression elem
-      viscosite_turbulente_liquide_eau elem
+      nu_turbulente_liquide_eau elem
       gradient_vitesse_liquide_eau elem
       vorticite elem
       alpha_residu elem
