@@ -164,9 +164,9 @@ void TCV::antisym_loop_internal_faces(const Domaine_VEF& dom_VEF,
   const IntTab& neighbour_face = dom_VEF.face_voisins();
   const DoubleVect& volumes = dom_VEF.volumes();
   const int first_internal_face = dom_VEF.premiere_face_int();
-  const int nb_faces_tot = dom_VEF.nb_faces_tot();
+  const int nb_faces = dom_VEF.nb_faces();
 
-  for (int nface = first_internal_face; nface < nb_faces_tot; ++nface)
+  for (int nface = first_internal_face; nface < nb_faces; ++nface)
     {
       const int f0 = neighbour_face(nface, 0);
       const int f1 = neighbour_face(nface, 1);
