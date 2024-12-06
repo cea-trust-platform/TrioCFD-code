@@ -1,4 +1,6 @@
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/3dOscillatingBeamALE
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/ALE_GCL
+./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/ALE_Placzek
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/DivaALE
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/RotationALE
 ./share/Validation/Rapports_automatiques/Fluid_Structure_Interaction/ALE/SquareObstacleALE

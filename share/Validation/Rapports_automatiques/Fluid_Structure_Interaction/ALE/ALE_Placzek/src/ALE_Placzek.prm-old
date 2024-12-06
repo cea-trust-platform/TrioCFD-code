@@ -1,0 +1,159 @@
+Parameters {
+	newvalidTrio
+	Title "Single oscillating cylinder in a cross-flow. Simulations at low Reynolds number"	
+	Author "M. A. Puscas"
+        
+	TestCase  F_0.5 ALE_Placzek.data  4   
+	TestCase  F_0.9 ALE_Placzek.data  4 
+
+
+	ParametersTRUST Problem: Pb_hydraulique_ALE
+	ParametersTRUST Dimension: 2D
+	ParametersTRUST Domain: Domaine_ALE
+	ParametersTRUST Pressure solver: Solver_moving_mesh_ALE PETSC Cholesky
+	ParametersTRUST Discretization: VEFPre1B
+	ParametersTRUST Time scheme: Scheme_euler_implicit with solver implicite_ALE GMRES
+	ParametersTRUST Medium: Fluide_Incompressible
+	ParametersTRUST Hydraulic problem: Navier_Stokes_standard_ALE
+        ParametersTRUST Convection scheme: ALE muscl
+
+        VersionTRUST 1.9.5
+	
+
+
+        Reference "1. J. F. Placzek, A. Sigrist and A. Hamdouni. Numerical simulation of an oscillating cylinder in a cross-flow at low reynolds number: Forced and free oscillations. Computers and Fluids, 38:80–100, 2009."
+
+}
+
+Purpose {	
+	Description "The purpose is to assess the robustness of the ALE module implemented in TrioCFD, considering the case of a single oscillating cylinder subject to an incident laminar cross-flow. The results of our 2D numerical simulations are compared to those in [1] obtained with STAR-CCM." 
+	     
+}
+
+Pb_description {
+        Description "The domain used for the numerical simulations is the one in Figure 1.  
+	geometry {
+		 Figure {
+		 	Title "The domain"
+			Width 12cm
+			picture pb_scheme.png
+		  	}
+	}
+	icbc {
+		Description "We study the interaction between a moving cylinder and an incident cross-flow. The cylinder is imposed a sinusoidal displacement of frequency \latex_($F_0$\latex_) and amplitude $A$.  The frequency ratio is noted \latex_($f=F_0/F_s$\latex_) and the dimensionless amplitude is \latex_($A^*=A/D=0.25$\latex_). As in [1], our simulations are performed at a low Reynolds number \latex_($Re=DU_{\infty}/\nu=100$\latex_), with \latex_($U_{\infty}$\latex_) the incident uniform fluid velocity. For such a low Reynolds number, the flow is 2D and laminar. The computations start from the final state of the solution obtained with the fixed cylinder (from which we find a Strouhal number \latex_($St=F_s D/U_\infty= 0.167$\latex_), exactly as ref. [1]). The simulations are performed at different frequencies to cover both the lock-in and unlocked zones. A configuration is locked (resp. unlocked) if the frequency of the vortex shedding \latex_($F_s$\latex_) equals (resp. differs from) the frequency of the imposed cylinder displacement." 
+	}
+	
+	fluidprop {
+		Description "The tube bundle is immersed in a Newtonian incompressible homogeneous fluid, with mass density \latex_($\rho \,(1000 \,Kg/m^3 )$\latex_) and kinematic viscosity \latex_($\nu \,(10^{-6}\, m^2/s)$\latex_). 
+	}
+}
+
+Casesetup {
+	
+	grid_mesh {	
+			Description "A refined mesh is used in the regions with large gradient fields whereas a loose mesh is used in the areas with low gradient fields. "	
+	Description "Calculation has been partitioned on 4 processors, such that each processor worked with 20000-30000 elements."
+	}
+	model_options {
+			Description "The fluid problem with moving boundaries is handled by the Arbitrary Lagrangian-Eulerian (ALE) method."
+			Description "In the ALE approach, the fluid flow is computed in a domain that is deformed in order to follow the movement of the fluid-solid interface. It provides a hybrid description not associated with the fluid particles and the laboratory coordinates. We associate the description with a moving imaginary mesh that follows the fluid domain."
+	}
+}
+
+
+Results {
+
+	Description "Locked configuration"
+	Description "In order to highlight the lock-in phenomenous, the Power Spectral Density (PSD) is used. We can see that for $f=0.9$ there is only one peak at $f*=1$ i.e. at \latex_($f_0$\latex_) because \latex_($f*=f/f_0$\latex_) which shows that the vortex shedding is governed by the forced oscillation. The phase portraits also show that, indeed the cycle is well defined."
+	
+		Figure {
+			Title "Locked configuration, $f=0.9$. Evolution of the lift coeﬃcient (ﬁrst column), its PSD (second column) and the associated phase portrait (third column). Reference solution [1]. "
+			Width 15cm
+			picture ReferenceSolution/ref_F0.9.pdf
+			}
+           Figure {
+			Title "Locked configuration, $f=0.9$. Evolution of the lift coeﬃcient. Current study. "
+			Width 10cm
+			picture F_0.9/Cl.png
+			}
+           Figure {
+			Title "Locked configuration, $f=0.9$. Evolution of the normalised PSD. Current study. "
+			Width 10cm
+			picture F_0.9/PSD.png
+			}
+           Figure {
+			Title "Locked configuration, $f=0.9$. Evolution of the associated phase portrait. Current study. "
+			Width 10cm
+			picture F_0.9/Cl_alpha.png
+			}
+			
+	Description "Unlocked configuration"
+	Description " In order to get out of the lock-in zone, simulations at $f=0.5$ are performed. The lift coefficient is no longer only controlled by the forced oscillations. The lift coefficient signal is no longer purely sinusoidal, this can also be seen through the phase portraits which no longer have well defined limits. We can define the cycle-to-cycle period different from the period of the signal which can now extend over several oscillations (which we will call the beating period). For $F=0.5$, the Strouhal frequency from the fixed cylinder is placed at \latex_($f_s/f_0=1/F=2$\latex_). So we can see that the cycle-to-cycle period corresponds to the strouhal period \latex_($T_s=0.5T_0$\latex_) as found by ref. [1]."
+	
+		Figure {
+			Title "Unlocked configuration, $f=0.5$. Evolution of the lift coeﬃcient (ﬁrst column), its PSD (second column) and the associated phase portrait (third column). Reference solution [1]. "
+			Width 15cm
+			picture ReferenceSolution/ref_F0.5.pdf
+			}
+           Figure {
+			Title "Unocked configuration, $f=0.5$. Evolution of the lift coeﬃcient. Current study. "
+			Width 10cm
+			picture F_0.5/Cl.png
+			}
+           Figure {
+			Title "Unlocked configuration, $f=0.5$. Evolution of the normalised PSD. Current study. "
+			Width 10cm
+			picture F_0.5/PSD.png
+			}
+           Figure {
+			Title "Unlocked configuration, $f=0.5$. Evolution of the associated phase portrait. Current study. "
+			Width 10cm
+			picture F_0.5/Cl_alpha.png
+			}
+			
+	Description "Aerodynamic coefficients." 
+	Description "To study the evolution of the fluid force \latex_(${\bf{F}}$\latex_) acting on the cylinder, we introduce the drag and the lift coefficients \latex_($C_D = \frac{F_D}{1/2 \rho U_{\infty}^2 D}$\latex_) and \latex_($C_L = \frac{F_L}{1/2 \rho U_{\infty}^2 D}$\latex_),  with \latex_($F_D={\bf{F}}\cdot {\bf{e_x}}$\latex_) and \latex_($F_L={\bf{F}}\cdot {\bf{e_y}}$\latex_)." 
+	
+		Table {
+		Title "Mean drag coefficient and the maximal lift coefficient with the frequency ratio $f = 1.1 $"	
+	
+		nb_columns 2		
+		label Mean \latex_($C_D$\latex_) | Max \latex_($C_L$\latex_) 
+		include_description_lines 0
+
+		Line {
+			legend "Reference solution [1] "		
+			values 1.50  0.136
+		}
+		Line {
+			legend "Current study"		
+			file F_0.9/Cd_Cl.txt
+		}
+
+
+	}
+	Table {
+		Title "Mean drag coefficient and the maximal lift coefficient with the frequency ratio $f = 0.5 $"	
+	
+		nb_columns 2		
+		label Mean \latex_($C_D$\latex_) | Max \latex_($C_L$\latex_) 
+		include_description_lines 0
+
+		Line {
+			legend "Reference solution [1] "		
+			values 1.380  0.418
+		}
+		Line {
+			legend "Current study"		
+			file F_0.5/Cd_Cl.txt
+		}
+
+
+	}
+									
+}
+
+Conclusion {
+	Description "The harmonic motion of a circular wall in a quiescent viscous fluid, has been  numerically simulated. A FEV method is applied to solve such a problem in conjunction with the ALE approach. The numerical results are in line with the numerical results of [1]."
+
+}

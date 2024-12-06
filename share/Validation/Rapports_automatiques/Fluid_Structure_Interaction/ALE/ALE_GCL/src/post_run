@@ -1,0 +1,5 @@
+erru=`cat ALE_GCL_ERRU.son | tail -1 | awk '{printf "%.12f", $2}'`
+errp=`cat ALE_GCL_ERRP.son | tail -1 | awk '{printf "%.12f", $2}'`
+errdivu=`cat ALE_GCL_ERRDIVU.son | tail -1 | awk '{ if ($2 < 0) print -$2; else print $2; fi}'` 
+echo -e $erru"\t"$errp"\t"$errdivu >> Err.txt
+

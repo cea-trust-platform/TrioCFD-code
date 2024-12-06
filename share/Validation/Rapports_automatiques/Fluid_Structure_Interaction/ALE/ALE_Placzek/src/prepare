@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cp post_run F_0.5/
+cp post_run F_0.9/
+cp DOM_p4.Zones F_0.5/
+cp DOM_p4.Zones F_0.9/
+cp -r Cylindre_fixe F_0.5/
+cp -r Cylindre_fixe F_0.9/
