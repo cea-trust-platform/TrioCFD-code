@@ -91,7 +91,7 @@ Read pb
       Transport_K_Omega
       {
         convection { amont }
-        diffusion { negligeable }
+        diffusion { }
         boundary_conditions {
           WALL1 paroi
           WALL2 paroi

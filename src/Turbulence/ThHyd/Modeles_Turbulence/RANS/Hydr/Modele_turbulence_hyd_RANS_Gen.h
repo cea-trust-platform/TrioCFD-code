@@ -31,9 +31,9 @@
 
 enum class MODELE_TYPE
 {
-  K_EPS , K_EPS_2_COUCHES,
-  K_EPS_BAS_REYNOLDS , K_EPS_REALISABLE,
-  K_EPS_BICEPHALE,  K_EPS_REALISABLE_BICEPHALE,
+  K_EPS, K_EPS_2_COUCHES,
+  K_EPS_BAS_REYNOLDS, K_EPS_REALISABLE,
+  K_EPS_BICEPHALE, K_EPS_REALISABLE_BICEPHALE,
   K_OMEGA
 };
 
@@ -184,9 +184,11 @@ template <typename MODELE> template <MODELE_TYPE M_TYPE>
 void Modele_turbulence_hyd_RANS_Gen<MODELE>::print_evolution(const Champ_Inc_base& le_champ_K_Eps_ou_Omega, const Schema_Temps_base& sch, const double LeCmu, const int avant, const Champ_Inc_base* le_champ_Eps)
 {
 
-  static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA), IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES),
-                        IS_BAS_REYNOLDS = (M_TYPE == MODELE_TYPE::K_EPS_BAS_REYNOLDS), IS_K_EPS_BICEPHALE = (M_TYPE == MODELE_TYPE::K_EPS_BICEPHALE),
-                        IS_K_EPS_REALISABLE_BICEPHALE = (M_TYPE == MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE);
+  static constexpr bool IS_K_OMEGA = (M_TYPE == MODELE_TYPE::K_OMEGA);
+  static constexpr bool IS_2_COUCHES = (M_TYPE == MODELE_TYPE::K_EPS_2_COUCHES);
+  static constexpr bool IS_BAS_REYNOLDS = (M_TYPE == MODELE_TYPE::K_EPS_BAS_REYNOLDS);
+  static constexpr bool IS_K_EPS_BICEPHALE = (M_TYPE == MODELE_TYPE::K_EPS_BICEPHALE);
+  static constexpr bool IS_K_EPS_REALISABLE_BICEPHALE = (M_TYPE == MODELE_TYPE::K_EPS_REALISABLE_BICEPHALE);
 
   assert (!IS_K_EPS_BICEPHALE || (IS_K_EPS_BICEPHALE && le_champ_Eps != nullptr));
 

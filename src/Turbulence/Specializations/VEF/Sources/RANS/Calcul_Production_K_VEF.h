@@ -36,15 +36,30 @@ class Calcul_Production_K_VEF
 protected:
   Calcul_Production_K_VEF() { }
 
+  // Standard TKE production
   DoubleTab& calculer_terme_production_K(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const int& interpol_visco, const double& limiteur) const;
+  void loop_for_internal_or_periodic_faces(DoubleTab& prodK, const DoubleTab& gradient_elem, const DoubleTab& visco_turb, const DoubleVect& volumes, const IntTab& face_voisins, const int nfaceinit, const int nfaceend, const int interpol_visco, const double limiteur) const;
+  void loop_for_non_periodic_boundaries(DoubleTab& prodK, const DoubleTab& gradient_elem, const DoubleTab& visco_turb, const DoubleVect& volumes, const IntTab& face_voisins, const int nfaceinit, const int nfaceend, const int interpol_visco, const double limiteur) const;
+
 
   DoubleTab& calculer_terme_production_K_BiK(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const int& interpol_visco, const double& limiteur) const;
 
+  // EASM
   DoubleTab& calculer_terme_production_K_EASM(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const int& interpol_visco, const double& limiteur) const;
-
+  void compute_production_term_EASM(const int face, const double visco_face, const DoubleTab& Re_face, const DoubleTab& gradient_face, DoubleTab& P) const;
   DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&, const Domaine_VEF&, const Domaine_Cl_VEF&) const;
 
+  // Commons
+  double get_turbulent_viscosity(const DoubleTab& visco_turb, const DoubleVect& volumes, const int type_interpo, const int poly1, const int poly2, const double limiteur) const;
+
+  // TKE destruction
   DoubleTab& calculer_terme_destruction_K_gen(const Domaine_VEF&, const Domaine_Cl_VEF&, DoubleTab&, const DoubleTab&, const DoubleTab&, const Champ_Don_base&, const DoubleVect&, int) const;
+  void compute_utheta_nbConsti_le_1_nbCompo_eq_0(const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& zcl_VEF, const IntTab& face_voisins, const DoubleVect& volumes, const DoubleTab& tab_beta, const DoubleTab& alpha_turb, const DoubleTrav& gradient_elem, DoubleTrav& u_theta) const;
+  void compute_utheta_nbConsti_le_1_nbCompo_eq_1(const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& zcl_VEF, const IntTab& face_voisins, const DoubleVect& volumes, const DoubleTab& tab_beta, const DoubleTab& alpha_turb, const DoubleTrav& gradient_elem, DoubleTrav& u_theta) const;
+  void compute_utheta_nbConsti_le_1_nbCompo_gt_1(const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& zcl_VEF, const IntTab& face_voisins, const DoubleVect& volumes, const DoubleTab& tab_beta, const DoubleTab& alpha_turb, const DoubleTrav& gradient_elem, DoubleTrav& u_theta) const;
+  void compute_utheta_nbConsti_gt_1_nbCompo_eq_0(const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& zcl_VEF, const IntTab& face_voisins, const DoubleVect& volumes, const DoubleTab& tab_beta, const DoubleTab& alpha_turb, const DoubleTrav& gradient_elem, const int nb_consti, DoubleTrav& u_theta) const;
+  void compute_utheta_nbConsti_gt_1_nbCompo_eq_1(const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& zcl_VEF, const IntTab& face_voisins, const DoubleVect& volumes, const DoubleTab& tab_beta, const DoubleTab& alpha_turb, const DoubleTrav& gradient_elem, const int nb_consti, DoubleTrav& u_theta) const;
+  void compute_utheta_nbConsti_gt_1_nbCompo_gt_1(const Domaine_VEF& domaine_VEF, const Domaine_Cl_VEF& zcl_VEF, const IntTab& face_voisins, const DoubleVect& volumes, const DoubleTab& tab_beta, const DoubleTab& alpha_turb, const DoubleTrav& gradient_elem, const int nb_consti, DoubleTrav& u_theta) const;
 
   void mettre_a_jour(double temps) { }
 };

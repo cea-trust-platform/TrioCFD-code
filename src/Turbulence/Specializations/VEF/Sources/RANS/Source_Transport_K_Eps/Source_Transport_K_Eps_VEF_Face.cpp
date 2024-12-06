@@ -30,11 +30,14 @@ Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_VEF_Face,
                                           "Source_Transport_K_Eps_VEF_P1NC",
                                           Source_Transport_VEF_Face_base);
 
-Sortie& Source_Transport_K_Eps_VEF_Face::printOn(Sortie& s) const { return s << que_suis_je() ; }
+Sortie& Source_Transport_K_Eps_VEF_Face::printOn(Sortie& s) const
+{
+  return s << que_suis_je();
+}
 
 Entree& Source_Transport_K_Eps_VEF_Face::readOn(Entree& is)
 {
-  Source_Transport_VEF_Face_base::verifier_pb_keps(mon_equation->probleme(),que_suis_je());
+  Source_Transport_VEF_Face_base::verifier_pb_keps(mon_equation->probleme(), que_suis_je());
   return Source_Transport_VEF_Face_base::readOn(is);
 }
 
@@ -61,19 +64,29 @@ const DoubleTab& Source_Transport_K_Eps_VEF_Face::get_K_pour_production() const
 
 const OWN_PTR(Modele_Fonc_Bas_Reynolds_Base)& Source_Transport_K_Eps_VEF_Face::get_modele_fonc_bas_reyn() const
 {
-  return ref_cast(Modele_turbulence_hyd_K_Eps,mon_eq_transport_K_Eps->modele_turbulence()).associe_modele_fonction();
+  return ref_cast(Modele_turbulence_hyd_K_Eps,
+                  mon_eq_transport_K_Eps->modele_turbulence()).associe_modele_fonction();
 }
 
 void Source_Transport_K_Eps_VEF_Face::calcul_tabs_bas_reyn(const DoubleTrav& P, const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don_base& ch_visco_cin,
                                                            const Champ_base& ch_visco_cin_ou_dyn, DoubleTab& D, DoubleTab& E, DoubleTab& F1, DoubleTab& F2) const
 {
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
-  get_modele_fonc_bas_reyn()->Calcul_D(D,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin);
-  get_modele_fonc_bas_reyn()->Calcul_E(E,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(),vit,K_eps,ch_visco_cin,visco_turb);
+  get_modele_fonc_bas_reyn()->Calcul_D(D, mon_eq_transport_K_Eps->domaine_dis(),
+                                       mon_eq_transport_K_Eps->domaine_Cl_dis(),
+                                       vit, K_eps, ch_visco_cin);
   D.echange_espace_virtuel();
+
+  get_modele_fonc_bas_reyn()->Calcul_E(E, mon_eq_transport_K_Eps->domaine_dis(),
+                                       mon_eq_transport_K_Eps->domaine_Cl_dis(),
+                                       vit, K_eps, ch_visco_cin, visco_turb);
   E.echange_espace_virtuel();
-  get_modele_fonc_bas_reyn()->Calcul_F1(F1,mon_eq_transport_K_Eps->domaine_dis(),mon_eq_transport_K_Eps->domaine_Cl_dis(), P, K_eps,ch_visco_cin_ou_dyn);
-  get_modele_fonc_bas_reyn()->Calcul_F2(F2,D,mon_eq_transport_K_Eps->domaine_dis(),K_eps, ch_visco_cin_ou_dyn  );
+
+  get_modele_fonc_bas_reyn()->Calcul_F1(F1, mon_eq_transport_K_Eps->domaine_dis(),
+                                        mon_eq_transport_K_Eps->domaine_Cl_dis(),
+                                        P, K_eps, ch_visco_cin_ou_dyn);
+  get_modele_fonc_bas_reyn()->Calcul_F2(F2, D, mon_eq_transport_K_Eps->domaine_dis(),
+                                        K_eps, ch_visco_cin_ou_dyn);
 }
 
 const Nom Source_Transport_K_Eps_VEF_Face::get_type_paroi() const
@@ -82,32 +95,42 @@ const Nom Source_Transport_K_Eps_VEF_Face::get_type_paroi() const
   return mod.loi_paroi().que_suis_je();
 }
 
-void Source_Transport_K_Eps_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco_turb, const DoubleTab& gradient_elem, DoubleTab& Re) const
+void Source_Transport_K_Eps_VEF_Face::calcul_tenseur_reyn(const DoubleTab& visco_turb,
+                                                          const DoubleTab& gradient_elem,
+                                                          DoubleTab& Re) const
 {
   get_modele_fonc_bas_reyn()->calcul_tenseur_Re(visco_turb, gradient_elem, Re);
 }
 
-void Source_Transport_K_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
+void Source_Transport_K_Eps_VEF_Face::fill_resu_bas_rey(const DoubleVect& volumes_entrelaces,
+                                                        const DoubleTrav& prod, const DoubleTab& D,
+                                                        const DoubleTab& E, const DoubleTab& F1,
+                                                        const DoubleTab& F2, DoubleTab& resu) const
 {
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_K_MIN();
   for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     {
-      resu(fac,0) += (P(fac)-K_eps(fac,1)-D(fac))*volumes_entrelaces(fac);
-      if (K_eps(fac,0) >= LeK_MIN)
-        resu(fac,1) += ((C1*P(fac)*F1(fac)-C2*K_eps(fac,1)*F2(fac))*K_eps(fac,1)/(K_eps(fac,0))+E(fac)) *volumes_entrelaces(fac);
+      const double tke = K_eps(fac, 0);
+      const double eps = K_eps(fac, 1);
+      resu(fac, 0) += (prod(fac) - eps - D(fac))*volumes_entrelaces(fac);
+      if (tke >= LeK_MIN)
+        resu(fac, 1) += ((C1*prod(fac)*F1(fac) - C2*eps*F2(fac))*eps/tke + E(fac))*volumes_entrelaces(fac);
     }
 }
 
-void Source_Transport_K_Eps_VEF_Face::fill_resu(const DoubleVect& volumes_entrelaces, const DoubleTrav& P, DoubleTab& resu) const
+void Source_Transport_K_Eps_VEF_Face::fill_resu(const DoubleVect& volumes_entrelaces,
+                                                const DoubleTrav& prod, DoubleTab& resu) const
 {
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_K_MIN();
   for (int fac = 0; fac < le_dom_VEF->nb_faces(); fac++)
     {
-      resu(fac,0) += (P(fac)-K_eps(fac,1))*volumes_entrelaces(fac);
-      if (K_eps(fac,0) >= LeK_MIN)
-        resu(fac,1) += (C1*P(fac)-C2*K_eps(fac,1))*volumes_entrelaces(fac)*K_eps(fac,1)/K_eps(fac,0);
+      const double tke = K_eps(fac, 0);
+      const double eps = K_eps(fac, 1);
+      resu(fac, 0) += (prod(fac) - eps)*volumes_entrelaces(fac);
+      if (K_eps(fac, 0) >= LeK_MIN)
+        resu(fac, 1) += (C1*prod(fac) - C2*eps)*eps/tke*volumes_entrelaces(fac);
     }
 }
 
@@ -116,19 +139,26 @@ DoubleTab& Source_Transport_K_Eps_VEF_Face::ajouter(DoubleTab& resu) const
   return Source_Transport_VEF_Face_base::ajouter_keps(resu);
 }
 
-void Source_Transport_K_Eps_VEF_Face::contribuer_a_avec(const DoubleTab& a, Matrice_Morse& matrice) const
+void Source_Transport_K_Eps_VEF_Face::contribuer_a_avec(const DoubleTab& a,
+                                                        Matrice_Morse& matrice) const
 {
   const DoubleTab& K_eps = equation().inconnue().valeurs();
   const double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_K_MIN();
   const DoubleVect& porosite_face = mon_eq_transport_K_Eps->milieu().porosite_face();
   const DoubleVect& volumes_entrelaces = le_dom_VEF->volumes_entrelaces();
+
   // on implicite le -eps et le -eps^2/k
   for (int face = 0; face < K_eps.dimension(0); face++)
     if (K_eps(face, 0) >= LeK_MIN) // -eps*vol  donne +vol dans la bonne case
       {
-        double coef_k = porosite_face(face) * volumes_entrelaces(face) * K_eps(face, 1) / K_eps(face, 0);
+        const double tke = K_eps(face, 0);
+        const double eps = K_eps(face, 1);
+        const double volporo = porosite_face(face) * volumes_entrelaces(face);
+
+        const double coef_k = eps/tke*volporo;
         matrice(face * 2, face * 2) += coef_k;
-        double coef_eps = C2 * K_eps(face, 1) / K_eps(face, 0) * volumes_entrelaces(face) * porosite_face(face);
+
+        const double coef_eps = C2 * eps/tke * volporo;
         matrice(face * 2 + 1, face * 2 + 1) += coef_eps;
       }
 }

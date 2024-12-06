@@ -114,15 +114,15 @@ int Transport_K_Eps::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 
       if (with_nu_==0)
         {
-          Cerr<<" On associe le champ de diffusion nul afin de faire comme avant !!!!!! " <<finl;
+          Cerr << " On associe le champ de diffusion nul afin de faire comme avant !!!!!! " << finl;
           EChaine tt("Champ_Uniforme 1 0");
-          tt>> Champ_don_nul_;
+          tt >> Champ_don_nul_;
           terme_diffusif.associer_diffusivite(Champ_don_nul_);
         }
       else
         {
           const Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
-          if (sub_type(Fluide_Quasi_Compressible,fluide_inc))
+          if (sub_type(Fluide_Quasi_Compressible, fluide_inc))
             terme_diffusif.associer_diffusivite(fluide_inc.viscosite_dynamique());
           else
             terme_diffusif.associer_diffusivite(fluide_inc.viscosite_cinematique());
@@ -139,14 +139,15 @@ int Transport_K_Eps::lire_motcle_non_standard(const Motcle& mot, Entree& is)
       is >> terme_convectif;
       return 1;
     }
-  else if (mot=="ecrire_fichier_xyz_valeur")
+  else if (mot == "ecrire_fichier_xyz_valeur")
     {
       Cerr << mot << " is not understood by " << que_suis_je() << finl;
       Cerr << "Use this keyword in the Navier Stokes equation, not in KEps equation, please." << finl;
-      exit();
+      Process::exit();
     }
   else
-    return Transport_K_Eps_base::lire_motcle_non_standard(mot,is);
+    return Transport_K_Eps_base::lire_motcle_non_standard(mot, is);
+
   return 1;
 }
 
@@ -160,7 +161,7 @@ void Transport_K_Eps::associer_modele_turbulence(const Modele_turbulence_hyd_RAN
   associer(eqn_hydr);
   associer_milieu_base(eqn_hydr.milieu());
   associer_vitesse(eqn_hydr.inconnue());
-  mon_modele = ref_cast(Modele_turbulence_hyd_K_Eps,modele);
+  mon_modele = ref_cast(Modele_turbulence_hyd_K_Eps, modele);
   discretiser();
 }
 
@@ -197,7 +198,7 @@ const Operateur& Transport_K_Eps::operateur(int i) const
       Cerr << "Error for Transport_K_Eps::operateur("<<i<<") !! " << finl;
       Cerr << "Transport_K_Eps has " << nombre_d_operateurs() <<" operators "<<finl;
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
-      exit();
+      Process::exit();
     }
   // Pour les compilos!!
   return terme_diffusif;
@@ -224,7 +225,7 @@ Operateur& Transport_K_Eps::operateur(int i)
       Cerr << "Error for Transport_K_Eps::operateur("<<i<<") !! " << finl;
       Cerr << "Transport_K_Eps has " << nombre_d_operateurs() <<" operators "<<finl;
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
-      exit();
+      Process::exit();
     }
   // Pour les compilos!!
   return terme_diffusif;
@@ -245,11 +246,11 @@ const Motcle& Transport_K_Eps::domaine_application() const
 
 DoubleTab& Transport_K_Eps::corriger_derivee_impl(DoubleTab& d)
 {
-  Nom pbb = probleme().que_suis_je();
-  if (pbb.contient("ALE")) corriger_derivee_impl_ALE(d);
+  const Nom pbb = probleme().que_suis_je();
+  if (pbb.contient("ALE"))
+    corriger_derivee_impl_ALE(d);
 
   const Turbulence_paroi_base& loi_paroi=modele_turbulence().loi_paroi();
   loi_paroi.corriger_derivee_impl(d);
   return Transport_K_Eps_base::corriger_derivee_impl(d);
 }
-

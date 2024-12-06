@@ -143,8 +143,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente(do
       // On connait donc la viscosite turbulente au centre des faces de chaque element
       // On cherche maintenant a interpoler cette viscosite turbulente au centre des elements.
       la_viscosite_turbulente_->affecter(visco_turb_au_format_K_Omega.valeur());
-      Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente visco_turb_au_format_K_Omega",
-                      visco_turb_au_format_K_Omega.valeur());
+      Debog::verifier("Modele_turbulence_hyd_K_Omega::calculer_viscosite_turbulente visco_turb_au_format_K_Omega", visco_turb_au_format_K_Omega.valeur());
     }
   else
     fill_turbulent_viscosity_tab(komega_size_real, tab_K_Omega, visco_turb);
