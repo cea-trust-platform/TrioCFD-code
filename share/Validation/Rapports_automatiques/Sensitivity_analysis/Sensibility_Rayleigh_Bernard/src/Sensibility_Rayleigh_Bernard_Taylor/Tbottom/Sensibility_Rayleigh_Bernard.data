@@ -1,0 +1,220 @@
+# Thermohydraulique 2D VEF Boussinesq #
+# Sensitivity analysis  based on Taylor expansion #
+# PARALLEL OK #
+dimension 2
+
+Domaine dom
+
+
+# BEGIN MESH #
+Lire_MED { 
+   domain dom 
+   file ../../Mesh.med 
+}
+
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 2 }
+	Larg_joint 2
+	zones_name DOM1
+}
+End
+END PARTITION #
+
+
+
+# BEGIN SCATTER #
+# Scatter DOM1.Zones dom #
+# END SCATTER #
+
+Pb_Thermohydraulique pb_etat
+Pb_Thermohydraulique_sensibility pb_sensibilite
+
+VEFPreP1B dis 
+
+
+# Currently, the only possible choice is the  'Scheme_euler_explicit' #
+Scheme_euler_explicit sch
+Read sch
+{
+	tinit 0
+	tmax 100
+	dt_min 1e-8
+	dt_max 1e-1
+	dt_impr 1e-8
+	seuil_statio 1.e-6
+	# nb_pas_dt_max 20 #
+}
+
+
+
+
+Associate pb_etat dom
+Associate pb_sensibilite dom
+
+
+Probleme_Couple pbc
+Associate pbc pb_etat
+Associate pbc pb_sensibilite
+Associate pbc sch
+Discretize pbc dis
+
+
+
+
+Read pb_etat
+{
+	Fluide_Incompressible 
+	{
+	        gravite champ_uniforme 2 0 -9.81
+		mu Champ_Uniforme 1 1.54e-5
+		rho Champ_Uniforme 1 1.092
+		lambda Champ_Uniforme 1 0.024
+		Cp Champ_Uniforme 1 1006
+		beta_th Champ_Uniforme 1 3e-3
+	}
+	Navier_Stokes_standard
+	{
+
+		solveur_pression Cholesky { impr }
+		convection { centre }
+		diffusion { }
+		sources { boussinesq_temperature { T0 338 } }
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+			Inlet paroi_fixe
+			Outlet paroi_fixe
+			Top paroi_fixe
+			Bottom paroi_fixe
+		}
+	}
+	Convection_Diffusion_Temperature
+	{
+		diffusion { }
+		convection { centre }
+		boundary_conditions 
+		{
+			Inlet paroi_adiabatique
+			Outlet paroi_adiabatique
+ 			Top Paroi_temperature_imposee Champ_Front_fonc_xyz 1 313
+			Bottom Paroi_temperature_imposee Champ_Front_Uniforme 1 363
+		}
+		initial_conditions { Temperature Champ_Uniforme 1 338 }
+	}
+	Post_processing
+	{
+	
+		Probes
+		{
+                        vitesse_etat_x_c  vitesse periode 0.001 segment 50 0. 0.0050014 0.0200056 0.0050014 
+                        temperature_etat_x_c temperature periode 0.001 segment 50 0. 0.0050014 0.0200056 0.0050014 
+                        pression_etat_x_c  pression periode 0.001 segment 50  0. 0.0050014 0.0200056 0.0050014 
+                        
+
+                        
+                        vitesse_etat_y_c  vitesse periode 0.001 segment 30  0.0100028 0.  0.0100028  0.0100028 
+                        temperature_etat_y_c  temperature periode 0.001 segment 30 0.0100028 0.  0.0100028  0.0100028 
+                        pression_etat_y_c  pression periode 0.001 segment 30 0.0100028 0.  0.0100028  0.0100028 
+                        
+
+                        
+		}
+	
+	
+                fichier state
+                format lata
+		fields dt_post 10
+		{
+			pression som
+			vitesse som
+			temperature som
+		}
+	}
+
+}
+Read pb_sensibilite
+{
+	Fluide_Incompressible 
+	{
+		gravite champ_uniforme 2 0 -9.81
+		mu Champ_Uniforme 1 1.54e-5
+		rho Champ_Uniforme 1 1.092
+		lambda Champ_Uniforme 1 0.024
+		Cp Champ_Uniforme 1 1006
+		beta_th Champ_Uniforme 1 3e-3
+	}
+
+        Navier_Stokes_standard_sensibility
+        {       
+                uncertain_variable { vitesse }
+		state { pb_champ_evaluateur pb_etat  vitesse } 
+      		solveur_pression cholesky {  }  
+                convection { Sensibility { centre } } 
+                diffusion { }
+		sources { boussinesq_temperature { T0 0 }  }
+                initial_conditions {
+                        vitesse Champ_Uniforme 2 0. 0.
+                        }
+                boundary_conditions {
+			Inlet paroi_fixe
+			Outlet paroi_fixe
+			Top paroi_fixe
+			Bottom paroi_fixe
+                }
+        }
+	Convection_Diffusion_Temperature_sensibility
+	{
+                uncertain_variable { temperature }
+                velocity_state { pb_champ_evaluateur pb_etat  vitesse } 
+		temperature_state { pb_champ_evaluateur pb_etat  temperature } 
+		diffusion { }
+		convection { Sensibility { centre } }
+		boundary_conditions 
+		{
+			Inlet paroi_adiabatique
+			Outlet paroi_adiabatique
+ 			Top Paroi_temperature_imposee Champ_Front_fonc_xyz 1 0
+			Bottom Paroi_temperature_imposee Champ_Front_Uniforme 1 1
+		}
+		initial_conditions { Temperature Champ_Uniforme 1 0. }
+	}
+	Post_processing
+	{
+	
+		Probes
+		{
+	                vitesse_sensibilite_x_c  vitesse periode 0.001 segment 50 0. 0.0050014 0.0200056 0.0050014 
+                        temperature_sensibilite_x_c temperature periode 0.001 segment 50 0. 0.0050014 0.0200056 0.0050014 
+                        pression_sensibilite_x_c  pression periode 0.001 segment 50  0. 0.0050014 0.0200056 0.0050014 
+
+                        
+                        vitesse_sensibilite_y_c  vitesse periode 0.001 segment 30  0.0100028 0.  0.0100028  0.0100028 
+                        temperature_sensibilite_y_c  temperature periode 0.001 segment 30 0.0100028 0.  0.0100028  0.0100028 
+                        pression_sensibilite_y_c  pression periode 0.001 segment 30 0.0100028 0.  0.0100028  0.0100028 
+
+		}
+                fichier sensibility
+                format lata
+		fields dt_post 10
+		{
+			pression som
+			vitesse som
+			temperature som
+		}
+	}
+
+}
+
+
+
+Solve pbc
+
+End
+
+
+

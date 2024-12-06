@@ -1,0 +1,76 @@
+ set style data linespoints
+ set termoption dash
+ set style line 1 lt -1 lw 1 linecolor rgb "red" 
+ set style line 2 lt -1 lw 1 linecolor rgb "blue" 
+ set style line 3 lt -1 lw 1 linecolor rgb "black" 
+ set style line 4 lt -1 lw 1 linecolor rgb "green" 
+ 
+ 
+ 
+ 
+ 
+ 
+ set key center top
+ set key spacing 2  
+ set ylabel 'Pressure [Pa]'  
+ set xlabel 'x [m]' 
+ set terminal png  
+ set output "IC_mixed_X_C_P.png"                                                                                                                                                                
+ plot "IC_mixed_X_C_P.txt" w errorbars ls 1 notitle, "IC_mixed_X_C_P.txt" u 1:2 ls 1 title 'Pressure'
+
+
+
+ set key center top
+ set key spacing 2   
+                                                                                                                                                                                                                                                                                                     
+ set ylabel 'Pressure [Pa]'  
+ set xlabel 'y [m]'   
+ set terminal png 
+ set output "IC_mixed_Y_C_P.png"                                                                                                                                                                
+ plot "IC_mixed_Y_C_P.txt" w errorbars ls 1 notitle, "IC_mixed_Y_C_P.txt" u 1:2 ls 1 title 'Pressure'
+  
+  
+ set key center top
+ set key spacing 2  
+
+ set ylabel 'Temperature [K]'  
+ set xlabel 'x [m]' 
+ set terminal png  
+ set output "IC_mixed_X_C_T.png"                                                                                                                                                                
+ plot "IC_mixed_X_C_T.txt" w errorbars ls 1 notitle, "IC_mixed_X_C_T.txt" u 1:2 ls 1 title 'Temperature'
+
+
+
+ set key center top
+ set key spacing 2   
+                                                                                                                                                                                                                                                                                                     
+ set ylabel 'Temperature [K]'  
+ set xlabel 'y [m]'   
+ set terminal png 
+ set output "IC_mixed_Y_C_T.png"                                                                                                                                                                
+ plot "IC_mixed_Y_C_T.txt" w errorbars ls 1 notitle, "IC_mixed_Y_C_T.txt" u 1:2 ls 1 title 'Temperature'
+ 
+
+
+ set key center top
+ set key spacing 2  
+ set xrange [0:0.02]                                                                                                                                                     
+ set ylabel 'Velocity [m/s]'  
+ set xlabel 'x [m]' 
+ set terminal png  
+ set output "IC_mixed_X_C_V.png"                                                                                                                                                                
+ plot "IC_mixed_X_C_Vx.txt" w errorbars ls 1 notitle,  "IC_mixed_X_C_Vy.txt" with errorbars ls 2 notitle, "IC_mixed_X_C_Vx.txt" u 1:2 ls 1 title 'x-component', "IC_mixed_X_C_Vy.txt" u 1:2 ls 2 title 'y-component'
+
+ set xrange [0:0.01]                                                                                                                                                     
+set yrange [-0.08:0.04]  
+ set key center top
+ set key spacing 2   
+                                                                                                                                                                                                                                                                                                     
+ set ylabel 'Velocity [m/s]'  
+ set xlabel 'y [m]'   
+ set terminal png 
+ set output "IC_mixed_Y_C_V.png"                                                                                                                                                                
+ plot "IC_mixed_Y_C_Vx.txt" w errorbars ls 1 notitle,  "IC_mixed_Y_C_Vy.txt" with errorbars ls 2 notitle, "IC_mixed_Y_C_Vx.txt" u 1:2 ls 1 title 'x-component', "IC_mixed_Y_C_Vy.txt" u 1:2 ls 2 title 'y-component'
+
+
+

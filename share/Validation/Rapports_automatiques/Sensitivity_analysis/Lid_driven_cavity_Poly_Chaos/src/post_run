@@ -1,0 +1,24 @@
+extrait_coupe Lid_driven_cavity_Poly_Chaos  U_V1
+extrait_coupe Lid_driven_cavity_Poly_Chaos  P_V1
+extrait_coupe Lid_driven_cavity_Poly_Chaos  U_H1
+extrait_coupe Lid_driven_cavity_Poly_Chaos  P_H1
+extrait_coupe Lid_driven_cavity_Poly_Chaos  U_V
+extrait_coupe Lid_driven_cavity_Poly_Chaos  P_V
+extrait_coupe Lid_driven_cavity_Poly_Chaos  U_H
+extrait_coupe Lid_driven_cavity_Poly_Chaos  P_H
+
+extrait_coupe Lid_driven_cavity_Poly_Chaos  U_V1_SENS
+extrait_coupe Lid_driven_cavity_Poly_Chaos  P_V1_SENS
+extrait_coupe Lid_driven_cavity_Poly_Chaos  U_H1_SENS
+extrait_coupe Lid_driven_cavity_Poly_Chaos  P_H1_SENS
+extrait_coupe Lid_driven_cavity_Poly_Chaos  U_V_SENS
+extrait_coupe Lid_driven_cavity_Poly_Chaos  P_V_SENS
+extrait_coupe Lid_driven_cavity_Poly_Chaos  U_H_SENS
+extrait_coupe Lid_driven_cavity_Poly_Chaos  P_H_SENS
+
+python IC.py
+
+cd ..
+python Variance_mixed.py
+python IC_mixed.py
+gnuplot gnuplot.txt

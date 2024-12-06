@@ -1,0 +1,25 @@
+ set style data linespoints
+ set termoption dash
+ set style line 1 lt -1 lw 1 linecolor rgb "red" 
+ set style line 2 lt -1 lw 1 linecolor rgb "blue" 
+ set style line 3 lt -1 lw 1 linecolor rgb "black" 
+ set style line 4 lt -1 lw 1 linecolor rgb "green" 
+
+
+ set key center top
+ set key spacing 2                                                                                                                                                      
+ set ylabel 'Velocity [m/s]'  
+ set xlabel 'y [m]' 
+ set terminal png  
+ set output "IC_mixed_V.png"                                                                                                                                                                
+ plot "IC_mixed_V_x.txt" w errorbars ls 1 notitle,  "IC_mixed_V_y.txt" with errorbars ls 2 notitle, "IC_mixed_V_x.txt" u 1:2 ls 1 title 'x-component', "IC_mixed_V_y.txt" u 1:2 ls 2 title 'y-component'
+
+  set yrange [-0.5:0.5] 
+ set key center top
+ set key spacing 2                                                                                                                                                      
+ set ylabel 'Velocity [m/s]'  
+ set xlabel 'x [m]'   
+ set terminal png 
+ set output "IC_mixed_H.png"                                                                                                                                                                
+ plot "IC_mixed_H_x.txt" w errorbars ls 1 notitle,  "IC_mixed_H_y.txt" with errorbars ls 2 notitle, "IC_mixed_H_x.txt" u 1:2 ls 1 title 'x-component', "IC_mixed_H_y.txt" u 1:2 ls 2 title 'y-component'
+
