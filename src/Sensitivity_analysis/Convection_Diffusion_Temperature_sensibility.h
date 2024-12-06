@@ -47,6 +47,8 @@ public :
   const Champ_Inc_base& get_velocity_state() const;
   const Champ_Inc_base& get_temperature_state() const;
   const Motcle& get_uncertain_variable_name() const;
+  const double& get_poly_chaos_value() const;
+
 
 protected :
   OBS_PTR(Champ_Inc_base) velocity_state_field;  //Reference to the unknown velocity field of the state problem
@@ -55,6 +57,7 @@ protected :
   Motcle name_velocity_state_field;         //name of the unknown velocity field of the state problem
   Motcle name_temperature_state_field;      //name of the unknown temperature field of the state problem
   Motcle uncertain_var;     				//name of the unknown field of the uncertain variable
+  double poly_chaos;               //It is the method that we will use to study the sensitivity of the Navier Stokes equation:
 
 };
 

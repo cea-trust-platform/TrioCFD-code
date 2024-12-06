@@ -93,6 +93,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const Champ_Inc_base& state = eq.get_state();
           const DoubleTab& state_field = eq.get_state_field();
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
+          const double& poly_chaos_value= eq.get_poly_chaos_value();
           // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
           DoubleTab& flux_b = flux_bords_;
           int nb_faces_bord=domaine_VEF.nb_faces_bord();
@@ -100,6 +101,20 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           flux_b = 0.;
           ajouter_conv_term(state,inco ,resu, flux_b);
           ajouter_conv_term(la_vitesse,state_field ,resu, flux_b);
+
+          //If we treat the Navier Stokes equations by the polynomial chaos method to calculate the sensitivity equations of this system,
+          //we find that we have to add one more convection term on the Navier_Stokes_standard_sensibility which is +2*\sigma u_a. grad u_a
+          // where \sigma is the variance of the uncertain parameter
+
+          if(poly_chaos_value !=0.)
+            {
+              double coeff= 2*poly_chaos_value;
+              DoubleTab var = inco;
+              var *= coeff;
+              const Champ_Inc_base& vitesse = eq.vitesse();
+              DoubleTab diff = resu;
+              ajouter_conv_term(vitesse ,var, resu, flux_b);
+            }
 
           //ajouter_Lstate_sensibility_Amont(state, inco, resu);
           //ajouter_Lsensibility_state_Amont(inco, state, resu);
@@ -114,6 +129,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const Champ_Inc_base& velocity_state = eq.get_velocity_state();
           const DoubleTab& temperature_state = eq.get_temperature_state_field();
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
+          const double& poly_chaos_value= eq.get_poly_chaos_value();
 
           DoubleTab& flux_b = flux_bords_;
           int nb_faces_bord=domaine_VEF.nb_faces_bord();
@@ -122,6 +138,15 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
 
           ajouter_conv_term(velocity_state,inco ,resu, flux_b);
           ajouter_conv_term(vitesse(), temperature_state,resu, flux_b);
+
+          if(poly_chaos_value !=0.)
+            {
+              double coeff= 2*poly_chaos_value;
+              DoubleTab inco_sigma = inco;
+              inco_sigma *=coeff;
+              ajouter_conv_term(vitesse(), inco_sigma, resu, flux_b);
+            }
+
           opConvVEFbase.modifier_flux(*this); // Multiplication by rhoCp
           if(uncertain_var=="LAMBDA")
             {
