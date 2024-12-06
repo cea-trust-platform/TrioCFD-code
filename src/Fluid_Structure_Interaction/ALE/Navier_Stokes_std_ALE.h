@@ -43,6 +43,10 @@ public :
 protected :
   OWN_PTR(Champ_Inc_base) ALEMeshVelocity_;
   OWN_PTR(Champ_Inc_base) ALEMeshTotalDisplacement_;
+  OWN_PTR(Champ_Inc_base) ALEMeshStructuralPressure_;
+  OWN_PTR(Champ_Inc_base) ALEMeshStructuralVonMises_;
+  OWN_PTR(Champ_Inc_base) ALEMeshStructuralForces_;
+
 };
 
 #endif

@@ -28,11 +28,13 @@
 #include <TRUSTLists.h>
 #include <Champ_P1NC.h>
 #include <Beam_model.h>
+#include <Structural_dynamic_mesh_model.h>
 #include <TRUST_Ref.h>
 #include <Domaine.h>
 
 class Equation_base;
 class Beam_model;
+class Structural_dynamic_mesh_model;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -70,6 +72,7 @@ public :
   void read_beam(Entree& is, int&);
   void reading_projection_ALE_boundary(Entree& is);
   void reading_ALE_Neumann_BC_for_grid_problem(Entree& is);
+  void reading_structural_dynamic_mesh_model(Entree& is);
   void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
   void  update_ALE_projection(const double);
   DoubleTab& laplacien(Domaine_dis_base&, Probleme_base&, const DoubleTab&, DoubleTab&);
@@ -80,6 +83,7 @@ public :
   inline const DoubleTab& getOldJacobian() const;
   inline const DoubleTab& getNewJacobian();
   inline const DoubleTab& getNewJacobian() const;
+  inline int getMeshMotionModel() const ;
 
 
   DoubleVect interpolationOnThe3DSurface(const int&, const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
@@ -95,12 +99,18 @@ public :
   Equation_base& getEquation() ;
   inline void associer_equation(const Equation_base& une_eq);
   void update_coord_dom_extrait_surface();
+  const DoubleVect& getMeshPbPressure() const ;
+  const DoubleVect& getMeshPbVonMises() const ;
+  const DoubleTab& getMeshPbForceFace() const ;
 
   inline const IntTab& les_elems_extrait_surf_reference() const;
   inline void set_les_elems_extrait_surf_reference(const IntTab& );
 
   inline bool extrait_surf_dom_deformable() const;
   inline void set_extrait_surf_dom_deformable(bool def);
+  void solveDynamicMeshProblem(const double temps, const DoubleTab& imposedVelocity, const IntVect& imposedVelocityTag,
+                               DoubleTab& outputMeshVelocity, const int nbSom, const int nbElem, const int nbSomElem,
+                               const IntTab& sommets, const int nbFace, const int nbSomFace, const IntTab& face_sommets) ;
 
 protected:
 
@@ -118,8 +128,8 @@ protected:
   DoubleTab ALEjacobian_new; // n+1
   int resumption; //1 if resumption of calculation else 0
   int nbBeam;
-//  Beam_model *beam; // Mechanical model: a beam model
-  std::vector<Beam_model> beam;
+  std::vector<Beam_model> beam; // Mechanical model: a beam model
+  Structural_dynamic_mesh_model str_mesh_model; // Fictitious structural model for mesh motion
   OBS_PTR(Equation_base) eq;
   Champs_front_ALE_projection field_ALE_projection_; // Definition of the modes of vibration in view of projection of the IFS force
   Noms name_ALE_boundary_projection_; // Names of the ALE boundary where the projection is computed
@@ -132,7 +142,9 @@ protected:
   IntTab les_elems_extrait_surf_reference_; // list of elements belonging to the extracted surface on a moving boundary defines at the initialization.
 
   bool extrait_surf_dom_deformable_ = false;
+  int meshMotionModel_ = 0 ; // Model for ALE mesh motion: 0 = Laplacien, 1 = Structural_dynamics
 };
+
 
 
 inline const DoubleTab& Domaine_ALE::vitesse() const
@@ -199,5 +211,12 @@ inline void Domaine_ALE::set_extrait_surf_dom_deformable(bool def)
 {
   extrait_surf_dom_deformable_ = def;
 }
+
+inline int Domaine_ALE::getMeshMotionModel() const
+{
+  return meshMotionModel_ ;
+
+}
+
 
 #endif
