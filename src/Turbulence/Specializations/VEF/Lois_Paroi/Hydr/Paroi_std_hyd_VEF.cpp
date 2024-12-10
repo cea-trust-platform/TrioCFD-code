@@ -112,6 +112,8 @@ bool compute_u_plus(const int ind_face,
                     const double Kappa,
                     double& r, int& iter, double& u_plus)
 {
+  iter = 0;
+  r = 1.;
   // PQ : 05/04/07 : formulation continue de la loi de paroi
   // construite d'apres la loi de Reichardt
   if(u_plus_d_plus < 1.)
@@ -120,9 +122,7 @@ bool compute_u_plus(const int ind_face,
       return true;
     }
   u_plus = u_plus_d_plus/100.;
-  r = 1.;
   const double seuil = 0.001;
-  iter = 0;
   const int itmax  = 25;
   const double A = (1/Kappa)*log(erugu/Kappa) ; //  (=7.44, contre 7.8 dans la loi d'origine)
   //  permettant d'avoir en l'infini la loi de
