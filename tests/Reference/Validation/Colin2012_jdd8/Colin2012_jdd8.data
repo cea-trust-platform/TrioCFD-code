@@ -1,4 +1,5 @@
-# PARALLEL OK #
+# PARALLEL NOT #
+# PARALLEL NOT ADDED TO TEST NR CASES ONLY IN SEQ MODE #
 
 Dimension 3
 Domaine dom
@@ -10,7 +11,6 @@ Lire_med { domaine dom file mesh_Colin_2.med mesh mesh }
 # BEGIN PARTITION
 Partition dom
 {
-  /* Choose Nb_parts so to have ~ 25000 cells per processor */
   Partition_tool metis { nb_parts 4 }
   Larg_joint 2
   zones_name DOM
@@ -65,7 +65,7 @@ Lire pb
     masse_ajoutee coef_constant { }
     portance_interfaciale Tomiyama { }
     dispersion_bulles turbulente_burns { } 
-    diametre_bulles champ champ_fonc_xyz dom 2 0 1.e-3*(0.+((X*X+Y*Y)<(0.0035000000000000005*0.0035000000000000005))*2.0+((X*X+Y*Y)](0.0172*0.0172))*2.0+((X*X+Y*Y)](0.0035000000000000005*0.0035000000000000005))*((X*X+Y*Y)<(0.0172*0.0172))*(0.+(6.584987949762057e-07)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(-2.5273931742654367e-08)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(3.332293179803392e-10)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(-1.5633026831090464e-12)*sqrt(x*x+y*y)+(2.0000000000000018))) 
+    diametre_bulles champ champ_fonc_xyz dom 2 0 1.e-3 
   }
   QDM_Multiphase
   {
