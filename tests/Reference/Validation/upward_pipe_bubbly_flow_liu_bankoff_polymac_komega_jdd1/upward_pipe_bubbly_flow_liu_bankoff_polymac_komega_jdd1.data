@@ -1,4 +1,5 @@
-# PARALLEL OK #
+# PARALLEL NOT #
+# PARALLEL NOT ADDED TO NOT TEST CASE IN PARALLEL MODE #
 
 Dimension 3
 Domaine dom
@@ -39,7 +40,7 @@ Read sch
   {
     criteres_convergence { alpha 1e-8 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 omega 1e-3 }
     iter_min 2
-    solveur petsc cli { }
+    solveur petsc cholesky { }
     seuil_convergence_implicite 1e30
   }
 }
@@ -65,12 +66,13 @@ Lire pb
     masse_ajoutee coef_constant { }
     portance_interfaciale Tomiyama { }
     dispersion_bulles turbulente_burns { }
-    diametre_bulles champ champ_fonc_xyz dom 2 0 1.e-3*(0.+((X*X+Y*Y)<(0.0009975*0.0009975))*3.72+((X*X+Y*Y)](0.0181165*0.0181165))*3.4850000000000003+((X*X+Y*Y)](0.0009975*0.0009975))*((X*X+Y*Y)<(0.0181165*0.0181165))*(0.+(-68683805.71213536)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(1989861.4342290512)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(-17151.928073690495)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(53.931818935463895)*sqrt(x*x+y*y)+(3.6971111166798845)))
+    diametre_bulles champ champ_fonc_xyz dom 2 0 1.e-3*(0.+((X*X+Y*Y)<(0.0009975*0.0009975))*3.72+((X*X+Y*Y)](0.0181165*0.0181165))*3.4850000000000003+((X*X+Y*Y)](0.0009975*0.0009975))*((X*X+Y*Y)<(0.0181165*0.0181165))*(0.+(-68683805.71213466)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(1989861.4342290321)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(-17151.92807369036)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(53.93181893546334)*sqrt(x*x+y*y)+(3.6971111166798845)))
   }
   QDM_Multiphase
   {
     evanescence { homogene { alpha_res 1.e-6 alpha_res_min 5.e-7 } }
-    solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+    # solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres } #
+    solveur_pression petsc cholesky { quiet }
     convection { amont }
     diffusion { turbulente k_omega { } }
     initial_conditions

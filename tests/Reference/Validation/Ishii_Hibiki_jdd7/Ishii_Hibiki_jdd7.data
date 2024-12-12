@@ -1,4 +1,5 @@
-# PARALLEL OK #
+# PARALLEL NOT #
+# PARALLEL NOT ADDED TO NOT TEST NR CASES IN PARALLEL #
 
 Dimension 3
 Domaine dom
@@ -10,7 +11,6 @@ Lire_med { domaine dom file mesh_Hibiki_1.med mesh mesh }
 # BEGIN PARTITION
 Partition dom
 {
-  /* Choose Nb_parts so to have ~ 25000 cells per processor */
   Partition_tool metis { nb_parts 4 }
   Larg_joint 2
   zones_name DOM
@@ -65,7 +65,7 @@ Lire pb
     masse_ajoutee coef_constant { }
     portance_interfaciale Tomiyama { }
     dispersion_bulles turbulente_burns { } 
-    diametre_bulles champ champ_fonc_xyz dom 2 0 1.e-3*(0.+((X*X+Y*Y)<(0.00127*0.00127))*2.365+((X*X+Y*Y)](0.023749*0.023749))*1.395+((X*X+Y*Y)](0.00127*0.00127))*((X*X+Y*Y)<(0.023749*0.023749))*(0.+(-4123703.9591309587)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(164626.9560945618)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(-3647.1445169674994)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(7.88709871729498)*sqrt(x*x+y*y)+(2.36457672017341))) 
+    diametre_bulles champ champ_fonc_xyz dom 2 0 1.e-3*(0.+((X*X+Y*Y)<(0.00127*0.00127))*2.365+((X*X+Y*Y)](0.023749*0.023749))*1.395+((X*X+Y*Y)](0.00127*0.00127))*((X*X+Y*Y)<(0.023749*0.023749))*(0.+(-4123703.959130749)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(164626.9560945529)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(-3647.1445169673902)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(7.887098717294593)*sqrt(x*x+y*y)+(2.36457672017341))) 
   }
   QDM_Multiphase
   {
