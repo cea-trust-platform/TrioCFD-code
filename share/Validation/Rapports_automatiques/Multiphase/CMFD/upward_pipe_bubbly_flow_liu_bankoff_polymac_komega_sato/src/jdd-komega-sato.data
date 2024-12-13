@@ -1,4 +1,5 @@
-# PARALLEL OK #
+# PARALLEL NOT #
+# PARALLEL NOT ADDED TO CHECK TEST CASE IN SEQ MODE #
 
 Dimension 3
 Domaine dom
@@ -39,7 +40,7 @@ Read sch
   {
     criteres_convergence { alpha 1e-8 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 omega 1e-3 }
     iter_min 2
-    solveur petsc cli { }
+    solveur petsc cholesky { }
     seuil_convergence_implicite 1e30
   }
 }
@@ -70,7 +71,8 @@ Lire pb
   QDM_Multiphase
   {
     evanescence { homogene { alpha_res 1.e-6 alpha_res_min 5.e-7 } }
-    solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+    # solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres } #
+    solveur_pression petsc cholesky { quiet }
     convection { amont }
     diffusion { turbulente multiple { k_omega k_omega { } sato sato { } } }
     initial_conditions

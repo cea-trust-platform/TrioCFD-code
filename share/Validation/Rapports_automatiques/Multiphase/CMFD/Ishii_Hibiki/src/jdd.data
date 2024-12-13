@@ -1,4 +1,5 @@
-# PARALLEL OK #
+# PARALLEL NOT #
+# PARALLEL NOT ADDED TO NOT TEST NR CASES IN PARALLEL #
 
 Dimension 3
 Domaine dom
@@ -10,7 +11,6 @@ Lire_med { domaine dom file $name_mesh mesh mesh }
 # BEGIN PARTITION
 Partition dom
 {
-  /* Choose Nb_parts so to have ~ 25000 cells per processor */
   Partition_tool metis { nb_parts 4 }
   Larg_joint 2
   zones_name DOM
@@ -39,7 +39,7 @@ Read sch
   {
     criteres_convergence { alpha 1e-8 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 $tau_ou_omega 1e-3 }
     iter_min 2
-    solveur petsc cli { }
+    solveur petsc cholesky { }
     seuil_convergence_implicite 1e30
   }
 }
@@ -60,17 +60,18 @@ Lire pb
   correlations
   {
     loi_paroi adaptative { }
-    flux_interfacial coef_constant { liquide_eau 1e10 gaz_air 1e10 } 
+    flux_interfacial coef_constant { liquide_eau 1e10 gaz_air 1e10 }
     frottement_interfacial $frottement_interfacial
     masse_ajoutee $masse_ajoutee
     portance_interfaciale $portance_interfaciale
-    dispersion_bulles $dispersion_bulles 
-    diametre_bulles champ champ_fonc_xyz dom 2 0 $diametre_bulles 
+    dispersion_bulles $dispersion_bulles
+    diametre_bulles champ champ_fonc_xyz dom 2 0 $diametre_bulles
   }
   QDM_Multiphase
   {
     evanescence { homogene { alpha_res 1.e-6 alpha_res_min 5.e-7 } }
-    solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+    # solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres } #
+    solveur_pression petsc cholesky { quiet }
     convection { amont }
     diffusion { turbulente $diffusion_qdm }
     initial_conditions
@@ -78,15 +79,15 @@ Lire pb
       vitesse  champ_fonc_xyz dom 6 0 0 0 0 $u_0 $u_0
       pression Champ_Fonc_xyz dom 1 1e5
     }
-    conditions_limites 
+    conditions_limites
     {
-      wall $WLu 
+      wall $WLu
       bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 6 0 0 0 0 $u_0 $u_0
       top frontiere_ouverte_pression_imposee champ_front_uniforme 1 1e5
       symetrie symetrie
     }
     sources
-    { 
+    {
       source_qdm Champ_Fonc_xyz dom 6 0 0 0 0 $grav $grav ,
       frottement_interfacial { } ,
       portance_interfaciale { beta $beta_portance } ,
@@ -98,7 +99,7 @@ Lire pb
   {
     initial_conditions { alpha Champ_Fonc_xyz dom 2 $alpha_l0 $alpha_v0 }
     convection { amont }
-    conditions_limites 
+    conditions_limites
     {
       wall paroi
       bottom frontiere_ouverte a_ext Champ_Front_Uniforme 2 $alpha_l0 $alpha_v0
@@ -137,7 +138,7 @@ Lire pb
     {
       Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
       Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
-      Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 } $diffusion_supplementaire_tau $source_omega_HZDR    
+      Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 } $diffusion_supplementaire_tau $source_omega_HZDR
     }
   }
   energie_cinetique_turbulente
@@ -159,13 +160,13 @@ Lire pb
     }
   }
   $equation_kWIT
-  
+
   Postraitement
   {
     Definition_champs  {
       d_bulles refChamp { Pb_champ pb diametre_bulles }
-      gradient_p refChamp { Pb_champ pb gradient_pression }  
-      dp refChamp { Pb_champ pb distance_paroi_globale }     
+      gradient_p refChamp { Pb_champ pb gradient_pression }
+      dp refChamp { Pb_champ pb distance_paroi_globale }
       diff_v operateur_eqn {
         numero_op 0
         sources { refChamp { pb_champ pb vitesse } }
@@ -199,20 +200,20 @@ Lire pb
       $champ_k_HZDR
       $champ_omega_HZDR
     }
-    
+
     sondes
     {
-      k k periode 1e8 segment 100 0 0 $h_sonde $x_sonde $y_sonde $h_sonde  
-      diss $tau_ou_omega periode 1e8 position_like k       
-      vitesse_eau vitesse_liquide_eau periode 1e8 position_like k 
-      vitesse_air vitesse_gaz_air periode 1e8 position_like k 
-      alpha_eau alpha_liquide_eau periode 1e8 position_like k 
-      alpha_air alpha_gaz_air periode 1e8 position_like k 
+      k k periode 1e8 segment 100 0 0 $h_sonde $x_sonde $y_sonde $h_sonde
+      diss $tau_ou_omega periode 1e8 position_like k
+      vitesse_eau vitesse_liquide_eau periode 1e8 position_like k
+      vitesse_air vitesse_gaz_air periode 1e8 position_like k
+      alpha_eau alpha_liquide_eau periode 1e8 position_like k
+      alpha_air alpha_gaz_air periode 1e8 position_like k
       diametre d_bulles periode 1e8 position_like k
       dp dp periode 1e8 position_like k
       diff_v diff_v periode 1e8 position_like k
       conv_v conv_v periode 1e8 position_like k
-      press gradient_pression periode 1e8 position_like k 
+      press gradient_pression periode 1e8 position_like k
       grav_v grav_v periode 1e8 position_like k
       drag drag periode 1e8 position_like k
       lift lift periode 1e8 position_like k

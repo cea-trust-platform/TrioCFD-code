@@ -1,0 +1,255 @@
+# PARALLEL NOT #
+# PARALLEL NOT ADDED TO NOT TEST NR CASES IN PARALLEL #
+
+Dimension 3
+Domaine dom
+
+# BEGIN MESH #
+Lire_med { domaine dom file mesh_Hibiki_1.med mesh mesh }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+  Partition_tool metis { nb_parts 4 }
+  Larg_joint 2
+  zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+PolyMAC_P0  dis
+option_PolyMAC_P0 { traitement_axi }
+
+Schema_euler_implicite sch
+Read sch
+{
+  tinit 0
+	nb_pas_dt_max 3
+  tmax 0.1
+  dt_impr 1e-8
+  facsec 1
+  facsec_max 1
+  seuil_statio 0.0001
+  solveur ice
+  {
+    criteres_convergence { alpha 1e-8 pression 1. vitesse 1e-5 temperature 1e8 k 1e-5 omega 1e-3 }
+    iter_min 2
+    solveur petsc cli { }
+    seuil_convergence_implicite 1e30
+  }
+}
+
+Pb_Multiphase pb
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Lire pb
+{
+  milieu_composite
+  {
+    liquide_eau Fluide_Incompressible { mu champ_uniforme 1 1.002e-3 rho champ_uniforme 1 998.30 lambda Champ_Uniforme 1 0.604 Cp Champ_Uniforme 1 75.366 beta_th Champ_Uniforme 1 0 }
+    gaz_air Fluide_Incompressible { mu champ_uniforme 1 1.85e-5 rho champ_uniforme 1 1.2 lambda Champ_Uniforme 1 0.023 Cp Champ_Uniforme 1 1006 beta_th Champ_Uniforme 1 0 }
+    interface_eau_air interface_sigma_constant { tension_superficielle 0.0728 }
+  }
+  correlations
+  {
+    loi_paroi adaptative { }
+    flux_interfacial coef_constant { liquide_eau 1e10 gaz_air 1e10 } 
+    frottement_interfacial Tomiyama { contamination 2 }
+    masse_ajoutee coef_constant { }
+    portance_interfaciale Tomiyama { }
+    dispersion_bulles turbulente_burns { } 
+    diametre_bulles champ champ_fonc_xyz dom 2 0 1.e-3*(0.+((X*X+Y*Y)<(0.00127*0.00127))*2.9+((X*X+Y*Y)](0.023749*0.023749))*3.395+((X*X+Y*Y)](0.00127*0.00127))*((X*X+Y*Y)<(0.023749*0.023749))*(0.+(1588134.249379809)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(76228.06836206006)*sqrt(x*x+y*y)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(-2841.6046278602976)*sqrt(x*x+y*y)*sqrt(x*x+y*y)+(22.99906366328504)*sqrt(x*x+y*y)+(2.888134135410213))) 
+  }
+  QDM_Multiphase
+  {
+    evanescence { homogene { alpha_res 1.e-6 alpha_res_min 5.e-7 } }
+    solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg -ksp_type fgmres }
+    convection { amont }
+    diffusion { turbulente multiple { k_omega k_omega { } sato sato { } } }
+    initial_conditions
+    {
+      vitesse  champ_fonc_xyz dom 6 0 0 0 0 1.136742 1.136742
+      pression Champ_Fonc_xyz dom 1 1e5
+    }
+    conditions_limites 
+    {
+      wall paroi_frottante_loi { } 
+      bottom frontiere_ouverte_vitesse_imposee_sortie Champ_front_Fonc_xyz 6 0 0 0 0 1.136742 1.136742
+      top frontiere_ouverte_pression_imposee champ_front_uniforme 1 1e5
+      symetrie symetrie
+    }
+    sources
+    { 
+      source_qdm Champ_Fonc_xyz dom 6 0 0 0 0 -9.81 -9.81 ,
+      frottement_interfacial { } ,
+      portance_interfaciale { beta 1 } ,
+      Dispersion_bulles { beta 1 } ,
+      Correction_Lubchenko { beta_disp 1 beta_lift 1 } ,
+      source_BIF
+    }
+  }
+  Masse_Multiphase
+  {
+    initial_conditions { alpha Champ_Fonc_xyz dom 2 0.8673911934282362 0.13260880657176388 }
+    convection { amont }
+    conditions_limites 
+    {
+      wall paroi
+      bottom frontiere_ouverte a_ext Champ_Front_Uniforme 2 0.8673911934282362 0.13260880657176388
+      top frontiere_ouverte a_ext Champ_Front_Uniforme 2 0.8673911934282362 0.13260880657176388
+      symetrie paroi
+    }
+    sources { }
+  }
+  Energie_Multiphase
+  {
+    diffusion { }
+    convection { amont }
+    initial_conditions { temperature Champ_Uniforme 2 0 0 }
+    boundary_conditions
+    {
+      wall paroi_adiabatique
+      bottom frontiere_ouverte T_ext Champ_Front_Uniforme 2 0 0
+      top frontiere_ouverte T_ext Champ_Front_Uniforme 2 0 0
+      symetrie paroi_adiabatique
+    }
+    sources { flux_interfacial }
+  }
+  taux_dissipation_turbulent
+  {
+    diffusion { turbulente SGDH { sigma 0.5 } }
+    convection { amont }
+    initial_conditions { omega Champ_Fonc_xyz dom 1 22.376811023622047 }
+    boundary_conditions
+    {
+      wall Cond_lim_omega_demi { }
+      bottom frontiere_ouverte omega_ext Champ_Front_Uniforme 1 22.376811023622047
+      top frontiere_ouverte omega_ext Champ_Front_Uniforme 1 22.376811023622047
+      symetrie neumann_paroi champ_front_uniforme 1 0
+    }
+    sources
+    {
+      Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+      Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 }  ,
+      Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }    
+    }
+  }
+  energie_cinetique_turbulente
+  {
+    diffusion { turbulente SGDH { sigma 0.67 } }
+    convection { amont }
+    initial_conditions { k champ_fonc_xyz dom 1 0.012921823745639998 }
+    boundary_conditions
+    {
+      wall Cond_lim_k_simple_flux_nul
+      bottom frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.012921823745639998
+      top frontiere_ouverte k_ext Champ_Front_Uniforme 1 0.012921823745639998
+      symetrie neumann_paroi champ_front_uniforme 1 0
+    }
+    sources
+    {
+      Production_energie_cin_turb { }  ,
+      Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+    }
+  }
+  
+  Postraitement
+  {
+    Definition_champs  {
+      d_bulles refChamp { Pb_champ pb diametre_bulles }
+      gradient_p refChamp { Pb_champ pb gradient_pression }  
+      dp refChamp { Pb_champ pb distance_paroi_globale }     
+      diff_v operateur_eqn {
+        numero_op 0
+        sources { refChamp { pb_champ pb vitesse } }
+      }
+      conv_v  operateur_eqn {
+        numero_op 1
+        sources { refChamp { pb_champ pb vitesse } }
+      }
+      grav_v  operateur_eqn {
+        numero_source 0
+        sources { refChamp { pb_champ pb vitesse } }
+      }
+      drag  operateur_eqn {
+        numero_source 1
+        sources { refChamp { pb_champ pb vitesse } }
+      }
+      lift  operateur_eqn {
+        numero_source 2
+        sources { refChamp { pb_champ pb vitesse } }
+      }
+      disp  operateur_eqn {
+        numero_source 3
+        sources { refChamp { pb_champ pb vitesse } }
+      }
+      lub  operateur_eqn {
+        numero_source 4
+        sources { refChamp { pb_champ pb vitesse } }
+      }
+      BIF operateur_eqn {
+        numero_source 5
+        sources { refChamp { pb_champ pb vitesse } }
+      }
+    }
+    
+    sondes
+    {
+      k k periode 1e8 segment 100 0 0 3.061 0.025375824828179187 0.0011079324390795343 3.061  
+      diss omega periode 1e8 position_like k       
+      vitesse_eau vitesse_liquide_eau periode 1e8 position_like k 
+      vitesse_air vitesse_gaz_air periode 1e8 position_like k 
+      alpha_eau alpha_liquide_eau periode 1e8 position_like k 
+      alpha_air alpha_gaz_air periode 1e8 position_like k 
+      diametre d_bulles periode 1e8 position_like k
+      dp dp periode 1e8 position_like k
+      diff_v diff_v periode 1e8 position_like k
+      conv_v conv_v periode 1e8 position_like k
+      press gradient_pression periode 1e8 position_like k 
+      grav_v grav_v periode 1e8 position_like k
+      drag drag periode 1e8 position_like k
+      lift lift periode 1e8 position_like k
+      disp disp periode 1e8 position_like k
+      lub lub periode 1e8 position_like k
+      viscosite nu_turbulente_liquide_eau periode 1e8 position_like k
+      gradv gradient_vitesse_liquide_eau periode 1e8 position_like k
+      BIF BIF periode 1e8 position_like k
+    }
+    format lml
+    champs binaire dt_post 1.
+    {
+      k elem
+      omega elem
+      alpha elem
+      temperature elem
+      vitesse elem
+      pression elem
+      nu_turbulente_liquide_eau elem
+      gradient_vitesse_liquide_eau elem
+      vorticite elem
+      alpha_residu elem
+      k_residu elem
+      y_plus elem
+      diff_v elem
+      conv_v elem
+      gradient_p elem
+      grav_v elem
+      drag elem
+      lift elem
+      disp elem
+      lub elem
+      BIF elem
+    }
+  }
+}
+
+Resoudre pb
+
+End
