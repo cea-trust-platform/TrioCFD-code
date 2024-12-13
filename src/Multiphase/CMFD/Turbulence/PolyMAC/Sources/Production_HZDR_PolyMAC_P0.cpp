@@ -28,6 +28,7 @@
 
 
 Implemente_instanciable(Production_HZDR_PolyMAC_P0,"Production_HZDR_Elem_PolyMAC_P0", Source_base);
+// XD Production_HZDR source_base Production_HZDR -1 not_set
 
 Sortie& Production_HZDR_PolyMAC_P0::printOn(Sortie& os) const
 {
@@ -37,8 +38,8 @@ Sortie& Production_HZDR_PolyMAC_P0::printOn(Sortie& os) const
 Entree& Production_HZDR_PolyMAC_P0::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("constante_gravitation", &g_);
-  param.ajouter("C_k", &C_k);
+  param.ajouter("constante_gravitation", &g_); // XD_ADD_P floattant not_set
+  param.ajouter("C_k", &C_k); // XD_ADD_P floattant not_set
   param.lire_avec_accolades_depuis(is);
 
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;

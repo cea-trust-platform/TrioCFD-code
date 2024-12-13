@@ -57,7 +57,7 @@ protected :
   Motcle name_velocity_state_field;         //name of the unknown velocity field of the state problem
   Motcle name_temperature_state_field;      //name of the unknown temperature field of the state problem
   Motcle uncertain_var;     				//name of the unknown field of the uncertain variable
-  double poly_chaos;               //It is the method that we will use to study the sensitivity of the Navier Stokes equation:
+  double poly_chaos;               //It is the method that we will use to study the sensitivity of the Convection_Diffusion_Temperature_sensibility
 
 };
 
