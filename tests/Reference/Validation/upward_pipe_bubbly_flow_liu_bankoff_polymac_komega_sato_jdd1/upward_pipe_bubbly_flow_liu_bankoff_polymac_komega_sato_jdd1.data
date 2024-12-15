@@ -94,7 +94,7 @@ Lire pb
       portance_interfaciale { beta 1 } ,
       Dispersion_bulles { beta 1 } ,
       Correction_Lubchenko { beta_disp 1 beta_lift 1 } ,
-      source_BIF
+      source_BIF { }
     }
   }
   Masse_Multiphase

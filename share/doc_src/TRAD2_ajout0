@@ -350,3 +350,11 @@ contact_vef_vdf condlim_base contact_vef_vdf 0 Boundary condition in the case of
   attr champ front_field_base champ 0 Boundary field type.
 methode_loi_horaire methode_transport_deriv loi_horaire -1 not_set
   attr nom_loi ref_loi_horaire nom_loi 0 not_set
+
+type_diffusion_turbulente_multiphase_multiple type_diffusion_turbulente_multiphase_deriv multiple 1 not_set
+  attr k_omega type_diffusion_turbulente_multiphase_multiple_k_omega k_omega 1 first correlation
+  attr sato type_diffusion_turbulente_multiphase_multiple_sato sato 1 not_set
+
+type_diffusion_turbulente_multiphase_multiple_deriv objet_lecture type_diffusion_turbulente_multiphase_multiple_deriv -1 not_set
+type_diffusion_turbulente_multiphase_multiple_k_omega type_diffusion_turbulente_multiphase_multiple_deriv k_omega 1 not_set
+type_diffusion_turbulente_multiphase_multiple_sato type_diffusion_turbulente_multiphase_multiple_deriv sato 1 not_set

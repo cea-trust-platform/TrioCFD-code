@@ -38,6 +38,7 @@
 
 
 Implemente_instanciable(Source_BIF_PolyMAC_P0,"Source_BIF_Face_PolyMAC_P0", Source_base);
+// XD Source_BIF source_base Source_BIF 1 not_set
 
 Sortie& Source_BIF_PolyMAC_P0::printOn(Sortie& os) const
 {
@@ -47,6 +48,8 @@ Sortie& Source_BIF_PolyMAC_P0::printOn(Sortie& os) const
 Entree& Source_BIF_PolyMAC_P0::readOn(Entree& is)
 {
   if (!sub_type(Viscosite_turbulente_multiple, ref_cast(Op_Diff_Turbulent_PolyMAC_P0_Face, ref_cast(Navier_Stokes_std, equation().probleme().equation(0)).operateur(0).l_op_base()).correlation())) Process::exit(que_suis_je() + " : the turbulence correlation must be multiple");
+  Param param(que_suis_je());
+  param.lire_avec_accolades_depuis(is);
 
   return is;
 }
