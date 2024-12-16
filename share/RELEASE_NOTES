@@ -1,7 +1,11 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.5_beta : Enhancements, modifications and corrected bugs since version 1.9.4 :
 --------------------------------------------------------------------------------------------------
-xx/xx/xx (TrioCFD) Keyword     : FTD - keyword juric_pour_tout was obsolete and did nothing, not allowed anymore in datafiles.
+06/12/24 (TrioCFD) New feature : Sensibility Analisis - module based on the Polynomial Chaos Method.
+06/12/24 (TrioCFD) New feature : ALE - Interface with the MFront/MGIS C++ library (https://thelfer.github.io/mgis/web/index.html) to integrate a mechanical behaviour for ALE grid motion
+21/10/24 (TrioCFD) Bug fix     : TrioCFD - In VEF, Viscous forces on boundaries (printed in *_Contrainte_visqueuse*.out files) in incompressible Navier-Stokes equations were computed as Integral(-mu*grad(u)*ndS). It is now computed as Integral(-mu*(grad(u) +grad(u)^T)*ndS).
+18/10/24 (TrioCFD) Minor change: TrioCFD - C++17 compilers are now mandatory
+02/08/24 (TrioCFD) Keyword     : FTD - keyword juric_pour_tout was obsolete and did nothing, not allowed anymore in datafiles.
 25/07/24 (TrioCFD) Bug fix     : FT IJK - valgrind issue in shear periodic conditions fixed
 25/07/24 (TrioCFD) Bug fix     : FT IJK - Performance regression since v1.9.4 ('New shear periodic conditions') fixed
 25/07/24 (TrioCFD) Major Change: FTD - Equations to be solved in a Front-Tracking-discontinu problem should not be read and associated to the problem. It should be read at the begining of each problem in a solved_equations bloc. New syntax is:
