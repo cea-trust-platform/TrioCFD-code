@@ -65,32 +65,6 @@ Scatter ../MESH/DOM.Zones dom
 END SCATTER #
 
 Probleme_FT_Disc_gen pb
-Fluide_Incompressible  liquid_water
-Lire liquid_water
-{
-    mu champ_uniforme       1 2.8e-4
-    rho champ_uniforme      1 958.37
-    lambda champ_uniforme   1 0.679
-    cp champ_uniforme       1 4.21e3
-}
-
-Fluide_Incompressible vapour
-Lire vapour
-{
-    mu champ_uniforme       1 1.227e-5
-    rho champ_uniforme      1 0.597
-    lambda champ_uniforme   1 0.025
-    cp champ_uniforme       1 2.077e3
-}
-
-Fluide_diphasique fluide
-Lire fluide
-{
-    fluide1 liquid_water
-    fluide0 vapour
-    sigma   Champ_Uniforme 1            5.89e-2
-    chaleur_latente Champ_Uniforme 1    -2.256e6
-}
 
 Schema_Euler_explicite  sch
 Lire sch
@@ -109,31 +83,7 @@ Lire sch
     periode_sauvegarde_securite_en_heures 0.5
 }
 
-Triple_Line_Model_FT_Disc TCL
-Read TCL
-{   # TCL #
-    Qtcl 30.5
-    ym 3.7999999999999996e-06
-    sm 4.9000000000000005e-06
-} # TCL #
-
-Champ_Uniforme gravite
-Lire gravite 2 0. -9.81
-Associate fluide gravite
-
-Navier_stokes_FT_disc                         hydraulique
-Transport_interfaces_FT_disc                  interf
-convection_diffusion_temperature_ft_disc      thermique
 Associate pb dom
-Associate pb hydraulique
-Associate pb thermique
-Associate pb interf
-Associate pb fluide
-
-Associate TCL hydraulique
-Associate TCL thermique
-Associate TCL interf
-Associate pb TCL
 
 Associate pb sch
 VDF dis
@@ -141,7 +91,32 @@ Discretize pb dis
 system "mkdir -p lata"
 Lire pb
 {
-
+    solved_equations
+    {
+        Navier_stokes_FT_disc                         hydraulique
+        Transport_interfaces_FT_disc                  interf
+        convection_diffusion_temperature_ft_disc      thermique
+    }
+    Fluide_diphasique
+    {
+        fluide1 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 2.8e-4
+            rho champ_uniforme      1 958.37
+            lambda champ_uniforme   1 0.679
+            cp champ_uniforme       1 4.21e3
+        }
+        fluide0 Fluide_Incompressible
+        {
+            mu champ_uniforme       1 1.227e-5
+            rho champ_uniforme      1 0.597
+            lambda champ_uniforme   1 0.025
+            cp champ_uniforme       1 2.077e3
+        }
+        sigma   Champ_Uniforme 1            5.89e-2
+        chaleur_latente Champ_Uniforme 1    -2.256e6
+        gravite Champ_Uniforme 2 0. -9.81
+    }
     hydraulique
     {
         modele_turbulence nul
@@ -228,6 +203,12 @@ Lire pb
         }
         conditions_initiales { Temperature_thermique Champ_Fonc_xyz dom 1 (8.5*(1-erf(y/0.0001))) }
     }
+    Triple_Line_Model_FT_Disc
+    {   # TCL #
+        Qtcl 30.5
+        ym 3.7999999999999996e-06
+        sm 4.9000000000000005e-06
+    } # TCL #
     postraitement
     {
         champs dt_post 100
