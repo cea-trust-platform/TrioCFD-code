@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------------------
-Release notes version 1.9.5_beta : Enhancements, modifications and corrected bugs since version 1.9.4 :
+Release notes version 1.9.5 : Enhancements, modifications and corrected bugs since version 1.9.4 :
 --------------------------------------------------------------------------------------------------
 06/12/24 (TrioCFD) New feature : Sensibility Analisis - module based on the Polynomial Chaos Method.
 06/12/24 (TrioCFD) New feature : ALE - Interface with the MFront/MGIS C++ library (https://thelfer.github.io/mgis/web/index.html) to integrate a mechanical behaviour for ALE grid motion
